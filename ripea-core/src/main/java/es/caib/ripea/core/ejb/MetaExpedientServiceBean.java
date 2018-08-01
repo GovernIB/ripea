@@ -20,7 +20,6 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 
 /**
@@ -273,34 +272,6 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
 			Long entitatId) {
 		return delegate.findActiusAmbEntitatPerLectura(entitatId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void addArxiu(
-			Long entitatId,
-			Long id,
-			Long arxiuId) throws NotFoundException {
-		delegate.addArxiu(entitatId, id, arxiuId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void removeArxiu(
-			Long entitatId,
-			Long metaExpedientId,
-			Long arxiuId) throws NotFoundException {
-		delegate.removeArxiu(entitatId, metaExpedientId, arxiuId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaExpedientDto> findAmbArxiu(
-			Long entitatId,
-			Long arxiuId) throws NotFoundException {
-		return delegate.findAmbArxiu(
-				entitatId,
-				arxiuId);
 	}
 
 }

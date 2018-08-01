@@ -15,12 +15,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +28,7 @@ import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -45,7 +46,6 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
@@ -58,14 +58,8 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
-import es.caib.ripea.core.repository.DocumentPublicacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.InteressatRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -77,40 +71,28 @@ import es.caib.ripea.core.security.ExtendedPermission;
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
+	@Autowired
 	private DocumentRepository documentRepository;
-	@Resource
+	@Autowired
 	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
-	@Resource
-	private InteressatRepository interessatRepository;
-	@Resource
+	@Autowired
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Resource
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Resource
-	private DocumentPublicacioRepository documentPublicacioRepository;
 
-	@Resource
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private PermisosHelper permisosHelper;
-	@Resource
+	@Autowired
 	private ContingutHelper contingutHelper;
-	@Resource
+	@Autowired
 	private DocumentHelper documentHelper;
-	@Resource
+	@Autowired
 	private PluginHelper pluginHelper;
-	@Resource
-	private UsuariHelper usuariHelper;
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-	@Resource
+	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
+	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 
 
@@ -127,117 +109,71 @@ public class DocumentServiceImpl implements DocumentService {
 				"contingutId=" + contingutId + ", " +
 				"document=" + document + ", " +
 				"fitxer=" + fitxer + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				true,
+				contingutId,
+				false,
+				false,
 				false,
 				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId,
-				null);
-		// Comprova el meta-document
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
+					contingut.getEntitat(),
 					document.getMetaDocument().getId(),
-					true);
-		}
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingut);
-		// Comprova l'accés al path del contenidor pare
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contingutHelper.isNomValid(document.getNom())) {
-			throw new ValidationException(
-					"<creacio>",
-					DocumentEntity.class,
-					"El nom del document no és vàlid (no pot començar amb \".\")");
-		}
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
-				true,
-				false,
-				false);
-		if (expedientSuperior != null) {
-			contingutHelper.comprovarPermisosContingut(
-					expedientSuperior,
+					false,
 					false,
 					true,
 					false);
-			if (metaDocument != null) {
-				// Comprova que el meta-document estigui actiu
-				if (!metaDocument.isActiu()) {
-					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-					logger.error("No es pot crear un document amb un meta-document desactivat ("
-							+ "entitatId=" + entitatId + ", "
-							+ "contingutId=" + contingutId + ", "
-							+ "metaDocumentId=" + metaDocument.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("No es pot crear un document amb un meta-document desactivat");
-				}
-				if (metaDocument.isGlobalExpedient()) {
-					// Comprova que es pugui crear segons la multiplicitat
-					List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
-							expedientSuperior,
-							metaDocument,
-							0);
-					if (documents.size() > 0 && (metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
-						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-						logger.error("La multiplicitat especificada per al meta-document no permet crear nous documents ("
-								+ "entitatId=" + entitatId + ", "
-								+ "contingutId=" + contingutId + ", "
-								+ "metaDocumentId=" + metaDocument.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-						throw new SecurityException("La multiplicitat especificada per al meta-document no permet crear nous documents");
-					}
-				} else {
-					// Comprova que el meta-document es pugui crear a dins l'expedient
-					MetaExpedientMetaDocumentEntity metaExpedientMetaDocument = metaExpedientMetaDocumentRepository.findByMetaExpedientAndMetaDocument(
-							expedientSuperior.getMetaExpedient(),
-							metaDocument);
-					if (metaExpedientMetaDocument == null) {
-						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-						logger.error("No es pot crear un document amb un meta-document no disponible ("
-								+ "entitatId=" + entitatId + ", "
-								+ "contingutId=" + contingutId + ", "
-								+ "metaDocumentId=" + metaDocument.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-						throw new SecurityException("No es pot crear un document amb un meta-document no disponible");
-					}
-					// Comprova que es pugui crear segons la multiplicitat
-					List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
-							expedientSuperior,
-							metaDocument,
-							0);
-					if (documents.size() > 0 && (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
-						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-						logger.error("La multiplicitat especificada per al meta-document no permet crear nous documents ("
-								+ "entitatId=" + entitatId + ", "
-								+ "contingutId=" + contingutId + ", "
-								+ "metaDocumentId=" + metaDocument.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-						throw new SecurityException("La multiplicitat especificada per al meta-document no permet crear nous documents");
-					}
-				}
+		} else {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"No es pot crear un document sense un meta-document associat");
+		}
+		contingutHelper.comprovarNomValid(
+				contingut,
+				document.getNom(),
+				"<creacio>",
+				DocumentEntity.class);
+		ExpedientEntity expedientSuperior;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
+			expedientSuperior = (ExpedientEntity)contingut;
+		} else {
+			expedientSuperior = contingut.getExpedient();
+		}
+		// Comprova que es pugui crear el document segons la multiplicitat
+		if (metaDocument.isGlobalExpedient()) {
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+					expedientSuperior,
+					metaDocument,
+					0);
+			if (documents.size() > 0 && (metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+				throw new ValidationException(
+						"<creacio>",
+						ExpedientEntity.class,
+						"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
+						"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
+						"metaDocumentMultiplicitat=" + document.getMetaDocument().getGlobalMultiplicitat() + ", " +
+						"expedientId=" + expedientSuperior.getId() + ")");
 			}
 		} else {
-			if (metaDocument != null) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				logger.error("No es pot crear un document amb meta-document fora d'un expedient ("
-						+ "entitatId=" + entitatId + ", "
-						+ "contingutId=" + contingutId + ", "
-						+ "usuari=" + auth.getName() + ")");
-				throw new SecurityException("No es pot crear un document amb meta-document fora d'un expedient");
+			MetaExpedientMetaDocumentEntity metaExpedientMetaDocument = metaExpedientMetaDocumentRepository.findByMetaExpedientAndMetaDocument(
+					expedientSuperior.getMetaExpedient(),
+					metaDocument);
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+					expedientSuperior,
+					metaDocument,
+					0);
+			if (documents.size() > 0 && (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+				throw new ValidationException(
+						"<creacio>",
+						ExpedientEntity.class,
+						"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
+						"metaExpedientId=" + expedientSuperior.getMetaExpedient().getId() + ", " +
+						"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
+						"metaDocumentMultiplicitat=" + metaExpedientMetaDocument.getMultiplicitat() + ", " +
+						"expedientId=" + expedientSuperior.getId() + ")");
 			}
 		}
 		if (expedientSuperior != null) {
@@ -252,17 +188,16 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
 				document.getNtiTipoDocumental(),
-				expedientSuperior,
 				metaDocument,
 				contingut,
-				entitat,
+				contingut.getEntitat(),
+				expedientSuperior,
 				document.getUbicacio());
 		if (fitxer != null) {
 			documentHelper.actualitzarFitxerDocument(
 					entity,
 					fitxer);
 		}
-		// Registra al log la creació del document
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
@@ -270,7 +205,6 @@ public class DocumentServiceImpl implements DocumentService {
 		DocumentDto dto = toDocumentDto(entity);
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
-				expedientSuperior,
 				fitxer);
 		return dto;
 	}
@@ -287,64 +221,34 @@ public class DocumentServiceImpl implements DocumentService {
 				"id=" + id + ", " +
 				"document=" + document + ", " +
 				"fitxer=" + fitxer + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity entity = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity entity = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				id,
 				false,
 				true,
-				false);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				entity);
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				entity,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contingutHelper.isNomValid(document.getNom())) {
-			throw new ValidationException(
-					id,
-					DocumentEntity.class,
-					"El nom del document no és vàlid (no pot començar amb \".\")");
-		}
-		// Comprova el permís de modificació a l'expedient superior
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				entity,
-				true,
 				false,
 				false);
-		if (expedientSuperior != null) {
-			contingutHelper.comprovarPermisosContingut(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
-		// Comprova el permís de modificació del document
-		contingutHelper.comprovarPermisosContingut(
-				entity,
-				false,
-				true,
-				false);
-		// Comprova el meta-expedient
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
+					entity.getEntitat(),
 					document.getMetaDocument().getId(),
-					true);
-			cacheHelper.evictErrorsValidacioPerNode(entity);
+					false,
+					true,
+					false,
+					false);
+		} else {
+			throw new ValidationException(
+					id,
+					DocumentEntity.class,
+					"No es pot actualitzar un document sense un meta-document associat");
 		}
+		contingutHelper.comprovarNomValid(
+				entity.getPare(),
+				document.getNom(),
+				id,
+				DocumentEntity.class);
+		cacheHelper.evictErrorsValidacioPerNode(entity);
 		String nomOriginal = entity.getNom();
 		entity.update(
 				metaDocument,
@@ -376,7 +280,6 @@ public class DocumentServiceImpl implements DocumentService {
 		DocumentDto dto = toDocumentDto(entity);
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
-				expedientSuperior,
 				fitxer);
 		return dto;
 	}
@@ -389,122 +292,13 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Obtenint el document ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				id,
 				true,
-				false,
 				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		return toDocumentDto(document);
 	}
-
-	/*@Transactional(readOnly = true)
-	@Override
-	public List<DocumentVersioDto> findVersionsByDocument(
-			Long entitatId,
-			Long id) {
-		logger.debug("Obtenint les versions del document ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				id,
-				true,
-				false,
-				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
-		List<DocumentVersioDto> resposta = conversioTipusHelper.convertirList(
-				documentVersioRepository.findByDocumentOrderByVersioDesc(document),
-				DocumentVersioDto.class);
-		for (DocumentVersioDto documentVersio: resposta) {
-			emplenarDadesPortafirmes(
-					documentVersio,
-					documentPortafirmesRepository.findByDocument(document));
-		}
-		return resposta;
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public DocumentVersioDto findDarreraVersio(
-			Long entitatId,
-			Long id) {
-		return findVersio(entitatId, id, -1);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public DocumentVersioDto findVersio(
-			Long entitatId,
-			Long id,
-			int versio) {
-		logger.debug("Obtenint la versió del document ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "versio=" + versio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				id,
-				true,
-				false,
-				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
-		DocumentVersioEntity documentVersio;
-		if (versio == -1) {
-			documentVersio = document.getVersioDarrera();
-		} else {
-			documentVersio = documentVersioRepository.findByDocumentAndVersio(
-					document,
-					versio);
-		}
-		DocumentVersioDto dto = conversioTipusHelper.convertir(
-				documentVersio,
-				DocumentVersioDto.class);
-		emplenarDadesPortafirmes(
-				dto,
-				documentPortafirmesRepository.findByDocument(document));
-		return dto;
-	}*/
 
 	@Transactional(readOnly = true)
 	@Override
@@ -514,15 +308,14 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Obtenint els documents amb permis de lectura de l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
-				true,
+				expedientId,
+				false,
+				false,
+				false,
 				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
 		List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Iterator<DocumentEntity> it = documents.iterator();
@@ -554,102 +347,56 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "versio=" + versio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				id,
 				true,
-				false,
 				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		return documentHelper.getFitxerAssociat(
 				document,
 				versio);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto descarregarImprimible(
 			Long entitatId,
 			Long id,
 			String versio) {
-		logger.debug("Descarregant contingut del document ("
+		logger.debug("Descarregant versió imprimible del document ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "versio=" + versio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				id,
 				true,
-				false,
 				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
-		
-		
-		FitxerDto fitxer = pluginHelper.arxiuDocumentVersioImprimible(
+		return pluginHelper.arxiuDocumentVersioImprimible(
 				document);
-		
-
-		return fitxer; 
 	}
-	
+
 	@Transactional
 	@Override
 	public void portafirmesEnviar(
 			Long entitatId,
-			Long documentId,
+			Long id,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
-				"documentId=" + documentId + ", " +
+				"id=" + id + ", " +
 				"assumpte=" + assumpte + ", " +
 				"prioritat=" + prioritat + ", " +
 				"dataCaducitat=" + dataCaducitat + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
+				id,
+				false,
 				true,
 				false,
 				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				documentId,
-				true,
-				false,
-				false);
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 			throw new ValidationException(
 					document.getId(),
@@ -662,11 +409,12 @@ public class DocumentServiceImpl implements DocumentService {
 					DocumentEntity.class,
 					"El document a enviar al portafirmes te alertes de validació");
 		}
-		if (DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+		if (	DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) ||
+				DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
-					"No es poden enviar al portafirmes documents ja custodiats");
+					"No es poden enviar al portafirmes documents firmates o custodiats");
 		}
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
@@ -680,20 +428,9 @@ public class DocumentServiceImpl implements DocumentService {
 					DocumentEntity.class,
 					"Aquest document te enviaments al portafirmes pendents");
 		}
-		ExpedientEntity expedient = contingutHelper.getExpedientSuperior(
-				document,
-				false,
-				false,
-				true);
-		if (expedient == null) {
-			throw new ValidationException(
-					documentId,
-					DocumentEntity.class,
-					"El document no pertany a cap expedient");
-		}
 		if (!document.getMetaDocument().isFirmaPortafirmesActiva()) {
 			throw new ValidationException(
-					documentId,
+					id,
 					DocumentEntity.class,
 					"El document no te activada la firma amb portafirmes");
 		}
@@ -729,28 +466,17 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long documentId) {
+			Long id) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
-				"documentId=" + documentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				"id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
+				id,
+				false,
 				true,
 				false,
 				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				documentId,
-				true,
-				false,
-				false);
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -806,28 +532,17 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void portafirmesReintentar(
 			Long entitatId,
-			Long documentId) {
+			Long id) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
 				+ "entitatId=" + entitatId + ", "
-				+ "documentId=" + documentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				+ "id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
+				id,
+				false,
 				true,
 				false,
 				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				documentId,
-				true,
-				false,
-				false);
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
@@ -860,28 +575,15 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
-			Long documentId) {
+			Long id) {
 		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
 				+ "entitatId=" + entitatId + ", "
-				+ "documentId=" + documentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				+ "id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
+				id,
 				true,
-				false,
 				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				documentId,
-				true,
-				false,
-				false);
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
@@ -904,29 +606,14 @@ public class DocumentServiceImpl implements DocumentService {
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) {
-		logger.debug("Convertint document a format PDF per firmar (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		logger.debug("Converteix un document en PDF per a la firma client ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				id,
 				true,
-				false,
 				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
 		return pluginHelper.conversioConvertirPdf(
 				documentHelper.getFitxerAssociat(document),
 				null);
@@ -940,35 +627,11 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Generar identificador firma al navegador ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				id,
 				true,
-				false,
 				false);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				document,
-				true,
-				false,
-				false,
-				true);
-		/*DocumentVersioEntity documentVersio = document.getVersioDarrera();
-		if (documentVersio == null) {
-			logger.error("No s'ha trobat la darrera versió del document (" +
-					"documentId=" + id + ")");
-			throw new NotFoundException(
-					"(documentId=" + id + ", versio=darrera)",
-					DocumentVersioEntity.class);
-		}
-		int versio = documentVersio.getVersio();*/
 		try {
 			return firmaClientXifrar(
 					new ObjecteFirmaApplet( 
@@ -1009,32 +672,13 @@ public class DocumentServiceImpl implements DocumentService {
 					ex);
 		}
 		if (objecte != null) {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 					objecte.getEntitatId(),
-					true,
-					false,
-					false);
-			DocumentEntity document = entityComprovarHelper.comprovarDocument(
-					entitat,
-					null,
 					objecte.getDocumentId(),
+					false,
 					true,
 					false,
 					false);
-			if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
-				throw new ValidationException(
-						document.getId(),
-						DocumentEntity.class,
-						"El document firmat te alertes de validació");
-			}
-			// Per a consultes no es comprova el contenidor arrel
-			// Comprova l'accés al path del document
-			contingutHelper.comprovarPermisosPathContingut(
-					document,
-					true,
-					false,
-					false,
-					true);
 			// Registra al log la firma del document
 			contingutLogHelper.log(
 					document,
@@ -1090,112 +734,6 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 	}
-
-	/*private SistemaExternException processarCallbackEstatFirmat(
-			DocumentEntity document,
-			DocumentPortafirmesEntity documentPortafirmes) {
-		SistemaExternException exception = null;
-		// Descarrega el document firmat del protafirmes
-		PortafirmesDocument portafirmesDocument = null;
-		try {
-			portafirmesDocument = pluginHelper.portafirmesDownload(
-					document,
-					documentPortafirmes);
-		} catch (SistemaExternException ex) {
-			documentPortafirmes.updateError(
-					ex.getMessage());
-			exception = ex;
-		}
-		// Si el document s'ha descarregat correctament intenta la custòdia
-		if (portafirmesDocument != null) {
-			if (portafirmesDocument.isCustodiat()) {
-				// Potser el document ja ha estat custodiat pel portafirmes
-				document.updateCustodiaUrl(
-						portafirmesDocument.getCustodiaUrl());
-				document.updateCustodiaEstat(
-						true,
-						new Date(),
-						portafirmesDocument.getCustodiaId());
-				documentPortafirmes.updateEstat(PortafirmesEstatEnumDto.CUSTODIAT);
-			} else {
-				// Si el document no s'ha custodiat des del portafirmes l'envia
-				// a la custòdia
-				try {
-					String custodiaDocumentId = pluginHelper.custodiaCustodiarDocumentFirmat(
-							document,
-							document.getMetaDocument().getPortafirmesCustodiaTipus(),
-							portafirmesDocument.getArxiuNom(),
-							portafirmesDocument.getArxiuContingut());
-					document.updateCustodiaEstat(
-							true,
-							new Date(),
-							custodiaDocumentId);
-					documentPortafirmes.updateEstat(PortafirmesEstatEnumDto.CUSTODIAT);
-					// Registra al log la custòdia del document
-					contingutLogHelper.log(
-							documentPortafirmes.getDocument(),
-							LogTipusEnumDto.CUSTODIA,
-							null,
-							null,
-							custodiaDocumentId,
-							null,
-							true,
-							true);
-				} catch (SistemaExternException ex) {
-					documentPortafirmes.updateError(
-							ex.getMessage());
-					exception = ex;
-				}
-			}
-		}
-		return exception;
-	}*/
-
-	/*private void emplenarDadesPortafirmes(
-			DocumentVersioDto documentVersio,
-			List<DocumentPortafirmesEntity> documentsPortafirmes) {
-		documentVersio.setPortafirmesConversioArxiuNom(
-				pluginHelper.conversioConvertirPdfArxiuNom(
-						documentVersio.getArxiuNom()));*/
-		/*for (DocumentPortafirmesEntity documentPortafirmes: documentsPortafirmes) {
-			if (documentVersio.getVersio() == documentPortafirmes.getVersio()) {
-				PortafirmesEnviamentDto portafirmesEnviament = new PortafirmesEnviamentDto();
-				portafirmesEnviament.setMotiu(
-						documentPortafirmes.getMotiu());
-				portafirmesEnviament.setPrioritat(
-						PortafirmesPrioritatEnumDto.valueOf(
-								documentPortafirmes.getPrioritat().name()));
-				portafirmesEnviament.setDataEnviament(
-						documentPortafirmes.getCreatedDate().toDate());
-				portafirmesEnviament.setDataCaducitat(
-						documentPortafirmes.getDataCaducitat());
-				portafirmesEnviament.setPortafirmesId(
-						documentPortafirmes.getPortafirmesId());
-				portafirmesEnviament.setPortafirmesEstat(
-						PortafirmesEstatEnumDto.valueOf(
-								documentPortafirmes.getPortafirmesEstat().name()));
-				portafirmesEnviament.setCallbackDarrer(
-						documentPortafirmes.getCallbackDarrer());
-				portafirmesEnviament.setCallbackCount(
-						documentPortafirmes.getCallbackCount());
-				portafirmesEnviament.setErrorDescripcio(
-						documentPortafirmes.getErrorDescripcio());
-				documentVersio.addPortafirmesEnviament(portafirmesEnviament);
-			}
-		}*/
-	/*}*/
-
-	/*private DocumentPortafirmesEntity findDocumentPortafirmesDarrer(
-			EntitatEntity entitat,
-			DocumentEntity document) {
-		List<DocumentPortafirmesEntity> documentsPortafirmes = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc(
-				document);
-		DocumentPortafirmesEntity documentPortafirmesDarrer = null;
-		if (!documentsPortafirmes.isEmpty()) {
-			documentPortafirmesDarrer = documentsPortafirmes.get(0);
-		}
-		return documentPortafirmesDarrer;
-	}*/
 
 	private static final String CLAU_SECRETA = "R1p3AR1p3AR1p3AR";
 	private String firmaClientXifrar(

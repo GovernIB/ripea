@@ -152,6 +152,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				metaDocument.getId(),
+				false,
+				false,
+				false,
 				false);
 		metaDocumentEntitiy.update(
 				metaDocument.getCodi(),
@@ -197,6 +200,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		metaDocument.updateActiu(actiu);
 		return conversioTipusHelper.convertir(
@@ -218,6 +224,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		metaDocumentRepository.delete(metaDocumentEntitiy);
 		return conversioTipusHelper.convertir(
@@ -241,6 +250,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
 				metaDocumentEntitiy,
@@ -360,6 +372,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(metaDocumentEntitiy.getPlantillaNom());
@@ -389,6 +404,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
 				entitat,
@@ -421,6 +439,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaNodeMetaDadaEntity metaNodeMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
 				entitat,
@@ -449,6 +470,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
 				entitat,
@@ -476,6 +500,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
 				entitat,
@@ -505,6 +532,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
 				entitat,
@@ -536,6 +566,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
 				entitat,
@@ -565,6 +598,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		MetaNodeMetaDadaEntity metaNodeMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
 				entitat,
@@ -605,6 +641,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		return permisosHelper.findPermisos(
 				id,
@@ -629,6 +668,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		permisosHelper.updatePermis(
 				id,
@@ -654,6 +696,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				id,
+				false,
+				false,
+				false,
 				false);
 		permisosHelper.deletePermis(
 				id,
@@ -676,8 +721,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contenidorId,
-				null);
+				contenidorId);
 		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
 				contingut,
 				true,
@@ -693,7 +737,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaDocumentDto> findActiveByEntitatAndContenidorPerModificacio(
+	public List<MetaDocumentDto> findActiveByEntitatAndDocumentPerModificacio(
 			Long entitatId,
 			Long documentId) {
 		logger.debug("Consulta de meta-documents actius per a modificació ("
@@ -708,7 +752,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				entitat,
 				null,
 				documentId,
-				true,
+				false,
+				false,
 				false,
 				false);
 		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(

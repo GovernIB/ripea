@@ -17,7 +17,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.AnotacioRegistreFiltreDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ContingutComentariDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -25,7 +24,6 @@ import es.caib.ripea.core.api.dto.ContingutLogDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -114,13 +112,6 @@ public class ContingutServiceBean implements ContingutService {
 			Long contingutDestiId,
 			boolean recursiu) {
 		return delegate.copy(entitatId, contingutOrigenId, contingutDestiId, recursiu);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public EscriptoriDto getEscriptoriPerUsuariActual(
-			Long entitatId) {
-		return delegate.getEscriptoriPerUsuariActual(entitatId);
 	}
 
 	@Override
@@ -235,6 +226,18 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<RegistreAnotacioDto> findAnotacionsRegistre(
+			Long entitatId,
+			AnotacioRegistreFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findAnotacionsRegistre(
+				entitatId,
+				filtre,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<ContingutDto> findEsborrats(
 			Long entitatId,
 			String nom,
@@ -273,43 +276,25 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ContingutComentariDto> findComentarisPerContingut(Long entitatId, Long contingutId)
+	public List<Long> findIdsMassiusAmbFiltre(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre)
 			throws NotFoundException {
-		return delegate.findComentarisPerContingut(entitatId, contingutId);
+		return delegate.findIdsMassiusAmbFiltre(
+				entitatId,
+				filtre);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public boolean publicarComentariPerContingut(Long entitatId, Long contingutId, String text)
-			throws NotFoundException {
-		return delegate.publicarComentariPerContingut(entitatId, contingutId, text);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public boolean marcarProcessat(Long entitatId, Long contingutId, String text) throws NotFoundException {
-		return delegate.marcarProcessat(entitatId, contingutId, text);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public PaginaDto<DocumentDto> documentMassiuFindByDatatable(Long entitatId, ContingutMassiuFiltreDto filtre,
+	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		return delegate.documentMassiuFindByDatatable(entitatId, filtre, paginacioParams);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public List<Long> findIdsMassiusAmbFiltre(Long entitatId, ContingutMassiuFiltreDto filtre)
-			throws NotFoundException {
-		return delegate.findIdsMassiusAmbFiltre(entitatId, filtre);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public PaginaDto<RegistreAnotacioDto> findAnotacionsRegistre(Long entitatId, AnotacioRegistreFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		return delegate.findAnotacionsRegistre(entitatId, filtre, paginacioParams);
+		return delegate.documentMassiuFindAmbFiltre(
+				entitatId,
+				filtre,
+				paginacioParams);
 	}
 
 }

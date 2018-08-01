@@ -114,7 +114,6 @@ public class PortafirmesPluginPortafibTest {
 				uploadDocument.getArxiuContingut().length,
 				downloadDocument.getArxiuContingut().length);*/
 		assertTrue(downloadDocument.isFirmat());
-		
 	}
 
 }

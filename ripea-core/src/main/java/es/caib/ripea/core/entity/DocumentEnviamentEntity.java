@@ -96,6 +96,9 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 			name = "ipa_document_enviament_doc",
 			joinColumns = {@JoinColumn(name = "document_enviament_id")},
 			inverseJoinColumns = {@JoinColumn(name = "document_id")})
+	@ForeignKey(
+			name = "ipa_docenv_docenvdoc_fk",
+			inverseName = "ipa_document_docenvdoc_fk")
 	protected List<DocumentEntity> annexos = new ArrayList<DocumentEntity>();
 	@Version
 	private long version = 0;
@@ -186,6 +189,11 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 		this.estat = DocumentEnviamentEstatEnumDto.ENVIAT;
 		this.error = true;
 		this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_TAMANY);
+		if (this.errorDescripcio != null) {
+			System.out.println(">>> error: " + this.errorDescripcio);
+			System.out.println(">>> length: " + this.errorDescripcio.length());
+			System.out.println(">>> length: " + this.errorDescripcio.getBytes().length);
+		}
 		this.processatData = null;
 		this.intentNum = intentNum++;
 		this.intentData = new Date();
@@ -219,7 +227,7 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 		return ReflectionToStringBuilder.toString(this);
 	}
 
-	private static final int ERROR_DESC_TAMANY = 2048;
+	private static final int ERROR_DESC_TAMANY = 2000;
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,18 +25,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.service.ArxiuService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.ExpedientAcumularCommand;
+import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
 import es.caib.ripea.war.command.ExpedientRelacionarCommand;
 import es.caib.ripea.war.command.ExpedientRelacionarCommand.Relacionar;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
+import es.caib.ripea.war.command.ContenidorCommand.Create;
+import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
@@ -57,11 +59,87 @@ public class ExpedientController extends BaseUserController {
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
-	private ArxiuService arxiuService;
-	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
 
-
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String get(
+			HttpServletRequest request,
+			Model model) {
+		return get(request, null, model);
+	}
+	@RequestMapping(value = "/{expedientId}", method = RequestMethod.GET)
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = null;
+		if (expedientId != null) {
+			expedient = expedientService.findById(
+					entitatActual.getId(),
+					expedientId);
+		}
+		ExpedientCommand command = null;
+		if (expedient != null) {
+			command = ExpedientCommand.asCommand(expedient);
+		} else {
+			command = new ExpedientCommand();
+			command.setAny(Calendar.getInstance().get(Calendar.YEAR));
+		}
+		command.setEntitatId(entitatActual.getId());
+		model.addAttribute(command);
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+		return "contingutExpedientForm";
+	}
+	@RequestMapping(value = "/new", method = RequestMethod.POST)
+	public String postNew(
+			HttpServletRequest request,
+			@Validated({Create.class}) ExpedientCommand command,
+			BindingResult bindingResult,
+			Model model) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			model.addAttribute(
+					"metaExpedients",
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+			return "contingutExpedientForm";
+		}
+		expedientService.create(
+				entitatActual.getId(),
+				command.getMetaNodeId(),
+				null,
+				command.getAny(),
+				command.getNom());
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../expedient",
+				"expedient.controller.creat.ok");
+	}
+	@RequestMapping(value = "/{expedientId}/update", method = RequestMethod.POST)
+	public String postUpdate(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@Validated({Update.class}) ExpedientCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			model.addAttribute(
+					"metaExpedients",
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+			return "contingutExpedientForm";
+		}
+		expedientService.update(
+				entitatActual.getId(),
+				command.getId(),
+				command.getNom());
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../expedient",
+				"expedient.controller.modificat.ok");
+	}
 
 	@RequestMapping(value = "/{expedientId}/agafar", method = RequestMethod.GET)
 	public String agafar(
@@ -156,17 +234,9 @@ public class ExpedientController extends BaseUserController {
 						expedientId,
 						true,
 						false));
-		EscriptoriDto escriptori = contingutService.getEscriptoriPerUsuariActual(entitatActual.getId());
-		model.addAttribute(
-				"contenidorOrigen",
-				escriptori);
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
-		model.addAttribute(
-				"arxius",
-				arxiuService.findPermesosPerUsuari(
-						entitatActual.getId()));
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerLectura(
@@ -187,7 +257,6 @@ public class ExpedientController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		EscriptoriDto escriptori = contingutService.getEscriptoriPerUsuariActual(entitatActual.getId());
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"expedient",
@@ -196,9 +265,6 @@ public class ExpedientController extends BaseUserController {
 							expedientId,
 							true,
 							false));
-			model.addAttribute(
-					"contenidorOrigen",
-					escriptori);
 			model.addAttribute(filtre);
 			model.addAttribute(
 					"expedientEstatEnumOptions",
@@ -253,60 +319,6 @@ public class ExpedientController extends BaseUserController {
 						entitatActual.getId(), 
 						ExpedientFiltreCommand.asDto(filtre), 
 						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
-	}
-
-	@RequestMapping(value = "/{expedientId}/acumular", method = RequestMethod.GET)
-	public String expedientAcumularGet(
-			HttpServletRequest request,
-			@PathVariable Long expedientId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ExpedientAcumularCommand command = new ExpedientAcumularCommand();
-		command.setExpedientId(expedientId);
-		model.addAttribute(command);
-		model.addAttribute(
-				"expedient",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						expedientId,
-						true,
-						false));
-		EscriptoriDto escriptori = contingutService.getEscriptoriPerUsuariActual(entitatActual.getId());
-		model.addAttribute(
-				"contingutOrigen",
-				escriptori);
-		return "expedientAcumularForm";
-	}
-	@RequestMapping(value = "/{expedientId}/acumular", method = RequestMethod.POST)
-	public String expedientAcumularPost(
-			HttpServletRequest request,
-			@PathVariable Long expedientId,
-			@Valid ExpedientAcumularCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		EscriptoriDto escriptori = contingutService.getEscriptoriPerUsuariActual(entitatActual.getId());
-		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"expedient",
-					contingutService.findAmbIdUser(
-							entitatActual.getId(),
-							expedientId,
-							true,
-							false));
-			model.addAttribute(
-					"contingutOrigen",
-					escriptori);
-			return "expedientAcumularForm";
-		}
-		expedientService.acumular(
-				entitatActual.getId(),
-				command.getExpedientId(),
-				command.getExpedientAcumulatId());
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../contingut/" + expedientId,
-				"expedient.controller.acumulat.ok");
 	}
 
 	@InitBinder

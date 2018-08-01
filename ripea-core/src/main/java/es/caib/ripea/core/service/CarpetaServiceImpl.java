@@ -12,11 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -65,50 +63,28 @@ public class CarpetaServiceImpl implements CarpetaService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
 				+ "nom=" + nom + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				true,
+				contingutId,
+				false,
+				false,
 				false,
 				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId,
-				null);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingut);
-		// Comprova l'accés al path del contenidor pare
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contingutHelper.isNomValid(nom)) {
-			throw new ValidationException(
-					"<creacio>",
-					CarpetaEntity.class,
-					"El nom de la carpeta no és vàlid (no pot començar amb \".\")");
-		}
-		// Comprova el permís de modificació de l'expedient superior
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				contingut,
 				true,
 				false,
 				false);
-		if (expedientSuperior != null) {
-			contingutHelper.comprovarPermisosContingut(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
+		contingutHelper.comprovarNomValid(
+				contingut,
+				nom,
+				"<creacio>",
+				CarpetaEntity.class);
 		CarpetaEntity carpeta = CarpetaEntity.getBuilder(
 				nom,
 				contingut,
-				entitat).build();
+				contingut.getEntitat(),
+				expedientSuperior).build();
 		carpeta = carpetaRepository.save(carpeta);
 		// Registra al log la creació de la carpeta
 		contingutLogHelper.logCreacio(
@@ -118,7 +94,6 @@ public class CarpetaServiceImpl implements CarpetaService {
 		CarpetaDto dto = toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
-				expedientSuperior,
 				null);
 		return dto;
 	}
@@ -133,45 +108,21 @@ public class CarpetaServiceImpl implements CarpetaService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "nom=" + nom + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				true,
+				id,
+				false,
+				false,
 				false,
 				false);
 		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
-				entitat,
+				contingut.getEntitat(),
 				id);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				carpeta);
-		// Comprova l'accés al path de la carpeta
-		contingutHelper.comprovarPermisosPathContingut(
-				carpeta,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contingutHelper.isNomValid(nom)) {
-			throw new ValidationException(
-					id,
-					CarpetaEntity.class,
-					"El nom de la carpeta no és vàlid (no pot començar amb \".\")");
-		}
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				carpeta,
-				true,
-				false,
-				false);
-		if (expedientSuperior != null) {
-			contingutHelper.comprovarPermisosContingut(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
+		contingutHelper.comprovarNomValid(
+				carpeta.getPare(),
+				nom,
+				id,
+				CarpetaEntity.class);
 		String nomOriginal = carpeta.getNom();
 		carpeta.update(
 				nom);
@@ -183,12 +134,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				null,
 				false,
 				false);
-		CarpetaDto dto = toCarpetaDto(carpeta);
-		contingutHelper.arxiuPropagarModificacio(
-				carpeta,
-				expedientSuperior,
-				null);
-		return dto;
+		return toCarpetaDto(carpeta);
 	}
 
 	@Transactional(readOnly = true)
@@ -199,58 +145,16 @@ public class CarpetaServiceImpl implements CarpetaService {
 		logger.debug("Obtenint la carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
+				id,
 				true,
-				false,
 				false);
 		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
-				entitat,
+				contingut.getEntitat(),
 				id);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path de la carpeta
-		contingutHelper.comprovarPermisosPathContingut(
-				carpeta,
-				true,
-				false,
-				false,
-				true);
 		return toCarpetaDto(carpeta);
 	}
-
-
-
-	/*private void propagarModificacioArxiu(
-			CarpetaEntity carpeta,
-			ExpedientEntity expedientSuperior) {
-		if (pluginHelper.isArxiuPluginActiu()) {
-			// Propaga la creació de la carpeta a l'arxiu
-			if (expedientSuperior != null) {
-				// Si la carpeta s'ha creat a dins un expedient
-				pluginHelper.arxiuCarpetaActualitzar(
-						carpeta,
-						carpeta.getPare(),
-						expedientSuperior);
-			} else {
-				// TODO Si la carpeta s'ha creat a dins un escriptori
-			}
-		}
-	}
-	private void propagarEliminacioArxiu(
-			CarpetaEntity carpeta,
-			ExpedientEntity expedientSuperior) {
-		if (pluginHelper.isArxiuPluginActiu() && carpeta.getArxiuUuid() != null) {
-			// Propaga l'esborrat de la carpeta a l'arxiu
-			if (expedientSuperior != null) {
-				// Si la carpeta s'ha esborrat a dins un expedient
-				pluginHelper.arxiuCarpetaEsborrar(
-						carpeta,
-						expedientSuperior);
-			} else {
-				// TODO Si la carpeta s'ha esborrat a dins un escriptori
-			}
-		}
-	}*/
 
 	private CarpetaDto toCarpetaDto(
 			CarpetaEntity carpeta) {

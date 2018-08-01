@@ -24,7 +24,6 @@ public class ContenidorCommand {
 	protected Long id;
 	@NotNull(groups = {Create.class, Update.class})
 	protected Long entitatId;
-	@NotNull(groups = {Create.class, Update.class})
 	protected Long pareId;
 	@NotEmpty(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	@Size(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=256)

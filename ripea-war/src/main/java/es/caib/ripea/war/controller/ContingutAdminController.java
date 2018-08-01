@@ -28,12 +28,10 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.api.service.RegistreService;
 import es.caib.ripea.war.command.ContingutFiltreCommand;
 import es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -49,8 +47,6 @@ public class ContingutAdminController extends BaseAdminController {
 
 	@Autowired
 	private ContingutService contingutService;
-	@Autowired
-	private RegistreService registreService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
@@ -184,36 +180,6 @@ public class ContingutAdminController extends BaseAdminController {
 				"contingut.admin.controller.esborrat.definitiu.ok");
 	}
 
-	@RequestMapping(value = "/{bustiaId}/registre/{registreId}/reintentar", method = RequestMethod.GET)
-	public String reintentar(
-			HttpServletRequest request,
-			@PathVariable Long bustiaId,
-			@PathVariable Long registreId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		boolean processatOk = registreService.reglaReintentarAdmin(
-				entitatActual.getId(),
-				bustiaId,
-				registreId);
-		if (processatOk) {
-			MissatgesHelper.success(
-					request, 
-					getMessage(
-							request, 
-							"contingut.admin.controller.registre.reintentat.ok",
-							null));
-		} else {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request, 
-							"contingut.admin.controller.registre.reintentat.error",
-							null));
-		}
-		return "redirect:../../../" + registreId + "/info";
-	}
-	
-
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -238,4 +204,5 @@ public class ContingutAdminController extends BaseAdminController {
 		}
 		return filtreCommand;
 	}
+
 }

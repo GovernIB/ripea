@@ -33,11 +33,9 @@ $(document).ready(function() {
 			.done(function(data) {
 				if (data.plantillaNom) {
 					$('#info-plantilla-si').removeClass('hidden');
-					$('#info-plantilla-no').addClass('hidden');
 					$('#info-plantilla-si a').attr('href', '../metaDocument/' + data.id + '/plantilla');
 				} else {
 					$('#info-plantilla-si').addClass('hidden');
-					$('#info-plantilla-no').removeClass('hidden');
 				}
 				webutilModalAdjustHeight();
 			})
@@ -45,7 +43,6 @@ $(document).ready(function() {
 				alert("<spring:message code="contingut.document.form.alert.plantilla"/>");
 			});
 		} else {
-			$('#info-plantilla-no').removeClass('hidden');
 			$('#info-plantilla-si').addClass('hidden');
 		}
 	});
@@ -92,11 +89,6 @@ $(document).ready(function() {
 			<spring:message code="contingut.document.form.info.plantilla.si"/>
 			<a href="#" class="btn btn-xs btn-default pull-right"><spring:message code="comu.boto.descarregar"/></a>
 		</div>
-		<div id="info-plantilla-no" class="alert well-sm alert-info hidden">
-			<span class="fa fa-info-circle"></span>
-			<spring:message code="contingut.document.form.info.plantilla.no"/>
-		</div>
-		
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
@@ -110,7 +102,7 @@ $(document).ready(function() {
 			<div role="tabpanel" class="tab-pane active" id="dades_doc">
 				<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true"/>
 				<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
-				<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.metanode.buit"/>
+				<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
 				<c:if test="${empty documentCommand.id}">
 					<rip:inputRadio name="origen" textKey="contingut.document.form.camp.origen" botons="true" optionItems="${digitalOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 					<div id="input-origen-arxiu" class="hidden">

@@ -39,6 +39,7 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotEmpty(groups = {CreateFisic.class, UpdateFisic.class})
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=255)
 	private String ubicacio;
+	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Long metaNodeId;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date data;

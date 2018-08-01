@@ -16,7 +16,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class ExpedientFiltreDto implements Serializable {
 
-	private Long arxiuId;
 	private Long metaExpedientId;
 	private String nom;
 	private Date dataCreacioInici;
@@ -31,12 +30,6 @@ public class ExpedientFiltreDto implements Serializable {
 	private Long tipusId;
 	
 
-	public Long getArxiuId() {
-		return arxiuId;
-	}
-	public void setArxiuId(Long arxiuId) {
-		this.arxiuId = arxiuId;
-	}
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
 	}

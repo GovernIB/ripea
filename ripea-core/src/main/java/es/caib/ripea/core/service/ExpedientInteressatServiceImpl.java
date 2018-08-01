@@ -6,10 +6,9 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,18 +45,18 @@ import es.caib.ripea.core.repository.InteressatRepository;
 @Service
 public class ExpedientInteressatServiceImpl implements ExpedientInteressatService {
 
-	@Resource
+	@Autowired
 	private InteressatRepository interessatRepository;
 
-	@Resource
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private ContingutHelper contingutHelper;
-	@Resource
+	@Autowired
 	private ContingutLogHelper contingutLogHelper;
-	@Resource
+	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
+	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 
 
@@ -90,15 +89,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					+ "expedientId=" + expedientId + ", "
 					+ "interessat=" + interessat + ")");
 		}
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				expedientId,
+				true,
+				false,
 				true,
 				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
@@ -108,23 +106,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 						InteressatEntity.class);
 			}
 		}
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Comprova l'accés al path del contenidor pare
-		contingutHelper.comprovarPermisosPathContingut(
-				expedient,
-				true,
-				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient
-		contingutHelper.comprovarPermisosContingut(
-				expedient,
-				false,
-				true,
-				false);
 		InteressatEntity interessatEntity = null;
 		if (interessat.isPersonaFisica()) {
 			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
@@ -248,15 +229,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					+ "expedientId=" + expedientId + ", "
 					+ "interessat=" + interessat + ")");
 		}
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				expedientId,
+				true,
+				false,
 				true,
 				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
@@ -268,23 +248,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 						InteressatEntity.class);
 			}
 		}
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Comprova l'accés al path del contenidor pare
-		contingutHelper.comprovarPermisosPathContingut(
-				expedient,
-				true,
-				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient
-		contingutHelper.comprovarPermisosContingut(
-				expedient,
-				false,
-				true,
-				false);
 		InteressatEntity interessatEntity = null;
 		if (interessat.isPersonaFisica()) {
 			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
@@ -380,31 +343,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
 				+ "interessatId=" + interessatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Comprova l'accés al path del contenidor pare
-		contingutHelper.comprovarPermisosPathContingut(
-				expedient,
+				entitatId,
+				expedientId,
 				true,
 				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient
-		contingutHelper.comprovarPermisosContingut(
-				expedient,
-				false,
 				true,
+				false,
 				false);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
@@ -444,31 +389,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				+ "expedientId=" + expedientId + ", "
 				+ "interessatId=" + interessatId + ", "
 				+ "representantId=" + representantId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Comprova l'accés al path del contenidor pare
-		contingutHelper.comprovarPermisosPathContingut(
-				expedient,
+				entitatId,
+				expedientId,
 				true,
 				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient
-		contingutHelper.comprovarPermisosContingut(
-				expedient,
-				false,
 				true,
+				false,
 				false);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
@@ -553,15 +480,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		logger.debug("Consulta interessats de l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				expedientId,
+				false,
 				true,
 				false,
+				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
 		List<InteressatEntity> interessats = interessatRepository.findByExpedientAndNotRepresentant(
 				expedient);
 //		List<InteressatDto> resposta = conversioTipusHelper.convertirList(
@@ -593,15 +519,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		logger.debug("Consulta interessats de l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				expedientId,
+				false,
 				true,
 				false,
+				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
 		return interessatRepository.countByExpedient(
 				expedient);
 	}
@@ -623,6 +548,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				entitat,
 				null,
 				documentId,
+				false,
 				false,
 				false,
 				false);

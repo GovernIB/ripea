@@ -14,7 +14,6 @@ import java.util.Date;
  */
 public class ExpedientDto extends NodeDto {
 
-	public ArxiuDto arxiu;
 	private ExpedientEstatEnumDto estat;
 	private Date tancatData;
 	private String tancatMotiu;
@@ -31,18 +30,8 @@ public class ExpedientDto extends NodeDto {
 	private String sistraUnitatAdministrativa;
 	private String sistraClau;
 	private UsuariDto agafatPer;
-
 	private String numero;
-	
-	private boolean ambRegistresSenseLlegir;
 
-
-	public ArxiuDto getArxiu() {
-		return arxiu;
-	}
-	public void setArxiu(ArxiuDto arxiu) {
-		this.arxiu = arxiu;
-	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -150,36 +139,6 @@ public class ExpedientDto extends NodeDto {
 		return (MetaExpedientDto)getMetaNode();
 	}
 
-	public boolean isAmbRegistresSenseLlegir() {
-		return ambRegistresSenseLlegir;
-	}
-	public void setAmbRegistresSenseLlegir(boolean ambRegistresSenseLlegir) {
-		this.ambRegistresSenseLlegir = ambRegistresSenseLlegir;
-	}
-	
-	
-	/*public String getNtiVersionUrl() {
-		return "http://administracionelectronica.gob.es/ENI/XSD/V" + ntiVersion + "/expediente-e";
-	}
-	public String getNtiClasificacion() {
-		if (ntiClasificacionSia != null) {
-			return ntiClasificacionSia;
-		} else {
-			if (getMetaNode() != null) {
-				MetaExpedientDto metaExpedient = (MetaExpedientDto)getMetaNode();
-				if (metaExpedient.getClassificacioSia() != null) {
-					return metaExpedient.getClassificacioSia();
-				} else {
-					return ntiOrgano + "_PRO_RIP" + String.format("%027d", metaExpedient.getId());
-				}
-			} else {
-				return ntiOrgano + "_PRO_RIP" + String.format("%027d", 0);
-			}
-		}
-	}
-	public String getNtiEstado() {
-		return ExpedientEstatEnumDto.OBERT.equals(estat) ? "Abierto" : "Cerrado";
-	}*/
 	public boolean isAgafat() {
 		return agafatPer != null;
 	}

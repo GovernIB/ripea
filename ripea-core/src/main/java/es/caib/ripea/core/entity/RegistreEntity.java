@@ -14,18 +14,14 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.BackofficeTipusEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.registre.RegistreProcesEstatEnum;
 import es.caib.ripea.core.api.registre.RegistreProcesEstatSistraEnum;
@@ -141,8 +137,6 @@ public class RegistreEntity extends ContingutEntity {
 	private String oficinaOrigenCodi;
 	@Column(name = "oficina_orig_desc", length = 100)
 	private String oficinaOrigenDescripcio;
-
-
 	@Enumerated(EnumType.STRING)
 	@Column(name = "proces_estat_sistra", length = 16)
 	private RegistreProcesEstatSistraEnum procesEstatSistra;
@@ -150,8 +144,6 @@ public class RegistreEntity extends ContingutEntity {
 	private String identificadorTramitSistra;
 	@Column(name = "sistra_id_proc", length = 100)
 	private String identificadorProcedimentSistra;
-
-	
 	@Column(name = "proces_error", length = ERROR_MAX_LENGTH)
 	private String procesError;
 	@Column(name = "proces_intents")
@@ -168,23 +160,10 @@ public class RegistreEntity extends ContingutEntity {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
-	
 	@Column(name = "justificant_arxiu_uuid", length = 100)
 	private String justificantArxiuUuid;
-	
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@JoinColumn(name = "regla_id")
-	@ForeignKey(name = "ipa_regla_registre_fk")
-	private ReglaEntity regla;
-	
 	@Column(name = "llegida")
 	private Boolean llegida;
-	
-//	@Column(name = "data_dist_asinc")
-//	private Date dataDistribucioAsincrona;
-//	
-//	@Column(name = "reintents_dist_asinc")
-//	private Integer reintentsDistribucioAsincrona;
 
 	public RegistreTipusEnum getRegistreTipus() {
 		return RegistreTipusEnum.valorAsEnum(registreTipus);
@@ -329,9 +308,6 @@ public class RegistreEntity extends ContingutEntity {
 	}
 	public String getJustificantArxiuUuid() {
 		return justificantArxiuUuid;
-	}
-	public ReglaEntity getRegla() {
-		return regla;
 	}
 	public Boolean getLlegida() {
 		return llegida;
@@ -568,17 +544,6 @@ public class RegistreEntity extends ContingutEntity {
 			built.procesData = procesData;
 			return this;
 		}
-		public Builder regla(ReglaEntity regla) {
-			built.regla = regla;
-			built.procesIntents = new Integer(0);
-			// Per backoffices tipus Sistra posa l'estat en pendent
-			if (regla != null
-					&& regla.getBackofficeTipus() != null
-					&& BackofficeTipusEnumDto.SISTRA.equals(regla.getBackofficeTipus())) {
-				built.procesEstatSistra = RegistreProcesEstatSistraEnum.PENDENT;
-			}
-			return this;
-		}
 		public Builder oficinaOrigen(Date dataOrigen,
 				String oficinaOrigenCodi,
 				String oficinaOrigenDescripcio) {
@@ -639,11 +604,6 @@ public class RegistreEntity extends ContingutEntity {
 		} else if (!registreTipus.equals(other.registreTipus))
 			return false;
 		return true;
-	}
-	
-	@Override
-	public String getContingutType() {
-		return "Anotació de registre";
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

@@ -32,12 +32,15 @@ public class ContingutMovimentEntity extends RipeaAuditable<Long> {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "contingut_id")
+	@ForeignKey(name = "ipa_contingut_contmov_fk")
 	protected ContingutEntity contingut;
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "origen_id")
+	@ForeignKey(name = "ipa_origen_contmov_fk")
 	protected ContingutEntity origen;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "desti_id")
+	@ForeignKey(name = "ipa_desti_contmov_fk")
 	protected ContingutEntity desti;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "remitent_codi")

@@ -14,7 +14,6 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.BustiaContingutPendentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
@@ -43,35 +42,25 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			Long contenidorId,
 			Long metaExpedientId,
-			Long arxiuId,
 			Integer any,
-			String nom,
-			BustiaContingutPendentTipusEnumDto contingutTipus,
-			Long contingutId) {
+			String nom) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
 				metaExpedientId,
-				arxiuId,
 				any,
-				nom,
-				contingutTipus,
-				contingutId);
+				nom);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public ExpedientDto update(
 			Long entitatId,
-			Long expedientId,
-			Long arxiuId,
-			Long metaExpedientId,
+			Long id,
 			String nom) {
 		return delegate.update(
 				entitatId,
-				expedientId,
-				arxiuId,
-				metaExpedientId,
+				id,
 				nom);
 	}
 
@@ -158,34 +147,6 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			Long id) throws NotFoundException {
 		delegate.reobrir(entitatId, id);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public void acumular(
-			Long entitatId,
-			Long id,
-			Long acumulatId) {
-		delegate.acumular(
-				entitatId,
-				id,
-				acumulatId);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public void afegirContingutBustia(
-			Long entitatId,
-			Long id,
-			Long bustiaId,
-			BustiaContingutPendentTipusEnumDto contingutTipus,
-			Long contingutId) {
-		delegate.afegirContingutBustia(
-				entitatId,
-				id,
-				bustiaId,
-				contingutTipus,
-				contingutId);
 	}
 
 	@Override

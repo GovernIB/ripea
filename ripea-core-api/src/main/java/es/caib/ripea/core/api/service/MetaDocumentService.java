@@ -441,7 +441,7 @@ public interface MetaDocumentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<MetaDocumentDto> findActiveByEntitatAndContenidorPerModificacio(
+	public List<MetaDocumentDto> findActiveByEntitatAndDocumentPerModificacio(
 			Long entitatId,
 			Long documentId) throws NotFoundException;
 

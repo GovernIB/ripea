@@ -30,7 +30,6 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String notificacioOficiText;
 	private Long pareId;
 	private List<MetaExpedientMetaDocumentDto> metaDocuments;
-	private int arxiusCount;
 
 
 
@@ -130,12 +129,6 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 			return 0;
 		else
 			return metaDocuments.size();
-	}
-	public void setArxiusCount(int arxiusCount) {
-		this.arxiusCount = arxiusCount;
-	}
-	public int getArxiusCount() {
-		return this.arxiusCount;
 	}
 
 	@Override

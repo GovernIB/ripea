@@ -100,7 +100,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	protected ExpedientEntity expedient;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "representant_id")
-	@ForeignKey(name = "ipa_interessat_interessat_fk")
+	@ForeignKey(name = "ipa_represent_interessat_fk")
 	protected InteressatEntity representant;
 	@Transient
 	private Long representantId;

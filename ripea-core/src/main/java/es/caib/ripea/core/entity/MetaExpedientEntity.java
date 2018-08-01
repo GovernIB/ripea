@@ -5,7 +5,6 @@ package es.caib.ripea.core.entity;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -14,8 +13,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -72,12 +69,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Set<MetaExpedientMetaDocumentEntity> metaDocuments = new HashSet<MetaExpedientMetaDocumentEntity>();
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-			name = "ipa_metaexpedient_arxiu",
-			joinColumns = {@JoinColumn(name = "metaexpedient_id")},
-			inverseJoinColumns = {@JoinColumn(name = "arxiu_id")})
-	protected List<ArxiuEntity> arxius;
 
 	public String getClassificacioSia() {
 		return classificacioSia;
@@ -123,9 +114,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	}
 	public Set<MetaExpedientMetaDocumentEntity> getMetaDocuments() {
 		return metaDocuments;
-	}
-	public List<ArxiuEntity> getArxius() {
-		return arxius;
 	}
 
 	public void update(

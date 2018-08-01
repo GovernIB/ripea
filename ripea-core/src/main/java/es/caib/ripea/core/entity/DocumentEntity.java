@@ -12,23 +12,21 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
-import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 
 /**
  * Classe del model de dades que representa un document.
@@ -46,10 +44,6 @@ public class DocumentEntity extends NodeEntity {
 	private DocumentEstatEnumDto estat;
 	@Column(name = "ubicacio", length = 255)
 	private String ubicacio;
-	@ManyToOne(optional = true)
-	@JoinColumn(name = "expedient_id")
-	@ForeignKey(name = "ipa_expedient_document_fk")
-	private ExpedientEntity expedient;
 	@Column(name = "data", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date data;
@@ -99,8 +93,6 @@ public class DocumentEntity extends NodeEntity {
 	private String ntiCsv;
 	@Column(name = "nti_csvreg", length = 512)
 	private String ntiCsvRegulacion;
-
-
 
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
@@ -174,9 +166,13 @@ public class DocumentEntity extends NodeEntity {
 	public String getNtiCsvRegulacion() {
 		return ntiCsvRegulacion;
 	}
-
 	public MetaDocumentEntity getMetaDocument() {
 		return (MetaDocumentEntity)getMetaNode();
+	}
+	@Transient
+	public boolean isFirmat() {
+		return	DocumentEstatEnumDto.FIRMAT.equals(estat) ||
+				DocumentEstatEnumDto.CUSTODIAT.equals(estat);
 	}
 
 	public void update(
@@ -273,10 +269,10 @@ public class DocumentEntity extends NodeEntity {
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
-			ExpedientEntity expedient,
 			MetaNodeEntity metaNode,
 			ContingutEntity pare,
-			EntitatEntity entitat) {
+			EntitatEntity entitat,
+			ExpedientEntity expedient) {
 		return new Builder(
 				documentTipus,
 				estat,
@@ -288,10 +284,10 @@ public class DocumentEntity extends NodeEntity {
 				ntiOrigen,
 				ntiEstadoElaboracion,
 				ntiTipoDocumental,
-				expedient,
 				metaNode,
 				pare,
-				entitat);
+				entitat,
+				expedient);
 	}
 	public static class Builder {
 		DocumentEntity built;
@@ -306,10 +302,10 @@ public class DocumentEntity extends NodeEntity {
 				NtiOrigenEnumDto ntiOrigen,
 				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 				DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
-				ExpedientEntity expedient,
 				MetaNodeEntity metaNode,
 				ContingutEntity pare,
-				EntitatEntity entitat) {
+				EntitatEntity entitat,
+				ExpedientEntity expedient) {
 			built = new DocumentEntity();
 			built.documentTipus = documentTipus;
 			built.estat = estat;
@@ -322,10 +318,10 @@ public class DocumentEntity extends NodeEntity {
 			built.ntiOrigen = ntiOrigen;
 			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
 			built.ntiTipoDocumental = ntiTipoDocumental;
-			built.expedient = expedient;
 			built.metaNode = metaNode;
 			built.pare = pare;
 			built.entitat = entitat;
+			built.expedient = expedient;
 			built.tipus = ContingutTipusEnumDto.DOCUMENT;
 			built.versioCount = 0;
 		}
@@ -352,11 +348,6 @@ public class DocumentEntity extends NodeEntity {
 		public DocumentEntity build() {
 			return built;
 		}
-	}
-
-	@Override
-	public String getContingutType() {
-		return "document";
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;

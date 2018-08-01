@@ -36,6 +36,7 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 	private LogTipusEnumDto tipus;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "contingut_id")
+	@ForeignKey(name = "ipa_contingut_contlog_fk")
 	protected ContingutEntity contingut;
 	@Column(name = "objecte_id", length = 64)
 	private String objecteId;

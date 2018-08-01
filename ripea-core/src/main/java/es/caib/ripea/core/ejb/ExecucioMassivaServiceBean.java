@@ -81,5 +81,9 @@ public class ExecucioMassivaServiceBean implements ExecucioMassivaService {
 			throws NotFoundException, ExecucioMassivaException {
 		return delegate.findContingutPerExecucioMassiva(exm_id);
 	}
-	
+
+	public void comprovarExecucionsMassives() {
+		delegate.comprovarExecucionsMassives();
+	}
+
 }

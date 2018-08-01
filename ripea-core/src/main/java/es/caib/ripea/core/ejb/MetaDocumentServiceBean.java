@@ -244,10 +244,10 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<MetaDocumentDto> findActiveByEntitatAndContenidorPerModificacio(
+	public List<MetaDocumentDto> findActiveByEntitatAndDocumentPerModificacio(
 			Long entitatId,
 			Long documentId) throws NotFoundException {
-		return delegate.findActiveByEntitatAndContenidorPerModificacio(
+		return delegate.findActiveByEntitatAndDocumentPerModificacio(
 				entitatId,
 				documentId);
 	}

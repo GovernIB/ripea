@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.AnotacioRegistreFiltreDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ContingutComentariDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -20,7 +19,6 @@ import es.caib.ripea.core.api.dto.ContingutLogDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -180,19 +178,6 @@ public interface ContingutService {
 			Long contingutOrigenId,
 			Long contingutDestiId,
 			boolean recursiu) throws NotFoundException, ValidationException;
-
-	/**
-	 * Obté el contingut de l'escriptori de l'usuari actual.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @return l'objecte que representa l'escriptori.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public EscriptoriDto getEscriptoriPerUsuariActual(
-			Long entitatId) throws NotFoundException;
 
 	/**
 	 * Obté la informació del contingut especificat.
@@ -470,63 +455,6 @@ public interface ContingutService {
 			Long contingutId) throws NotFoundException;
 
 	/**
-	 * Retorna els comentaris d'un contingut
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @param contingutId
-	 *            Atribut id del contingut que es vol exportar.
-	 * @return Llista de comentaris pel contingut.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public List<ContingutComentariDto> findComentarisPerContingut(
-			Long entitatId,
-			Long contingutId) throws NotFoundException;
-	
-	/**
-	 * Publica un comentari per a un contingut
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @param contingutId
-	 *            Atribut id del contingut que es vol exportar.
-	 * @param text
-	 *            text del comentari a publicar.
-	 * @return boolea per indicar si s'ha publicat correctament.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public boolean publicarComentariPerContingut(
-			Long entitatId,
-			Long contingutId,
-			String text) throws NotFoundException;
-	
-	
-	/**
-	 * Marcar com a processat un contingut
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @param contingutId
-	 *            Atribut id del contingut que es vol exportar.
-	 * @param text
-	 *            text del comentari a publicar.
-	 * @return boolea per indicar si el procés ha finaltizat correctament
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public boolean marcarProcessat(
-			Long entitatId,
-			Long contingutId,
-			String text) throws NotFoundException;
-	
-	
-	
-	/**
 	 * Consulta la llista d'ids de contingut segons el filtre.
 	 * 
 	 * @param entitatId
@@ -540,10 +468,7 @@ public interface ContingutService {
 	public List<Long> findIdsMassiusAmbFiltre(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException;
-	
-	
-	
-	
+
 	/**
 	 * Consulta el amb el programar accions massives
 	 * 
@@ -556,9 +481,9 @@ public interface ContingutService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public PaginaDto<DocumentDto> documentMassiuFindByDatatable(
+	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
-	
+
 }

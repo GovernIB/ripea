@@ -17,7 +17,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @Table(	name = "ipa_registre_annex_firma")
 @EntityListeners(AuditingEntityListener.class)
 public class RegistreAnnexFirmaEntity extends RipeaAuditable<Long> {
-	
+
 	@Column(name = "tipus")
 	private String tipus;
 	@Column(name = "perfil")
@@ -32,54 +32,40 @@ public class RegistreAnnexFirmaEntity extends RipeaAuditable<Long> {
 	private Boolean autofirma = false;
 	@Column(name = "gesdoc_fir_id")
 	private String gesdocFirmaId;
-	
-	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "annex_id")
-	@ForeignKey(name = "ipa_firma_annex_fk")
+	@ForeignKey(name = "ipa_reganx_reganxfir_fk")
 	private RegistreAnnexEntity annex;
-	
+
 	public String getTipus() {
 		return tipus;
 	}
-
 	public String getPerfil() {
 		return perfil;
 	}
-
 	public String getFitxerNom() {
 		return fitxerNom;
 	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	public String getTipusMime() {
 		return tipusMime;
 	}
-
 	public String getCsvRegulacio() {
 		return csvRegulacio;
 	}
-
 	public boolean isAutofirma() {
 		return autofirma != null ? autofirma : false ;
 	}
-
 	public String getGesdocFirmaId() {
 		return gesdocFirmaId;
 	}
-
 	public RegistreAnnexEntity getAnnex() {
 		return annex;
 	}
-	
+
 	public void updateGesdocFirmaId(String gesdocFirmaId) {
 		this.gesdocFirmaId = gesdocFirmaId;
 	}
-	
-	
+
 	public static Builder getBuilder(
 			String tipus,
 			String perfil,

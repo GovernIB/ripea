@@ -39,32 +39,65 @@ public class ExecucioMassivaContingutEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "datA_inici")
 	private Date dataInici;
-	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_fi")
 	private Date dataFi;
-	
 	@Column(name = "estat")
 	@Enumerated(EnumType.STRING)
 	private ExecucioMassivaEstat estat;
-	
 	@Column(name = "error", length = ERROR_TAMANY)
 	private String error;
-	
 	@Column(name = "ordre", nullable = false)
 	private int ordre;
-
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "execucio_massiva_id")
-	@ForeignKey(name = "ipa_exmas_exmascont_fk")
+	@ForeignKey(name = "ipa_exmas_exmascon_fk")
 	private ExecucioMassivaEntity execucioMassiva;
-	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name="contingut_id")
-	@ForeignKey(name="hel_cont_exmascont_fk")
+	@ForeignKey(name="hel_cont_exmascon_fk")
 	private ContingutEntity contingut;
-	
-	
+
+	public Date getDataInici() {
+		return dataInici;
+	}
+	public Date getDataFi() {
+		return dataFi;
+	}
+	public ExecucioMassivaEstat getEstat() {
+		return estat;
+	}
+	public String getError() {
+		return error;
+	}
+	public int getOrdre() {
+		return ordre;
+	}
+	public ExecucioMassivaEntity getExecucioMassiva() {
+		return execucioMassiva;
+	}
+	public ContingutEntity getContingut() {
+		return contingut;
+	}
+
+	public void updateError(
+			Date ara,
+			String error) {
+		this.dataInici = ara;
+		this.dataFi = ara;
+		this.estat = ExecucioMassivaEstat.ESTAT_ERROR;
+		this.error = error;
+	}
+	public void updateDataInici(
+			Date dataInici) {
+		this.dataInici = dataInici;
+	}
+	public void updateFinalitzat(
+			Date dataFi) {
+		this.dataFi = dataFi;
+		this.estat = ExecucioMassivaEstat.ESTAT_FINALITZAT;
+	}
+
 	public static Builder getBuilder(
 			ExecucioMassivaEntity execucioMassiva,
 			ContingutEntity contingut,
@@ -74,12 +107,6 @@ public class ExecucioMassivaContingutEntity extends RipeaAuditable<Long> {
 				contingut,
 				ordre);
 	}
-
-	/**
-	 * Builder per a crear novus continguts d'execucions massives
-	 * 
-	 * @author Limit Tecnologies <limit@limit.es>
-	 */
 	public static class Builder {
 		ExecucioMassivaContingutEntity built;
 		Builder(ExecucioMassivaEntity execucioMassiva,
@@ -95,55 +122,7 @@ public class ExecucioMassivaContingutEntity extends RipeaAuditable<Long> {
 			return built;
 		}
 	}
-	
-	
-	public void updateError(
-			Date ara,
-			String error) {
-		this.dataInici = ara;
-		this.dataFi = ara;
-		this.estat = ExecucioMassivaEstat.ESTAT_ERROR;
-		this.error = error;
-	}
-	
-	public void updateDataInici(
-			Date dataInici) {
-		this.dataInici = dataInici;
-	}
-	
-	public void updateFinalitzat(
-			Date dataFi) {
-		this.dataFi = dataFi;
-		this.estat = ExecucioMassivaEstat.ESTAT_FINALITZAT;
-	}
-	
-	public Date getDataInici() {
-		return dataInici;
-	}
-
-	public Date getDataFi() {
-		return dataFi;
-	}
-
-	public ExecucioMassivaEstat getEstat() {
-		return estat;
-	}
-
-	public String getError() {
-		return error;
-	}
-
-	public int getOrdre() {
-		return ordre;
-	}
-
-	public ExecucioMassivaEntity getExecucioMassiva() {
-		return execucioMassiva;
-	}
-
-	public ContingutEntity getContingut() {
-		return contingut;
-	}
 
 	private static final long serialVersionUID = 5407126790947037434L;
+
 }

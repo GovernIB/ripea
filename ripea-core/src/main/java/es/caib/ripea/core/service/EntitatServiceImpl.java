@@ -5,10 +5,9 @@ package es.caib.ripea.core.service;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -28,8 +27,6 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosEntitatHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.repository.ArxiuRepository;
-import es.caib.ripea.core.repository.BustiaRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -41,24 +38,20 @@ import es.caib.ripea.core.security.ExtendedPermission;
 @Service
 public class EntitatServiceImpl implements EntitatService {
 
-	@Resource
+	@Autowired
 	private EntitatRepository entitatRepository;
-	@Resource
-	private ArxiuRepository arxiuRepository;
-	@Resource
-	private BustiaRepository bustiaRepository;
 
-	@Resource
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private PaginacioHelper paginacioHelper;
-	@Resource
+	@Autowired
 	private PermisosHelper permisosHelper;
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-	@Resource
+	@Autowired
 	private PermisosEntitatHelper permisosEntitatHelper;
-	@Resource
+	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 
 

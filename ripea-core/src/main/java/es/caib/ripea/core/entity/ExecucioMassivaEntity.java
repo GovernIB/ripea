@@ -18,11 +18,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
@@ -34,7 +31,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 
 	private static final int MOTIU_TAMANY = 256;
-	
+
 	public enum ExecucioMassivaTipus {
 		PORTASIGNATURES
 	}
@@ -42,42 +39,70 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Column(name = "tipus")
 	@Enumerated(EnumType.STRING)
 	private ExecucioMassivaTipus tipus;
-	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_inici")
 	private Date dataInici;
-	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_fi")
 	private Date dataFi;
-	
-//	Paràmetres enviament portafirmes
 	@Column(name = "pfirmes_motiu", length = MOTIU_TAMANY)
 	private String motiu;
-	
 	@Column(name = "pfirmes_priori")
 	@Enumerated(EnumType.STRING)
 	private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
-	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "pfirmes_datcad")
 	private Date dataCaducitat;
-//////////////////////////////////////	
-	
 	@Column(name = "enviar_correu")
 	private Boolean enviarCorreu;
-	
-	@OneToMany(mappedBy = "execucioMassiva", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+	@OneToMany(
+			mappedBy = "execucioMassiva",
+			cascade = {CascadeType.ALL},
+			fetch = FetchType.EAGER)
 	private List<ExecucioMassivaContingutEntity> continguts = new ArrayList<ExecucioMassivaContingutEntity>();
-	
 	@Column(name = "entitat_id")
 	private Long entitatId;
-	
+
+	public ExecucioMassivaTipus getTipus() {
+		return tipus;
+	}
+	public Date getDataInici() {
+		return dataInici;
+	}
+	public Date getDataFi() {
+		return dataFi;
+	}
+	public String getMotiu() {
+		return motiu;
+	}
+	public PortafirmesPrioritatEnumDto getPrioritat() {
+		return prioritat;
+	}
+	public Date getDataCaducitat() {
+		return dataCaducitat;
+	}
+	public Boolean getEnviarCorreu() {
+		return enviarCorreu;
+	}
+	public List<ExecucioMassivaContingutEntity> getContinguts() {
+		return continguts;
+	}
+	public Long getEntitatId() {
+		return entitatId;
+	}
+
+	public void addContingut(ExecucioMassivaContingutEntity contingut) {
+		getContinguts().add(contingut);
+	}
+	public void removeContingut(ExecucioMassivaContingutEntity contingut) {
+		getContinguts().remove(contingut);
+	}
+
 	public void updateDataFi(
 			Date dataFi) {
 		this.dataFi = dataFi;
 	}
-	
+
 	public static Builder getBuilder(
 			ExecucioMassivaTipus tipus,
 			Date dataInici,
@@ -95,12 +120,6 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				enviarCorreu,
 				entitatId);
 	}
-
-	/**
-	 * Builder per a crear noves execucions massives
-	 * 
-	 * @author Limit Tecnologies <limit@limit.es>
-	 */
 	public static class Builder {
 		ExecucioMassivaEntity built;
 		Builder(ExecucioMassivaTipus tipus,
@@ -123,56 +142,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			return built;
 		}
 	}
-	
-	@Transient
-	public List<GrantedAuthority> getAuthenticationRoles(String rol) {
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(rol));
-		return authorities;
-	}
-	
-	public ExecucioMassivaTipus getTipus() {
-		return tipus;
-	}
-
-	public Date getDataInici() {
-		return dataInici;
-	}
-
-	public Date getDataFi() {
-		return dataFi;
-	}
-
-	public String getMotiu() {
-		return motiu;
-	}
-
-	public PortafirmesPrioritatEnumDto getPrioritat() {
-		return prioritat;
-	}
-
-	public Date getDataCaducitat() {
-		return dataCaducitat;
-	}
-
-	public Boolean getEnviarCorreu() {
-		return enviarCorreu;
-	}
-
-	public List<ExecucioMassivaContingutEntity> getContinguts() {
-		return continguts;
-	}
-	
-	public Long getEntitatId() {
-		return entitatId;
-	}
-
-	public void addContingut(ExecucioMassivaContingutEntity contingut) {
-		getContinguts().add(contingut);
-	}
-	public void removeContingut(ExecucioMassivaContingutEntity contingut) {
-		getContinguts().remove(contingut);
-	}
 
 	private static final long serialVersionUID = -2077000626779456363L;
+
 }

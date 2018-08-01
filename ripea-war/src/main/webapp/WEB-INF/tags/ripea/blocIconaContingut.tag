@@ -11,19 +11,14 @@
 <c:choose>
 	<c:when test="${nomesIconaNom}">
 		<c:choose>
-			<c:when test="${contingut.escriptori}">${iconaEscriptori} ${iconaTamany}</c:when>
 			<c:when test="${contingut.expedient and contingut.estat == 'OBERT'}">${iconaExpedientObert} ${iconaTamany}</c:when>
 			<c:when test="${contingut.expedient and contingut.estat != 'OBERT'}">${iconaExpedientTancat} ${iconaTamany}</c:when>
 			<c:when test="${contingut.document}">${iconaDocument} ${iconaTamany}</c:when>
 			<c:when test="${contingut.carpeta}">${iconaCarpeta} ${iconaTamany}</c:when>
-			<c:when test="${contingut.bustia}">${iconaBustia} ${iconaTamany}</c:when>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
 		<c:choose>
-			<c:when test="${contingut.escriptori}">
-				<span class="fa ${iconaEscriptori} ${iconaTamany}" title="<spring:message code="contingut.icona.escriptori"/>"></span>
-			</c:when>
 			<c:when test="${contingut.expedient and contingut.estat == 'OBERT'}">
 				<span class="fa ${iconaExpedientObert} ${iconaTamany}" title="<spring:message code="contingut.icona.expedient"/>"></span>
 			</c:when>
@@ -35,9 +30,6 @@
 			</c:when>
 			<c:when test="${contingut.carpeta}">
 				<span class="fa ${iconaCarpeta} ${iconaTamany}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
-			</c:when>
-			<c:when test="${contingut.bustia}">
-				<span class="fa ${iconaBustia} ${iconaTamany}" title="<spring:message code="contingut.icona.bustia"/>"></span>
 			</c:when>
 		</c:choose>
 	</c:otherwise>

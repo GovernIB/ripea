@@ -8,15 +8,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,7 +36,6 @@ import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.ContingutComentariDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -49,7 +48,6 @@ import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
@@ -63,15 +61,12 @@ import es.caib.ripea.core.api.exception.ConteDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.entity.BustiaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutComentariEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.EscriptoriEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -79,11 +74,9 @@ import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.BustiaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
@@ -91,13 +84,10 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ContingutComentariRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.EscriptoriRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
@@ -114,51 +104,39 @@ import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 @Service
 public class ContingutServiceImpl implements ContingutService {
 
-	@Resource
+	@Autowired
 	private UsuariRepository usuariRepository;
-	@Resource
-	private EscriptoriRepository escriptoriRepository;
-	@Resource
+	@Autowired
 	private ContingutRepository contingutRepository;
-	@Resource
+	@Autowired
 	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
-	@Resource
+	@Autowired
 	private MetaDadaRepository metaDadaRepository;
-	@Resource
+	@Autowired
 	private DadaRepository dadaRepository;
-	@Resource
+	@Autowired
 	private MetaNodeRepository metaNodeRepository;
-	@Resource
-	private ContingutComentariRepository contingutComentariRepository;
-	@Resource
+	@Autowired
 	private DocumentRepository documentRepository;
-	@Resource
+	@Autowired
 	private AlertaRepository alertaRepository;
-	@Resource
+	@Autowired
 	private RegistreRepository registreRepository;
 
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	PaginacioHelper paginacioHelper;
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-	@Resource
+	@Autowired
 	private ContingutHelper contingutHelper;
-	@Resource
+	@Autowired
 	private DocumentHelper documentHelper;
-	@Resource
+	@Autowired
 	private ContingutLogHelper contingutLogHelper;
-	@Resource
-	private UsuariHelper usuariHelper;
-	@Resource
+	@Autowired
 	private PluginHelper pluginHelper;
-	@Resource
+	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private BustiaHelper bustiaHelper;
-
-
 
 	@Transactional
 	@Override
@@ -170,48 +148,19 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
 				+ "nom=" + nom + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				true,
-				false,
-				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova que el contingut arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingut);
-		// Comprova l'accés al path del contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
 				false,
-				false,
-				true,
-				true);
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
 				true,
 				false,
 				false);
-		if (expedientSuperior != null) {
-			contingutHelper.comprovarPermisosContingut(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
-		if (!contingutHelper.isNomValid(nom)) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"El nom del contingut no és vàlid (no pot començar amb \".\")");
-		}
-		// Canvia el nom del contingut
+		contingutHelper.comprovarNomValid(
+				contingut.getPare(),
+				nom,
+				contingutId,
+				ContingutEntity.class);
 		contingut.update(nom);
-		// Registra al log la modificació del contingut
 		contingutLogHelper.log(
 				contingut,
 				LogTipusEnumDto.MODIFICACIO,
@@ -240,31 +189,12 @@ public class ContingutServiceImpl implements ContingutService {
 				"entitatId=" + entitatId + ", " +
 				"contingutId=" + contingutId + ", " +
 				"valors=" + valors + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientModificable(
 				entitatId,
-				true,
-				false,
-				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId,
-				null);
-		if (!(contingut instanceof NodeEntity)) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"El contingut no és un node");
-		}
-		// Comprova que el contingut arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingut);
-		// Comprova el permis d'escriptura al node
-		NodeEntity node = entityComprovarHelper.comprovarNode(
-				entitat,
 				contingutId,
 				false,
 				true,
+				false,
 				false);
 		// Esborra les dades no especificades
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
@@ -276,9 +206,11 @@ public class ContingutServiceImpl implements ContingutService {
 		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode());
 		List<MetaDadaEntity> metaDadesGlobals = null;
 		if (node instanceof ExpedientEntity) {
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(entitat);
+			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(
+					node.getEntitat());
 		} else if (node instanceof DocumentEntity) {
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(entitat);
+			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(
+					node.getEntitat());
 		}
 		// Modifica les dades existents
 		for (String dadaCodi: valors.keySet()) {
@@ -302,42 +234,10 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				true,
-				false,
-				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova que el contingut arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingut);
-		// Comprova l'accés al path del contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				true,
 				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
-				false,
-				false,
-				false);
-		if (expedientSuperior != null) {
-			contingutHelper.comprovarPermisosContingut(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
-		// Comprova el permís d'esborrar del contingut
-		contingutHelper.comprovarPermisosContingut(
-				contingut,
 				false,
 				false,
 				true);
@@ -376,9 +276,7 @@ public class ContingutServiceImpl implements ContingutService {
 			}
 		}
 		// Propaga l'acció a l'arxiu
-		contingutHelper.arxiuPropagarEliminacio(
-				contingut,
-				expedientSuperior);
+		contingutHelper.arxiuPropagarEliminacio(contingut);
 		return dto;
 	}
 
@@ -393,14 +291,13 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutId=" + contingutId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				true,
+				false,
 				false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contingutId,
-				null);
-		// Esborra definitivament el contingut
+				contingutId);
+		// No es comproven permisos perquè això només ho pot fer l'administrador
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				true,
@@ -415,14 +312,7 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		contingutRepository.delete(contingut);
 		// Propaga l'acció a l'arxiu
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
-				false,
-				false,
-				false);
-		contingutHelper.arxiuPropagarEliminacio(
-				contingut,
-				expedientSuperior);
+		contingutHelper.arxiuPropagarEliminacio(contingut);
 		// Registra al log l'eliminació definitiva del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -444,13 +334,12 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutId=" + contingutId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				true,
+				false,
 				false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contingutId,
-				null);
+				contingutId);
 		// No es comproven permisos perquè això només ho pot fer l'administrador
 		if (contingut.getEsborrat() == 0) {
 			logger.error("Aquest contingut no està esborrat (contingutId=" + contingutId + ")");
@@ -496,11 +385,6 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 		// Propaga l'acció a l'arxiu
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
-				false,
-				false,
-				false);
 		FitxerDto fitxer = null;
 		if (contingut instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)contingut;
@@ -510,7 +394,6 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		contingutHelper.arxiuPropagarModificacio(
 				contingut,
-				expedientSuperior,
 				fitxer);
 		if (fitxer != null) {
 			fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
@@ -528,47 +411,65 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
 				+ "contingutDestiId=" + contingutDestiId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingutOrigen = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
+				contingutOrigenId,
 				true,
 				false,
+				false,
+				true);
+		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutDestiId,
+				false,
+				false,
+				false,
 				false);
-		ContingutEntity contingutOrigen = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutOrigenId,
-				null);
-		if (!(contingutOrigen instanceof DocumentEntity) && !(contingutOrigen instanceof CarpetaEntity)) {
+		// Comprova el tipus del contingut que es vol moure
+		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
-					"Només es poden moure documents i carpetes");
+					"Només es poden moure documents");
 		}
-		// Comprova que el contingutOrigen arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingutOrigen);
-		// Comprova l'accés al path del contingutOrigen
-		contingutHelper.comprovarPermisosPathContingut(
+		// No es poden moure documents firmats
+		if (contingutOrigen instanceof DocumentEntity) {
+			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+			if (documentOrigen.isFirmat()) {
+				throw new ValidationException(
+						contingutOrigenId,
+						contingutOrigen.getClass(),
+						"No es poden moure documents firmats");
+			}
+		}
+		// Es comprova que es poden crear elements d'aquest tipus a l'expedient destí
+		if (contingutOrigen instanceof DocumentEntity) {
+			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					documentOrigen.getMetaDocument(),
+					documentOrigen.getId(),
+					false,
+					false,
+					true,
+					false);
+		}
+		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false,
-				true);
-		// Comprova que el contingutDesti arrel és l'escriptori de l'usuari actual
-		ContingutEntity contingutDesti = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutDestiId,
-				null);
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingutDesti);
-		// Comprova l'accés al path del contingutDesti
-		contingutHelper.comprovarPermisosPathContingut(
+				false);
+		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
-				false,
 				true,
 				false,
-				true);
+				false);
+		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
+			throw new ValidationException(
+					contingutOrigenId,
+					contingutOrigen.getClass(),
+					"Només es pot moure contingut entre dos expedients del mateix tipus");
+		}
 		// Comprova que el nom no sigui duplicat
 		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
 				contingutDesti,
@@ -581,8 +482,6 @@ public class ContingutServiceImpl implements ContingutService {
 					"Ja existeix un altre contingut amb el mateix nom dins el contingut destí ("
 							+ "contingutDestiId=" + contingutDestiId + ")");
 		}
-		// Comprova que la sèrie documental sigui la mateixa
-		// TODO comprovació sèrie documental
 		// Realitza el moviment del contingut
 		ContingutMovimentEntity contingutMoviment = contingutHelper.ferIEnregistrarMoviment(
 				contingutOrigen,
@@ -621,47 +520,65 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
 				+ "contingutDestiId=" + contingutDestiId + ", "
 				+ "recursiu=" + recursiu + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingutOrigen = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
+				contingutOrigenId,
 				true,
 				false,
+				false,
 				false);
-		ContingutEntity contingutOrigen = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutOrigenId,
-				null);
-		if (!(contingutOrigen instanceof DocumentEntity) && !(contingutOrigen instanceof CarpetaEntity)) {
+		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutDestiId,
+				false,
+				false,
+				false,
+				false);
+		// Comprova el tipus del contingut que es vol moure
+		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
-					"Només es poden copiar documents i carpetes");
+					"Només es poden copiar documents");
 		}
-		// Comprova que el contingutOrigen arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingutOrigen);
-		// Comprova l'accés al path del contingutOrigen
-		contingutHelper.comprovarPermisosPathContingut(
+		// TODO Mirar què passa amb els documents firmats
+		if (contingutOrigen instanceof DocumentEntity) {
+			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+			if (documentOrigen.isFirmat()) {
+				throw new ValidationException(
+						contingutOrigenId,
+						contingutOrigen.getClass(),
+						"No es poden copiar documents firmats");
+			}
+		}
+		// Es comprova que es poden crear elements d'aquest tipus a l'expedient destí
+		if (contingutOrigen instanceof DocumentEntity) {
+			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					documentOrigen.getMetaDocument(),
+					documentOrigen.getId(),
+					false,
+					false,
+					true,
+					false);
+		}
+		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false,
-				true);
-		ContingutEntity contingutDesti = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutDestiId,
-				null);
-		// Comprova que el contingutDesti arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingutDesti);
-		// Comprova l'accés al path del contingutDesti
-		contingutHelper.comprovarPermisosPathContingut(
+				false);
+		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
-				false,
 				true,
 				false,
-				true);
+				false);
+		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
+			throw new ValidationException(
+					contingutOrigenId,
+					contingutOrigen.getClass(),
+					"Només es pot moure contingut entre dos expedients del mateix tipus");
+		}
 		// Comprova que el nom no sigui duplicat
 		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
 				contingutDesti,
@@ -674,11 +591,9 @@ public class ContingutServiceImpl implements ContingutService {
 					"Ja existeix un altre contingut amb el mateix nom dins el contingut destí ("
 							+ "contingutDestiId=" + contingutDestiId + ")");
 		}
-		// Comprova que la sèrie documental sigui la mateixa
-		// TODO comprovació sèrie documental
 		// Realitza la còpia del contingut
 		ContingutEntity contingutCopia = copiarContingut(
-				entitat,
+				contingutOrigen.getEntitat(),
 				contingutOrigen,
 				contingutDesti,
 				recursiu);
@@ -704,33 +619,6 @@ public class ContingutServiceImpl implements ContingutService {
 		return dto;
 	}
 
-	@Transactional
-	@Override
-	public EscriptoriDto getEscriptoriPerUsuariActual(
-			Long entitatId) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Obtenint escriptori ("
-				+ "entitatId=" + entitatId + ", "
-				+ "usuariCodi=" + auth.getName() + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		EscriptoriEntity escriptori = contingutHelper.getEscriptoriPerUsuari(
-				entitat,
-				usuariHelper.getUsuariAutenticat());
-		return (EscriptoriDto)contingutHelper.toContingutDto(
-				escriptori,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false);
-	}
-
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -743,51 +631,31 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutId=" + contingutId + ", "
 				+ "ambFills=" + ambFills + ", "
 				+ "ambVersions=" + ambVersions + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		if (contingut instanceof ExpedientEntity) {
-			contingutHelper.comprovarPermisosContingut(
-					contingut,
-					true,
-					false,
-					false);
-		} else {
-			contingutHelper.comprovarPermisosPathContingut(
-					contingut,
-					true,
-					false,
-					false,
-					true);
-		}
-		ContingutDto result = contingutHelper.toContingutDto(
+				true,
+				false);
+		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				true,
 				ambFills,
 				ambFills,
 				true,
 				true,
-				false,
+				true,
 				ambVersions);
-		
-		
-		result.setAlerta(alertaRepository.countByLlegidaAndContingutId(
+		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
-				result.getId()) > 0);
-				
-		List<ContingutEntity> continguts = contingutRepository.findRegistresByPareId(result.getId());
-		if(!continguts.isEmpty() && alertaRepository.countByLlegidaAndContinguts(
+				dto.getId()) > 0);
+		List<ContingutEntity> continguts = contingutRepository.findRegistresByPareId(dto.getId());
+		if (!continguts.isEmpty()) {
+			long numAlertes = alertaRepository.countByLlegidaAndContinguts(
 				false,
-				continguts
-				) > 0) result.setAlerta(true);
-		
-		return result;
+				continguts);
+			dto.setAlerta(numAlertes > 0);
+		}
+		return dto;
 	}
 
 	@Transactional(readOnly = true)
@@ -802,13 +670,12 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "ambFills=" + ambFills + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
+				true,
 				false,
-				false,
-				true);
+				false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contingutId,
-				null);
+				contingutId);
 		return contingutHelper.toContingutDto(
 				contingut,
 				true,
@@ -830,7 +697,8 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "entitatId=" + entitatId + ", "
 				+ "path=" + path + ", "
 				+ "usuariCodi=" + auth.getName() + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		// TODO
+		/*EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
@@ -884,7 +752,8 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true);
+				true);*/
+		return null;
 	}
 
 	@Transactional(readOnly = true)
@@ -895,32 +764,12 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint errors de validació del contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova l'accés al path del contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
 				true,
-				false,
-				false,
-				true);
-		if (contingut instanceof NodeEntity) {
-			NodeEntity node = (NodeEntity)contingut;
-			return cacheHelper.findErrorsValidacioPerNode(node);
-		} else {
-			logger.error("El contingut no és cap node (contingutId=" + contingutId + ")");
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"El contingut no és un node");
-		}
+				false);
+		return cacheHelper.findErrorsValidacioPerNode(node);
 	}
 
 	@Transactional(readOnly = true)
@@ -933,13 +782,12 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "nodeId=" + contingutId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
+				true,
 				false,
-				false,
-				true);
+				false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contingutId,
-				null);
+				contingutId);
 		return contingutLogHelper.findLogsContingut(contingut);
 	}
 
@@ -951,22 +799,11 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre d'accions pel contingut usuari normal ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova que l'usuari tengui accés al contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				false,
-				false,
-				false,
-				true);
+				true,
+				false);
 		return contingutLogHelper.findLogsContingut(contingut);
 	}
 
@@ -981,13 +818,12 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "nodeId=" + contingutId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
+				true,
 				false,
-				false,
-				true);
+				false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contingutId,
-				null);
+				contingutId);
 		return contingutLogHelper.findLogDetalls(
 				contingut,
 				contingutLogId);
@@ -1002,22 +838,11 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre d'accions pel contingut usuari normal ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova que l'usuari tengui accés al contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				false,
-				false,
-				false,
-				true);
+				true,
+				false);
 		return contingutLogHelper.findLogDetalls(
 				contingut,
 				contingutLogId);
@@ -1038,12 +863,9 @@ public class ContingutServiceImpl implements ContingutService {
 				true);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
-				contingutId,
-				null);
+				contingutId);
 		return contingutLogHelper.findMovimentsContingut(contingut);
 	}
-
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1053,22 +875,11 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre de moviments pel contingut usuari normal ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova que l'usuari tengui accés al contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				false,
-				false,
-				false,
-				true);
+				true,
+				false);
 		return contingutLogHelper.findMovimentsContingut(contingut);
 	}
 
@@ -1095,34 +906,20 @@ public class ContingutServiceImpl implements ContingutService {
 						MetaNodeEntity.class);
 			}
 		}
-		boolean tipusArxiu = true;
-		boolean tipusBustia = true;
 		boolean tipusCarpeta = true;
 		boolean tipusDocument = true;
-		boolean tipusEscriptori = false;
 		boolean tipusExpedient = true;
 		boolean tipusRegistre = true;
 		if (filtre.getTipus() != null) {
-			tipusArxiu = false;
-			tipusBustia = false;
 			tipusCarpeta = false;
 			tipusDocument = false;
-			tipusExpedient = false;
 			tipusRegistre = false;
 			switch (filtre.getTipus()) {
-			case ARXIU:
-				tipusArxiu = true;
-				break;
-			case BUSTIA:
-				tipusBustia = true;
-				break;
 			case CARPETA:
 				tipusCarpeta = true;
 				break;
 			case DOCUMENT:
 				tipusDocument = true;
-				break;
-			case ESCRIPTORI:
 				break;
 			case EXPEDIENT:
 				tipusExpedient = true;
@@ -1132,44 +929,23 @@ public class ContingutServiceImpl implements ContingutService {
 				break;
 			}
 		}
-		Date dataInici = filtre.getDataCreacioInici();
-		if (dataInici != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataInici);
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dataInici = cal.getTime();
-		}
-		Date dataFi = filtre.getDataCreacioFi();
-		if (dataFi != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataFi);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 999);
-			dataFi = cal.getTime();
-		}
+		Date dataCreacioInici = toDateInicialDia(filtre.getDataCreacioInici());
+		Date dataCreacioFi = toDateFinalDia(filtre.getDataCreacioFi());
 		return paginacioHelper.toPaginaDto(
 				contingutRepository.findByFiltrePaginat(
 						entitat,
-						tipusArxiu,
-						tipusBustia,
 						tipusCarpeta,
 						tipusDocument,
-						tipusEscriptori,
 						tipusExpedient,
 						tipusRegistre,
 						(filtre.getNom() == null),
 						filtre.getNom(),
 						(metaNode == null),
 						metaNode,
-						(dataInici == null),
-						dataInici,
-						(dataFi == null),
-						dataFi,
+						(dataCreacioInici == null),
+						dataCreacioInici,
+						(dataCreacioFi == null),
+						dataCreacioFi,
 						filtre.isMostrarEsborrats(),
 						filtre.isMostrarNoEsborrats(),
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
@@ -1204,39 +980,17 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false);
-		
-		Date dataInici = filtre.getDataCreacioInici();
-		if (dataInici != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataInici);
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dataInici = cal.getTime();
-		}
-		Date dataFi = filtre.getDataCreacioFi();
-		if (dataFi != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataFi);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 999);
-			dataFi = cal.getTime();
-		}
-		
+		Date dataCreacioInici = toDateInicialDia(filtre.getDataCreacioInici());
+		Date dataCreacioFi = toDateFinalDia(filtre.getDataCreacioFi());
 		return paginacioHelper.toPaginaDto(
 				registreRepository.findByFiltrePaginat(
 						entitat, 
 						(filtre.getUnitatOrganitzativa() == null),
 						filtre.getUnitatOrganitzativa(),
-						(filtre.getBustia() == null),
-						(filtre.getBustia() != null ? Long.parseLong(filtre.getBustia()) : null),
-						(dataInici == null),
-						dataInici,
-						(dataFi == null),
-						dataFi,
+						(dataCreacioInici == null),
+						dataCreacioInici,
+						(dataCreacioFi == null),
+						dataCreacioFi,
 						(filtre.getEstat() == null),
 						filtre.getEstat(),
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
@@ -1287,24 +1041,6 @@ public class ContingutServiceImpl implements ContingutService {
 						UsuariEntity.class);
 			}
 		}
-		if (dataInici != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataInici);
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dataInici = cal.getTime();
-		}
-		if (dataFi != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataFi);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 999);
-			dataFi = cal.getTime();
-		}
 		return paginacioHelper.toPaginaDto(
 				contingutRepository.findEsborratsByFiltrePaginat(
 						entitat,
@@ -1313,9 +1049,9 @@ public class ContingutServiceImpl implements ContingutService {
 						(usuari == null),
 						usuari,
 						(dataInici == null),
-						dataInici,
+						toDateInicialDia(dataInici),
 						(dataFi == null),
-						dataFi,
+						toDateFinalDia(dataFi),
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 				ContingutDto.class,
 				new Converter<ContingutEntity, ContingutDto>() {
@@ -1342,15 +1078,11 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint informació de l'arxiu pel contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
+				true,
+				false);
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
@@ -1632,22 +1364,11 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Exportant document a format ENI (" +
 				"entitatId=" + entitatId + ", " +
 				"contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId,
-				null);
-		// Comprova l'accés al path del document
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
 				true,
-				false,
-				false,
-				true);
+				false);
 		String exportacio;
 		if (contingut instanceof ExpedientEntity) {
 			exportacio = pluginHelper.arxiuExpedientExportar(
@@ -1670,117 +1391,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ContingutComentariDto> findComentarisPerContingut(
-			Long entitatId,
-			Long contingutId) {
-		logger.debug("Obtenint els comentaris pel contingut de bustia ("
-				+ "entitatId=" + entitatId + ", "
-				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId,
-				null);
-		// Comprova que l'usuari tengui accés al contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				false,
-				false,
-				false,
-				true);
-		
-		
-		return conversioTipusHelper.convertirList(
-				contingutComentariRepository.findByContingutOrderByCreatedDateAsc(contingut), 
-				ContingutComentariDto.class);
-	}
-	
-	@Transactional
-	@Override
-	public boolean publicarComentariPerContingut(
-			Long entitatId,
-			Long contingutId,
-			String text) {
-		logger.debug("Obtenint els comentaris pel contingut de bustia ("
-				+ "entitatId=" + entitatId + ", "
-				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId,
-				null);
-		// Comprova que l'usuari tengui accés al contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingut,
-				false,
-				false,
-				false,
-				true);
-		
-		//truncam a 1024 caracters
-		if (text.length() > 1024)
-			text = text.substring(0, 1024);
-		
-		ContingutComentariEntity comentari = ContingutComentariEntity.getBuilder(
-				contingut, 
-				text).build();
-		
-		contingutComentariRepository.save(comentari);
-		
-		return true;
-	}
-	
-	@Transactional
-	@Override
-	public boolean marcarProcessat(
-			Long entitatId,
-			Long contingutId,
-			String text) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId,
-				null);
-		
-		contingut.updateEsborrat(1);
-		
-		// Marca per evitar la cache de la bustia
-		Long bustiaId = contingut.getPare().getId();
-		BustiaEntity bustia = entityComprovarHelper.comprovarBustia(
-				entitat,
-				bustiaId,
-				true);
-		bustiaHelper.evictElementsPendentsBustia(entitat, bustia);
-		
-		// Si el contingut és una anotació de registre s'ha de 
-		// tancar l'expedient temporal 
-		if (ContingutTipusEnumDto.REGISTRE == contingut.getTipus()) {
-			RegistreEntity registre = (RegistreEntity)contingut;
-			if (registre.getAnnexos() != null && registre.getAnnexos().size() > 0)
-				pluginHelper.arxiuExpedientTemporalTancar(registre);
-		}
-		
-		return publicarComentariPerContingut(
-				entitatId,
-				contingutId,
-				text);
-	}
-	
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<DocumentDto> documentMassiuFindByDatatable(
+	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
 			Long entitatId, 
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
@@ -1789,26 +1400,6 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false);
-		Date dataInici = filtre.getDataInici();
-		if (dataInici != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataInici);
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dataInici = cal.getTime();
-		}
-		Date dataFi = filtre.getDataFi();
-		if (dataFi != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataFi);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 999);
-			dataFi = cal.getTime();
-		}
 		Long idMetaNode = null;
 		MetaNodeEntity metaNode = null;
 		if (filtre.getTipusElement() == ContingutTipusEnumDto.EXPEDIENT && filtre.getTipusExpedient() != null) {
@@ -1824,12 +1415,14 @@ public class ContingutServiceImpl implements ContingutService {
 						MetaNodeEntity.class);
 			}
 		}
+		Date dataInici = toDateInicialDia(filtre.getDataInici());
+		Date dataFi = toDateFinalDia(filtre.getDataFi());
 		List<DocumentEntity> preDocuments = documentRepository.findDocumentMassiuByFiltre(
 				entitat,
 				(filtre.getTipusExpedient() == null),
 				filtre.getTipusExpedient(),
 				(filtre.getExpedientId() == null),
-				filtre.getExpedientId(),
+				Arrays.asList(filtre.getExpedientId()),
 				(filtre.getTipusDocument() == null),
 				filtre.getTipusDocument(),
 				(filtre.getNom() == null),
@@ -1842,12 +1435,13 @@ public class ContingutServiceImpl implements ContingutService {
 				true);
 		List<Long> docIds = new ArrayList<Long>();
 		for (DocumentEntity document: preDocuments) {
-			try {
-				contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(entitat, document);
-				docIds.add(document.getId());
-			} catch (SecurityException se) {
-				
-			}
+			contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					document.getId(),
+					false,
+					true,
+					false,
+					false);
 		}
 		if (!docIds.isEmpty()) {
 			return paginacioHelper.toPaginaDto(
@@ -1895,6 +1489,74 @@ public class ContingutServiceImpl implements ContingutService {
 
 
 
+	/*private ContingutEntity contingutHelper.comprovarContingutDinsExpedient(
+			Long entitatId,
+			Long contingutId,
+			boolean comprovarEsNode,
+			boolean comprovarPermisReadEnNode,
+			boolean comprovarPermisWriteEnNode,
+			boolean comprovarPermisDeleteEnNode) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		// Comprova el permís de modificació de l'expedient superior
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
+				contingut,
+				true,
+				false,
+				true);
+		if (expedientSuperior != null) {
+			// Comprova que l'usuari actual te agafat l'expedient
+			UsuariEntity agafatPer = expedientSuperior.getAgafatPer();
+			if (agafatPer != null) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (!auth.getName().equals(agafatPer.getCodi())) {
+					throw new ValidationException(
+							contingutId,
+							ContingutEntity.class,
+							"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
+							"usuariActualCodi=" + auth.getName() + ")");
+				}
+			} else {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
+			}
+			// Comprova els permisos per a modificar l'expedient
+			contingutHelper.comprovarPermisosNode(
+					expedientSuperior,
+					false,
+					true,
+					false);
+			if (comprovarEsNode) {
+				if (!(contingut instanceof NodeEntity)) {
+					throw new ValidationException(
+							contingutId,
+							ContingutEntity.class,
+							"El contingut no és un node");
+				}
+				NodeEntity node = (NodeEntity)contingut;
+				contingutHelper.comprovarPermisosNode(
+						node,
+						comprovarPermisReadEnNode,
+						comprovarPermisWriteEnNode,
+						comprovarPermisDeleteEnNode);
+			}
+		} else {
+			throw new ValidationException(
+					contingutId,
+					ContingutEntity.class,
+					"No es pot modificar un contingut que no està associat a un expedient");
+		}
+		return contingut;
+	}*/
+
 	private List<Long> findIdsAmbFiltrePaginat(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) {
@@ -1903,30 +1565,8 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false);
-		
-		Date dataInici = filtre.getDataInici();
-		if (dataInici != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataInici);
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dataInici = cal.getTime();
-		}
-		Date dataFi = filtre.getDataFi();
-		if (dataFi != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dataFi);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 999);
-			dataFi = cal.getTime();
-		}
 		Long idMetaNode = null;
 		MetaNodeEntity metaNode = null;
-		
 		if (filtre.getTipusElement() == ContingutTipusEnumDto.EXPEDIENT && filtre.getTipusExpedient() != null)
 			idMetaNode = filtre.getTipusExpedient();
 		else if (filtre.getTipusElement() == ContingutTipusEnumDto.DOCUMENT && filtre.getTipusDocument() != null)
@@ -1940,6 +1580,8 @@ public class ContingutServiceImpl implements ContingutService {
 						MetaNodeEntity.class);
 			}
 		}
+		Date dataInici = toDateInicialDia(filtre.getDataInici());
+		Date dataFi = toDateFinalDia(filtre.getDataFi());
 		return documentRepository.findIdMassiuByEntitatAndFiltre(
 				entitat,
 				(filtre.getTipusExpedient() == null),
@@ -1969,7 +1611,8 @@ public class ContingutServiceImpl implements ContingutService {
 			CarpetaEntity carpetaNova = CarpetaEntity.getBuilder(
 					carpetaOrigen.getNom(),
 					contingutDesti,
-					entitat).build();
+					entitat,
+					contingutDesti.getExpedient()).build();
 			creat = contingutRepository.save(carpetaNova);
 		} else if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
@@ -1982,10 +1625,10 @@ public class ContingutServiceImpl implements ContingutService {
 					documentOrigen.getNtiOrigen(),
 					documentOrigen.getNtiEstadoElaboracion(),
 					documentOrigen.getNtiTipoDocumental(),
-					documentOrigen.getExpedient(),
 					documentOrigen.getMetaDocument(),
 					contingutDesti,
 					entitat,
+					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio());
 		}
 		if (creat != null) {
@@ -2184,6 +1827,31 @@ public class ContingutServiceImpl implements ContingutService {
 		File fContent = new File(getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
 		fContent.delete();
+	}
+
+	private Date toDateInicialDia(Date data) {
+		if (data == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(data);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+	private Date toDateFinalDia(Date data) {
+		if (data == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(data);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+		return cal.getTime();
 	}
 
 	private String getBaseDir() {

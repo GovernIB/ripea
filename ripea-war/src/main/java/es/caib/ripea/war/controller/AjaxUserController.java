@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ArxiuDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ArxiuService;
 import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 
 /**
@@ -35,8 +32,6 @@ public class AjaxUserController extends BaseUserController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private ArxiuService arxiuService;
 
 
 
@@ -56,18 +51,6 @@ public class AjaxUserController extends BaseUserController {
 			@PathVariable String text,
 			Model model) {
 		return aplicacioService.findUsuariAmbText(text);
-	}
-
-	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/arxius", method = RequestMethod.GET)
-	@ResponseBody
-	public List<ArxiuDto> arxiusAmbMetaExpedient(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return arxiuService.findAmbMetaExpedientPerCreacio(
-				entitatActual.getId(),
-				metaExpedientId);
 	}
 
 	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)

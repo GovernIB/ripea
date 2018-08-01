@@ -8,8 +8,6 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -29,17 +27,5 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Sort sort);
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Pageable pageable);
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
-
-	/** Conta el número d'arxius per a cada meta-expedient de la entitat. */
-	@Query(	"select " +
-			"    id, " +
-			"    size(arxius) " +
-			"from " +
-			"    MetaExpedientEntity " +
-			"where " +
-			"    entitat = :entitat " +
-			"group by id ")
-	List<Object[]> countArxius(
-			@Param("entitat") EntitatEntity entitat);
 
 }

@@ -264,6 +264,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				nodeId,
 				false,
 				false,
+				false,
 				false);
 		List<MetaNodeMetaDadaDto> metaNodeMetaDades = new ArrayList<MetaNodeMetaDadaDto>();
 		metaNodeMetaDades.addAll(
@@ -315,7 +316,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 		NodeEntity node = entityComprovarHelper.comprovarNode(
 				entitat,
 				nodeId,
-				true,
+				false,
+				false,
 				false,
 				false);
 		List<MetaDadaEntity> metaDades = new ArrayList<MetaDadaEntity>();

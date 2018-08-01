@@ -59,4 +59,7 @@ public interface ExecucioMassivaService {
 	public List<ExecucioMassivaDto> findExecucionsMassivesGlobals() throws NotFoundException;
 	
 	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException, ExecucioMassivaException;
+
+	public void comprovarExecucionsMassives();
+
 }

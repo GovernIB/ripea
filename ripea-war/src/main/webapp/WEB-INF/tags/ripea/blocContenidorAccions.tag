@@ -51,8 +51,8 @@
 				<li><a href="../expedient/${contingut.id}/alliberar"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 				<c:if test="${contingut.metaNode.usuariActualWrite or empty contingut.metaNode}">
 					<li><a href="../expedient/${contingut.id}/relacionar" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-					<li><a href="../expedient/${contingut.id}/acumular" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
-					<%--li><a href="../contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
+					<%--li><a href="../expedient/${contingut.id}/acumular" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
+					<li><a href="../contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
 				</c:if>
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
@@ -79,15 +79,14 @@
 			</c:if>
 			<c:if test="${contingut.documentTipus != 'FISIC'}">
 				<li><a href="../contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
-				<li><a href="../contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
 			<c:if test="${contingut.expedientPare.agafat and expedientPareObertOInexistent}">
-				<%--c:if test="${contingut.estat == 'CUSTODIAT'}"--%>
+				<c:if test="${contingut.estat == 'CUSTODIAT'}">
 					<li><a href="../document/${contingut.id}/notificar" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
 					<li><a href="../document/${contingut.id}/publicar" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-clipboard"></span>&nbsp;<spring:message code="comu.boto.publicar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
-				<%--/c:if--%>
+				</c:if>
 				<c:if test="${contingut.estat == 'REDACCIO' && contingut.metaNode.firmaPortafirmesActiva && contingut.documentTipus != 'FISIC'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
@@ -110,7 +109,7 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				<c:if test="${contingut.estat != 'REDACCIO' && contingut.documentTipus != 'FISIC'}">
+				<%--c:if test="${contingut.estat != 'REDACCIO' && contingut.documentTipus != 'FISIC'}">
 					<c:choose>
 						<c:when test="${contingut.estat != 'CUSTODIAT'}">
 							<li><a href="../document/${contingut.id}/portafirmes/info" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>
@@ -119,6 +118,13 @@
 							<li><a href="../document/${contingut.id}/custodia/info" target="_blank"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.custodia"/>&nbsp;<small><i class="fa fa-external-link"></i></small></a></li>
 						</c:otherwise>
 					</c:choose>
+					<c:if test="${contingut.estat != 'CUSTODIAT'}">
+						<li><a href="../document/${contingut.id}/portafirmes/info" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>
+					</c:when>
+					<c:set var="mostrarSeparador" value="${true}"/>
+				</c:if--%>
+				<c:if test="${contingut.estat != 'REDACCIO' && contingut.documentTipus != 'FISIC' && contingut.estat != 'CUSTODIAT'}">
+					<li><a href="../document/${contingut.id}/portafirmes/info" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 			</c:if>

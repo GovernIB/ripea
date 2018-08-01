@@ -1,4 +1,4 @@
-CREATE SEQUENCE hibernate_sequence
+CREATE SEQUENCE ipa_hibernate_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE

@@ -13,9 +13,6 @@
 			"entitatActual",
 			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
 	pageContext.setAttribute(
-			"countElementsPendentsBusties",
-			es.caib.ripea.war.helper.ElementsPendentsBustiaHelper.countElementsPendentsBusties(request));
-	pageContext.setAttribute(
 			"requestParameterCanviEntitat",
 			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
 	pageContext.setAttribute(
@@ -186,10 +183,6 @@ body {
 										<li><a href="<c:url value="/metaDocument"/>"><spring:message code="decorator.menu.metadocuments"/></a></li>
 										<li><a href="<c:url value="/metaDada"/>"><spring:message code="decorator.menu.metadades"/></a></li>
 										<li class="divider"></li>
-										<li><a href="<c:url value="/bustiaAdmin"/>"><spring:message code="decorator.menu.busties"/></a></li>
-										<li><a href="<c:url value="/arxiuAdmin"/>"><spring:message code="decorator.menu.arxius"/></a></li>
-										<li class="divider"></li>
-										<li><a href="<c:url value="/regla"/>"><spring:message code="decorator.menu.regles"/></a></li>
 										<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 									</ul>
 								</div>
@@ -197,7 +190,6 @@ body {
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
 										<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
-										<li><a href="<c:url value="/anotacionsRegistre"/>"><spring:message code="decorator.menu.anotacions"/></a></li>
 										<li>
 											<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
 												<spring:message code="decorator.menu.accions.massives.admin"/>
@@ -207,14 +199,9 @@ body {
 								</div>
 							</c:when>
 							<c:when test="${isRolActualUsuari}">
-								<%--a href="<c:url value="/escriptori"/>" class="btn btn-primary"><spring:message code="decorator.menu.escriptori"/></a--%>
 								<c:if test="${teAccesExpedients}">
 									<a href="<c:url value="/expedient"/>" class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
 								</c:if>
-								<a href="<c:url value="/bustiaUser"/>" class="btn btn-primary">
-									<spring:message code="decorator.menu.busties"/>
-									<span id="bustia-pendent-count" class="badge small">${countElementsPendentsBusties}</span>
-								</a>
 							</c:when>
 						</c:choose>
 						<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">

@@ -14,7 +14,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.entity.ArxiuEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -28,34 +27,6 @@ import es.caib.ripea.core.entity.UsuariEntity;
  */
 public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long> {
 
-	@Query(	"select " +
-			"    arxiu.id, " +
-			"    count(*) " +
-			"from " +
-			"    ExpedientEntity " +
-			"where " +
-			"    entitat = :entitat " +
-			"and esborrat = 0 " +
-			"group by " +
-			"    arxiu")
-	List<Object[]> countByArxiu(
-			@Param("entitat") EntitatEntity entitat);
-
-	@Query(	"select " +
-			"    arxiu.id, " +
-			"    count(*) " +
-			"from " +
-			"    ExpedientEntity " +
-			"where " +
-			"    entitat = :entitat " +
-			"and esborrat = 0 " +
-			"and (metaNode is null or metaNode in (:metaNodes)) " +
-			"group by " +
-			"    arxiu")
-	List<Object[]> countPermesosByArxiu(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNodes") List<? extends MetaNodeEntity> metanodes);
-
 	ExpedientEntity findByEntitatAndMetaNodeAndAnyAndSequencia(
 			EntitatEntity entitat,
 			MetaNodeEntity metaNode,
@@ -67,7 +38,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and (:esNullArxiu = true or e.arxiu = :arxiu) " +
 			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -82,8 +52,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) ")
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullArxiu") boolean esNullArxiu,
-			@Param("arxiu") ArxiuEntity arxiu,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,			
@@ -116,7 +84,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and (:esNullArxiu = true or e.arxiu = :arxiu) " +
 			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -128,8 +95,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullEstat = true or e.estat = :estat)")
 	List<Long> findIdByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullArxiu") boolean esNullArxiu,
-			@Param("arxiu") ArxiuEntity arxiu,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,			

@@ -14,7 +14,7 @@ public class ValidationException extends RuntimeException {
 	private Object objectId;
 	private Class<?> objectClass;
 	private String error;
-	
+
 	public ValidationException(
 			Object objectId,
 			Class<?> objectClass,

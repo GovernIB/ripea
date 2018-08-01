@@ -544,7 +544,7 @@ public class ContingutDocumentController extends BaseUserController {
 		} else {
 			model.addAttribute(
 					"metaDocuments",
-					metaDocumentService.findActiveByEntitatAndContenidorPerModificacio(
+					metaDocumentService.findActiveByEntitatAndDocumentPerModificacio(
 							entitatActual.getId(),
 							command.getId()));
 		}

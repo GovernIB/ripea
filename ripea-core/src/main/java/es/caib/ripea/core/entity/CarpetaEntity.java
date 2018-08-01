@@ -29,22 +29,26 @@ public class CarpetaEntity extends ContingutEntity {
 	public static Builder getBuilder(
 			String nom,
 			ContingutEntity pare,
-			EntitatEntity entitat) {
+			EntitatEntity entitat,
+			ExpedientEntity expedient) {
 		return new Builder(
 				nom,
 				pare,
-				entitat);
+				entitat,
+				expedient);
 	}
 	public static class Builder {
 		CarpetaEntity built;
 		Builder(
 				String nom,
 				ContingutEntity pare,
-				EntitatEntity entitat) {
+				EntitatEntity entitat,
+				ExpedientEntity expedient) {
 			built = new CarpetaEntity();
 			built.nom = nom;
 			built.pare = pare;
 			built.entitat = entitat;
+			built.expedient = expedient;
 			built.tipus = ContingutTipusEnumDto.CARPETA;
 		}
 		public CarpetaEntity build() {
@@ -52,11 +56,6 @@ public class CarpetaEntity extends ContingutEntity {
 		}
 	}
 
-	@Override
-	public String getContingutType() {
-		return "carpeta";
-	}
-	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

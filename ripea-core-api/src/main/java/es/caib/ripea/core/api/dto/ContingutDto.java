@@ -28,12 +28,9 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected Date darrerMovimentData;
 	protected UsuariDto darrerMovimentUsuari;
 	protected String darrerMovimentComentari;
-
-	protected boolean perConvertirJson;
-	
 	private boolean alerta;
-	
-	
+	protected boolean perConvertirJson;
+
 	public Long getId() {
 		return id;
 	}
@@ -111,8 +108,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 			}
 		}
 	}
-	
-	
 
 	public ContingutDto getPare() {
 		if (getPath() != null && !getPath().isEmpty())
@@ -176,13 +171,14 @@ public abstract class ContingutDto extends AuditoriaDto {
 	}
 
 	public ExpedientDto getExpedientPare() {
-		if (getPath() == null)
-			return null;
 		if (this instanceof ExpedientDto) {
 			if (perConvertirJson)
 				return (ExpedientDto)copiarContenidor(this);
 			else
 				return (ExpedientDto)this;
+		}
+		if (getPath() == null) {
+			return null;
 		}
 		for (int i = getPath().size() - 1; i >= 0; i--) {
 			ContingutDto contenidor = getPath().get(i);
@@ -191,40 +187,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 			}
 		}
 		return null;
-	}
-
-	public EscriptoriDto getEscriptoriPare() {
-		if (getPath() == null)
-			return null;
-		if (this instanceof EscriptoriDto) {
-			if (perConvertirJson)
-				return (EscriptoriDto)copiarContenidor(this);
-			else
-				return (EscriptoriDto)this;
-		}
-		for (int i = getPath().size() - 1; i >= 0; i--) {
-			ContingutDto contenidor = getPath().get(i);
-			if (contenidor instanceof EscriptoriDto) {
-				return (EscriptoriDto)contenidor;
-			}
-		}
-		return null;
-	}
-	public String getNomPropietariEscriptoriPare() {
-		EscriptoriDto escriptoriPare = getEscriptoriPare();
-		if (escriptoriPare != null) {
-			return escriptoriPare.getCreatedBy().getNom();
-		} else {
-			return null;
-		}
-	}
-	public String getCodiPropietariEscriptoriPare() {
-		EscriptoriDto escriptoriPare = getEscriptoriPare();
-		if (escriptoriPare != null) {
-			return escriptoriPare.getCreatedBy().getCodi();
-		} else {
-			return null;
-		}
 	}
 
 	public List<ExpedientDto> getFillsExpedients() {
@@ -363,12 +325,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 	public boolean isEscriptori() {
 		return this instanceof EscriptoriDto;
 	}
-	public boolean isArxiv() {
-		return this instanceof ArxiuDto;
-	}
-	public boolean isBustia() {
-		return this instanceof BustiaDto;
-	}
 	public boolean isRegistre() {
 		return this instanceof RegistreAnotacioDto;
 	}
@@ -380,12 +336,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 			return ContingutTipusEnumDto.DOCUMENT;
 		} else if (isCarpeta()) {
 			return ContingutTipusEnumDto.CARPETA;
-		} else if (isEscriptori()) {
-			return ContingutTipusEnumDto.ESCRIPTORI;
-		} else if (isArxiv()) {
-			return ContingutTipusEnumDto.ARXIU;
-		} else if (isBustia()) {
-			return ContingutTipusEnumDto.BUSTIA;
 		} else if (isRegistre()) {
 			return ContingutTipusEnumDto.REGISTRE;
 		} else {

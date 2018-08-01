@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
@@ -38,7 +37,6 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
@@ -62,11 +60,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 	@Autowired
 	private ContingutService contingutService;
 	@Autowired
-	private ContingutService contenidorService;
-	@Autowired
 	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private ExecucioMassivaService execucioMassivaService;
 	@Autowired
@@ -78,16 +72,12 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 	public String getDocuments(
 			HttpServletRequest request,
 			Model model) {
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		EscriptoriDto escriptori = contenidorService.getEscriptoriPerUsuariActual(entitatActual.getId());
-		
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
 		filtreCommand.setBloquejarTipusElement(true);
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
-		
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -104,20 +94,12 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
-		model.addAttribute(
-				"metaDocuments",
-				metaDocumentService.findActiveByEntitatAndContenidorPerCreacio(
-						entitatActual.getId(),
-						escriptori.getId()));
-		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (filtreCommand.getTipusExpedient() != null)
 			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getTipusExpedient());
-		
 		model.addAttribute(
 				"expedients",
 				expedients);
-		
 		return "contingutMassiuList";
 	}
 	
@@ -214,7 +196,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				 contingutService.documentMassiuFindByDatatable(
+				 contingutService.documentMassiuFindAmbFiltre(
 							entitatActual.getId(), 
 							ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 							DatatablesHelper.getPaginacioDtoFromRequest(request)),
@@ -222,7 +204,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 				 SESSION_ATTRIBUTE_SELECCIO);
 		
 	}
-	
+
 	@RequestMapping(value = "/expedients/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ExpedientSelectorDto> findAll(
@@ -236,7 +218,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), metaExpedientId);
 		return expedients;
 	}
-	
+
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody
 	public int select(
@@ -267,6 +249,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		}
 		return seleccio.size();
 	}
+
 	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselect(
@@ -292,20 +275,15 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		}
 		return seleccio.size();
 	}
-	
-	
+
 	@RequestMapping(value = "/consulta/{pagina}", method = RequestMethod.GET)
 	public String getConsultaExecucions(
 			HttpServletRequest request,
 			@PathVariable int pagina,
 			Model model) {
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
 		pagina = (pagina < 0 ? 0 : pagina);
-		
 		List<ExecucioMassivaDto> execucionsMassives = new ArrayList<ExecucioMassivaDto>();
-		
 		UsuariDto usuariActual = null;
 		if (RolHelper.isRolActualAdministrador(request)) {
 			model.addAttribute(
@@ -317,33 +295,27 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 					"titolConsulta",
 					getMessage(request, "accio.massiva.consulta.titol.usuari", new String[]{usuariActual.getNom()}));
 		}
-		
 		execucionsMassives = execucioMassivaService.findExecucionsMassivesPerUsuari(entitatActual.getId(), usuariActual,pagina);
-		
-		if (execucionsMassives.size() < 8)
+		if (execucionsMassives.size() < 8) {
 			model.addAttribute("sumador", 0);
-		else
+		} else {
 			model.addAttribute("sumador", 1);
-		
+		}
 		model.addAttribute("pagina",pagina);
 		model.addAttribute("execucionsMassives", execucionsMassives);
-		
 		return "consultaExecucionsMassives";
 	}
-	
+
 	@RequestMapping(value = "/consultaContingut/{execucioMassivaId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ExecucioMassivaContingutDto> getConsultaContinguts(
 			HttpServletRequest request,
 			@PathVariable Long execucioMassivaId) {
-		
 		if (RolHelper.isRolActualUsuari(request)) 
 			getEntitatActualComprovantPermisos(request);
-		
 		return execucioMassivaService.findContingutPerExecucioMassiva(execucioMassivaId);
-		
 	}
-	
+
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -352,7 +324,9 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
-	
+
+
+
 	private ContingutMassiuFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ContingutMassiuFiltreCommand filtreCommand = (ContingutMassiuFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
@@ -367,7 +341,5 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		}
 		return filtreCommand;
 	}
-	
-	
 
 }

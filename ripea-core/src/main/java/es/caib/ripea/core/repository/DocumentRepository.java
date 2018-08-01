@@ -53,21 +53,21 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    c.entitat = :entitat " +
 			"and c.estat = 0 " +
-			"and (:esNullTipusExpedient = true or c.expedient.metaNode.id = :tipusExpedientId) " +
-			"and (:esNullExpedient = true or c.expedient.id = :expedientId) " +
-			"and (:esNullTipusDocument = true or c.metaNode.id = :tipusDocumentId) " +
+			"and (:esNullMetaExpedientId = true or c.expedient.metaNode.id = :metaExpedientId) " +
+			"and (:esNullExpedientIds = true or c.expedient.id in (:expedientIds)) " +
+			"and (:esNullMetaDocumentId = true or c.metaNode.id = :metaDocumentId) " +
 			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or c.lastModifiedDate >= :dataInici) " +
 			"and (:esNullDataFi = true or c.lastModifiedDate <= :dataFi) " +
 			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) ")
 	public List<DocumentEntity> findDocumentMassiuByFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullTipusExpedient") boolean esNullTipusExpedient,
-			@Param("tipusExpedientId") Long tipusExpedientId,
-			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedientId") Long expedientId,
-			@Param("esNullTipusDocument") boolean esNullTipusDocument,
-			@Param("tipusDocumentId") Long tipusDocumentId,
+			@Param("esNullMetaExpedientId") boolean esNullMetaExpedientId,
+			@Param("metaExpedientId") Long metaExpedientId,
+			@Param("esNullExpedientIds") boolean esNullExpedientIds,
+			@Param("expedientIds") List<Long> expedientIds,
+			@Param("esNullMetaDocumentId") boolean esNullMetaDocumentId,
+			@Param("metaDocumentId") Long metaDocumentId,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,

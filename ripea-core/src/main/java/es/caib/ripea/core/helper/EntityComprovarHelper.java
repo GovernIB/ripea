@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.entity.ArxiuEntity;
-import es.caib.ripea.core.entity.BustiaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
@@ -34,11 +32,7 @@ import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
-import es.caib.ripea.core.entity.ReglaEntity;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.ArxiuRepository;
-import es.caib.ripea.core.repository.BustiaRepository;
+import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -55,7 +49,6 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
-import es.caib.ripea.core.repository.ReglaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 
@@ -92,13 +85,7 @@ public class EntityComprovarHelper {
 	@Resource
 	private DadaRepository dadaRepository;
 	@Resource
-	private BustiaRepository bustiaRepository;
-	@Resource
-	private ArxiuRepository arxiuRepository;
-	@Resource
 	private RegistreRepository registreRepository;
-	@Resource
-	private ReglaRepository reglaRepository;
 	@Resource
 	private InteressatRepository interessatRepository;
 	@Resource
@@ -173,7 +160,10 @@ public class EntityComprovarHelper {
 	public MetaDocumentEntity comprovarMetaDocument(
 			EntitatEntity entitat,
 			Long id,
-			boolean comprovarPermisCreate) {
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(
 				id);
 		if (metaDocument == null) {
@@ -188,30 +178,36 @@ public class EntityComprovarHelper {
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-expedient");
 		}
 		if (comprovarPermisCreate) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			boolean granted = permisosHelper.isGrantedAll(
-					metaDocument.getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.CREATE},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
+			if (!metaDocument.isActiu()) {
+				throw new ValidationException(
 						id,
 						MetaDocumentEntity.class,
-						auth.getName(),
-						"CREATE");
+						"El meta-document no es troba actiu (id=" + id + ")");
 			}
 		}
+		comprovarPermisosMetaNode(
+				metaDocument,
+				id,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete);
 		return metaDocument;
 	}
 
 	public MetaExpedientEntity comprovarMetaExpedient(
-			EntitatEntity entitat,
+			Long entitatId,
 			Long id,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisRead) {
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(
-				id);
+			boolean comprovarPermisDelete) {
+		EntitatEntity entitat = comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(id);
 		if (metaExpedient == null) {
 			throw new NotFoundException(
 					id,
@@ -223,35 +219,21 @@ public class EntityComprovarHelper {
 					MetaExpedientEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-expedient");
 		}
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisCreate) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaExpedient.getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.CREATE},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
+			if (!metaExpedient.isActiu()) {
+				throw new ValidationException(
 						id,
 						MetaExpedientEntity.class,
-						auth.getName(),
-						"CREATE");
+						"El meta-expedient no es troba actiu (id=" + id + ")");
 			}
 		}
-		if (comprovarPermisRead) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaExpedient.getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
-						id,
-						MetaExpedientEntity.class,
-						auth.getName(),
-						"READ");
-			}
-		}
+		comprovarPermisosMetaNode(
+				metaExpedient,
+				id,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete);
 		return metaExpedient;
 	}
 
@@ -328,8 +310,7 @@ public class EntityComprovarHelper {
 
 	public ContingutEntity comprovarContingut(
 			EntitatEntity entitat,
-			Long id,
-			BustiaEntity bustiaPare) {
+			Long id) {
 		ContingutEntity contingut = contingutRepository.findOne(id);
 		if (contingut == null) {
 			throw new NotFoundException(
@@ -342,16 +323,6 @@ public class EntityComprovarHelper {
 					ContingutEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del contingut");
 		}
-		if (bustiaPare != null) {
-			if (contingut.getPare() != null) {
-				if (!contingut.getPare().getId().equals(bustiaPare.getId())) {
-					throw new ValidationException(
-							id,
-							ContingutEntity.class,
-							"La bústia especificada (id=" + bustiaPare.getId() + ") no coincideix amb la bústia del contingut");
-				}
-			}
-		}
 		return contingut;
 	}
 
@@ -360,6 +331,7 @@ public class EntityComprovarHelper {
 			Long nodeId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
 		NodeEntity node = nodeRepository.findOne(nodeId);
 		if (node == null) {
@@ -373,41 +345,13 @@ public class EntityComprovarHelper {
 					NodeEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del node");
 		}
-		if (comprovarPermisRead || comprovarPermisWrite || comprovarPermisDelete) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			List<Permission> permisos = new ArrayList<Permission>();
-			StringBuilder permisosStr = new StringBuilder();
-			if (comprovarPermisRead) {
-				permisos.add(ExtendedPermission.READ);
-				if (permisosStr.length() > 0)
-					permisosStr.append(" && ");
-				permisosStr.append("READ");
-			}
-			if (comprovarPermisWrite) {
-				permisos.add(ExtendedPermission.WRITE);
-				if (permisosStr.length() > 0)
-					permisosStr.append(" && ");
-				permisosStr.append("WRITE");
-			}
-			if (comprovarPermisDelete) {
-				permisos.add(ExtendedPermission.DELETE);
-				if (permisosStr.length() > 0)
-					permisosStr.append(" && ");
-				permisosStr.append("DELETE");
-			}
-			boolean granted = permisosHelper.isGrantedAll(
-					node.getMetaNode().getId(),
-					MetaNodeEntity.class,
-					permisos.toArray(new Permission[permisos.size()]),
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
-						nodeId,
-						node.getClass(),
-						auth.getName(),
-						permisosStr.toString());
-			}
-		}
+		comprovarPermisosMetaNode(
+				node.getMetaNode(),
+				nodeId,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete);
 		return node;
 	}
 
@@ -430,24 +374,18 @@ public class EntityComprovarHelper {
 	}
 
 	public ExpedientEntity comprovarExpedient(
-			EntitatEntity entitat,
-			ArxiuEntity arxiu,
-			Long expedientId) {
-		return comprovarExpedient(
-				entitat,
-				 arxiu,
-				expedientId,
-				false,
-				false,
-				false);
-	}
-	public ExpedientEntity comprovarExpedient(
-			EntitatEntity entitat,
-			ArxiuEntity arxiu,
+			Long entitatId,
 			Long expedientId,
+			boolean comprovarAgafatPerUsuariActual,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
+		EntitatEntity entitat = comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
 			throw new NotFoundException(
@@ -465,47 +403,31 @@ public class EntityComprovarHelper {
 					ExpedientEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'expedient");
 		}
-		if (arxiu != null && !arxiu.equals(expedient.getArxiu())) {
-			throw new ValidationException(
-					expedientId,
-					ExpedientEntity.class,
-					"L'arxiu especificat (id=" + arxiu.getId() + ") no coincideix amb l'arxiu de l'expedient");
-		}
-		if (comprovarPermisRead || comprovarPermisWrite || comprovarPermisDelete) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			List<Permission> permisos = new ArrayList<Permission>();
-			StringBuilder permisosStr = new StringBuilder();
-			if (comprovarPermisRead) {
-				permisos.add(ExtendedPermission.READ);
-				if (permisosStr.length() > 0)
-					permisosStr.append(" && ");
-				permisosStr.append("READ");
-			}
-			if (comprovarPermisWrite) {
-				permisos.add(ExtendedPermission.WRITE);
-				if (permisosStr.length() > 0)
-					permisosStr.append(" && ");
-				permisosStr.append("WRITE");
-			}
-			if (comprovarPermisDelete) {
-				permisos.add(ExtendedPermission.DELETE);
-				if (permisosStr.length() > 0)
-					permisosStr.append(" && ");
-				permisosStr.append("DELETE");
-			}
-			boolean granted = permisosHelper.isGrantedAll(
-					expedient.getMetaExpedient().getId(),
-					MetaNodeEntity.class,
-					permisos.toArray(new Permission[permisos.size()]),
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
+		if (comprovarAgafatPerUsuariActual) {
+			UsuariEntity agafatPer = expedient.getAgafatPer();
+			if (agafatPer != null) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (!auth.getName().equals(agafatPer.getCodi())) {
+					throw new ValidationException(
+							expedientId,
+							ContingutEntity.class,
+							"L'expedient no està agafat per l'usuari actual (" +
+							"usuariActualCodi=" + auth.getName() + ")");
+				}
+			} else {
+				throw new ValidationException(
 						expedientId,
-						DocumentEntity.class,
-						auth.getName(),
-						permisosStr.toString());
+						ContingutEntity.class,
+						"L'expedient no està agafat per cap usuari");
 			}
 		}
+		comprovarPermisosMetaNode(
+				expedient.getMetaExpedient(),
+				expedientId,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete);
 		return expedient;
 	}
 
@@ -515,6 +437,7 @@ public class EntityComprovarHelper {
 			Long documentId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
 		DocumentEntity document = documentRepository.findOne(documentId);
 		if (document == null) {
@@ -590,84 +513,7 @@ public class EntityComprovarHelper {
 		return dada;
 	}
 
-	public BustiaEntity comprovarBustia(
-			EntitatEntity entitat,
-			Long bustiaId,
-			boolean comprovarPermisRead) {
-		BustiaEntity bustia = bustiaRepository.findOne(bustiaId);
-		if (bustia == null) {
-			throw new NotFoundException(
-					bustiaId,
-					BustiaEntity.class);
-		}
-		if (!entitat.equals(bustia.getEntitat())) {
-			throw new ValidationException(
-					bustiaId,
-					BustiaEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de la bústia (id=" + bustia.getEntitat().getId() + ")");
-		}
-		if (comprovarPermisRead) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			boolean esPermisRead = permisosHelper.isGrantedAll(
-					bustiaId,
-					BustiaEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (!esPermisRead) {
-				throw new PermissionDeniedException(
-						bustiaId,
-						BustiaEntity.class,
-						auth.getName(),
-						"READ");
-			}
-		}
-		return bustia;
-	}
-
-	public ArxiuEntity comprovarArxiu(
-			EntitatEntity entitat,
-			Long arxiuId,
-			boolean comprovarAcces) throws NotFoundException {
-		ArxiuEntity arxiu = arxiuRepository.findOne(arxiuId);
-		if (arxiu == null) {
-			throw new NotFoundException(
-					arxiuId,
-					ArxiuEntity.class);
-		}
-		if (!entitat.equals(arxiu.getEntitat())) {
-			throw new ValidationException(
-					arxiuId,
-					ArxiuEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'arxiu");
-		}
-		if (comprovarAcces) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			List<MetaExpedientEntity> metaExpedientsPermesos = new ArrayList<MetaExpedientEntity>();
-			if (arxiu.getMetaExpedients() != null) {
-				metaExpedientsPermesos.addAll(arxiu.getMetaExpedients());
-			}
-			permisosHelper.filterGrantedAny(
-					metaExpedientsPermesos,
-					new ObjectIdentifierExtractor<MetaNodeEntity>() {
-						public Long getObjectIdentifier(MetaNodeEntity obj) {
-							return obj.getId();
-						}
-					},
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (metaExpedientsPermesos.isEmpty()) {
-				throw new PermissionDeniedException(
-						arxiuId,
-						ArxiuEntity.class,
-						auth.getName(),
-						"READ");
-			}
-		}
-		return arxiu;
-	}
-
-	public RegistreEntity comprovarRegistre(
+	/*public RegistreEntity comprovarRegistre(
 			Long id,
 			BustiaEntity bustiaPare) {
 		RegistreEntity registre = registreRepository.findOne(id);
@@ -687,25 +533,7 @@ public class EntityComprovarHelper {
 			}
 		}
 		return registre;
-	}
-
-	public ReglaEntity comprovarRegla(
-			EntitatEntity entitat,
-			Long reglaId) {
-		ReglaEntity regla = reglaRepository.findOne(reglaId);
-		if (regla == null) {
-			throw new NotFoundException(
-					reglaId,
-					ReglaEntity.class);
-		}
-		if (!regla.getEntitat().equals(entitat)) {
-			throw new ValidationException(
-					reglaId,
-					ReglaEntity.class,
-					"La regla especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de la regla");
-		}
-		return regla;
-	}
+	}*/
 
 	public InteressatEntity comprovarInteressat(
 			ExpedientEntity expedient,
@@ -775,6 +603,64 @@ public class EntityComprovarHelper {
 					"El document especificat (id=" + document.getId() + ") no coincideix amb el document de la publicació (id=" + publicacio.getDocument().getId() + ")");
 		}
 		return publicacio;
+	}
+
+	public void comprovarPermisosMetaNode(
+			MetaNodeEntity metaNode,
+			Long nodeId,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (comprovarPermisRead) {
+			boolean granted = permisosHelper.isGrantedAll(
+					metaNode.getId(),
+					MetaNodeEntity.class,
+					new Permission[] {ExtendedPermission.READ},
+					auth);
+			if (!granted) {
+				throw new SecurityException("Sense permisos per accedir al node ("
+						+ "id=" + nodeId + ", "
+						+ "usuari=" + auth.getName() + ")");
+			}
+		}
+		if (comprovarPermisWrite) {
+			boolean granted = permisosHelper.isGrantedAll(
+					metaNode.getId(),
+					MetaNodeEntity.class,
+					new Permission[] {ExtendedPermission.WRITE},
+					auth);
+			if (!granted) {
+				throw new SecurityException("Sense permisos per a modificar el node ("
+						+ "id=" + nodeId + ", "
+						+ "usuari=" + auth.getName() + ")");
+			}
+		}
+		if (comprovarPermisCreate) {
+			boolean granted = permisosHelper.isGrantedAll(
+					metaNode.getId(),
+					MetaNodeEntity.class,
+					new Permission[] {ExtendedPermission.WRITE},
+					auth);
+			if (!granted) {
+				throw new SecurityException("Sense permisos per a modificar el node ("
+						+ "id=" + nodeId + ", "
+						+ "usuari=" + auth.getName() + ")");
+			}
+		}
+		if (comprovarPermisDelete) {
+			boolean granted = permisosHelper.isGrantedAll(
+					metaNode.getId(),
+					MetaNodeEntity.class,
+					new Permission[] {ExtendedPermission.DELETE},
+					auth);
+			if (!granted) {
+				throw new SecurityException("Sense permisos per a esborrar el node ("
+						+ "id=" + nodeId + ", "
+						+ "usuari=" + auth.getName() + ")");
+			}
+		}
 	}
 
 }

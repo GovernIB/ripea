@@ -22,7 +22,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
-	
+
 	Page<AlertaEntity> findByLlegidaAndContingutId(
 			boolean llegida,
 			Long id,
@@ -32,7 +32,7 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 			boolean llegida,
 			Long id,
 			Sort sort);
-	
+
 	@Query("select " +
 			"   count(a) " +
 			"from " +
@@ -44,7 +44,7 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 	long countByLlegidaAndContingutId(
 			@Param("llegida") boolean llegida,
 			@Param("id") Long id);
-	
+
 	@Query("select " +
 			"   count(a) " +
 			"from " +
@@ -56,7 +56,7 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 	long countByLlegidaAndContinguts(
 			@Param("llegida") boolean llegida,
 			@Param("continguts") List<ContingutEntity> continguts);
-	
+
 	@Query("select " +
 			"   a " +
 			"from " +
@@ -69,7 +69,7 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 			@Param("llegida") boolean llegida,
 			@Param("continguts") List<ContingutEntity> continguts,
 			Pageable pageable);
-	
+
 	@Query("select " +
 			"   a " +
 			"from " +
@@ -82,4 +82,5 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 			@Param("llegida") boolean llegida,
 			@Param("continguts") List<ContingutEntity> continguts,
 			Sort sort);
+
 }

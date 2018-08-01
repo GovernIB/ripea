@@ -41,17 +41,6 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 @EntityListeners(AuditingEntityListener.class)
 public class ExpedientEntity extends NodeEntity {
 
-	@ManyToOne(
-			optional = false,
-			fetch = FetchType.EAGER)
-	@JoinColumn(name = "arxiu_id")
-	@ForeignKey(name = "ipa_arxiu_expedient_fk")
-	protected ArxiuEntity arxiu;
-	@OneToMany(
-			mappedBy = "expedient",
-			fetch = FetchType.LAZY,
-			orphanRemoval = true)
-	protected Set<InteressatEntity> interessats = new HashSet<InteressatEntity>();
 	@Column(name = "estat", nullable = false)
 	protected ExpedientEstatEnumDto estat;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -88,6 +77,11 @@ public class ExpedientEntity extends NodeEntity {
 	@JoinColumn(name = "agafat_per_codi")
 	@ForeignKey(name = "ipa_agafatper_expedient_fk")
 	protected UsuariEntity agafatPer;
+	@OneToMany(
+			mappedBy = "expedient",
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	protected Set<InteressatEntity> interessats = new HashSet<InteressatEntity>();
 	@ManyToMany(
 			cascade = {
 					CascadeType.DETACH,
@@ -103,8 +97,8 @@ public class ExpedientEntity extends NodeEntity {
 			inverseJoinColumns = {
 					@JoinColumn(name = "expedient_rel_id", referencedColumnName = "id")})
 	@ForeignKey(
-			name = "ipa_expedient_rel_exp_fk",
-			inverseName = "ipa_expedient_rel_rel_fk")
+			name = "ipa_exprel_exprel_fk",
+			inverseName = "ipa_expedient_exprel_fk")
 	protected List<ExpedientEntity> relacionatsAmb = new ArrayList<ExpedientEntity>();
 	@ManyToMany(
 			cascade = {
@@ -125,12 +119,6 @@ public class ExpedientEntity extends NodeEntity {
 			inverseName = "ipa_expedient_rel_exp_fk")
 	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
 
-	public ArxiuEntity getArxiu() {
-		return arxiu;
-	}
-	public Set<InteressatEntity> getInteressats() {
-		return interessats;
-	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -179,6 +167,9 @@ public class ExpedientEntity extends NodeEntity {
 	public UsuariEntity getAgafatPer() {
 		return agafatPer;
 	}
+	public Set<InteressatEntity> getInteressats() {
+		return interessats;
+	}
 	public List<ExpedientEntity> getRelacionatsAmb() {
 		return relacionatsAmb;
 	}
@@ -195,12 +186,8 @@ public class ExpedientEntity extends NodeEntity {
 	}
 
 	public void update(
-			String nom,
-			MetaExpedientEntity metaExpedient,
-			ArxiuEntity arxiu) {
+			String nom) {
 		this.nom = nom;
-		this.metaNode = metaExpedient;
-		this.arxiu = arxiu;
 	}
 	public void updateAnySequenciaCodi(
 			int any,
@@ -270,7 +257,6 @@ public class ExpedientEntity extends NodeEntity {
 	public static Builder getBuilder(
 			String nom,
 			MetaNodeEntity metaNode,
-			ArxiuEntity arxiu,
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			String ntiVersion,
@@ -280,7 +266,6 @@ public class ExpedientEntity extends NodeEntity {
 		return new Builder(
 				nom,
 				metaNode,
-				arxiu,
 				pare,
 				entitat,
 				ntiVersion,
@@ -294,7 +279,6 @@ public class ExpedientEntity extends NodeEntity {
 		Builder(
 				String nom,
 				MetaNodeEntity metaNode,
-				ArxiuEntity arxiu,
 				ContingutEntity pare,
 				EntitatEntity entitat,
 				String ntiVersion,
@@ -304,7 +288,6 @@ public class ExpedientEntity extends NodeEntity {
 			built = new ExpedientEntity();
 			built.nom = nom;
 			built.metaNode = metaNode;
-			built.arxiu = arxiu;
 			built.pare = pare;
 			built.entitat = entitat;
 			built.ntiVersion = ntiVersion;
@@ -315,16 +298,15 @@ public class ExpedientEntity extends NodeEntity {
 			built.estat = ExpedientEstatEnumDto.OBERT;
 			built.tipus = ContingutTipusEnumDto.EXPEDIENT;
 		}
+		public Builder agafatPer(UsuariEntity agafatPer) {
+			built.agafatPer = agafatPer;
+			return this;
+		}
 		public ExpedientEntity build() {
 			return built;
 		}
 	}
 
-	@Override
-	public String getContingutType() {
-		return "expedient";
-	}
-	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

@@ -18,10 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.ExpedientHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
@@ -35,9 +33,6 @@ public class RipeaController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-
 
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String get(
@@ -51,10 +46,7 @@ public class RipeaController {
 			if (RolHelper.isRolActualAdministrador(request)) {
 				return "redirect:metaExpedient";
 			} else if (RolHelper.isRolActualUsuari(request)) {
-				if (ExpedientHelper.teAccesExpedients(request, metaExpedientService))
-					return "redirect:expedient";
-				else
-					return "redirect:bustiaUser";
+				return "redirect:expedient";
 			} else {
 				return "index";
 			}

@@ -21,9 +21,13 @@ import com.sun.jersey.core.util.Base64;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -37,6 +41,7 @@ import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
@@ -74,10 +79,10 @@ public class DocumentHelper {
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
-			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
 			ContingutEntity pare,
 			EntitatEntity entitat,
+			ExpedientEntity expedient,
 			String ubicacio) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
@@ -90,10 +95,10 @@ public class DocumentHelper {
 				ntiOrigen,
 				ntiEstadoElaboracion,
 				ntiTipoDocumental,
-				expedient,
 				metaDocument,
 				pare,
-				entitat).
+				entitat,
+				expedient).
 				ubicacio(ubicacio).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);
@@ -136,6 +141,7 @@ public class DocumentHelper {
 						document,
 						null,
 						versio,
+						true,
 						true);
 				fitxer = new FitxerDto();
 				fitxer.setContentType(document.getFitxerContentType());
@@ -271,6 +277,7 @@ public class DocumentHelper {
 							custodiaDocumentId,
 							document.getCustodiaCsv());
 					actualitzarVersionsDocument(document);
+					actualitzarInformacioFirma(document);
 					contingutLogHelper.log(
 							documentPortafirmes.getDocument(),
 							LogTipusEnumDto.ARXIU_CUSTODIAT,
@@ -338,6 +345,120 @@ public class DocumentHelper {
 						ex);
 			}
 		}
+	}
+
+	public void actualitzarInformacioFirma(
+			DocumentEntity document) {
+		if (pluginHelper.arxiuSuportaVersionsDocuments()) {
+			try {
+				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
+						document,
+						null,
+						null,
+						false);
+				DocumentNtiTipoFirmaEnumDto tipoFirma = null;
+				String csv = null;
+				String csvDef = null;
+				if (documentArxiu.getFirmes() != null) {
+					for (Firma firma: documentArxiu.getFirmes()) {
+						if (FirmaTipus.CSV.equals(firma.getTipus())) {
+							csv = new String(firma.getContingut());
+							csvDef = firma.getCsvRegulacio();
+						} else {
+							switch (firma.getTipus()) {
+							case CSV:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
+								break;
+							case XADES_DET:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
+								break;
+							case XADES_ENV:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
+								break;
+							case CADES_DET:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
+								break;
+							case CADES_ATT:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
+								break;
+							case PADES:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
+								break;
+							case SMIME:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
+								break;
+							case ODT:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
+								break;
+							case OOXML:
+								tipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
+								break;
+							}
+						}
+					}
+				}
+				document.updateNti(
+						document.getNtiVersion(),
+						document.getNtiIdentificador(),
+						document.getNtiOrgano(),
+						document.getNtiOrigen(),
+						document.getNtiEstadoElaboracion(),
+						document.getNtiTipoDocumental(),
+						document.getNtiIdDocumentoOrigen(),
+						tipoFirma,
+						csv,
+						csvDef);
+			} catch (Exception ex) {
+				logger.error(
+						"Error al actualitzar les metadades NTI de firma (" + 
+						"entitatId=" + document.getEntitat().getId() + ", " +
+						"documentId=" + document.getId() + ", " +
+						"documentTitol=" + document.getNom() + ")",
+						ex);
+			}
+		}
+	}
+
+	public DocumentEntity comprovarDocumentDinsExpedientModificable(
+			Long entitatId,
+			Long id,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
+		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientModificable(
+				entitatId,
+				id,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete);
+		if (!ContingutTipusEnumDto.DOCUMENT.equals(node.getTipus())) {
+			throw new ValidationException(
+					id,
+					DocumentEntity.class,
+					"El contingut especificat no és un document");
+		}
+		return (DocumentEntity)node;
+	}
+
+	public DocumentEntity comprovarDocumentDinsExpedientAccessible(
+			Long entitatId,
+			Long id,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite) {
+		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientAccessible(
+				entitatId,
+				id,
+				comprovarPermisRead,
+				comprovarPermisWrite);
+		if (!ContingutTipusEnumDto.DOCUMENT.equals(node.getTipus())) {
+			throw new ValidationException(
+					id,
+					DocumentEntity.class,
+					"El contingut especificat no és un document");
+		}
+		return (DocumentEntity)node;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);

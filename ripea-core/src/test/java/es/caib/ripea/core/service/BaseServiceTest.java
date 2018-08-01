@@ -14,13 +14,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import es.caib.ripea.core.api.dto.ArxiuDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.service.ArxiuService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -47,8 +45,6 @@ public class BaseServiceTest {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ArxiuService arxiuService;
 
 
 
@@ -117,11 +113,6 @@ public class BaseServiceTest {
 											permis);
 								}
 							}
-						} else if (element instanceof ArxiuDto) {
-							elementsCreats.add(
-									arxiuService.create(
-											entitatId,
-											(ArxiuDto)element));
 						} else {
 							throw new RuntimeException(
 									"Tipus d'element desconegut: " + element.getClass().getName());
@@ -156,10 +147,6 @@ public class BaseServiceTest {
 					metaExpedientService.delete(
 							entitatId,
 							((MetaExpedientDto)element).getId());
-				} else if (element instanceof ArxiuDto) {
-					arxiuService.delete(
-							entitatId,
-							((ArxiuDto)element).getId());
 				}
 			}
 		}

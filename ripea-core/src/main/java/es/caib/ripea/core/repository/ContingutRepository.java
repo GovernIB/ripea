@@ -46,12 +46,8 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"    ContingutEntity c " +
 			"where " +
 			"    c.entitat = :entitat " +
-			"and (c.pare is not null or (type(c) <> es.caib.ripea.core.entity.ArxiuEntity and type(c) <> es.caib.ripea.core.entity.BustiaEntity)) " +
-			"and (:tipusArxiu = true or type(c) <> es.caib.ripea.core.entity.ArxiuEntity) " +
-			"and (:tipusBustia = true or type(c) <> es.caib.ripea.core.entity.BustiaEntity) " +
 			"and (:tipusCarpeta = true or type(c) <> es.caib.ripea.core.entity.CarpetaEntity) " +
 			"and (:tipusDocument = true or type(c) <> es.caib.ripea.core.entity.DocumentEntity) " +
-			"and (:tipusEscriptori = true or type(c) <> es.caib.ripea.core.entity.EscriptoriEntity) " +
 			"and (:tipusExpedient = true or type(c) <> es.caib.ripea.core.entity.ExpedientEntity) " +
 			"and (:tipusRegistre = true or type(c) <> es.caib.ripea.core.entity.RegistreEntity) " +
 			"and (:esNullMetaNode = true or ((type(c) = es.caib.ripea.core.entity.ExpedientEntity or type(c) = es.caib.ripea.core.entity.DocumentEntity) and c.metaNode = :metaNode)) " +
@@ -61,11 +57,8 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) ")
 	public Page<ContingutEntity> findByFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("tipusArxiu") boolean tipusArxiu,
-			@Param("tipusBustia") boolean tipusBustia,
 			@Param("tipusCarpeta") boolean tipusCarpeta,
 			@Param("tipusDocument") boolean tipusDocument,
-			@Param("tipusEscriptori") boolean tipusEscriptori,
 			@Param("tipusExpedient") boolean tipusExpedient,
 			@Param("tipusRegistre") boolean tipusRegistre,
 			@Param("esNullNom") boolean esNullNom,

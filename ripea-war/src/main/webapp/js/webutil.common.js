@@ -333,8 +333,9 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			$(this).css('height', '0');
 			var headingOffset = $heading.offset();
 			var thisOffset = $(this).offset();
+			var margeAcumulat = $(this).children().length * 7 - 6;
 			$(this).css('top', (headingOffset.top - 3) + "px");
-			$(this).css('left', (headingOffset.left + $heading.innerWidth() - $(this).outerWidth()) + "px");
+			$(this).css('left', (headingOffset.left + $heading.innerWidth() - $(this).outerWidth() - margeAcumulat) + "px");
 		}
 	}
 	$.fn.webutilBotonsTitolEval = function() {

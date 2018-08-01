@@ -3,12 +3,15 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.Resource;
+import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -17,8 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -40,9 +45,12 @@ import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity.ExecucioMassivaE
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity.ExecucioMassivaTipus;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaRepository;
@@ -56,23 +64,30 @@ import es.caib.ripea.core.repository.UsuariRepository;
 @Service
 public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 
-	@Resource
+	@Autowired
 	private ContingutRepository contingutRepository;
-	@Resource
+	@Autowired
 	private UsuariRepository usuariRepository;
-	@Resource
+	@Autowired
 	private ExecucioMassivaRepository execucioMassivaRepository;
-	@Resource
+	@Autowired
 	private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
-	@Resource
+
+	@Autowired
 	private EmailHelper mailHelper;
-	@Resource
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private AlertaHelper alertaHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 	
 	@Autowired
 	private DocumentService documentService;
+	
+	private static Map<Long, String> errorsMassiva = new HashMap<Long, String>();
 
 	@Transactional
 	@Override
@@ -152,38 +167,28 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findOne(cmasiu_id);
 		if (emc == null)
 			throw new NotFoundException(cmasiu_id, ExecucioMassivaContingutEntity.class);
-		
 		ExecucioMassivaEntity exm = emc.getExecucioMassiva();
 		ExecucioMassivaTipus tipus = exm.getTipus();
-		
 		try {
 			Authentication orgAuthentication = SecurityContextHolder.getContext().getAuthentication();
-			
 			final String user = exm.getCreatedBy().getCodi();
 	        Principal principal = new Principal() {
 				public String getName() {
 					return user;
 				}
 			};
-			
 			Authentication authentication =  new UsernamePasswordAuthenticationToken(
 					principal, 
 					"N/A",
-					exm.getAuthenticationRoles("tothom"));
-			
+					Arrays.asList(new SimpleGrantedAuthority("tothom")));
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
-			
-	        
 			if (tipus == ExecucioMassivaTipus.PORTASIGNATURES){
 				enviarPortafirmes(emc);
 			}
-			
 			SecurityContextHolder.getContext().setAuthentication(orgAuthentication);
 		} catch (Throwable ex) {
-			
 			Throwable excepcioRetorn = ExceptionUtils.getRootCause(ex) != null ? ExceptionUtils.getRootCause(ex) : ex;
-			
-			SegonPlaServiceImpl.saveError(cmasiu_id, excepcioRetorn, exm.getTipus());
+			saveError(cmasiu_id, excepcioRetorn, exm.getTipus());
 			throw new ExecucioMassivaException(
 					emc.getContingut().getId(),
 					emc.getContingut().getNom(),
@@ -292,7 +297,75 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		
 		return dtos;
 	}
-	
+
+	@Override
+	@Scheduled(fixedDelayString = "${config:es.caib.ripea.segonpla.massives.periode.comprovacio}")
+	public void comprovarExecucionsMassives() {
+		boolean active = true;
+		Long ultimaExecucioMassiva = null;
+		int timeBetweenExecutions = 500;
+		try {
+			timeBetweenExecutions = Integer.parseInt(
+					PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.arxiu.class"));
+		} catch (Exception ex) {}
+		while (active) {
+			Long cmasiu_id = null;
+			boolean alertat = false;
+			try {
+				cmasiu_id = getExecucionsMassivesActiva(ultimaExecucioMassiva);
+				if (cmasiu_id != null) {
+					ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findOne(cmasiu_id);
+					try {
+						executarExecucioMassiva(cmasiu_id);
+						if (emc != null)
+							alertaHelper.crearAlerta(
+									messageHelper.getMessage(
+											"alertes.segon.pla.execucio.massiva",
+											new Object[] {cmasiu_id}),
+									null,
+									emc.getContingut().getId());
+					} catch (Exception e) {
+						// recuperem l'error de la aplicació
+						String errMsg = getError(cmasiu_id);
+						if (errMsg == null || "".equals(errMsg))
+							errMsg = e.getMessage();
+						generaInformeError(cmasiu_id, errMsg);
+						if (emc != null)
+							alertaHelper.crearAlerta(
+									messageHelper.getMessage(
+											"alertes.segon.pla.executar.execucio.massiva.error",
+											new Object[] {cmasiu_id}),
+									e,
+									emc.getContingut().getId());
+						alertat = true;
+					}
+					if (emc == null)
+						throw new NotFoundException(cmasiu_id, ExecucioMassivaContingutEntity.class);
+					ultimaExecucioMassiva = emc.getExecucioMassiva().getId();
+					actualitzaUltimaOperacio(emc.getId());
+				} else {
+					active = false;
+				}
+				Thread.sleep(timeBetweenExecutions);
+			} catch (Exception e) {
+				logger.error("La execució de execucions massives ha estat interromput");
+				active = false;
+				if(!alertat && cmasiu_id != null) {
+					ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findOne(cmasiu_id);
+					alertaHelper.crearAlerta(
+							messageHelper.getMessage(
+									"alertes.segon.pla.execucio.massiva.error",
+									new Object[] {cmasiu_id}),
+							e,
+							emc.getContingut().getId());
+					alertat = true;
+				}
+			}
+		}
+	}
+
+
+
 	private List<ExecucioMassivaDto> recompteErrors(List<ExecucioMassivaEntity> exmEntities) {
 		List<ExecucioMassivaDto> dtos = new ArrayList<ExecucioMassivaDto>();
 		for (ExecucioMassivaEntity exm: exmEntities) {
@@ -313,7 +386,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		}
 		return dtos;
 	}
-	
+
 	private double getPercent(Long value, Long total) {
 		if (total == 0)
 			return 100L;
@@ -321,7 +394,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			return 0L;
 	    return Math.round(value * 100 / total);
 	}
-	
+
 	private void enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
 		ContingutEntity contingut = emc.getContingut();
 		
@@ -344,6 +417,17 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		}
 	}
 
+	private static void saveError(Long execucioMassivaContingutId, Throwable error, ExecucioMassivaTipus tipus) {
+		StringWriter out = new StringWriter();
+		error.printStackTrace(new PrintWriter(out));
+		errorsMassiva.put(execucioMassivaContingutId, out.toString());
+	}
+	private static String getError(Long operacioMassivaId) {
+		String error = errorsMassiva.get(operacioMassivaId);
+		errorsMassiva.remove(operacioMassivaId);
+		return error;
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-	
+
 }

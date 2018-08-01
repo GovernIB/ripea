@@ -32,8 +32,6 @@ import org.springframework.web.util.WebUtils;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.service.ArxiuService;
-import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
@@ -58,10 +56,6 @@ public class ExpedientConsultaController extends BaseUserController {
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 
 	@Autowired
-	private ArxiuService arxiuService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
 	private ExpedientService expedientService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
@@ -83,10 +77,6 @@ public class ExpedientConsultaController extends BaseUserController {
 		model.addAttribute(
 				getFiltreCommand(request));
 		model.addAttribute(
-				"arxius",
-				arxiuService.findPermesosPerUsuari(
-						entitatActual.getId()));
-		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
@@ -98,10 +88,6 @@ public class ExpedientConsultaController extends BaseUserController {
 						"expedient.estat.enum."));
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
-		model.addAttribute(
-				"escriptori",
-				contingutService.getEscriptoriPerUsuariActual(
-						entitatActual.getId()));
 		return "expedientUserList";
 	}
 

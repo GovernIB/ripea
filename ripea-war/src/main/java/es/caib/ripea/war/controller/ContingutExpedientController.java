@@ -4,7 +4,6 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import es.caib.ripea.core.api.dto.ArxiuDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.service.ArxiuService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
@@ -41,8 +38,6 @@ public class ContingutExpedientController extends BaseUserController {
 	private ExpedientService expedientService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ArxiuService arxiuService;
 
 	@RequestMapping(value = "/{contingutId}/expedient/new", method = RequestMethod.GET)
 	public String get(
@@ -77,15 +72,6 @@ public class ContingutExpedientController extends BaseUserController {
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
-		if (command.getMetaNodeId() != null) {	
-			model.addAttribute(
-					"arxius",
-					arxiuService.findPermesosPerUsuariIMetaExpedient(
-							entitatActual.getId(),
-							command.getMetaNodeId()));
-		} else {
-			model.addAttribute("arxius", new ArrayList<ArxiuDto>());
-		}
 		return "contingutExpedientForm";
 	}
 	@RequestMapping(value = "/{contingutId}/expedient/new", method = RequestMethod.POST)
@@ -114,15 +100,6 @@ public class ContingutExpedientController extends BaseUserController {
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
-			if(command.getMetaNodeId() != null) {				
-				model.addAttribute(
-						"arxius",
-						arxiuService.findPermesosPerUsuariIMetaExpedient(
-								entitatActual.getId(),
-								command.getMetaNodeId()));
-			} else {
-				model.addAttribute("arxius", new ArrayList<ArxiuDto>());
-			}
 			return "contingutExpedientForm";
 		}
 		if (command.getId() == null) {
@@ -130,11 +107,8 @@ public class ContingutExpedientController extends BaseUserController {
 					entitatActual.getId(),
 					contingutId,
 					command.getMetaNodeId(),
-					command.getArxiuId(),
 					command.getAny(),
-					command.getNom(),
-					null,
-					null);
+					command.getNom());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + contingutId,
@@ -143,8 +117,6 @@ public class ContingutExpedientController extends BaseUserController {
 			expedientService.update(
 					entitatActual.getId(),
 					command.getId(),
-					command.getArxiuId(),
-					command.getMetaNodeId(),
 					command.getNom());
 			return getModalControllerReturnValueSuccess(
 					request,

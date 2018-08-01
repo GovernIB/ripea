@@ -23,16 +23,6 @@
 	<import resource="classpath:es/caib/ripea/core/context/application-context-war.xml" />
 	<import resource="classpath:es/caib/ripea/war/context/application-context-security.xml" />
 
-	<wss:binding url="/ws/v0/bustia">
-		<wss:service>
-			<ws:service bean="#bustiaV0WsServiceImpl"/>
-		</wss:service>
-	</wss:binding>
-	<wss:binding url="/ws/v1/bustia">
-		<wss:service>
-			<ws:service bean="#bustiaV1WsServiceImpl"/>
-		</wss:service>
-	</wss:binding>
 	<wss:binding url="/ws/MCGDws">
 		<wss:service>
 			<ws:service bean="#MCGDwsImpl"/>
@@ -41,11 +31,6 @@
 	<wss:binding url="/ws/portafibCallback">
 		<wss:service>
 			<ws:service bean="#portaFIBCallBackWsImpl"/>
-		</wss:service>
-	</wss:binding>
-	<wss:binding url="/ws/bantel">
-		<wss:service>
-			<ws:service bean="#bantelBackofficeWsImpl"/>
 		</wss:service>
 	</wss:binding>
 

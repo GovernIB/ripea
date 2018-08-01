@@ -34,7 +34,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 }
 </style>
 <script>
-var mostrarMeusExpedients = '${meusExpedients}' == 'true';
+var mostrarMeusExpedients = '${meusExpedients}' === 'true';
 var columnaAgafatPer = 12;
 $(document).ready(function() {
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
@@ -108,10 +108,10 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
+	<div data-toggle="botons-titol">
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
 		<c:if test="${not empty metaExpedientsPermisCreacio}">
-			<a href="<c:url value="/contingut/${escriptori.id}/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
+			<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 		</c:if>
 	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
@@ -119,16 +119,13 @@ function getCookie(cname) {
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>
 			</div>
-			<div class="col-md-2">
+			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="expedient.list.user.placeholder.titol"/>
 			</div>
 			<div class="col-md-3">
 				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedientsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="expedient.list.user.placeholder.tipusExpedient" inline="true"/>
 			</div>
 			<div class="col-md-3">
-				<rip:inputSelect name="arxiuId" optionItems="${arxius}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="expedient.list.user.placeholder.arxiu" inline="true"/>
-			</div>
-			<div class="col-md-2">
 				<rip:inputSelect name="estat" optionItems="${expedientEstatEnumOptions}" optionValueAttribute="value" emptyOption="true" optionTextKeyAttribute="text" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
 			</div>
 		</div>
@@ -172,21 +169,21 @@ function getCookie(cname) {
 			</ul>
 		</div>
 	</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">contingut/{{:id}}</script>
 	<table id="taulaDades" 
 			data-toggle="datatable" 
 			data-url="<c:url value="/expedient/datatable"/>" 
-			class="table table-bordered table-striped" 
-			data-default-order="10" 
+			class="table table-bordered table-striped table-hover" 
+			data-default-order="9" 
 			data-default-dir="desc"
 			data-botons-template="#botonsTemplate"
+			data-rowhref-template="#rowhrefTemplate"
 			data-selection-enabled="true"
 			style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="ambRegistresSenseLlegir" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
-				<th data-col-name="pare.id" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
@@ -210,7 +207,6 @@ function getCookie(cname) {
 						{{:nom}}
 					</script>
 				</th>
-				<th data-col-name="arxiu.nom" width="15%"><spring:message code="expedient.list.user.columna.arxiu"/></th>
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%"><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
@@ -236,10 +232,10 @@ function getCookie(cname) {
 							<ul class="dropdown-menu">
 								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
 								{{if metaNode.usuariActualWrite}}
-									<li><a href="contingut/{{:pare.id}}/expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+									<li><a href="expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 								{{/if}}
 								{{if metaNode.usuariActualDelete}}
-									<li><a href="contingut/{{:pare.id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 								<li role="separator" class="divider"></li>
 								{{if metaNode.usuariActualWrite}}

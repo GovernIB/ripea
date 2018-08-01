@@ -22,8 +22,6 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.entity.ArxiuEntity;
-import es.caib.ripea.core.entity.BustiaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutLogEntity;
@@ -35,6 +33,7 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.repository.ContingutLogRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
@@ -476,10 +475,8 @@ public class ContingutLogHelper {
 			objecteTipus = LogObjecteTipusEnumDto.DOCUMENT;
 		} else if (contingut instanceof CarpetaEntity) {
 			objecteTipus = LogObjecteTipusEnumDto.CARPETA;
-		} else if (contingut instanceof BustiaEntity) {
-			objecteTipus = LogObjecteTipusEnumDto.BUSTIA;
-		} else if (contingut instanceof ArxiuEntity) {
-			objecteTipus = LogObjecteTipusEnumDto.ARXIU;
+		} else if (contingut instanceof RegistreEntity) {
+			objecteTipus = LogObjecteTipusEnumDto.REGISTRE;
 		} else {
 			objecteTipus = LogObjecteTipusEnumDto.CONTINGUT;
 		}

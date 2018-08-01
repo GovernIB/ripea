@@ -37,7 +37,6 @@
 		<module>ripea-plugin</module>
 		<module>ripea-plugin-impl</module>
 		<module>ripea-ear</module>
-		<module>ripea-applet</module>
 		<module>ripea-lib-common</module>
 		<module>ripea-ws-client</module>
 	</modules>

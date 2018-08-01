@@ -4,11 +4,7 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -34,7 +30,6 @@ import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.entity.BustiaEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -45,7 +40,6 @@ import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.BustiaRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -81,8 +75,6 @@ public class CacheHelper {
 	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
 	@Resource
 	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
-	@Resource
-	private BustiaRepository bustiaRepository;
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
@@ -96,8 +88,6 @@ public class CacheHelper {
 	private PluginHelper pluginHelper;
 	@Resource
 	private UsuariHelper usuariHelper;
-
-	private Map<String, Set<String>> usuarisElementsPendentsPerEntitat;
 
 
 
@@ -249,52 +239,6 @@ public class CacheHelper {
 			String entitatCodi) {
 	}
 
-	@Cacheable(value = "elementsPendentsBustiesUsuari", key="{#entitat.id, #usuariCodi}")
-	public long countElementsPendentsBustiesUsuari(
-			EntitatEntity entitat,
-			String usuariCodi) {
-		// Consulta les bústies de l'usuari a l'entitat
-		List<BustiaEntity> busties = bustiaRepository.findByEntitatAndActivaTrueAndPareNotNull(
-				entitat);
-		// Filtra la llista de bústies segons els permisos
-		permisosHelper.filterGrantedAll(
-				busties,
-				new ObjectIdentifierExtractor<BustiaEntity>() {
-					@Override
-					public Long getObjectIdentifier(BustiaEntity bustia) {
-						return bustia.getId();
-					}
-				},
-				BustiaEntity.class,
-				new Permission[] {ExtendedPermission.READ},
-				usuariHelper.generarUsuariAutenticat(usuariCodi, false));
-		long count = 0;
-		if (!busties.isEmpty()) {
-			// Ompl els contadors de fills i registres
-			long[] countFills = contenidorHelper.countFillsAmbPermisReadByContinguts(
-					entitat,
-					busties,
-					true);
-			for (long c: countFills)
-				count += c;
-			/*long[] countRegistres = contenidorHelper.countRegistresByContinguts(
-					entitat,
-					busties);
-			for (long c: countRegistres)
-				count += c;*/
-		}
-		// Afegeix l'usuari a l'entitat
-		afegirUsuariElementsPendentsPerEntitat(
-				entitat,
-				usuariCodi);
-		return count;
-	}
-	@CacheEvict(value = "elementsPendentsBustiesUsuari", key="{#entitat.id, #usuariCodi}")
-	public void evictElementsPendentsBustiesUsuari(
-			EntitatEntity entitat,
-			String usuariCodi) {
-	}
-
 	@Cacheable(value = "paisos")
 	public List<PaisDto> findPaisos() {
 		return conversioTipusHelper.convertirList(
@@ -359,23 +303,6 @@ public class CacheHelper {
 						metaDocument,
 						MetaDocumentDto.class),
 				MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
-	}
-
-	private void afegirUsuariElementsPendentsPerEntitat(
-			EntitatEntity entitat,
-			String usuariCodi) {
-		String entitatCodi = entitat.getCodi();
-		if (usuarisElementsPendentsPerEntitat == null) {
-			usuarisElementsPendentsPerEntitat = new HashMap<String, Set<String>>();
-		}
-		Set<String> usuaris = usuarisElementsPendentsPerEntitat.get(entitatCodi);
-		if (usuaris == null) {
-			usuaris = new HashSet<String>();
-			usuarisElementsPendentsPerEntitat.put(
-					entitatCodi,
-					usuaris);
-		}
-		usuaris.add(usuariCodi);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);

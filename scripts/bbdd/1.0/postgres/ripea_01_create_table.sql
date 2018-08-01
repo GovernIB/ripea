@@ -121,13 +121,6 @@ CREATE TABLE IPA_METAEXPEDIENT
 );
 
 
-CREATE TABLE IPA_METAEXPEDIENT_ARXIU
-(
-  METAEXPEDIENT_ID  BIGINT                      NOT NULL,
-  ARXIU_ID          bigint                      NOT NULL
-);
-
-
 CREATE TABLE IPA_METAEXP_SEQ
 (
   ID                   BIGINT                    NOT NULL,
@@ -174,14 +167,6 @@ CREATE TABLE IPA_INTERESSAT
 );
 
 
-CREATE TABLE IPA_ARXIU
-(
-  ID                   BIGINT                    NOT NULL,
-  ACTIU                boolean,
-  UNITAT_CODI          character varying(9)      NOT NULL
-);
-
-
 CREATE TABLE IPA_CONTINGUT
 (
   ID                   BIGINT                   NOT NULL,
@@ -191,6 +176,7 @@ CREATE TABLE IPA_CONTINGUT
   ESBORRAT             integer,
   ARXIU_UUID           character varying(36),
   ARXIU_DATA_ACT       timestamp without time zone,
+  EXPEDIENT_ID         bigint,
   CONTMOV_ID           bigint,
   ENTITAT_ID           bigint                   NOT NULL,
   CREATEDDATE          timestamp without time zone,
@@ -216,23 +202,6 @@ CREATE TABLE IPA_CONT_MOV
 );
 
 
-CREATE TABLE IPA_CONT_MOV_EMAIL 
-(
-  ID 					BIGINT 					NOT NULL, 
-  DESTINATARI_CODI		character varying(64) 	NOT NULL, 
-  DESTINATARI_EMAIL		character varying(256) 	NOT NULL,
-  ENVIAMENT_AGRUPAT		boolean					NOT NULL,
-  BUSTIA_ID 			BIGINT 					NOT NULL,
-  CONTINGUT_MOVIMENT_ID BIGINT 					NOT NULL, 
-  CONTINGUT_ID 			BIGINT 					NOT NULL,
-  UNITAT_ORGANITZATIVA 	character varying(256),
-  CREATEDDATE          	timestamp without time zone,
-  LASTMODIFIEDDATE     	timestamp without time zone,
-  CREATEDBY_CODI       	character varying(64),
-  LASTMODIFIEDBY_CODI  	character varying(64)
-);
-
-
 CREATE TABLE IPA_CONT_LOG
 (
   ID                   BIGINT                   NOT NULL,
@@ -249,13 +218,6 @@ CREATE TABLE IPA_CONT_LOG
   LASTMODIFIEDDATE     timestamp without time zone,
   CREATEDBY_CODI       character varying(64),
   LASTMODIFIEDBY_CODI  character varying(64)
-);
-
-
-CREATE TABLE IPA_ESCRIPTORI
-(
-  ID         BIGINT                               NOT NULL,
-  USUARI_ID  character varying(64)                NOT NULL
 );
 
 
@@ -326,7 +288,6 @@ CREATE TABLE IPA_EXPEDIENT
   ANIO               integer                    NOT NULL,
   SEQUENCIA          bigint                     NOT NULL,
   CODI               character varying(256)     NOT NULL,
-  ARXIU_ID           bigint                     NOT NULL,
   NTI_VERSION        character varying(5)       NOT NULL,
   NTI_IDENTIF        character varying(52)      NOT NULL,
   NTI_ORGANO         character varying(9)       NOT NULL,
@@ -355,7 +316,6 @@ CREATE TABLE IPA_DOCUMENT
   UBICACIO             character varying(255),
   DATA                 timestamp without time zone NOT NULL,
   DATA_CAPTURA         timestamp without time zone NOT NULL,
-  EXPEDIENT_ID         bigint,
   CUSTODIA_DATA        timestamp without time zone,
   CUSTODIA_ID          character varying(256),
   CUSTODIA_CSV         character varying(256),
@@ -440,15 +400,6 @@ CREATE TABLE IPA_EXPEDIENT_INTERESSAT
 (
   EXPEDIENT_ID   BIGINT                         NOT NULL,
   INTERESSAT_ID  bigint                         NOT NULL
-);
-
-
-CREATE TABLE IPA_BUSTIA
-(
-  ID           BIGINT                           NOT NULL,
-  UNITAT_CODI  character varying(9)             NOT NULL,
-  PER_DEFECTE  boolean,
-  ACTIVA       boolean
 );
 
 
@@ -594,31 +545,38 @@ CREATE TABLE IPA_REGISTRE_INTER
 );
 
 
-CREATE TABLE IPA_REGLA
+CREATE TABLE IPA_EXECUCIO_MASSIVA
+(
+  ID                   BIGINT   		NOT NULL,
+  TIPUS                character varying(255)   NOT NULL,
+  DATA_INICI	       timestamp without time zone,
+  DATA_FI              timestamp without time zone,
+  PFIRMES_MOTIU	       character varying(256),
+  PFIRMES_PRIORI       character varying(255),
+  PFIRMES_DATCAD       timestamp without time zone,
+  ENVIAR_CORREU	       boolean,
+  ENTITAT_ID	       bigint		NOT NULL,
+  CREATEDBY_CODI       character varying(64),
+  CREATEDDATE          timestamp without time zone,
+  LASTMODIFIEDBY_CODI  character varying(64),
+  LASTMODIFIEDDATE     timestamp without time zone
+);
+
+
+CREATE TABLE IPA_MASSIVA_CONTINGUT
 (
   ID                   BIGINT                   NOT NULL,
+  EXECUCIO_MASSIVA_ID  bigint,
+  CONTINGUT_ID         bigint,
+  DATA_INICI	       timestamp without time zone,
+  DATA_FI              timestamp without time zone,
+  ESTAT	               character varying(255),
+  ERROR	               character varying(2046),
+  ORDRE	               bigint,
+  CREATEDBY_CODI       character varying(64),
   CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDDATE     timestamp without time zone,
-  ACTIVA               boolean,
-  ASSUMPTE_CODI        character varying(16)    NOT NULL,
-  DESCRIPCIO           character varying(1024),
-  NOM                  character varying(256)   NOT NULL,
-  ORDRE                integer                  NOT NULL,
-  TIPUS                character varying(32)    NOT NULL,
-  UNITAT_CODI          character varying(9),
-  VERSION              bigint                   NOT NULL,
-  CREATEDBY_CODI       character varying(256),
-  LASTMODIFIEDBY_CODI  character varying(256),
-  ENTITAT_ID           bigint                   NOT NULL,
-  CONTRASENYA          character varying(64),
-  TIPUS_BACKOFFICE     character varying(255),
-  INTENTS              integer,
-  TEMPS_ENTRE_INTENTS  integer,
-  URL                  character varying(256),
-  USUARI               character varying(64),
-  ARXIU_ID             bigint,
-  BUSTIA_ID            bigint,
-  METAEXPEDIENT_ID     bigint
+  LASTMODIFIEDBY_CODI  character varying(64),
+  LASTMODIFIEDDATE     timestamp without time zone
 );
 
 
@@ -658,51 +616,4 @@ CREATE TABLE IPA_ACL_OBJECT_IDENTITY
   PARENT_OBJECT       bigint,
   OWNER_SID           bigint                    NOT NULL,
   ENTRIES_INHERITING  boolean                   NOT NULL
-);
-
-
-CREATE TABLE IPA_CONT_COMMENT
-(
-  ID                   BIGINT                   NOT NULL,
-  CONTINGUT_ID         bigint 		        NOT NULL,
-  TEXT		       character varying (1024),
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDDATE     timestamp without time zone,
-  CREATEDBY_CODI       character varying(64),
-  LASTMODIFIEDBY_CODI  character varying(64)
-);
-
-
-CREATE TABLE IPA_EXECUCIO_MASSIVA
-(
-  ID                   BIGINT   		NOT NULL,
-  TIPUS                character varying(255)   NOT NULL,
-  DATA_INICI	       timestamp without time zone,
-  DATA_FI              timestamp without time zone,
-  PFIRMES_MOTIU	       character varying(256),
-  PFIRMES_PRIORI       character varying(255),
-  PFIRMES_DATCAD       timestamp without time zone,
-  ENVIAR_CORREU	       boolean,
-  ENTITAT_ID	       bigint		NOT NULL,
-  CREATEDBY_CODI       character varying(64),
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDBY_CODI  character varying(64),
-  LASTMODIFIEDDATE     timestamp without time zone
-);
-
-
-CREATE TABLE IPA_MASSIVA_CONTINGUT
-(
-  ID                   BIGINT                   NOT NULL,
-  EXECUCIO_MASSIVA_ID  bigint,
-  CONTINGUT_ID         bigint,
-  DATA_INICI	       timestamp without time zone,
-  DATA_FI              timestamp without time zone,
-  ESTAT	               character varying(255),
-  ERROR	               character varying(2046),
-  ORDRE	               bigint,
-  CREATEDBY_CODI       character varying(64),
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDBY_CODI  character varying(64),
-  LASTMODIFIEDDATE     timestamp without time zone
 );

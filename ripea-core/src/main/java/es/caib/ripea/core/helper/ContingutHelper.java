@@ -7,16 +7,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -24,37 +21,30 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.ripea.core.api.dto.ArxiuDto;
-import es.caib.ripea.core.api.dto.BustiaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
 import es.caib.ripea.core.api.dto.NodeDto;
-import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.RegistreAnotacioDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreInteressat;
-import es.caib.ripea.core.entity.ArxiuEntity;
-import es.caib.ripea.core.entity.BustiaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.EscriptoriEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
@@ -66,19 +56,12 @@ import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.EscriptoriRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
  * Utilitat per a gestionar contenidors.
@@ -88,51 +71,39 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
 @Component
 public class ContingutHelper {
 
-	@Resource
+	@Autowired
 	private ContingutRepository contingutRepository;
-	@Resource
-	private EscriptoriRepository escriptoriRepository;
-	@Resource
+	@Autowired
 	private NodeRepository nodeRepository;
-	@Resource
+	@Autowired
 	private DadaRepository dadaRepository;
-	@Resource
-	private DocumentRepository documentRepository;
-	@Resource
+	@Autowired
 	private ExpedientRepository expedientRepository;
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
-	@Resource
-	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
-	@Resource
+	@Autowired
 	private MetaNodeRepository metaNodeRepository;
-	@Resource
-	private RegistreRepository registreRepository;
-	@Resource
+	@Autowired
+	private UsuariRepository usuariRepository;
+	@Autowired
 	private ContingutMovimentRepository contenidorMovimentRepository;
-	@Resource
+	@Autowired
 	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
 
-	@Resource
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private MetaNodeHelper metaNodeHelper;
-	@Resource
+	@Autowired
 	private DocumentHelper documentHelper;
-	@Resource
+	@Autowired
 	private PluginHelper pluginHelper;
-	@Resource
+	@Autowired
 	private PermisosHelper permisosHelper;
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-	@Resource
+	@Autowired
 	private UsuariHelper usuariHelper;
-	@Resource
-	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 
 
 
@@ -161,10 +132,7 @@ public class ContingutHelper {
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-		if (deproxied instanceof EscriptoriEntity) {
-			EscriptoriDto dto = new EscriptoriDto();
-			resposta = dto;
-		} else if (deproxied instanceof ExpedientEntity) {
+		if (deproxied instanceof ExpedientEntity) {
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
 			ExpedientDto dto = new ExpedientDto();
 			dto.setEstat(expedient.getEstat());
@@ -187,23 +155,12 @@ public class ContingutHelper {
 					conversioTipusHelper.convertir(
 							expedient.getAgafatPer(),
 							UsuariDto.class));
-			dto.setArxiu((ArxiuDto)toContingutDto(expedient.getArxiu()));
 			metaNode = conversioTipusHelper.convertir(
 					expedient.getMetaNode(),
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
-			dto.setAmbRegistresSenseLlegir(false);
-			for(ContingutEntity c: expedient.getFills()) {
-				if(c instanceof RegistreEntity) {
-					Boolean llegida = ((RegistreEntity) c).getLlegida();
-					if(llegida != null && !llegida) {
-						dto.setAmbRegistresSenseLlegir(true);
-						break;
-					}
-				}
-			}
 			resposta = dto;
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
@@ -257,28 +214,6 @@ public class ContingutHelper {
 			resposta = dto;
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
-			resposta = dto;
-		} else if (deproxied instanceof ArxiuEntity) {
-			ArxiuEntity arxiu = (ArxiuEntity)deproxied;
-			ArxiuDto dto = new ArxiuDto();
-			dto.setUnitatCodi(arxiu.getUnitatCodi());
-			dto.setActiu(arxiu.isActiu());
-			resposta = dto;
-		} else if (deproxied instanceof BustiaEntity) {
-			BustiaEntity bustia = (BustiaEntity)deproxied;
-			BustiaDto dto = new BustiaDto();
-			dto.setUnitatCodi(bustia.getUnitatCodi());
-			dto.setActiva(bustia.isActiva());
-			dto.setPerDefecte(bustia.isPerDefecte());
-			UnitatOrganitzativaDto unitatConselleria = unitatOrganitzativaHelper.findConselleria(
-					bustia.getEntitat().getCodi(),
-					bustia.getUnitatCodi());
-			if (unitatConselleria != null)
-				dto.setUnitatConselleriaCodi(unitatConselleria.getCodi());
-			UnitatOrganitzativaDto unitatOrganitzativa = unitatOrganitzativaHelper.findPerEntitatAndCodi(
-					bustia.getEntitat().getCodi(),
-					bustia.getUnitatCodi());
-			dto.setUnitat(unitatOrganitzativa);
 			resposta = dto;
 		} else if (deproxied instanceof RegistreEntity) {
 			RegistreEntity registre = (RegistreEntity)deproxied;
@@ -405,119 +340,210 @@ public class ContingutHelper {
 		return resposta;
 	}
 
-	public void comprovarPermisosContingut(
-			ContingutEntity contingut,
+	public NodeEntity comprovarNodeDinsExpedientModificable(
+			Long entitatId,
+			Long contingutId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
+		ContingutEntity contingut = comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutId,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete);
+		if (!(contingut instanceof NodeEntity)) {
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					"El contingut no és un node");
+		}
+		return (NodeEntity)contingut;
+	}
+
+	public ContingutEntity comprovarContingutDinsExpedientModificable(
+			Long entitatId,
+			Long contingutId,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		// Comprova el permís de modificació de l'expedient superior
+		ExpedientEntity expedientSuperior = getExpedientSuperior(
+				contingut,
+				true,
+				false,
+				true);
+		if (expedientSuperior != null) {
+			// Comprova que l'usuari actual te agafat l'expedient
+			UsuariEntity agafatPer = expedientSuperior.getAgafatPer();
+			if (agafatPer != null) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (!auth.getName().equals(agafatPer.getCodi())) {
+					throw new ValidationException(
+							contingutId,
+							ContingutEntity.class,
+							"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
+							"usuariActualCodi=" + auth.getName() + ")");
+				}
+			} else {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
+			}
+		} else {
+			throw new ValidationException(
+					contingutId,
+					ContingutEntity.class,
+					"No es pot modificar un contingut que no està associat a un expedient");
+		}
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus()) || ContingutTipusEnumDto.DOCUMENT.equals(contingut.getTipus())) {
+			comprovarPermisosNode(
+					(NodeEntity)contingut,
+					comprovarPermisRead,
+					comprovarPermisWrite,
+					comprovarPermisCreate,
+					comprovarPermisDelete);
+		}
+		return contingut;
+	}
+
+	public NodeEntity comprovarNodeDinsExpedientAccessible(
+			Long entitatId,
+			Long contingutId,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite) {
+		ContingutEntity contingut = comprovarContingutDinsExpedientAccessible(
+				entitatId,
+				contingutId,
+				comprovarPermisRead,
+				comprovarPermisWrite);
+		if (!(contingut instanceof NodeEntity)) {
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					"El contingut no és un node");
+		}
+		return (NodeEntity)contingut;
+	}
+
+	public ContingutEntity comprovarContingutDinsExpedientAccessible(
+			Long entitatId,
+			Long contingutId,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		// Comprova el permís de lectura de l'expedient superior
+		getExpedientSuperior(
+				contingut,
+				true,
+				true,
+				false);
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus()) || ContingutTipusEnumDto.DOCUMENT.equals(contingut.getTipus())) {
+			comprovarPermisosNode(
+					(NodeEntity)contingut,
+					comprovarPermisRead,
+					comprovarPermisWrite,
+					false,
+					false);
+		}
+		return contingut;
+	}
+
+	public void comprovarPermisosNode(
+			NodeEntity node,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		// Comprova els permisos del contenidor actual
-		if (contingut instanceof NodeEntity) {
-			// Si el contenidor és de tipus node
-			NodeEntity node = (NodeEntity)contingut;
-			if (node.getMetaNode() != null) {
-				if (comprovarPermisRead) {
-					boolean granted = permisosHelper.isGrantedAll(
-							node.getMetaNode().getId(),
-							MetaNodeEntity.class,
-							new Permission[] {ExtendedPermission.READ},
-							auth);
-					if (!granted) {
-						logger.debug("No te permisos per a llegir el node ("
-								+ "id=" + node.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-						throw new SecurityException("Sense permisos per accedir al node ("
-								+ "id=" + node.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-					}
-				}
-				if (comprovarPermisWrite) {
-					boolean granted = permisosHelper.isGrantedAll(
-							node.getMetaNode().getId(),
-							MetaNodeEntity.class,
-							new Permission[] {ExtendedPermission.WRITE},
-							auth);
-					if (!granted) {
-						logger.debug("No te permisos per a modificar el node ("
-								+ "id=" + node.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-						throw new SecurityException("Sense permisos per a modificar el node ("
-								+ "id=" + node.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-					}
-				}
-				if (comprovarPermisDelete) {
-					boolean granted = permisosHelper.isGrantedAll(
-							node.getMetaNode().getId(),
-							MetaNodeEntity.class,
-							new Permission[] {ExtendedPermission.DELETE},
-							auth);
-					if (!granted) {
-						logger.debug("No te permisos per a esborrar el node ("
-								+ "id=" + node.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-						throw new SecurityException("Sense permisos per a esborrar el node ("
-								+ "id=" + node.getId() + ", "
-								+ "usuari=" + auth.getName() + ")");
-					}
-				}
-			}
-		} else if (contingut instanceof EscriptoriEntity) {
-			EscriptoriEntity escriptori = (EscriptoriEntity)contingut;
+		if (node.getMetaNode() != null) {
 			if (comprovarPermisRead) {
-				boolean granted = escriptori.getUsuari().getCodi().equals(auth.getName());
-				if (!granted) {
-					logger.debug("Sense permisos per a accedir a l'escriptori ("
-							+ "id=" + escriptori.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per accedir a l'escriptori ("
-							+ "id=" + escriptori.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-		} else if (contingut instanceof ArxiuEntity) {
-			ArxiuEntity arxiu = (ArxiuEntity)contingut;
-			if (arxiu.getPare() != null && comprovarPermisRead) {
-				// Comprova que algun dels seus meta-expedients associants tingui el permís de lectura
-				boolean granted = false;
-				for(MetaExpedientEntity metaExpedient : arxiu.getMetaExpedients()) {
-					granted = permisosHelper.isGrantedAll(
-							metaExpedient.getId(),
-							MetaNodeEntity.class,
-							new Permission[] {ExtendedPermission.READ},
-							auth);
-					if(granted)
-						break;
-				}
-				if (!granted) {
-					logger.debug("Sense permisos per a accedir a l'arxiu ("
-							+ "id=" + arxiu.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per accedir a l'arxiu ("
-							+ "id=" + arxiu.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-		} else if (contingut instanceof BustiaEntity) {
-			BustiaEntity bustia = (BustiaEntity)contingut;
-			if (bustia.getPare() != null && comprovarPermisRead) {
 				boolean granted = permisosHelper.isGrantedAll(
-						bustia.getId(),
-						BustiaEntity.class,
+						node.getMetaNode().getId(),
+						MetaNodeEntity.class,
 						new Permission[] {ExtendedPermission.READ},
 						auth);
 				if (!granted) {
-					logger.debug("Sense permisos per a accedir a la bústia ("
-							+ "id=" + bustia.getId() + ", "
+					logger.debug("No te permisos per a llegir el node ("
+							+ "id=" + node.getId() + ", "
 							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per accedir a la bústia ("
-							+ "id=" + bustia.getId() + ", "
+					throw new SecurityException("Sense permisos per accedir al node ("
+							+ "id=" + node.getId() + ", "
 							+ "usuari=" + auth.getName() + ")");
 				}
 			}
+			if (comprovarPermisWrite) {
+				boolean granted = permisosHelper.isGrantedAll(
+						node.getMetaNode().getId(),
+						MetaNodeEntity.class,
+						new Permission[] {ExtendedPermission.WRITE},
+						auth);
+				if (!granted) {
+					logger.debug("No te permisos per a modificar el node ("
+							+ "id=" + node.getId() + ", "
+							+ "usuari=" + auth.getName() + ")");
+					throw new SecurityException("Sense permisos per a modificar el node ("
+							+ "id=" + node.getId() + ", "
+							+ "usuari=" + auth.getName() + ")");
+				}
+			}
+			if (comprovarPermisCreate) {
+				boolean granted = permisosHelper.isGrantedAll(
+						node.getMetaNode().getId(),
+						MetaNodeEntity.class,
+						new Permission[] {ExtendedPermission.CREATE},
+						auth);
+				if (!granted) {
+					logger.debug("No te permisos per a crear el node ("
+							+ "id=" + node.getId() + ", "
+							+ "usuari=" + auth.getName() + ")");
+					throw new SecurityException("Sense permisos per a crear el node ("
+							+ "id=" + node.getId() + ", "
+							+ "usuari=" + auth.getName() + ")");
+				}
+			}
+			if (comprovarPermisDelete) {
+				boolean granted = permisosHelper.isGrantedAll(
+						node.getMetaNode().getId(),
+						MetaNodeEntity.class,
+						new Permission[] {ExtendedPermission.DELETE},
+						auth);
+				if (!granted) {
+					logger.debug("No te permisos per a esborrar el node ("
+							+ "id=" + node.getId() + ", "
+							+ "usuari=" + auth.getName() + ")");
+					throw new SecurityException("Sense permisos per a esborrar el node ("
+							+ "id=" + node.getId() + ", "
+							+ "usuari=" + auth.getName() + ")");
+				}
+			}
+		} else {
+			throw new ValidationException(
+					node.getId(),
+					ContingutEntity.class,
+					"El node no te meta-node associat (nodeId=" + node.getId() + ")");
 		}
 	}
-	public void comprovarPermisosPathContingut(
+	/*public void comprovarPermisosPathContingut(
 			ContingutEntity contingut,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
@@ -563,8 +589,9 @@ public class ContingutHelper {
 			}
 			boolean expedientArrelTrobat = false;
 			for (ContingutEntity contingutPath: path) {
-				if (!expedientArrelTrobat && contingutPath instanceof ExpedientEntity)
+				if (!expedientArrelTrobat && contingutPath instanceof ExpedientEntity) {
 					expedientArrelTrobat = true;
+				}
 				if (expedientArrelTrobat) {
 					comprovarPermisosContingut(
 							contingutPath,
@@ -603,7 +630,7 @@ public class ContingutHelper {
 						+ "entitatId=" + entitat.getId() + ", "
 						+ "usuari=" + auth.getName() + ")");
 		}
-	}
+	}*/
 
 	public ExpedientEntity getExpedientSuperior(
 			ContingutEntity contingut,
@@ -689,23 +716,29 @@ public class ContingutHelper {
 	public ExpedientEntity crearNouExpedient(
 			String nom,
 			MetaExpedientEntity metaExpedient,
-			ArxiuEntity arxiu,
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			String ntiVersion,
 			String ntiOrgano,
 			Date ntiFechaApertura,
-			Integer any) {
+			Integer any,
+			boolean agafar) {
+		UsuariEntity agafatPer = null;
+		if (agafar) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			agafatPer = usuariRepository.getOne(auth.getName());
+		}
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
-				arxiu,
 				pare,
 				entitat,
 				"1.0",
 				ntiOrgano,
 				ntiFechaApertura,
-				metaExpedient.getClassificacioSia()).build();
+				metaExpedient.getClassificacioSia()).
+				agafatPer(agafatPer).
+				build();
 		// Calcula en número del nou expedient
 		calcularSequenciaExpedient(
 				expedientCrear,
@@ -724,29 +757,13 @@ public class ContingutHelper {
 			String organCodi,
 			Integer any) {
 		int anyExpedient;
-		if (any != null)
+		if (any != null) {
 			anyExpedient = any.intValue();
-		else
+		} else {
 			anyExpedient = Calendar.getInstance().get(Calendar.YEAR);
+		}
 		String ntiIdentificador = "ES_" + organCodi + "_" + anyExpedient + "_EXP_RIP" + String.format("%027d", expedient.getId());
 		expedient.updateNtiIdentificador(ntiIdentificador);
-	}
-
-	public EscriptoriEntity getEscriptoriPerUsuari(
-			EntitatEntity entitat,
-			UsuariEntity usuari) {
-		EscriptoriEntity escriptori = escriptoriRepository.findByEntitatAndUsuari(
-				entitat,
-				usuari);
-		if (escriptori == null) {
-			logger.debug("No s'ha trobat l'escriptori i se'n crea un de nou");
-			escriptori = escriptoriRepository.save(
-					EscriptoriEntity.getBuilder(
-							usuari,
-							entitat).build());
-			pluginHelper.arxiuEscriptoriCrear(escriptori);
-		}
-		return escriptori;
 	}
 
 	public long[] countFillsAmbPermisReadByContinguts(
@@ -806,14 +823,10 @@ public class ContingutHelper {
 		return resposta;
 	}
 
-	public Set<String> findUsuarisAmbPermisReadPerContenidor(
+	/*public Set<String> findUsuarisAmbPermisReadPerContenidor(
 			ContingutEntity contingut) {
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
-		if (contingut instanceof BustiaEntity) {
-			permisos = permisosHelper.findPermisos(
-					contingut.getId(),
-					BustiaEntity.class);
-		} else if (contingut instanceof NodeEntity) {
+		if (contingut instanceof NodeEntity) {
 			NodeEntity node = (NodeEntity)contingut;
 			permisos = permisosHelper.findPermisos(
 					node.getMetaNode().getId(),
@@ -837,7 +850,7 @@ public class ContingutHelper {
 			}
 		}
 		return usuaris;
-	}
+	}*/
 
 	public ContingutMovimentEntity ferIEnregistrarMoviment(
 			ContingutEntity contingut,
@@ -870,15 +883,34 @@ public class ContingutHelper {
 		return contingutRepository.findOne(contingutActual.getId());
 	}
 
-	public boolean isNomValid(String nom) {
-		return !nom.startsWith(".");
+	public void comprovarNomValid(
+			ContingutEntity contingutPare,
+			String nom,
+			Object objectId,
+			Class<?> objectClass) {
+		if (nom.startsWith(".")) {
+			throw new ValidationException(
+					objectId,
+					objectClass,
+					"El nom de l'expedient no és vàlid (no pot començar amb un \".\")");
+		}
+		if (contingutPare != null) {
+			for (ContingutEntity fill: contingutPare.getFills()) {
+				if (fill.getNom().equals(nom)) {
+					throw new ValidationException(
+							objectId,
+							objectClass,
+							"Ja existeix un altre contingut amb el mateix nom");
+				}
+			}
+		}
 	}
 
 	public void arxiuPropagarModificacio(
 			ContingutEntity contingut,
-			ExpedientEntity expedientSuperior,
 			FitxerDto fitxer) {
 		String serieDocumental = null;
+		ExpedientEntity expedientSuperior = contingut.getExpedient();
 		if (expedientSuperior != null) {
 			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
 		}
@@ -906,9 +938,7 @@ public class ContingutHelper {
 		}
 	}
 
-	public void arxiuPropagarEliminacio(
-			ContingutEntity contingut,
-			ExpedientEntity expedientSuperior) {
+	public void arxiuPropagarEliminacio(ContingutEntity contingut) {
 		if (contingut.getArxiuUuid() != null) {
 			if (pluginHelper.isArxiuPluginActiu()) {
 				if (contingut instanceof ExpedientEntity) {

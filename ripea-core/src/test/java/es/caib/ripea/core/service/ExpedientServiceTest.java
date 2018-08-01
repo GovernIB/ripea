@@ -22,10 +22,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ArxiuDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
@@ -37,7 +35,6 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.ArxiuService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.helper.PropertiesHelper;
@@ -56,14 +53,11 @@ public class ExpedientServiceTest extends BaseServiceTest {
 	private ContingutService contingutService;
 	@Autowired
 	private ExpedientService expedientService;
-	@Autowired
-	private ArxiuService arxiuService;
 
 	private EntitatDto entitat;
 	private MetaDadaDto metaDada;
 	private MetaDocumentDto metaDocument;
 	private MetaExpedientDto metaExpedient;
-	private ArxiuDto arxiu;
 	private ExpedientDto expedientCreate;
 	private ExpedientDto expedientUpdate;
 	private PermisDto permisUserRead;
@@ -139,9 +133,6 @@ public class ExpedientServiceTest extends BaseServiceTest {
 		permisUser.setPrincipalNom("user");
 		permisosExpedient.add(permisUser);
 		metaExpedient.setPermisos(permisosExpedient);
-		arxiu = new ArxiuDto();
-		arxiu.setNom("Arxiu de test");
-		arxiu.setUnitatCodi(CODI_UNITAT_ARREL);
 		expedientCreate = new ExpedientDto();
 		expedientCreate.setAny(Calendar.getInstance().get(Calendar.YEAR));
 		expedientCreate.setNom("Expedient de test");
@@ -160,11 +151,6 @@ public class ExpedientServiceTest extends BaseServiceTest {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
-						//EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						//MetaDadaDto metaDadaCreada = (MetaDadaDto)elementsCreats.get(1);
-						//MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						//MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(3);
-						//ArxiuDto arxiuCreat = (ArxiuDto)elementsCreats.get(4);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						assertNotNull(expedientCreat);
 						assertNotNull(expedientCreat.getId());
@@ -202,14 +188,10 @@ public class ExpedientServiceTest extends BaseServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(3);
-						ArxiuDto arxiuCreat = (ArxiuDto)elementsCreats.get(4);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						ExpedientDto modificat = expedientService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								arxiuCreat.getId(),
-								metaExpedientCreat.getId(),
 								expedientUpdate.getNom());
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
@@ -390,18 +372,6 @@ public class ExpedientServiceTest extends BaseServiceTest {
 
 
 
-	private void donarPermisosArxiu(
-			EntitatDto entitat,
-			ArxiuDto arxiu,
-			MetaExpedientDto metaExpedient) {
-		autenticarUsuari("admin");
-		arxiuService.addMetaExpedient(
-				entitat.getId(),
-				arxiu.getId(),
-				metaExpedient.getId());
-		autenticarUsuari("user");
-	}
-
 	private void comprovarExpedientCoincideix(
 			ExpedientDto original,
 			ExpedientDto perComprovar) {
@@ -421,25 +391,13 @@ public class ExpedientServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("user");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						//MetaDadaDto metaDadaCreada = (MetaDadaDto)elementsCreats.get(1);
-						//MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(3);
-						ArxiuDto arxiuCreat = (ArxiuDto)elementsCreats.get(4);
-						donarPermisosArxiu(
-								entitatCreada,
-								arxiuCreat,
-								metaExpedientCreat);
-						EscriptoriDto escriptori = contingutService.getEscriptoriPerUsuariActual(
-								entitatCreada.getId());
 						ExpedientDto creat = expedientService.create(
 								entitatCreada.getId(),
-								escriptori.getId(),
 								metaExpedientCreat.getId(),
-								arxiuCreat.getId(),
-								expedientCreate.getAny(),
-								expedientCreate.getNom(),
 								null,
-								null);
+								expedientCreate.getAny(),
+								expedientCreate.getNom());
 						try {
 							elementsCreats.add(creat);
 							testAmbExpedientCreat.executar(
@@ -463,8 +421,7 @@ public class ExpedientServiceTest extends BaseServiceTest {
 				entitat,
 				metaDada,
 				metaDocument,
-				metaExpedient,
-				arxiu);
+				metaExpedient);
 	}
 
 	class TestAmbElementsIExpedient extends TestAmbElementsCreats {

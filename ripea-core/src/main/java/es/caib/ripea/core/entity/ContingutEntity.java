@@ -81,6 +81,10 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "ipa_entitat_contingut_fk")
 	protected EntitatEntity entitat;
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "expedient_id")
+	@ForeignKey(name = "ipa_expedient_contingut_fk")
+	protected ExpedientEntity expedient;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "contmov_id")
 	@ForeignKey(name = "ipa_contmov_contingut_fk")
@@ -93,8 +97,6 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	protected List<AlertaEntity> alertes = new ArrayList<AlertaEntity>();
 	@Version
 	private long version = 0;
-
-
 
 	public String getNom() {
 		return nom;
@@ -120,15 +122,16 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
+	public ExpedientEntity getExpedient() {
+		return expedient;
+	}
 	public ContingutMovimentEntity getDarrerMoviment() {
 		return darrerMoviment;
 	}
-	
-	
-
 	public List<AlertaEntity> getAlertes() {
 		return alertes;
 	}
+
 	public void update(String nom) {
 		this.nom = nom;
 	}
@@ -187,10 +190,6 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		} else if (!nom.equals(other.nom))
 			return false;
 		return true;
-	}
-	
-	public String getContingutType() {
-		return "desconegut";
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

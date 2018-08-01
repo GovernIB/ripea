@@ -8,6 +8,8 @@
 
 <c:set var="potModificarContingut" value="${false}"/>
 <c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty contingut.metaNode or contingut.metaNode.usuariActualWrite}"/></c:if>
+<c:set var="agafatPerUsuariActual" value="${false}"/>
+<c:if test="${contingut.expedient and contingut.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="agafatPerUsuariActual" value="${true}"/></c:if>
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -23,7 +25,6 @@
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
-			<c:when test="${contingut.bustia}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
 	</title>
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
@@ -377,8 +378,6 @@ $(document).ready(function() {
 							</c:if>
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.codi}/${contingut.sequencia}/${contingut.any}</dd>
-							<dt><spring:message code="contingut.info.arxiu"/></dt>
-							<dd>${contingut.arxiu.nom}</dd>
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
 						</c:if>
@@ -493,18 +492,6 @@ $(document).ready(function() {
 					</li>
 				</c:if>
 				<c:if test="${contingut.expedient}">
-					<li id="pipella-registres">
-						<a href="#registres" data-toggle="tab">
-							<spring:message code="contingut.tab.registres"/>&nbsp;
-							<span class="badge" id="registres-count">${contingut.fillsRegistresCount}</span>
-							<c:if test="${contingut.ambRegistresSenseLlegir}">
-								<span class="fa-stack" aria-hidden="true">
-	          						<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
-	          						<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
-	        					</span>
-							</c:if>
-						</a>
-					</li>
 					<li>
 						<a href="#interessats" data-toggle="tab"><spring:message code="contingut.tab.interessats"/>&nbsp;<span class="badge" id="interessats-count">${interessatsCount}</span></a>
 					</li>
@@ -603,24 +590,12 @@ $(document).ready(function() {
 												<td><strong><spring:message code="contingut.document.camp.firma.csv.regulacio"/></strong></td>
 												<td>${contingut.ntiCsvRegulacion}</td>
 											</tr>
-											<%--tr>
-												<td><strong><spring:message code="contingut.document.camp.firma.custodia.data"/></strong></td>
-												<td><fmt:formatDate value="${contingut.custodiaData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-											</tr--%>
 										</tbody>
 									</table>
 								</div>
 							</c:if>
 							<c:if test="${contingut.documentTipus != 'FISIC'}">
-								<c:choose>
-									<c:when test="${not contingut.custodiat}">
-										<a href="../contingut/${contingut.id}/document/${contingut.id}/descarregar" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
-										<a href="../contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a>
-									</c:when>
-									<c:otherwise>
-										<a href="../contingut/${contingut.id}/document/${contingut.id}/descarregar" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="contingut.document.descarregar.firmat"/></a>
-									</c:otherwise>
-								</c:choose>
+								<a href="../contingut/${contingut.id}/document/${contingut.id}/descarregar" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 							</c:if>
 						</c:when>
 						<c:otherwise>
@@ -650,7 +625,7 @@ $(document).ready(function() {
 										</ul>
 									</div>
 								</c:if>
-								<c:if test="${(contingut.escriptori or contingut.carpeta or ((contingut.expedient or contingut.document) and potModificarContingut))}">
+								<c:if test="${agafatPerUsuariActual and (contingut.carpeta or ((contingut.expedient or contingut.document) and potModificarContingut))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
@@ -743,51 +718,6 @@ $(document).ready(function() {
 					</div>
 				</c:if>
 				<c:if test="${contingut.expedient}">
-					<div class="tab-pane" id="registres">
-						<%--                   --%>
-						<%-- Pipella registres --%>
-						<%--                   --%>
-						<table id="taulaRegistres" data-toggle="datatable" data-url="<c:url value="/contingut/${contingut.id}/registre/datatable"/>" data-paging-enabled="false" class="table table-bordered table-striped" style="width:100%">
-							<thead>
-								<tr>
-									<th data-col-name="id" data-visible="false">#</th>
-									<th data-col-name="llegida" data-visible="false"></th>
-									<th data-col-name="registreTipus" data-template="#cellTipusTemplate" data-orderable="false" width="12%">
-										<spring:message code="contingut.registre.columna.tipus"/>
-										<script id="cellTipusTemplate" type="text/x-jsrender">
-											{{:~eval('registreTipusText["' + registreTipus + '"]')}}
-											{{if !llegida}}
-												<span class="fa-stack" aria-hidden="true">
-          											<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
-          											<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
-        										</span>
-											{{/if}}
-										</script>
-									</th>
-									<th data-col-name="identificador" data-orderable="false" width="10%"><spring:message code="contingut.registre.columna.identificador"/></th>
-									<th data-col-name="data" data-converter="datetime" data-orderable="false" width="18%"><spring:message code="contingut.registre.columna.data"/></th>
-									<th data-col-name="extracte" data-orderable="false" width="40%"><spring:message code="contingut.registre.columna.extracte"/></th>
-									<th data-col-name="id" data-orderable="false" data-template="#cellAccionsRegistreTemplate" width="10%">
-										<script id="cellAccionsRegistreTemplate" type="text/x-jsrender">
-											<div class="dropdown">
-												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-												<ul class="dropdown-menu">
-													<li><a href="../contingut/${contingut.id}/registre/{{:id}}" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-													<li><a href="../contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-													{{if !llegida}}
-														<li><a href="<c:url value="/contingut/${contingut.id}/registre/{{:id}}/llegir"/>" data-confirm="<spring:message code="contingut.registre.missatge.confirmacio"/>"><span class="fa fa-check-square-o"></span>&nbsp;&nbsp;<spring:message code="contingut.registre.accio.llegida"/></a></li>
-													{{/if}}
-												</ul>
-											</div>
-										</script>
-									</th>
-								</tr>
-							</thead>
-						</table>
-						<%--                    --%>
-						<%-- /Pipella registres --%>
-						<%--                    --%>
-					</div>
 					<div class="tab-pane" id="interessats">
 						<%--                     --%>
 						<%-- Pipella interessats --%>

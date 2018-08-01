@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -29,13 +28,13 @@ import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -57,6 +56,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private DocumentPublicacioRepository documentPublicacioRepository;
 
 	@Autowired
+	private DocumentHelper documentHelper;
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
@@ -77,34 +78,27 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacio) {
-		logger.debug("Creant una notificació de l'expedient (" +
+		logger.debug("Creant una notificació del document (" +
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"notificacio=" + notificacio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
+		if (!DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+			throw new ValidationException(
+					documentId,
+					DocumentEntity.class,
+					"El document no està custodiat");
+		}
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
 					documentId,
 					DocumentEntity.class,
 					"El document no te cap expedient associat (documentId=" + documentId + ")");
-		}
-		if (!DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
-			throw new ValidationException(
-					documentId,
-					DocumentEntity.class,
-					"El document no està custodiat");
 		}
 		if (	!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacio.getTipus()) &&
 				!expedient.getMetaExpedient().isNotificacioActiva()) {
@@ -145,20 +139,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		if (notificacioIdioma == null) {
 			notificacioIdioma = InteressatIdiomaEnumDto.CA;
 		}
-		List<DocumentEntity> annexos = null;
-		if (notificacio.getAnnexos() != null) {
-			annexos = new ArrayList<DocumentEntity>();
-			for (DocumentDto annex: notificacio.getAnnexos()) {
-				DocumentEntity annexEntity = entityComprovarHelper.comprovarDocument(
-						entitat,
-						null,
-						annex.getId(),
-						false,
-						false,
-						false);
-				annexos.add(annexEntity);
-			}
-		}
 		DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
 				(notificacio.getEstat() != null) ? notificacio.getEstat() : DocumentEnviamentEstatEnumDto.PENDENT,
 				notificacio.getAssumpte(),
@@ -174,7 +154,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				notificacio.getSeuOficiText(),
 				expedient,
 				document).
-				annexos(annexos).
 				observacions(notificacio.getObservacions()).
 				seuAvisTextMobil(notificacio.getSeuAvisTextMobil()).
 				build();
@@ -217,18 +196,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"notificacio=" + notificacio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -319,18 +291,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"notificacioId=" + notificacioId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -385,18 +350,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"notificacioId=" + notificacioId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -423,18 +381,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"publicacio=" + publicacio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -478,18 +429,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"publicacio=" + publicacio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -532,18 +476,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"publicacioId=" + publicacioId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -581,18 +518,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"publicacioId=" + publicacioId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
@@ -617,15 +547,14 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		logger.debug("Obtenint la llista d'enviaments de l'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				expedientId,
+				false,
 				true,
 				false,
+				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitat,
-				null,
-				expedientId);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);
 		for (DocumentNotificacioEntity notificacio: notificacions) {
@@ -653,18 +582,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		logger.debug("Obtenint la llista d'enviaments de l'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
-				true,
-				false,
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
 				documentId,
 				false,
-				false,
-				false);
+				true);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByEnviatDataAsc(
 				document);
@@ -688,16 +610,15 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Override
 	@Transactional
 	public void notificacioActualitzarEstat(String identificador, String referencia) {
-		
 		DocumentNotificacioEntity notificacio = documentNotificacioRepository.findByEnviamentIdentificadorAndEnviamentReferencia(
 				identificador,
 				referencia);
+		logger.debug("Actualitzant l'estat de les notificacions");
 		if (notificacio == null) {
 			throw new NotFoundException(
 					"[" + identificador + ", " + referencia + "]",
 					DocumentNotificacioEntity.class);
 		}
-		
 		try {
 			pluginHelper.notificacioActualitzarEstat(notificacio);
 		} catch (Exception ex) {
@@ -711,39 +632,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					notificacio.getExpedient().getId());
 		}
 	}
-	
-//	@Override
-//	@Transactional
-//	@Async
-//	@Scheduled(fixedRateString = "${config:es.caib.ripea.tasca.notificacio.pendent.periode.execucio}")
-//	public void notificacioActualitzarEstat() {
-//		logger.debug("Refrescant estat de les notificacions pendents");
-//		List<DocumentNotificacioEntity> pendents = documentNotificacioRepository.findByEstatAndTipusIn(
-//				DocumentEnviamentEstatEnumDto.ENVIAT,
-//				new DocumentNotificacioTipusEnumDto[] {
-//					DocumentNotificacioTipusEnumDto.NOTIFICACIO,
-//					DocumentNotificacioTipusEnumDto.COMUNICACIO,
-//				});
-//		logger.debug("Refrescant estat de " + pendents.size() + " notificacions pendents");
-//		if (!pendents.isEmpty()) {
-//			for (DocumentNotificacioEntity pendent: pendents) {
-//				try {
-//					pluginHelper.notificacioActualitzarEstat(pendent);
-//				} catch (Exception ex) {
-//					Throwable rootCause = ExceptionUtils.getRootCause(ex);
-//					if (rootCause == null) rootCause = ex;
-//					alertaHelper.crearAlerta(
-//							messageHelper.getMessage(
-//									"alertes.segon.pla.notificacions.error",
-//									new Object[] {pendent.getId()}),
-//							ex,
-//							pendent.getExpedient().getId());
-//				}
-//			}
-//		} else {
-//			logger.debug("No hi ha notificacions pendents de processar");
-//		}
-//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentEnviamentServiceImpl.class);
 }
