@@ -23,6 +23,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	MetaExpedientEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 
 	List<MetaExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Sort sort);
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Pageable pageable);
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);

@@ -15,17 +15,101 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
-	private String classificacio;
+	private String classificacioSia;
+	private String serieDocumental;
+	private boolean notificacioActiva;
+	private String notificacioSeuProcedimentCodi;
+	private String notificacioSeuRegistreLlibre;
+	private String notificacioSeuRegistreOficina;
+	private String notificacioSeuRegistreOrgan;
+	private String notificacioSeuExpedientUnitatOrganitzativa;
+	private String notificacioAvisTitol;
+	private String notificacioAvisText;
+	private String notificacioAvisTextMobil;
+	private String notificacioOficiTitol;
+	private String notificacioOficiText;
 	private Long pareId;
 	private List<MetaExpedientMetaDocumentDto> metaDocuments;
 
 
 
-	public String getClassificacio() {
-		return classificacio;
+	public String getClassificacioSia() {
+		return classificacioSia;
 	}
-	public void setClassificacio(String classificacio) {
-		this.classificacio = classificacio;
+	public void setClassificacioSia(String classificacioSia) {
+		this.classificacioSia = classificacioSia;
+	}
+	public String getSerieDocumental() {
+		return serieDocumental;
+	}
+	public void setSerieDocumental(String serieDocumental) {
+		this.serieDocumental = serieDocumental;
+	}
+	public boolean isNotificacioActiva() {
+		return notificacioActiva;
+	}
+	public void setNotificacioActiva(boolean notificacioActiva) {
+		this.notificacioActiva = notificacioActiva;
+	}
+	public String getNotificacioSeuProcedimentCodi() {
+		return notificacioSeuProcedimentCodi;
+	}
+	public void setNotificacioSeuProcedimentCodi(String notificacioSeuProcedimentCodi) {
+		this.notificacioSeuProcedimentCodi = notificacioSeuProcedimentCodi;
+	}
+	public String getNotificacioSeuRegistreLlibre() {
+		return notificacioSeuRegistreLlibre;
+	}
+	public void setNotificacioSeuRegistreLlibre(String notificacioSeuRegistreLlibre) {
+		this.notificacioSeuRegistreLlibre = notificacioSeuRegistreLlibre;
+	}
+	public String getNotificacioSeuRegistreOficina() {
+		return notificacioSeuRegistreOficina;
+	}
+	public void setNotificacioSeuRegistreOficina(String notificacioSeuRegistreOficina) {
+		this.notificacioSeuRegistreOficina = notificacioSeuRegistreOficina;
+	}
+	public String getNotificacioSeuRegistreOrgan() {
+		return notificacioSeuRegistreOrgan;
+	}
+	public void setNotificacioSeuRegistreOrgan(String notificacioSeuRegistreOrgan) {
+		this.notificacioSeuRegistreOrgan = notificacioSeuRegistreOrgan;
+	}
+	public String getNotificacioSeuExpedientUnitatOrganitzativa() {
+		return notificacioSeuExpedientUnitatOrganitzativa;
+	}
+	public void setNotificacioSeuExpedientUnitatOrganitzativa(String notificacioSeuExpedientUnitatOrganitzativa) {
+		this.notificacioSeuExpedientUnitatOrganitzativa = notificacioSeuExpedientUnitatOrganitzativa;
+	}
+	public String getNotificacioAvisTitol() {
+		return notificacioAvisTitol;
+	}
+	public void setNotificacioAvisTitol(String notificacioAvisTitol) {
+		this.notificacioAvisTitol = notificacioAvisTitol;
+	}
+	public String getNotificacioAvisText() {
+		return notificacioAvisText;
+	}
+	public void setNotificacioAvisText(String notificacioAvisText) {
+		this.notificacioAvisText = notificacioAvisText;
+	}
+	public String getNotificacioAvisTextMobil() {
+		return notificacioAvisTextMobil;
+	}
+	public void setNotificacioAvisTextMobil(String notificacioAvisTextMobil) {
+		this.notificacioAvisTextMobil = notificacioAvisTextMobil;
+	}
+	public String getNotificacioOficiTitol() {
+		return notificacioOficiTitol;
+	}
+	public void setNotificacioOficiTitol(String notificacioOficiTitol) {
+		this.notificacioOficiTitol = notificacioOficiTitol;
+	}
+	public String getNotificacioOficiText() {
+		return notificacioOficiText;
+	}
+	public void setNotificacioOficiText(String notificacioOficiText) {
+		this.notificacioOficiText = notificacioOficiText;
 	}
 	public Long getPareId() {
 		return pareId;

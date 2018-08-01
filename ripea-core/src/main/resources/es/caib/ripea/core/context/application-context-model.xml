@@ -5,31 +5,34 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
 	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans
-		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/tx
-		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/context
-		http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/data/jpa
 		http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
 		http://www.springframework.org/schema/cache
-		http://www.springframework.org/schema/cache/spring-cache.xsd">
+		http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd">
 
-	<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="${es.caib.ripea.properties.path}" />
-		<property name="placeholderPrefix" value="${config:" />
-		<property name="ignoreResourceNotFound" value="true" />
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-	</bean>
+	<aop:aspectj-autoproxy/>
 
 	<context:annotation-config />
 	<context:component-scan base-package="es.caib.ripea.core.service" />
 	<context:component-scan base-package="es.caib.ripea.core.helper" />
+	<context:component-scan base-package="es.caib.ripea.core.aspect" />
 	<jpa:repositories base-package="es.caib.ripea.core.repository" />
 
-	<bean name="auditorAwareBean" class="es.caib.ripea.core.audit.BasicAuditorAware" factory-method="getInstance" />
+	<jpa:auditing auditor-aware-ref="auditorAwareBean" />
+	<bean name="auditorAwareBean" class="es.caib.ripea.core.audit.RipeaAuditorAware"/>
 
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
@@ -50,6 +53,11 @@
 		<property name="session" ref="mailSession"/>
 	</bean>
 	<!-- /E-mail -->
+
+	<!-- Execució de tasques periòdiques -->
+	<task:annotation-driven scheduler="taskScheduler"/>
+	<task:scheduler id="taskScheduler" pool-size="10"/>
+	<!-- /Execució de tasques periòdiques -->
 
 	<!-- Consola Groovy -->
 	<!--bean id="groovyShellService" class="es.caib.ripea.core.console.GroovyShellService" init-method="initialize" destroy-method="destroy">

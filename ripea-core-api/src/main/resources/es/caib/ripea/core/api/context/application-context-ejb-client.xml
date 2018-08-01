@@ -7,11 +7,11 @@
 				http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 				http://www.springframework.org/schema/jee
 				http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
-
+				
 	<jee:local-slsb
-			id="aclService"
-			jndi-name="ripea/AclServiceBean/local"
-			business-interface="org.springframework.security.acls.model.AclService"/>
+			id="alertaService"
+			jndi-name="ripea/AlertaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.AlertaService"/>
 	<jee:local-slsb
 			id="aplicacioService"
 			jndi-name="ripea/AplicacioServiceBean/local"
@@ -29,9 +29,9 @@
 			jndi-name="ripea/CarpetaServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.CarpetaService"/>
 	<jee:local-slsb
-			id="contenidorService"
-			jndi-name="ripea/ContenidorServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ContenidorService"/>
+			id="contingutService"
+			jndi-name="ripea/ContingutServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ContingutService"/>
 	<jee:local-slsb
 			id="documentService"
 			jndi-name="ripea/DocumentServiceBean/local"
@@ -41,13 +41,17 @@
 			jndi-name="ripea/EntitatServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.EntitatService"/>
 	<jee:local-slsb
+			id="documentEnviamentService"
+			jndi-name="ripea/DocumentEnviamentServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.DocumentEnviamentService"/>
+	<jee:local-slsb
+			id="expedientInteressatService"
+			jndi-name="ripea/ExpedientInteressatServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ExpedientInteressatService"/>
+	<jee:local-slsb
 			id="expedientService"
 			jndi-name="ripea/ExpedientServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.ExpedientService"/>
-	<jee:local-slsb
-			id="interessatService"
-			jndi-name="ripea/InteressatServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.InteressatService"/>
 	<jee:local-slsb
 			id="metaDadaService"
 			jndi-name="ripea/MetaDadaServiceBean/local"
@@ -65,8 +69,37 @@
 			jndi-name="ripea/RegistreServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.RegistreService"/>
 	<jee:local-slsb
-			id="integracioService"
-			jndi-name="ripea/IntegracioServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.IntegracioService"/>
+			id="reglaService"
+			jndi-name="ripea/ReglaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ReglaService"/>
+	<jee:local-slsb
+			id="dadesExternesService"
+			jndi-name="ripea/DadesExternesServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.DadesExternesService"/>
+	<jee:local-slsb
+			id="unitatOrganitzativaService"
+			jndi-name="ripea/UnitatOrganitzativaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.UnitatOrganitzativaService"/>
+	<jee:local-slsb
+			id="execucioMassivaService"
+			jndi-name="ripea/ExecucioMassivaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ExecucioMassivaService"/>
+	<jee:local-slsb
+			id="segonPlaService"
+			jndi-name="ripea/SegonPlaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.SegonPlaService"/>
+
+	<jee:local-slsb
+			id="bustiaV0WsService"
+			jndi-name="ripea/BustiaV0WsServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ws.BustiaV0WsService"/>
+	<jee:local-slsb
+			id="bustiaV1WsService"
+			jndi-name="ripea/BustiaV1WsServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ws.BustiaV1WsService"/>
+	<jee:local-slsb
+			id="bantelBackofficeWs"
+			jndi-name="ripea/BantelBackofficeWsBean/local"
+			business-interface="es.caib.ripea.core.api.service.bantel.ws.v2.BantelBackofficeWs"/>
 
 </beans>

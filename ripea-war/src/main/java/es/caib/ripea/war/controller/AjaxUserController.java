@@ -3,10 +3,12 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 
 /**
  * Controlador per a les consultes ajax dels usuaris normals.
@@ -25,10 +28,10 @@ import es.caib.ripea.core.api.service.AplicacioService;
  */
 @Controller
 @RequestMapping("/userajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
-public class AjaxUserController {
+public class AjaxUserController extends BaseUserController {
 
 	@Autowired
-	AplicacioService aplicacioService;
+	private AplicacioService aplicacioService;
 
 
 
@@ -48,6 +51,34 @@ public class AjaxUserController {
 			@PathVariable String text,
 			Model model) {
 		return aplicacioService.findUsuariAmbText(text);
+	}
+
+	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<HtmlOption> enumValorsAmbText(
+			HttpServletRequest request,
+			@PathVariable String enumClass) throws ClassNotFoundException {
+		Class<?> enumeracio = Class.forName("es.caib.ripea.core.api.dto." + enumClass);
+		StringBuilder textKeyPrefix = new StringBuilder();
+		String[] textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
+		for (String textKey: textKeys) {
+			if (!"dto".equalsIgnoreCase(textKey)) {
+				textKeyPrefix.append(textKey.toLowerCase());
+				textKeyPrefix.append(".");
+			}
+		}
+		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
+		if (enumeracio.isEnum()) {
+			for (Object e: enumeracio.getEnumConstants()) {
+				resposta.add(new HtmlOption(
+						((Enum<?>)e).name(),
+						getMessage(
+								request,
+								textKeyPrefix.toString() + ((Enum<?>)e).name(),
+								null)));
+			}
+		}
+		return resposta;
 	}
 
 }

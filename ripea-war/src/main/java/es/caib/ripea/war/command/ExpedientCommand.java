@@ -17,11 +17,8 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  */
 public class ExpedientCommand extends ContenidorCommand {
 
-	protected Long metaNodeId;
 	@NotNull(groups = {Create.class, Update.class})
-	protected Long arxiuId;
-	protected Long contingutId;
-	protected Long registreId;
+	protected Long metaNodeId;
 	private String tancatMotiu;
 	private int any;
 	private long sequencia;
@@ -32,24 +29,6 @@ public class ExpedientCommand extends ContenidorCommand {
 	}
 	public void setMetaNodeId(Long metaNodeId) {
 		this.metaNodeId = metaNodeId;
-	}
-	public Long getArxiuId() {
-		return arxiuId;
-	}
-	public void setArxiuId(Long arxiuId) {
-		this.arxiuId = arxiuId;
-	}
-	public Long getContingutId() {
-		return contingutId;
-	}
-	public void setContingutId(Long contingutId) {
-		this.contingutId = contingutId;
-	}
-	public Long getRegistreId() {
-		return registreId;
-	}
-	public void setRegistreId(Long registreId) {
-		this.registreId = registreId;
 	}
 	public String getTancatMotiu() {
 		return tancatMotiu;

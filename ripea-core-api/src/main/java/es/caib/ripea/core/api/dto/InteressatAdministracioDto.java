@@ -13,20 +13,27 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class InteressatAdministracioDto extends InteressatDto {
 
-	private String identificador;
+	protected String organCodi;
 
-
-
-	public String getIdentificador() {
-		return identificador;
+	@Override
+	public InteressatTipusEnumDto getTipus() {
+		return InteressatTipusEnumDto.ADMINISTRACIO;
 	}
-	public void setIdentificador(String identificador) {
-		this.identificador = identificador;
+	
+	public String getOrganCodi() {
+		return organCodi;
+	}
+	public void setOrganCodi(String organCodi) {
+		this.organCodi = organCodi;
 	}
 
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public String getNomComplet() {
+		return organCodi;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

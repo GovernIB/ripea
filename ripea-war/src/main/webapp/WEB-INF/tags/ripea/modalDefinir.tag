@@ -65,8 +65,8 @@
 			$.ajax({
 				"url": "<c:url value="/nodeco/util/alertes"/>",
 				"success": function (data) {
-					$('#contingut-alertes *').remove();
-					$('#contingut-alertes').append(data);
+					$('#contingut-missatges *').remove();
+					$('#contingut-missatges').append(data);
 				},
 				error: function(xhr, textStatus, errorThrown) {
 					console.log("<spring:message code="peticio.ajax.error"/>: " + xhr.responseText);

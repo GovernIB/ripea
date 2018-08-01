@@ -9,6 +9,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.core.api.exception.PropietatNotFoundException;
+
 /**
  * Utilitat per accedir a les entrades del fitxer de properties.
  * 
@@ -23,11 +25,16 @@ public class PropertiesHelper extends Properties {
 	private boolean llegirSystem = true;
 
 
-
 	public static PropertiesHelper getProperties() {
+		return getProperties(null);
+	}
+	public static PropertiesHelper getProperties(String path) {
+		String propertiesPath = path;
+		if (propertiesPath == null) {
+			propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
+		}
 		if (instance == null) {
 			instance = new PropertiesHelper();
-			String propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
 			if (propertiesPath != null) {
 				instance.llegirSystem = false;
 				logger.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
@@ -52,6 +59,10 @@ public class PropertiesHelper extends Properties {
 		return instance;
 	}
 
+	public boolean isLlegirSystem() {
+		return llegirSystem;
+	}
+
 	public String getProperty(String key) {
 		if (llegirSystem)
 			return System.getProperty(key);
@@ -62,21 +73,84 @@ public class PropertiesHelper extends Properties {
 		String val = getProperty(key);
         return (val == null) ? defaultValue : val;
 	}
+	public String getPropertyAmbComprovacio(String key) {
+		String valor = getProperty(key);
+		if (valor == null || valor.isEmpty()) {
+			throw new PropietatNotFoundException(key);
+		}
+		return valor;
+	}
 
 	public boolean getAsBoolean(String key) {
-		return new Boolean(getProperty(key)).booleanValue();
+		String value = getProperty(key);
+		if (value != null) {
+			return new Boolean(getProperty(key)).booleanValue();
+		} else {
+			return false;
+		}
 	}
 	public int getAsInt(String key) {
-		return new Integer(getProperty(key)).intValue();
+		String value = getProperty(key);
+		if (value != null) {
+			return new Integer(value).intValue();
+		} else {
+			throw new PropietatNotFoundException(key);
+		}
 	}
 	public long getAsLong(String key) {
-		return new Long(getProperty(key)).longValue();
+		String value = getProperty(key);
+		if (value != null) {
+			return new Long(value).longValue();
+		} else {
+			throw new PropietatNotFoundException(key);
+		}
 	}
 	public float getAsFloat(String key) {
-		return new Float(getProperty(key)).floatValue();
+		String value = getProperty(key);
+		if (value != null) {
+			return new Float(value).floatValue();
+		} else {
+			throw new PropietatNotFoundException(key);
+		}
 	}
 	public double getAsDouble(String key) {
-		return new Double(getProperty(key)).doubleValue();
+		String value = getProperty(key);
+		if (value != null) {
+			return new Double(value).doubleValue();
+		} else {
+			throw new PropietatNotFoundException(key);
+		}
+	}
+
+	public Properties findByPrefix(String prefix) {
+		Properties properties = new Properties();
+		if (llegirSystem) {
+			for (Object key: System.getProperties().keySet()) {
+				if (key instanceof String) {
+					String keystr = (String)key;
+					if (prefix == null || keystr.startsWith(prefix)) {
+						properties.put(
+								keystr,
+								System.getProperty(keystr));
+					}
+				}
+			}
+		} else {
+			for (Object key: this.keySet()) {
+				if (key instanceof String) {
+					String keystr = (String)key;
+					if (prefix == null || keystr.startsWith(prefix)) {
+						properties.put(
+								keystr,
+								getProperty(keystr));
+					}
+				}
+			}
+		}
+		return properties;
+	}
+	public Properties findAll() {
+		return findByPrefix(null);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);

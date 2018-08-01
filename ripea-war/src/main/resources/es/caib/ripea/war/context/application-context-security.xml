@@ -5,27 +5,39 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="
 				http://www.springframework.org/schema/beans
-				http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+				http://www.springframework.org/schema/beans/spring-beans.xsd
 				http://www.springframework.org/schema/security
-				http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+				http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<sec:http create-session="never" use-expressions="false" auto-config="true" entry-point-ref="preAuthenticatedProcessingFilterEntryPoint">
-		<sec:intercept-url pattern="/error" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-		<sec:intercept-url pattern="/ws/MCGDws*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-		<sec:intercept-url pattern="/ws/bustia*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-		<sec:intercept-url pattern="/ws/registre*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-		<sec:intercept-url pattern="/entitat*" access="ROLE_SUPER"/>
-		<sec:intercept-url pattern="/permis*" access="ROLE_ADMIN"/>
-		<sec:intercept-url pattern="/metaExpedient*" access="ROLE_ADMIN"/>
-		<sec:intercept-url pattern="/metaDocument*" access="ROLE_ADMIN"/>
-		<sec:intercept-url pattern="/metaCarpeta*" access="ROLE_ADMIN"/>
-		<sec:intercept-url pattern="/metaDada*" access="ROLE_ADMIN"/>
-		<sec:intercept-url pattern="/*" access="ROLE_USER"/>
+	<sec:http pattern="/rest/notib**" security="none"/>
+	<sec:http pattern="/rest/notib/**" security="none"/>
+	<sec:http create-session="never" use-expressions="true" auto-config="true" entry-point-ref="preAuthenticatedProcessingFilterEntryPoint">
+		<sec:intercept-url pattern="/error" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/ws/MCGDws*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/ws/portafibCallback*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/ws/v0/bustia*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/ws/v1/bustia*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/ws/bantel*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/rest/notib*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/rest/notib/notificaCanvi*" access="isAnonymous()"/>
+		
+		<sec:intercept-url pattern="/rest/v0/bustia" access="hasRole('IPA_BSTWS')"/>
+		<sec:intercept-url pattern="/rest/v1/bustia" access="hasRole('IPA_BSTWS')"/>
+		<sec:intercept-url pattern="/entitat*" access="hasRole('IPA_SUPER')"/>
+		<sec:intercept-url pattern="/permis*" access="hasRole('IPA_ADMIN')"/>
+		<sec:intercept-url pattern="/metaExpedient*" access="hasRole('IPA_ADMIN')"/>
+		<sec:intercept-url pattern="/metaDocument*" access="hasRole('IPA_ADMIN')"/>
+		<sec:intercept-url pattern="/metaCarpeta*" access="hasRole('IPA_ADMIN')"/>
+		<sec:intercept-url pattern="/metaDada*" access="hasRole('IPA_ADMIN')"/>
+		<sec:intercept-url pattern="/*" access="hasRole('tothom')"/>
 		<sec:custom-filter position="PRE_AUTH_FILTER" ref="preauthFilter"/>
 		<sec:anonymous/>
 		<sec:session-management session-fixation-protection="none"/>
+		<sec:headers>
+			<sec:frame-options policy="SAMEORIGIN"/>
+		</sec:headers>
 	</sec:http>
-
+		
 	<sec:authentication-manager alias="authenticationManager">
 		<sec:authentication-provider ref="preAuthenticatedAuthenticationProvider"/>
 	</sec:authentication-manager>
@@ -46,7 +58,6 @@
 							<set>
 								<value>IPA_SUPER</value>
 								<value>IPA_ADMIN</value>
-								<value>IPA_REGWS</value>
 								<value>IPA_BSTWS</value>
 								<value>tothom</value>
 							</set>
@@ -54,17 +65,7 @@
 					</bean>
 				</property>
 				<property name="userRoles2GrantedAuthoritiesMapper">
-					<bean class="es.caib.ripea.war.security.RolesBasedAttributes2GrantedAuthoritiesMapper">
-						<property name="baseRoleMapping">
-							<map>
-								<entry key="IPA_SUPER" value="ROLE_SUPER"/>
-								<entry key="IPA_ADMIN" value="ROLE_ADMIN"/>
-								<entry key="IPA_REGWS" value="ROLE_REGWS"/>
-								<entry key="IPA_BSTWS" value="ROLE_BSTWS"/>
-								<entry key="tothom" value="ROLE_USER"/>
-							</map>
-						</property>
-					</bean>
+					<bean class="es.caib.ripea.war.security.RolesBasedAttributes2GrantedAuthoritiesMapper"/>
 				</property>
 			</bean>
 		</property>
@@ -72,5 +73,6 @@
 	</bean>
 
 	<bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
+	<bean class="es.caib.ripea.war.security.DefaultRolesPrefixPostProcessor"/>
 
 </beans>

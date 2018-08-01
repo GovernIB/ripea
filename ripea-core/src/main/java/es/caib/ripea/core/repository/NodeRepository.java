@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.ContenidorEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
@@ -35,7 +35,7 @@ public interface NodeRepository extends JpaRepository<NodeEntity, Long> {
 			"    pare")
 	List<Object[]> countByPares(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("pares") List<? extends ContenidorEntity> pares);
+			@Param("pares") List<? extends ContingutEntity> pares);
 
 	@Query(	"select " +
 			"    pare.id, " +
@@ -51,7 +51,7 @@ public interface NodeRepository extends JpaRepository<NodeEntity, Long> {
 			"    pare")
 	List<Object[]> countAmbPermisReadByPares(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("pares") List<? extends ContenidorEntity> pares,
+			@Param("pares") List<? extends ContingutEntity> pares,
 			@Param("metaNodesPermesos") List<MetaNodeEntity> metaNodesPermesos);
 
 }

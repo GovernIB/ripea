@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -28,6 +29,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -135,6 +137,23 @@ public class PermisosHelper {
 				new Permission[] {permission});
 	}
 
+	public void filterGrantedAny(
+			Collection<? extends AbstractPersistable<Long>> objects,
+			Class<?> clazz,
+			Permission[] permissions) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		filterGrantedAny(
+				objects,
+				new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
+					@Override
+					public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
+						return entitat.getId();
+					}
+				},
+				clazz,
+				permissions,
+				auth);
+	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void filterGrantedAny(
 			Collection<?> objects,
@@ -171,6 +190,23 @@ public class PermisosHelper {
 		return false;
 	}
 
+	public void filterGrantedAll(
+			Collection<? extends AbstractPersistable<Long>> objects,
+			Class<?> clazz,
+			Permission[] permissions) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		filterGrantedAll(
+				objects,
+				new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
+					@Override
+					public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
+						return entitat.getId();
+					}
+				},
+				clazz,
+				permissions,
+				auth);
+	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void filterGrantedAll(
 			Collection<?> objects,
@@ -318,7 +354,7 @@ public class PermisosHelper {
 					}
 				} else if (ace.getSid() instanceof GrantedAuthoritySid) {
 					String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
-					permis = permisosUsuari.get(grantedAuthority);
+					permis = permisosRol.get(grantedAuthority);
 					if (permis == null) {
 						permis = new PermisDto();
 						permis.setId((Long)ace.getId());

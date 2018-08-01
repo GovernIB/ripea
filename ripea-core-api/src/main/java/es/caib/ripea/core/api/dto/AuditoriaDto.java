@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -11,7 +11,9 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AuditoriaDto implements Serializable {
+public class AuditoriaDto {
+
+	private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
 
 	private UsuariDto createdBy;
 	private Date createdDate;
@@ -43,6 +45,17 @@ public class AuditoriaDto implements Serializable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-	private static final long serialVersionUID = -139254994389509932L;
+	public String getCreatedDateAmbFormat() {
+		if (createdDate == null)
+			return null;
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		return sdf.format(createdDate);
+	}
+	public String getLastModifiedDateAmbFormat() {
+		if (lastModifiedDate == null)
+			return null;
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		return sdf.format(lastModifiedDate);
+	}
 
 }

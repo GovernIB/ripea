@@ -72,6 +72,8 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 
 	@Override
 	public String getNomArxiuConvertitPdf(String nomOriginal) {
+		if (nomOriginal == null || nomOriginal.lastIndexOf(".") == -1)
+			return nomOriginal;
 		return nomOriginal.substring(0, nomOriginal.lastIndexOf(".")) + ".pdf";
 	}
 

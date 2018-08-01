@@ -3,6 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -14,7 +19,7 @@ public class DadaDto extends AuditoriaDto {
 
 	private Long id;
 	private MetaDadaDto metaDada;
-	protected String valor;
+	protected Object valor;
 	protected int ordre;
 
 
@@ -31,10 +36,10 @@ public class DadaDto extends AuditoriaDto {
 	public void setMetaDada(MetaDadaDto metaDada) {
 		this.metaDada = metaDada;
 	}
-	public void setValor(String valor) {
+	public void setValor(Object valor) {
 		this.valor = valor;
 	}
-	public String getValor() {
+	public Object getValor() {
 		return valor;
 	}
 	public int getOrdre() {
@@ -45,32 +50,33 @@ public class DadaDto extends AuditoriaDto {
 	}
 
 	public String getValorMostrar() {
+		if (valor == null)
+			return null;
 		if (metaDada != null) {
 			if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT)) {
-				return valor;
+				return valor.toString();
 			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DATA)) {
-				return valor;
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+				return sdf.format((Date)valor);
 			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.SENCER)) {
-				return valor.toString();
+				DecimalFormat decimalFormat = new DecimalFormat("###0");
+				return decimalFormat.format((Long)valor);
 			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.FLOTANT)) {
-				return valor.toString();
+				DecimalFormat decimalFormat = new DecimalFormat("###0.##");
+				return decimalFormat.format((Double)valor);
 			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.IMPORT)) {
-				return valor.toString();
+				DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+				return decimalFormat.format((BigDecimal)valor);
 			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.BOOLEA)) {
-				return new Boolean(valor).toString();
-			} else {
-				return valor;
+				return ((Boolean)valor).toString();
 			}
-		} else {
-			return valor;
 		}
+		return valor.toString();
 	}
 
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
-	private static final long serialVersionUID = -139254994389509932L;
 
 }

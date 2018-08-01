@@ -9,55 +9,93 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatCiutadaDto;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.war.command.InteressatCommand.Administracio;
-import es.caib.ripea.war.command.InteressatCommand.Ciutada;
+import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
+import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
-import es.caib.ripea.war.validation.DocumentIdentitat;
+import es.caib.ripea.war.validation.InteressatDocument;
 import es.caib.ripea.war.validation.InteressatNoRepetit;
+import es.caib.ripea.war.validation.InteressatPais;
 
 /**
  * Command per al manteniment d'interessats.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@InteressatNoRepetit(
-		groups = {Ciutada.class, Administracio.class},
-		campId = "id",
-		campEntitatId = "entitatId",
-		campNom = "nom",
-		campNif = "nif",
-		campLlinatges = "llinatges",
-		campIdentificador = "identificador",
-		campTipus = "tipus")
+@InteressatNoRepetit(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
+@InteressatPais(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
+@InteressatDocument(groups = {PersonaFisica.class, PersonaJuridica.class})
 public class InteressatCommand  {
 
-	public static final String TIPUS_CIUTADA = "C";
-	public static final String TIPUS_ADMINISTRACIO = "A";
+//	public static final String TIPUS_CIUTADA = "C";
+//	public static final String TIPUS_ADMINISTRACIO = "A";
 
 	protected Long id;
-	@NotNull(groups = {ComprovarCiutada.class, ComprovarAdministracio.class, Ciutada.class, Administracio.class})
+	@NotNull(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 	protected Long entitatId;
-	@NotEmpty(groups = {Ciutada.class, Administracio.class})
-	@Size(max = 256, groups = {Ciutada.class, Administracio.class})
+	@NotEmpty(groups = {PersonaFisica.class})
+	@Size(max = 30, groups = {PersonaFisica.class}, message = "max.size")
 	protected String nom;
-	@NotEmpty(groups = {Ciutada.class})
-	@Size(max = 256, groups = {Ciutada.class})
-	protected String llinatges;
-	@NotEmpty(groups = {ComprovarCiutada.class, Ciutada.class})
-	@DocumentIdentitat(groups = {ComprovarCiutada.class, Ciutada.class})
-	@Size(max = 9, groups = {ComprovarCiutada.class, Ciutada.class})
-	protected String nif;
-	@NotEmpty(groups = {ComprovarAdministracio.class, Administracio.class})
-	@Size(max = 9, groups = {ComprovarAdministracio.class, Administracio.class})
-	protected String identificador;
+	@NotEmpty(groups = {PersonaFisica.class})
+	@Size(max = 30, groups = {PersonaFisica.class}, message = "max.size")
+	protected String llinatge1;
+	@Size(max = 30, groups = {PersonaFisica.class}, message = "max.size")
+	protected String llinatge2;
+	@NotEmpty(groups = {PersonaJuridica.class})
+	@Size(max = 80, groups = {PersonaJuridica.class}, message = "max.size")
+	protected String raoSocial;
+	@NotEmpty(groups = {Administracio.class})
+	@Size(max = 9, groups = {Administracio.class}, message = "max.size")
+	protected String organCodi;
+	
+	@NotNull(groups = {PersonaFisica.class, PersonaJuridica.class})
+	protected InteressatDocumentTipusEnumDto documentTipus;
+	@NotEmpty(groups = {PersonaFisica.class, PersonaJuridica.class})
+//	@DocumentIdentitat(groups = {PersonaFisica.class, PersonaJuridica.class})
+	@Size(max = 9, groups = {PersonaFisica.class, PersonaJuridica.class}, message = "max.size")
+	protected String documentNum;
+	
+	@NotEmpty(groups = {PersonaFisica.class, PersonaJuridica.class})
+	@Size(max = 4, groups={PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String pais;
+	@Size(max = 2, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String provincia;
+	@Size(max = 5, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String municipi;
+	@NotEmpty(groups = {PersonaFisica.class, PersonaJuridica.class})
+	@Size(max = 160, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String adresa;
+	@NotEmpty(groups = {PersonaFisica.class, PersonaJuridica.class})
+	@Size(max = 5, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String codiPostal;
+	@Size(max = 160, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String email;
+	@Size(max = 20, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String telefon;
+	@Size(max = 160, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	protected String observacions;
+	protected InteressatIdiomaEnumDto preferenciaIdioma;
+	protected Boolean notificacioAutoritzat;
 
-	protected String tipus;
+	@NotNull
+	protected InteressatTipusEnumDto tipus;
 	protected boolean comprovat = false;
-
-
+	
+	// Camps de filtre (No s'utilitzen al fer submit)
+	protected String filtreCodiDir3;
+	protected String filtreDenominacio;
+	protected String filtreNivellAdministracio;
+	protected String filtreComunitat;
+	protected String filtreProvincia;
+	protected String filtreLocalitat;
+	protected Boolean filtreArrel;
 
 	public Long getId() {
 		return id;
@@ -77,28 +115,106 @@ public class InteressatCommand  {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	public String getLlinatges() {
-		return llinatges;
+	public String getLlinatge1() {
+		return llinatge1;
 	}
-	public void setLlinatges(String llinatges) {
-		this.llinatges = llinatges;
+	public void setLlinatge1(String llinatge1) {
+		this.llinatge1 = llinatge1;
 	}
-	public String getNif() {
-		return nif;
+	public String getLlinatge2() {
+		return llinatge2;
 	}
-	public void setNif(String nif) {
-		this.nif = nif;
+	public void setLlinatge2(String llinatge2) {
+		this.llinatge2 = llinatge2;
 	}
-	public String getIdentificador() {
-		return identificador;
+	public String getRaoSocial() {
+		return raoSocial;
 	}
-	public void setIdentificador(String identificador) {
-		this.identificador = identificador;
+	public void setRaoSocial(String raoSocial) {
+		this.raoSocial = raoSocial;
 	}
-	public String getTipus() {
+	public String getOrganCodi() {
+		return organCodi;
+	}
+	public void setOrganCodi(String organCodi) {
+		this.organCodi = organCodi;
+	}
+	public InteressatDocumentTipusEnumDto getDocumentTipus() {
+		return documentTipus;
+	}
+	public void setDocumentTipus(InteressatDocumentTipusEnumDto documentTipus) {
+		this.documentTipus = documentTipus;
+	}
+	public String getDocumentNum() {
+		return documentNum;
+	}
+	public void setDocumentNum(String documentNum) {
+		this.documentNum = documentNum;
+	}
+	public String getPais() {
+		return pais;
+	}
+	public void setPais(String pais) {
+		this.pais = pais;
+	}
+	public String getProvincia() {
+		return provincia;
+	}
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
+	}
+	public String getMunicipi() {
+		return municipi;
+	}
+	public void setMunicipi(String municipi) {
+		this.municipi = municipi;
+	}
+	public String getAdresa() {
+		return adresa;
+	}
+	public void setAdresa(String adresa) {
+		this.adresa = adresa;
+	}
+	public String getCodiPostal() {
+		return codiPostal;
+	}
+	public void setCodiPostal(String codiPostal) {
+		this.codiPostal = codiPostal;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getTelefon() {
+		return telefon;
+	}
+	public void setTelefon(String telefon) {
+		this.telefon = telefon;
+	}
+	public String getObservacions() {
+		return observacions;
+	}
+	public void setObservacions(String observacions) {
+		this.observacions = observacions;
+	}
+	public InteressatIdiomaEnumDto getPreferenciaIdioma() {
+		return preferenciaIdioma;
+	}
+	public void setPreferenciaIdioma(InteressatIdiomaEnumDto preferenciaIdioma) {
+		this.preferenciaIdioma = preferenciaIdioma;
+	}
+	public Boolean getNotificacioAutoritzat() {
+		return notificacioAutoritzat;
+	}
+	public void setNotificacioAutoritzat(Boolean notificacioAutoritzat) {
+		this.notificacioAutoritzat = notificacioAutoritzat;
+	}
+	public InteressatTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public void setTipus(String tipus) {
+	public void setTipus(InteressatTipusEnumDto tipus) {
 		this.tipus = tipus;
 	}
 	public boolean isComprovat() {
@@ -108,16 +224,64 @@ public class InteressatCommand  {
 		this.comprovat = comprovat;
 	}
 
+	public String getFiltreCodiDir3() {
+		return filtreCodiDir3;
+	}
+	public void setFiltreCodiDir3(String filtreCodiDir3) {
+		this.filtreCodiDir3 = filtreCodiDir3;
+	}
+	public String getFiltreDenominacio() {
+		return filtreDenominacio;
+	}
+	public void setFiltreDenominacio(String filtreDenominacio) {
+		this.filtreDenominacio = filtreDenominacio;
+	}
+	public String getFiltreNivellAdministracio() {
+		return filtreNivellAdministracio;
+	}
+	public void setFiltreNivellAdministracio(String filtreNivellAdministracio) {
+		this.filtreNivellAdministracio = filtreNivellAdministracio;
+	}
+	public String getFiltreComunitat() {
+		return filtreComunitat;
+	}
+	public void setFiltreComunitat(String filtreComunitat) {
+		this.filtreComunitat = filtreComunitat;
+	}
+	public String getFiltreProvincia() {
+		return filtreProvincia;
+	}
+	public void setFiltreProvincia(String filtreProvincia) {
+		this.filtreProvincia = filtreProvincia;
+	}
+	public String getFiltreLocalitat() {
+		return filtreLocalitat;
+	}
+	public void setFiltreLocalitat(String filtreLocalitat) {
+		this.filtreLocalitat = filtreLocalitat;
+	}
+	public Boolean getFiltreArrel() {
+		return filtreArrel;
+	}
+	public void setFiltreArrel(Boolean filtreArrel) {
+		this.filtreArrel = filtreArrel;
+	}
+	
 	public static InteressatCommand asCommand(InteressatDto dto) {
 		InteressatCommand command = ConversioTipusHelper.convertir(
 				dto,
 				InteressatCommand.class);
 		return command;
 	}
-	public static InteressatCiutadaDto asCiutadaDto(InteressatCommand command) {
+	public static InteressatPersonaFisicaDto asPersonaFisicaDto(InteressatCommand command) {
 		return ConversioTipusHelper.convertir(
 				command,
-				InteressatCiutadaDto.class);
+				InteressatPersonaFisicaDto.class);
+	}
+	public static InteressatPersonaJuridicaDto asPersonaJuridicaDto(InteressatCommand command) {
+		return ConversioTipusHelper.convertir(
+				command,
+				InteressatPersonaJuridicaDto.class);
 	}
 	public static InteressatAdministracioDto asAdministracioDto(InteressatCommand command) {
 		return ConversioTipusHelper.convertir(
@@ -125,13 +289,16 @@ public class InteressatCommand  {
 				InteressatAdministracioDto.class);
 	}
 
-	public boolean isCiutada() {
+	public boolean isPersonaFisica() {
 		if (tipus == null)
 			return true;
-		return TIPUS_CIUTADA.equals(tipus);
+		return InteressatTipusEnumDto.PERSONA_FISICA.equals(tipus);
+	}
+	public boolean isPersonaJuridica() {
+		return InteressatTipusEnumDto.PERSONA_JURIDICA.equals(tipus);
 	}
 	public boolean isAdministracio() {
-		return TIPUS_ADMINISTRACIO.equals(tipus);
+		return InteressatTipusEnumDto.ADMINISTRACIO.equals(tipus);
 	}
 
 	@Override
@@ -139,9 +306,8 @@ public class InteressatCommand  {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	public interface Ciutada {}
+	public interface PersonaFisica {}
+	public interface PersonaJuridica {}
 	public interface Administracio {}
-	public interface ComprovarCiutada {}
-	public interface ComprovarAdministracio {}
 
 }

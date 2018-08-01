@@ -4,7 +4,6 @@
 package es.caib.ripea.plugin.caib.unitat;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import es.caib.ripea.plugin.SistemaExternException;
@@ -13,96 +12,77 @@ import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.
+ * La estructura d'unitats és la següent:
+ *   arrel: Limit Tecnologies (00000000T)
+ *   filla: Departament de programari (12345678Z)
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class UnitatsOrganitzativesPluginMock implements UnitatsOrganitzativesPlugin {
 
+	private static final String CODI_UNITAT_ARREL = "00000000T";
+	private static final String CODI_UNITAT_FILLA = "12345678Z";
+
+	private List<UnitatOrganitzativa> unitats;
+
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(
 			String pareCodi) throws SistemaExternException {
-		List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
-		UnitatOrganitzativa unitatArrel = new UnitatOrganitzativa(
-				"LIM000000",
-				"Limit Tecnologies",
-				"12345678Z",
-				new Date(0),
-				"V");
-		unitats.add(unitatArrel);
-		UnitatOrganitzativa unitat1 = new UnitatOrganitzativa(
-				"LIM000001",
-				"Departament de programari",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000000",
-				"LIM000000");
-		unitats.add(unitat1);
-		UnitatOrganitzativa unitat2 = new UnitatOrganitzativa(
-				"LIM000002",
-				"Departament de comunicacions i taller",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000000",
-				"LIM000000");
-		unitats.add(unitat2);
-		UnitatOrganitzativa unitat3 = new UnitatOrganitzativa(
-				"LIM000003",
-				"Departament comercial",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000000",
-				"LIM000000");
-		unitats.add(unitat3);
-		UnitatOrganitzativa unitat4 = new UnitatOrganitzativa(
-				"LIM000004",
-				"Secció de programació Java",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000001",
-				"LIM000000");
-		unitats.add(unitat4);
-		UnitatOrganitzativa unitat5 = new UnitatOrganitzativa(
-				"LIM000005",
-				"Secció de programació Forms/Oracle",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000001",
-				"LIM000000");
-		unitats.add(unitat5);
-		UnitatOrganitzativa unitat6 = new UnitatOrganitzativa(
-				"LIM000006",
-				"Secció de programació Web/PHP",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000001",
-				"LIM000000");
-		unitats.add(unitat6);
-		UnitatOrganitzativa unitat7 = new UnitatOrganitzativa(
-				"LIM000007",
-				"Departament d'administració",
-				"12345678Z",
-				new Date(0),
-				"V",
-				"LIM000000",
-				"LIM000000");
-		unitats.add(unitat7);
-		return unitats;
+		List<UnitatOrganitzativa> resposta = new ArrayList<UnitatOrganitzativa>();
+		resposta.add(findAmbCodi(pareCodi));
+		for (UnitatOrganitzativa unitat: getUnitats()) {
+			if (unitat.getCodiUnitatSuperior() != null && unitat.getCodiUnitatSuperior().equals(pareCodi)) {
+				resposta.add(unitat);
+			}
+		}
+		return resposta;
 	}
 
 	@Override
 	public UnitatOrganitzativa findAmbCodi(
 			String codi) throws SistemaExternException {
-		List<UnitatOrganitzativa> unitats = findAmbPare(null);
-		for (UnitatOrganitzativa unitat: unitats) {
+		for (UnitatOrganitzativa unitat: getUnitats()) {
 			if (unitat.getCodi().equals(codi))
 				return unitat;
 		}
+		return null;
+	}
+
+	/*@Override
+	public List<UnitatOrganitzativaD3> cercaUnitatsD3(
+			String codiUnitat, 
+			String denominacioUnitat,
+			Long codiNivellAdministracio, 
+			Long codiComunitat, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long codiProvincia, 
+			String codiLocalitat) throws SistemaExternException {
+		throw new SistemaExternException("Mètode no implementat");
+	}*/
+
+	private List<UnitatOrganitzativa> getUnitats() {
+		if (unitats == null) {
+			unitats = new ArrayList<UnitatOrganitzativa>();
+			UnitatOrganitzativa pare = new UnitatOrganitzativa();
+			pare.setCodi(CODI_UNITAT_ARREL);
+			pare.setDenominacio("Límit Tecnologies");
+			unitats.add(pare);
+			UnitatOrganitzativa fill = new UnitatOrganitzativa();
+			fill.setCodi(CODI_UNITAT_FILLA);
+			fill.setDenominacio("Departament de programari");
+			fill.setCodiUnitatArrel(CODI_UNITAT_ARREL);
+			fill.setCodiUnitatSuperior(CODI_UNITAT_ARREL);
+			unitats.add(fill);
+		}
+		return unitats;
+	}
+
+	@Override
+	public List<UnitatOrganitzativa> cercaUnitats(String codiUnitat, String denominacioUnitat,
+			Long codiNivellAdministracio, Long codiComunitat, Boolean ambOficines, Boolean esUnitatArrel,
+			Long codiProvincia, String codiLocalitat) throws SistemaExternException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

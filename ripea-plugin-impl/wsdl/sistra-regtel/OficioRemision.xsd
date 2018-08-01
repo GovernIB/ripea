@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:es:caib:regtel:ws:v2:model:OficioRemision" version="1.0" xmlns:tns="urn:es:caib:regtel:ws:v2:model:OficioRemision" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:complexType name="OficioRemision">
+		<xs:sequence>
+			<xs:element name="titulo" type="xs:string"/>
+			<xs:element name="texto" type="xs:string"/>
+			<xs:element minOccurs="0" name="tramiteSubsanacion" nillable="true">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="descripcionTramite" type="xs:string"/>
+						<xs:element name="identificadorTramite" type="xs:string"/>
+						<xs:element name="versionTramite" type="xs:int"/>
+						<xs:element minOccurs="0" name="parametrosTramite" nillable="true">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element maxOccurs="unbounded" ref="tns:parametroTramite"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="parametroTramite">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="parametro" type="xs:string"/>
+				<xs:element name="valor" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

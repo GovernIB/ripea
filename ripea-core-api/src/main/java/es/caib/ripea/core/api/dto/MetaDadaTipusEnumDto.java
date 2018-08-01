@@ -12,8 +12,8 @@ package es.caib.ripea.core.api.dto;
 public enum MetaDadaTipusEnumDto {
 	TEXT,
 	DATA,
+	IMPORT,
 	SENCER,
 	FLOTANT,
-	IMPORT,
 	BOOLEA
 }

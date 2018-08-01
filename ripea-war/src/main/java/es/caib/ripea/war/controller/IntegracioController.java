@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
-import es.caib.ripea.core.api.service.IntegracioService;
-import es.caib.ripea.war.datatable.DatatablesPagina;
-import es.caib.ripea.war.helper.PaginacioHelper;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -35,7 +35,7 @@ public class IntegracioController extends BaseUserController {
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
 
 	@Autowired
-	private IntegracioService integracioService;
+	private AplicacioService aplicacioService;
 
 
 
@@ -50,7 +50,7 @@ public class IntegracioController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable String codi,
 			Model model) {
-		List<IntegracioDto> integracions = integracioService.findAll();
+		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
 		model.addAttribute(
 				"integracions",
 				integracions);
@@ -73,7 +73,7 @@ public class IntegracioController extends BaseUserController {
 		return "integracioList";
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesPagina<IntegracioAccioDto> datatable(
 			HttpServletRequest request,
@@ -91,6 +91,24 @@ public class IntegracioController extends BaseUserController {
 		return PaginacioHelper.getPaginaPerDatatables(
 				request,
 				accions);
+	}*/
+	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse datatable(
+			HttpServletRequest request) {
+		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_FILTRE);
+		List<IntegracioAccioDto> accions = null;
+		if (codi != null) {
+			accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
+		} else {
+			accions = new ArrayList<IntegracioAccioDto>();
+		}
+		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
+				request,
+				accions);
+		return dtr;
 	}
 
 	@RequestMapping(value = "/{codi}/{index}", method = RequestMethod.GET)
@@ -99,7 +117,7 @@ public class IntegracioController extends BaseUserController {
 			@PathVariable String codi,
 			@PathVariable int index,
 			Model model) {
-		List<IntegracioAccioDto> accions = integracioService.findDarreresAccionsByIntegracio(codi);
+		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
 		if (index < accions.size()) {
 			model.addAttribute(
 					"integracio",

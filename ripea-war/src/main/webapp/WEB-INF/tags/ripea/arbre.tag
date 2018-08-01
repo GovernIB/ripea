@@ -6,25 +6,29 @@
 <%@ attribute name="atributNom" required="true"%>
 <%@ attribute name="seleccionatId"%>
 <%@ attribute name="changedCallback"%>
+<%@ attribute name="deselectAllCallback"%>
 <%@ attribute name="fulles" type="java.lang.Object"%>
 <%@ attribute name="fullesAtributId"%>
 <%@ attribute name="fullesAtributNom"%>
 <%@ attribute name="fullesAtributPare"%>
 <%@ attribute name="fullesIcona"%>
+<%@ attribute name="fullesAtributInfo"%>
+<%@ attribute name="fullesAtributInfoText"%>
 <%@ attribute name="isArbreSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isFullesSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isOcultarCounts" type="java.lang.Boolean"%>
 <%@ attribute name="isError" type="java.lang.Boolean"%>
+<%@ attribute name="height" required="false" rtexprvalue="true"%>
 <c:if test="${empty isArbreSeleccionable and empty isFullesSeleccionable}"><c:set var="isArbreSeleccionable" value="${true}"/><c:set var="isFullesSeleccionable" value="${true}"/></c:if>
 <c:if test="${empty isOcultarCounts}"><c:set var="isOcultarCounts" value="${false}"/></c:if>
 <c:if test="${empty isError}"><c:set var="isError" value="${false}"/></c:if>
-<div id="${id}" class="well" style="overflow: auto;<c:if test="${isError}">margin-bottom:10px; border-color: #A94442</c:if>">
+<div id="${id}" class="well" style="width: 100%; overflow: auto; <c:if test="${not empty height}">height: ${height}; </c:if><c:if test="${isError}">margin-bottom:10px; border-color: #A94442</c:if>">
 	<c:if test="${not empty arbre and not empty arbre.arrel}">
 		<c:set var="arrel" value="${arbre.arrel}"/>
 		<ul>
 			<li id="${arbre.arrel.dades[atributId]}" class="jstree-open" data-jstree='{"icon":"fa fa-home fa-lg"<c:if test="${not empty seleccionatId and arbre.arrel.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
-				${arbre.arrel.dades[atributNom]}
-				<rip:arbreFills pare="${arbre.arrel}" fills="${arbre.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}" fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" isOcultarCounts="${isOcultarCounts}"/>
+				<small>${arbre.arrel.dades[atributNom]}<c:if test="${not isOcultarCounts and arbre.arrel.mostrarCount}"> <span class="badge">${arbre.arrel.count}</span></c:if></small>
+				<rip:arbreFills pare="${arbre.arrel}" fills="${arbre.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}" fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" fullesAtributInfo="${fullesAtributInfo}" fullesAtributInfoText="${fullesAtributInfoText}" isOcultarCounts="${isOcultarCounts}"/>
 			</li>
 		</ul>
 	</c:if>
@@ -70,19 +74,21 @@
 		"plugins": ["conditionalselect", "conditionalhover"]
 	})
 	.on('after_open.jstree', function (e, data) {
-		var iframe = $('.modal-body iframe', window.parent.document);
-		var height = $('html').height();
-		iframe.height(height + 'px');
+		// var iframe = $('.modal-body iframe', window.parent.document);
+		// var height = $('html').height();
+		// iframe.height(height + 'px');
 	})
 	.on('after_close.jstree', function (e, data) {
-		var iframe = $('.modal-body iframe', window.parent.document);
-		var height = $('html').height();
-		iframe.height(height + 'px');
+		// var iframe = $('.modal-body iframe', window.parent.document);
+		// var height = $('html').height();
+		// iframe.height(height + 'px');
 	})<c:if test="${not empty changedCallback}">
 	.on('changed.jstree', function (e, data) {
+		//console.log('>>> changed.jstree');
 		return ${changedCallback}(e, data);
-	})
+	})</c:if><c:if test="${not empty deselectAllCallback}">
 	.on('deselect_all.jstree', function (e, data) {
-		return ${changedCallback}(e, data);
+		//console.log('>>> deselect_all.jstree');
+		//return ${changedCallback}(e, data);
 	})</c:if>;	
 </script>

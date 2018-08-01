@@ -3,8 +3,7 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 
 /**
@@ -14,138 +13,27 @@ import java.util.List;
  */
 public class DocumentVersioDto extends AuditoriaDto {
 
-	private Long id;
-	private int versio;
-	private String arxiuNom;
-	private String arxiuContentType;
-	private long arxiuContentLength;
-	private String custodiaId;
-	protected String custodiaUrl;
+	private String arxiuUuid;
+	private String id;
+	private Date data;
 
-	private String portafirmesConversioArxiuNom;
-	private List<PortafirmesEnviamentDto> portafirmesEnviaments;
-
-
-
-	public Long getId() {
+	public String getArxiuUuid() {
+		return arxiuUuid;
+	}
+	public void setArxiuUuid(String arxiuUuid) {
+		this.arxiuUuid = arxiuUuid;
+	}
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public int getVersio() {
-		return versio;
+	public Date getData() {
+		return data;
 	}
-	public void setVersio(int versio) {
-		this.versio = versio;
+	public void setData(Date data) {
+		this.data = data;
 	}
-	public String getArxiuNom() {
-		return arxiuNom;
-	}
-	public void setArxiuNom(String arxiuNom) {
-		this.arxiuNom = arxiuNom;
-	}
-	public String getArxiuContentType() {
-		return arxiuContentType;
-	}
-	public void setArxiuContentType(String arxiuContentType) {
-		this.arxiuContentType = arxiuContentType;
-	}
-	public long getArxiuContentLength() {
-		return arxiuContentLength;
-	}
-	public void setArxiuContentLength(long arxiuContentLength) {
-		this.arxiuContentLength = arxiuContentLength;
-	}
-	public String getCustodiaId() {
-		return custodiaId;
-	}
-	public void setCustodiaId(String custodiaId) {
-		this.custodiaId = custodiaId;
-	}
-	public String getCustodiaUrl() {
-		return custodiaUrl;
-	}
-	public void setCustodiaUrl(String custodiaUrl) {
-		this.custodiaUrl = custodiaUrl;
-	}
-	public String getPortafirmesConversioArxiuNom() {
-		return portafirmesConversioArxiuNom;
-	}
-	public void setPortafirmesConversioArxiuNom(String portafirmesConversioArxiuNom) {
-		this.portafirmesConversioArxiuNom = portafirmesConversioArxiuNom;
-	}
-	public List<PortafirmesEnviamentDto> getPortafirmesEnviaments() {
-		return portafirmesEnviaments;
-	}
-	public void setPortafirmesEnviaments(
-			List<PortafirmesEnviamentDto> portafirmesEnviaments) {
-		this.portafirmesEnviaments = portafirmesEnviaments;
-	}
-
-	public void addPortafirmesEnviament(
-			PortafirmesEnviamentDto portafirmesEnviament) {
-		if (portafirmesEnviaments == null) {
-			portafirmesEnviaments = new ArrayList<PortafirmesEnviamentDto>();
-		}
-		portafirmesEnviaments.add(portafirmesEnviament);
-	}
-
-	public PortafirmesEnviamentDto getPortafirmesEnviamentDarrer() {
-		PortafirmesEnviamentDto darrer = null;
-		if (portafirmesEnviaments != null && !portafirmesEnviaments.isEmpty()) {
-			for (PortafirmesEnviamentDto portafirmesEnviament: portafirmesEnviaments) {
-				if (darrer == null || portafirmesEnviament.getDataEnviament().after(darrer.getDataEnviament())) {
-					darrer = portafirmesEnviament;
-				}
-			}
-		}
-		return darrer;
-	}
-
-	public DocumentFirmaEstatEnumDto getFirmaEstat() {
-		PortafirmesEnviamentDto portafirmesEnviamentDarrer = getPortafirmesEnviamentDarrer();
-		if (portafirmesEnviamentDarrer != null) {
-			switch (portafirmesEnviamentDarrer.getPortafirmesEstat()) {
-			case PENDENT:
-				return DocumentFirmaEstatEnumDto.PFIRMA_PENDENT;
-			case REBUTJAT:
-				return DocumentFirmaEstatEnumDto.PFIRMA_REBUTJAT;
-			case FIRMAT:
-				if (getCustodiaId() != null)
-					return DocumentFirmaEstatEnumDto.PFIRMA_CUSTODIAT;
-				else
-					return DocumentFirmaEstatEnumDto.PFIRMA_FIRMAT;
-			case CANCELAT:
-				return DocumentFirmaEstatEnumDto.PFIRMA_CANCELAT;
-			case ERROR:
-				return DocumentFirmaEstatEnumDto.CALLBACK_ERROR;
-			}
-		}
-		return DocumentFirmaEstatEnumDto.SENSE_FIRMA;
-	}
-
-	public boolean isFirmaEstatCustodiat() {
-		DocumentFirmaEstatEnumDto firmaEstat = getFirmaEstat();
-		return	firmaEstat.equals(DocumentFirmaEstatEnumDto.PFIRMA_CUSTODIAT) ||
-				firmaEstat.equals(DocumentFirmaEstatEnumDto.APPLET_CUSTODIAT);
-	}
-	public boolean isFirmaEstatPortafirmesPendent() {
-		DocumentFirmaEstatEnumDto firmaEstat = getFirmaEstat();
-		return firmaEstat.equals(DocumentFirmaEstatEnumDto.PFIRMA_PENDENT);
-	}
-	public boolean isFirmaEstatPortafirmesBloquejat() {
-		DocumentFirmaEstatEnumDto firmaEstat = getFirmaEstat();
-		return	firmaEstat.equals(DocumentFirmaEstatEnumDto.PFIRMA_PENDENT) ||
-				firmaEstat.equals(DocumentFirmaEstatEnumDto.PFIRMA_FIRMAT) ||
-				firmaEstat.equals(DocumentFirmaEstatEnumDto.PFIRMA_CUSTODIAT) ||
-				firmaEstat.equals(DocumentFirmaEstatEnumDto.CALLBACK_ERROR);
-	}
-	public boolean isFirmaEstatError() {
-		DocumentFirmaEstatEnumDto firmaEstat = getFirmaEstat();
-		return firmaEstat.equals(DocumentFirmaEstatEnumDto.CALLBACK_ERROR);
-	}
-
-	private static final long serialVersionUID = -139254994389509932L;
 
 }

@@ -11,26 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.CarpetaTipusEnumDto;
-import es.caib.ripea.core.api.exception.CarpetaNotFoundException;
-import es.caib.ripea.core.api.exception.ContenidorNotFoundException;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
-import es.caib.ripea.core.api.exception.ExpedientNotFoundException;
-import es.caib.ripea.core.api.exception.NomInvalidException;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.CarpetaTipusEnum;
-import es.caib.ripea.core.entity.ContenidorEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.LogTipusEnum;
-import es.caib.ripea.core.helper.ContenidorHelper;
-import es.caib.ripea.core.helper.ContenidorLogHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.PermisosComprovacioHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
-import es.caib.ripea.core.repository.ContenidorRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 
 /**
@@ -41,27 +33,23 @@ import es.caib.ripea.core.repository.EntitatRepository;
 @Service
 public class CarpetaServiceImpl implements CarpetaService {
 
-	public static final String CARPETA_NOUVINGUTS_NOM = ".nouvinguts";
-
 	@Resource
 	private EntitatRepository entitatRepository;
 	@Resource
-	private ContenidorRepository contenidorRepository;
-	@Resource
 	private CarpetaRepository carpetaRepository;
-	//@Resource
-	//private ContenidorLogRepository contenidorLogRepository;
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private PermisosHelper permisosHelper;
 	@Resource
-	private ContenidorHelper contenidorHelper;
+	private ContingutHelper contingutHelper;
 	@Resource
-	private PermisosComprovacioHelper permisosComprovacioHelper;
+	private PluginHelper pluginHelper;
 	@Resource
-	private ContenidorLogHelper contenidorLogHelper;
+	private EntityComprovarHelper entityComprovarHelper;
+	@Resource
+	private ContingutLogHelper contingutLogHelper;
 
 
 
@@ -69,67 +57,45 @@ public class CarpetaServiceImpl implements CarpetaService {
 	@Override
 	public CarpetaDto create(
 			Long entitatId,
-			Long contenidorId,
-			String nom,
-			CarpetaTipusEnumDto tipus) throws EntitatNotFoundException, ContenidorNotFoundException, NomInvalidException {
+			Long contingutId,
+			String nom) {
 		logger.debug("Creant nova carpeta ("
 				+ "entitatId=" + entitatId + ", "
-				+ "contenidorId=" + contenidorId + ", "
-				+ "nom=" + nom + ", "
-				+ "tipus=" + tipus + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+				+ "contingutId=" + contingutId + ", "
+				+ "nom=" + nom + ")");
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
+				contingutId,
+				false,
+				false,
+				false,
+				false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
+				contingut,
 				true,
 				false,
 				false);
-		if (CarpetaTipusEnumDto.NOUVINGUT.equals(tipus)) {
-			logger.error("No es pot crear una carpeta de nouvinguts");
-			throw new CarpetaNotFoundException();
-		}
-		ContenidorEntity contenidor = comprovarContenidor(
-				entitat,
-				contenidorId);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				contenidor);
-		// Comprova l'accés al path del contenidor pare
-		contenidorHelper.comprovarPermisosPathContenidor(
-				contenidor,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contenidorHelper.isNomValid(nom)) {
-			throw new NomInvalidException();
-		}
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-				contenidor,
-				true);
-		if (expedientSuperior != null) {
-			contenidorHelper.comprovarPermisosContenidor(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
+		contingutHelper.comprovarNomValid(
+				contingut,
+				nom,
+				"<creacio>",
+				CarpetaEntity.class);
 		CarpetaEntity carpeta = CarpetaEntity.getBuilder(
 				nom,
-				CarpetaTipusEnum.valueOf(tipus.name()),
-				contenidor,
-				entitat).build();
+				contingut,
+				contingut.getEntitat(),
+				expedientSuperior).build();
 		carpeta = carpetaRepository.save(carpeta);
 		// Registra al log la creació de la carpeta
-		contenidorLogHelper.log(
+		contingutLogHelper.logCreacio(
 				carpeta,
-				LogTipusEnum.CREACIO,
-				null,
-				null,
 				true,
 				true);
-		return toCarpetaDto(carpeta);
+		CarpetaDto dto = toCarpetaDto(carpeta);
+		contingutHelper.arxiuPropagarModificacio(
+				carpeta,
+				null);
+		return dto;
 	}
 
 	@Transactional
@@ -137,116 +103,37 @@ public class CarpetaServiceImpl implements CarpetaService {
 	public CarpetaDto update(
 			Long entitatId,
 			Long id,
-			String nom,
-			CarpetaTipusEnumDto tipus) throws EntitatNotFoundException, CarpetaNotFoundException, NomInvalidException {
+			String nom) {
 		logger.debug("Actualitzant dades de la carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
-				+ "nom=" + nom + ", "
-				+ "tipus=" + tipus + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+				+ "nom=" + nom + ")");
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				true,
+				id,
+				false,
+				false,
 				false,
 				false);
-		CarpetaEntity carpeta = comprovarCarpeta(
-				entitat,
+		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
+				contingut.getEntitat(),
 				id);
-		if (CarpetaTipusEnum.NOUVINGUT.equals(carpeta.getTipus())) {
-			logger.error("No es pot modificar la carpeta de nouvinguts (id=" + id + ")");
-			throw new CarpetaNotFoundException();
-		}
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				carpeta);
-		// Comprova l'accés al path de la carpeta
-		contenidorHelper.comprovarPermisosPathContenidor(
-				carpeta,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contenidorHelper.isNomValid(nom)) {
-			throw new NomInvalidException();
-		}
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-				carpeta,
-				true);
-		if (expedientSuperior != null) {
-			contenidorHelper.comprovarPermisosContenidor(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
-		carpeta.update(
+		contingutHelper.comprovarNomValid(
+				carpeta.getPare(),
 				nom,
-				CarpetaTipusEnum.valueOf(tipus.name()));
+				id,
+				CarpetaEntity.class);
+		String nomOriginal = carpeta.getNom();
+		carpeta.update(
+				nom);
 		// Registra al log la modificació de la carpeta
-		contenidorLogHelper.log(
+		contingutLogHelper.log(
 				carpeta,
-				LogTipusEnum.MODIFICACIO,
-				null,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(carpeta.getNom())) ? carpeta.getNom() : null,
 				null,
 				false,
 				false);
-		return toCarpetaDto(carpeta);
-	}
-
-	@Transactional
-	@Override
-	public CarpetaDto delete(
-			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
-		logger.debug("Esborrant la carpeta ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		CarpetaEntity carpeta = comprovarCarpeta(
-				entitat,
-				id);
-		if (CarpetaTipusEnum.NOUVINGUT.equals(carpeta.getTipus())) {
-			logger.error("No es pot esborrar la carpeta de nouvinguts (id=" + id + ")");
-			throw new CarpetaNotFoundException();
-		}
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				carpeta);
-		// Comprova l'accés al path de la carpeta
-		contenidorHelper.comprovarPermisosPathContenidor(
-				carpeta,
-				true,
-				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-				carpeta,
-				false);
-		if (expedientSuperior != null) {
-			contenidorHelper.comprovarPermisosContenidor(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
-		carpetaRepository.delete(carpeta);
-		// Registra al log l'eliminació de la carpeta
-		contenidorLogHelper.log(
-				carpeta,
-				LogTipusEnum.ELIMINACIO,
-				null,
-				null,
-				true,
-				true);
 		return toCarpetaDto(carpeta);
 	}
 
@@ -254,75 +141,32 @@ public class CarpetaServiceImpl implements CarpetaService {
 	@Override
 	public CarpetaDto findById(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, CarpetaNotFoundException {
+			Long id) {
 		logger.debug("Obtenint la carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 				entitatId,
+				id,
 				true,
-				false,
 				false);
-		CarpetaEntity carpeta = comprovarCarpeta(
-				entitat,
+		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
+				contingut.getEntitat(),
 				id);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path de la carpeta
-		contenidorHelper.comprovarPermisosPathContenidor(
-				carpeta,
-				true,
-				false,
-				false,
-				true);
 		return toCarpetaDto(carpeta);
 	}
 
-
-
 	private CarpetaDto toCarpetaDto(
 			CarpetaEntity carpeta) {
-		return (CarpetaDto)contenidorHelper.toContenidorDto(
+		return (CarpetaDto)contingutHelper.toContingutDto(
 				carpeta,
 				false,
 				false,
 				false,
 				false,
 				false,
+				false,
 				false);
-	}
-
-	private ContenidorEntity comprovarContenidor(
-			EntitatEntity entitat,
-			Long id) throws EntitatNotFoundException {
-		ContenidorEntity contenidor = contenidorRepository.findOne(id);
-		if (contenidor == null) {
-			logger.error("No s'ha trobat el contenidor (contenidorId=" + id + ")");
-			throw new ContenidorNotFoundException();
-		}
-		if (!contenidor.getEntitat().equals(entitat)) {
-			logger.error("L'entitat del contenidor no coincideix ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + contenidor.getEntitat().getId() + ")");
-			throw new ContenidorNotFoundException();
-		}
-		return contenidor;
-	}
-
-	private CarpetaEntity comprovarCarpeta(
-			EntitatEntity entitat,
-			Long id) throws CarpetaNotFoundException {
-		CarpetaEntity carpeta = carpetaRepository.findOne(id);
-		if (carpeta == null) {
-			logger.error("No s'ha trobat la carpeta (id=" + id + ")");
-			throw new CarpetaNotFoundException();
-		}
-		if (!entitat.equals(carpeta.getEntitat())) {
-			logger.error("L'entitat especificada no coincideix amb l'entitat de la carpeta ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + carpeta.getEntitat().getId() + ")");
-			throw new CarpetaNotFoundException();
-		}
-		return carpeta;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaServiceImpl.class);

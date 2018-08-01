@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientMetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
@@ -19,10 +20,6 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
-import es.caib.ripea.core.api.exception.MetaDadaNotFoundException;
-import es.caib.ripea.core.api.exception.MetaDocumentNotFoundException;
-import es.caib.ripea.core.api.exception.MetaExpedientNotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 
 /**
@@ -52,7 +49,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) throws EntitatNotFoundException, MetaExpedientNotFoundException {
+			MetaExpedientDto metaExpedient) {
 		return delegate.update(entitatId, metaExpedient);
 	}
 
@@ -61,7 +58,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu) throws EntitatNotFoundException, MetaExpedientNotFoundException {
+			boolean actiu) {
 		return delegate.updateActiu(entitatId, id, actiu);
 	}
 
@@ -69,7 +66,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long metaExpedientId) throws EntitatNotFoundException, MetaExpedientNotFoundException {
+			Long metaExpedientId) {
 		return delegate.delete(entitatId, metaExpedientId);
 	}
 
@@ -77,7 +74,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto findById(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException {
+			Long id) {
 		return delegate.findById(
 				entitatId,
 				id);
@@ -87,7 +84,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
-			String codi) throws EntitatNotFoundException {
+			String codi) {
 		return delegate.findByEntitatCodi(entitatId, codi);
 	}
 
@@ -95,7 +92,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<MetaExpedientDto> findByEntitatPaginat(
 			Long entitatId,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException {
+			PaginacioParamsDto paginacioParams) {
 		return delegate.findByEntitatPaginat(entitatId, paginacioParams);
 	}
 
@@ -106,7 +103,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id,
 			Long metaDadaId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
+			boolean readOnly) {
 		delegate.metaDadaCreate(entitatId, id, metaDadaId, multiplicitat, readOnly);
 	}
 
@@ -117,7 +114,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id,
 			Long metaNodeMetaDadaId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
+			boolean readOnly) {
 		delegate.metaDadaUpdate(entitatId, id, metaNodeMetaDadaId, multiplicitat, readOnly);
 	}
 
@@ -126,27 +123,52 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public void metaDadaDelete(
 			Long entitatId,
 			Long id,
-			Long metaDadaId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
+			Long metaDadaId) {
 		delegate.metaDadaDelete(entitatId, id, metaDadaId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaMove(
+	public void metaDadaMoveUp(
 			Long entitatId,
 			Long id,
-			Long metaDadaId,
-			int posicio) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
-		delegate.metaDadaMove(entitatId, id, metaDadaId, posicio);
+			Long metaDadaId) {
+		delegate.metaDadaMoveUp(entitatId, id, metaDadaId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public MetaNodeMetaDadaDto findMetaDada(
+	public void metaDadaMoveDown(
 			Long entitatId,
 			Long id,
-			Long metaNodeMetaDadaId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
-		return delegate.findMetaDada(entitatId, id, metaNodeMetaDadaId);
+			Long metaDadaId) {
+		delegate.metaDadaMoveDown(entitatId, id, metaDadaId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void metaDadaMoveTo(
+			Long entitatId,
+			Long id,
+			Long metaDadaId,
+			int posicio) {
+		delegate.metaDadaMoveTo(entitatId, id, metaDadaId, posicio);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaNodeMetaDadaDto metaDadaFind(
+			Long entitatId,
+			Long id,
+			Long metaNodeMetaDadaId) {
+		return delegate.metaDadaFind(entitatId, id, metaNodeMetaDadaId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<MetaDadaDto> metaDadaFindGlobals(
+			Long entitatId) {
+		return delegate.metaDadaFindGlobals(entitatId);
 	}
 
 	@Override
@@ -156,7 +178,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id,
 			Long metaDocumentId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
+			boolean readOnly) {
 		delegate.metaDocumentCreate(entitatId, id, metaDocumentId, multiplicitat, readOnly);
 	}
 
@@ -167,7 +189,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id,
 			Long metaExpedientMetaDocumentId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException {
+			boolean readOnly) {
 		delegate.metaDocumentUpdate(entitatId, id, metaExpedientMetaDocumentId, multiplicitat, readOnly);
 	}
 
@@ -176,7 +198,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public void metaDocumentDelete(
 			Long entitatId,
 			Long id,
-			Long metaDocumentId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
+			Long metaDocumentId) {
 		delegate.metaDocumentDelete(entitatId, id, metaDocumentId);
 	}
 
@@ -186,7 +208,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long entitatId,
 			Long id,
 			Long metaDocumentId,
-			int posicio) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException {
+			int posicio) {
 		delegate.metaDocumentMove(entitatId, id, metaDocumentId, posicio);
 	}
 
@@ -195,50 +217,61 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientMetaDocumentDto findMetaDocument(
 			Long entitatId,
 			Long id,
-			Long metaExpedientMetaDocumentId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException {
+			Long metaExpedientMetaDocumentId) {
 		return delegate.findMetaDocument(entitatId, id, metaExpedientMetaDocumentId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<PermisDto> findPermis(Long entitatId, Long id)
-			throws EntitatNotFoundException, MetaExpedientNotFoundException {
+	public List<PermisDto> findPermis(Long entitatId, Long id) {
 		return delegate.findPermis(entitatId, id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public void updatePermis(Long entitatId, Long id, PermisDto permis)
-			throws EntitatNotFoundException, MetaExpedientNotFoundException {
+	public void updatePermis(Long entitatId, Long id, PermisDto permis) {
 		delegate.updatePermis(entitatId, id, permis);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public void deletePermis(Long entitatId, Long id, Long permisId)
-			throws EntitatNotFoundException, MetaExpedientNotFoundException {
+	public void deletePermis(Long entitatId, Long id, Long permisId) {
 		delegate.deletePermis(entitatId, id, permisId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<MetaExpedientDto> findByEntitat(
-			Long entitatId) throws EntitatNotFoundException {
+			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
-	public List<MetaExpedientDto> findActiveByEntitatPerCreacio(
-			Long entitatId) throws EntitatNotFoundException {
-		return delegate.findActiveByEntitatPerCreacio(entitatId);
+	@RolesAllowed("IPA_ADMIN")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerAdmin(
+			Long entitatId) {
+		return delegate.findActiusAmbEntitatPerAdmin(entitatId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<MetaExpedientDto> findByEntitatPerLectura(
-			Long entitatId) throws EntitatNotFoundException {
-		return delegate.findByEntitatPerLectura(entitatId);
+	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
+			Long entitatId) {
+		return delegate.findActiusAmbEntitatPerCreacio(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(
+			Long entitatId) {
+		return delegate.findActiusAmbEntitatPerModificacio(entitatId);
+	}	
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
+			Long entitatId) {
+		return delegate.findActiusAmbEntitatPerLectura(entitatId);
 	}
 
 }

@@ -4,7 +4,6 @@
 package es.caib.ripea.war.command;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -12,10 +11,6 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import es.caib.ripea.core.api.dto.DadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 /**
  * Command per al manteniment de nodes.
@@ -123,7 +118,7 @@ public class DadaCommand {
 		return null;
 	}
 
-	public static DadaCommand asCommand(DadaDto dto) throws Exception {
+	/*public static DadaCommand asCommand(DadaDto dto) throws Exception {
 		DadaCommand command = ConversioTipusHelper.convertir(
 				dto,
 				DadaCommand.class);
@@ -145,7 +140,7 @@ public class DadaCommand {
 			}
 		}
 		return command;
-	}
+	}*/
 
 	@Override
 	public String toString() {

@@ -15,9 +15,10 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
 
 /**
  * Classe del model de dades que representa una relació entre
@@ -28,7 +29,7 @@ import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
 @Entity
 @Table(	name="ipa_metaexpedient_metadocument",
 		uniqueConstraints={@UniqueConstraint(columnNames = {"metaexpedient_id", "metadocument_id"})})
-@EntityListeners(RipeaAuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class MetaExpedientMetaDocumentEntity extends RipeaAuditable<Long> {
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
@@ -41,7 +42,7 @@ public class MetaExpedientMetaDocumentEntity extends RipeaAuditable<Long> {
 	private MetaDocumentEntity metaDocument;
 	@Column(name = "multiplicitat")
 	@Enumerated(EnumType.STRING)
-	private MultiplicitatEnum multiplicitat;
+	private MultiplicitatEnumDto multiplicitat;
 	@Column(name = "readonly")
 	private boolean readOnly;
 	private int ordre;
@@ -54,7 +55,7 @@ public class MetaExpedientMetaDocumentEntity extends RipeaAuditable<Long> {
 	public MetaDocumentEntity getMetaDocument() {
 		return metaDocument;
 	}
-	public MultiplicitatEnum getMultiplicitat() {
+	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
 	public boolean isReadOnly() {
@@ -65,7 +66,7 @@ public class MetaExpedientMetaDocumentEntity extends RipeaAuditable<Long> {
 	}
 
 	public void update(
-			MultiplicitatEnum multiplicitat,
+			MultiplicitatEnumDto multiplicitat,
 			boolean readOnly) {
 		this.multiplicitat = multiplicitat;
 		this.readOnly = readOnly;
@@ -92,7 +93,7 @@ public class MetaExpedientMetaDocumentEntity extends RipeaAuditable<Long> {
 	public static Builder getBuilder(
 			MetaExpedientEntity metaExpedient,
 			MetaDocumentEntity metaDocument,
-			MultiplicitatEnum multiplicitat,
+			MultiplicitatEnumDto multiplicitat,
 			boolean readOnly,
 			int ordre) {
 		return new Builder(
@@ -113,7 +114,7 @@ public class MetaExpedientMetaDocumentEntity extends RipeaAuditable<Long> {
 		Builder(
 				MetaExpedientEntity metaExpedient,
 				MetaDocumentEntity metaDocument,
-				MultiplicitatEnum multiplicitat,
+				MultiplicitatEnumDto multiplicitat,
 				boolean readOnly,
 				int ordre) {
 			built = new MetaExpedientMetaDocumentEntity();

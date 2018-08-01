@@ -3,14 +3,13 @@
  */
 package es.caib.ripea.core.entity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 
 /**
  * Classe del model de dades que representa una carpeta.
@@ -19,71 +18,38 @@ import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
  */
 @Entity
 @Table(name = "ipa_carpeta")
-@EntityListeners(RipeaAuditingEntityListener.class)
-public class CarpetaEntity extends ContenidorEntity {
-
-	@Column(name = "tipus", nullable = false)
-	@Enumerated(EnumType.STRING)
-	protected CarpetaTipusEnum tipus;
-
-
-
-	public CarpetaTipusEnum getTipus() {
-		return tipus;
-	}
+@EntityListeners(AuditingEntityListener.class)
+public class CarpetaEntity extends ContingutEntity {
 
 	public void update(
-			String nom,
-			CarpetaTipusEnum tipus) {
+			String nom) {
 		this.nom = nom;
-		this.tipus = tipus;
 	}
 
-	/**
-	 * Obté el Builder per a crear objectes de tipus carpeta.
-	 * 
-	 * @param nom
-	 *            El valor de l'atribut nom.
-	 * @param nom
-	 *            El valor de l'atribut tipus.
-	 * @param metaNode
-	 *            El meta-node al qual pertany aquesta carpeta.
-	 * @param pare
-	 *            El contenidor al qual pertany aquesta carpeta.
-	 * @param entitat
-	 *            L'entitat a la qual pertany aquesta carpeta.
-	 * @return Una nova instància del Builder.
-	 */
 	public static Builder getBuilder(
 			String nom,
-			CarpetaTipusEnum tipus,
-			ContenidorEntity pare,
-			EntitatEntity entitat) {
+			ContingutEntity pare,
+			EntitatEntity entitat,
+			ExpedientEntity expedient) {
 		return new Builder(
 				nom,
-				tipus,
 				pare,
-				entitat);
+				entitat,
+				expedient);
 	}
-
-	/**
-	 * Builder per a crear noves instàncies d'aquesta classe.
-	 * 
-	 * @author Limit Tecnologies <limit@limit.es>
-	 */
 	public static class Builder {
 		CarpetaEntity built;
 		Builder(
 				String nom,
-				CarpetaTipusEnum tipus,
-				ContenidorEntity pare,
-				EntitatEntity entitat) {
+				ContingutEntity pare,
+				EntitatEntity entitat,
+				ExpedientEntity expedient) {
 			built = new CarpetaEntity();
 			built.nom = nom;
-			built.tipus = tipus;
 			built.pare = pare;
 			built.entitat = entitat;
-			built.tipusContenidor = ContenidorTipusEnum.CONTINGUT;
+			built.expedient = expedient;
+			built.tipus = ContingutTipusEnumDto.CARPETA;
 		}
 		public CarpetaEntity build() {
 			return built;

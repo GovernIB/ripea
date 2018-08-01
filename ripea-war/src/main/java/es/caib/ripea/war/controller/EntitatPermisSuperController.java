@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.PermisCommand;
-import es.caib.ripea.war.datatable.DatatablesPagina;
-import es.caib.ripea.war.helper.PaginacioHelper;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per al manteniment de permisos d'entitats.
@@ -46,7 +46,7 @@ public class EntitatPermisSuperController extends BaseController {
 				entitatService.findById(entitatId));
 		return "entitatPermis";
 	}
-	@RequestMapping(value = "/{entitatId}/permis/datatable", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/{entitatId}/permis/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesPagina<PermisDto> datatable(
 			HttpServletRequest request,
@@ -55,6 +55,16 @@ public class EntitatPermisSuperController extends BaseController {
 		return PaginacioHelper.getPaginaPerDatatables(
 				request,
 				entitatService.findPermisSuper(entitatId));
+	}*/
+	@RequestMapping(value = "/{entitatId}/permis/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse datatable(
+			HttpServletRequest request,
+			@PathVariable Long entitatId) {
+		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
+				request,
+				entitatService.findPermisSuper(entitatId));
+		return dtr;
 	}
 
 	@RequestMapping(value = "/{entitatId}/permis/new", method = RequestMethod.GET)

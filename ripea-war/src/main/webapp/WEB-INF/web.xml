@@ -78,7 +78,6 @@
 
 	<login-config>
 		<auth-method>BASIC</auth-method>
-		<!--auth-method>CLIENT-CERT</auth-method-->
 		<realm-name>Govern de les Illes Balears</realm-name>
 	</login-config>
 
@@ -89,7 +88,7 @@
 		<role-name>IPA_ADMIN</role-name>
 	</security-role>
 	<security-role>
-		<role-name>IPA_REGWS</role-name>
+		<role-name>IPA_BSTWS</role-name>
 	</security-role>
 	<security-role>
 		<role-name>tothom</role-name>
@@ -103,16 +102,20 @@
 		<auth-constraint>
 			<role-name>IPA_SUPER</role-name>
 			<role-name>IPA_ADMIN</role-name>
-			<role-name>IPA_REGWS</role-name>
+			<role-name>IPA_BSTWS</role-name>
 			<role-name>tothom</role-name>
 		</auth-constraint>
 	</security-constraint>
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Public areas</web-resource-name>
-			<url-pattern>/ws/bustia</url-pattern>
-			<url-pattern>/ws/registre</url-pattern>
+			<url-pattern>/ws/v0/bustia</url-pattern>
+			<url-pattern>/ws/v1/bustia</url-pattern>
 			<url-pattern>/ws/MCGDws</url-pattern>
+			<url-pattern>/ws/portafibCallback</url-pattern>
+			<url-pattern>/ws/bantel</url-pattern>
+			<url-pattern>/rest/notib</url-pattern>
+			<url-pattern>/rest/notib/notificaCanvi</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 

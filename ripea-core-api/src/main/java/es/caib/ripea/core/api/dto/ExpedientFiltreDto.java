@@ -16,20 +16,20 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class ExpedientFiltreDto implements Serializable {
 
-	private Long arxiuId;
 	private Long metaExpedientId;
 	private String nom;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
+	private String numero;
+	private ExpedientEstatEnumDto estat;
+	private Date dataTancatInici;
+	private Date dataTancatFi;
+	private boolean meusExpedients;
+	private String search;
+	
+	private Long tipusId;
+	
 
-
-
-	public Long getArxiuId() {
-		return arxiuId;
-	}
-	public void setArxiuId(Long arxiuId) {
-		this.arxiuId = arxiuId;
-	}
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
 	}
@@ -55,6 +55,51 @@ public class ExpedientFiltreDto implements Serializable {
 		this.dataCreacioFi = dataCreacioFi;
 	}
 
+	public String getNumero() {
+		return numero;
+	}
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+	public ExpedientEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(ExpedientEstatEnumDto estat) {
+		this.estat = estat;
+	}
+	public Date getDataTancatInici() {
+		return dataTancatInici;
+	}
+	public void setDataTancatInici(Date dataTancatInici) {
+		this.dataTancatInici = dataTancatInici;
+	}
+	public Date getDataTancatFi() {
+		return dataTancatFi;
+	}
+	public void setDataTancatFi(Date dataTancatFi) {
+		this.dataTancatFi = dataTancatFi;
+	}
+	public boolean isMeusExpedients() {
+		return meusExpedients;
+	}
+	public void setMeusExpedients(boolean meusExpedients) {
+		this.meusExpedients = meusExpedients;
+	}
+	public String getSearch() {
+		return search;
+	}
+	public void setSearch(String search) {
+		this.search = search;
+	}
+	
+	public Long getTipusId() {
+		return tipusId;
+	}
+	public void setTipusId(Long tipusId) {
+		this.tipusId = tipusId;
+	}
+	
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

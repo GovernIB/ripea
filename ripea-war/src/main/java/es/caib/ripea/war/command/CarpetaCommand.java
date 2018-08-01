@@ -4,7 +4,6 @@
 package es.caib.ripea.war.command;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.CarpetaTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 /**
@@ -13,15 +12,6 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class CarpetaCommand extends ContenidorCommand {
-
-	private CarpetaTipusEnumDto tipus;
-
-	public CarpetaTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public void setTipus(CarpetaTipusEnumDto tipus) {
-		this.tipus = tipus;
-	}
 
 	public static CarpetaCommand asCommand(CarpetaDto dto) {
 		CarpetaCommand command = ConversioTipusHelper.convertir(

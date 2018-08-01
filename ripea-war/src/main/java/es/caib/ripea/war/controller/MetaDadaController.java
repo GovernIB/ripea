@@ -19,8 +19,8 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.war.command.MetaDadaCommand;
-import es.caib.ripea.war.datatable.DatatablesPagina;
-import es.caib.ripea.war.helper.PaginacioHelper;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per al manteniment de meta-dades.
@@ -44,17 +44,17 @@ public class MetaDadaController extends BaseAdminController {
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesPagina<MetaDadaDto> datatable(
+	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return PaginacioHelper.getPaginaPerDatatables(
+		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDadaService.findAllByEntitatPaginat(
 						entitatActual.getId(),
-						PaginacioHelper.getPaginacioDtoFromDatatable(
-								request,
-								null)));
+						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+				"id");
+		return dtr;
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)

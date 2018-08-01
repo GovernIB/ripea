@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:es:caib:regtel:ws:v2:model:Documento" version="1.0" xmlns:ns1="urn:es:caib:regtel:ws:v2:model:ReferenciaRDS" xmlns:ns2="urn:es:caib:regtel:ws:v2:model:FirmaWS" xmlns:tns="urn:es:caib:regtel:ws:v2:model:Documento" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="urn:es:caib:regtel:ws:v2:model:ReferenciaRDS" schemaLocation="ReferenciaRDS.xsd"/>
+	<xs:import namespace="urn:es:caib:regtel:ws:v2:model:FirmaWS" schemaLocation="FirmaWS.xsd"/>
+	<xs:complexType name="Documento">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="referenciaRDS" nillable="true" type="ns1:ReferenciaRDS"/>
+			<xs:element minOccurs="0" name="modelo" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="version" nillable="true" type="xs:int"/>
+			<xs:element minOccurs="0" name="nombre" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="extension" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="datosFichero" nillable="true" type="xs:base64Binary"/>
+			<xs:element minOccurs="0" name="plantilla" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="firmas" nillable="true" type="ns2:FirmasWS"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Documentos">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="documentos" type="tns:Documento"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

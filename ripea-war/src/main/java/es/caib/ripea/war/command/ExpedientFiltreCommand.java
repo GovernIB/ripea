@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
@@ -22,8 +23,13 @@ public class ExpedientFiltreCommand {
 	private String nom;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
-
-
+	private String numero;
+	private ExpedientEstatEnumDto estat;
+	private Date dataTancatInici;
+	private Date dataTancatFi;
+	private boolean meusExpedients;
+	private String search;
+	private Long tipusId;
 
 	public Long getArxiuId() {
 		return arxiuId;
@@ -54,6 +60,49 @@ public class ExpedientFiltreCommand {
 	}
 	public void setDataCreacioFi(Date dataCreacioFi) {
 		this.dataCreacioFi = dataCreacioFi;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+	public ExpedientEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(ExpedientEstatEnumDto estat) {
+		this.estat = estat;
+	}
+	public Date getDataTancatInici() {
+		return dataTancatInici;
+	}
+	public void setDataTancatInici(Date dataTancatInici) {
+		this.dataTancatInici = dataTancatInici;
+	}
+	public Date getDataTancatFi() {
+		return dataTancatFi;
+	}
+	public void setDataTancatFi(Date dataTancatFi) {
+		this.dataTancatFi = dataTancatFi;
+	}
+	public boolean isMeusExpedients() {
+		return meusExpedients;
+	}
+	public void setMeusExpedients(boolean meusExpedients) {
+		this.meusExpedients = meusExpedients;
+	}
+	public String getSearch() {
+		return search;
+	}
+	public void setSearch(String search) {
+		this.search = search;
+	}
+	public Long getTipusId() {
+		return tipusId;
+	}
+	public void setTipusId(Long tipusId) {
+		this.tipusId = tipusId;
 	}
 
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {

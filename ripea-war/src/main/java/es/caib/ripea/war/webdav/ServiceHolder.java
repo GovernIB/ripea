@@ -4,7 +4,7 @@
 package es.caib.ripea.war.webdav;
 
 import es.caib.ripea.core.api.service.CarpetaService;
-import es.caib.ripea.core.api.service.ContenidorService;
+import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 
 /**
@@ -15,12 +15,12 @@ import es.caib.ripea.core.api.service.DocumentService;
  */
 public class ServiceHolder {
 
-	private ContenidorService contenidorService;
+	private ContingutService contenidorService;
 	private DocumentService documentService;
 	private CarpetaService carpetaService;
 
 	public ServiceHolder(
-			ContenidorService contenidorService,
+			ContingutService contenidorService,
 			DocumentService documentService,
 			CarpetaService carpetaService) {
 		this.contenidorService = contenidorService;
@@ -28,7 +28,7 @@ public class ServiceHolder {
 		this.carpetaService = carpetaService;
 	}
 
-	public ContenidorService getContenidorService() {
+	public ContingutService getContenidorService() {
 		return contenidorService;
 	}
 	public DocumentService getDocumentService() {

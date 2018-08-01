@@ -14,7 +14,7 @@ import org.springframework.context.MessageSourceAware;
 import org.springframework.web.servlet.support.RequestContext;
 
 import es.caib.ripea.war.helper.AjaxHelper;
-import es.caib.ripea.war.helper.AlertHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 
 /**
@@ -27,10 +27,12 @@ public class BaseController implements MessageSourceAware {
 	MessageSource messageSource;
 
 	protected String modalUrlTancar() {
-		return "redirect:/nodeco/util/modalTancar";
+		//return "redirect:/nodeco/util/modalTancar";
+		return "redirect:" + ModalHelper.ACCIO_MODAL_TANCAR;
 	}
 	protected String ajaxUrlOk() {
-		return "redirect:/nodeco/util/ajaxOk";
+		//return "redirect:/nodeco/util/ajaxOk";
+		return "redirect:" + AjaxHelper.ACCIO_AJAX_OK;
 	}
 
 	protected String getAjaxControllerReturnValueSuccess(
@@ -49,7 +51,7 @@ public class BaseController implements MessageSourceAware {
 			String messageKey,
 			Object[] messageArgs) {
 		if (messageKey != null) {
-			AlertHelper.success(
+			MissatgesHelper.success(
 					request, 
 					getMessage(
 							request, 
@@ -78,7 +80,7 @@ public class BaseController implements MessageSourceAware {
 			String messageKey,
 			Object[] messageArgs) {
 		if (messageKey != null) {
-			AlertHelper.error(
+			MissatgesHelper.error(
 					request, 
 					getMessage(
 							request, 
@@ -108,7 +110,7 @@ public class BaseController implements MessageSourceAware {
 			String messageKey,
 			Object[] messageArgs) {
 		if (messageKey != null) {
-			AlertHelper.success(
+			MissatgesHelper.success(
 					request, 
 					getMessage(
 							request, 
@@ -138,7 +140,7 @@ public class BaseController implements MessageSourceAware {
 			String messageKey,
 			Object[] messageArgs) {
 		if (messageKey != null) {
-			AlertHelper.error(
+			MissatgesHelper.error(
 					request, 
 					getMessage(
 							request, 
@@ -160,7 +162,8 @@ public class BaseController implements MessageSourceAware {
 		response.setHeader("Expires", "");
 		response.setHeader("Cache-Control", "");
 		response.setHeader("Content-Disposition","attachment; filename=\"" + fileName + "\"");
-		response.setContentType(new MimetypesFileTypeMap().getContentType(fileName));
+		if (fileName != null && !fileName.isEmpty())
+			response.setContentType(new MimetypesFileTypeMap().getContentType(fileName));
 		response.getOutputStream().write(fileContent);
 	}
 

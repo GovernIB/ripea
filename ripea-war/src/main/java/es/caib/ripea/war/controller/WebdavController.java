@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.CarpetaService;
-import es.caib.ripea.core.api.service.ContenidorService;
+import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.webdav.RipeaResourceFactory;
@@ -39,7 +39,7 @@ public class WebdavController extends BaseUserController {
 	@Autowired
 	private ServletContext servletContext;
 	@Autowired
-	private ContenidorService contenidorService;
+	private ContingutService contenidorService;
 	@Autowired
 	private DocumentService documentService;
 	@Autowired

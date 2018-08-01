@@ -6,11 +6,11 @@ package es.caib.ripea.war.helper;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-
-import org.springframework.stereotype.Component;
 
 /**
  * Helper per a convertir entre diferents formats de documents.

@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
  * Informació d'un fitxer.
  * 
@@ -18,6 +17,7 @@ public class FitxerDto implements Serializable {
 	private String nom;
 	private String contentType;
 	private byte[] contingut;
+	private long tamany;
 
 
 
@@ -38,6 +38,25 @@ public class FitxerDto implements Serializable {
 	}
 	public void setContingut(byte[] contingut) {
 		this.contingut = contingut;
+		if (contingut != null)
+			this.tamany = contingut.length;
+		else
+			this.tamany = 0;
+	}
+	public long getTamany() {
+		return tamany;
+	}
+	public void setTamany(long tamany) {
+		this.tamany = tamany;
+	}
+
+	public String getExtensio() {
+		int indexPunt = nom.lastIndexOf(".");
+		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
+			return nom.substring(indexPunt + 1);
+		} else {
+			return null;
+		}
 	}
 
 	@Override

@@ -6,6 +6,7 @@
 <script>
 	//window.parent.modalTancarIRefrescar(window.frameElement);
 	$('button.close', $(window.frameElement).parent().parent().parent().parent()).trigger('click');
+	
 </script>
 </head>
 <body></body>

@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -10,11 +13,11 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ForeignKey;
-
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * Classe del model de dades que representa un node.
@@ -22,10 +25,10 @@ import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(	name = "ipa_node")
+@Table(name = "ipa_node")
 @Inheritance(strategy=InheritanceType.JOINED)
-@EntityListeners(RipeaAuditingEntityListener.class)
-public abstract class NodeEntity extends ContenidorEntity {
+@EntityListeners(AuditingEntityListener.class)
+public abstract class NodeEntity extends ContingutEntity {
 
 	@ManyToOne(
 			optional = true,
@@ -34,11 +37,11 @@ public abstract class NodeEntity extends ContenidorEntity {
 	@ForeignKey(name = "ipa_metanode_node_fk")
 	protected MetaNodeEntity metaNode;
 
+	@OneToMany(mappedBy = "node", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+	protected Set<DadaEntity> dades;
 
 
-	public String getNom() {
-		return nom;
-	}
+
 	public MetaNodeEntity getMetaNode() {
 		return metaNode;
 	}

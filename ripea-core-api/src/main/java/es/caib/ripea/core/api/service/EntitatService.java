@@ -11,7 +11,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
+import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
  * Declaració dels mètodes per a la gestió d'entitats.
@@ -27,7 +27,7 @@ public interface EntitatService {
 	 *            Informació de l'entitat a crear.
 	 * @return L'Entitat creada.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public EntitatDto create(EntitatDto entitat);
 
 	/**
@@ -37,12 +37,12 @@ public interface EntitatService {
 	 * @param entitat
 	 *            Informació de l'entitat a modificar.
 	 * @return L'entitat modificada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public EntitatDto update(
-			EntitatDto entitat) throws EntitatNotFoundException;
+			EntitatDto entitat) throws NotFoundException;
 
 	/**
 	 * Marca l'entitat amb l'id especificat com a activa/inactiva.
@@ -52,13 +52,13 @@ public interface EntitatService {
 	 * @param activa
 	 *            true si es vol activar o false en cas contrari.
 	 * @return L'entitat modificada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public EntitatDto updateActiva(
 			Long id,
-			boolean activa) throws EntitatNotFoundException;
+			boolean activa) throws NotFoundException;
 
 	/**
 	 * Esborra l'entitat amb el mateix id que l'especificat.
@@ -66,12 +66,12 @@ public interface EntitatService {
 	 * @param id
 	 *            Atribut id de l'entitat a esborrar.
 	 * @return L'entitat esborrada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap Entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public EntitatDto delete(
-			Long id) throws EntitatNotFoundException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Consulta una entitat donat el seu id.
@@ -79,9 +79,12 @@ public interface EntitatService {
 	 * @param id
 	 *            Atribut id de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-	public EntitatDto findById(Long id);
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	public EntitatDto findById(
+			Long id) throws NotFoundException;
 
 	/**
 	 * Consulta una entitat donat el seu codi.
@@ -90,7 +93,7 @@ public interface EntitatService {
 	 *            Atribut codi de l'entitat a trobar.
 	 * @return L'entitat amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public EntitatDto findByCodi(String codi);
 
 	/**
@@ -100,15 +103,15 @@ public interface EntitatService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina d'Entitats.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
-	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams);
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public PaginaDto<EntitatDto> findPaginat(PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Llistat amb les entitats accessibles per a l'usuari actual.
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public List<EntitatDto> findAccessiblesUsuariActual();
 
 	/**
@@ -117,12 +120,12 @@ public interface EntitatService {
 	 * @param id
 	 *            Atribut id de l'entitat a la qual es volen consultar els permisos.
 	 * @return El llistat de permisos.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public List<PermisDto> findPermisSuper(
-			Long id) throws EntitatNotFoundException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a una entitat com a
@@ -132,13 +135,13 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat de la qual es modificar el permís.
 	 * @param permis
 	 *            El permís que es vol modificar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public void updatePermisSuper(
 			Long id,
-			PermisDto permis) throws EntitatNotFoundException;
+			PermisDto permis) throws NotFoundException;
 
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a una entitat com a
@@ -148,13 +151,13 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat de la qual es vol modificar el permís.
 	 * @param permisId
 	 *            Atribut id del permís que es vol esborrar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public void deletePermisSuper(
 			Long id,
-			Long permisId) throws EntitatNotFoundException;
+			Long permisId) throws NotFoundException;
 
 	/**
 	 * Consulta els permisos de l'entitat com a administrador.
@@ -162,12 +165,12 @@ public interface EntitatService {
 	 * @param id
 	 *            Atribut id de l'entitat a la qual es volen consultar els permisos.
 	 * @return El llistat de permisos.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<PermisDto> findPermisAdmin(
-			Long id) throws EntitatNotFoundException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a una entitat com a
@@ -177,13 +180,13 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat de la qual es vol modificar el permís.
 	 * @param permis
 	 *            El permís que es vol modificar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void updatePermisAdmin(
 			Long id,
-			PermisDto permis) throws EntitatNotFoundException;
+			PermisDto permis) throws NotFoundException;
 
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a una entitat com a
@@ -193,13 +196,13 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat de la qual es vol modificar el permís.
 	 * @param permisId
 	 *            Atribut id del permís que es vol esborrar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void deletePermisAdmin(
 			Long id,
-			Long permisId) throws EntitatNotFoundException;
+			Long permisId) throws NotFoundException;
 
 
 }

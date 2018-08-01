@@ -19,6 +19,7 @@ public class MetaNodeMetaDadaDto implements Serializable {
 	private MultiplicitatEnumDto multiplicitat;
 	boolean readOnly;
 	private int ordre;
+	private boolean global;
 
 
 
@@ -51,6 +52,12 @@ public class MetaNodeMetaDadaDto implements Serializable {
 	}
 	public void setOrdre(int ordre) {
 		this.ordre = ordre;
+	}
+	public boolean isGlobal() {
+		return global;
+	}
+	public void setGlobal(boolean global) {
+		this.global = global;
 	}
 
 	@Override

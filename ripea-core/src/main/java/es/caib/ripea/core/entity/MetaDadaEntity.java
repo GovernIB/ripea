@@ -16,9 +16,11 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
 
 /**
  * Classe del model de dades que representa una meta-dada.
@@ -31,7 +33,7 @@ import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
 				@UniqueConstraint(columnNames = {
 						"entitat_id",
 						"codi"})})
-@EntityListeners(RipeaAuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class MetaDadaEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false)
@@ -42,14 +44,14 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	private String descripcio;
 	@Column(name = "tipus", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private MetaDadaTipusEnum tipus;
+	private MetaDadaTipusEnumDto tipus;
 	@Column(name = "global_expedient")
 	private boolean globalExpedient;
 	@Column(name = "global_document")
 	private boolean globalDocument;
 	@Column(name = "global_multiplicitat")
 	@Enumerated(EnumType.STRING)
-	private MultiplicitatEnum globalMultiplicitat;
+	private MultiplicitatEnumDto globalMultiplicitat;
 	@Column(name = "global_readonly")
 	private boolean globalReadOnly;
 	@Column(name = "activa")
@@ -72,7 +74,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	public String getDescripcio() {
 		return descripcio;
 	}
-	public MetaDadaTipusEnum getTipus() {
+	public MetaDadaTipusEnumDto getTipus() {
 		return tipus;
 	}
 	public boolean isGlobalExpedient() {
@@ -81,7 +83,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	public boolean isGlobalDocument() {
 		return globalDocument;
 	}
-	public MultiplicitatEnum getGlobalMultiplicitat() {
+	public MultiplicitatEnumDto getGlobalMultiplicitat() {
 		return globalMultiplicitat;
 	}
 	public boolean isGlobalReadOnly() {
@@ -101,10 +103,10 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			String codi,
 			String nom,
 			String descripcio,
-			MetaDadaTipusEnum tipus,
+			MetaDadaTipusEnumDto tipus,
 			boolean globalExpedient,
 			boolean globalDocument,
-			MultiplicitatEnum globalMultiplicitat,
+			MultiplicitatEnumDto globalMultiplicitat,
 			boolean globalReadOnly,
 			EntitatEntity entitat) {
 		this.codi = codi;
@@ -149,10 +151,10 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			String codi,
 			String nom,
 			String descripcio,
-			MetaDadaTipusEnum tipus,
+			MetaDadaTipusEnumDto tipus,
 			boolean globalExpedient,
 			boolean globalDocument,
-			MultiplicitatEnum globalMultiplicitat,
+			MultiplicitatEnumDto globalMultiplicitat,
 			boolean globalReadOnly,
 			EntitatEntity entitat) {
 		return new Builder(
@@ -178,10 +180,10 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				String codi,
 				String nom,
 				String descripcio,
-				MetaDadaTipusEnum tipus,
+				MetaDadaTipusEnumDto tipus,
 				boolean globalExpedient,
 				boolean globalDocument,
-				MultiplicitatEnum globalMultiplicitat,
+				MultiplicitatEnumDto globalMultiplicitat,
 				boolean globalReadOnly,
 				EntitatEntity entitat) {
 			built = new MetaDadaEntity();

@@ -14,70 +14,62 @@
 <html>
 <head>
 	<title><spring:message code="arxiu.list.titol"/></title>
-	<link href="<c:url value="/css/DT_bootstrap.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jquery.dataTables.js"/>"></script>
-	<script src="<c:url value="/js/DT_bootstrap.js"/>"></script>
-	<script src="<c:url value="/js/jsrender.min.js"/>"></script>
-	<script src="<c:url value="/js/ripea.datatable.js"/>"></script>
-	<script src="<c:url value="/js/ripea.modal.js"/>"></script>
-	<link href="<c:url value="/css/jstree.min.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jstree.min.js"/>"></script>
-	<script src="<c:url value="/js/jquery.dataTables.fnReloadAjax.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
+	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script>
-$(document).ready(function() {
-	$("#taulaDades").ripeaDataTable({
-		ajaxSourceUrl: "<c:url value="/arxiuAdmin/unitat/${unitatCodiPerUrl}/datatable"/>",
-		localeUrl: "<c:url value="/js/dataTables-locales/dataTables_locale_ca.txt"/>",
-		alertesRefreshUrl: "<c:url value="/nodeco/util/alertes"/>"
-	});
-});
 function changedCallback(e, data) {
 	var baseUrl = '${unitatCodiUrlPrefix}arxiuAdmin/unitat/' + data.node.id;
-	$('#tableButtonsTemplate').html('<p style="text-align:right"><a class="btn btn-default" href="' + baseUrl + '/new" data-rdt-link-modal="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="arxiu.list.boto.nou.arxiu"/></a></p>');
-	$('#taulaDades').dataTable().fnReloadAjax(baseUrl  + '/datatable');
+	$('#arxiu-boto-nou').attr('href', baseUrl + '/new');
+	$('#arxius').webutilDatatable('refresh-url', baseUrl  + '/datatable');
 	$('#taulaLlistat').css('visibility', '');
 }
 </script>
 </head>
 <body>
 	<div class="row">
-		<div class="col-md-4">
-			<rip:arbre id="arbreUnitats" arbre="${arbreUnitatsOrganitzatives}" atributId="codi" atributNom="denominacio" changedCallback="changedCallback" seleccionatId="${unitatCodi}"/>
+		<div class="col-md-5">
+			<rip:arbre id="arbreUnitats" arbre="${arbreUnitatsOrganitzatives}" atributId="codi" atributNom="denominacio" changedCallback="changedCallback" seleccionatId="${unitatCodi}" />
 		</div>
-		<div id="taulaLlistat" class="col-md-8"<c:if test="${empty unitatCodi}"> style="visibility:hidden"</c:if>>
-			<table id="taulaDades" class="table table-striped table-bordered" data-rdt-button-template="tableButtonsTemplate" data-rdt-paginable="false">
+		<div id="taulaLlistat" class="col-md-7"<c:if test="${empty unitatCodi}"> style="visibility:hidden"</c:if>>
+			<table id="arxius" data-toggle="datatable" data-url="<c:url value="/arxiuAdmin/unitat/${unitatCodiPerUrl}/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%">
 				<thead>
 					<tr>
-						<th data-rdt-property="id" width="4%" data-rdt-visible="false">#</th>
-						<th data-rdt-property="nom" data-rdt-sorting="desc"><spring:message code="arxiu.list.columna.nom"/></th>
-						<th data-rdt-property="actiu" data-rdt-template="cellActiuTemplate">
+						<th data-col-name="nom"><spring:message code="arxiu.list.columna.nom"/></th>
+						<th data-col-name="actiu" data-template="#cellActiuTemplate">
 							<spring:message code="arxiu.list.columna.actiu"/>
 							<script id="cellActiuTemplate" type="text/x-jsrender">
 								{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 							</script>
 						</th>
-						<th data-rdt-property="expedientsCount" data-rdt-template="cellExpedientsCountTemplate" data-rdt-sortable="false" width="10%">
+						<th data-col-name="metaExpedientsCount" data-template="#cellMetaExpedientsCountTemplate" data-orderable="false" width="10%">
+							<script id="cellMetaExpedientsCountTemplate" type="text/x-jsrender">
+								<a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/metaExpedient" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="arxiu.list.boto.metaexpedients"/>&nbsp;<span class="badge">{{:metaExpedientsCount}}</span></a>
+							</script>
+						</th>
+						<th data-col-name="expedientsCount" data-template="#cellExpedientsCountTemplate" data-orderable="false" width="10%">
 							<script id="cellExpedientsCountTemplate" type="text/x-jsrender">
 								<a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/expedient" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="arxiu.list.boto.expedients"/>&nbsp;<span class="badge">{{:expedientsCount}}</span></a>
 							</script>
 						</th>
-						<th data-rdt-property="permisosCount" data-rdt-template="cellPermisosCountTemplate" data-rdt-sortable="false" width="10%">
-							<script id="cellPermisosCountTemplate" type="text/x-jsrender">
-								<a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/permis" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="arxiu.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
-							</script>
-						</th>
-						<th data-rdt-property="id" data-rdt-template="cellAccionsTemplate" data-rdt-sortable="false" width="10%">
+						<th data-col-name="id" data-template="#cellAccionsTemplate" data-rdt-sortable="false" width="10%">
 							<script id="cellAccionsTemplate" type="text/x-jsrender">
 								<div class="dropdown">
 									<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 									<ul class="dropdown-menu">
-										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}" data-rdt-link-modal="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 										{{if !actiu}}
-										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/enable" data-rdt-link-ajax="true"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 										{{else}}
-										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/disable" data-rdt-link-ajax="true"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
 										{{/if}}
-										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/delete" data-rdt-link-ajax="true" data-rdt-link-confirm="<spring:message code="arxiu.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+										<li><a href="${unitatCodiUrlPrefix}arxiuAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="arxiu.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									</ul>
 								</div>
 							</script>
@@ -85,8 +77,8 @@ function changedCallback(e, data) {
 					</tr>
 				</thead>
 			</table>
-			<script id="tableButtonsTemplate" type="text/x-jsrender">
-				<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}arxiuAdmin/unitat/${unitatCodiPerUrl}/new" data-rdt-link-modal="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="arxiu.list.boto.nou.arxiu"/></a></p>
+			<script id="botonsTemplate" type="text/x-jsrender">
+				<p style="text-align:right"><a id="arxiu-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}arxiuAdmin/unitat/${unitatCodiPerUrl}/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="arxiu.list.boto.nou.arxiu"/></a></p>
 			</script>
 		</div>
 	</div>

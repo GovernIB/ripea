@@ -9,26 +9,22 @@
 <html>
 <head>
 	<title>${titol}</title>
-	<rip:modalHead titol="${titol}"/>
 	<link href="<c:url value="/css/jstree.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/jstree.min.js"/>"></script>
+	<rip:modalHead/>
 </head>
 <body>
 	<form:form action="" class="form-horizontal" commandName="contenidorMoureCopiarEnviarCommand">
-		<form:hidden path="contenidorOrigenId"/>
+		<form:hidden path="origenId"/>
 		<rip:inputFixed textKey="contenidor.enviar.camp.origen">
-			<c:choose>
-				<c:when test="${contenidorOrigen.expedient}"><span class="fa fa-briefcase"></span></c:when>
-				<c:when test="${contenidorOrigen.carpeta}"><rip:blocIconaCarpeta carpeta="${contenidorOrigen}" petita="${true}"/></c:when>
-				<c:when test="${contenidorOrigen.document}"><span class="fa fa-file"></span></c:when>
-			</c:choose>
-			${contenidorOrigen.nom}
+			<rip:blocIconaContingut contingut="${contingutPendent}"/>
+			${contingutOrigen.nom}
 		</rip:inputFixed>
-		<rip:inputArbre name="contenidorDestiId" textKey="contenidor.enviar.camp.desti" arbre="${arbreUnitatsOrganitzatives}" required="true" fulles="${busties}" fullesAtributId="id" fullesAtributNom="nom" fullesAtributPare="unitatCodi" fullesIcona="fa fa-inbox fa-lg" isArbreSeleccionable="${false}" isFullesSeleccionable="${true}" isOcultarCounts="${true}"/>
+		<rip:inputArbre name="destiId" textKey="contenidor.enviar.camp.desti" arbre="${arbreUnitatsOrganitzatives}" required="true" fulles="${busties}" fullesAtributId="id" fullesAtributNom="nom" fullesAtributPare="unitatCodi" fullesIcona="fa fa-inbox fa-lg" isArbreSeleccionable="${false}" isFullesSeleccionable="${true}" isOcultarCounts="${true}"/>
 		<rip:inputTextarea name="comentariEnviar" textKey="contenidor.enviar.camp.comentari"/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-envelope"></span> <spring:message code="comu.boto.enviar"/></button>
-			<a href="<c:url value="/contenidor/${contenidorOrigen.pare.id}"/>" class="btn btn-default modal-tancar"><spring:message code="comu.boto.cancelar"/></a>
+			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="comu.boto.enviar"/></button>
+			<a href="<c:url value="/contenidor/${contingutOrigen.pare.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

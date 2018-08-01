@@ -40,26 +40,14 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 			boolean incloureGlobalsExpedient,
 			boolean incloureGlobalsDocument);
 
-	@Query(	"from " +
-			"    MetaDadaEntity md " +
-			"where " +
-			"    md.entitat = ?1 " +
-			"and md.globalExpedient = true " +
-			"and md.activa = true " +
-			"order by " +
-			"    md.nom asc")
-	List<MetaDadaEntity> findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByNomAsc(
+	List<MetaDadaEntity> findByEntitatAndGlobalExpedientTrueOrderByIdAsc(EntitatEntity entitat);
+
+	List<MetaDadaEntity> findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(
 			EntitatEntity entitat);
 
-	@Query(	"from " +
-			"    MetaDadaEntity md " +
-			"where " +
-			"    md.entitat = ?1 " +
-			"and md.globalDocument = true " +
-			"and md.activa = true " +
-			"order by " +
-			"    md.nom asc")
-	List<MetaDadaEntity> findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByNomAsc(
+	List<MetaDadaEntity> findByEntitatAndGlobalDocumentTrueOrderByIdAsc(EntitatEntity entitat);
+
+	List<MetaDadaEntity> findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(
 			EntitatEntity entitat);
 	
 }

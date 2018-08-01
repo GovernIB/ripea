@@ -22,12 +22,14 @@ public interface MetaNodeMetaDadaRepository extends JpaRepository<MetaNodeMetaDa
 
 	@Query("from MetaNodeMetaDadaEntity where metaNode.id = ?1 order by ordre asc")
 	List<MetaNodeMetaDadaEntity> findByMetaNodeId(Long metaNodeId);
+
 	@Query("from MetaNodeMetaDadaEntity where metaNode.id in ?1 order by metaNode.id asc, ordre asc")
 	List<MetaNodeMetaDadaEntity> findByMetaNodeIdIn(List<Long> metaNodeIds);
+
 	@Query("from MetaNodeMetaDadaEntity where metaNode.id = ?1 and metaDada = ?2")
 	MetaNodeMetaDadaEntity findByMetaNodeIdAndMetaDada(Long metaNodeId, MetaDadaEntity metaDada);
 
-	@Query("from MetaNodeMetaDadaEntity where metaNode = ?1 and metaDada.activa = true")
+	@Query("from MetaNodeMetaDadaEntity where metaNode = ?1 and metaDada.activa = true order by ordre asc and id asc")
 	List<MetaNodeMetaDadaEntity> findByMetaNodeAndActivaTrue(MetaNodeEntity metaNode);
 
 }

@@ -7,21 +7,13 @@
 <html>
 <head>
 	<title><spring:message code="integracio.list.titol"/></title>
-	<link href="<c:url value="/css/DT_bootstrap.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jquery.dataTables.js"/>"></script>
-	<script src="<c:url value="/js/DT_bootstrap.js"/>"></script>
-	<script src="<c:url value="/js/jsrender.min.js"/>"></script>
-	<script src="<c:url value="/js/ripea.datatable.js"/>"></script>
-	<script src="<c:url value="/js/ripea.modal.js"/>"></script>
-<script>
-$(document).ready(function() {
-	$("#taulaDades").ripeaDataTable({
-		ajaxSourceUrl: "<c:url value="/integracio/datatable"/>",
-		localeUrl: "<c:url value="/js/dataTables-locales/dataTables_locale_ca.txt"/>",
-		alertesRefreshUrl: "<c:url value="/nodeco/util/alertes"/>"
-	});
-});
-</script>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
 	<ul class="nav nav-tabs" role="tablist">
@@ -30,15 +22,19 @@ $(document).ready(function() {
 		</c:forEach>
 	</ul>
 	<br/>
-	<table id="taulaDades" class="table table-striped table-bordered">
+	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%">
 		<thead>
 			<tr>
-				<th data-rdt-property="excepcioMessage" data-rdt-visible="false"></th>
-				<th data-rdt-property="excepcioStacktrace" data-rdt-visible="false"></th>
-				<th data-rdt-property="data" data-rdt-sortable="false" data-rdt-type="datetime"><spring:message code="integracio.list.columna.data"/></th>
-				<th data-rdt-property="descripcio" data-rdt-sortable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
-				<th data-rdt-property="tipus" data-rdt-sortable="false"><spring:message code="integracio.list.columna.tipus"/></th>
-				<th data-rdt-property="estat" data-rdt-template="cellEstatTemplate" data-rdt-sortable="false">
+				<th data-col-name="excepcioMessage" data-visible="false"></th>
+				<th data-col-name="excepcioStacktrace" data-visible="false"></th>
+				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="integracio.list.columna.data"/></th>
+				<th data-col-name="descripcio" data-orderable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
+				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
+				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
+					<spring:message code="integracio.list.columna.temps.resposta"/>
+					<script id="cellTempsTemplate" type="text/x-jsrender">{{:tempsResposta}} ms</script>
+				</th>
+				<th data-col-name="estat" data-template="#cellEstatTemplate" data-orderable="false">
 					<spring:message code="integracio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'OK'}}
@@ -48,9 +44,9 @@ $(document).ready(function() {
 						{{/if}}
 					</script>
 				</th>
-				<th data-rdt-property="index" data-rdt-template="cellAccionsTemplate" data-rdt-sortable="false" width="10%">
+				<th data-col-name="index" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="../integracio/${codiActual}/{{:index}}" class="btn btn-default" data-rdt-link-modal="true"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="contenidor.admin.boto.detalls"/></a>
+						<a href="../integracio/${codiActual}/{{:index}}" class="btn btn-default" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>
 					</script>
 				</th>
 			</tr>

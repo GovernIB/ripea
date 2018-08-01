@@ -17,12 +17,14 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private boolean globalExpedient;
 	private MultiplicitatEnumDto globalMultiplicitat;
 	private boolean globalReadOnly;
-	private boolean firmaAppletActiva;
-	private String signaturaTipusMime;
 	private boolean firmaPortafirmesActiva;
 	private String portafirmesDocumentTipus;
 	private String portafirmesFluxId;
-	private String custodiaPolitica;
+	private String[] portafirmesResponsables;
+	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+	private String portafirmesCustodiaTipus;
+	private boolean firmaPassarelaActiva;
+	private String firmaPassarelaCustodiaTipus;
 	private String plantillaNom;
 	private String plantillaContentType;
 
@@ -44,18 +46,6 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	public void setGlobalReadOnly(boolean globalReadOnly) {
 		this.globalReadOnly = globalReadOnly;
 	}
-	public boolean isFirmaAppletActiva() {
-		return firmaAppletActiva;
-	}
-	public void setFirmaAppletActiva(boolean firmaAppletActiva) {
-		this.firmaAppletActiva = firmaAppletActiva;
-	}
-	public String getSignaturaTipusMime() {
-		return signaturaTipusMime;
-	}
-	public void setSignaturaTipusMime(String signaturaTipusMime) {
-		this.signaturaTipusMime = signaturaTipusMime;
-	}
 	public boolean isFirmaPortafirmesActiva() {
 		return firmaPortafirmesActiva;
 	}
@@ -74,11 +64,35 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	public void setPortafirmesFluxId(String portafirmesFluxId) {
 		this.portafirmesFluxId = portafirmesFluxId;
 	}
-	public String getCustodiaPolitica() {
-		return custodiaPolitica;
+	public String[] getPortafirmesResponsables() {
+		return portafirmesResponsables;
 	}
-	public void setCustodiaPolitica(String custodiaPolitica) {
-		this.custodiaPolitica = custodiaPolitica;
+	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
+		this.portafirmesResponsables = portafirmesResponsables;
+	}
+	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
+		return portafirmesFluxTipus;
+	}
+	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	}
+	public String getPortafirmesCustodiaTipus() {
+		return portafirmesCustodiaTipus;
+	}
+	public void setPortafirmesCustodiaTipus(String portafirmesCustodiaTipus) {
+		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus;
+	}
+	public boolean isFirmaPassarelaActiva() {
+		return firmaPassarelaActiva;
+	}
+	public void setFirmaPassarelaActiva(boolean firmaPassarelaActiva) {
+		this.firmaPassarelaActiva = firmaPassarelaActiva;
+	}
+	public String getFirmaPassarelaCustodiaTipus() {
+		return firmaPassarelaCustodiaTipus;
+	}
+	public void setFirmaPassarelaCustodiaTipus(String firmaPassarelaCustodiaTipus) {
+		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus;
 	}
 	public String getPlantillaNom() {
 		return plantillaNom;

@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Informació d'un MetaNode.
+ * Informació d'una entitat.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -25,8 +25,6 @@ public class EntitatDto extends AuditoriaDto {
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
 	private boolean usuariActualAdministration;
-
-
 
 	public Long getId() {
 		return id;
@@ -100,7 +98,5 @@ public class EntitatDto extends AuditoriaDto {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
-	private static final long serialVersionUID = -139254994389509932L;
 
 }

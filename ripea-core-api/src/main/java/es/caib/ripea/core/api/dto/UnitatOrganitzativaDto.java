@@ -24,7 +24,17 @@ public class UnitatOrganitzativaDto implements Serializable {
 	private Date dataAnulacio;
 	private String estat; // V: Vigente, E: Extinguido, A: Anulado, T: Transitorio
 
+	private String codiPais;
+	private String codiComunitat;
+	private String codiProvincia;
+	private String codiPostal;
+	private String nomLocalitat;
+	private String localitat;
 
+	private String adressa;
+	private Long tipusVia;
+	private String nomVia;
+	private String numVia; 
 
 	public String getCodi() {
 		return codi;
@@ -86,7 +96,71 @@ public class UnitatOrganitzativaDto implements Serializable {
 	public void setDataAnulacio(Date dataAnulacio) {
 		this.dataAnulacio = dataAnulacio;
 	}
+	public String getCodiPais() {
+		return codiPais;
+	}
+	public void setCodiPais(String codiPais) {
+		this.codiPais = codiPais;
+	}
+	public String getCodiComunitat() {
+		return codiComunitat;
+	}
+	public void setCodiComunitat(String codiComunitat) {
+		this.codiComunitat = codiComunitat;
+	}
+	public String getCodiProvincia() {
+		return codiProvincia;
+	}
+	public void setCodiProvincia(String codiProvincia) {
+		this.codiProvincia = codiProvincia;
+	}
+	public String getCodiPostal() {
+		return codiPostal;
+	}
+	public void setCodiPostal(String codiPostal) {
+		this.codiPostal = codiPostal;
+	}
+	public String getNomLocalitat() {
+		return nomLocalitat;
+	}
+	public void setNomLocalitat(String nomLocalitat) {
+		this.nomLocalitat = nomLocalitat;
+	}
+	public String getLocalitat() {
+		return localitat;
+	}
+	public void setLocalitat(String localitat) {
+		this.localitat = localitat;
+	}
+	public String getAdressa() {
+		return adressa;
+	}
+	public void setAdressa(String adressa) {
+		this.adressa = adressa;
+	}
+	public Long getTipusVia() {
+		return tipusVia;
+	}
+	public void setTipusVia(Long tipusVia) {
+		this.tipusVia = tipusVia;
+	}
+	public String getNomVia() {
+		return nomVia;
+	}
+	public void setNomVia(String nomVia) {
+		this.nomVia = nomVia;
+	}
+	public String getNumVia() {
+		return numVia;
+	}
+	public void setNumVia(String numVia) {
+		this.numVia = numVia;
+	}
 
+	public String getNom() {
+		return this.denominacio + " (" + this.codi + ")";
+	}
+	
 	private static final long serialVersionUID = -5602898182576627524L;
 
 }

@@ -21,8 +21,8 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.PermisCommand;
-import es.caib.ripea.war.datatable.DatatablesPagina;
-import es.caib.ripea.war.helper.PaginacioHelper;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per al manteniment de permisos de l'entitat
@@ -48,14 +48,15 @@ public class EntitatPermisAdminController extends BaseAdminController {
 	}
 	@RequestMapping(value = "datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesPagina<PermisDto> datatable(
+	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return PaginacioHelper.getPaginaPerDatatables(
+		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
-				entitatService.findPermisAdmin(
-						entitatActual.getId()));
+				entitatService.findPermisAdmin(entitatActual.getId()),
+				"id");
+		return dtr;
 	}
 
 	@RequestMapping(value = "new", method = RequestMethod.GET)

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.helper.IntegracioHelper;
 
@@ -27,8 +28,8 @@ import es.caib.ripea.core.helper.IntegracioHelper;
 		name = "MCGDws",
 		serviceName = "MCGDwsService",
 		portName = "MCGDwsServicePort",
-		endpointInterface = "es.caib.ripea.core.service.ws.callback.MCGDws",
-		targetNamespace = "http://www.indra.es/portafirmasmcgdws/mcgdws")
+		targetNamespace = "http://www.indra.es/portafirmasmcgdws/mcgdws",
+		endpointInterface = "es.caib.ripea.core.service.ws.callback.MCGDws")
 public class MCGDwsImpl implements MCGDws {
 
 	@Resource
@@ -50,18 +51,62 @@ public class MCGDwsImpl implements MCGDws {
 		accioParams.put("documentId", new Integer(documentId).toString());
 		accioParams.put("estat", estat.toString());
 		CallbackResponse callbackResponse = new CallbackResponse();
-		try {
-			Exception ex = documentService.portafirmesCallback(
-					documentId,
-					estat);
-			if (ex == null) {
-				integracioHelper.addAccioOk(
-						IntegracioHelper.INTCODI_CALLBACK,
-						accioDescripcio,
-						accioParams,
-						IntegracioAccioTipusEnumDto.RECEPCIO);
-				callbackResponse.setReturn(1);
-			} else {
+		PortafirmesCallbackEstatEnumDto estatEnum = null;
+		switch (estat) {
+		case 0:
+			estatEnum = PortafirmesCallbackEstatEnumDto.PAUSAT;
+			break;
+		case 1:
+			estatEnum = PortafirmesCallbackEstatEnumDto.PENDENT;
+			break;
+		case 2:
+			estatEnum = PortafirmesCallbackEstatEnumDto.FIRMAT;
+			break;
+		case 3:
+			estatEnum = PortafirmesCallbackEstatEnumDto.REBUTJAT;
+			break;
+		default:
+			String errorDescripcio = "No es reconeix el codi d'estat (" + estat + ")";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_CALLBACK,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					0,
+					errorDescripcio);
+			callbackResponse.setReturn(-1);
+		}
+		if (estatEnum != null) {
+			try {
+				Exception ex = documentService.portafirmesCallback(
+						documentId,
+						estatEnum);
+				if (ex == null) {
+					integracioHelper.addAccioOk(
+							IntegracioHelper.INTCODI_CALLBACK,
+							accioDescripcio,
+							accioParams,
+							IntegracioAccioTipusEnumDto.RECEPCIO,
+							0);
+					callbackResponse.setReturn(1);
+				} else {
+					logger.error(
+							"Error al processar petició rebuda al callback de portafirmes (" +
+							"documentId:" + documentId + ", " +
+							"estat:" + estat + ")",
+							ex);
+					String errorDescripcio = "Error al processar petició rebuda al callback de portafirmes";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_CALLBACK,
+							accioDescripcio,
+							accioParams,
+							IntegracioAccioTipusEnumDto.RECEPCIO,
+							0,
+							errorDescripcio,
+							ex);
+					callbackResponse.setReturn(-1);
+				}
+			} catch (Exception ex) {
 				logger.error(
 						"Error al processar petició rebuda al callback de portafirmes (" +
 						"documentId:" + documentId + ", " +
@@ -73,29 +118,15 @@ public class MCGDwsImpl implements MCGDws {
 						accioDescripcio,
 						accioParams,
 						IntegracioAccioTipusEnumDto.RECEPCIO,
+						0,
 						errorDescripcio,
 						ex);
 				callbackResponse.setReturn(-1);
 			}
-		} catch (Exception ex) {
-			logger.error(
-					"Error al processar petició rebuda al callback de portafirmes (" +
-					"documentId:" + documentId + ", " +
-					"estat:" + estat + ")",
-					ex);
-			String errorDescripcio = "Error al processar petició rebuda al callback de portafirmes";
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_CALLBACK,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.RECEPCIO,
-					errorDescripcio,
-					ex);
-			callbackResponse.setReturn(-1);
 		}
 		return callbackResponse;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MCGDwsImpl.class);
-			
+
 }

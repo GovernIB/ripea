@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -12,18 +14,13 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.ContenidorDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.exception.ArxiuNotFoundException;
-import es.caib.ripea.core.api.exception.ContenidorNotFoundException;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
-import es.caib.ripea.core.api.exception.ExpedientNotFoundException;
-import es.caib.ripea.core.api.exception.MetaExpedientNotFoundException;
-import es.caib.ripea.core.api.exception.NomInvalidException;
-import es.caib.ripea.core.api.exception.UsuariNotFoundException;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientService;
 
 /**
@@ -39,97 +36,74 @@ public class ExpedientServiceBean implements ExpedientService {
 	@Autowired
 	ExpedientService delegate;
 
-
-
 	@Override
 	@RolesAllowed("tothom")
 	public ExpedientDto create(
 			Long entitatId,
 			Long contenidorId,
 			Long metaExpedientId,
-			Long arxiuId,
 			Integer any,
-			String nom,
-			Long contingutId,
-			Long registreId) throws EntitatNotFoundException, ContenidorNotFoundException, MetaExpedientNotFoundException, ArxiuNotFoundException, NomInvalidException {
+			String nom) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
 				metaExpedientId,
-				arxiuId,
 				any,
-				nom,
-				contingutId,
-				registreId);
+				nom);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public ExpedientDto update(
 			Long entitatId,
-			Long expedientId,
-			Long arxiuId,
-			Long metaExpedientId,
-			String nom) throws EntitatNotFoundException, ExpedientNotFoundException, ArxiuNotFoundException, NomInvalidException {
+			Long id,
+			String nom) {
 		return delegate.update(
 				entitatId,
-				expedientId,
-				arxiuId,
-				metaExpedientId,
+				id,
 				nom);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public ExpedientDto delete(
-			Long entitatId,
-			Long expedientId) throws EntitatNotFoundException, ExpedientNotFoundException {
-		return delegate.delete(entitatId, expedientId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException {
+			Long id) {
 		return delegate.findById(entitatId, id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ExpedientDto> findPaginatAdmin(
+	public PaginaDto<ExpedientDto> findAmbFiltreAdmin(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException, ArxiuNotFoundException {
-		return delegate.findPaginatAdmin(entitatId, filtre, paginacioParams);
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltreAdmin(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<ExpedientDto> findPaginatUser(
+	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException, ArxiuNotFoundException {
-		return delegate.findPaginatUser(entitatId, filtre, paginacioParams);
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltreUser(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ContenidorDto> getContingutCarpetaNouvinguts(
+	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
-		return delegate.getContingutCarpetaNouvinguts(
-				entitatId,
-				id);
+			ExpedientFiltreDto filtre) throws NotFoundException {
+		return delegate.findIdsAmbFiltre(entitatId, filtre);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public void agafarUser(
 			Long entitatId,
-			Long arxiuId,
-			Long id) throws EntitatNotFoundException, ArxiuNotFoundException, ExpedientNotFoundException {
-		delegate.agafarUser(entitatId, arxiuId, id);
+			Long id) {
+		delegate.agafarUser(entitatId, id);
 	}
 
 	@Override
@@ -138,7 +112,7 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			Long arxiuId,
 			Long id,
-			String usuariCodi) throws EntitatNotFoundException, ArxiuNotFoundException, ExpedientNotFoundException, UsuariNotFoundException {
+			String usuariCodi) {
 		delegate.agafarAdmin(entitatId, arxiuId, id, usuariCodi);
 	}
 
@@ -146,7 +120,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public void alliberarUser(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
+			Long id) {
 		delegate.alliberarUser(entitatId, id);
 	}
 
@@ -154,26 +128,77 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public void alliberarAdmin(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
+			Long id) {
 		delegate.alliberarAdmin(entitatId, id);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public void finalitzar(
+	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) throws EntitatNotFoundException, ExpedientNotFoundException {
-		delegate.finalitzar(entitatId, id, motiu);
+			String motiu) {
+		delegate.tancar(entitatId, id, motiu);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public void acumular(
+	public void reobrir(
+			Long entitatId,
+			Long id) throws NotFoundException {
+		delegate.reobrir(entitatId, id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void relacioCreate(
 			Long entitatId,
 			Long id,
-			Long acumulatId) throws EntitatNotFoundException, ExpedientNotFoundException {
-		delegate.acumular(entitatId, id, acumulatId);
+			Long relacionatId) {
+		delegate.relacioCreate(
+				entitatId,
+				id,
+				relacionatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean relacioDelete(
+			Long entitatId, 
+			Long expedientId, 
+			Long relacionatId) {
+		return delegate.relacioDelete(
+				entitatId,
+				expedientId,
+				relacionatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<ExpedientDto> relacioFindAmbExpedient(
+			Long entitatId, 
+			Long expedientId) {
+		return delegate.relacioFindAmbExpedient(entitatId, expedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportacio(
+			Long entitatId,
+			Long metaExpedientId,
+			Collection<Long> expedientIds,
+			String format) throws IOException {
+		return delegate.exportacio(
+				entitatId,
+				metaExpedientId,
+				expedientIds,
+				format);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId) throws NotFoundException {
+		return delegate.findPerUserAndTipus(entitatId, metaExpedientId);
 	}
 
 }

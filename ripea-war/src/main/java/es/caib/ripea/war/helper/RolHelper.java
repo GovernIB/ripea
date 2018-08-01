@@ -20,9 +20,9 @@ import es.caib.ripea.core.api.dto.EntitatDto;
  */
 public class RolHelper {
 
-	private static final String ROLE_SUPER = "ROLE_SUPER";
-	private static final String ROLE_ADMIN = "ROLE_ADMIN";
-	private static final String ROLE_USER = "ROLE_USER";
+	private static final String ROLE_SUPER = "IPA_SUPER";
+	private static final String ROLE_ADMIN = "IPA_ADMIN";
+	private static final String ROLE_USER = "tothom";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
@@ -47,43 +47,47 @@ public class RolHelper {
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
-			if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
-				rolActual = ROLE_SUPER;
+			if (request.isUserInRole(ROLE_USER) && rolsDisponibles.contains(ROLE_USER)) {
+				rolActual = ROLE_USER;
 			} else if (request.isUserInRole(ROLE_ADMIN) && rolsDisponibles.contains(ROLE_ADMIN)) {
 				rolActual = ROLE_ADMIN;
-			} else if (request.isUserInRole(ROLE_USER) && rolsDisponibles.contains(ROLE_USER)) {
-				rolActual = ROLE_USER;
+			} else if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
+				rolActual = ROLE_SUPER;
 			}
-			if (rolActual != null)
+			if (rolActual != null) {
 				request.getSession().setAttribute(
 						SESSION_ATTRIBUTE_ROL_ACTUAL,
 						rolActual);
+			}
 		}
 		LOGGER.debug("Obtenint rol actual (rol=" + rolActual + ")");
 		return rolActual;
 	}
 
-	public static boolean isUsuariActualSuperusuari(HttpServletRequest request) {
+	public static boolean isRolActualSuperusuari(HttpServletRequest request) {
 		return ROLE_SUPER.equals(getRolActual(request));
 	}
-	public static boolean isUsuariActualAdministrador(HttpServletRequest request) {
+	public static boolean isRolActualAdministrador(HttpServletRequest request) {
 		return ROLE_ADMIN.equals(getRolActual(request));
 	}
-	public static boolean isUsuariActualUsuari(HttpServletRequest request) {
+	public static boolean isRolActualUsuari(HttpServletRequest request) {
 		return ROLE_USER.equals(getRolActual(request));
 	}
 
 	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
 		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
 		List<String> rols = new ArrayList<String>();
-		if (request.isUserInRole(ROLE_SUPER))
+		if (request.isUserInRole(ROLE_SUPER)) {
 			rols.add(ROLE_SUPER);
+		}
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null) {
-			if (entitatActual.isUsuariActualAdministration() && request.isUserInRole(ROLE_ADMIN))
+			if (entitatActual.isUsuariActualAdministration() && request.isUserInRole(ROLE_ADMIN)) {
 				rols.add(ROLE_ADMIN);
-			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER))
+			}
+			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {
 				rols.add(ROLE_USER);
+			}
 		}
 		return rols;
 	}

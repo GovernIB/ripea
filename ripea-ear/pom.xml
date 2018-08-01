@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>es.caib</groupId>
+		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
 		<version>0.1</version>
 	</parent>
@@ -31,24 +31,24 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-lib-common</artifactId>
 			<version>${ripea.version}</version>
 			<type>pom</type>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin-impl</artifactId>
 			<version>${ripea.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-core</artifactId>
 			<version>${ripea.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-war</artifactId>
 			<version>${ripea.version}</version>
 			<type>war</type>
@@ -64,27 +64,18 @@
 					<version>5</version>
 					<modules>
 						<ejbModule>
-							<groupId>es.caib</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>ripea-core</artifactId>
 							<bundleFileName>ripea.jar</bundleFileName>
 						</ejbModule>
 						<webModule>
-							<groupId>es.caib</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>ripea-war</artifactId>
 							<contextRoot>/ripea</contextRoot>
 							<bundleFileName>ripea.war</bundleFileName>
 						</webModule>
 					</modules>
 					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<fork>true</fork>
-					<compilerVersion>${java.version}</compilerVersion>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 		</plugins>

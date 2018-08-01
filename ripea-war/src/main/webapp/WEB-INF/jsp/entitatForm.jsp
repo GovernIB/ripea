@@ -12,7 +12,7 @@
 <html>
 <head>
 	<title>${titol}</title>
-	<rip:modalHead titol="${titol}" buttonContainerId="botons"/>
+	<rip:modalHead/>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
@@ -22,9 +22,9 @@
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>
-		<div id="modal-botons" class="well">
+		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/entitat"/>" class="btn btn-default modal-tancar"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/entitat"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

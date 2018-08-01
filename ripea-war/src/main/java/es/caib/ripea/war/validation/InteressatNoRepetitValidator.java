@@ -8,14 +8,15 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatCiutadaDto;
-import es.caib.ripea.core.api.service.InteressatService;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.war.command.InteressatCommand;
 
 /**
@@ -26,55 +27,42 @@ import es.caib.ripea.war.command.InteressatCommand;
  */
 public class InteressatNoRepetitValidator implements ConstraintValidator<InteressatNoRepetit, Object> {
 
-	private String campId;
-	private String campEntitatId;
-	private String campNom;
-	private String campNif;
-	private String campLlinatges;
-	private String campIdentificador;
-	private String campTipus;
-
 	@Autowired
-	private InteressatService interessatService;
+	private ExpedientInteressatService expedientInteressatService;
 
 
 
 	@Override
 	public void initialize(final InteressatNoRepetit constraintAnnotation) {
-		this.campId = constraintAnnotation.campId();
-		this.campEntitatId = constraintAnnotation.campEntitatId();
-		this.campNom = constraintAnnotation.campNom();
-		this.campNif = constraintAnnotation.campNif();
-		this.campLlinatges = constraintAnnotation.campLlinatges();
-		this.campIdentificador = constraintAnnotation.campIdentificador();
-		this.campTipus = constraintAnnotation.campTipus();
 	}
 
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 		try {
-			final String id = BeanUtils.getSimpleProperty(value, campId);
-			if (id != null && !id.isEmpty())
+			
+			InteressatCommand interessat = (InteressatCommand)value;
+			
+			final Long id = interessat.getId();
+			if (id != null)
 				return true;
-			final Long entitatId = new Long(BeanUtils.getSimpleProperty(value, campEntitatId));
-			final String nom = BeanUtils.getProperty(value, campNom);
-			final String nif = BeanUtils.getProperty(value, campNif);
-			final String llinatges = BeanUtils.getProperty(value, campLlinatges);
-			final String identificador = BeanUtils.getProperty(value, campIdentificador);
-			final String tipus = BeanUtils.getSimpleProperty(value, campTipus);
+			final InteressatTipusEnumDto tipus = interessat.getTipus();
+			
 			boolean existeix;
-			if (InteressatCommand.TIPUS_CIUTADA.equals(tipus)) {
-				List<InteressatCiutadaDto> interessats = interessatService.findByFiltreCiutada(
-						entitatId,
-						nom,
-						nif,
-						llinatges);
+			if (InteressatTipusEnumDto.PERSONA_FISICA.equals(tipus)) {
+				List<InteressatPersonaFisicaDto> interessats = expedientInteressatService.findByFiltrePersonaFisica(
+						interessat.getDocumentNum(), 
+						interessat.getNom(), 
+						interessat.getLlinatge1(), 
+						interessat.getLlinatge2());
 				existeix = interessats.size() > 0;
-			} else if (InteressatCommand.TIPUS_ADMINISTRACIO.equals(tipus)) {
-				List<InteressatAdministracioDto> interessats = interessatService.findByFiltreAdministracio(
-						entitatId,
-						nom,
-						identificador);
+			} else if (InteressatTipusEnumDto.PERSONA_JURIDICA.equals(tipus)) {
+				List<InteressatPersonaJuridicaDto> interessats = expedientInteressatService.findByFiltrePersonaJuridica(
+						interessat.getDocumentNum(),
+						interessat.getRaoSocial());
+				existeix = interessats.size() > 0;
+			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(tipus)) {
+				List<InteressatAdministracioDto> interessats = expedientInteressatService.findByFiltreAdministracio(
+						interessat.getOrganCodi());
 				existeix = interessats.size() > 0;
 			} else {
 				throw new RuntimeException("No s'ha pogut comprovar si l'interessat ja està donat d'alta: tipus desconegut");

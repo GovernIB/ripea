@@ -8,21 +8,15 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
 
-import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 
 /**
  * Classe del model de dades que representa un enviament d'una versió
@@ -31,151 +25,117 @@ import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table( name = "ipa_document_pfirmes",
-		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {
-						"document_id",
-						"versio",
-						"pfirmes_id"})})
-@EntityListeners(RipeaAuditingEntityListener.class)
-public class DocumentPortafirmesEntity extends RipeaAuditable<Long> {
+@EntityListeners(AuditingEntityListener.class)
+public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
-	@JoinColumn(name = "document_id")
-	@ForeignKey(name = "ipa_document_docpfir_fk")
-	private DocumentEntity document;
-	@Column(name = "versio", nullable = false)
-	private int versio;
-	@Column(name = "motiu", length = 256, nullable = false)
-	protected String motiu;
-	@Column(name = "prioritat", nullable = false)
-	@Enumerated(EnumType.STRING)
-	protected DocumentPortafirmesPrioritatEnum prioritat;
+	@Column(name = "pf_prioritat")
+	private PortafirmesPrioritatEnumDto prioritat;
 	@Temporal(TemporalType.DATE)
-	@Column(name = "data_caducitat")
-	protected Date dataCaducitat;
-	@Column(name = "pfirmes_id", nullable = false, unique = true)
-	private long portafirmesId;
-	@Column(name = "pfirmes_estat", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private DocumentPortafirmesEstatEnum portafirmesEstat;
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "callback_darrer")
-	private Date callbackDarrer;
-	@Column(name = "callback_count")
-	private int callbackCount;
-	@Column(name = "error_desc", length = 1024)
-	private String errorDescripcio;
-	@Version
-	private long version = 0;
+	@Column(name = "pf_cad_data")
+	private Date caducitatData;
+	@Column(name = "pf_doc_tipus", length = 64)
+	private String documentTipus;
+	@Column(name = "pf_responsables", length = 1024)
+	private String responsables;
+	@Column(name = "pf_flux_tipus")
+	private MetaDocumentFirmaFluxTipusEnumDto fluxTipus;
+	@Column(name = "pf_flux_id", length = 64)
+	private String fluxId;
+	@Column(name = "pf_portafirmes_id", length = 64, unique = true)
+	private String portafirmesId;
+	@Column(name = "pf_callback_estat")
+	private PortafirmesCallbackEstatEnumDto callbackEstat;
 
-
-
-	public DocumentEntity getDocument() {
-		return document;
-	}
-	public int getVersio() {
-		return versio;
-	}
-	public String getMotiu() {
-		return motiu;
-	}
-	public DocumentPortafirmesPrioritatEnum getPrioritat() {
+	public PortafirmesPrioritatEnumDto getPrioritat() {
 		return prioritat;
 	}
-	public Date getDataCaducitat() {
-		return dataCaducitat;
+	public Date getCaducitatData() {
+		return caducitatData;
 	}
-	public long getPortafirmesId() {
+	public String getDocumentTipus() {
+		return documentTipus;
+	}
+	public String[] getResponsables() {
+		return responsables.split(",");
+	}
+	public MetaDocumentFirmaFluxTipusEnumDto getFluxTipus() {
+		return fluxTipus;
+	}
+	public String getFluxId() {
+		return fluxId;
+	}
+	public String getPortafirmesId() {
 		return portafirmesId;
 	}
-	public DocumentPortafirmesEstatEnum getPortafirmesEstat() {
-		return portafirmesEstat;
-	}
-	public Date getCallbackDarrer() {
-		return callbackDarrer;
-	}
-	public int getCallbackCount() {
-		return callbackCount;
-	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
+	public PortafirmesCallbackEstatEnumDto getCallbackEstat() {
+		return callbackEstat;
 	}
 
-	public void updateEstat(
-			DocumentPortafirmesEstatEnum portafirmesEstat) {
-		this.portafirmesEstat = portafirmesEstat;
-	}
-	public void updateEstatError(
-			String errorDescripcio) {
-		this.portafirmesEstat = DocumentPortafirmesEstatEnum.ERROR;
-		this.errorDescripcio = errorDescripcio;
-	}
-	public void updateNouCallback() {
-		this.callbackDarrer = new Date();
-		this.callbackCount++;
+	public void updateEnviat(
+			Date enviatData,
+			String portafirmesId) {
+		super.updateEnviat(enviatData);
+		this.portafirmesId = portafirmesId;
 	}
 
-	/**
-	 * Obté el Builder per a crear objectes de tipus document-portafirmes.
-	 * 
-	 * @param document
-	 *            El document relacionat amb aquest enviament.
-	 * @param versio
-	 *            La versió del document.
-	 * @param motiu
-	 *            El motiu per l'enviament.
-	 * @param prioritat
-	 *            La prioritat per l'enviament.
-	 * @param dataCaducitat
-	 *            La data de caducitat per l'enviament.
-	 * @param portafirmesId
-	 *            La identificació de l'enviament a portafirmes.
-	 * @param portafirmesEstat
-	 *            L'estat de l'enviament a portafirmes.
-	 * @return Una nova instància del Builder.
-	 */
+	public void updateCallbackEstat(
+			PortafirmesCallbackEstatEnumDto callbackEstat) {
+		this.callbackEstat = callbackEstat;
+	}
+
 	public static Builder getBuilder(
-			DocumentEntity document,
-			int versio,
-			String motiu,
-			DocumentPortafirmesPrioritatEnum prioritat,
-			Date dataCaducitat,
-			long portafirmesId,
-			DocumentPortafirmesEstatEnum portafirmesEstat) {
+			DocumentEnviamentEstatEnumDto estat,
+			String assumpte,
+			PortafirmesPrioritatEnumDto prioritat,
+			Date caducitatData,
+			String documentTipus,
+			String[] responsables,
+			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+			String fluxId,
+			ExpedientEntity expedient,
+			DocumentEntity document) {
 		return new Builder(
-				document,
-				versio,
-				motiu,
+				estat,
+				assumpte,
 				prioritat,
-				dataCaducitat,
-				portafirmesId,
-				portafirmesEstat);
+				caducitatData,
+				documentTipus,
+				responsables,
+				fluxTipus,
+				fluxId,
+				expedient,
+				document);
 	}
 
-	/**
-	 * Builder per a crear noves instàncies d'aquesta classe.
-	 * 
-	 * @author Limit Tecnologies <limit@limit.es>
-	 */
 	public static class Builder {
 		DocumentPortafirmesEntity built;
 		Builder(
-				DocumentEntity document,
-				int versio,
-				String motiu,
-				DocumentPortafirmesPrioritatEnum prioritat,
-				Date dataCaducitat,
-				long portafirmesId,
-				DocumentPortafirmesEstatEnum portafirmesEstat) {
+				DocumentEnviamentEstatEnumDto estat,
+				String assumpte,
+				PortafirmesPrioritatEnumDto prioritat,
+				Date caducitatData,
+				String documentTipus,
+				String[] responsables,
+				MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+				String fluxId,
+				ExpedientEntity expedient,
+				DocumentEntity document) {
 			built = new DocumentPortafirmesEntity();
-			built.document = document;
-			built.versio = versio;
-			built.motiu = motiu;
+			built.inicialitzar();
+			built.estat = estat;
+			built.assumpte = assumpte;
 			built.prioritat = prioritat;
-			built.dataCaducitat = dataCaducitat;
-			built.portafirmesId = portafirmesId;
-			built.portafirmesEstat = portafirmesEstat;
+			built.caducitatData = caducitatData;
+			built.documentTipus = documentTipus;
+			built.responsables = getResponsablesFromArray(responsables);
+			built.fluxTipus = fluxTipus;
+			built.fluxId = fluxId;
+			built.expedient = expedient;
+			built.document = document;
+		}
+		public Builder observacions(String observacions) {
+			built.observacions = observacions;
+			return this;
 		}
 		public DocumentPortafirmesEntity build() {
 			return built;
@@ -186,14 +146,18 @@ public class DocumentPortafirmesEntity extends RipeaAuditable<Long> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((document == null) ? 0 : document.hashCode());
-		result = prime * result
-				+ (int) (portafirmesId ^ (portafirmesId >>> 32));
-		result = prime * result + versio;
+		result = prime * result + ((expedient == null) ? 0 : expedient.hashCode());
+		result = prime * result + ((document == null) ? 0 : document.hashCode());
+		result = prime * result + ((enviatData == null) ? 0 : enviatData.hashCode());
+		result = prime * result + ((processatData == null) ? 0 : processatData.hashCode());
+		result = prime * result + ((caducitatData == null) ? 0 : caducitatData.hashCode());
+		result = prime * result + ((documentTipus == null) ? 0 : documentTipus.hashCode());
+		result = prime * result + ((fluxId == null) ? 0 : fluxId.hashCode());
+		result = prime * result + ((fluxTipus == null) ? 0 : fluxTipus.hashCode());
+		result = prime * result + ((prioritat == null) ? 0 : prioritat.hashCode());
+		result = prime * result + ((responsables == null) ? 0 : responsables.hashCode());
 		return result;
 	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -203,16 +167,61 @@ public class DocumentPortafirmesEntity extends RipeaAuditable<Long> {
 		if (getClass() != obj.getClass())
 			return false;
 		DocumentPortafirmesEntity other = (DocumentPortafirmesEntity) obj;
+		if (expedient == null) {
+			if (other.expedient != null)
+				return false;
+		} else if (!expedient.equals(other.expedient))
+			return false;
 		if (document == null) {
 			if (other.document != null)
 				return false;
 		} else if (!document.equals(other.document))
 			return false;
-		if (portafirmesId != other.portafirmesId)
+		if (enviatData == null) {
+			if (other.enviatData != null)
+				return false;
+		} else if (!enviatData.equals(other.enviatData))
 			return false;
-		if (versio != other.versio)
+		if (processatData == null) {
+			if (other.processatData != null)
+				return false;
+		} else if (!processatData.equals(other.processatData))
+			return false;
+		if (caducitatData == null) {
+			if (other.caducitatData != null)
+				return false;
+		} else if (!caducitatData.equals(other.caducitatData))
+			return false;
+		if (documentTipus == null) {
+			if (other.documentTipus != null)
+				return false;
+		} else if (!documentTipus.equals(other.documentTipus))
+			return false;
+		if (fluxId == null) {
+			if (other.fluxId != null)
+				return false;
+		} else if (!fluxId.equals(other.fluxId))
+			return false;
+		if (fluxTipus != other.fluxTipus)
+			return false;
+		if (prioritat != other.prioritat)
+			return false;
+		if (responsables == null) {
+			if (other.responsables != null)
+				return false;
+		} else if (!responsables.equals(other.responsables))
 			return false;
 		return true;
+	}
+
+	private static String getResponsablesFromArray(String[] responsables) {
+		StringBuilder responsablesStr = new StringBuilder();
+		for (String responsable: responsables) {
+			if (responsablesStr.length() > 0)
+				responsablesStr.append(",");
+			responsablesStr.append(responsable);
+		}
+		return responsablesStr.toString();
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

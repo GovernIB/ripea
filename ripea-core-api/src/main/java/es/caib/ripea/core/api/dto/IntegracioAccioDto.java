@@ -21,6 +21,7 @@ public class IntegracioAccioDto implements Serializable {
 	private Map<String, String> parametres;
 	private IntegracioDto integracio;
 	private IntegracioAccioTipusEnumDto tipus;
+	private long tempsResposta;
 	private IntegracioAccioEstatEnumDto estat;
 	private EntitatDto entitat;
 	private String errorDescripcio;
@@ -64,6 +65,12 @@ public class IntegracioAccioDto implements Serializable {
 	}
 	public void setTipus(IntegracioAccioTipusEnumDto tipus) {
 		this.tipus = tipus;
+	}
+	public long getTempsResposta() {
+		return tempsResposta;
+	}
+	public void setTempsResposta(long tempsResposta) {
+		this.tempsResposta = tempsResposta;
 	}
 	public IntegracioAccioEstatEnumDto getEstat() {
 		return estat;

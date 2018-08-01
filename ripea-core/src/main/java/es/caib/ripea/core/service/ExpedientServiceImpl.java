@@ -3,75 +3,71 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.annotation.Resource;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
+import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ContenidorDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.exception.ArxiuNotFoundException;
-import es.caib.ripea.core.api.exception.ContenidorNotFoundException;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
-import es.caib.ripea.core.api.exception.ExpedientNotFoundException;
-import es.caib.ripea.core.api.exception.MetaDocumentNotFoundException;
-import es.caib.ripea.core.api.exception.MetaExpedientNotFoundException;
-import es.caib.ripea.core.api.exception.NomInvalidException;
-import es.caib.ripea.core.api.exception.RegistreNotFoundException;
-import es.caib.ripea.core.api.exception.UsuariNotFoundException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.entity.ArxiuEntity;
-import es.caib.ripea.core.entity.BustiaEntity;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.CarpetaTipusEnum;
-import es.caib.ripea.core.entity.ContenidorEntity;
-import es.caib.ripea.core.entity.ContenidorLogEntity;
-import es.caib.ripea.core.entity.ContenidorMovimentEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.EscriptoriEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.LogTipusEnum;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.BustiaHelper;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContenidorHelper;
-import es.caib.ripea.core.helper.ContenidorLogHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.CsvHelper;
 import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PermisosComprovacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.ArxiuRepository;
-import es.caib.ripea.core.repository.BustiaRepository;
-import es.caib.ripea.core.repository.CarpetaRepository;
-import es.caib.ripea.core.repository.ContenidorRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -82,190 +78,103 @@ import es.caib.ripea.core.security.ExtendedPermission;
 @Service
 public class ExpedientServiceImpl implements ExpedientService {
 
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private ContenidorRepository contenidorRepository;
-	@Resource
+	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-	@Resource
+	@Autowired
 	private ExpedientRepository expedientRepository;
-	@Resource
-	private CarpetaRepository carpetaRepository;
-	@Resource
-	private ArxiuRepository arxiuRepository;
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Resource
-	private RegistreRepository registreRepository;
-	@Resource
-	private BustiaRepository bustiaRepository;
-	@Resource
-	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
+	@Autowired
+	private DadaRepository dadaRepository;
+	@Autowired
+	private AlertaRepository alertaRepository;
+	@Autowired
+	private ContingutRepository contingutRepository;
 
-	@Resource
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private PermisosHelper permisosHelper;
-	@Resource
-	private ContenidorHelper contenidorHelper;
-	@Resource
+	@Autowired
+	private ContingutHelper contingutHelper;
+	@Autowired
 	private PaginacioHelper paginacioHelper;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private BustiaHelper bustiaHelper;
-	@Resource
+	@Autowired
 	private UsuariHelper usuariHelper;
-	@Resource
+	@Autowired
 	private EmailHelper emailHelper;
-	@Resource
-	private ContenidorLogHelper contenidorLogHelper;
-	@Resource
-	private PermisosComprovacioHelper permisosComprovacioHelper;
-
-
+	@Autowired
+	private PluginHelper pluginHelper;
+	@Autowired
+	private CsvHelper csvHelper;
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	@Transactional
 	@Override
 	public ExpedientDto create(
 			Long entitatId,
-			Long contenidorId,
 			Long metaExpedientId,
-			Long arxiuId,
+			Long pareId,
 			Integer any,
-			String nom,
-			Long contingutId,
-			Long registreId) throws EntitatNotFoundException, ContenidorNotFoundException, MetaExpedientNotFoundException, ArxiuNotFoundException, NomInvalidException {
-		logger.debug("Creant nou expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contenidorId=" + contenidorId + ", "
-				+ "metaExpedientId=" + metaExpedientId + ", "
-				+ "arxiuId=" + arxiuId + ", "
-				+ "any=" + any + ", "
-				+ "nom=" + nom + ", "
-				+ "contingutId=" + contingutId + ", "
-				+ "registreId=" + registreId + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+			String nom) {
+		logger.debug("Creant nou expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"pareId=" + pareId + ", " +
+				"any=" + any + ", " +
+				"nom=" + nom + ")");
+		if (metaExpedientId == null) {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"No es pot crear un expedient sense un meta-expedient associat");
+		}
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitatId,
-				true,
+				metaExpedientId,
 				false,
+				false,
+				true,
 				false);
-		// Comprova el meta-expedient i que l'usuari tengui permisos per a crear
-		MetaExpedientEntity metaExpedient = null;
-		if (metaExpedientId != null) {
-			metaExpedient = comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					true,
-					false);
-		}
-		ArxiuEntity arxiu = comprovarArxiu(
-				entitat,
-				arxiuId,
-				true);
-		ContenidorEntity contenidor = comprovarContenidor(
-				entitat,
-				contenidorId);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				contenidor);
-		// Comprova l'accés al path del contenidor pare
-		contenidorHelper.comprovarPermisosPathContenidor(
-				contenidor,
-				true,
-				false,
-				false,
-				true);
-		// Comprova que el nom sigui vàlid
-		if (!contenidorHelper.isNomValid(nom)) {
-			throw new NomInvalidException();
-		}
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-				contenidor,
-				true);
-		if (expedientSuperior != null) {
-			contenidorHelper.comprovarPermisosContenidor(
-					expedientSuperior,
+		ContingutEntity contingutPare = null;
+		if (pareId != null) {
+			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					pareId,
+					false,
 					false,
 					true,
 					false);
-			// TODO Comprovar jerarquia de meta-expedients amb la cadena d'expedients
-		} else {
-			// TODO Comprovar que el metaExpedient és de primer nivell
 		}
-		// Crea l'expedient
-		ExpedientEntity expedient = ExpedientEntity.getBuilder(
+		contingutHelper.comprovarNomValid(
+				contingutPare,
+				nom,
+				"<creacio>",
+				ExpedientEntity.class);
+		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
 				metaExpedient,
-				arxiu,
-				contenidor,
-				entitat).build();
-		expedientRepository.save(expedient);
-		// Lliga el contingut al nou contenidor
-		if (contingutId != null) {
-			ContenidorEntity contingut = comprovarContenidor(
-					entitat,
-					contingutId);
-			BustiaEntity bustia = bustiaRepository.findOne(contingut.getPare().getId());
-			if (bustia != null) {
-				bustiaHelper.evictElementsPendentsBustia(entitat, bustia);
-			}
-			contenidorHelper.ferIEnregistrarMovimentContenidor(
-					contenidor,
-					expedient,
-					null);
-		}
-		// Lliga l'anotació de registre al nou contenidor
-		if (registreId != null) {
-			RegistreEntity registre = comprovarRegistre(
-					entitat,
-					registreId);
-			bustiaHelper.evictElementsPendentsBustiaPerRegistre(
-					entitat,
-					registre);
-			registre.updateContenidor(expedient);
-		}
-		// Obté la seqüència de l'expedient
-		int anyExpedient;
-		if (any != null)
-			anyExpedient = any.intValue();
-		else
-			anyExpedient = Calendar.getInstance().get(Calendar.YEAR);
-		MetaExpedientSequenciaEntity sequencia = metaExpedientSequenciaRepository.findByMetaExpedientAndAny(
-				metaExpedient,
-				anyExpedient);
-		if (sequencia == null) {
-			sequencia = MetaExpedientSequenciaEntity.getBuilder(
-					anyExpedient,
-					metaExpedient).build();
-			metaExpedientSequenciaRepository.save(sequencia);
-		}
-		long sequenciaExpedient = sequencia.getValor();
-		sequencia.incrementar();
-		expedient.updateAnySequencia(
-				anyExpedient,
-				sequenciaExpedient);
-		// Crear carpeta de nouvinguts
-		CarpetaEntity nouvinguts = CarpetaEntity.getBuilder(
-				CarpetaServiceImpl.CARPETA_NOUVINGUTS_NOM,
-				CarpetaTipusEnum.NOUVINGUT,
-				expedient,
-				entitat).build();
-		carpetaRepository.save(nouvinguts);
-		// Registra al log la creació de l'expedient
-		contenidorLogHelper.log(
-				expedient,
-				LogTipusEnum.CREACIO,
-				null,
-				null,
-				true,
+				contingutPare,
+				metaExpedient.getEntitat(),
+				"1.0",
+				metaExpedient.getEntitat().getUnitatArrel(),
+				new Date(),
+				any,
 				true);
-		return toExpedientDto(
+		contingutLogHelper.logCreacio(
 				expedient,
+				false,
 				false);
+		ExpedientDto dto = toExpedientDto(
+				expedient,
+				true);
+		contingutHelper.arxiuPropagarModificacio(
+				expedient,
+				null);
+		return dto;
 	}
 
 	@Transactional
@@ -273,181 +182,86 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public ExpedientDto update(
 			Long entitatId,
 			Long id,
-			Long arxiuId,
-			Long metaExpedientId,
-			String nom) throws EntitatNotFoundException, ExpedientNotFoundException, ArxiuNotFoundException, NomInvalidException {
+			String nom) {
 		logger.debug("Actualitzant dades de l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
-				+ "arxiuId=" + arxiuId + ", "
 				+ "nom=" + nom + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
+				id,
+				false,
 				true,
 				false,
 				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		ArxiuEntity arxiu = comprovarArxiu(
-				entitat,
-				arxiuId,
-				true);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Comprova l'accés al path de l'expedient
-		contenidorHelper.comprovarPermisosPathContenidor(
-				expedient,
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				id,
+				false,
+				false,
 				true,
 				false,
-				false,
-				true);
-		// Comprova el permís de modificació de l'expedient
-		contenidorHelper.comprovarPermisosContenidor(
-				expedient,
-				false,
-				true,
 				false);
-		// Comprova el meta-expedient
-		MetaExpedientEntity metaExpedient = null;
-		if (metaExpedientId != null) {
-			metaExpedient = comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					true,
-					false);
-			cacheHelper.evictErrorsValidacioPerNode(expedient);
-		}
-		// Comprova que el nom sigui vàlid
-		if (!contenidorHelper.isNomValid(nom)) {
-			throw new NomInvalidException();
-		}
-		// Modifica l'expedient
-		expedient.update(
+		contingutHelper.comprovarNomValid(
+				expedient.getPare(),
 				nom,
-				metaExpedient,
-				arxiu);
-		// Registra al log la modificació de l'expedient
-		contenidorLogHelper.log(
+				id,
+				ExpedientEntity.class);
+		String nomOriginal = expedient.getNom();
+		expedient.update(nom);
+		contingutLogHelper.log(
 				expedient,
-				LogTipusEnum.MODIFICACIO,
-				null,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(expedient.getNom())) ? expedient.getNom() : null,
 				null,
 				false,
 				false);
-		return toExpedientDto(
+		ExpedientDto dto = toExpedientDto(
 				expedient,
-				false);
-	}
-
-	@Transactional
-	@Override
-	@CacheEvict(value = "errorsValidacioNode", key = "#id")
-	public ExpedientDto delete(
-			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
-		logger.debug("Esborrant l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Comprova l'accés al path de l'expedient
-		contenidorHelper.comprovarPermisosPathContenidor(
-				expedient,
-				true,
-				false,
-				false,
 				true);
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
+		contingutHelper.arxiuPropagarModificacio(
 				expedient,
-				false);
-		if (expedientSuperior != null) {
-			contenidorHelper.comprovarPermisosContenidor(
-					expedientSuperior,
-					false,
-					true,
-					false);
-		}
-		// Comprova el permís d'esborrar de l'expedient actual
-		contenidorHelper.comprovarPermisosContenidor(
-				expedient,
-				false,
-				false,
-				true);
-		expedientRepository.delete(expedient);
-		// Registra al log l'eliminació de l'expedient
-		contenidorLogHelper.log(
-				expedient,
-				LogTipusEnum.ELIMINACIO,
-				null,
-				null,
-				true,
-				true);
-		return toExpedientDto(
-				expedient,
-				false);
+				null);
+		return dto;
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
+			Long id) {
 		logger.debug("Obtenint l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				id,
+				false,
 				true,
+				false,
 				false,
 				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path de l'expedient
-		contenidorHelper.comprovarPermisosPathContenidor(
-				expedient,
-				true,
-				false,
-				false,
-				true);
 		return toExpedientDto(
 				expedient,
-				false);
+				true);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientDto> findPaginatAdmin(
+	public PaginaDto<ExpedientDto> findAmbFiltreAdmin(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException, ArxiuNotFoundException, MetaExpedientNotFoundException {
-		logger.debug("Consultant els expedients paginats per admins ("
+			PaginacioParamsDto paginacioParams) {
+		logger.debug("Consultant els expedients segons el filtre per admins ("
 				+ "entitatId=" + entitatId + ", "
+				+ "filtre=" + filtre + ", "
 				+ "paginacioParams=" + paginacioParams + ")");
-		permisosComprovacioHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		return findByArxiuPaginat(
+		return findAmbFiltrePaginat(
 				entitatId,
 				filtre,
 				paginacioParams,
@@ -457,19 +271,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientDto> findPaginatUser(
+	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException, ArxiuNotFoundException, MetaExpedientNotFoundException {
-		logger.debug("Consultant els expedients paginats per users ("
+			PaginacioParamsDto paginacioParams) {
+		logger.debug("Consultant els expedients segons el filtre per usuaris ("
 				+ "entitatId=" + entitatId + ", "
+				+ "filtre=" + filtre + ", "
 				+ "paginacioParams=" + paginacioParams + ")");
-		permisosComprovacioHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-		return findByArxiuPaginat(
+		return findAmbFiltrePaginat(
 				entitatId,
 				filtre,
 				paginacioParams,
@@ -479,169 +294,169 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ContenidorDto> getContingutCarpetaNouvinguts(
+	public List<ExpedientSelectorDto> findPerUserAndTipus(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ExpedientNotFoundException {
-		logger.debug("Consultant el contingut de la carpeta nouvinguts de l'expedient ("
+			Long metaExpedientId) {
+		logger.debug("Consultant els expedients segons el tipus per usuaris ("
 				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+				+ "metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		// Per a consultes no es comprova el contenidor arrel
-		// Comprova l'accés al path de l'expedient
-		contenidorHelper.comprovarPermisosPathContenidor(
-				expedient,
-				true,
-				false,
-				false,
-				true);
-		List<ContenidorEntity> fills = contenidorRepository.findByPareAndEsborrat(
-				expedient,
-				0,
-				new Sort("createdDate"));
-		for (ContenidorEntity fill: fills) {
-			// Si es la carpeta de nouvinguts
-			if (fill instanceof CarpetaEntity && CarpetaTipusEnum.NOUVINGUT.equals(((CarpetaEntity)fill).getTipus())) {
-				ContenidorDto fillDto = contenidorHelper.toContenidorDto(
-						fill,
-						true,
-						false,
-						false,
-						false,
-						false,
-						false);
-				return fillDto.getFills();
-			}
+		MetaExpedientEntity metaExpedient = null;
+		if (metaExpedientId != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitatId,
+					metaExpedientId,
+					false,
+					true,
+					false,
+					false);
 		}
-		return new ArrayList<ContenidorDto>();
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
+				entitat);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		permisosHelper.filterGrantedAll(
+				metaExpedientsPermesos,
+				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+					@Override
+					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+						return metaExpedient.getId();
+					}
+				},
+				MetaNodeEntity.class,
+				new Permission[] {ExtendedPermission.READ},
+				auth);
+		if (!metaExpedientsPermesos.isEmpty()) {
+			return conversioTipusHelper.convertirList(
+					expedientRepository.findByEntitatAndMetaExpedientOrderByNomAsc(
+							entitat, 
+							metaExpedientsPermesos,
+							metaExpedient == null,
+							metaExpedient), 
+					ExpedientSelectorDto.class);
+		} else {
+			return new ArrayList<ExpedientSelectorDto>();
+		}
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<Long> findIdsAmbFiltre(
+			Long entitatId,
+			ExpedientFiltreDto filtre) throws NotFoundException {
+		logger.debug("Consultant els ids d'expedient segons el filtre ("
+				+ "entitatId=" + entitatId + ", "
+				+ "filtre=" + filtre + ")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		return findIdsAmbFiltrePaginat(
+				entitatId,
+				filtre,
+				false,
+				true);
 	}
 
 	@Transactional
 	@Override
 	public void agafarUser(
 			Long entitatId,
-			Long arxiuId,
-			Long id) throws EntitatNotFoundException, ArxiuNotFoundException, ExpedientNotFoundException {
+			Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Agafant l'expedient ("
+		logger.debug("Agafant l'expedient com a usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "usuari=" + auth.getName() + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				id,
+				false,
+				false,
 				true,
 				false,
 				false);
-		ArxiuEntity arxiu = comprovarArxiu(
-				entitat,
-				arxiuId,
-				true);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				arxiu,
-				id);
-		// No s'ha de poder agafar un expedient no arrel
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
+				false,
+				false,
 				false);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + id + ")");
-			throw new ExpedientNotFoundException();
+			throw new ValidationException(
+					id,
+					ExpedientEntity.class,
+					"No es pot agafar un expedient no arrel");
 		}
-		// Comprova que es pugui modificar l'expedient a agafar
-		contenidorHelper.comprovarPermisosContenidor(
-				expedient,
-				false,
-				true,
-				false);
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
-		ContenidorEntity arrel = contenidorHelper.findContenidorArrel(expedient);
-		UsuariEntity usuariOriginal = null;
-		if (arrel instanceof EscriptoriEntity)
-			usuariOriginal = ((EscriptoriEntity)arrel).getUsuari();
-		EscriptoriEntity escriptori = contenidorHelper.getEscriptoriPerUsuari(
-				entitat,
-				usuariHelper.getUsuariAutenticat());
-		contenidorHelper.ferIEnregistrarMovimentContenidor(
-				expedient,
-				escriptori,
-				null);
-		// Avisa a l'usuari que li han pres
+		UsuariEntity usuariOriginal = expedient.getAgafatPer();
+		UsuariEntity usuariNou = usuariHelper.getUsuariAutenticat();
+		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
-			emailHelper.emailUsuariContenidorAgafatSensePermis(
+			// Avisa a l'usuari que li han pres
+			emailHelper.emailUsuariContingutAgafatSensePermis(
 					expedient,
-					usuariOriginal);
+					usuariOriginal,
+					usuariNou);
 		}
-		// Registra al log l'apropiació de l'expedient
-		contenidorLogHelper.log(
+		contingutLogHelper.log(
 				expedient,
-				LogTipusEnum.RESERVA,
+				LogTipusEnumDto.AGAFAR,
 				null,
 				null,
 				false,
 				false);
 	}
-
+	
 	@Transactional
 	@Override
 	public void agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
 			Long id,
-			String usuariCodi) throws EntitatNotFoundException, ArxiuNotFoundException, ExpedientNotFoundException, UsuariNotFoundException {
-		logger.debug("Agafant l'expedient ("
+			String usuariCodi) {
+		logger.debug("Agafant l'expedient com a administrador ("
 				+ "entitatId=" + entitatId + ", "
 				+ "arxiuId=" + arxiuId + ", "
 				+ "id=" + id + ", "
 				+ "usuariCodi=" + usuariCodi + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				id,
 				false,
-				true,
+				false,
+				false,
+				false,
 				false);
-		ArxiuEntity arxiu = comprovarArxiu(
-				entitat,
-				arxiuId,
-				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				arxiu,
-				id);
-		// No s'ha de poder agafar un expedient no arrel
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
+				false,
+				false,
 				false);
 		if (expedientSuperior != null) {
-			logger.error("No es pot agafar un expedient no arrel (id=" + id + ")");
-			throw new ExpedientNotFoundException();
+			throw new ValidationException(
+					id,
+					ExpedientEntity.class,
+					"No es pot agafar un expedient no arrel");
 		}
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
-		ContenidorEntity arrel = contenidorHelper.findContenidorArrel(expedient);
-		UsuariEntity usuariOriginal = null;
-		if (arrel instanceof EscriptoriEntity)
-			usuariOriginal = ((EscriptoriEntity)arrel).getUsuari();
-		EscriptoriEntity escriptori = contenidorHelper.getEscriptoriPerUsuari(
-				entitat,
-				usuariRepository.findOne(usuariCodi));
-		contenidorHelper.ferIEnregistrarMovimentContenidor(
+		UsuariEntity usuariOriginal = expedient.getAgafatPer();
+		UsuariEntity usuariNou = usuariHelper.getUsuariAutenticat();
+		expedient.updateAgafatPer(usuariNou);
+		if (usuariOriginal != null) {
+			// Avisa a l'altre l'usuari que li han pres
+			emailHelper.emailUsuariContingutAgafatSensePermis(
+					expedient,
+					usuariOriginal,
+					usuariNou);
+		}
+		contingutLogHelper.log(
 				expedient,
-				escriptori,
-				null);
-		// Avisa a l'usuari que li han pres
-		emailHelper.emailUsuariContenidorAgafatSensePermis(
-				expedient,
-				usuariOriginal);
-		// Registra al log l'apropiacio de l'expedient
-		contenidorLogHelper.log(
-				expedient,
-				LogTipusEnum.RESERVA,
+				LogTipusEnumDto.AGAFAR,
 				null,
 				null,
 				false,
@@ -652,33 +467,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	public void alliberarUser(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ArxiuNotFoundException, ExpedientNotFoundException {
+			Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Alliberant l'expedient com a usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "usuari=" + auth.getName() + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				id,
 				true,
 				false,
+				false,
+				false,
 				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		contenidorHelper.ferIEnregistrarMovimentContenidor(
+		expedient.updateAgafatPer(null);
+		contingutLogHelper.log(
 				expedient,
-				expedient.getArxiu(),
-				null);
-		// Registra al log l'alliberació de l'expedient
-		contenidorLogHelper.log(
-				expedient,
-				LogTipusEnum.ALLIBERACIO,
+				LogTipusEnumDto.ALLIBERAR,
 				null,
 				null,
 				false,
@@ -689,29 +495,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	public void alliberarAdmin(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, ArxiuNotFoundException, ExpedientNotFoundException {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Long id) {
 		logger.debug("Alliberant l'expedient com a administrador ("
 				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "usuari=" + auth.getName() + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+				+ "id=" + id + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				id,
 				false,
-				true,
+				false,
+				false,
+				false,
 				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		contenidorHelper.ferIEnregistrarMovimentContenidor(
+		expedient.updateAgafatPer(null);
+		contingutLogHelper.log(
 				expedient,
-				expedient.getArxiu(),
-				null);
-		// Registra al log l'alliberació de l'expedient
-		contenidorLogHelper.log(
-				expedient,
-				LogTipusEnum.ALLIBERACIO,
+				LogTipusEnumDto.ALLIBERAR,
 				null,
 				null,
 				false,
@@ -720,120 +519,321 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void finalitzar(
+	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) throws EntitatNotFoundException, ExpedientNotFoundException {
-		logger.debug("Finalitzant l'expedient ("
+			String motiu) {
+		logger.debug("Tancant l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ","
-				+ "mootiu=" + motiu + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+				+ "motiu=" + motiu + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				id,
+				true,
+				false,
 				true,
 				false,
 				false);
-		ExpedientEntity expedient = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		// Comprova que l'usuari tengui permisos d'escriptura a damunt l'expedient
-		contenidorHelper.comprovarPermisosContenidor(
+		expedient.updateEstat(
+				ExpedientEstatEnumDto.TANCAT,
+				motiu);
+		contingutLogHelper.log(
 				expedient,
-				false,
-				true,
-				false);
-		// Comprova que el contenidor arrel és l'escriptori de l'usuari actual
-		contenidorHelper.comprovarContenidorArrelEsEscriptoriUsuariActual(
-				entitat,
-				expedient);
-		// Allibera l'expedient
-		contenidorHelper.ferIEnregistrarMovimentContenidor(
-				expedient,
-				expedient.getArxiu(),
-				null);
-		// Finalitza l'expedient
-		expedient.updateFinalitzar(motiu);
-		contenidorLogHelper.log(
-				expedient,
-				LogTipusEnum.FINALITZACIO,
+				LogTipusEnumDto.TANCAMENT,
 				null,
 				null,
 				false,
 				false);
-	}
-
-	@Transactional
-	@Override
-	public void acumular(
-			Long entitatId,
-			Long id,
-			Long acumulatId) throws EntitatNotFoundException, ExpedientNotFoundException {
-		logger.debug("Finalitzant l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		ExpedientEntity expedientDesti = comprovarExpedient(
-				entitat,
-				null,
-				id);
-		ExpedientEntity expedientOrigen = comprovarExpedient(
-				entitat,
-				null,
-				acumulatId);
-		CarpetaEntity carpetaNouvinguts = findCarpetaNouvinguts(expedientDesti);
-		// Registra al log l'acumulació
-		ContenidorLogEntity contenidorLog = contenidorLogHelper.log(
-				expedientDesti,
-				LogTipusEnum.ACUMULACIO,
-				null,
-				null,
-				false,
-				false);
-		for (ContenidorEntity contenidor: expedientOrigen.getFills()) {
-			ContenidorMovimentEntity contenidorMoviment = contenidorHelper.ferIEnregistrarMovimentContenidor(
-					contenidor,
-					carpetaNouvinguts,
-					null);
-			// Registra al log el moviment del node
-			contenidorLogHelper.log(
-					contenidor,
-					LogTipusEnum.MOVIMENT,
-					contenidorLog,
-					contenidorMoviment,
-					true,
-					true);
+		if (pluginHelper.isArxiuPluginActiu()) {
+			pluginHelper.arxiuExpedientTancar(expedient);
 		}
 	}
 
+	@Transactional
+	@Override
+	public void reobrir(
+			Long entitatId,
+			Long id) {
+		logger.debug("Reobrint l'expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				id,
+				true,
+				false,
+				true,
+				false,
+				false);
+		expedient.updateEstat(
+				ExpedientEstatEnumDto.OBERT,
+				null);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.REOBERTURA,
+				null,
+				null,
+				false,
+				false);
+		if (pluginHelper.isArxiuPluginActiu()) {
+			pluginHelper.arxiuExpedientReobrir(expedient);
+		}
+	}
+
+	@Transactional
+	@Override
+	@SuppressWarnings("serial")
+	public void relacioCreate(
+			Long entitatId,
+			final Long id,
+			final Long relacionatId) {
+		logger.debug("Relacionant l'expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ", "
+				+ "relacionatId=" + relacionatId + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				id,
+				true,
+				false,
+				true,
+				false,
+				false);
+		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				relacionatId,
+				true,
+				false,
+				true,
+				false,
+				false);
+		expedient.addRelacionat(relacionat);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				new Persistable<String>() {
+					@Override
+					public String getId() {
+						return id + "#" + relacionatId;
+					}
+					@Override
+					public boolean isNew() {
+						return false;
+					}
+				},
+				LogObjecteTipusEnumDto.RELACIO,
+				LogTipusEnumDto.CREACIO,
+				id.toString(),
+				relacionatId.toString(),
+				false,
+				false);
+	}
+
+	@Transactional
+	@Override
+	@SuppressWarnings("serial")
+	public boolean relacioDelete(
+			Long entitatId,
+			final Long id,
+			final Long relacionatId) {
+		logger.debug("Esborrant la relació de l'expedient amb un altre expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ", "
+				+ "relacionatId=" + relacionatId + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				id,
+				true,
+				false,
+				true,
+				false,
+				false);
+		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				relacionatId,
+				true,
+				false,
+				true,
+				false,
+				false);
+		boolean trobat = true;
+		if (expedient.getRelacionatsAmb().contains(relacionat)) {
+			expedient.removeRelacionat(relacionat);
+		} else if (relacionat.getRelacionatsAmb().contains(expedient)) {
+			relacionat.removeRelacionat(expedient);
+		} else {
+			trobat = false;
+		}
+		if (trobat) {
+			contingutLogHelper.log(
+					expedient,
+					LogTipusEnumDto.MODIFICACIO,
+					new Persistable<String>() {
+						@Override
+						public String getId() {
+							return id + "#" + relacionatId;
+						}
+						@Override
+						public boolean isNew() {
+							return false;
+						}
+					},
+					LogObjecteTipusEnumDto.RELACIO,
+					LogTipusEnumDto.ELIMINACIO,
+					id.toString(),
+					relacionatId.toString(),
+					false,
+					false);
+		}
+		return trobat;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientDto> relacioFindAmbExpedient(
+			Long entitatId,
+			Long expedientId) {
+		logger.debug("Obtenint la llista d'expedients relacionats (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false);
+		List<ExpedientEntity> relacionats = new ArrayList<ExpedientEntity>();
+		relacionats.addAll(expedient.getRelacionatsAmb());
+		relacionats.addAll(expedient.getRelacionatsPer());
+		Collections.sort(
+				relacionats, 
+				new Comparator<ExpedientEntity>() {
+				    @Override
+				    public int compare(ExpedientEntity e1, ExpedientEntity e2) {
+				        return e1.getNom().compareTo(e2.getNom());
+				    }
+				});
+		List<ExpedientDto> relacionatsDto = new ArrayList<ExpedientDto>();
+		for (ExpedientEntity e: relacionats)
+			relacionatsDto.add(toExpedientDto(e, false));		
+		return relacionatsDto;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto exportacio(
+			Long entitatId,
+			Long metaExpedientId,
+			Collection<Long> expedientIds,
+			String format) throws IOException {
+		logger.debug("Exportant informació dels expedients (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"expedientIds=" + expedientIds + ", " +
+				"format=" + format + ")");
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				true,
+				false,
+				false,
+				false);
+		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
+				metaExpedient.getEntitat(),
+				metaExpedient,
+				expedientIds);
+		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(expedientIds);
+		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
+		int numColumnes = 5 + metaDades.size();
+		String[] columnes = new String[numColumnes];
+		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
+		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
+		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
+		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
+		columnes[4] = messageHelper.getMessage("expedient.service.exportacio.idnti");
+		for (int i = 0; i < metaDades.size(); i++) {
+			MetaDadaEntity metaDada = metaDades.get(i);
+			columnes[5 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		List<String[]> files = new ArrayList<String[]>();
+		int dadesIndex = 0;
+		for (ExpedientEntity expedient: expedients) {
+			String[] fila = new String[numColumnes];
+			fila[0] = expedient.getNumero();
+			fila[1] = expedient.getNom();
+			fila[2] = expedient.getEstat().name();
+			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
+			fila[4] = expedient.getNtiIdentificador();
+			if (!dades.isEmpty()) {
+				DadaEntity dadaActual = dades.get(dadesIndex);
+				if (dadaActual.getNode().getId().equals(expedient.getId())) {
+					for (int i = 0; i < metaDades.size(); i++) {
+						MetaDadaEntity metaDada = metaDades.get(i);
+						int dadesIndexIncrement = 1;
+						while (dadaActual.getNode().getId().equals(expedient.getId())) {
+							if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
+								break;
+							}
+							dadaActual = dades.get(dadesIndex + dadesIndexIncrement++);
+						}
+						if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
+							fila[5 + i] = dadaActual.getValorComString();
+						}
+					}
+				}
+			}
+			files.add(fila);
+		}
+		FitxerDto fitxer = new FitxerDto();
+		if ("ODS".equalsIgnoreCase(format)) {
+			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
+			TableModel model = new DefaultTableModel(filesArray, columnes);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			SpreadSheet.createEmpty(model).getPackage().save(baos);
+			fitxer.setNom("exportacio.ods");
+			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
+			fitxer.setContingut(baos.toByteArray());
+		} else if ("CSV".equalsIgnoreCase(format)) {
+			fitxer.setNom("exportacio.csv");
+			fitxer.setContentType("text/csv");
+			StringBuilder sb = new StringBuilder();
+			csvHelper.afegirLinia(sb, columnes, ';');
+			for (String[] fila: files) {
+				csvHelper.afegirLinia(sb, fila, ';');
+			}
+			fitxer.setContingut(sb.toString().getBytes());
+		} else {
+			throw new ValidationException("Format de fitxer no suportat: " + format);
+		}
+		return fitxer;
+	}
 
 
-	private PaginaDto<ExpedientDto> findByArxiuPaginat(
+
+	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			boolean accesAdmin,
 			boolean comprovarAccesMetaExpedients) {
-		EntitatEntity entitat = permisosComprovacioHelper.comprovarEntitat(
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				(!accesAdmin),
 				accesAdmin,
 				false);
-		ArxiuEntity arxiu = comprovarArxiu(
-				entitat,
-				filtre.getArxiuId(),
-				(!accesAdmin));
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = comprovarMetaExpedient(
-					entitat,
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitatId,
 					filtre.getMetaExpedientId(),
+					true,
 					false,
-					true);
+					false,
+					false);
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
 				entitat);
@@ -852,20 +852,42 @@ public class ExpedientServiceImpl implements ExpedientService {
 					auth);
 		}
 		if (!metaExpedientsPermesos.isEmpty()) {
-			return paginacioHelper.toPaginaDto(
-					expedientRepository.findByEntitatAndArxiuFiltre(
-							entitat,
-							arxiu,
-							metaExpedientsPermesos,
-							metaExpedient == null,
-							metaExpedient,
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom(),
-							filtre.getDataCreacioInici() == null,
-							filtre.getDataCreacioInici(),
-							filtre.getDataCreacioFi() == null,
-							filtre.getDataCreacioFi(),
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
+			UsuariEntity agafatPer = null;
+			if (filtre.isMeusExpedients()) {
+				agafatPer = usuariHelper.getUsuariAutenticat();
+			}
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("numero", new String[] {"codi", "any", "sequencia"});
+			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndFiltre(
+					entitat,
+					metaExpedientsPermesos,
+					metaExpedient == null,
+					metaExpedient,
+					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+					filtre.getNumero() == null ? "" : filtre.getNumero(),
+					filtre.getNom() == null || filtre.getNom().isEmpty(),
+					filtre.getNom() == null ? "" : filtre.getNom(),
+					filtre.getDataCreacioInici() == null,
+					filtre.getDataCreacioInici(),
+					filtre.getDataCreacioFi() == null,
+					filtre.getDataCreacioFi(),
+					filtre.getDataTancatInici() == null,
+					filtre.getDataTancatInici(),
+					filtre.getDataTancatFi() == null,
+					filtre.getDataTancatFi(),
+					filtre.getEstat() == null,
+					filtre.getEstat(),
+					agafatPer == null,
+					agafatPer,
+					filtre.getSearch() == null,
+					filtre.getSearch() == null ? "" : filtre.getSearch(),
+					filtre.getTipusId() == null,
+					filtre.getTipusId(),
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams,
+							ordenacioMap));
+			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
+					paginaExpedients,
 					ExpedientDto.class,
 					new Converter<ExpedientEntity, ExpedientDto>() {
 						@Override
@@ -875,161 +897,100 @@ public class ExpedientServiceImpl implements ExpedientService {
 									true);
 						}
 					});
+			for (ExpedientDto e: result) {
+				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(
+						false,
+						e.getId()
+						) > 0;
+				List<ContingutEntity> continguts = contingutRepository.findRegistresByPareId(e.getId());
+				if(!continguts.isEmpty() && alertaRepository.countByLlegidaAndContinguts(
+						false,
+						continguts
+						) > 0) enAlerta = true;
+				
+				e.setAlerta(enAlerta);
+			}
+			return result;
 		} else {
 			return paginacioHelper.getPaginaDtoBuida(
 					ExpedientDto.class);
 		}
 	}
 
+	private List<Long> findIdsAmbFiltrePaginat(
+			Long entitatId,
+			ExpedientFiltreDto filtre,
+			boolean accesAdmin,
+			boolean comprovarAccesMetaExpedients) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				(!accesAdmin),
+				accesAdmin,
+				false);
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitatId,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
+				entitat);
+		if (comprovarAccesMetaExpedients) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			permisosHelper.filterGrantedAll(
+					metaExpedientsPermesos,
+					new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+						@Override
+						public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+							return metaExpedient.getId();
+						}
+					},
+					MetaNodeEntity.class,
+					new Permission[] {ExtendedPermission.READ},
+					auth);
+		}
+		if (!metaExpedientsPermesos.isEmpty()) {
+			return expedientRepository.findIdByEntitatAndFiltre(
+					entitat,
+					metaExpedientsPermesos,
+					metaExpedient == null,
+					metaExpedient,
+					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+					filtre.getNumero(),
+					filtre.getNom() == null || filtre.getNom().isEmpty(),
+					filtre.getNom(),
+					filtre.getDataCreacioInici() == null,
+					filtre.getDataCreacioInici(),
+					filtre.getDataCreacioFi() == null,
+					filtre.getDataCreacioFi(),
+					filtre.getDataTancatInici() == null,
+					filtre.getDataTancatInici(),
+					filtre.getDataTancatFi() == null,
+					filtre.getDataTancatFi(),
+					filtre.getEstat() == null,
+					filtre.getEstat());
+		} else {
+			return new ArrayList<Long>();
+		}
+	}
+
 	private ExpedientDto toExpedientDto(
 			ExpedientEntity expedient,
 			boolean ambPathIPermisos) {
-		return (ExpedientDto)contenidorHelper.toContenidorDto(
+		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
 				false,
 				false,
 				false,
 				ambPathIPermisos,
+				false,
 				false);
-	}
-
-	private ContenidorEntity comprovarContenidor(
-			EntitatEntity entitat,
-			Long id) throws EntitatNotFoundException {
-		ContenidorEntity contenidor = contenidorRepository.findOne(id);
-		if (contenidor == null) {
-			logger.error("No s'ha trobat el contenidor (contenidorId=" + id + ")");
-			throw new ContenidorNotFoundException();
-		}
-		if (!contenidor.getEntitat().equals(entitat)) {
-			logger.error("L'entitat del contenidor no coincideix ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + contenidor.getEntitat().getId() + ")");
-			throw new ContenidorNotFoundException();
-		}
-		return contenidor;
-	}
-	private MetaExpedientEntity comprovarMetaExpedient(
-			EntitatEntity entitat,
-			Long id,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisRead) throws MetaExpedientNotFoundException {
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(
-				id);
-		if (metaExpedient == null) {
-			logger.error("No s'ha trobat el meta-expedient (id=" + id + ")");
-			throw new MetaExpedientNotFoundException();
-		}
-		if (!entitat.equals(metaExpedient.getEntitat())) {
-			logger.error("L'entitat especificada no coincideix amb l'entitat del meta-expedient ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + metaExpedient.getEntitat().getId() + ")");
-			throw new MetaExpedientNotFoundException();
-		}
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (comprovarPermisCreate) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaExpedient.getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.CREATE},
-					auth);
-			if (!granted) {
-				logger.error("No es tenen permisos per a crear expedients amb el meta-expedient (id=" + id + ")");
-				throw new MetaDocumentNotFoundException();
-			}
-		}
-		if (comprovarPermisRead) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaExpedient.getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (!granted) {
-				logger.error("No es tenen permisos per a llegir expedients amb el meta-expedient (id=" + id + ")");
-				throw new MetaDocumentNotFoundException();
-			}
-		}
-		return metaExpedient;
-	}
-
-	private ArxiuEntity comprovarArxiu(
-			EntitatEntity entitat,
-			Long id,
-			boolean comprovarAcces) throws ArxiuNotFoundException {
-		ArxiuEntity arxiu = arxiuRepository.findOne(id);
-		if (arxiu == null) {
-			logger.error("No s'ha trobat l'arxiu (id=" + id + ")");
-			throw new ArxiuNotFoundException();
-		}
-		if (!entitat.equals(arxiu.getEntitat())) {
-			logger.error("L'entitat especificada no coincideix amb l'entitat de l'arxiu ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + arxiu.getEntitat().getId() + ")");
-			throw new ArxiuNotFoundException();
-		}
-		if (comprovarAcces) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			boolean granted = permisosHelper.isGrantedAll(
-					arxiu.getId(),
-					ArxiuEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (!granted) {
-				logger.error("No es tenen permisos per a accedir a l'arxiu (id=" + id + ")");
-				throw new ArxiuNotFoundException();
-			}
-		}
-		return arxiu;
-	}
-
-	private ExpedientEntity comprovarExpedient(
-			EntitatEntity entitat,
-			ArxiuEntity arxiu,
-			Long id) throws ExpedientNotFoundException {
-		ExpedientEntity expedient = expedientRepository.findOne(id);
-		if (expedient == null) {
-			logger.error("No s'ha trobat l'expedient (id=" + id + ")");
-			throw new ExpedientNotFoundException();
-		}
-		if (!entitat.getId().equals(expedient.getEntitat().getId())) {
-			logger.error("L'entitat especificada no coincideix amb l'entitat de l'expedient ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + expedient.getEntitat().getId() + ")");
-			throw new ExpedientNotFoundException();
-		}
-		if (arxiu != null && !arxiu.equals(expedient.getArxiu())) {
-			logger.error("L'arxiu de l'expedient no coincideix amb l'especificat ("
-					+ "id=" + id + ", "
-					+ "arxiuId1=" + arxiu.getId() + ", "
-					+ "arxiuId2=" + expedient.getArxiu().getId() + ")");
-			throw new ExpedientNotFoundException();
-		}
-		return expedient;
-	}
-
-	private RegistreEntity comprovarRegistre(
-			EntitatEntity entitat,
-			Long id) throws RegistreNotFoundException {
-		RegistreEntity registre = registreRepository.findOne(id);
-		if (registre == null) {
-			logger.error("No s'ha trobat l'anotació de registre (id=" + id + ")");
-			throw new RegistreNotFoundException();
-		}
-		if (!entitat.getId().equals(registre.getEntitat().getId())) {
-			logger.error("L'entitat especificada no coincideix amb l'entitat de l'anotació de registre ("
-					+ "entitatId1=" + entitat.getId() + ", "
-					+ "entitatId2=" + registre.getEntitat().getId() + ")");
-			throw new RegistreNotFoundException();
-		}
-		return registre;
-	}
-
-	private CarpetaEntity findCarpetaNouvinguts(ExpedientEntity expedient) {
-		return (CarpetaEntity)contenidorRepository.findByPareAndNomAndEsborrat(
-				expedient,
-				CarpetaServiceImpl.CARPETA_NOUVINGUTS_NOM,
-				0);
+		return expedientDto;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);

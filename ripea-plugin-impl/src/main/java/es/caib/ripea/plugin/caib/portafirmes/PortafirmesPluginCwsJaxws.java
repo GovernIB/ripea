@@ -75,15 +75,15 @@ import es.indra.portafirmasws.cws.UploadStep;
 public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 
 	@Override
-	public long upload(
+	public String upload(
 			PortafirmesDocument document,
-			Long documentTipus,
+			String documentTipus,
 			String motiu,
 			String remitent,
 			PortafirmesPrioritatEnum importancia,
 			Date dataCaducitat,
 			List<PortafirmesFluxBloc> flux,
-			Long plantillaFluxId,
+			String plantillaFluxId,
 			List<PortafirmesDocument> annexos,
 			boolean signarAnnexos) throws SistemaExternException {
 		try {
@@ -93,22 +93,23 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 			application.setUser(getUsername());
 			application.setPassword(getPassword());
 			uploadRequest.setApplication(application);
-			uploadRequest.setDocument(getUploadRequestDocument(
-					document,
-					documentTipus,
-					annexos,
-					signarAnnexos,
-					flux,
-					motiu,
-					remitent,
-					importancia,
-					dataCaducitat));
+			uploadRequest.setDocument(
+					getUploadRequestDocument(
+							document,
+							documentTipus,
+							annexos,
+							signarAnnexos,
+							flux,
+							motiu,
+							remitent,
+							importancia,
+							dataCaducitat));
 			Cws cws = getCwsService();
 			addAttachments(cws, document, annexos);
 			UploadResponse uploadResponse = cws.uploadDocument(
 					uploadRequest);
 			comprovarResult(uploadResponse.getResult());
-			return new Long(uploadResponse.getDocument().getId()).longValue();
+			return new Integer(uploadResponse.getDocument().getId()).toString();
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut pujar el document al portafirmes",
@@ -117,7 +118,8 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	}
 
 	@Override
-	public PortafirmesDocument download(long id) throws SistemaExternException {
+	public PortafirmesDocument download(
+			String id) throws SistemaExternException {
 		try {
 			DownloadRequest downloadRequest = new DownloadRequest();
 			Application application = new Application();
@@ -170,7 +172,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 
 	@Override
 	public void delete(
-			long id) throws SistemaExternException {
+			String id) throws SistemaExternException {
 		try {
 			DeleteRequest deleteRequest = new DeleteRequest();
 			Application application = new Application();
@@ -207,7 +209,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,
-			Long documentTipus,
+			String documentTipus,
 			List<PortafirmesDocument> annexos,
 			boolean signarAnnexos,
 			List<PortafirmesFluxBloc> flux,
@@ -222,7 +224,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 		documentAttributes.setDescription(
 				limitarString(document.getDescripcio(), 250));
 		documentAttributes.setExtension(document.getArxiuExtensio());
-		documentAttributes.setType(documentTipus.intValue());
+		documentAttributes.setType(new Integer(documentTipus).intValue());
 		documentAttributes.setSubject(motiu);
 		Sender sender = new Sender();
 		sender.setName(

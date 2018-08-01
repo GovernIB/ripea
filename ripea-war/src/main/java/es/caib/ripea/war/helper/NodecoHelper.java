@@ -17,10 +17,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class NodecoHelper {
 
-	private static final String ESQUEMA_PREFIX = "/ripea";
-	private static final String URI_PREFIX_NODECO = ESQUEMA_PREFIX + "/nodeco";
+	private static final String PREFIX_NODECO = "/nodeco";
 	private static final String REQUEST_ATTRIBUTE_NODECO = "NodecoHelper.Nodeco";
-	private static final String SESSION_ATTRIBUTE_URIMAP = "NodecoHelper.UriMap";
+	private static final String SESSION_ATTRIBUTE_REQUESTPATHSMAP = "NodecoHelper.RequestPathsMap";
+
+
 
 	public static boolean isNodeco(HttpServletRequest request) {
 		return request.getAttribute(REQUEST_ATTRIBUTE_NODECO) != null;
@@ -28,43 +29,45 @@ public class NodecoHelper {
 	public static boolean comprovarNodecoInterceptor(
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
-		if (isRequestUriNodeco(request)) {
+		if (isRequestPathNodeco(request)) {
 			String uriSensePrefix = getUriSensePrefix(request);
-			Set<String> uriMap = getUriMap(request);
-			uriMap.add(uriSensePrefix);
+			Set<String> requestPathsMap = getRequestPathsMap(request);
+			requestPathsMap.add(uriSensePrefix);
 			RequestDispatcher dispatcher = request.getRequestDispatcher(uriSensePrefix);
 		    dispatcher.forward(request, response);
 		    return false;
 		} else {
-			Set<String> uriMap = getUriMap(request);
-			String uriComprovacio = request.getRequestURI().substring(ESQUEMA_PREFIX.length());
-			if (uriMap.contains(uriComprovacio)) {
-				uriMap.remove(uriComprovacio);
+			Set<String> requestPathsMap = getRequestPathsMap(request);
+			String pathComprovacio = request.getServletPath();
+			if (requestPathsMap.contains(pathComprovacio)) {
+				requestPathsMap.remove(pathComprovacio);
 				marcarNodeco(request);
 			}
 			return true;
 		}
 	}
 
-	private static boolean isRequestUriNodeco(
+	private static boolean isRequestPathNodeco(
 			HttpServletRequest request) {
-		return request.getRequestURI().startsWith(URI_PREFIX_NODECO);
+		String servletPath = request.getServletPath();
+		return servletPath.startsWith(PREFIX_NODECO);
 	}
 	private static String getUriSensePrefix(
 			HttpServletRequest request) {
-		return request.getRequestURI().substring(URI_PREFIX_NODECO.length());
+		return request.getServletPath().substring(PREFIX_NODECO.length());
 	}
-	private static Set<String> getUriMap(
+	private static Set<String> getRequestPathsMap(
 			HttpServletRequest request) {
 		@SuppressWarnings("unchecked")
-		Set<String> uriMap = (Set<String>)request.getSession().getAttribute(SESSION_ATTRIBUTE_URIMAP);
-		if (uriMap == null) {
-			uriMap = new HashSet<String>();
+		Set<String> requestPathsMap = (Set<String>)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_REQUESTPATHSMAP);
+		if (requestPathsMap == null) {
+			requestPathsMap = new HashSet<String>();
 			request.getSession().setAttribute(
-					SESSION_ATTRIBUTE_URIMAP,
-					uriMap);
+					SESSION_ATTRIBUTE_REQUESTPATHSMAP,
+					requestPathsMap);
 		}
-		return uriMap;
+		return requestPathsMap;
 	}
 	private static void marcarNodeco(HttpServletRequest request) {
 		request.setAttribute(

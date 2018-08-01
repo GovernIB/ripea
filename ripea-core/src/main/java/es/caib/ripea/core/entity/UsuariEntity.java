@@ -23,16 +23,21 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class UsuariEntity implements Serializable {
 
 	@Id
-	@Column(name = "codi", length = 64, nullable = false)
+	@Column(name = "codi", length = 64, nullable = false, unique = true)
 	private String codi;
 	@Column(name = "nom", length = 200)
 	private String nom;
-	@Column(name = "nif", length = 9, nullable = false, unique = true)
+	@Column(name = "nif", length = 9, nullable = false)
 	private String nif;
 	@Column(name = "email", length = 200)
 	private String email;
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
+	@Column(name = "rebre_emails")
+	private boolean rebreEmailsBustia = true;
+	@Column(name = "emails_agrupats")
+	private boolean rebreEmailsAgrupats = true;
+	
 	@Version
 	private long version = 0;
 
@@ -53,7 +58,13 @@ public class UsuariEntity implements Serializable {
 	public boolean isInicialitzat() {
 		return inicialitzat;
 	}
-
+	public boolean isRebreEmailsBustia() {
+		return rebreEmailsBustia;
+	}
+	public boolean isRebreEmailsAgrupats() {
+		return rebreEmailsAgrupats;
+	}
+	
 	public void update(
 			String nom,
 			String nif,
@@ -62,6 +73,13 @@ public class UsuariEntity implements Serializable {
 		this.nif = nif;
 		this.email = email;
 		this.inicialitzat = true;
+	}
+	
+	public void update(
+			boolean rebreEmailsBustia,
+			boolean rebreEmailsAgrupats) {
+		this.rebreEmailsBustia = rebreEmailsBustia;
+		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 	}
 
 	/**

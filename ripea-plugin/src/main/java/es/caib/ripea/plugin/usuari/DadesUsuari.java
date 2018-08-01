@@ -13,10 +13,11 @@ import java.io.Serializable;
 public class DadesUsuari implements Serializable {
 
 	private String codi;
+	private String nomSencer;
 	private String nom;
+	private String llinatges;
 	private String nif;
 	private String email;
-	private String[] rols;
 
 	public String getCodi() {
 		return codi;
@@ -24,11 +25,33 @@ public class DadesUsuari implements Serializable {
 	public void setCodi(String codi) {
 		this.codi = codi;
 	}
+	public String getNomSencer() {
+		if (nomSencer != null) {
+			return nomSencer;
+		} else if (nom != null) {
+			if (llinatges != null) {
+				return nom + " " + llinatges;
+			} else {
+				return nom;
+			}
+		} else {
+			return null;
+		}
+	}
+	public void setNomSencer(String nomSencer) {
+		this.nomSencer = nomSencer;
+	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
+	}
+	public String getLlinatges() {
+		return llinatges;
+	}
+	public void setLlinatges(String llinatges) {
+		this.llinatges = llinatges;
 	}
 	public String getNif() {
 		return nif;
@@ -41,12 +64,6 @@ public class DadesUsuari implements Serializable {
 	}
 	public void setEmail(String email) {
 		this.email = email;
-	}
-	public String[] getRols() {
-		return rols;
-	}
-	public void setRols(String[] rols) {
-		this.rols = rols;
 	}
 
 

@@ -7,53 +7,132 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 
 /**
- * Classe del model de dades que representa un interessat de tipus
- * administració.
+ * Classe del model de dades que representa un interessat de tipus administració pública.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@EntityListeners(RipeaAuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class InteressatAdministracioEntity extends InteressatEntity {
 
-	@Column(name = "identificador", length = 9)
-	protected String identificador;
-
-
-
-	public String getIdentificador() {
-		return identificador;
+//	CAMP					TIPUS INTERESSAT	DESCRIPCIÓ
+//	------------------------------------------------------------------------------------------------------------------------------------
+//	organCodi: 				ADMINISTRACIÓ		codi DIR3 de l’òrgan en cas de que l’interessat sigui del tipus administració pública.
+	
+	@Column(name = "organ_codi", length = 9)
+	protected String organCodi;
+	@Column(name = "organ_nom", length = 80)
+	protected String organNom;
+	
+	public String getOrganCodi() {
+		return organCodi;
 	}
-
+	public void setOrganCodi(String organCodi) {
+		this.organCodi = organCodi;
+	}
+	public String getOrganNom() {
+		return organNom;
+	}
+	public void setOrganNom(String organNom) {
+		this.organNom = organNom;
+	}
+	
+	@Override
+	public String getIdentificador() {
+		return this.organNom;
+	}
+	
 	public void update(
-			String nom,
-			String identificador) {
-		this.nom = nom;
-		this.identificador = identificador;
+			String organCodi,
+			String organNom,
+			InteressatDocumentTipusEnumDto documentTipus,
+			String documentNum,
+			String pais,
+			String provincia,
+			String municipi,
+			String adresa,
+			String codiPostal,
+			String email,
+			String telefon,
+			String observacions,
+			InteressatIdiomaEnumDto preferenciaIdioma,
+			Boolean notificacioAutoritzat) {
+		this.organCodi = organCodi;
+		this.organNom = organNom;
+		this.documentTipus = documentTipus;
+		this.documentNum = documentNum;
+		this.pais = pais;
+		this.provincia =  provincia;
+		this.municipi =  municipi;
+		this.adresa =  adresa;
+		this.codiPostal =  codiPostal;
+		this.email =  email;
+		this.telefon =  telefon;
+		this.observacions =  observacions;
+		this.preferenciaIdioma =  preferenciaIdioma;
+		this.notificacioAutoritzat =  notificacioAutoritzat;
 	}
 
 	/**
-	 * Obté el Builder per a crear objectes de tipus interessat-ciutada.
+	 * Obté el Builder per a crear objectes de tipus interessat-administració pública.
 	 * 
-	 * @param nom
-	 *             El valor de l'atribut nom.
-	 * @param identificador
-	 *            El valor de l'atribut identificador.
-	 * @param entitat
-	 *            L'entitat a la qual pertany aquest interessat.
-	 * @return Una nova instància del Builder.
+	 * @param organCodi El codi DIR3 de l'òrgan de l'administració pública.
+	 * @param documentTipus	El tipus de document de l'òrgan de l'administració pública.
+	 * @param documentNum	El número de document de l'òrgan de l'administració pública.
+	 * @param pais	El país de residència de l'òrgan de l'administració pública.
+	 * @param provincia	La província de residència de l'òrgan de l'administració pública.
+	 * @param municipi	El municipi de residència de l'òrgan de l'administració pública.
+	 * @param adresa	L'adreça de residència de l'òrgan de l'administració pública.
+	 * @param codiPostal	El codi postal de la residència de l'òrgan de l'administració pública.
+	 * @param email	El correu electrònic de l'òrgan de l'administració pública.
+	 * @param telefon	El telèfon de l'òrgan de l'administració pública.
+	 * @param observacions	Camp per introduir observacions sobre l'òrgan de l'administració pública.
+	 * @param notificacioIdioma	Idioma en que l'òrgan de l'administració pública desitja rebre les notificacions.
+	 * @param notificacioAutoritzat	Camp per indicar si l'òrgan de l'administració pública ha autoritzat la recepció de notificacions en format electrònic.
+	 * @param expedient	Expedient on està vinculat l'òrgan de l'administració pública.
+	 * @param representant	Representant de l'òrgan de l'administració pública.
+	 * @return
 	 */
 	public static Builder getBuilder(
-			String nom,
-			String identificador,
-			EntitatEntity entitat) {
+			String organCodi,
+			String organNom,
+			InteressatDocumentTipusEnumDto documentTipus,
+			String documentNum,
+			String pais,
+			String provincia,
+			String municipi,
+			String adresa,
+			String codiPostal,
+			String email,
+			String telefon,
+			String observacions,
+			InteressatIdiomaEnumDto preferenciaIdioma,
+			Boolean notificacioAutoritzat,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
 		return new Builder(
-				nom,
-				identificador,
-				entitat);
+				organCodi,
+				organNom,
+				documentTipus,
+				documentNum,
+				pais,
+				provincia,
+				municipi,
+				adresa,
+				codiPostal,
+				email,
+				telefon,
+				observacions,
+				preferenciaIdioma,
+				notificacioAutoritzat,
+				expedient,
+				representant);
 	}
 
 	/**
@@ -64,13 +143,40 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	public static class Builder {
 		InteressatAdministracioEntity built;
 		Builder(
-				String nom,
-				String identificador,
-				EntitatEntity entitat) {
+				String organCodi,
+				String organNom,
+				InteressatDocumentTipusEnumDto documentTipus,
+				String documentNum,
+				String pais,
+				String provincia,
+				String municipi,
+				String adresa,
+				String codiPostal,
+				String email,
+				String telefon,
+				String observacions,
+				InteressatIdiomaEnumDto preferenciaIdioma,
+				Boolean notificacioAutoritzat,
+				ExpedientEntity expedient,
+				InteressatEntity representant) {
 			built = new InteressatAdministracioEntity();
-			built.nom = nom;
-			built.identificador = identificador;
-			built.entitat = entitat;
+			built.organCodi = organCodi;
+			built.organNom = organNom;
+			built.documentTipus = documentTipus;
+			built.documentNum = documentNum;
+			built.pais = pais;
+			built.provincia =  provincia;
+			built.municipi =  municipi;
+			built.adresa =  adresa;
+			built.codiPostal =  codiPostal;
+			built.email =  email;
+			built.telefon =  telefon;
+			built.observacions =  observacions;
+			built.preferenciaIdioma =  preferenciaIdioma;
+			built.notificacioAutoritzat =  notificacioAutoritzat;
+			built.expedient =  expedient;
+			built.representant =  representant;
+			built.esRepresentant = false;
 		}
 		public InteressatAdministracioEntity build() {
 			return built;
@@ -81,13 +187,12 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
-		result = prime * result
-				+ ((identificador == null) ? 0 : identificador.hashCode());
-		result = prime * result + ((nom == null) ? 0 : nom.hashCode());
+		result = prime * result + ((documentNum == null) ? 0 : documentNum.hashCode());
+		result = prime * result + ((documentTipus == null) ? 0 : documentTipus.hashCode());
+		result = prime * result + ((expedient == null) ? 0 : expedient.hashCode());
+		result = prime * result + ((organCodi == null) ? 0 : organCodi.hashCode());
 		return result;
 	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -97,20 +202,22 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		InteressatAdministracioEntity other = (InteressatAdministracioEntity) obj;
-		if (entitat == null) {
-			if (other.entitat != null)
+		if (documentNum == null) {
+			if (other.documentNum != null)
 				return false;
-		} else if (!entitat.equals(other.entitat))
+		} else if (!documentNum.equals(other.documentNum))
 			return false;
-		if (identificador == null) {
-			if (other.identificador != null)
-				return false;
-		} else if (!identificador.equals(other.identificador))
+		if (documentTipus != other.documentTipus)
 			return false;
-		if (nom == null) {
-			if (other.nom != null)
+		if (expedient == null) {
+			if (other.expedient != null)
 				return false;
-		} else if (!nom.equals(other.nom))
+		} else if (!expedient.equals(other.expedient))
+			return false;
+		if (organCodi == null) {
+			if (other.organCodi != null)
+				return false;
+		} else if (!organCodi.equals(other.organCodi))
 			return false;
 		return true;
 	}

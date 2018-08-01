@@ -16,7 +16,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
 import es.caib.ripea.core.api.service.EntitatService;
 
 /**
@@ -43,7 +42,7 @@ public class EntitatServiceBean implements EntitatService {
 	@Override
 	@RolesAllowed("IPA_SUPER")
 	public EntitatDto update(
-			EntitatDto entitat) throws EntitatNotFoundException {
+			EntitatDto entitat) {
 		return delegate.update(entitat);
 	}
 
@@ -51,14 +50,14 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed("IPA_SUPER")
 	public EntitatDto updateActiva(
 			Long id,
-			boolean activa) throws EntitatNotFoundException {
+			boolean activa) {
 		return delegate.updateActiva(id, activa);
 	}
 
 	@Override
 	@RolesAllowed("IPA_SUPER")
 	public EntitatDto delete(
-			Long id) throws EntitatNotFoundException {
+			Long id) {
 		return delegate.delete(id);
 	}
 
@@ -76,8 +75,8 @@ public class EntitatServiceBean implements EntitatService {
 
 	@Override
 	@RolesAllowed("IPA_SUPER")
-	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		return delegate.findAllPaginat(paginacioParams);
+	public PaginaDto<EntitatDto> findPaginat(PaginacioParamsDto paginacioParams) {
+		return delegate.findPaginat(paginacioParams);
 	}
 
 	@Override
@@ -88,8 +87,7 @@ public class EntitatServiceBean implements EntitatService {
 
 	@Override
 	@RolesAllowed("IPA_SUPER")
-	public List<PermisDto> findPermisSuper(Long id)
-			throws EntitatNotFoundException {
+	public List<PermisDto> findPermisSuper(Long id) {
 		return delegate.findPermisSuper(id);
 	}
 
@@ -97,7 +95,7 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed("IPA_SUPER")
 	public void updatePermisSuper(
 			Long id,
-			PermisDto permis) throws EntitatNotFoundException {
+			PermisDto permis) {
 		delegate.updatePermisSuper(
 				id,
 				permis);
@@ -106,8 +104,7 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed("IPA_SUPER")
 	public void deletePermisSuper(
 			Long id,
-			Long permisId)
-			throws EntitatNotFoundException {
+			Long permisId) {
 		delegate.deletePermisSuper(
 				id,
 				permisId);
@@ -115,8 +112,7 @@ public class EntitatServiceBean implements EntitatService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<PermisDto> findPermisAdmin(Long id)
-			throws EntitatNotFoundException {
+	public List<PermisDto> findPermisAdmin(Long id) {
 		return delegate.findPermisAdmin(id);
 	}
 
@@ -124,8 +120,7 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed("IPA_ADMIN")
 	public void updatePermisAdmin(
 			Long id,
-			PermisDto permis)
-			throws EntitatNotFoundException {
+			PermisDto permis) {
 		delegate.updatePermisAdmin(
 				id,
 				permis);
@@ -134,8 +129,7 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed("IPA_ADMIN")
 	public void deletePermisAdmin(
 			Long id,
-			Long permisId)
-			throws EntitatNotFoundException {
+			Long permisId) {
 		delegate.deletePermisAdmin(
 				id,
 				permisId);

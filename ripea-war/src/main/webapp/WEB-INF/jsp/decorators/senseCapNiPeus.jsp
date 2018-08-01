@@ -12,23 +12,22 @@
 	<meta name="description" content=""/>
 	<meta name="author" content=""/>
 	<!-- Estils CSS -->
-	<link href="<c:url value="/css/bootstrap.min.css"/>" rel="stylesheet">
-	<link href="<c:url value="/css/font-awesome.min.css"/>" rel="stylesheet">
-    <link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
+	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
 	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
-	<script src="<c:url value="/js/jquery-1.10.2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 	<!-- Llibreria per a compatibilitat amb HTML5 -->
 	<!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <script src="<c:url value="/js/bootstrap.min.js"/>"></script>
+    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	<decorator:head />
 </head>
 <body>
-	<div class="container">
-		<div id="contingut-alertes"><rip:alertes/></div>
+	<div class="container-nocappeus">
+		<div id="contingut-missatges"><rip:missatges/></div>
 		<decorator:body />
 	</div>
-    <script src="<c:url value="/js/bootstrap.min.js"/>"></script>
 </body>
 </html>

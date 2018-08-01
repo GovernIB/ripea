@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientMetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
@@ -14,10 +15,7 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
-import es.caib.ripea.core.api.exception.MetaDadaNotFoundException;
-import es.caib.ripea.core.api.exception.MetaDocumentNotFoundException;
-import es.caib.ripea.core.api.exception.MetaExpedientNotFoundException;
+import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
  * Declaració dels mètodes per a la gestió de meta-expedients.
@@ -34,13 +32,13 @@ public interface MetaExpedientService {
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a crear.
 	 * @return El meta-expedient creat.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto create(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) throws EntitatNotFoundException;
+			MetaExpedientDto metaExpedient) throws NotFoundException;
 
 	/**
 	 * Actualitza la informació del meta-expedient que tengui el mateix
@@ -51,15 +49,13 @@ public interface MetaExpedientService {
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a modificar.
 	 * @return El meta-expedient modificat.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) throws EntitatNotFoundException, MetaExpedientNotFoundException;
+			MetaExpedientDto metaExpedient) throws NotFoundException;
 
 	/**
 	 * Marca el meta-expedient especificat com a actiu/inactiu .
@@ -71,16 +67,14 @@ public interface MetaExpedientService {
 	 * @param actiu
 	 *            true si el meta-expedient es vol activar o false en cas contrari.
 	 * @return El meta-expedient modificada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_SUPER')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu) throws EntitatNotFoundException, MetaExpedientNotFoundException;
+			boolean actiu) throws NotFoundException;
 
 	/**
 	 * Esborra el meta-expedient amb el mateix id que l'especificat.
@@ -90,15 +84,13 @@ public interface MetaExpedientService {
 	 * @param id
 	 *            Atribut id del meta-expedient a esborrar.
 	 * @return El meta-expedient esborrat.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, MetaExpedientNotFoundException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un meta-expedient donat el seu id.
@@ -108,13 +100,13 @@ public interface MetaExpedientService {
 	 * @param id
 	 *            Atribut id del meta-expedient a trobar.
 	 * @return El meta-expedient amb l'id especificat o null si no s'ha trobat.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto findById(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un meta-expedient donat el seu codi.
@@ -124,13 +116,13 @@ public interface MetaExpedientService {
 	 * @param codi
 	 *            Atribut codi del meta-expedient a trobar.
 	 * @return El meta-expedient amb el codi especificat o null si no s'ha trobat.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
-			String codi) throws EntitatNotFoundException;
+			String codi) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-expedients d'una entitat.
@@ -138,12 +130,12 @@ public interface MetaExpedientService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @return La llista de meta-expedients de l'entitat especificada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<MetaExpedientDto> findByEntitat(
-			Long entitatId) throws EntitatNotFoundException;
+			Long entitatId) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-expedients d'una entitat de forma paginada.
@@ -153,13 +145,13 @@ public interface MetaExpedientService {
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de meta-expedients.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public PaginaDto<MetaExpedientDto> findByEntitatPaginat(
 			Long entitatId,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException;
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
 	 * Afegeix una meta-dada al meta-expedient.
@@ -174,20 +166,16 @@ public interface MetaExpedientService {
 	 *            Multiplicitat de la meta-dada a l'expedient.
 	 * @param readOnly
 	 *            Valor de l'atribut readOnly de la meta-dada a l'expedient.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDadaNotFoundException
-	 *             Si no s'ha trobat cap meta-dada amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDadaCreate(
 			Long entitatId,
 			Long id,
 			Long metaDadaId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException;
+			boolean readOnly) throws NotFoundException;
 
 	/**
 	 * Actualitza una meta-dada del meta-expedient.
@@ -202,20 +190,16 @@ public interface MetaExpedientService {
 	 *            Multiplicitat de la meta-dada a l'expedient.
 	 * @param readOnly
 	 *            Valor de l'atribut readOnly de la meta-dada a l'expedient.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDadaNotFoundException
-	 *             Si no s'ha trobat la meta-dada amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDadaUpdate(
 			Long entitatId,
 			Long id,
 			Long metaNodeMetaDadaId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException;
+			boolean readOnly) throws NotFoundException;
 
 	/**
 	 * Esborra una meta-dada del meta-expedient.
@@ -226,18 +210,50 @@ public interface MetaExpedientService {
 	 *            Atribut id del meta-expedient.
 	 * @param metaExpedientMetaDadaId
 	 *            Id de la meta-dada a esborrar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDadaNotFoundException
-	 *             Si no s'ha trobat la meta-dada amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDadaDelete(
 			Long entitatId,
 			Long id,
-			Long metaExpedientMetaDadaId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException;
+			Long metaExpedientMetaDadaId) throws NotFoundException;
+
+	/**
+	 * Mou una meta-dada del meta-expedient una posició cap amunt.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param id
+	 *            Atribut id del meta-expedient.
+	 * @param metaExpedientMetaDadaId
+	 *            Id de la meta-dada a moure.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void metaDadaMoveUp(
+			Long entitatId,
+			Long id,
+			Long metaExpedientMetaDadaId) throws NotFoundException;
+
+	/**
+	 * Mou una meta-dada del meta-expedient una posició cap avall.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param id
+	 *            Atribut id del meta-expedient.
+	 * @param metaExpedientMetaDadaId
+	 *            Id de la meta-dada a moure.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void metaDadaMoveDown(
+			Long entitatId,
+			Long id,
+			Long metaExpedientMetaDadaId) throws NotFoundException;
 
 	/**
 	 * Mou una meta-dada del meta-expedient a una altra posició i reorganitza.
@@ -250,19 +266,15 @@ public interface MetaExpedientService {
 	 *            Id de la meta-dada a moure.
 	 * @param posicio
 	 *            Posició a on moure la meta-dada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDadaNotFoundException
-	 *             Si no s'ha trobat la meta-dada amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public void metaDadaMove(
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void metaDadaMoveTo(
 			Long entitatId,
 			Long id,
 			Long metaExpedientMetaDadaId,
-			int posicio) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException;
+			int posicio) throws NotFoundException;
 
 	/**
 	 * Cerca la meta-dada del meta-expedient donat l'id del registre
@@ -275,18 +287,27 @@ public interface MetaExpedientService {
 	 * @param metaNodeMetaDadaId
 	 *            Id de la meta-dada a trobar.
 	 * @return La meta-dada del meta-expedient.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDadaNotFoundException
-	 *             Si no s'ha trobat la meta-dada amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public MetaNodeMetaDadaDto findMetaDada(
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaNodeMetaDadaDto metaDadaFind(
 			Long entitatId,
 			Long id,
-			Long metaNodeMetaDadaId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDadaNotFoundException;
+			Long metaNodeMetaDadaId) throws NotFoundException;
+
+	/**
+	 * Cerca les meta-dades globals pels meta-expedients.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @return Les meta-dades globals.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<MetaDadaDto> metaDadaFindGlobals(
+			Long entitatId) throws NotFoundException;
 
 	/**
 	 * Afegeix un meta-document al meta-expedient.
@@ -301,20 +322,16 @@ public interface MetaExpedientService {
 	 *            Multiplicitat del meta-document a afegir.
 	 * @param readOnly
 	 *            Valor de l'atribut readOnly de la meta-dada a l'expedient.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDocumentNotFoundException
-	 *             Si no s'ha trobat cap meta-document amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDocumentCreate(
 			Long entitatId,
 			Long id,
 			Long metaDocumentId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException;
+			boolean readOnly) throws NotFoundException;
 
 	/**
 	 * Actualitza un meta-document al meta-expedient.
@@ -329,20 +346,16 @@ public interface MetaExpedientService {
 	 *            Multiplicitat del meta-document a modificar.
 	 * @param readOnly
 	 *            Valor de l'atribut readOnly de la meta-dada a l'expedient.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDocumentNotFoundException
-	 *             Si no s'ha trobat cap meta-document amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDocumentUpdate(
 			Long entitatId,
 			Long id,
 			Long metaExpedientMetaDocumentId,
 			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException;
+			boolean readOnly) throws NotFoundException;
 
 	/**
 	 * Esborra un meta-document del meta-expedient.
@@ -353,18 +366,14 @@ public interface MetaExpedientService {
 	 *            Atribut id del meta-expedient.
 	 * @param metaDocumentId
 	 *            Id del meta-document a esborrar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDocumentNotFoundException
-	 *             Si no s'ha trobat la meta-document amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDocumentDelete(
 			Long entitatId,
 			Long id,
-			Long metaDocumentId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException;
+			Long metaDocumentId) throws NotFoundException;
 
 	/**
 	 * Cerca el meta-documents del meta-expedient donat l'id del registre
@@ -377,18 +386,14 @@ public interface MetaExpedientService {
 	 * @param metaExpedientMetaDocumentId
 	 *            Id del meta-document a trobar.
 	 * @return La meta-dada del meta-expedient.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDocumentNotFoundException
-	 *             Si no s'ha trobat el meta-document amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientMetaDocumentDto findMetaDocument(
 			Long entitatId,
 			Long id,
-			Long metaExpedientMetaDocumentId) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException;
+			Long metaExpedientMetaDocumentId) throws NotFoundException;
 
 	/**
 	 * Mou un meta-document del meta-expedient a una altra posició i reorganitza.
@@ -401,19 +406,15 @@ public interface MetaExpedientService {
 	 *            Id del meta-document a moure.
 	 * @param posicio
 	 *            Posició a on moure la meta-dada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
-	 * @throws MetaDocumentNotFoundException
-	 *             Si no s'ha trobat la meta-document amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void metaDocumentMove(
 			Long entitatId,
 			Long id,
 			Long metaExpedientMetaDocumentId,
-			int posicio) throws EntitatNotFoundException, MetaExpedientNotFoundException, MetaDocumentNotFoundException;
+			int posicio) throws NotFoundException;
 
 	/**
 	 * Consulta els permisos del meta-expedient.
@@ -423,15 +424,13 @@ public interface MetaExpedientService {
 	 * @param id
 	 *            Atribut id del meta-expedient.
 	 * @return El llistat de permisos.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<PermisDto> findPermis(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException, MetaExpedientNotFoundException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a un meta-expedient.
@@ -442,16 +441,14 @@ public interface MetaExpedientService {
 	 *            Atribut id del meta-expedient.
 	 * @param permis
 	 *            El permís que es vol modificar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void updatePermis(
 			Long entitatId,
 			Long id,
-			PermisDto permis) throws EntitatNotFoundException, MetaExpedientNotFoundException;
+			PermisDto permis) throws NotFoundException;
 
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a un meta-expedient.
@@ -462,16 +459,27 @@ public interface MetaExpedientService {
 	 *            Atribut id del meta-expedient.
 	 * @param permisId
 	 *            Atribut id del permís que es vol esborrar.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
-	 * @throws MetaExpedientNotFoundException
-	 *             Si no s'ha trobat cap meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void deletePermis(
 			Long entitatId,
 			Long id,
-			Long permisId) throws EntitatNotFoundException, MetaExpedientNotFoundException;
+			Long permisId) throws NotFoundException;
+
+	/**
+	 * Consulta els meta-expedients actius per una entitat pels usuaris admins.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @return La llista de meta-expedients actius per l'entitat especificada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerAdmin(
+			Long entitatId) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-expedients actius per una entitat amb el permis CREATE per
@@ -480,25 +488,39 @@ public interface MetaExpedientService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_USER')")
-	public List<MetaExpedientDto> findActiveByEntitatPerCreacio(
-			Long entitatId) throws EntitatNotFoundException;
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
+			Long entitatId) throws NotFoundException;
 
 	/**
-	 * Consulta els meta-expedients d' una entitat amb el permis READ per
+	 * Consulta els meta-expedients actius per una entitat amb el permis WRITE
+	 * per a l'usuari actual.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @return La llista de meta-expedients actius per l'entitat especificada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(
+			Long entitatId) throws NotFoundException;
+
+	/**
+	 * Consulta els meta-expedients d'una entitat amb el permis READ per
 	 * a l'usuari actual.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
-	 * @throws EntitatNotFoundException
-	 *             Si no s'ha trobat cap entitat amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('ROLE_USER')")
-	public List<MetaExpedientDto> findByEntitatPerLectura(
-			Long entitatId) throws EntitatNotFoundException;
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
+			Long entitatId) throws NotFoundException;
 
 }

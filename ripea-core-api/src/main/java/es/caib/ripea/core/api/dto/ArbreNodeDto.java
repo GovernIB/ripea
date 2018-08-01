@@ -17,7 +17,8 @@ public class ArbreNodeDto<T> implements Serializable {
 	public ArbreNodeDto<T> pare;
 	public T dades;
 	public List<ArbreNodeDto<T>> fills;
-	public Long count;
+	public long count = 0;
+	public boolean mostrarCount = false;
 
 	public ArbreNodeDto(
 			ArbreNodeDto<T> pare) {
@@ -135,11 +136,17 @@ public class ArbreNodeDto<T> implements Serializable {
 		this.dades = dades;
 	}
 
-	public Long getCount() {
+	public long getCount() {
 		return count;
 	}
-	public void setCount(Long count) {
+	public void setCount(long count) {
 		this.count = count;
+		mostrarCount = true;
+	}
+
+	public void addCount(long count) {
+		this.count += count;
+		mostrarCount = true;
 	}
 
 	public int getNivell() {
@@ -153,7 +160,7 @@ public class ArbreNodeDto<T> implements Serializable {
 	}
 
 	public boolean isMostrarCount() {
-		return count != null;
+		return mostrarCount;
 	}
 
 	public ArbreNodeDto<T> clone(

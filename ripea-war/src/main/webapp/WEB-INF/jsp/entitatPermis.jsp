@@ -3,66 +3,43 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%
-pageContext.setAttribute(
-		"principalTipus",
-		es.caib.ripea.core.api.dto.PrincipalTipusEnumDto.values());
-%>
 <html>
 <head>
 	<title><spring:message code="entitat.permis.titol"/></title>
 	<meta name="subtitle" content="${entitat.nom}"/>
-	<link href="<c:url value="/css/DT_bootstrap.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jquery.dataTables.js"/>"></script>
-	<script src="<c:url value="/js/DT_bootstrap.js"/>"></script>
-	<script src="<c:url value="/js/jsrender.min.js"/>"></script>
-	<script src="<c:url value="/js/ripea.datatable.js"/>"></script>
-	<script src="<c:url value="/js/ripea.modal.js"/>"></script>
-<script>
-var principalTipusEnumText = new Array();
-<c:forEach var="principalTipus" items="${principalTipus}">
-principalTipusEnumText["${principalTipus}"] = "<spring:message code="principal.tipus.enum.${principalTipus}"/>";
-</c:forEach>
-$(document).ready(function() {
-	$("#taulaDades").ripeaDataTable({
-		ajaxSourceUrl: "<c:url value="/entitat/${entitat.id}/permis/datatable"/>",
-		paginacio: false,
-		localeUrl: "<c:url value="/js/dataTables-locales/dataTables_locale_ca.txt"/>",
-		alertesRefreshUrl: "<c:url value="/nodeco/util/alertes"/>"
-	});
-});
-</script>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<table id="taulaDades" class="table table-striped table-bordered" data-rdt-button-template="tableButtonsTemplate">
+	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/entitat/${entitat.id}/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%">
 		<thead>
 			<tr>
-				<th data-rdt-property="principalTipus" data-rdt-template="cellPrincipalTipusTemplate">
-					<spring:message code="entitat.permis.columna.tipus"/>
-					<script id="cellPrincipalTipusTemplate" type="text/x-jsrender">
-						{{:~eval("principalTipusEnumText['" + principalTipus + "']")}}
-					</script>
-				</th>
-				<th data-rdt-property="principalNom" data-rdt-sorting="desc"><spring:message code="entitat.permis.columna.principal"/></th>
-				<th data-rdt-property="administration" data-rdt-template="cellAdministrationTemplate">
+				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="entitat.permis.columna.tipus"/></th>
+				<th data-col-name="principalNom"><spring:message code="entitat.permis.columna.principal"/></th>
+				<th data-col-name="administration" data-template="#cellAdministrationTemplate">
 					<spring:message code="entitat.permis.columna.administracio"/>
 					<script id="cellAdministrationTemplate" type="text/x-jsrender">
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-rdt-property="read" data-rdt-template="cellReadTemplate">
+				<th data-col-name="read" data-template="#cellReadTemplate">
 					<spring:message code="entitat.permis.columna.usuari"/>
 					<script id="cellReadTemplate" type="text/x-jsrender">
 						{{if read}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-rdt-property="id" data-rdt-template="cellAccionsTemplate" data-rdt-sortable="false" width="10%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="../../entitat/${entitat.id}/permis/{{:id}}" data-rdt-link-modal="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="../../entitat/${entitat.id}/permis/{{:id}}/delete" data-rdt-link-ajax="true" data-rdt-link-confirm="<spring:message code="entitat.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="../../entitat/${entitat.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="../../entitat/${entitat.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="entitat.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
 					</script>
@@ -70,8 +47,8 @@ $(document).ready(function() {
 			</tr>
 		</thead>
 	</table>
-	<script id="tableButtonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="../../entitat/${entitat.id}/permis/new" data-rdt-link-modal="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.permis.boto.nou.permis"/></a></p>
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<p style="text-align:right"><a class="btn btn-default" href="../../entitat/${entitat.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.permis.boto.nou.permis"/></a></p>
 	</script>
 	<a href="<c:url value="/entitat"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span> <spring:message code="comu.boto.tornar"/></a>
 </body>

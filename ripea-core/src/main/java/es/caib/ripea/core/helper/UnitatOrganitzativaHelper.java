@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,22 +27,56 @@ public class UnitatOrganitzativaHelper {
 
 	@Resource
 	private CacheHelper cacheHelper;
+	@Resource
+	private EntityComprovarHelper entityComprovarHelper;
+	@Resource
+	private PaginacioHelper paginacioHelper;
+	@Resource
+	private PluginHelper pluginHelper;
+	@Resource
+	private ConversioTipusHelper conversioTipusHelper;
 
 
 
 	public UnitatOrganitzativaDto findPerEntitatAndCodi(
 			String entitatCodi,
-			String unitatCodi) {
+			String unitatOrganitzativaCodi) {
 		ArbreDto<UnitatOrganitzativaDto> arbre = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatCodi);
 		for (UnitatOrganitzativaDto unitat: arbre.toDadesList()) {
-			if (unitat.getCodi().equals(unitatCodi)) {
+			if (unitat.getCodi().equals(unitatOrganitzativaCodi)) {
 				return unitat;
 			}
 		}
 		return null;
 	}
 
-	public ArbreDto<UnitatOrganitzativaDto> findUnitatsOrganitzativesPerEntitatAmbPermesos(
+	public UnitatOrganitzativaDto findAmbCodi(
+			String unitatOrganitzativaCodi) {
+		return pluginHelper.unitatsOrganitzativesFindByCodi(
+				unitatOrganitzativaCodi);
+	}
+
+	public List<UnitatOrganitzativaDto> findPath(
+			String entitatCodi,
+			String unitatOrganitzativaCodi) {
+		ArbreDto<UnitatOrganitzativaDto> arbre = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatCodi);
+		List<UnitatOrganitzativaDto> superiors = new ArrayList<UnitatOrganitzativaDto>();
+		String codiActual = unitatOrganitzativaCodi;
+		do {
+			UnitatOrganitzativaDto unitatActual = cercaDinsArbreAmbCodi(
+					arbre,
+					codiActual);
+			if (unitatActual != null) {
+				superiors.add(unitatActual);
+				codiActual = unitatActual.getCodiUnitatSuperior();
+			} else {
+				codiActual = null;
+			}
+		} while (codiActual != null);
+		return superiors;
+	}
+
+	public ArbreDto<UnitatOrganitzativaDto> findPerEntitatAmbCodisPermesos(
 			String entitatCodi,
 			Set<String> unitatCodiPermesos) {
 		ArbreDto<UnitatOrganitzativaDto> arbre = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatCodi).clone();
@@ -74,14 +109,14 @@ public class UnitatOrganitzativaHelper {
 		return arbre;
 	}
 
-	public UnitatOrganitzativaDto findConselleriaPerUnitatOrganitzativa(
+	public UnitatOrganitzativaDto findConselleria(
 			String entitatCodi,
-			String unitatCodi) {
+			String unitatOrganitzativaCodi) {
 		ArbreDto<UnitatOrganitzativaDto> arbre = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatCodi).clone();
 		UnitatOrganitzativaDto unitatConselleria = null;
 		for (ArbreNodeDto<UnitatOrganitzativaDto> node: arbre.toList()) {
 			UnitatOrganitzativaDto uo = node.getDades();
-			if (uo.getCodi().equals(unitatCodi)) {
+			if (uo.getCodi().equals(unitatOrganitzativaCodi)) {
 				ArbreNodeDto<UnitatOrganitzativaDto> nodeActual = node;
 				while (nodeActual.getNivell() > 1) {
 					nodeActual = nodeActual.getPare();
@@ -92,6 +127,21 @@ public class UnitatOrganitzativaHelper {
 			}
 		}
 		return unitatConselleria;
+	}
+
+
+
+	private UnitatOrganitzativaDto cercaDinsArbreAmbCodi(
+			ArbreDto<UnitatOrganitzativaDto> arbre,
+			String unitatOrganitzativaCodi) {
+		UnitatOrganitzativaDto trobada = null;
+		for (UnitatOrganitzativaDto unitat: arbre.toDadesList()) {
+			if (unitat.getCodi().equals(unitatOrganitzativaCodi)) {
+				trobada = unitat;
+				break;
+			}
+		}
+		return trobada;
 	}
 
 }

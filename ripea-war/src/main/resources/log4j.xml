@@ -22,10 +22,27 @@
 	</logger>
 	<logger name="es.caib.ripea.war.webdav.RipeaFolderResource">
 		<level value="DEBUG"/> 
+	</logger>
+	<logger name="es.caib.ripea.war.passarelafirma.PassarelaFirmaController">
+		<level value="DEBUG"/> 
 	</logger-->
 
 	<logger name="org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog">
-		<level value="error" />
+		<level value="ERROR" />
+	</logger>
+
+	<!--logger name="org.springframework.web.servlet">
+		<level value="DEBUG"/> 
+	</logger>
+	<logger name="org.springframework.web">
+		<level value="DEBUG" />
+	</logger>
+	<logger name="org.springframework.security.access">
+		<level value="DEBUG" />
+	</logger-->
+
+	<logger name="es.caib.plugins.arxiu.caib">
+		<level value="DEBUG" />
 	</logger>
 
 	<root>

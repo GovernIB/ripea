@@ -13,8 +13,8 @@
 </head>
 <body>
 	<form:form action="" class="form-horizontal" commandName="contenidorMoureCopiarEnviarCommand">
-		<form:hidden path="contenidorOrigenId"/>
-		<rip:inputFileChooser name="contenidorDestiId" contenidorOrigen="${contenidorOrigen}" textKey="bustia.pendent.registre.addexp.camp.desti" ocultarDocuments="true" ocultarCarpetes="true" required="true"/>
+		<form:hidden path="origenId"/>
+		<rip:inputFileChooser name="destiId" contingutOrigen="${contenidorOrigen}" textKey="bustia.pendent.registre.addexp.camp.desti" ocultarDocuments="true" ocultarCarpetes="true" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-sign-in"></span> <spring:message code="comu.boto.afegir"/></button>
 			<a href="<c:url value="/contenidor/${contenidorOrigen.pare.id}"/>" class="btn btn-default modal-tancar"><spring:message code="comu.boto.cancelar"/></a>

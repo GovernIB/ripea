@@ -4,11 +4,7 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -22,13 +18,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.ComunitatDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.MunicipiDto;
+import es.caib.ripea.core.api.dto.NivellAdministracioDto;
+import es.caib.ripea.core.api.dto.PaisDto;
+import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.entity.BustiaEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -37,11 +38,8 @@ import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
-import es.caib.ripea.core.entity.MultiplicitatEnum;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.BustiaRepository;
-import es.caib.ripea.core.repository.ContenidorRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -50,6 +48,7 @@ import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
@@ -76,15 +75,11 @@ public class CacheHelper {
 	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
 	@Resource
 	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
-	@Resource
-	private BustiaRepository bustiaRepository;
-	@Resource
-	private ContenidorRepository contenidorRepository;
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
-	private ContenidorHelper contenidorHelper;
+	private ContingutHelper contenidorHelper;
 	@Resource
 	private PermisosHelper permisosHelper;
 	@Resource
@@ -94,13 +89,11 @@ public class CacheHelper {
 	@Resource
 	private UsuariHelper usuariHelper;
 
-	private Map<String, Set<String>> usuarisElementsPendentsPerEntitat;
 
 
-
-	@Cacheable("entitatsUsuari")
-	public List<EntitatDto> findEntitatsAccessiblesUsuari(String usuari) {
-		logger.debug("Consulta entitats accessibles (usuari=" + usuari + ")");
+	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
+	public List<EntitatDto> findEntitatsAccessiblesUsuari(String usuariCodi) {
+		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
 		permisosHelper.filterGrantedAny(
@@ -123,8 +116,8 @@ public class CacheHelper {
 				false);
 		return resposta;
 	}
-	@CacheEvict(value = "entitatsUsuari")
-	public void evictEntitatsAccessiblesUsuari(String usuari) {
+	@CacheEvict(value = "entitatsUsuari", key="#usuariCodi")
+	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
 	}
 
 	@Cacheable(value = "errorsValidacioNode", key = "#node.id")
@@ -136,14 +129,14 @@ public class CacheHelper {
 		// Valida dades globals
 		List<MetaDadaEntity> metaDadesGlobals = null;
 		if (node instanceof ExpedientEntity)
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByNomAsc(
+			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(
 					node.getEntitat());
 		else
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByNomAsc(
+			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(
 					node.getEntitat());
 		if (metaDadesGlobals != null) {
 			for (MetaDadaEntity metaDada: metaDadesGlobals) {
-				if (metaDada.getGlobalMultiplicitat().equals(MultiplicitatEnum.M_1) || metaDada.getGlobalMultiplicitat().equals(MultiplicitatEnum.M_1_N)) {
+				if (metaDada.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDada.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 					boolean trobada = false;
 					for (DadaEntity dada: dades) {
 						if (dada.getMetaDada().equals(metaDada)) {
@@ -162,7 +155,7 @@ public class CacheHelper {
 		// Valida dades específiques del meta-node
 		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode());
 		for (MetaNodeMetaDadaEntity metaNodeMetaDada: metaNodeMetaDades) {
-			if (metaNodeMetaDada.getMultiplicitat().equals(MultiplicitatEnum.M_1) || metaNodeMetaDada.getMultiplicitat().equals(MultiplicitatEnum.M_1_N)) {
+			if (metaNodeMetaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaNodeMetaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 				boolean trobada = false;
 				for (DadaEntity dada: dades) {
 					if (dada.getMetaDada() != null && dada.getMetaDada().equals(metaNodeMetaDada.getMetaDada())) {
@@ -179,12 +172,14 @@ public class CacheHelper {
 		}
 		if (node instanceof ExpedientEntity) {
 			ExpedientEntity expedient = (ExpedientEntity)node;
-			List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
+					expedient,
+					0);
 			// Valida documents globals
 			List<MetaDocumentEntity> metaDocumentsGlobals = metaDocumentRepository.findByEntitatAndGlobalExpedientTrueAndActiuTrueOrderByNomAsc(
 					node.getEntitat());
 			for (MetaDocumentEntity metaDocument: metaDocumentsGlobals) {
-				if (metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnum.M_1) || metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnum.M_1_N)) {
+				if (metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 					boolean trobat = false;
 					for (DocumentEntity document: documents) {
 						if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaDocument)) {
@@ -202,7 +197,7 @@ public class CacheHelper {
 			// Valida documents específics del meta-node
 			List<MetaExpedientMetaDocumentEntity> metaExpedientMetaDocuments = metaExpedientMetaDocumentRepository.findByMetaExpedient(expedient.getMetaExpedient());
 			for (MetaExpedientMetaDocumentEntity metaExpedientMetaDocument: metaExpedientMetaDocuments) {
-				if (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnum.M_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnum.M_1_N)) {
+				if (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 					boolean trobat = false;
 					for (DocumentEntity document: documents) {
 						if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaExpedientMetaDocument.getMetaDocument())) {
@@ -225,69 +220,75 @@ public class CacheHelper {
 			NodeEntity node) {
 	}
 
-	@Cacheable(value = "unitatsOrganitzatives")
+	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
+	public DadesUsuari findUsuariAmbCodi(
+			String usuariCodi) {
+		return pluginHelper.dadesUsuariFindAmbCodi(
+				usuariCodi);
+	}
+
+	@Cacheable(value = "unitatsOrganitzatives", key="#entitatCodi")
 	public ArbreDto<UnitatOrganitzativaDto> findUnitatsOrganitzativesPerEntitat(
 			String entitatCodi) {
 		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
 		return pluginHelper.unitatsOrganitzativesFindArbreByPare(
 				entitat.getUnitatArrel());
 	}
-	@CacheEvict(value = "unitatsOrganitzatives")
+	@CacheEvict(value = "unitatsOrganitzatives", key="#entitatCodi")
 	public void evictUnitatsOrganitzativesPerEntitat(
 			String entitatCodi) {
 	}
 
-	@Cacheable(value = "elementsPendentsBustiesUsuari")
-	public long countElementsPendentsBustiesUsuari(
-			EntitatEntity entitat,
-			String usuariCodi) {
-		// Consulta les bústies de l'usuari a l'entitat
-		List<BustiaEntity> busties = bustiaRepository.findByEntitatAndPareNotNull(
-				entitat);
-		// Filtra la llista de bústies segons els permisos
-		permisosHelper.filterGrantedAll(
-				busties,
-				new ObjectIdentifierExtractor<BustiaEntity>() {
-					@Override
-					public Long getObjectIdentifier(BustiaEntity bustia) {
-						return bustia.getId();
-					}
-				},
-				BustiaEntity.class,
-				new Permission[] {ExtendedPermission.READ},
-				usuariHelper.generarUsuariAutenticat(usuariCodi, false));
-		long count = 0;
-		if (!busties.isEmpty()) {
-			// Ompl els contadors de fills i registres
-			long[] countFills = contenidorHelper.countFillsAmbPermisReadByContenidors(
-					entitat,
-					busties,
-					true);
-			for (long c: countFills)
-				count += c;
-			long[] countRegistres = contenidorHelper.countRegistresByContenidors(
-					entitat,
-					busties);
-			for (long c: countRegistres)
-				count += c;
-		}
-		// Afegeix l'usuari a l'entitat
-		afegirUsuariElementsPendentsPerEntitat(
-				entitat,
-				usuariCodi);
-		return count;
+	@Cacheable(value = "paisos")
+	public List<PaisDto> findPaisos() {
+		return conversioTipusHelper.convertirList(
+				pluginHelper.dadesExternesPaisosFindAll(),
+				PaisDto.class);
 	}
-	@CacheEvict(value = "elementsPendentsBustiesUsuari")
-	public void evictElementsPendentsBustiesUsuari(
-			EntitatEntity entitat,
-			String usuariCodi) {
+	
+	@Cacheable(value = "comunitats")
+	public List<ComunitatDto> findComunitats() {
+		return conversioTipusHelper.convertirList(
+				pluginHelper.dadesExternesComunitatsFindAll(),
+				ComunitatDto.class);
+	}
+
+	@Cacheable(value = "provincies")
+	public List<ProvinciaDto> findProvincies() {
+		return conversioTipusHelper.convertirList(
+				pluginHelper.dadesExternesProvinciesFindAll(),
+				ProvinciaDto.class);
+	}
+
+	@Cacheable(value = "provinciesPerComunitat", key="#comunitatCodi")
+	public List<ProvinciaDto> findProvinciesPerComunitat(String comunitatCodi) {
+		return conversioTipusHelper.convertirList(
+				pluginHelper.dadesExternesProvinciesFindAmbComunitat(comunitatCodi),
+				ProvinciaDto.class);
+	}
+
+	@Cacheable(value = "municipisPerProvincia", key="#provinciaCodi")
+	public List<MunicipiDto> findMunicipisPerProvincia(String provinciaCodi) {
+		return conversioTipusHelper.convertirList(
+				pluginHelper.dadesExternesMunicipisFindAmbProvincia(provinciaCodi),
+				MunicipiDto.class);
+	}
+
+	@Cacheable(value = "nivellAdministracio")
+	public List<NivellAdministracioDto> findNivellAdministracio() {
+		return pluginHelper.dadesExternesNivellsAdministracioAll();
+	}
+
+	@Cacheable(value = "tipusVia")
+	public List<TipusViaDto	> findTipusVia() {
+		return pluginHelper.dadesExternesTipusViaAll();
 	}
 
 
 
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,
-			MultiplicitatEnum multiplicitat) {
+			MultiplicitatEnumDto multiplicitat) {
 		return new ValidacioErrorDto(
 				conversioTipusHelper.convertir(
 						metaDada,
@@ -296,29 +297,12 @@ public class CacheHelper {
 	}
 	private ValidacioErrorDto crearValidacioError(
 			MetaDocumentEntity metaDocument,
-			MultiplicitatEnum multiplicitat) {
+			MultiplicitatEnumDto multiplicitat) {
 		return new ValidacioErrorDto(
 				conversioTipusHelper.convertir(
 						metaDocument,
 						MetaDocumentDto.class),
 				MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
-	}
-
-	private void afegirUsuariElementsPendentsPerEntitat(
-			EntitatEntity entitat,
-			String usuariCodi) {
-		String entitatCodi = entitat.getCodi();
-		if (usuarisElementsPendentsPerEntitat == null) {
-			usuarisElementsPendentsPerEntitat = new HashMap<String, Set<String>>();
-		}
-		Set<String> usuaris = usuarisElementsPendentsPerEntitat.get(entitatCodi);
-		if (usuaris == null) {
-			usuaris = new HashSet<String>();
-			usuarisElementsPendentsPerEntitat.put(
-					entitatCodi,
-					usuaris);
-		}
-		usuaris.add(usuariCodi);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);

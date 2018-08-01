@@ -96,6 +96,10 @@ public class MetaNodeDto implements Serializable {
 		else
 			return permisos.size();
 	}
+	
+	public String getIdentificador() {
+		return nom + " (" + codi + ")"; 
+	}
 
 	@Override
 	public String toString() {

@@ -2,12 +2,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>es.caib</groupId>
+		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
 		<version>0.1</version>
 	</parent>
 	<artifactId>ripea-plugin-impl</artifactId>
 	<dependencies>
+		<dependency>
+			<groupId>es.caib.notib</groupId>
+			<artifactId>notib-client</artifactId>
+			<version>${notib.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
@@ -49,15 +54,35 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>com.artofsolving</groupId>
+			<artifactId>jodconverter</artifactId>
+			<version>2.2.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>axis-jaxrpc</artifactId>
+					<groupId>org.apache.axis</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.axis</groupId>
+					<artifactId>axis-saaj</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.axis</groupId>
-			<artifactId>axis-jaxrpc</artifactId>
-			<version>1.4</version>
-			<scope>provided</scope>
+			<groupId>javax.xml</groupId>
+			<artifactId>jaxrpc-api</artifactId>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
@@ -72,9 +97,42 @@
 			<scope>provided</scope>
   		</dependency>
   		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+  		<dependency>
 			<groupId>es.caib.portafib</groupId>
 			<artifactId>portafib-ws-api</artifactId>
-			<version>1.0.0</version>
+			<version>${portafib.version}</version>
+		</dependency>
+		<!-- Signatura en el servidor amb PortaFib -->
+		<dependency>
+			<groupId>org.fundaciobit.plugins</groupId>
+			<artifactId>plugin-signatureserver-api</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fundaciobit.plugins</groupId>
+			<artifactId>plugin-signatureserver-portafib</artifactId>
+			<version>2.0.0</version>
+		</dependency>		
+	    <dependency>
+	      <groupId>log4j</groupId>
+	      <artifactId>log4j</artifactId>
+	      <version>1.2.14</version>
+	      <scope>provided</scope>
+	    </dependency>
+		<!-- Fi signatura en el servidor amb PortaFib -->
+  		<dependency>
+			<groupId>es.caib.regweb3</groupId>
+			<artifactId>regweb3-ws-api</artifactId>
+			<version>${regweb.version}</version>
+		</dependency>
+  		<dependency>
+			<groupId>es.caib.dir3caib</groupId>
+			<artifactId>dir3caib-ws-api</artifactId>
+			<version>${dir3caib.version}</version>
 		</dependency>
   		<dependency>
 			<groupId>es.caib</groupId>
@@ -108,12 +166,17 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
+			<version>2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk14</artifactId>
-			<version>1.38</version>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -122,38 +185,49 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin</artifactId>
 			<version>${ripea.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.2</version>
 		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
-			<!--plugin>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>${cxf.version}</version>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>generate-sources</id>
+						<id>generate-reports-ws-code</id>
 						<phase>generate-sources</phase>
-						<configuration>
-							<sourceRoot>${project.basedir}/src/main/java/</sourceRoot>
-							<wsdlOptions>
-								<wsdlOption>
-									<wsdl>${project.basedir}/../ripea-plugin-impl/src/main/resources/es/caib/ripea/plugin/unitat/ObtenerUnidadesImpl.wsdl</wsdl>
-								</wsdlOption>
-							</wsdlOptions>
-							<defaultOptions>
-								<frontEnd>jaxws21</frontEnd>
-							</defaultOptions>
-						</configuration>
 						<goals>
-							<goal>wsdl2java</goal>
+							<goal>wsimport</goal>
 						</goals>
+						<configuration>
+							<wsdlUrls>
+								<wsdlUrl>${basedir}/wsdl/cws/CWS.wsdl</wsdlUrl>
+								<wsdlUrl>${basedir}/wsdl/sistra-bantel/BackofficeFacade.wsdl</wsdlUrl>
+								<!--wsdlUrl>${basedir}/wsdl/sistra-zonaper/BackofficeFacade.wsdl</wsdlUrl>
+								<wsdlUrl>${basedir}/wsdl/sistra-regtel/BackofficeFacade.wsdl</wsdlUrl-->
+							</wsdlUrls>
+							<vmArgs>
+								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+							</vmArgs>
+							<verbose>true</verbose>
+							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
+						</configuration>
 					</execution>
 				</executions>
-			</plugin-->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -161,59 +235,16 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<fork>true</fork>
-					<compilerVersion>${java.version}</compilerVersion>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
 		</plugins>
-		<!--pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.cxf
-										</groupId>
-										<artifactId>
-											cxf-codegen-plugin
-										</artifactId>
-										<versionRange>
-											[${cxf.version},)
-										</versionRange>
-										<goals>
-											<goal>wsdl2java</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement-->
 	</build>
 	<repositories>
 		<repository>
-			<name>PortaFIB Maven Repository</name>
-			<id>es.caib.portafib</id>
-			<url>http://portafib.sourceforge.net/maven/</url>
+			<id>github-governib-maven-repos</id>
+			<name>GitHub GovernIB Maven Repository</name>
+			<url>http://GovernIB.github.io/maven/maven/</url>
 		</repository>
 		<repository>
-			<name>Local Maven Repository</name>
+			<name>Local Maven repository</name>
 			<id>es.caib.ripea.local</id>
 			<url>file://${basedir}/../local-repo</url>
 		</repository>

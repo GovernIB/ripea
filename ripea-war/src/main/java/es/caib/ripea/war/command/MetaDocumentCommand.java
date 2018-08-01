@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
@@ -38,14 +39,18 @@ public class MetaDocumentCommand {
 	@NotNull
 	private MultiplicitatEnumDto globalMultiplicitat;
 	private boolean globalReadOnly;
-	@Size(max=64)
-	private String custodiaPolitica;
+	private boolean FirmaPortafirmesActiva;
 	@Size(max=64)
 	private String portafirmesDocumentTipus;
 	@Size(max=64)
 	private String portafirmesFluxId;
+	private String[] portafirmesResponsables;
+	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	@Size(max=64)
-	private String signaturaTipusMime;
+	private String portafirmesCustodiaTipus;
+	private boolean firmaPassarelaActiva;
+	@Size(max=64)
+	private String firmaPassarelaCustodiaTipus;
 	protected MultipartFile plantilla;
 
 	private Long entitatId;
@@ -94,11 +99,11 @@ public class MetaDocumentCommand {
 	public void setGlobalReadOnly(boolean globalReadOnly) {
 		this.globalReadOnly = globalReadOnly;
 	}
-	public String getCustodiaPolitica() {
-		return custodiaPolitica;
+	public boolean isFirmaPortafirmesActiva() {
+		return FirmaPortafirmesActiva;
 	}
-	public void setCustodiaPolitica(String custodiaPolitica) {
-		this.custodiaPolitica = custodiaPolitica;
+	public void setFirmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
+		FirmaPortafirmesActiva = firmaPortafirmesActiva;
 	}
 	public String getPortafirmesDocumentTipus() {
 		return portafirmesDocumentTipus;
@@ -112,11 +117,35 @@ public class MetaDocumentCommand {
 	public void setPortafirmesFluxId(String portafirmesFluxId) {
 		this.portafirmesFluxId = portafirmesFluxId;
 	}
-	public String getSignaturaTipusMime() {
-		return signaturaTipusMime;
+	public String[] getPortafirmesResponsables() {
+		return portafirmesResponsables;
 	}
-	public void setSignaturaTipusMime(String signaturaTipusMime) {
-		this.signaturaTipusMime = signaturaTipusMime;
+	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
+		this.portafirmesResponsables = portafirmesResponsables;
+	}
+	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
+		return portafirmesFluxTipus;
+	}
+	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	}
+	public String getPortafirmesCustodiaTipus() {
+		return portafirmesCustodiaTipus;
+	}
+	public void setPortafirmesCustodiaTipus(String portafirmesCustodiaTipus) {
+		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus;
+	}
+	public boolean isFirmaPassarelaActiva() {
+		return firmaPassarelaActiva;
+	}
+	public void setFirmaPassarelaActiva(boolean firmaPassarelaActiva) {
+		this.firmaPassarelaActiva = firmaPassarelaActiva;
+	}
+	public String getFirmaPassarelaCustodiaTipus() {
+		return firmaPassarelaCustodiaTipus;
+	}
+	public void setFirmaPassarelaCustodiaTipus(String firmaPassarelaCustodiaTipus) {
+		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus;
 	}
 	public MultipartFile getPlantilla() {
 		return plantilla;

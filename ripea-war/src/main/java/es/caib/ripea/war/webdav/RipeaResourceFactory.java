@@ -3,12 +3,6 @@
  */
 package es.caib.ripea.war.webdav;
 
-import io.milton.common.Path;
-import io.milton.http.ResourceFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.Resource;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,18 +11,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.ContenidorDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EscriptoriDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ContenidorNotFoundException;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.CarpetaService;
-import es.caib.ripea.core.api.service.ContenidorService;
+import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.EntitatService;
+import io.milton.common.Path;
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.Resource;
 
 /**
  * ResourceFactory per a crear els recursos per al servidor
@@ -38,14 +37,14 @@ import es.caib.ripea.core.api.service.EntitatService;
  */
 public class RipeaResourceFactory implements ResourceFactory {
 
-	private ContenidorService contenidorService;
+	private ContingutService contenidorService;
 	private DocumentService documentService;
 	private CarpetaService carpetaService;
 	private EntitatService entitatService;
 	private AplicacioService aplicacioService;
 
 	public RipeaResourceFactory(
-			ContenidorService contenidorService,
+			ContingutService contenidorService,
 			DocumentService documentService,
 			CarpetaService carpetaService,
 			EntitatService entitatService,
@@ -83,15 +82,15 @@ public class RipeaResourceFactory implements ResourceFactory {
 			}
 			if (entitatActual != null) {
 				try {
-					ContenidorDto contenidor = contenidorService.getContenidorAmbContingutPerPath(
+					ContingutDto contingut = contenidorService.getContingutAmbFillsPerPath(
 							entitatActual.getId(),
 							pathActual.toString());
 					return contenidorToResource(
 							entitatActual,
-							contenidor,
+							contingut,
 							path,
 							false);
-				} catch (ContenidorNotFoundException ex) {
+				} catch (NotFoundException ex) {
 					logger.debug("[F] getResource error (host=" + host + ", path=" + path + "): No s'ha trobat el contenidor");
 				}
 			}
@@ -103,7 +102,7 @@ public class RipeaResourceFactory implements ResourceFactory {
 
 	private Resource contenidorToResource(
 			EntitatDto entitat,
-			ContenidorDto contenidor,
+			ContingutDto contenidor,
 			String path,
 			boolean esEntitat) {
 		if (contenidor instanceof EscriptoriDto) {
@@ -111,7 +110,7 @@ public class RipeaResourceFactory implements ResourceFactory {
 			EscriptoriDto escriptori = (EscriptoriDto)contenidor;
 			RipeaFolderResource resource = new RipeaFolderResource(
 					entitat,
-					toContenidorDto(
+					toContingutDto(
 							entitat,
 							escriptori),
 					new ServiceHolder(
@@ -149,7 +148,7 @@ public class RipeaResourceFactory implements ResourceFactory {
 			return resource;
 		} else if (contenidor instanceof DocumentDto) {
 			DocumentDto document = (DocumentDto)contenidor;
-			String contenidorPath = contenidor.getPathAsStringAmbNomContenidor();
+			String contenidorPath = contenidor.getPathAsStringWebdavAmbNom();
 			if (path.endsWith("/"))
 				contenidorPath += "/";
 			if (path.endsWith(contenidorPath)) {
@@ -179,44 +178,44 @@ public class RipeaResourceFactory implements ResourceFactory {
 		}
 	}
 
-	private static ContenidorDto toContenidorDto(
+	private static ContingutDto toContingutDto(
 			EntitatDto entitat,
 			EscriptoriDto escriptori) {
-		ContenidorDto contenidorDto = new CarpetaDto();
-		contenidorDto.setId(escriptori.getId());
-		contenidorDto.setFills(escriptori.getFills());
-		contenidorDto.setPath(escriptori.getPath());
-		contenidorDto.setCreatedBy(escriptori.getCreatedBy());
-		contenidorDto.setCreatedDate(escriptori.getCreatedDate());
-		contenidorDto.setLastModifiedBy(escriptori.getLastModifiedBy());
-		contenidorDto.setLastModifiedDate(escriptori.getLastModifiedDate());
-		contenidorDto.setNom(entitat.getNom());
-		return contenidorDto;
+		ContingutDto contingutDto = new CarpetaDto();
+		contingutDto.setId(escriptori.getId());
+		contingutDto.setFills(escriptori.getFills());
+		contingutDto.setPath(escriptori.getPath());
+		contingutDto.setCreatedBy(escriptori.getCreatedBy());
+		contingutDto.setCreatedDate(escriptori.getCreatedDate());
+		contingutDto.setLastModifiedBy(escriptori.getLastModifiedBy());
+		contingutDto.setLastModifiedDate(escriptori.getLastModifiedDate());
+		contingutDto.setNom(entitat.getNom());
+		return contingutDto;
 	}
 
-	private static ContenidorDto toContenidorDto(EntitatDto entitat) {
-		ContenidorDto contenidorDto = new CarpetaDto();
-		contenidorDto.setId(entitat.getId());
-		contenidorDto.setCreatedBy(entitat.getCreatedBy());
-		contenidorDto.setCreatedDate(entitat.getCreatedDate());
-		contenidorDto.setLastModifiedBy(entitat.getLastModifiedBy());
-		contenidorDto.setLastModifiedDate(entitat.getLastModifiedDate());
-		contenidorDto.setNom(entitat.getNom());
-		return contenidorDto;
+	private static ContingutDto toContenidorDto(EntitatDto entitat) {
+		ContingutDto contingutDto = new CarpetaDto();
+		contingutDto.setId(entitat.getId());
+		contingutDto.setCreatedBy(entitat.getCreatedBy());
+		contingutDto.setCreatedDate(entitat.getCreatedDate());
+		contingutDto.setLastModifiedBy(entitat.getLastModifiedBy());
+		contingutDto.setLastModifiedDate(entitat.getLastModifiedDate());
+		contingutDto.setNom(entitat.getNom());
+		return contingutDto;
 	}
 
-	private ContenidorDto getContenidorArrel() {
+	private ContingutDto getContenidorArrel() {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
-		ContenidorDto contenidorDto = new CarpetaDto();
+		ContingutDto contenidorDto = new CarpetaDto();
 		contenidorDto.setId(new Long(-1));
 		contenidorDto.setNom(usuari.getNom());
 		List<EntitatDto> entitats = entitatService.findAccessiblesUsuariActual();
-		List<ContenidorDto> fills = new ArrayList<ContenidorDto>();
+		List<ContingutDto> fills = new ArrayList<ContingutDto>();
 		for (EntitatDto entitat: entitats) {
 			fills.add(toContenidorDto(entitat));
 		}
 		contenidorDto.setFills(fills);
-		contenidorDto.setPath(new ArrayList<ContenidorDto>());
+		contenidorDto.setPath(new ArrayList<ContingutDto>());
 		Date ara = new Date();
 		contenidorDto.setCreatedBy(usuari);
 		contenidorDto.setCreatedDate(ara);

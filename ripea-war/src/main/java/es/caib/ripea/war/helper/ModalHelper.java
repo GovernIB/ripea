@@ -17,10 +17,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class ModalHelper {
 
-	private static final String ESQUEMA_PREFIX = "/ripea";
-	private static final String URI_PREFIX_MODAL = ESQUEMA_PREFIX + "/modal";
+	private static final String PREFIX_MODAL = "/modal";
 	private static final String REQUEST_ATTRIBUTE_MODAL = "ModalHelper.Modal";
-	private static final String SESSION_ATTRIBUTE_URIMAP = "ModalHelper.UriMap";
+	private static final String SESSION_ATTRIBUTE_REQUESTPATHSMAP = "ModalHelper.RequestPathsMap";
+
+	public static final String ACCIO_MODAL_TANCAR = PREFIX_MODAL + "/tancar";
+
+
 
 	public static boolean isModal(HttpServletRequest request) {
 		return request.getAttribute(REQUEST_ATTRIBUTE_MODAL) != null;
@@ -28,43 +31,47 @@ public class ModalHelper {
 	public static boolean comprovarModalInterceptor(
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
-		if (isRequestUriModal(request)) {
-			String uriSensePrefix = getUriSensePrefix(request);
-			Set<String> uriMap = getUriMap(request);
-			uriMap.add(uriSensePrefix);
-			RequestDispatcher dispatcher = request.getRequestDispatcher(uriSensePrefix);
+		if (isRequestPathModal(request)) {
+			String pathSensePrefix = getPathSensePrefix(request);
+			Set<String> requestPathsMap = getRequestPathsMap(request);
+			requestPathsMap.add(pathSensePrefix);
+			RequestDispatcher dispatcher = request.getRequestDispatcher(pathSensePrefix);
 		    dispatcher.forward(request, response);
 		    return false;
 		} else {
-			Set<String> uriMap = getUriMap(request);
-			String uriComprovacio = request.getRequestURI().substring(ESQUEMA_PREFIX.length());
-			if (uriMap.contains(uriComprovacio)) {
-				uriMap.remove(uriComprovacio);
+			Set<String> requestPathsMap = getRequestPathsMap(request);
+			String pathComprovacio = request.getServletPath();
+			if (requestPathsMap.contains(pathComprovacio)) {
+				requestPathsMap.remove(pathComprovacio);
 				marcarModal(request);
 			}
 			return true;
 		}
 	}
 
-	private static boolean isRequestUriModal(
+	private static boolean isRequestPathModal(
 			HttpServletRequest request) {
-		return request.getRequestURI().startsWith(URI_PREFIX_MODAL);
+		String servletPath = request.getServletPath();
+		return
+				servletPath.startsWith(PREFIX_MODAL) &&
+				!servletPath.startsWith(ACCIO_MODAL_TANCAR);
 	}
-	private static String getUriSensePrefix(
+	private static String getPathSensePrefix(
 			HttpServletRequest request) {
-		return request.getRequestURI().substring(URI_PREFIX_MODAL.length());
+		return request.getServletPath().substring(PREFIX_MODAL.length());
 	}
-	private static Set<String> getUriMap(
+	private static Set<String> getRequestPathsMap(
 			HttpServletRequest request) {
 		@SuppressWarnings("unchecked")
-		Set<String> uriMap = (Set<String>)request.getSession().getAttribute(SESSION_ATTRIBUTE_URIMAP);
-		if (uriMap == null) {
-			uriMap = new HashSet<String>();
+		Set<String> requestPathsMap = (Set<String>)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_REQUESTPATHSMAP);
+		if (requestPathsMap == null) {
+			requestPathsMap = new HashSet<String>();
 			request.getSession().setAttribute(
-					SESSION_ATTRIBUTE_URIMAP,
-					uriMap);
+					SESSION_ATTRIBUTE_REQUESTPATHSMAP,
+					requestPathsMap);
 		}
-		return uriMap;
+		return requestPathsMap;
 	}
 	private static void marcarModal(HttpServletRequest request) {
 		request.setAttribute(

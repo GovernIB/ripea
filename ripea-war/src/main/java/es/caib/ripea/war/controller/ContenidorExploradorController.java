@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ContenidorDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.service.ContenidorService;
+import es.caib.ripea.core.api.service.ContingutService;
 
 /**
  * Controlador per a navegar pels contenidors.
@@ -27,21 +27,23 @@ import es.caib.ripea.core.api.service.ContenidorService;
 public class ContenidorExploradorController extends BaseUserController {
 
 	@Autowired
-	private ContenidorService contenidorService;
+	private ContingutService contenidorService;
 
 
 
 	@RequestMapping(value = "/explora/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ContenidorDto get(
+	public ContingutDto get(
 			HttpServletRequest request,
 			@PathVariable Long contenidorArrelId,
 			@PathVariable Long contenidorId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContenidorDto contenidor = contenidorService.getContenidorAmbContingut(
+		ContingutDto contenidor = contenidorService.findAmbIdUser(
 				entitatActual.getId(),
-				contenidorId);
+				contenidorId,
+				true,
+				false);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		contenidor.setPerConvertirJson(true);
 		return contenidor;

@@ -9,6 +9,11 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
+import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
+import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
+import es.caib.ripea.war.command.DocumentCommand.UpdateFisic;
+
 /**
  * Command per al manteniment de contenidors.
  * 
@@ -19,9 +24,9 @@ public class ContenidorCommand {
 	protected Long id;
 	@NotNull(groups = {Create.class, Update.class})
 	protected Long entitatId;
-	@NotNull(groups = {Create.class, Update.class})
 	protected Long pareId;
-	@NotEmpty(groups = {Create.class, Update.class}) @Size(max=256)
+	@NotEmpty(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	@Size(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=256)
 	protected String nom;
 
 

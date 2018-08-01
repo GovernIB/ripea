@@ -4,33 +4,24 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <html>
 <head>
 	<title><spring:message code="arxiu.expedient.list.titol"/></title>
 	<meta name="subtitle" content="${arxiu.nom}"/>
-	<link href="<c:url value="/css/DT_bootstrap.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jquery.dataTables.js"/>"></script>
-	<script src="<c:url value="/js/DT_bootstrap.js"/>"></script>
-	<script src="<c:url value="/js/jsrender.min.js"/>"></script>
-	<script src="<c:url value="/js/ripea.datatable.js"/>"></script>
-	<script src="<c:url value="/js/ripea.modal.js"/>"></script>
-	<link href="<c:url value="/css/datepicker.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/js/bootstrap-datepicker.js"/>"></script>
-	<script src="<c:url value="/js/datepicker-locales/bootstrap-datepicker.${idioma}.js"/>"></script>
-	<link href="<c:url value="/css/select2.css"/>" rel="stylesheet"/>
-	<link href="<c:url value="/css/select2-bootstrap.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/js/select2-locales/select2_locale_${idioma}.js"/>"></script>
-<script>
-$(document).ready(function() {
-	$("#taulaDades").ripeaDataTable({
-		ajaxSourceUrl: "<c:url value="/arxiuAdmin/${arxiu.id}/expedient/datatable"/>",
-		localeUrl: "<c:url value="/js/dataTables-locales/dataTables_locale_ca.txt"/>",
-		alertesRefreshUrl: "<c:url value="/nodeco/util/alertes"/>"
-	});
-});
-</script>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
 	<form:form action="" method="post" cssClass="form-inline well" commandName="expedientFiltreCommand">
@@ -43,29 +34,26 @@ $(document).ready(function() {
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 		</div>
 	</form:form>
-	<table id="taulaDades" class="table table-bordered table-striped" data-rdt-filtre-form-id="expedientFiltreCommand">
+	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/arxiuAdmin/${arxiu.id}/expedient/datatable"/>" data-default-order="3" data-default-dir="desc" data-filter="#expedientFiltreCommand" class="table table-bordered table-striped">
 		<thead>
 			<tr>
-				<th data-rdt-property="id" data-rdt-visible="false">#</th>
-				<th data-rdt-property="codiPropietariEscriptoriPare" data-rdt-visible="false"></th>
-				<th data-rdt-property="nom" width="35%"><spring:message code="arxiu.expedient.list.columna.nom"/></th>
-				<th data-rdt-property="metaNode.nom" width="20%"><spring:message code="arxiu.expedient.list.columna.tipus"/></th>
-				<th data-rdt-property="createdDate" data-rdt-type="datetime" data-rdt-sorting="desc" width="15%"><spring:message code="arxiu.expedient.list.columna.createl"/></th>
-				<th data-rdt-property="nomPropietariEscriptoriPare" data-sortable="false" width="20%"><spring:message code="arxiu.expedient.list.columna.agafatper"/></th>
-				<th data-rdt-property="id" data-rdt-template="cellAccionsTemplate" data-rdt-sortable="false" width="10%">
+				<th data-col-name="codiPropietariEscriptoriPare" data-visible="false"></th>
+				<th data-col-name="nom" width="35%"><spring:message code="arxiu.expedient.list.columna.nom"/></th>
+				<th data-col-name="metaNode.nom" width="20%"><spring:message code="arxiu.expedient.list.columna.tipus"/></th>
+				<th data-col-name="createdDate" data-converter="datetime" width="15%"><spring:message code="arxiu.expedient.list.columna.createl"/></th>
+				<th data-col-name="nomPropietariEscriptoriPare" data-orderable="false" width="20%"><spring:message code="arxiu.expedient.list.columna.agafatper"/></th>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						{{if obert}}
 							<div class="dropdown">
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
 									{{if !codiPropietariEscriptoriPare}}
-									<li><a href="../../arxiuAdmin/${arxiu.id}/expedient/{{:id}}/agafar" data-rdt-link-modal="true"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+									<li><a href="../../arxiuAdmin/${arxiu.id}/expedient/{{:id}}/agafar" data-toggle="modal"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
-									<li><a href="../../arxiuAdmin/${arxiu.id}/expedient/{{:id}}/alliberar" data-rdt-link-ajax="true"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
+									<li><a href="../../arxiuAdmin/${arxiu.id}/expedient/{{:id}}/alliberar" data-toggle="ajax" data-confirm="<spring:message code="arxiu.expedient.list.confirmacio.alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 									{{/if}}
 								</ul>
 							</div>
-						{{/if}}
 					</script>
 				</th>
 			</tr>

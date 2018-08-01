@@ -42,41 +42,52 @@ public class PaginacioHelper {
 
 	public <T> Pageable toSpringDataPageable(
 			PaginacioParamsDto dto,
-			Map<String, String> mapeigPropietatsOrdenacio) {
+			Map<String, String[]> mapeigPropietatsOrdenacio) {
 		return new PageRequest(
 				dto.getPaginaNum(),
 				dto.getPaginaTamany(),
-				toSpringDataSort(dto, mapeigPropietatsOrdenacio));
+				toSpringDataSort(dto.getOrdres(), mapeigPropietatsOrdenacio));
 	}
 	public <T> Pageable toSpringDataPageable(
 			PaginacioParamsDto dto) {
 		return toSpringDataPageable(dto, null);
 	}
+
 	public <T> Sort toSpringDataSort(
 			PaginacioParamsDto dto) {
-		return toSpringDataSort(dto, null);
+		return toSpringDataSort(dto.getOrdres(), null);
 	}
-	public <T> Sort toSpringDataSort(
-			PaginacioParamsDto dto,
-			Map<String, String> mapeigPropietatsOrdenacio) {
+	public Sort toSpringDataSort(
+			List<OrdreDto> ordres,
+			Map<String, String[]> mapeigPropietatsOrdenacio) {
 		List<Order> orders = new ArrayList<Order>();
-		if (dto.getOrdres() != null) {
-			for (OrdreDto ordre: dto.getOrdres()) {
+		if (ordres != null) {
+			for (OrdreDto ordre: ordres) {
 				Direction direccio = OrdreDireccioDto.DESCENDENT.equals(ordre.getDireccio()) ? Sort.Direction.DESC : Sort.Direction.ASC;
-				String propietat = ordre.getCamp();
 				if (mapeigPropietatsOrdenacio != null) {
-					String mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
-					if (mapeig != null)
-						propietat = mapeig;
+					String[] mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
+					if (mapeig != null) {
+						for (String prop: mapeig) {
+							orders.add(new Order(
+									direccio,
+									prop));
+						}
+					} else {
+						orders.add(new Order(
+								direccio,
+								ordre.getCamp()));
+					}
 				} else {
-					propietat = ordre.getCamp();
+					orders.add(new Order(
+							direccio,
+							ordre.getCamp()));
 				}
-				orders.add(new Order(
-						direccio,
-						propietat));
 			}
 		}
-		return new Sort(orders);
+		if (!orders.isEmpty())
+			return new Sort(orders);
+		else
+			return null;
 	}
 
 	public <S, T> PaginaDto<T> toPaginaDto(
@@ -93,10 +104,10 @@ public class PaginacioHelper {
 		dto.setTamany(page.getSize());
 		dto.setTotal(page.getTotalPages());
 		dto.setElementsTotal(page.getTotalElements());
-		dto.setAnteriors(page.hasPreviousPage());
-		dto.setPrimera(page.isFirstPage());
-		dto.setPosteriors(page.hasNextPage());
-		dto.setDarrera(page.isLastPage());
+		dto.setAnteriors(page.hasPrevious());
+		dto.setPrimera(page.isFirst());
+		dto.setPosteriors(page.hasNext());
+		dto.setDarrera(page.isLast());
 		if (page.hasContent()) {
 			if (converter == null) {
 				dto.setContingut(

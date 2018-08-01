@@ -28,12 +28,4 @@ public @interface InteressatNoRepetit {
 
 	Class<? extends Payload>[] payload() default {};
 
-	String campId();
-	String campEntitatId();
-	String campNom();
-	String campNif();
-	String campLlinatges();
-	String campIdentificador();
-	String campTipus();
-
 }

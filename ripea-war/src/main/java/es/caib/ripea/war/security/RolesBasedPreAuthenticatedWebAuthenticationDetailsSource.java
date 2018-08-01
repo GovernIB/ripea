@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.preauth.j2ee.J2eeBasedPre
  */
 public class RolesBasedPreAuthenticatedWebAuthenticationDetailsSource extends J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource {
 
+	private boolean rolesConfigured = false;
+
 	MappableAttributesRetriever mappableAttributesRetriever;
 
 	public RolesBasedPreAuthenticatedWebAuthenticationDetailsSource() {
@@ -27,19 +29,22 @@ public class RolesBasedPreAuthenticatedWebAuthenticationDetailsSource extends J2
 
 	@Override
 	protected Collection<String> getUserRoles(HttpServletRequest request) {
-		Set<String> roles = mappableAttributesRetriever.getMappableAttributes();
-        Set<String> j2eeUserRolesList = new HashSet<String>();
-        for (String role: roles) {
-            if (request.isUserInRole(role)) {
-                j2eeUserRolesList.add(role);
+		if (!rolesConfigured) {
+			j2eeMappableRoles = mappableAttributesRetriever.getMappableAttributes();
+			rolesConfigured = true;
+		}
+		Set<String> j2eeUserRolesList = new HashSet<String>();
+        for (String role: j2eeMappableRoles) {
+        	if (request.isUserInRole(role)) {
+            	j2eeUserRolesList.add(role);
             }
         }
         return j2eeUserRolesList;
     }
 	@Override
 	public void setMappableRolesRetriever(MappableAttributesRetriever mappableAttributesRetriever) {
-        this.mappableAttributesRetriever = mappableAttributesRetriever;
-        this.j2eeMappableRoles = new HashSet<String>();
-    }
+		this.mappableAttributesRetriever = mappableAttributesRetriever;
+		this.j2eeMappableRoles = new HashSet<String>();
+	}
 
 }

@@ -5,7 +5,7 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="
 				http://www.springframework.org/schema/beans
-				http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+				http://www.springframework.org/schema/beans/spring-beans.xsd
 				http://jax-ws.dev.java.net/spring/core
 				http://jax-ws.java.net/spring/core.xsd
 				http://jax-ws.dev.java.net/spring/servlet
@@ -20,23 +20,18 @@
 		</property>
 	</bean>
 
-	<wss:binding url="/ws/registre">
-		<wss:service>
-			<ws:service bean="#registreImpl"/>
-		</wss:service>
-	</wss:binding>
-	<wss:binding url="/ws/bustia">
-		<wss:service>
-			<ws:service bean="#bustiaWsImpl"/>
-		</wss:service>
-	</wss:binding>
+	<import resource="classpath:es/caib/ripea/core/context/application-context-war.xml" />
+	<import resource="classpath:es/caib/ripea/war/context/application-context-security.xml" />
+
 	<wss:binding url="/ws/MCGDws">
 		<wss:service>
 			<ws:service bean="#MCGDwsImpl"/>
 		</wss:service>
 	</wss:binding>
-
-	<import resource="classpath:es/caib/ripea/core/context/application-context-war.xml" />
-	<import resource="classpath:es/caib/ripea/war/context/application-context-security.xml" />
+	<wss:binding url="/ws/portafibCallback">
+		<wss:service>
+			<ws:service bean="#portaFIBCallBackWsImpl"/>
+		</wss:service>
+	</wss:binding>
 
 </beans>

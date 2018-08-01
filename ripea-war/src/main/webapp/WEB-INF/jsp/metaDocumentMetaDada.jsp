@@ -3,73 +3,56 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<%
-pageContext.setAttribute(
-		"metadadaTipusEnumOptions",
-		es.caib.ripea.war.helper.HtmlSelectOptionHelper.getOptionsForEnum(
-				es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto.class,
-				"metadada.tipus.enum."));
-pageContext.setAttribute(
-		"multiplicitatEnumOptions",
-		es.caib.ripea.war.helper.HtmlSelectOptionHelper.getOptionsForEnum(
-				es.caib.ripea.core.api.dto.MultiplicitatEnumDto.class,
-				"multiplicitat.enum."));
-%>
 <html>
 <head>
 	<title><spring:message code="metadocument.metadada.titol"/></title>
 	<meta name="subtitle" content="${metaDocument.nom}"/>
-	<link href="<c:url value="/css/DT_bootstrap.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jquery.dataTables.js"/>"></script>
-	<script src="<c:url value="/js/DT_bootstrap.js"/>"></script>
-	<script src="<c:url value="/js/jsrender.min.js"/>"></script>
-	<script src="<c:url value="/js/ripea.datatable.js"/>"></script>
-	<script src="<c:url value="/js/ripea.modal.js"/>"></script>
-	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
-<script>
-var metadadaTipusText = new Array();
-<c:forEach var="option" items="${metadadaTipusEnumOptions}">
-metadadaTipusText["${option.value}"] = "<spring:message code="${option.text}"/>";
-</c:forEach>
-var multiplicitatText = new Array();
-<c:forEach var="option" items="${multiplicitatEnumOptions}">
-multiplicitatText["${option.value}"] = "<spring:message code="${option.text}"/>";
-</c:forEach>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/webjars/Sortable/1.4.2/Sortable.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+<script type="text/javascript">
 $(document).ready(function() {
-	$("#taulaDades").ripeaDataTable({
-		ajaxSourceUrl: "<c:url value="/metaDocument/${metaDocument.id}/metaDada/datatable"/>",
-		localeUrl: "<c:url value="/js/dataTables-locales/dataTables_locale_ca.txt"/>",
-		alertesRefreshUrl: "<c:url value="/nodeco/util/alertes"/>"
+	$('#metadades').on('dragupdate.dataTable', function (event, itemId, index) {
+		$.ajax({
+			url: "../../ajax/metaDocument/${metaDocument.id}/metaDada/" + itemId + "/move/" + index,
+			async: false
+		});
 	});
 });
 </script>
 </head>
 <body>
-	<table id="taulaDades" class="table table-striped table-bordered" data-rdt-paginable="false" data-rdt-ordenable="true" data-rdt-button-template="tableButtonsTemplate">
+	<div class="text-right" data-toggle="botons-titol">
+		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.metadada.boto.afegir"/></a>
+	</div>
+	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaDocument/${metaDocument.id}/metaDada/datatable"/>" data-drag-enabled="true" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				<th data-rdt-property="id" width="4%" data-rdt-visible="false">#</th>
-				<th data-rdt-property="metaDada.codi"><spring:message code="metadocument.metadada.columna.codi"/></th>
-				<th data-rdt-property="metaDada.nom"><spring:message code="metadocument.metadada.columna.nom"/></th>
-				<th data-rdt-property="metaDada.tipus" data-rdt-template="cellMetadadaTipusTemplate">
-					<spring:message code="metadocument.metadada.columna.tipus"/>
-					<script id="cellMetadadaTipusTemplate" type="text/x-jsrender">
-						{{:~eval('metadadaTipusText["' + metaDada_tipus + '"]')}}
+				<th data-col-name="ordre" data-visible="false"></th>
+				<th data-col-name="metaDada.codi" data-orderable="false"><spring:message code="metadocument.metadada.columna.codi"/></th>
+				<th data-col-name="metaDada.nom" data-orderable="false"><spring:message code="metadocument.metadada.columna.nom"/></th>
+				<th data-col-name="metaDada.tipus" data-renderer="enum(MetaDadaTipusEnumDto)" data-orderable="false"><spring:message code="metadocument.metadada.columna.tipus"/></th>
+				<th data-col-name="multiplicitat" data-renderer="enum(MultiplicitatEnumDto)" data-orderable="false"><spring:message code="metadocument.metadada.columna.multiplicitat"/></th>
+				<th data-col-name="metaDada.activa" data-template="#cellActivaTemplate" data-orderable="false">
+					<spring:message code="metadocument.metadada.columna.activa"/>
+					<script id="cellActivaTemplate" type="text/x-jsrender">
+						{{if metaDada.activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-rdt-property="multiplicitat" data-rdt-template="cellMultiplicitatTemplate">
-					<spring:message code="metadocument.metadada.columna.multiplicitat"/>
-					<script id="cellMultiplicitatTemplate" type="text/x-jsrender">
-						{{:~eval('multiplicitatText["' + multiplicitat + '"]')}}
-					</script>
-				</th>
-				<th data-rdt-property="id" data-rdt-template="cellAccionsTemplate" data-rdt-sortable="false" width="10%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="../../metaDocument/${metaDocument.id}/metaDada/{{:id}}" data-rdt-link-modal="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="../../metaDocument/${metaDocument.id}/metaDada/{{:id}}/delete" data-rdt-link-ajax="true" data-rdt-link-confirm="<spring:message code="metadocument.metadada.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="metaDada/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="metaDada/{{:id}}/up" data-toggle="ajax"><span class="fa fa-arrow-up"></span>&nbsp;&nbsp;<spring:message code="comu.boto.amunt"/></a></li>
+								<li><a href="metaDada/{{:id}}/down" data-toggle="ajax"><span class="fa fa-arrow-down"></span>&nbsp;&nbsp;<spring:message code="comu.boto.avall"/></a></li>
+								<li><a href="metaDada/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metadocument.metadada.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
 					</script>
@@ -77,8 +60,34 @@ $(document).ready(function() {
 			</tr>
 		</thead>
 	</table>
-	<script id="tableButtonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="../../metaDocument/${metaDocument.id}/metaDada/new" data-rdt-link-modal="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.metadada.boto.afegir"/></a></p>
-	</script>
+	<c:if test="${not empty metaDadesGlobals}">
+		<div class="panel panel-default">
+			<div class="panel-heading" data-toggle="collapse" data-target="#metadadesGlobalsTable">
+				<spring:message code="metadocument.metadada.globals"/> <span class="badge">${fn:length(metaDadesGlobals)}</span>
+			</div>
+  			<table id="metadadesGlobalsTable" class="table table-striped table-bordered collapse" style="width:100%">
+  			<thead>
+  				<tr>
+  					<th><spring:message code="metadocument.metadada.columna.codi"/></th>
+  					<th><spring:message code="metadocument.metadada.columna.nom"/></th>
+  					<th><spring:message code="metadocument.metadada.columna.tipus"/></th>
+  					<th><spring:message code="metadocument.metadada.columna.multiplicitat"/></th>
+  					<th><spring:message code="metadocument.metadada.columna.activa"/></th>
+  				</tr>
+  			</thead>
+  			<tbody>
+  				<c:forEach var="metaDada" items="${metaDadesGlobals}">
+	  				<tr>
+	  					<td>${metaDada.codi}</td>
+	  					<td>${metaDada.nom}</td>
+	  					<td><spring:message code="meta.dada.tipus.enum.${metaDada.tipus}"/></td>
+	  					<td><spring:message code="multiplicitat.enum.${metaDada.globalMultiplicitat}"/></td>
+	  					<td><c:if test="${metaDada.activa}"><span class="fa fa-check"></span></c:if></td>
+	  				</tr>
+  				</c:forEach>
+  			</tbody>
+  			</table>
+  		</div>
+	</c:if>
 	<a href="<c:url value="/metaDocument"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span> <spring:message code="comu.boto.tornar"/></a>
 </body>

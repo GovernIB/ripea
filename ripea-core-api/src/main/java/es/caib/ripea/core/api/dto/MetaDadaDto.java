@@ -21,7 +21,6 @@ public class MetaDadaDto implements Serializable {
 	private MetaDadaTipusEnumDto tipus;
 	private boolean globalExpedient;
 	private boolean globalDocument;
-	private boolean globalCarpeta;
 	private MultiplicitatEnumDto globalMultiplicitat;
 	private boolean globalReadOnly;
 	private boolean activa;
@@ -64,12 +63,6 @@ public class MetaDadaDto implements Serializable {
 	}
 	public void setGlobalDocument(boolean globalDocument) {
 		this.globalDocument = globalDocument;
-	}
-	public boolean isGlobalCarpeta() {
-		return globalCarpeta;
-	}
-	public void setGlobalCarpeta(boolean globalCarpeta) {
-		this.globalCarpeta = globalCarpeta;
 	}
 	public MultiplicitatEnumDto getGlobalMultiplicitat() {
 		return globalMultiplicitat;

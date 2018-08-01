@@ -29,7 +29,7 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
 public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 
 	@Override
-	public DadesUsuari consultarAmbUsuariCodi(
+	public DadesUsuari findAmbCodi(
 			String usuariCodi) throws SistemaExternException {
 		LOGGER.debug("Consulta de les dades de l'usuari (codi=" + usuariCodi + ")");
 		return consultaDadesUsuariUnic(
@@ -40,25 +40,13 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	}
 
 	@Override
-	public DadesUsuari consultarAmbUsuariNif(
-			String usuariNif) throws SistemaExternException {
-		LOGGER.debug("Consulta de les dades de l'usuari (nif=" + usuariNif + ")");
-		return consultaDadesUsuariUnic(
-				getJdbcQueryUsuariNif(),
-				"nif",
-				usuariNif,
-				true);
-	}
-
-	@Override
-	public List<DadesUsuari> findUsuarisPerGrup(
+	public List<DadesUsuari> findAmbGrup(
 			String grupCodi) throws SistemaExternException {
 		LOGGER.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		return consultaDadesUsuari(
 				getJdbcQueryUsuariGrup(),
 				"grup",
-				grupCodi,
-				false);
+				grupCodi);
 	}
 
 
@@ -71,8 +59,7 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 		List<DadesUsuari> llista = consultaDadesUsuari(
 				sqlQuery,
 				paramName,
-				paramValue,
-				ambRols);
+				paramValue);
 		if (llista.size() > 0)
 			return llista.get(0);
 		else
@@ -82,8 +69,7 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	private List<DadesUsuari> consultaDadesUsuari(
 			String sqlQuery,
 			String paramName,
-			String paramValue,
-			boolean ambRols) throws SistemaExternException {
+			String paramValue) throws SistemaExternException {
 		List<DadesUsuari> llistaUsuaris = new ArrayList<DadesUsuari>();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -123,58 +109,7 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 				LOGGER.error("Error al tancar la connexió", ex);
 			}
 		}
-		if (ambRols) {
-			for (DadesUsuari dadesUsuari: llistaUsuaris) {
-				dadesUsuari.setRols(
-						consultaRolsUsuari(
-								"codi",
-								dadesUsuari.getCodi()));
-			}
-		}
 		return llistaUsuaris;
-	}
-
-	private String[] consultaRolsUsuari(
-			String paramName,
-			String paramValue) throws SistemaExternException {
-		String sqlQuery = getJdbcQueryUsuariRols();
-		if (sqlQuery == null)
-			return null;
-		Connection con = null;
-		PreparedStatement ps = null;
-		List<String> rols = new ArrayList<String>();
-		try {
-			Context initContext = new InitialContext();
-			DataSource ds = (DataSource)initContext.lookup(getDatasourceJndiName());
-			con = ds.getConnection();
-			if (sqlQuery.contains("?")) {
-				ps = con.prepareStatement(sqlQuery);
-				ps.setString(1, paramValue);
-			} else if (sqlQuery.contains(":" + paramName)) {
-				ps = con.prepareStatement(
-						sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
-			} else {
-				ps = con.prepareStatement(sqlQuery);
-			}
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				rols.add(rs.getString(1));
-			}
-		} catch (Exception ex) {
-			throw new SistemaExternException(ex);
-		} finally {
-			try {
-				if (ps != null) ps.close();
-			} catch (Exception ex) {
-				LOGGER.error("Error al tancar el PreparedStatement", ex);
-			}
-			try {
-				if (con != null) con.close();
-			} catch (Exception ex) {
-				LOGGER.error("Error al tancar la connexió", ex);
-			}
-		}
-		return rols.toArray(new String[rols.size()]);
 	}
 
 	private String getDatasourceJndiName() {
@@ -185,12 +120,6 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 		if (query == null || query.isEmpty())
 			query = PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.codi");
 		return query;
-	}
-	private String getJdbcQueryUsuariNif() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.nif");
-	}
-	private String getJdbcQueryUsuariRols() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.rols");
 	}
 	private String getJdbcQueryUsuariGrup() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.grup");

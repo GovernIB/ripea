@@ -34,7 +34,7 @@ public class ConversioPluginXdocreportTest {
 		original = new ConversioArxiu();
 		original.setArxiuNom("original_conversio.odt");
 		original.setArxiuContingut(
-			IOUtils.toByteArray(getClass().getResource(
+			IOUtils.toByteArray(getClass().getResourceAsStream(
 	        		"/es/caib/ripea/plugin/caib/original_conversio.odt")));
 	}
 

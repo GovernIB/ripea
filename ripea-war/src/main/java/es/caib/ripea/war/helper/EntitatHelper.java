@@ -92,6 +92,7 @@ public class EntitatHelper {
 		request.getSession().setAttribute(
 				SESSION_ATTRIBUTE_ENTITAT_ACTUAL,
 				entitatActual);
+		ExpedientHelper.resetAccesUsuariExpedients(request);
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatHelper.class);

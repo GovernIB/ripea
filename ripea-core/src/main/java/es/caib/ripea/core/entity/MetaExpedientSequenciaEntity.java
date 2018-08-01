@@ -13,9 +13,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -28,7 +28,7 @@ uniqueConstraints = {
 		@UniqueConstraint(columnNames = {
 				"anio",
 				"meta_expedient_id"})})
-@EntityListeners(RipeaAuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class MetaExpedientSequenciaEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "anio")

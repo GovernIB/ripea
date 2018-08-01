@@ -25,16 +25,38 @@ public class MetaExpedientCommand {
 
 	private Long id;
 
-	@NotEmpty @Size(max=64)
+	@NotEmpty @Size(max = 64)
 	private String codi;
-	@NotEmpty @Size(max=256)
+	@NotEmpty @Size(max = 256)
 	private String nom;
 	@Size(max=1024)
 	private String descripcio;
-	@Size(max=9)
-	private String classificacio;
+	@NotEmpty @Size(max = 6)
+	private String classificacioSia;
+	@Size(max = 30)
+	private String serieDocumental;
+	private boolean notificacioActiva;
+	@Size(max = 44)
+	private String notificacioSeuProcedimentCodi;
+	@Size(max = 5)
+	private String notificacioSeuRegistreLlibre;
+	@Size(max = 9)
+	private String notificacioSeuRegistreOficina;
+	@Size(max = 9)
+	private String notificacioSeuRegistreOrgan;
+	@Size(max = 9)
+	private String notificacioSeuExpedientUnitatOrganitzativa;
+	@Size(max = 256)
+	private String notificacioAvisTitol;
+	@Size(max = 1024)
+	private String notificacioAvisText;
+	@Size(max = 200)
+	private String notificacioAvisTextMobil;
+	@Size(max = 256)
+	private String notificacioOficiTitol;
+	@Size(max = 1024)
+	private String notificacioOficiText;
 	private Long pareId;
-
 	private Long entitatId;
 
 
@@ -63,11 +85,83 @@ public class MetaExpedientCommand {
 	public void setDescripcio(String descripcio) {
 		this.descripcio = descripcio;
 	}
-	public String getClassificacio() {
-		return classificacio;
+	public String getClassificacioSia() {
+		return classificacioSia;
 	}
-	public void setClassificacio(String classificacio) {
-		this.classificacio = classificacio;
+	public void setClassificacioSia(String classificacioSia) {
+		this.classificacioSia = classificacioSia;
+	}
+	public String getSerieDocumental() {
+		return serieDocumental;
+	}
+	public void setSerieDocumental(String serieDocumental) {
+		this.serieDocumental = serieDocumental;
+	}
+	public boolean isNotificacioActiva() {
+		return notificacioActiva;
+	}
+	public void setNotificacioActiva(boolean notificacioActiva) {
+		this.notificacioActiva = notificacioActiva;
+	}
+	public String getNotificacioSeuProcedimentCodi() {
+		return notificacioSeuProcedimentCodi;
+	}
+	public void setNotificacioSeuProcedimentCodi(String notificacioSeuProcedimentCodi) {
+		this.notificacioSeuProcedimentCodi = notificacioSeuProcedimentCodi;
+	}
+	public String getNotificacioSeuRegistreLlibre() {
+		return notificacioSeuRegistreLlibre;
+	}
+	public void setNotificacioSeuRegistreLlibre(String notificacioSeuRegistreLlibre) {
+		this.notificacioSeuRegistreLlibre = notificacioSeuRegistreLlibre;
+	}
+	public String getNotificacioSeuRegistreOficina() {
+		return notificacioSeuRegistreOficina;
+	}
+	public void setNotificacioSeuRegistreOficina(String notificacioSeuRegistreOficina) {
+		this.notificacioSeuRegistreOficina = notificacioSeuRegistreOficina;
+	}
+	public String getNotificacioSeuRegistreOrgan() {
+		return notificacioSeuRegistreOrgan;
+	}
+	public void setNotificacioSeuRegistreOrgan(String notificacioSeuRegistreOrgan) {
+		this.notificacioSeuRegistreOrgan = notificacioSeuRegistreOrgan;
+	}
+	public String getNotificacioSeuExpedientUnitatOrganitzativa() {
+		return notificacioSeuExpedientUnitatOrganitzativa;
+	}
+	public void setNotificacioSeuExpedientUnitatOrganitzativa(String notificacioSeuExpedientUnitatOrganitzativa) {
+		this.notificacioSeuExpedientUnitatOrganitzativa = notificacioSeuExpedientUnitatOrganitzativa;
+	}
+	public String getNotificacioAvisTitol() {
+		return notificacioAvisTitol;
+	}
+	public void setNotificacioAvisTitol(String notificacioAvisTitol) {
+		this.notificacioAvisTitol = notificacioAvisTitol;
+	}
+	public String getNotificacioAvisText() {
+		return notificacioAvisText;
+	}
+	public void setNotificacioAvisText(String notificacioAvisText) {
+		this.notificacioAvisText = notificacioAvisText;
+	}
+	public String getNotificacioAvisTextMobil() {
+		return notificacioAvisTextMobil;
+	}
+	public void setNotificacioAvisTextMobil(String notificacioAvisTextMobil) {
+		this.notificacioAvisTextMobil = notificacioAvisTextMobil;
+	}
+	public String getNotificacioOficiTitol() {
+		return notificacioOficiTitol;
+	}
+	public void setNotificacioOficiTitol(String notificacioOficiTitol) {
+		this.notificacioOficiTitol = notificacioOficiTitol;
+	}
+	public String getNotificacioOficiText() {
+		return notificacioOficiText;
+	}
+	public void setNotificacioOficiText(String notificacioOficiText) {
+		this.notificacioOficiText = notificacioOficiText;
 	}
 	public Long getPareId() {
 		return pareId;

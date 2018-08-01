@@ -39,15 +39,15 @@ public interface PortafirmesPlugin {
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public long upload(
+	public String upload(
 			PortafirmesDocument document,
-			Long documentTipus,
+			String documentTipus,
 			String motiu,
 			String remitent,
 			PortafirmesPrioritatEnum prioritat,
 			Date dataCaducitat,
 			List<PortafirmesFluxBloc> flux,
-			Long plantillaFluxId,
+			String plantillaFluxId,
 			List<PortafirmesDocument> annexos,
 			boolean signarAnnexos) throws SistemaExternException;
 
@@ -61,7 +61,7 @@ public interface PortafirmesPlugin {
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
 	public PortafirmesDocument download(
-			long id) throws SistemaExternException;
+			String id) throws SistemaExternException;
 
 	/**
 	 * Esborra un document del portafirmes.
@@ -72,7 +72,7 @@ public interface PortafirmesPlugin {
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
 	public void delete(
-			long id) throws SistemaExternException;
+			String id) throws SistemaExternException;
 
 	/**
 	 * Retorna la llista amb tots els tipus de document permesos.

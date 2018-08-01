@@ -6,9 +6,12 @@ package es.caib.ripea.plugin.caib.gesdoc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.apache.commons.io.IOUtils;
 
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.gesdoc.GestioDocumentalArxiu;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
 
@@ -23,9 +26,23 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 	@Override
 	public String create(
-			GestioDocumentalArxiu arxiu) throws SistemaExternException {
+			String agrupacio,
+			InputStream contingut) throws SistemaExternException {
 		try {
-			return saveWithNewId(arxiu);
+			String id = new Long(System.currentTimeMillis()).toString();
+			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			fContent.getParentFile().mkdirs();
+			while (fContent.exists()) {
+				try {
+					Thread.sleep(1);
+				} catch (Exception ignored) {}
+				id = new Long(System.currentTimeMillis()).toString();
+				fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			}
+			FileOutputStream outContent = new FileOutputStream(fContent);
+			IOUtils.copy(contingut, outContent);
+			outContent.close();
+			return id;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut crear l'arxiu",
@@ -36,9 +53,16 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	@Override
 	public void update(
 			String id,
-			GestioDocumentalArxiu arxiu) throws SistemaExternException {
+			String agrupacio,
+			InputStream contingut) throws SistemaExternException {
 		try {
-			if (!updateWithId(id, arxiu)) {
+			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			fContent.getParentFile().mkdirs();
+			if (fContent.exists()) {
+				FileOutputStream outContent = new FileOutputStream(fContent, false);
+				IOUtils.copy(contingut, outContent);
+				outContent.close();
+			} else {
 				throw new SistemaExternException(
 						"No s'ha trobat l'arxiu (id=" + id + ")");
 			}
@@ -51,9 +75,14 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 	@Override
 	public void delete(
-			String id) throws SistemaExternException {
+			String id,
+			String agrupacio) throws SistemaExternException {
 		try {
-			if (!deleteWithId(id)) {
+			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			fContent.getParentFile().mkdirs();
+			if (fContent.exists()) {
+				fContent.delete();
+			} else {
 				throw new SistemaExternException(
 						"No s'ha trobat l'arxiu (id=" + id + ")");
 			}
@@ -65,14 +94,20 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	}
 
 	@Override
-	public GestioDocumentalArxiu get(
-			String id) throws SistemaExternException {
+	public void get(
+			String id,
+			String agrupacio,
+			OutputStream contingutOut) throws SistemaExternException {
 		try {
-			GestioDocumentalArxiu arxiu = readWithId(id);
-			if (arxiu == null)
+			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			fContent.getParentFile().mkdirs();
+			if (fContent.exists()) {
+				FileInputStream contingutIn = new FileInputStream(fContent);
+				IOUtils.copy(contingutIn, contingutOut);
+			} else {
 				throw new SistemaExternException(
 						"No s'ha trobat l'arxiu (id=" + id + ")");
-			return arxiu;
+			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut llegir l'arxiu (id=" + id + ")",
@@ -82,82 +117,16 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 
 
-	private String saveWithNewId(
-			GestioDocumentalArxiu arxiu) throws Exception {
-		String id = new Long(System.currentTimeMillis()).toString();
-		File fContent = new File(getBaseDir() + "/" + id);
-		while (fContent.exists()) {
-			try {
-				Thread.sleep(1);
-			} catch (Exception ignored) {}
-			id = new Long(System.currentTimeMillis()).toString();
-			fContent = new File(getBaseDir() + "/" + id);
-		}
-		FileOutputStream outContent = new FileOutputStream(fContent);
-		outContent.write(arxiu.getContent());
-		outContent.close();
-		File fName = new File(getBaseDir() + "/" + id + ".name");
-		FileOutputStream outName = new FileOutputStream(fName);
-		outName.write(arxiu.getFileName().getBytes());
-		outName.close();
-		return id;
-	}
-
-	private boolean updateWithId(
-			String id,
-			GestioDocumentalArxiu arxiu) throws Exception {
-		File fContent = new File(getBaseDir() + "/" + id);
-		if (fContent.exists()) {
-			FileOutputStream outContent = new FileOutputStream(fContent, false);
-			outContent.write(arxiu.getContent());
-			outContent.close();
-			File fName = new File(getBaseDir() + "/" + id + ".name");
-			FileOutputStream outName = new FileOutputStream(fName);
-			outName.write(arxiu.getFileName().getBytes());
-			outName.close();
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private boolean deleteWithId(
-			String id) throws Exception {
-		File fContent = new File(getBaseDir() + "/" + id);
-		if (fContent.exists()) {
-			fContent.delete();
-			File fName = new File(getBaseDir() + "/" + id + ".name");
-			fName.delete();
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private GestioDocumentalArxiu readWithId(
-			String id) throws Exception {
-		File fContent = new File(getBaseDir() + "/" + id);
-		if (fContent.exists()) {
-			FileInputStream inContent = new FileInputStream(fContent);
-			byte fileContent[] = new byte[(int)fContent.length()];
-			inContent.read(fileContent);
-			inContent.close();
-			File fName = new File(getBaseDir() + "/" + id + ".name");
-			FileInputStream inName = new FileInputStream(fName);
-			byte fileName[] = new byte[(int)fName.length()];
-			inName.read(fileName);
-			inName.close();
-			return new GestioDocumentalArxiu(
-					new String(fileName),
-					fileContent);
-		} else {
-			return null;
-		}
-	}
-
-	private String getBaseDir() {
-		return PropertiesHelper.getProperties().getProperty(
+	private String getBaseDir(String agrupacio) {
+		String baseDir = PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.gesdoc.filesystem.base.dir");
+		if (baseDir != null) {
+			if (baseDir.endsWith("/")) {
+				return baseDir + agrupacio;
+			} else {
+				return baseDir + "/" + agrupacio;
+			}
+		}
+		return baseDir;
 	}
-
 }

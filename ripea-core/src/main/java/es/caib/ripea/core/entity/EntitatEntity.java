@@ -14,8 +14,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
 
 /**
  * Classe del model de dades que representa una Entitat.
@@ -24,7 +25,7 @@ import es.caib.ripea.core.audit.RipeaAuditingEntityListener;
  */
 @Entity
 @Table(name="ipa_entitat")
-@EntityListeners(RipeaAuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class EntitatEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false, unique = true)

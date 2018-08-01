@@ -11,11 +11,17 @@ package es.caib.ripea.core.api.dto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum LogObjecteTipusEnumDto {
-	CONTENIDOR,
+	CONTINGUT,
 	EXPEDIENT,
 	CARPETA,
 	DOCUMENT,
 	DADA,
+	BUSTIA,
+	ARXIU,
 	INTERESSAT,
-	REGISTRE
+	REGISTRE,
+	RELACIO,
+	NOTIFICACIO,
+	PUBLICACIO,
+	ALTRES
 }

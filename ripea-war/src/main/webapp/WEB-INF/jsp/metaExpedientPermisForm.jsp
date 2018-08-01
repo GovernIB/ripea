@@ -4,15 +4,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
-<%
-pageContext.setAttribute(
-		"principalTipusEnumOptions",
-		es.caib.ripea.war.helper.HtmlSelectOptionHelper.getOptionsForEnum(
-				es.caib.ripea.core.api.dto.PrincipalTipusEnumDto.class,
-				"principal.tipus.enum."));
-%>
-
 <c:choose>
 	<c:when test="${empty permisCommand.id}"><c:set var="titol"><spring:message code="metaexpedient.permis.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.permis.form.titol.modificar"/></c:set></c:otherwise>
@@ -20,7 +11,12 @@ pageContext.setAttribute(
 <html>
 <head>
 	<title>${titol}</title>
-	<rip:modalHead titol="${titol}" buttonContainerId="botons"/>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<rip:modalHead/>
 <script>
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
@@ -34,7 +30,7 @@ pageContext.setAttribute(
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/permis"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
-		<rip:inputSelect name="principalTipus" textKey="metaexpedient.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionItems="${principalTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<rip:inputSelect name="principalTipus" textKey="metaexpedient.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<rip:inputText name="principalNom" textKey="metaexpedient.permis.form.camp.principal" disabled="${not empty permisCommand.id}"/>
 		<rip:inputCheckbox name="create" textKey="metaexpedient.permis.form.camp.creacio"/>
 		<rip:inputCheckbox name="read" textKey="metaexpedient.permis.form.camp.consulta"/>
@@ -42,7 +38,7 @@ pageContext.setAttribute(
 		<rip:inputCheckbox name="delete" textKey="metaexpedient.permis.form.camp.eliminacio"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/permis"/>" class="btn btn-default modal-tancar"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

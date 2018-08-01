@@ -13,11 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.exception.EntitatNotFoundException;
-import es.caib.ripea.core.api.exception.MetaDadaNotFoundException;
-import es.caib.ripea.core.api.exception.NodeNotFoundException;
 import es.caib.ripea.core.api.service.MetaDadaService;
 
 /**
@@ -47,7 +45,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto update(
 			Long entitatId,
-			MetaDadaDto metaDada) throws EntitatNotFoundException, MetaDadaNotFoundException {
+			MetaDadaDto metaDada) {
 		return delegate.update(entitatId, metaDada);
 	}
 
@@ -56,7 +54,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	public MetaDadaDto updateActiva(
 			Long entitatId,
 			Long id,
-			boolean activa) throws EntitatNotFoundException, MetaDadaNotFoundException {
+			boolean activa) {
 		return delegate.updateActiva(entitatId, id, activa);
 	}
 
@@ -64,7 +62,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto delete(
 			Long entitatId,
-			Long metaDadaId) throws EntitatNotFoundException, MetaDadaNotFoundException {
+			Long metaDadaId) {
 		return delegate.delete(entitatId, metaDadaId);
 	}
 
@@ -72,7 +70,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto findById(
 			Long entitatId,
-			Long id) throws EntitatNotFoundException {
+			Long id) {
 		return delegate.findById(
 				entitatId,
 				id);
@@ -82,7 +80,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto findByEntitatCodi(
 			Long entitatId,
-			String codi) throws EntitatNotFoundException {
+			String codi) {
 		return delegate.findByEntitatCodi(entitatId, codi);
 	}
 
@@ -90,7 +88,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<MetaDadaDto> findAllByEntitatPaginat(
 			Long entitatId,
-			PaginacioParamsDto paginacioParams) throws EntitatNotFoundException {
+			PaginacioParamsDto paginacioParams) {
 		return delegate.findAllByEntitatPaginat(entitatId, paginacioParams);
 	}
 
@@ -99,7 +97,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	public List<MetaDadaDto> findActiveByEntitat(
 			Long entitatId,
 			boolean incloureGlobalsExpedient,
-			boolean incloureGlobalsDocument) throws EntitatNotFoundException {
+			boolean incloureGlobalsDocument) {
 		return delegate.findActiveByEntitat(
 				entitatId,
 				incloureGlobalsExpedient,
@@ -108,9 +106,17 @@ public class MetaDadaServiceBean implements MetaDadaService {
 
 	@Override
 	@RolesAllowed("tothom")
+	public List<MetaNodeMetaDadaDto> findByNode(
+			Long entitatId,
+			Long nodeId) {
+		return delegate.findByNode(entitatId, nodeId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
 	public List<MetaDadaDto> findByNodePerCreacio(
 			Long entitatId,
-			Long nodeId) throws EntitatNotFoundException, NodeNotFoundException {
+			Long nodeId) {
 		return delegate.findByNodePerCreacio(entitatId, nodeId);
 	}
 

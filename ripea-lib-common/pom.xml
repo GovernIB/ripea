@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>es.caib</groupId>
+		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
 		<version>0.1</version>
 	</parent>
@@ -36,6 +36,17 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>${ehcache.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
@@ -45,6 +56,11 @@
 					<groupId>commons-logging</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -64,7 +80,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>${spring-data.version}</version>
+			<version>${spring-data-jpa.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jcl-over-slf4j</artifactId>
@@ -226,7 +242,7 @@
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
 			<artifactId>orika-core</artifactId>
-			<version>1.1.7</version>
+			<version>${orika.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-simple</artifactId>
@@ -236,11 +252,15 @@
 					<artifactId>javassist</artifactId>
 					<groupId>javassist</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
@@ -260,12 +280,12 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-core-api</artifactId>
 			<version>${ripea.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>es.caib</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin</artifactId>
 			<version>${ripea.version}</version>
 		</dependency>

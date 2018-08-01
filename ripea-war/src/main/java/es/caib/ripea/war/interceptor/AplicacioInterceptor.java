@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.war.helper.AplicacioHelper;
@@ -30,6 +31,9 @@ public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		AplicacioHelper.comprovarVersioActual(request, aplicacioService);
+		request.setAttribute(
+				"requestLocale",
+				RequestContextUtils.getLocale(request).getLanguage());
 		return true;
 	}
 

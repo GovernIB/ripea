@@ -12,21 +12,20 @@
 <html>
 <head>
 	<title>${titol}</title>
-	<rip:modalHead titol="${titol}" buttonContainerId="botons"/>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<rip:modalHead/>
 </head>
 <body>
-
 	<c:set var="formAction"><rip:modalUrl value="/arxiuAdmin"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="arxiuCommand" role="form">
 		<form:hidden path="id"/>
 		<form:hidden path="pareId"/>
 		<rip:inputText name="nom" textKey="arxiu.form.camp.nom" required="true"/>
 		<form:hidden path="unitatCodi"/>
-		<div id="modal-botons" class="well">
+		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/entitat"/>" class="btn btn-default modal-tancar"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/arxiuAdmin/unitat/${arxiuCommand.unitatCodi}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
-
 </body>
 </html>

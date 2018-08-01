@@ -21,8 +21,8 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.PermisCommand;
-import es.caib.ripea.war.datatable.DatatablesPagina;
-import es.caib.ripea.war.helper.PaginacioHelper;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per al manteniment de permisos de meta-expedients.
@@ -52,17 +52,18 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		return "metaExpedientPermis";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/permis/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesPagina<PermisDto> datatable(
+		@ResponseBody
+	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return PaginacioHelper.getPaginaPerDatatables(
+		return DatatablesHelper.getDatatableResponse(
 				request,
 				metaExpedientService.findPermis(
 						entitatActual.getId(),
-						metaExpedientId));
+						metaExpedientId),
+				"id");
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/permis/new", method = RequestMethod.GET)

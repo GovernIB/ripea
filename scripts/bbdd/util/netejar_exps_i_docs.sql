@@ -1,0 +1,21 @@
+delete from ipa_interessat;
+delete from ipa_cont_log;
+delete from ipa_document_enviament_doc;
+delete from ipa_document_enviament;
+update ipa_document set versio_darrera_id = null;
+delete from ipa_document_versio;
+delete from ipa_document;
+delete from ipa_expedient_rel;
+delete from ipa_expedient;
+delete from ipa_carpeta;
+delete from ipa_dada;
+delete from ipa_node;
+delete from ipa_escriptori;
+update ipa_contingut set contmov_id = null;
+delete from ipa_cont_mov;
+delete from ipa_registre_annex;
+delete from ipa_registre_inter;
+delete from ipa_registre;
+
+update ipa_contingut c set c.pare_id = null where (id not in (select b.id from ipa_bustia b)) and (id not in (select a.id from ipa_arxiu a));
+delete from ipa_contingut c where (id not in (select b.id from ipa_bustia b)) and (id not in (select a.id from ipa_arxiu a));

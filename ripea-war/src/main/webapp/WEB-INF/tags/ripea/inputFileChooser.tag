@@ -9,20 +9,22 @@
 <%@ attribute name="ocultarExpedients" required="false" rtexprvalue="true"%>
 <%@ attribute name="ocultarCarpetes" required="false" rtexprvalue="true"%>
 <%@ attribute name="ocultarDocuments" required="false" rtexprvalue="true"%>
-<%@ attribute name="contenidorOrigen" required="true" rtexprvalue="true" type="java.lang.Object"%>
+<%@ attribute name="contingutOrigen" required="true" rtexprvalue="true" type="java.lang.Object"%>
+<%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
+<c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
+<c:set var="campInputSize">${12 - campLabelSize}</c:set>
 <c:choose>
-	<c:when test="${not empty contenidorOrigen.escriptoriPare}"><c:set var="contenidorBaseId" value="${contenidorOrigen.escriptoriPare.id}"/></c:when>
-	<c:otherwise><c:set var="contenidorBaseId" value="${contenidorOrigen.id}"/></c:otherwise>
+	<c:when test="${not empty contingutOrigen.escriptoriPare}"><c:set var="contenidorBaseId" value="${contingutOrigen.escriptoriPare.id}"/></c:when>
+	<c:otherwise><c:set var="contenidorBaseId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
 <c:choose>
-	<c:when test="${not empty contenidorOrigen.pare}"><c:set var="contenidorInicialId" value="${contenidorOrigen.pare.id}"/></c:when>
-	<c:otherwise><c:set var="contenidorInicialId" value="${contenidorOrigen.id}"/></c:otherwise>
+	<c:when test="${not empty contingutOrigen.pare}"><c:set var="contenidorInicialId" value="${contingutOrigen.pare.id}"/></c:when>
+	<c:otherwise><c:set var="contenidorInicialId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
-
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
-	<label class="control-label col-xs-4" for="${campPath}">
+	<label class="control-label col-xs-${campLabelSize}" for="${campPath}">
 		<c:choose>
 			<c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when>
 			<c:when test="${not empty text}">${text}</c:when>
@@ -30,7 +32,7 @@
 		</c:choose>
 		<c:if test="${required}">*</c:if>
 	</label>
-	<div class="controls col-xs-8">
+	<div class="controls col-xs-${campInputSize}">
 		<div id="file-chooser-${campPath}-input" class="input-group">
 			<form:hidden path="${campPath}" id="${campPath}" disabled="${disabled}"/>
 			<div id="file-chooser-${campPath}-panel" class="panel panel-default">
@@ -56,6 +58,10 @@
 }
 </style>
 <script>
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
 function refrescarFileChooser(campPath, contenidorId) {
 	$.ajax({
 		type: "GET",
@@ -70,13 +76,16 @@ function refrescarFileChooser(campPath, contenidorId) {
 			var path = "";
 			if (data.id == '${contenidorBaseId}') {
 				if (data.escriptori)
-					path += "Escriptori";
+					path += '<span class="fa fa-desktop"></span> Escriptori';
 				if (data.expedient)
 					path += data.nom;
 			} else {
-				path += data.pathAsString.substring(1);
-				path += "/" + data.nom;
+				path += data.pathAsStringExploradorAmbNom;
 			}
+			path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Escriptori');
+			path = path.replaceAll('#X#', '<span class="fa fa-briefcase"></span>');
+			path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
+			path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
 			$("#file-chooser-" + campPath + "-path").html(path);
 			$("#file-chooser-" + campPath + "-content").html('');
 			$('<div class="list-group">').appendTo("#file-chooser-" + campPath + "-content");
@@ -84,7 +93,7 @@ function refrescarFileChooser(campPath, contenidorId) {
 				$('<a href="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-" + campPath + "-content");
 			for (var i = 0; i < data.fills.length; i++) {
 				var ocultar = (data.fills[i].expedient && ocultarExpedients) || (data.fills[i].carpeta && ocultarCarpetes) || (data.fills[i].document && ocultarDocuments);
-				if (!ocultar && data.fills[i].id != '${contenidorOrigen.id}') {
+				if (!ocultar && data.fills[i].id != '${contingutOrigen.id}') {
 					var htmlIcona = '';
 					if (data.fills[i].expedient)
 						htmlIcona += '<span class="fa fa-briefcase"></span> ';
@@ -92,7 +101,7 @@ function refrescarFileChooser(campPath, contenidorId) {
 						htmlIcona += '<span class="fa fa-folder"></span> ';
 					else if (data.fills[i].document)
 						htmlIcona += '<span class="fa fa-file"></span> ';
-					if ((data.fills[i].expedient || data.fills[i].carpeta) && data.fills[i].id != '${contenidorOrigen.id}')
+					if ((data.fills[i].expedient || data.fills[i].carpeta) && data.fills[i].id != '${contingutOrigen.id}')
 						$('<a href="' + data.fills[i].id + '" class="list-group-item">' + htmlIcona + data.fills[i].nom + '</a>').appendTo("#file-chooser-" + campPath + "-content");
 					else
 						$('<div class="list-group-item text-muted" style="border:none">' + htmlIcona + data.fills[i].nom + '</div>').appendTo("#file-chooser-" + campPath + "-content");
@@ -103,9 +112,7 @@ function refrescarFileChooser(campPath, contenidorId) {
 				refrescarFileChooser(campPath, $(this).attr('href'));
 				return false;
 			});
-			var iframe = $('.modal-body iframe', window.parent.document);
-			var height = $('html').height();
-			iframe.height(height + 'px');
+			webutilModalAdjustHeight();
 		},
 		error: function(xhr, textStatus, errorThrown) {
 			console.log("<spring:message code="peticio.ajax.error"/>: " + xhr.responseText);
