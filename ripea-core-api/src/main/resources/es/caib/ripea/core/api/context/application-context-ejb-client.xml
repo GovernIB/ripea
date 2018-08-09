@@ -17,14 +17,6 @@
 			jndi-name="ripea/AplicacioServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.AplicacioService"/>
 	<jee:local-slsb
-			id="arxiuService"
-			jndi-name="ripea/ArxiuServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ArxiuService"/>
-	<jee:local-slsb
-			id="bustiaService"
-			jndi-name="ripea/BustiaServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.BustiaService"/>
-	<jee:local-slsb
 			id="carpetaService"
 			jndi-name="ripea/CarpetaServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.CarpetaService"/>
@@ -65,14 +57,6 @@
 			jndi-name="ripea/MetaExpedientServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.MetaExpedientService"/>
 	<jee:local-slsb
-			id="registreService"
-			jndi-name="ripea/RegistreServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.RegistreService"/>
-	<jee:local-slsb
-			id="reglaService"
-			jndi-name="ripea/ReglaServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ReglaService"/>
-	<jee:local-slsb
 			id="dadesExternesService"
 			jndi-name="ripea/DadesExternesServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.DadesExternesService"/>
@@ -84,22 +68,5 @@
 			id="execucioMassivaService"
 			jndi-name="ripea/ExecucioMassivaServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.ExecucioMassivaService"/>
-	<jee:local-slsb
-			id="segonPlaService"
-			jndi-name="ripea/SegonPlaServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.SegonPlaService"/>
-
-	<jee:local-slsb
-			id="bustiaV0WsService"
-			jndi-name="ripea/BustiaV0WsServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ws.BustiaV0WsService"/>
-	<jee:local-slsb
-			id="bustiaV1WsService"
-			jndi-name="ripea/BustiaV1WsServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ws.BustiaV1WsService"/>
-	<jee:local-slsb
-			id="bantelBackofficeWs"
-			jndi-name="ripea/BantelBackofficeWsBean/local"
-			business-interface="es.caib.ripea.core.api.service.bantel.ws.v2.BantelBackofficeWs"/>
 
 </beans>
