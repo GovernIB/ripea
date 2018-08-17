@@ -33,6 +33,7 @@ public class PermisCommand {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
+	private boolean selectAll;
 
 	public Long getId() {
 		return id;
@@ -83,6 +84,12 @@ public class PermisCommand {
 		this.administration = administration;
 	}
 
+	public boolean isSelectAll() {
+		return selectAll;
+	}
+	public void setSelectAll(boolean selectAll) {
+		this.selectAll = selectAll;
+	}
 	public static List<PermisCommand> toPermisCommands(
 			List<PermisDto> dtos) {
 		List<PermisCommand> commands = new ArrayList<PermisCommand>();
@@ -96,9 +103,18 @@ public class PermisCommand {
 	}
 
 	public static PermisCommand asCommand(PermisDto dto) {
-		return ConversioTipusHelper.convertir(
+		PermisCommand permisCommand = ConversioTipusHelper.convertir(
 				dto,
-				PermisCommand.class);
+				PermisCommand.class); 
+		
+		permisCommand.setSelectAll(false);
+		if (permisCommand.isCreate() &&
+			permisCommand.isDelete() &&
+			permisCommand.isRead() &&
+			permisCommand.isWrite())
+			permisCommand.setSelectAll(true);
+		
+		return permisCommand;
 	}
 	public static PermisDto asDto(PermisCommand command) {
 		return ConversioTipusHelper.convertir(

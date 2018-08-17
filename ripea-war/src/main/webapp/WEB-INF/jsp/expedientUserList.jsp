@@ -110,9 +110,7 @@ function getCookie(cname) {
 <body>
 	<div data-toggle="botons-titol">
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
-		<c:if test="${not empty metaExpedientsPermisCreacio}">
-			<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
-		</c:if>
+
 	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
@@ -158,6 +156,7 @@ function getCookie(cname) {
 	</form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="btn-group pull-right">
+			
 			<button type="button" id="seleccioAll"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 			<button type="button" id="seleccioNone"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 			<button type="button"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -167,6 +166,9 @@ function getCookie(cname) {
 				<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 				<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
 			</ul>
+			<c:if test="${not empty metaExpedientsPermisCreacio}">
+				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
+			</c:if>
 		</div>
 	</script>
 	<script id="rowhrefTemplate" type="text/x-jsrender">contingut/{{:id}}</script>
@@ -249,7 +251,6 @@ function getCookie(cname) {
 										{{/if}}
 									{{/if}}
 									<li><a href="expedient/{{:id}}/relacionar" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-									<li><a href="expedient/{{:id}}/acumular" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
 									{{if estat == 'OBERT'}}
 										{{if valid && estat == 'OBERT'}}
 											<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>

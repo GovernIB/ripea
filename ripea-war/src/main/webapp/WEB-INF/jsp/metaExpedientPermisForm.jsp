@@ -23,19 +23,47 @@
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisCommand *:disabled").removeAttr('disabled');
 		});
+
+		$("#selectAll").on('change', function() {
+			if ($(this).prop("checked"))
+				$("div.permisosInput :checkbox").prop('checked', true);
+			else
+				$("div.permisosInput :checkbox").prop('checked', false);
+		});
+
+		$("div.permisosInput :checkbox").on('change', function() {
+			var totsSeleccionats = true;
+			$("div.permisosInput :checkbox").each(function() {
+				  if(!$(this).prop('checked'))
+					  totsSeleccionats = false;
+			});
+			$("#selectAll").prop('checked', totsSeleccionats);
+		});
 	});
+
 </script>
+<style>
+	.permisosInput {margin-left: 45px}
+</style>
+
+
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/permis"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect name="principalTipus" textKey="metaexpedient.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
-		<rip:inputText name="principalNom" textKey="metaexpedient.permis.form.camp.principal" disabled="${not empty permisCommand.id}"/>
-		<rip:inputCheckbox name="create" textKey="metaexpedient.permis.form.camp.creacio"/>
-		<rip:inputCheckbox name="read" textKey="metaexpedient.permis.form.camp.consulta"/>
-		<rip:inputCheckbox name="write" textKey="metaexpedient.permis.form.camp.modificacio"/>
-		<rip:inputCheckbox name="delete" textKey="metaexpedient.permis.form.camp.eliminacio"/>
+		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
+		<rip:inputSuggest name="principalNom" suggestValue="codi" suggestText="nom" textKey="metaexpedient.permis.form.camp.principal" disabled="${not empty permisCommand.id}" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" placeholderKey="metaexpedient.permis.form.camp.principal"/>
+		
+		<rip:inputCheckbox name="selectAll" textKey="metaexpedient.permis.form.camp.all"/>
+		<div class="permisosInput">
+			<rip:inputCheckbox name="create" textKey="metaexpedient.permis.form.camp.creacio"/>
+			<rip:inputCheckbox name="read" textKey="metaexpedient.permis.form.camp.consulta"/>
+			<rip:inputCheckbox name="write" textKey="metaexpedient.permis.form.camp.modificacio"/>
+			<rip:inputCheckbox name="delete" textKey="metaexpedient.permis.form.camp.eliminacio"/>
+		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
