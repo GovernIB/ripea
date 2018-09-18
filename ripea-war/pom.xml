@@ -447,6 +447,10 @@
 			<url>https://dl.bintray.com/milton/Milton/</url>
 		</repository>
 		<repository>
+			<id>mvn-local-repo</id>
+			<url>file://${basedir}/../local-repo</url>
+		</repository>
+		<repository>
 			<id>github-governib-maven-repos</id>
 			<name>GitHub GovernIB Maven Repository</name>
 			<url>http://GovernIB.github.io/maven/maven/</url>
