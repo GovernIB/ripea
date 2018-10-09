@@ -52,7 +52,7 @@
 		<rip:inputSelect name="principalTipus" textKey="metadocument.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
-		<rip:inputSuggest name="principalNom" suggestValue="codi" suggestText="nom" textKey="metadocument.permis.form.camp.principal" disabled="${not empty permisCommand.id}" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" placeholderKey="metadocument.permis.form.camp.principal"/>
+		<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
 		
 		<rip:inputCheckbox name="selectAll" textKey="metaexpedient.permis.form.camp.all"/>
 		<div class="permisosInput">
