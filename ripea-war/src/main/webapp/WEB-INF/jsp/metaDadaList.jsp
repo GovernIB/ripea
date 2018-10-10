@@ -18,7 +18,9 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
 	</div>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaDada/datatable"/>" data-info-type="search" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaDada/{{:id}}</script>	
+	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaDada/datatable"/>" data-info-type="search" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered"
+	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="codi"><spring:message code="metadada.list.columna.codi"/></th>

@@ -16,7 +16,9 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<table id="excepcions" data-toggle="datatable" data-url="<c:url value="/excepcio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%">
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/excepcio/{{:index}}</script>
+	<table id="excepcions" data-toggle="datatable" data-url="<c:url value="/excepcio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%"
+	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="excepcio.list.columna.data"/></th>

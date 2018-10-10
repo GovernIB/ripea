@@ -88,7 +88,9 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</form:form>
-	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/contingutAdmin/datatable"/>" data-filter="#contingutFiltreCommand" data-default-order="11" data-default-dir="asc" class="table table-bordered table-striped">
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/log/{{:id}}</script>
+	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/contingutAdmin/datatable"/>" data-filter="#contingutFiltreCommand" data-default-order="11" data-default-dir="asc" class="table table-bordered table-striped"
+	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>

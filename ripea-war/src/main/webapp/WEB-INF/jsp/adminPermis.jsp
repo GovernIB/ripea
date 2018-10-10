@@ -18,7 +18,9 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="permis/new" data-toggle="modal" data-datatable-id="permisos"><span class="fa fa-plus"></span>&nbsp;<spring:message code="permis.list.boto.nou.permis"/></a>
 	</div>
-	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/permis/{{:id}}</script>		
+	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered"
+	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="permis.list.columna.tipus"/></th>

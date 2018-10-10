@@ -19,7 +19,9 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDocument/new" data-toggle="modal" data-datatable-id="metadocuments"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.list.boto.nou"/></a>
 	</div>
-	<table id="metadocuments" data-toggle="datatable" data-url="<c:url value="/metaDocument/datatable"/>" data-info-type="search" data-default-order="2" data-default-dir="asc" class="table table-striped table-bordered" style="width:100%">
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaDocument/{{:id}}</script>
+	<table id="metadocuments" data-toggle="datatable" data-url="<c:url value="/metaDocument/datatable"/>" data-info-type="search" data-default-order="2" data-default-dir="asc" class="table table-striped table-bordered" style="width:100%"
+	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
