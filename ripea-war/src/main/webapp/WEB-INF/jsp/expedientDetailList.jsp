@@ -32,7 +32,20 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 	cursor: pointer;
 }
 
-.container{width: 1500px}
+.container{width: 98%}
+
+.buttons {
+    position: absolute;
+    top: 138px;
+    right: 2%;
+}
+
+.buttons a {
+	float: right;
+	margin-left: 10px;
+}
+
+
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
@@ -138,7 +151,7 @@ function getCookie(cname) {
 <body>
 
 
-	<div data-toggle="botons-titol">
+	<div class="buttons" >
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
 		<a  style="float: right" href="<c:url value="/expedient"/>"  class="btn btn-primary"> <spring:message code="expedient.list.canviVista"/></a>
 	</div>
@@ -217,8 +230,8 @@ function getCookie(cname) {
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
 				<th data-col-name="metaNode.nom" width="15%" data-visible="false"><spring:message code="expedient.list.user.columna.tipus"/></th>
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
-				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
+				<th data-col-name="numero" width="30%"><spring:message code="expedient.list.user.columna.numero"/></th>
+				<th data-col-name="nom" data-template="#cellNomTemplate" width="70%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
 						{{if !valid}}
