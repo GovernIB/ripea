@@ -70,7 +70,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -89,7 +88,6 @@ import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -108,8 +106,6 @@ public class ContingutServiceImpl implements ContingutService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private ContingutRepository contingutRepository;
-	@Autowired
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
 	@Autowired
 	private MetaDadaRepository metaDadaRepository;
 	@Autowired
@@ -202,25 +198,12 @@ public class ContingutServiceImpl implements ContingutService {
 				dadaRepository.delete(dada);
 			}
 		}
-		// Obté les metaDades del node (globals i específiques)
-		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode());
-		List<MetaDadaEntity> metaDadesGlobals = null;
-		if (node instanceof ExpedientEntity) {
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(
-					node.getEntitat());
-		} else if (node instanceof DocumentEntity) {
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(
-					node.getEntitat());
-		}
 		// Modifica les dades existents
 		for (String dadaCodi: valors.keySet()) {
 			nodeDadaGuardar(
 					node,
 					dadaCodi,
-					valors.get(dadaCodi),
-					metaNodeMetaDades,
-					metaDadesGlobals);
-			
+					valors.get(dadaCodi));
 		}
 		cacheHelper.evictErrorsValidacioPerNode(node);
 	}
@@ -1662,24 +1645,10 @@ public class ContingutServiceImpl implements ContingutService {
 	private void nodeDadaGuardar(
 			NodeEntity node,
 			String dadaCodi,
-			Object dadaValor,
-			List<MetaNodeMetaDadaEntity> metaNodeMetaDades,
-			List<MetaDadaEntity> metaDadesGlobals) {
-		MetaDadaEntity metaDada = null;
-		for (MetaNodeMetaDadaEntity metaNodeMetaDada: metaNodeMetaDades) {
-			if (metaNodeMetaDada.getMetaDada().getCodi().equals(dadaCodi)) {
-				metaDada = metaNodeMetaDada.getMetaDada();
-				break;
-			}
-		}
-		if (metaDada == null) {
-			for (MetaDadaEntity metaDadaGlobal: metaDadesGlobals) {
-				if (metaDadaGlobal.getCodi().equals(dadaCodi)) {
-					metaDada = metaDadaGlobal;
-					break;
-				}
-			}
-		}
+			Object dadaValor) {
+		MetaDadaEntity metaDada = metaDadaRepository.findByMetaNodeAndCodi(
+				node.getMetaNode(),
+				dadaCodi);
 		if (metaDada == null) {
 			throw new ValidationException(
 					node.getId(),

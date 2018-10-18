@@ -4,7 +4,6 @@
 package es.caib.ripea.core.entity;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -27,7 +26,6 @@ import javax.persistence.Version;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
 /**
@@ -67,7 +65,7 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	@OrderBy("ordre asc")
-	private Set<MetaNodeMetaDadaEntity> metaDades = new HashSet<MetaNodeMetaDadaEntity>();
+	private Set<MetaDadaEntity> metaDades = new HashSet<MetaDadaEntity>();
 	@OneToMany(
 			mappedBy = "metaNode",
 			fetch = FetchType.LAZY)
@@ -89,7 +87,7 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
-	public Set<MetaNodeMetaDadaEntity> getMetaDades() {
+	public Set<MetaDadaEntity> getMetaDades() {
 		return metaDades;
 	}
 	public Set<NodeEntity> getNodes() {
@@ -110,27 +108,6 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 	public void updateActiu(
 			boolean actiu) {
 		this.actiu = actiu;
-	}
-
-	public void metaDadaAdd(
-			MetaDadaEntity metaDada,
-			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) {
-		MetaNodeMetaDadaEntity metaNodeMetaDada = MetaNodeMetaDadaEntity.getBuilder(
-				this,
-				metaDada,
-				multiplicitat,
-				readOnly,
-				metaDades.size()).build();
-		metaDades.add(metaNodeMetaDada);
-	}
-	public void metaDadaDelete(MetaNodeMetaDadaEntity metaNodeMetaDada) {
-		Iterator<MetaNodeMetaDadaEntity> it = metaDades.iterator();
-		while (it.hasNext()) {
-			MetaNodeMetaDadaEntity mnmd = it.next();
-			if (mnmd.getId().equals(metaNodeMetaDada.getId()))
-				it.remove();
-		}
 	}
 
 	@Override

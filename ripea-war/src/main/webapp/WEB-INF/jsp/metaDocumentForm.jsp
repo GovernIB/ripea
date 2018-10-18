@@ -38,8 +38,7 @@ pageContext.setAttribute(
 	<rip:modalHead/>
 </head>
 <body>
-
-	<c:set var="formAction"><rip:modalUrl value="/metaDocument"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDocumentCommand.metaExpedientId}/metaDocument"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaDocumentCommand" enctype="multipart/form-data">
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dades"/></a></li>
@@ -48,15 +47,14 @@ pageContext.setAttribute(
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
+		<form:hidden path="metaExpedientId"/>
 		<br/>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
 				<rip:inputText name="codi" textKey="metadocument.form.camp.codi" required="true"/>
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio"/>
-				<rip:inputCheckbox name="globalExpedient" textKey="metadada.form.camp.global.expedient"/>
-				<rip:inputSelect name="globalMultiplicitat" textKey="metadada.form.camp.global.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputCheckbox name="globalReadOnly" textKey="metadada.form.camp.global.readonly"/>
+				<rip:inputSelect name="multiplicitat" textKey="metadocument.form.camp.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">
@@ -84,6 +82,5 @@ pageContext.setAttribute(
 			<a href="<c:url value="/metaDocument"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
-
 </body>
 </html>

@@ -6,20 +6,18 @@ package es.caib.ripea.core.api.dto;
 import java.util.List;
 
 /**
- * Informació d'un MetaNode.
+ * Informació d'un meta-node amb meta-dades.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class MetaNodeAmbMetaDadesDto extends MetaNodeDto {
 
-	private List<MetaNodeMetaDadaDto> metaDades;
+	private List<MetaDadaDto> metaDades;
 
-
-
-	public List<MetaNodeMetaDadaDto> getMetaDades() {
+	public List<MetaDadaDto> getMetaDades() {
 		return metaDades;
 	}
-	public void setMetaDades(List<MetaNodeMetaDadaDto> metaDades) {
+	public void setMetaDades(List<MetaDadaDto> metaDades) {
 		this.metaDades = metaDades;
 	}
 

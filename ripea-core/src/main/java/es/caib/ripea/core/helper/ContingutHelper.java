@@ -280,8 +280,8 @@ public class ContingutHelper {
 					Iterator<ContingutEntity> it = fills.iterator();
 					while (it.hasNext()) {
 						ContingutEntity c = it.next();
-						if (c instanceof NodeEntity) {
-							NodeEntity n = (NodeEntity)c;
+						if (c instanceof ExpedientEntity) {
+							ExpedientEntity n = (ExpedientEntity)c;
 							if (n.getMetaNode() != null && !permisosHelper.isGrantedAll(
 									n.getMetaNode().getId(),
 									MetaNodeEntity.class,
@@ -408,7 +408,7 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus()) || ContingutTipusEnumDto.DOCUMENT.equals(contingut.getTipus())) {
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			comprovarPermisosNode(
 					(NodeEntity)contingut,
 					comprovarPermisRead,
@@ -457,7 +457,7 @@ public class ContingutHelper {
 				true,
 				true,
 				false);
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus()) || ContingutTipusEnumDto.DOCUMENT.equals(contingut.getTipus())) {
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			comprovarPermisosNode(
 					(NodeEntity)contingut,
 					comprovarPermisRead,

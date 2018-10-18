@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DadaDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import net.sf.cglib.beans.BeanGenerator;
@@ -36,15 +36,15 @@ public class BeanGeneratorHelper {
 			Long entitatId,
 			Long nodeId,
 			List<DadaDto> dades) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		List<MetaNodeMetaDadaDto> contingutMetaDades = metaDadaService.findByNode(
+		List<MetaDadaDto> contingutMetaDades = metaDadaService.findByNode(
 				entitatId,
 				nodeId);
 		String[] noms = new String[contingutMetaDades.size()];
 		Class<?>[] tipus = new Class<?>[contingutMetaDades.size()];
 		Object[] valors = (dades != null) ? new Object[contingutMetaDades.size()] : null;
 		for (int i = 0; i < contingutMetaDades.size(); i++) {
-			MetaNodeMetaDadaDto metaDada = contingutMetaDades.get(i);
-			noms[i] = metaDada.getMetaDada().getCodi();
+			MetaDadaDto metaDada = contingutMetaDades.get(i);
+			noms[i] = metaDada.getCodi();
 			boolean isMultiple = (MultiplicitatEnumDto.M_0_N.equals(metaDada.getMultiplicitat()) || MultiplicitatEnumDto.M_1_N.equals(metaDada.getMultiplicitat()));
 			List<Object> dadaValors = new ArrayList<Object>();
 			if (dades != null) {
@@ -54,7 +54,7 @@ public class BeanGeneratorHelper {
 					}
 				}
 			}
-			switch (metaDada.getMetaDada().getTipus()) {
+			switch (metaDada.getTipus()) {
 			case BOOLEA:
 				tipus[i] = (isMultiple) ? Boolean[].class : Boolean.class;
 				if (valors != null) {

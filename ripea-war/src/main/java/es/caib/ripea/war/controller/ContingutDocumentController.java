@@ -444,7 +444,7 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@PathVariable Long metaDocumentId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiveByEntitatAndContenidorPerCreacio(
+		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
 				contingutId);
 		for (MetaDocumentDto metaDocument: metaDocuments) {
@@ -463,6 +463,7 @@ public class ContingutDocumentController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto plantilla = metaDocumentService.getPlantilla(
 				entitatActual.getId(),
+				contingutId,
 				metaDocumentId);
 		writeFileToResponse(
 				plantilla.getNom(),
@@ -538,13 +539,13 @@ public class ContingutDocumentController extends BaseUserController {
 		if (command.getId() == null) {
 			model.addAttribute(
 					"metaDocuments",
-					metaDocumentService.findActiveByEntitatAndContenidorPerCreacio(
+					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
 							contingutId));
 		} else {
 			model.addAttribute(
 					"metaDocuments",
-					metaDocumentService.findActiveByEntitatAndDocumentPerModificacio(
+					metaDocumentService.findActiusPerModificacio(
 							entitatActual.getId(),
 							command.getId()));
 		}

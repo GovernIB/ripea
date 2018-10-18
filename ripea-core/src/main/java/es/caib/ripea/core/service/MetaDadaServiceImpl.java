@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,26 +13,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 
 /**
@@ -51,8 +45,6 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	@Resource
 	private NodeRepository nodeRepository;
 	@Resource
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
-	@Resource
 	private DadaRepository dadaRepository;
 
 	@Resource
@@ -63,32 +55,35 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	private PermisosHelper permisosHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
-
-
+	@Resource
+	private MetaNodeHelper metaNodeHelper;
 
 	@Transactional
 	@Override
 	public MetaDadaDto create(
 			Long entitatId,
+			Long metaNodeId,
 			MetaDadaDto metaDada) {
-		logger.debug("Creant una nova meta-dada ("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaDada=" + metaDada + ")");
+		logger.debug("Creant una nova meta-dada (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"metaDada=" + metaDada + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
 		MetaDadaEntity entity = MetaDadaEntity.getBuilder(
 				metaDada.getCodi(),
 				metaDada.getNom(),
-				metaDada.getDescripcio(),
 				metaDada.getTipus(),
-				metaDada.isGlobalExpedient(),
-				metaDada.isGlobalDocument(),
-				metaDada.getGlobalMultiplicitat(),
-				metaDada.isGlobalReadOnly(),
-				entitat).build();
+				metaDada.getMultiplicitat(),
+				metaDada.isReadOnly(),
+				0,
+				metaNode).
+				descripcio(metaDada.getDescripcio()).
+				build();
 		return conversioTipusHelper.convertir(
 				metaDadaRepository.save(entity),
 				MetaDadaDto.class);
@@ -98,26 +93,31 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	@Override
 	public MetaDadaDto update(
 			Long entitatId,
+			Long metaNodeId,
 			MetaDadaDto metaDada) {
-		logger.debug("Actualitzant meta-dada existent ("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaDada=" + metaDada + ")");
+		logger.debug("Actualitzant meta-dada existent (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"metaDada=" + metaDada + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDadaEntity entity = entityComprovarHelper.comprovarMetaDada(entitat, metaDada.getId());
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity entity = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				metaDada.getId());
 		entity.update(
 				metaDada.getCodi(),
 				metaDada.getNom(),
-				metaDada.getDescripcio(),
 				metaDada.getTipus(),
-				metaDada.isGlobalExpedient(),
-				metaDada.isGlobalDocument(),
-				metaDada.getGlobalMultiplicitat(),
-				metaDada.isGlobalReadOnly(),
-				entitat);
+				metaDada.getMultiplicitat(),
+				metaDada.getDescripcio(),
+				metaDada.isReadOnly());
 		return conversioTipusHelper.convertir(
 				entity,
 				MetaDadaDto.class);
@@ -125,20 +125,56 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Transactional
 	@Override
-	public MetaDadaDto updateActiva(
+	public MetaDadaDto delete(
 			Long entitatId,
-			Long id,
-			boolean activa) {
-		logger.debug("Actualitzant propietat activa de la meta-dada ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ","
-				+ "activa=" + activa + ")");
+			Long metaNodeId,
+			Long id) {
+		logger.debug("Esborrant meta-dada (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(entitat, id);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				id);
+		metaDadaRepository.delete(metaDada);
+		return conversioTipusHelper.convertir(
+				metaDada,
+				MetaDadaDto.class);
+	}
+
+	@Transactional
+	@Override
+	public MetaDadaDto updateActiva(
+			Long entitatId,
+			Long metaNodeId,
+			Long id,
+			boolean activa) {
+		logger.debug("Actualitzant propietat activa de la meta-dada (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"id=" + id + "," +
+				"activa=" + activa + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				id);
 		metaDada.updateActiva(activa);
 		return conversioTipusHelper.convertir(
 				metaDada,
@@ -147,34 +183,112 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Transactional
 	@Override
-	public MetaDadaDto delete(
+	public void moveUp(
 			Long entitatId,
-			Long id) {
-		logger.debug("Esborrant meta-dada (id=" + id +  ")");
+			Long metaNodeId,
+			Long metaDadaId) {
+		logger.debug("Movent meta-dada al meta-expedient cap amunt ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "metaNodeId=" + metaNodeId +  ", "
+				+ "metaDadaId=" + metaDadaId +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(entitat, id);
-		metaDadaRepository.delete(metaDada);
-		return conversioTipusHelper.convertir(
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				metaDadaId);
+		metaNodeHelper.moureMetaNodeMetaDada(
+				metaNode,
 				metaDada,
-				MetaDadaDto.class);
+				metaDada.getOrdre() - 1);
+	}
+
+	@Transactional
+	@Override
+	public void moveDown(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId) {
+		logger.debug("Movent meta-dada al meta-expedient cap avall ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "metaNodeId=" + metaNodeId +  ", "
+				+ "metaDadaId=" + metaDadaId +  ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				metaDadaId);
+		metaNodeHelper.moureMetaNodeMetaDada(
+				metaNode,
+				metaDada,
+				metaDada.getOrdre() + 1);
+	}
+
+	@Transactional
+	@Override
+	public void moveTo(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId,
+			int posicio) {
+		logger.debug("Movent meta-dada al meta-expedient ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "metaNodeId=" + metaNodeId +  ", "
+				+ "metaDadaId=" + metaDadaId +  ", "
+				+ "posicio=" + posicio +  ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				metaDadaId);
+		metaNodeHelper.moureMetaNodeMetaDada(
+				metaNode,
+				metaDada,
+				posicio);
 	}
 
 	@Transactional(readOnly=true)
 	@Override
 	public MetaDadaDto findById(
 			Long entitatId,
+			Long metaNodeId,
 			Long id) {
-		logger.debug("Consulta de la meta-dada (id=" + id + ")");
+		logger.debug("Consulta de la meta-dada (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(entitat, id);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+				entitat,
+				metaNode,
+				id);
 		return conversioTipusHelper.convertir(
 				metaDada,
 				MetaDadaDto.class);
@@ -182,44 +296,56 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Transactional(readOnly=true)
 	@Override
-	public MetaDadaDto findByEntitatCodi(
+	public MetaDadaDto findByCodi(
 			Long entitatId,
+			Long metaNodeId,
 			String codi) {
-		logger.debug("Consulta de la meta-dada per entitat i codi ("
-				+ "entitatId=" + entitatId + ", "
-				+ "codi=" + codi + ")");
+		logger.debug("Consulta de la meta-dada per entitat i codi (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"codi=" + codi + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
 		return conversioTipusHelper.convertir(
-				metaDadaRepository.findByEntitatAndCodi(entitat, codi),
+				metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi),
 				MetaDadaDto.class);
 	}
 
 	@Transactional(readOnly=true)
 	@Override
-	public PaginaDto<MetaDadaDto> findAllByEntitatPaginat(
+	public PaginaDto<MetaDadaDto> findByMetaNodePaginat(
 			Long entitatId,
+			Long metaNodeId,
 			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta paginada de les meta-dades de l'entitat (entitatId=" + entitatId + ")");
+		logger.debug("Consulta paginada de les meta-dades de l'entitat (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ", " +
+				"paginacioParams=" + paginacioParams + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
 		PaginaDto<MetaDadaDto> resposta;
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			resposta = paginacioHelper.toPaginaDto(
-					metaDadaRepository.findByEntitat(
-							entitat,
+					metaDadaRepository.findByMetaNode(
+							metaNode,
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaDadaDto.class);
 		} else {
 			resposta = paginacioHelper.toPaginaDto(
-					metaDadaRepository.findByEntitat(
-							entitat,
+					metaDadaRepository.findByMetaNode(
+							metaNode,
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaDadaDto.class);
 		}
@@ -228,27 +354,28 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Transactional(readOnly=true)
 	@Override
-	public List<MetaDadaDto> findActiveByEntitat(
+	public List<MetaDadaDto> findActiveByMetaNode(
 			Long entitatId,
-			boolean incloureGlobalsExpedient,
-			boolean incloureGlobalsDocument) {
-		logger.debug("Consulta de les meta-dades de l'entitat (entitatId=" + entitatId + ")");
+			Long metaNodeId) {
+		logger.debug("Consulta de les meta-dades de l'entitat (" +
+				"entitatId=" + entitatId + ", " +
+				"metaNodeId=" + metaNodeId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
+				entitat,
+				metaNodeId);
 		return conversioTipusHelper.convertirList(
-				metaDadaRepository.findByEntitatAndActivaTrueAndGlobalsOrderByNomAsc(
-						entitat,
-						incloureGlobalsExpedient,
-						incloureGlobalsDocument),
+				metaDadaRepository.findByMetaNodeAndActivaTrue(metaNode),
 				MetaDadaDto.class);
 	}
 
 	@Transactional(readOnly=true)
 	@Override
-	public List<MetaNodeMetaDadaDto> findByNode(
+	public List<MetaDadaDto> findByNode(
 			Long entitatId,
 			Long nodeId) {
 		logger.debug("Consulta de les meta-dades disponibles al node ("
@@ -266,41 +393,12 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				false,
 				false,
 				false);
-		List<MetaNodeMetaDadaDto> metaNodeMetaDades = new ArrayList<MetaNodeMetaDadaDto>();
-		metaNodeMetaDades.addAll(
-				conversioTipusHelper.convertirList(
-						metaNodeMetaDadaRepository.findByMetaNodeAndActivaTrue(
-								node.getMetaNode()),
-						MetaNodeMetaDadaDto.class));
-		List<MetaDadaEntity> metaDadesGlobals = null;
-		if (node instanceof ExpedientEntity) {
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(entitat);
-		} else if (node instanceof DocumentEntity) {
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(entitat);
-		}
-		for (MetaDadaEntity metaDada: metaDadesGlobals) {
-			boolean afegida = false;
-			for (MetaNodeMetaDadaDto metaNodeMetaDada: metaNodeMetaDades) {
-				if (metaNodeMetaDada.getMetaDada().getCodi().equals(metaDada.getCodi())) {
-					afegida = true;
-					break;
-				}
-			}
-			if (!afegida) {
-				MetaNodeMetaDadaDto dto = new MetaNodeMetaDadaDto();
-				dto.setMetaDada(conversioTipusHelper.convertir(
-						metaDada,
-						MetaDadaDto.class));
-				dto.setMultiplicitat(metaDada.getGlobalMultiplicitat());
-				dto.setReadOnly(metaDada.isGlobalReadOnly());
-				dto.setGlobal(true);
-				metaNodeMetaDades.add(dto);
-			}
-		}
-		return metaNodeMetaDades;
+		return conversioTipusHelper.convertirList(
+				metaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode()),
+				MetaDadaDto.class);
 	}
 
-	@Transactional(readOnly=true)
+	/*@Transactional(readOnly=true)
 	@Override
 	public List<MetaDadaDto> findByNodePerCreacio(
 			Long entitatId,
@@ -364,9 +462,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 		return conversioTipusHelper.convertirList(
 				metaDades,
 				MetaDadaDto.class);
-	}
-
-
+	}*/
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaDadaServiceImpl.class);
 

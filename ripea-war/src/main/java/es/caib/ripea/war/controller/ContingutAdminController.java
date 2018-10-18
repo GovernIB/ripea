@@ -26,7 +26,6 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutFiltreCommand;
 import es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum;
@@ -49,10 +48,6 @@ public class ContingutAdminController extends BaseAdminController {
 	private ContingutService contingutService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-
-
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -67,9 +62,9 @@ public class ContingutAdminController extends BaseAdminController {
 					"metaNodes",
 					metaExpedientService.findByEntitat(entitatActual.getId()));
 		} else if (ContingutTipusEnumDto.DOCUMENT.equals(filtreCommand.getTipus())) {
-			model.addAttribute(
+			/*model.addAttribute(
 					"metaNodes",
-					metaDocumentService.findByEntitat(entitatActual.getId()));
+					metaDocumentService.findByEntitat(entitatActual.getId()));*/
 		}
 		return "contingutAdminList";
 	}

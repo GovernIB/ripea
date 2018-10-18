@@ -48,7 +48,6 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -60,7 +59,6 @@ import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -73,8 +71,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Autowired
 	private DocumentRepository documentRepository;
-	@Autowired
-	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
 	@Autowired
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
 
@@ -116,15 +112,19 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false);
+		ExpedientEntity expedientSuperior;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
+			expedientSuperior = (ExpedientEntity)contingut;
+		} else {
+			expedientSuperior = contingut.getExpedient();
+		}
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					contingut.getEntitat(),
+					expedientSuperior.getMetaExpedient(),
 					document.getMetaDocument().getId(),
-					false,
-					false,
-					true,
-					false);
+					true);
 		} else {
 			throw new ValidationException(
 					"<creacio>",
@@ -136,45 +136,19 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getNom(),
 				"<creacio>",
 				DocumentEntity.class);
-		ExpedientEntity expedientSuperior;
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			expedientSuperior = (ExpedientEntity)contingut;
-		} else {
-			expedientSuperior = contingut.getExpedient();
-		}
-		// Comprova que es pugui crear el document segons la multiplicitat
-		if (metaDocument.isGlobalExpedient()) {
-			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
-					expedientSuperior,
-					metaDocument,
-					0);
-			if (documents.size() > 0 && (metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
-				throw new ValidationException(
-						"<creacio>",
-						ExpedientEntity.class,
-						"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
-						"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
-						"metaDocumentMultiplicitat=" + document.getMetaDocument().getGlobalMultiplicitat() + ", " +
-						"expedientId=" + expedientSuperior.getId() + ")");
-			}
-		} else {
-			MetaExpedientMetaDocumentEntity metaExpedientMetaDocument = metaExpedientMetaDocumentRepository.findByMetaExpedientAndMetaDocument(
-					expedientSuperior.getMetaExpedient(),
-					metaDocument);
-			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
-					expedientSuperior,
-					metaDocument,
-					0);
-			if (documents.size() > 0 && (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
-				throw new ValidationException(
-						"<creacio>",
-						ExpedientEntity.class,
-						"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
-						"metaExpedientId=" + expedientSuperior.getMetaExpedient().getId() + ", " +
-						"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
-						"metaDocumentMultiplicitat=" + metaExpedientMetaDocument.getMultiplicitat() + ", " +
-						"expedientId=" + expedientSuperior.getId() + ")");
-			}
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+				expedientSuperior,
+				metaDocument,
+				0);
+		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
+					"metaExpedientId=" + expedientSuperior.getMetaExpedient().getId() + ", " +
+					"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
+					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
+					"expedientId=" + expedientSuperior.getId() + ")");
 		}
 		if (expedientSuperior != null) {
 			cacheHelper.evictErrorsValidacioPerNode(expedientSuperior);
@@ -232,10 +206,8 @@ public class DocumentServiceImpl implements DocumentService {
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					entity.getEntitat(),
+					entity.getMetaDocument().getMetaExpedient(),
 					document.getMetaDocument().getId(),
-					false,
-					true,
-					false,
 					false);
 		} else {
 			throw new ValidationException(

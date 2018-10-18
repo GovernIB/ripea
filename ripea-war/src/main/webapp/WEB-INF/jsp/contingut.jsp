@@ -625,7 +625,7 @@ $(document).ready(function() {
 										</ul>
 									</div>
 								</c:if>
-								<c:if test="${agafatPerUsuariActual and (contingut.carpeta or ((contingut.expedient or contingut.document) and potModificarContingut))}">
+								<c:if test="${agafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
@@ -662,40 +662,40 @@ $(document).ready(function() {
 										</tr>
 									</thead>
 									<tbody>
-										<c:forEach var="metaNodeMetaDada" items="${metaDades}">
+										<c:forEach var="metaDada" items="${metaDades}">
 											<c:set var="dadaValor"></c:set>
 											<c:forEach var="dada" items="${contingut.dades}">
-												<c:if test="${dada.metaDada.codi == metaNodeMetaDada.metaDada.codi}">
+												<c:if test="${dada.metaDada.codi == metaDada.codi}">
 													<c:set var="dadaValor">${dada.valorMostrar}</c:set>
 												</c:if>
 											</c:forEach>
-											<c:set var="isMultiple" value="${metaNodeMetaDada.multiplicitat == 'M_0_N' or metaNodeMetaDada.multiplicitat == 'M_1_N'}"/>
+											<c:set var="isMultiple" value="${metaDada.multiplicitat == 'M_0_N' or metaNodeMetaDada.multiplicitat == 'M_1_N'}"/>
 											<c:set var="multipleClass" value=""/>
 											<c:if test="${isMultiple}"><c:set var="multipleClass" value=" multiple"/></c:if>
 											<tr>
-												<td>${metaNodeMetaDada.metaDada.nom}</td>
+												<td>${metaDada.nom}</td>
 												<td>
 													<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
-														<label class="hidden" for="${metaNodeMetaDada.metaDada.codi}"></label>
+														<label class="hidden" for="${metaDada.codi}"></label>
 														<div>
 															<c:choose>
-																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'DATA'}">
-																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaDada.tipus == 'DATA'}">
+																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'IMPORT'}">
-																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaDada.tipus == 'IMPORT'}">
+																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'SENCER'}">
-																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaDada.tipus == 'SENCER'}">
+																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'FLOTANT'}">
-																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaDada.tipus == 'FLOTANT'}">
+																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'BOOLEA'}">
-																	<form:checkbox path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" name="${metaNodeMetaDada.metaDada.codi}"></form:checkbox>
+																<c:when test="${metaDada.tipus == 'BOOLEA'}">
+																	<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
 																</c:when>
 																<c:otherwise>
-																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
+																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
 																</c:otherwise>
 															</c:choose>
 															<span class="" aria-hidden="true"></span>

@@ -17,12 +17,11 @@ public class MetaDadaDto implements Serializable {
 	private Long id;
 	private String codi;
 	private String nom;
-	private String descripcio;
 	private MetaDadaTipusEnumDto tipus;
-	private boolean globalExpedient;
-	private boolean globalDocument;
-	private MultiplicitatEnumDto globalMultiplicitat;
-	private boolean globalReadOnly;
+	private String descripcio;
+	private MultiplicitatEnumDto multiplicitat;
+	private boolean readOnly;
+	private int ordre;
 	private boolean activa;
 
 	public Long getId() {
@@ -52,29 +51,23 @@ public class MetaDadaDto implements Serializable {
 	public MetaDadaTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public boolean isGlobalExpedient() {
-		return globalExpedient;
+	public MultiplicitatEnumDto getMultiplicitat() {
+		return multiplicitat;
 	}
-	public void setGlobalExpedient(boolean globalExpedient) {
-		this.globalExpedient = globalExpedient;
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
 	}
-	public boolean isGlobalDocument() {
-		return globalDocument;
+	public boolean isReadOnly() {
+		return readOnly;
 	}
-	public void setGlobalDocument(boolean globalDocument) {
-		this.globalDocument = globalDocument;
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
 	}
-	public MultiplicitatEnumDto getGlobalMultiplicitat() {
-		return globalMultiplicitat;
+	public int getOrdre() {
+		return ordre;
 	}
-	public void setGlobalMultiplicitat(MultiplicitatEnumDto globalMultiplicitat) {
-		this.globalMultiplicitat = globalMultiplicitat;
-	}
-	public boolean isGlobalReadOnly() {
-		return globalReadOnly;
-	}
-	public void setGlobalReadOnly(boolean globalReadOnly) {
-		this.globalReadOnly = globalReadOnly;
+	public void setOrdre(int ordre) {
+		this.ordre = ordre;
 	}
 	public boolean isActiva() {
 		return activa;

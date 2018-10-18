@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -90,18 +90,18 @@ public class ContingutDadaController extends BaseUserController {
 					bindingResult);
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			List<MetaNodeMetaDadaDto> contingutMetaDades = metaDadaService.findByNode(
+			List<MetaDadaDto> contingutMetaDades = metaDadaService.findByNode(
 					entitatActual.getId(),
 					contingutId);
 			Map<String, Object> valors = new HashMap<String, Object>();
 			for (int i = 0; i < contingutMetaDades.size(); i++) {
-				MetaNodeMetaDadaDto metaDada = contingutMetaDades.get(i);
+				MetaDadaDto metaDada = contingutMetaDades.get(i);
 				Object valor = PropertyUtils.getSimpleProperty(
 						dadesCommand,
-						metaDada.getMetaDada().getCodi());
+						metaDada.getCodi());
 				if (valor != null && (!(valor instanceof String) || !((String)valor).isEmpty())) {
 					valors.put(
-							metaDada.getMetaDada().getCodi(),
+							metaDada.getCodi(),
 							valor);
 				}
 			}

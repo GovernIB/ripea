@@ -14,14 +14,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaNodeAmbMetaDadesDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
+import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -33,78 +33,78 @@ import es.caib.ripea.core.security.ExtendedPermission;
 public class MetaNodeHelper {
 
 	@Resource
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
+	private MetaDadaRepository metaDadaRepository;
 	@Resource
 	ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private PermisosHelper permisosHelper;
 
-
-
 	public void omplirMetaDadesPerMetaNodes(
 			List<? extends MetaNodeAmbMetaDadesDto> metaNodes) {
 		List<Long> metaNodeIds = new ArrayList<Long>();
-		for (MetaNodeAmbMetaDadesDto metaNode: metaNodes)
-			metaNodeIds.add(metaNode.getId());
-		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = null;
-		// Si passam una llista buida dona un error a la consulta.
-		if (metaNodeIds.size() > 0)
-			metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeIdIn(metaNodeIds);
 		for (MetaNodeAmbMetaDadesDto metaNode: metaNodes) {
-			List<MetaNodeMetaDadaDto> metaDades = new ArrayList<MetaNodeMetaDadaDto>();
-			if (metaNodeMetaDades != null) {
-				for (MetaNodeMetaDadaEntity metaNodeMetaDada: metaNodeMetaDades) {
-					if (metaNodeMetaDada.getMetaNode().getId().equals(metaNode.getId())) {
-						metaDades.add(conversioTipusHelper.convertir(
-								metaNodeMetaDada,
-								MetaNodeMetaDadaDto.class));
+			metaNodeIds.add(metaNode.getId());
+		}
+		List<MetaDadaEntity> metaDades = null;
+		if (metaNodeIds.size() > 0) {
+			metaDades = metaDadaRepository.findByMetaNodeIdInOrderByMetaNodeIdAscOrdreAsc(
+					metaNodeIds);
+		}
+		for (MetaNodeAmbMetaDadesDto metaNode: metaNodes) {
+			List<MetaDadaDto> dtos = new ArrayList<MetaDadaDto>();
+			if (metaDades != null) {
+				for (MetaDadaEntity metaDada: metaDades) {
+					if (metaDada.getMetaNode().getId().equals(metaNode.getId())) {
+						dtos.add(conversioTipusHelper.convertir(
+								metaDada,
+								MetaDadaDto.class));
 					}
 				}
 			}
-			metaNode.setMetaDades(metaDades);
+			metaNode.setMetaDades(dtos);
 		}
 	}
 
 	public void omplirMetaDadesPerMetaNode(
 			MetaNodeAmbMetaDadesDto metaNode) {
-		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeId(
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeIdOrderByOrdreAsc(
 				metaNode.getId());
-		List<MetaNodeMetaDadaDto> metaDades = new ArrayList<MetaNodeMetaDadaDto>();
-		for (MetaNodeMetaDadaEntity metaNodeMetaDada: metaNodeMetaDades) {
-			metaDades.add(conversioTipusHelper.convertir(
-					metaNodeMetaDada,
-					MetaNodeMetaDadaDto.class));
+		List<MetaDadaDto> dtos = new ArrayList<MetaDadaDto>();
+		for (MetaDadaEntity metaDada: metaDades) {
+			dtos.add(conversioTipusHelper.convertir(
+					metaDada,
+					MetaDadaDto.class));
 		}
-		metaNode.setMetaDades(metaDades);
+		metaNode.setMetaDades(dtos);
 	}
 
 	public void moureMetaNodeMetaDada(
 			MetaNodeEntity metaNode,
-			MetaNodeMetaDadaEntity metaNodeMetaDada,
+			MetaDadaEntity metaDada,
 			int posicio) {
-		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeId(
-				metaNode.getId());
+		List<MetaDadaEntity> metaNodeMetaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaNode);
 		int indexOrigen = -1;
-		for (MetaNodeMetaDadaEntity mnmd: metaNodeMetaDades) {
-			if (mnmd.getId().equals(metaNodeMetaDada.getId())) {
-				indexOrigen = mnmd.getOrdre();
+		for (MetaDadaEntity md: metaNodeMetaDades) {
+			if (md.getId().equals(metaDada.getId())) {
+				indexOrigen = md.getOrdre();
 				break;
 			}
 		}
 		metaNodeMetaDades.add(
 				posicio,
 				metaNodeMetaDades.remove(indexOrigen));
-		for (int i = 0; i < metaNodeMetaDades.size(); i++)
+		for (int i = 0; i < metaNodeMetaDades.size(); i++) {
 			metaNodeMetaDades.get(i).updateOrdre(i);
+		}
 	}
 
 	public void reordenarMetaDades(
 			MetaNodeEntity metaNode) {
-		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeId(
-				metaNode.getId());
+		List<MetaDadaEntity> metaNodeMetaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaNode);
 		int ordre = 0;
-		for (MetaNodeMetaDadaEntity metaNodeMetaDada: metaNodeMetaDades)
-			metaNodeMetaDada.updateOrdre(ordre++);
+		for (MetaDadaEntity metaDada: metaNodeMetaDades) {
+			metaDada.updateOrdre(ordre++);
+		}
 	}
 
 	public void omplirPermisosPerMetaNodes(

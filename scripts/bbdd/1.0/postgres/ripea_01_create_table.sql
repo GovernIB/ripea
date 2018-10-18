@@ -59,48 +59,6 @@ CREATE TABLE IPA_METANODE
 );
 
 
-CREATE TABLE IPA_METADOCUMENT
-(
-  ID                      BIGINT               NOT NULL,
-  GLOBAL_EXPEDIENT        boolean,
-  GLOBAL_MULTIPLICITAT    character varying(256),
-  GLOBAL_READONLY         boolean,
-  FIRMA_PFIRMA            boolean,
-  PORTAFIRMES_DOCTIP      character varying(64),
-  PORTAFIRMES_FLUXID      character varying(64),
-  PORTAFIRMES_RESPONS     character varying(512),
-  PORTAFIRMES_FLUXTIP     character varying(256),
-  PORTAFIRMES_CUSTIP      character varying(64),
-  FIRMA_PASSARELA         boolean,
-  PASSARELA_CUSTIP        character varying(64),
-  PLANTILLA_NOM           character varying(256),
-  PLANTILLA_CONTENT_TYPE  character varying(256),
-  PLANTILLA_CONTINGUT     oid
-);
-
-
-CREATE TABLE IPA_METADADA
-(
-  ID                    BIGINT                 NOT NULL,
-  CREATEDDATE           timestamp without time zone,
-  LASTMODIFIEDDATE      timestamp without time zone,
-  ACTIVA                boolean,
-  CODI                  character varying(64)   NOT NULL,
-  DESCRIPCIO            character varying(1024),
-  GLOBAL_CARPETA        boolean,
-  GLOBAL_DOCUMENT       boolean,
-  GLOBAL_EXPEDIENT      boolean,
-  GLOBAL_MULTIPLICITAT  character varying(256),
-  GLOBAL_READONLY       boolean,
-  NOM                   character varying(256)   NOT NULL,
-  TIPUS                 character varying(256)  NOT NULL,
-  VERSION               bigint                   NOT NULL,
-  CREATEDBY_CODI        character varying(64),
-  LASTMODIFIEDBY_CODI   character varying(64),
-  ENTITAT_ID            bigint                   NOT NULL
-);
-
-
 CREATE TABLE IPA_METAEXPEDIENT
 (
   ID                 BIGINT                     NOT NULL,
@@ -131,6 +89,45 @@ CREATE TABLE IPA_METAEXP_SEQ
   CREATEDBY_CODI       character varying(64),
   LASTMODIFIEDBY_CODI  character varying(64),
   META_EXPEDIENT_ID    bigint                    NOT NULL
+);
+
+
+CREATE TABLE IPA_METADOCUMENT
+(
+  ID                      BIGINT               NOT NULL,
+  MULTIPLICITAT           int                  NOT NULL,
+  FIRMA_PFIRMA            boolean,
+  PORTAFIRMES_DOCTIP      character varying(64),
+  PORTAFIRMES_FLUXID      character varying(64),
+  PORTAFIRMES_RESPONS     character varying(512),
+  PORTAFIRMES_FLUXTIP     character varying(256),
+  PORTAFIRMES_CUSTIP      character varying(64),
+  FIRMA_PASSARELA         boolean,
+  PASSARELA_CUSTIP        character varying(64),
+  PLANTILLA_NOM           character varying(256),
+  PLANTILLA_CONTENT_TYPE  character varying(256),
+  PLANTILLA_CONTINGUT     oid,
+  META_EXPEDIENT_ID       bigint                   NOT NULL
+);
+
+
+CREATE TABLE IPA_METADADA
+(
+  ID                    BIGINT                  NOT NULL,
+  CODI                  character varying(64)   NOT NULL,
+  NOM                   character varying(256)  NOT NULL,
+  TIPUS                 int                     NOT NULL,
+  MULTIPLICITAT         int                     NOT NULL,
+  ACTIVA                boolean                 NOT NULL,
+  READONLY              boolean                 NOT NULL,
+  ORDRE                 int                     NOT NULL,
+  DESCRIPCIO            character varying(1024),
+  META_NODE_ID          bigint                  NOT NULL,
+  VERSION               bigint                  NOT NULL,
+  CREATEDBY_CODI        character varying(64),
+  CREATEDDATE           timestamp without time zone,
+  LASTMODIFIEDBY_CODI   character varying(64),
+  LASTMODIFIEDDATE      timestamp without time zone
 );
 
 
@@ -221,40 +218,10 @@ CREATE TABLE IPA_CONT_LOG
 );
 
 
-CREATE TABLE IPA_METAEXPEDIENT_METADOCUMENT
-(
-  ID                   BIGINT                     NOT NULL,
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDDATE     timestamp without time zone,
-  MULTIPLICITAT        character varying(256),
-  ORDRE                integer                 NOT NULL,
-  CREATEDBY_CODI       character varying(64),
-  LASTMODIFIEDBY_CODI  character varying(64),
-  METADOCUMENT_ID      bigint                     NOT NULL,
-  METAEXPEDIENT_ID     bigint                     NOT NULL,
-  READONLY             boolean
-);
-
-
 CREATE TABLE IPA_NODE
 (
   ID                  BIGINT                      NOT NULL,
   METANODE_ID         bigint
-);
-
-
-CREATE TABLE IPA_METANODE_METADADA
-(
-  ID                   BIGINT                     NOT NULL,
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDDATE     timestamp without time zone,
-  MULTIPLICITAT        character varying(256),
-  ORDRE                integer                 NOT NULL,
-  CREATEDBY_CODI       character varying(64),
-  LASTMODIFIEDBY_CODI  character varying(64),
-  METADADA_ID          bigint                     NOT NULL,
-  METANODE_ID          bigint                     NOT NULL,
-  READONLY             boolean
 );
 
 

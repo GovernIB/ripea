@@ -3,9 +3,17 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<c:set var="metaNodeNom" value="${metaExpedient.nom}"/>
+<c:if test="${not empty metaDocument}"><c:set var="metaNodeNom" value="${metaDocument.nom}"/></c:if>
 <html>
 <head>
-	<title><spring:message code="metadada.list.titol"/></title>
+	<title>
+	    <c:choose>
+			<c:when test="${not empty metaDocument}"><spring:message code="metadada.tipdoc.list.titol"/></c:when>
+			<c:otherwise><spring:message code="metadada.tipexp.list.titol"/></c:otherwise>
+		</c:choose>
+	</title>
+	<meta name="subtitle" content="${metaNodeNom}"/>
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -18,25 +26,13 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
 	</div>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaDada/datatable"/>" data-info-type="search" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
+	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-info-type="search" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th data-col-name="codi"><spring:message code="metadada.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="metadada.list.columna.nom"/></th>
 				<th data-col-name="tipus" data-renderer="enum(MetaDadaTipusEnumDto)">
 					<spring:message code="metadada.list.columna.tipus"/>
-				</th>
-				<th data-col-name="globalExpedient" data-template="#cellGlobalExpedientTemplate">
-					<spring:message code="metadada.list.columna.global"/>
-					<script id="cellGlobalExpedientTemplate" type="text/x-jsrender">
-						{{if globalExpedient}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="globalDocument" data-template="#cellGlobalDocumentTemplate" data-visible="false">
-					<spring:message code="metadada.list.columna.global"/>
-					<script id="cellGlobalDocumentTemplate" type="text/x-jsrender">
-						{{if globalDocument}}<span class="fa fa-check"></span>{{/if}}
-					</script>
 				</th>
 				<th data-col-name="activa" data-template="#cellActivaTemplate">
 					<spring:message code="metadada.list.columna.activa"/>
@@ -63,4 +59,13 @@
 			</tr>
 		</thead>
 	</table>
+	<c:choose>
+		<c:when test="${not empty metaDocument}">
+			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/metaDocument"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+		</c:when>
+		<c:otherwise>
+			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+		</c:otherwise>
+	</c:choose>
+	<div class="clearfix"></div>
 </body>

@@ -28,9 +28,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.CarpetaRepository;
@@ -44,9 +42,8 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
+import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -63,15 +60,13 @@ public class EntityComprovarHelper {
 	@Resource
 	private EntitatRepository entitatRepository;
 	@Resource
+	private MetaNodeRepository metaNodeRepository;
+	@Resource
 	private MetaDocumentRepository metaDocumentRepository;
 	@Resource
 	private MetaExpedientRepository metaExpedientRepository;
 	@Resource
-	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
-	@Resource
 	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
 	@Resource
 	private NodeRepository nodeRepository;
 	@Resource
@@ -157,57 +152,30 @@ public class EntityComprovarHelper {
 		return entitat;
 	}
 
-	public MetaDocumentEntity comprovarMetaDocument(
+	public MetaNodeEntity comprovarMetaNode(
 			EntitatEntity entitat,
-			Long id,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(
+			Long id) {
+		MetaNodeEntity metaNode = metaNodeRepository.findOne(
 				id);
-		if (metaDocument == null) {
+		if (metaNode == null) {
 			throw new NotFoundException(
 					id,
-					MetaDocumentEntity.class);
+					MetaNodeEntity.class);
 		}
-		if (!entitat.equals(metaDocument.getEntitat())) {
+		if (!entitat.equals(metaNode.getEntitat())) {
 			throw new ValidationException(
 					id,
-					MetaDocumentEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-expedient");
+					MetaNodeEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-node");
 		}
-		if (comprovarPermisCreate) {
-			if (!metaDocument.isActiu()) {
-				throw new ValidationException(
-						id,
-						MetaDocumentEntity.class,
-						"El meta-document no es troba actiu (id=" + id + ")");
-			}
-		}
-		comprovarPermisosMetaNode(
-				metaDocument,
-				id,
-				comprovarPermisRead,
-				comprovarPermisWrite,
-				comprovarPermisCreate,
-				comprovarPermisDelete);
-		return metaDocument;
+		return metaNode;
 	}
 
 	public MetaExpedientEntity comprovarMetaExpedient(
-			Long entitatId,
-			Long id,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
-		EntitatEntity entitat = comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(id);
+			EntitatEntity entitat,
+			Long id) {
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(
+				id);
 		if (metaExpedient == null) {
 			throw new NotFoundException(
 					id,
@@ -219,6 +187,16 @@ public class EntityComprovarHelper {
 					MetaExpedientEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-expedient");
 		}
+		return metaExpedient;
+	}
+	public MetaExpedientEntity comprovarMetaExpedient(
+			EntitatEntity entitat,
+			Long id,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
+		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(entitat, id);
 		if (comprovarPermisCreate) {
 			if (!metaExpedient.isActiu()) {
 				throw new ValidationException(
@@ -237,75 +215,73 @@ public class EntityComprovarHelper {
 		return metaExpedient;
 	}
 
-	public MetaExpedientMetaDocumentEntity comprovarMetaExpedientMetaDocument(
+	public MetaDocumentEntity comprovarMetaDocument(
 			EntitatEntity entitat,
 			MetaExpedientEntity metaExpedient,
-			Long metaExpedientMetaDocumentId) {
-		MetaExpedientMetaDocumentEntity metaExpedientMetaDocument = metaExpedientMetaDocumentRepository.findOne(metaExpedientMetaDocumentId);
-		if (metaExpedientMetaDocument == null) {
+			Long id) {
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(
+				id);
+		if (metaDocument == null) {
 			throw new NotFoundException(
-					metaExpedientMetaDocumentId,
-					MetaExpedientMetaDocumentEntity.class);
+					id,
+					MetaDocumentEntity.class);
 		}
-		if (!metaExpedientMetaDocument.getMetaExpedient().equals(metaExpedient)) {
+		if (!entitat.equals(metaDocument.getEntitat())) {
 			throw new ValidationException(
-					metaExpedientMetaDocumentId,
-					MetaExpedientMetaDocumentEntity.class,
+					id,
+					MetaDocumentEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
+		}
+		if (!metaExpedient.equals(metaDocument.getMetaExpedient())) {
+			throw new ValidationException(
+					id,
+					MetaDocumentEntity.class,
 					"El meta-expedient especificat (id=" + metaExpedient.getId() + ") no coincideix amb el meta-expedient del meta-document");
 		}
-		return metaExpedientMetaDocument;
+		return metaDocument;
+	}
+	public MetaDocumentEntity comprovarMetaDocument(
+			EntitatEntity entitat,
+			MetaExpedientEntity metaExpedient,
+			Long id,
+			boolean comprovarActiu) {
+		MetaDocumentEntity metaDocument = comprovarMetaDocument(
+				entitat,
+				metaExpedient,
+				id);
+		if (comprovarActiu) {
+			if (!metaDocument.isActiu()) {
+				throw new ValidationException(
+						id,
+						MetaDocumentEntity.class,
+						"El meta-document no es troba actiu (id=" + id + ")");
+			}
+		}return metaDocument;
 	}
 
 	public MetaDadaEntity comprovarMetaDada(
 			EntitatEntity entitat,
-			Long metaDadaId) {
-		MetaDadaEntity metaDada = metaDadaRepository.findOne(metaDadaId);
+			MetaNodeEntity metaNode,
+			Long id) {
+		MetaDadaEntity metaDada = metaDadaRepository.findOne(id);
 		if (metaDada == null) {
 			throw new NotFoundException(
-					metaDadaId,
+					id,
 					MetaDadaEntity.class);
 		}
-		if (!entitat.equals(metaDada.getEntitat())) {
+		if (!metaNode.equals(metaDada.getMetaNode())) {
 			throw new ValidationException(
-					metaDadaId,
-					MetaDadaEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de la meta-dada");
-		}
-		return metaDada;
-	}
-
-	public MetaNodeMetaDadaEntity comprovarMetaNodeMetaDada(
-			EntitatEntity entitat,
-			MetaNodeEntity metaNode,
-			Long metaNodeMetaDadaId) {
-		MetaNodeMetaDadaEntity metaNodeMetaDada = metaNodeMetaDadaRepository.findOne(metaNodeMetaDadaId);
-		if (metaNodeMetaDada == null) {
-			throw new NotFoundException(
-					metaNodeMetaDadaId,
-					MetaDadaEntity.class);
-		}
-		if (!metaNodeMetaDada.getMetaNode().equals(metaNode)) {
-			throw new ValidationException(
-					metaNodeMetaDadaId,
+					id,
 					MetaDadaEntity.class,
 					"El meta-node especificat (id=" + metaNode.getId() + ") no coincideix amb el meta-node de la meta-dada");
 		}
-		return metaNodeMetaDada;
-	}
-
-	public MetaNodeMetaDadaEntity comprovarMetaNodeMetaDada(
-			EntitatEntity entitat,
-			MetaNodeEntity metaNode,
-			MetaDadaEntity metaDada) {
-		MetaNodeMetaDadaEntity metaNodeMetaDada = metaNodeMetaDadaRepository.findByMetaNodeIdAndMetaDada(
-				metaNode.getId(),
-				metaDada);
-		if (metaNodeMetaDada == null) {
-			throw new NotFoundException(
-					"(metaNodeId=" + metaNode.getId() + ", metaDadaId=" + metaDada.getId() + ")",
-					MetaNodeMetaDadaEntity.class);
+		if (!entitat.equals(metaDada.getMetaNode().getEntitat())) {
+			throw new ValidationException(
+					id,
+					MetaExpedientEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-expedient");
 		}
-		return metaNodeMetaDada;
+		return metaDada;
 	}
 
 	public ContingutEntity comprovarContingut(

@@ -23,7 +23,11 @@ import es.caib.ripea.war.validation.CodiMetaDadaNoRepetit;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@CodiMetaDadaNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
+@CodiMetaDadaNoRepetit(
+		campId = "id",
+		campCodi = "codi",
+		campEntitatId = "entitatId",
+		campMetaNodeId = "metaNodeId")
 public class MetaDadaCommand {
 
 	private Long id;
@@ -32,20 +36,14 @@ public class MetaDadaCommand {
 	private String codi;
 	@NotEmpty @Size(max=256)
 	private String nom;
-	@Size(max=1024)
-	private String descripcio;
 	@NotNull
 	private MetaDadaTipusEnumDto tipus;
-	private boolean globalExpedient;
-	private boolean globalDocument;
 	@NotNull
-	private MultiplicitatEnumDto globalMultiplicitat;
-	private boolean globalReadOnly;
-	private boolean activa;
-
+	private MultiplicitatEnumDto multiplicitat;
+	@Size(max=1024)
+	private String descripcio;
 	private Long entitatId;
-
-
+	private Long metaNodeId;
 
 	public Long getId() {
 		return id;
@@ -65,53 +63,35 @@ public class MetaDadaCommand {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
 	public MetaDadaTipusEnumDto getTipus() {
 		return tipus;
 	}
 	public void setTipus(MetaDadaTipusEnumDto tipus) {
 		this.tipus = tipus;
 	}
-	public boolean isGlobalExpedient() {
-		return globalExpedient;
+	public MultiplicitatEnumDto getMultiplicitat() {
+		return multiplicitat;
 	}
-	public void setGlobalExpedient(boolean globalExpedient) {
-		this.globalExpedient = globalExpedient;
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
 	}
-	public boolean isGlobalDocument() {
-		return globalDocument;
+	public String getDescripcio() {
+		return descripcio;
 	}
-	public void setGlobalDocument(boolean globalDocument) {
-		this.globalDocument = globalDocument;
-	}
-	public MultiplicitatEnumDto getGlobalMultiplicitat() {
-		return globalMultiplicitat;
-	}
-	public void setGlobalMultiplicitat(MultiplicitatEnumDto globalMultiplicitat) {
-		this.globalMultiplicitat = globalMultiplicitat;
-	}
-	public boolean isGlobalReadOnly() {
-		return globalReadOnly;
-	}
-	public void setGlobalReadOnly(boolean globalReadOnly) {
-		this.globalReadOnly = globalReadOnly;
-	}
-	public boolean isActiva() {
-		return activa;
-	}
-	public void setActiva(boolean activa) {
-		this.activa = activa;
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
 	}
 	public Long getEntitatId() {
 		return entitatId;
 	}
 	public void setEntitatId(Long entitatId) {
 		this.entitatId = entitatId;
+	}
+	public Long getMetaNodeId() {
+		return metaNodeId;
+	}
+	public void setMetaNodeId(Long metaNodeId) {
+		this.metaNodeId = metaNodeId;
 	}
 
 	public static List<MetaDadaCommand> toMetaDadaCommands(

@@ -34,4 +34,6 @@ public @interface CodiMetaDocumentNoRepetit {
 
 	String campEntitatId();
 
+	String campMetaExpedientId();
+
 }

@@ -10,47 +10,34 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió de meta-documents.
@@ -66,10 +53,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	private EntitatRepository entitatRepository;
 	@Resource
 	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
-	@Resource
-	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
 	@Resource
 	private DocumentRepository documentRepository;
 
@@ -88,32 +71,34 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 
-
-
 	@Transactional
 	@Override
 	public MetaDocumentDto create(
 			Long entitatId,
+			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut) {
-		logger.debug("Creant un nou meta-document ("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaDocument=" + metaDocument + ")");
+		logger.debug("Creant un nou meta-document (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"metaDocument=" + metaDocument + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
 		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
 				entitat,
 				metaDocument.getCodi(),
-				metaDocument.getNom()).
+				metaDocument.getNom(),
+				metaDocument.getMultiplicitat(),
+				metaExpedient).
 				descripcio(metaDocument.getDescripcio()).
-				globalExpedient(metaDocument.isGlobalExpedient()).
-				globalMultiplicitat(metaDocument.getGlobalMultiplicitat()).
-				globalReadOnly(metaDocument.isGlobalReadOnly()).
 				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
 				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
 				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
@@ -137,32 +122,32 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Override
 	public MetaDocumentDto update(
 			Long entitatId,
+			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut) {
-		logger.debug("Actualitzant meta-document existent ("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaDocument=" + metaDocument + ")");
+		logger.debug("Actualitzant meta-document existent (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"metaDocument=" + metaDocument + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
-				metaDocument.getId(),
-				false,
-				false,
-				false,
-				false);
-		metaDocumentEntitiy.update(
+				metaExpedientId);
+		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
+				entitat,
+				metaExpedient,
+				metaDocument.getId());
+		entity.update(
 				metaDocument.getCodi(),
 				metaDocument.getNom(),
 				metaDocument.getDescripcio(),
-				metaDocument.isGlobalExpedient(),
-				metaDocument.getGlobalMultiplicitat(),
-				metaDocument.isGlobalReadOnly(),
+				metaDocument.getMultiplicitat(),
 				metaDocument.isFirmaPortafirmesActiva(),
 				metaDocument.getPortafirmesDocumentTipus(),
 				metaDocument.getPortafirmesFluxId(),
@@ -172,13 +157,13 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isFirmaPassarelaActiva(),
 				metaDocument.getFirmaPassarelaCustodiaTipus());
 		if (plantillaContingut != null) {
-			metaDocumentEntitiy.updatePlantilla(
+			entity.updatePlantilla(
 					plantillaNom,
 					plantillaContentType,
 					plantillaContingut);
 		}
 		return conversioTipusHelper.convertir(
-				metaDocumentEntitiy,
+				entity,
 				MetaDocumentDto.class);
 	}
 
@@ -186,24 +171,25 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Override
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
+			Long metaExpedientId,
 			Long id,
 			boolean actiu) {
-		logger.debug("Actualitzant propietat activa d'un meta-document existent ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "actiu=" + actiu + ")");
+		logger.debug("Actualitzant propietat activa d'un meta-document existent (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
+				metaExpedient,
+				id);
 		metaDocument.updateActiu(actiu);
 		return conversioTipusHelper.convertir(
 				metaDocument,
@@ -214,48 +200,54 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Override
 	public MetaDocumentDto delete(
 			Long entitatId,
+			Long metaExpedientId,
 			Long id) {
-		logger.debug("Esborrant meta-document (id=" + id +  ")");
+		logger.debug("Esborrant meta-document (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		metaDocumentRepository.delete(metaDocumentEntitiy);
+				metaExpedientId);
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
+				entitat,
+				metaExpedient,
+				id);
+		metaDocumentRepository.delete(metaDocument);
 		return conversioTipusHelper.convertir(
-				metaDocumentEntitiy,
+				metaDocument,
 				MetaDocumentDto.class);
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
 	public MetaDocumentDto findById(
 			Long entitatId,
+			Long metaExpedientId,
 			Long id) {
-		logger.debug("Consulta del meta-document ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
+		logger.debug("Consulta del meta-document (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
+				metaExpedientId);
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
+				entitat,
+				metaExpedient,
+				id);
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
-				metaDocumentEntitiy,
+				metaDocument,
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
@@ -264,21 +256,28 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
-	public MetaDocumentDto findByEntitatCodi(
+	public MetaDocumentDto findByCodi(
 			Long entitatId,
+			Long metaExpedientId,
 			String codi) {
-		logger.debug("Consulta del meta-document per entitat i codi ("
-				+ "entitatId=" + entitatId + ", "
-				+ "codi=" + codi + ")");
+		logger.debug("Consulta del meta-document amb codi (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"codi=" + codi + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
-				metaDocumentRepository.findByEntitatAndCodi(entitat, codi),
+				metaDocumentRepository.findByMetaExpedientAndCodi(
+						metaExpedient,
+						codi),
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
@@ -287,28 +286,54 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}
 
-	@Transactional(readOnly=true)
+//	@Transactional(readOnly = true)
+//	@Override
+//	public List<MetaDocumentDto> findByMetaExpedient(
+//			Long entitatId,
+//			Long metaExpedientId) {
+//		logger.debug("Consulta de tots els meta-documents del meta-expedient (" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ")");
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				true,
+//				false);
+//		return conversioTipusHelper.convertirList(
+//				metaDocumentRepository.findByEntitatOrderByNomAsc(
+//						entitat),
+//						MetaDocumentDto.class);
+//	}
+
+	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<MetaDocumentDto> findByEntitatPaginat(
+	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
+			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta paginada dels meta-documents de l'entitat (entitatId=" + entitatId + ")");
+		logger.debug("Consulta dels meta-documents del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"paginacioParams=" + paginacioParams + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
 		PaginaDto<MetaDocumentDto> resposta;
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			resposta = paginacioHelper.toPaginaDto(
-					metaDocumentRepository.findByEntitat(
-							entitat,
+					metaDocumentRepository.findByMetaExpedient(
+							metaExpedient,
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaDocumentDto.class);
 		} else {
 			resposta = paginacioHelper.toPaginaDto(
-					metaDocumentRepository.findByEntitat(
-							entitat,
+					metaDocumentRepository.findByMetaExpedient(
+							metaExpedient,
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaDocumentDto.class);
 		}
@@ -319,63 +344,53 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}
 
-	@Transactional(readOnly=true)
-	@Override
-	public List<MetaDocumentDto> findByEntitat(
-			Long entitatId) {
-		logger.debug("Consulta de tots els meta-documents de l'entitat ("
-				+ "entitatId=" + entitatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		return conversioTipusHelper.convertirList(
-				metaDocumentRepository.findByEntitatOrderByNomAsc(
-						entitat),
-						MetaDocumentDto.class);
-	}
+//	@Transactional(readOnly=true)
+//	@Override
+//	public List<MetaDocumentDto> findByMetaExpedientAndActiveTrue(
+//			Long entitatId,
+//			Long metaExpedientId) {
+//		logger.debug("Consulta dels meta-documents actius del meta-expedient (" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ")");
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				true,
+//				false);
+//		return conversioTipusHelper.convertirList(
+//				metaDocumentRepository.findByEntitatAndActiuTrueAndGlobalsOrderByNomAsc(
+//						entitat,
+//						incloureGlobalsExpedient),
+//						MetaDocumentDto.class);
+//	}
 
-	@Transactional(readOnly=true)
-	@Override
-	public List<MetaDocumentDto> findByEntitatAndActiveTrue(
-			Long entitatId,
-			boolean incloureGlobalsExpedient) {
-		logger.debug("Consulta dels meta-documents actius de l'entitat ("
-				+ "entitatId=" + entitatId + ", "
-				+ "incloureGlobalsExpedient=" + incloureGlobalsExpedient + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		return conversioTipusHelper.convertirList(
-				metaDocumentRepository.findByEntitatAndActiuTrueAndGlobalsOrderByNomAsc(
-						entitat,
-						incloureGlobalsExpedient),
-						MetaDocumentDto.class);
-	}
-
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getPlantilla(
 			Long entitatId,
+			Long contingutId,
 			Long id) {
 		logger.debug("Obtenint plantilla del meta-document (" +
 				"entitatId=" + entitatId + ", " +
+				"contingutId=" + contingutId + ", " +
 				"id=" + id +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				true);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, id);
+		ExpedientEntity expedientSuperior;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
+			expedientSuperior = (ExpedientEntity)contingut;
+		} else {
+			expedientSuperior = contingut.getExpedient();
+		}
+		MetaExpedientEntity metaExpedient = expedientSuperior.getMetaExpedient();
 		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
+				metaExpedient,
+				id);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(metaDocumentEntitiy.getPlantillaNom());
 		fitxer.setContentType(metaDocumentEntitiy.getPlantillaContentType());
@@ -383,332 +398,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return fitxer;
 	}
 
-	@Transactional
-	@Override
-	public void metaDadaCreate(
-			Long entitatId,
-			Long id,
-			Long metaDadaId,
-			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) {
-		logger.debug("Afegint meta-dada al meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaDadaId=" + metaDadaId +  ", "
-				+ "readOnly=" + readOnly +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaDadaId);
-		metaDocument.metaDadaAdd(
-				metaDada,
-				multiplicitat,
-				readOnly);
-	}
-
-	@Transactional
-	@Override
-	public void metaDadaUpdate(
-			Long entitatId,
-			Long id,
-			Long metaNodeMetaDadaId,
-			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) {
-		logger.debug("Actualitzant meta-dada del meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaNodeMetaDadaId=" + metaNodeMetaDadaId +  ","
-				+ "multiplicitat=" + multiplicitat +  ", "
-				+ "readOnly=" + readOnly +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaNodeMetaDadaEntity metaNodeMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
-				entitat,
-				metaDocument,
-				metaNodeMetaDadaId);
-		metaNodeMetaDada.update(
-				multiplicitat,
-				readOnly);
-	}
-
-	@Transactional
-	@Override
-	public void metaDadaDelete(
-			Long entitatId,
-			Long id,
-			Long metaDocumentMetaDadaId) {
-		logger.debug("Afegint meta-dada al meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaDocumentMetaDadaId=" + metaDocumentMetaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
-				entitat,
-				metaDocument,
-				metaDocumentMetaDadaId);
-		metaDocument.metaDadaDelete(metaDocumentMetaDada);
-		metaNodeHelper.reordenarMetaDades(metaDocument);
-	}
-
-	@Transactional
-	@Override
-	public void metaDadaMoveUp(
-			Long entitatId,
-			Long id,
-			Long metaDocumentMetaDadaId) {
-		logger.debug("Movent meta-dada al meta-document cap amunt ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaDocumentMetaDadaId=" + metaDocumentMetaDadaId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
-				entitat,
-				metaDocument,
-				metaDocumentMetaDadaId);
-		metaNodeHelper.moureMetaNodeMetaDada(
-				metaDocument,
-				metaDocumentMetaDada,
-				metaDocumentMetaDada.getOrdre() - 1);
-	}
-
-	@Transactional
-	@Override
-	public void metaDadaMoveDown(
-			Long entitatId,
-			Long id,
-			Long metaDocumentMetaDadaId) {
-		logger.debug("Movent meta-dada al meta-document cap avall ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaDocumentMetaDadaId=" + metaDocumentMetaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
-				entitat,
-				metaDocument,
-				metaDocumentMetaDadaId);
-		metaNodeHelper.moureMetaNodeMetaDada(
-				metaDocument,
-				metaDocumentMetaDada,
-				metaDocumentMetaDada.getOrdre() + 1);
-	}
-
-	@Transactional
-	@Override
-	public void metaDadaMoveTo(
-			Long entitatId,
-			Long id,
-			Long metaDocumentMetaDadaId,
-			int posicio) {
-		logger.debug("Movent meta-dada al meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaDocumentMetaDadaId=" + metaDocumentMetaDadaId +  ", "
-				+ "posicio=" + posicio +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaNodeMetaDadaEntity metaDocumentMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
-				entitat,
-				metaDocument,
-				metaDocumentMetaDadaId);
-		metaNodeHelper.moureMetaNodeMetaDada(
-				metaDocument,
-				metaDocumentMetaDada,
-				posicio);
-	}
-
 	@Transactional(readOnly = true)
 	@Override
-	public MetaNodeMetaDadaDto metaDadaFind(
-			Long entitatId,
-			Long id,
-			Long metaNodeMetaDadaId) {
-		logger.debug("Cercant la meta-dada del meta-expedient ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ", "
-				+ "metaNodeMetaDadaId=" + metaNodeMetaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		MetaNodeMetaDadaEntity metaNodeMetaDada = entityComprovarHelper.comprovarMetaNodeMetaDada(
-				entitat,
-				metaDocument,
-				metaNodeMetaDadaId);
-		return conversioTipusHelper.convertir(
-				metaNodeMetaDada,
-				MetaNodeMetaDadaDto.class);
-	}
-
-	public List<MetaDadaDto> metaDadaFindGlobals(
-			Long entitatId) throws NotFoundException {
-		logger.debug("Cercant les meta-dades globals del meta-document ("
-				+ "entitatId=" + entitatId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		return conversioTipusHelper.convertirList(
-				metaDadaRepository.findByEntitatAndGlobalDocumentTrueOrderByIdAsc(entitat),
-				MetaDadaDto.class);
-	}
-
-	@Transactional
-	@Override
-	public List<PermisDto> findPermis(
-			Long entitatId,
-			Long id) {
-		logger.debug("Consulta dels permisos del meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ")"); 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		return permisosHelper.findPermisos(
-				id,
-				MetaNodeEntity.class);
-	}
-
-	@Transactional
-	@Override
-	public void updatePermis(
-			Long entitatId,
-			Long id,
-			PermisDto permis) {
-		logger.debug("Modificació del permis del meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id + ", "
-				+ "permis=" + permis + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		permisosHelper.updatePermis(
-				id,
-				MetaNodeEntity.class,
-				permis);
-	}
-
-	@Transactional
-	@Override
-	public void deletePermis(
-			Long entitatId,
-			Long id,
-			Long permisId) {
-		logger.debug("Eliminació del permis del meta-document ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id + ", "
-				+ "permisId=" + permisId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		permisosHelper.deletePermis(
-				id,
-				MetaNodeEntity.class,
-				permisId);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<MetaDocumentDto> findActiveByEntitatAndContenidorPerCreacio(
+	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contenidorId) {
 		logger.debug("Consulta de meta-documents actius per a creació ("
@@ -737,7 +429,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaDocumentDto> findActiveByEntitatAndDocumentPerModificacio(
+	public List<MetaDocumentDto> findActiusPerModificacio(
 			Long entitatId,
 			Long documentId) {
 		logger.debug("Consulta de meta-documents actius per a modificació ("
@@ -776,7 +468,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<PortafirmesDocumentTipusDto> findPortafirmesDocumentTipus() {
+	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
 		return pluginHelper.portafirmesFindDocumentTipus();
 	}
 
@@ -785,62 +477,27 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	private List<MetaDocumentEntity> findMetaDocumentsDisponiblesPerCreacio(
 			EntitatEntity entitat,
 			ExpedientEntity expedientSuperior) {
-		List<MetaDocumentEntity> metaDocuments;
-		if (expedientSuperior != null) {
-			// A dins els expedients només es poden crear documents amb meta-document 
-			metaDocuments = new ArrayList<MetaDocumentEntity>();
-			// Dels meta-documents actius pel meta-expedient només deixa els que
-			// encara es poden afegir segons la multiplicitat.
-			List<MetaExpedientMetaDocumentEntity> metaExpedientMetaDocuments = metaExpedientMetaDocumentRepository.findByMetaExpedientAndMetaDocumentActiuTrueOrderByMetaDocumentNomAsc(
-					expedientSuperior.getMetaExpedient());
-			// Nomes retorna els documents que no s'hagin esborrat
-			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
-					expedientSuperior,
-					0);
-			for (MetaExpedientMetaDocumentEntity metaExpedientMetaDocument: metaExpedientMetaDocuments) {
-				boolean afegir = true;
-				for (DocumentEntity document: documents) {
-					if (document.getMetaNode() != null && document.getMetaNode().equals(metaExpedientMetaDocument.getMetaDocument())) {
-						if (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1))
-							afegir = false;
-						break;
-					}
+		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
+		// Dels meta-documents actius pel meta-expedient només deixa els que
+		// encara es poden afegir segons la multiplicitat.
+		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(
+				expedientSuperior.getMetaExpedient());
+		// Nomes retorna els documents que no s'hagin esborrat
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
+				expedientSuperior,
+				0);
+		for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
+			boolean afegir = true;
+			for (DocumentEntity document: documents) {
+				if (document.getMetaNode() != null && document.getMetaNode().equals(metaDocument)) {
+					if (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1))
+						afegir = false;
+					break;
 				}
-				if (afegir)
-					metaDocuments.add(metaExpedientMetaDocument.getMetaDocument());
 			}
-			// ...comprova que es tengui el permis CREATE
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			permisosHelper.filterGrantedAll(
-					metaDocuments,
-					new ObjectIdentifierExtractor<MetaNodeEntity>() {
-						public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-							return metaNode.getId();
-						}
-					},
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.CREATE},
-					auth);
-			// Afegeix els meta-documents globals actius
-			metaDocuments.addAll(
-					metaDocumentRepository.findByEntitatAndGlobalExpedientTrueAndActiuTrueOrderByNomAsc(
-							entitat));
-		} else {
-			// Consulta els metadocuments de l'entitat...
-			metaDocuments = metaDocumentRepository.findByEntitatAndActiuTrueOrderByNomAsc(entitat);
-			// ...i comprova que es tengui el permis CREATE
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			permisosHelper.filterGrantedAll(
-					metaDocuments,
-					new ObjectIdentifierExtractor<MetaNodeEntity>() {
-						public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-							return metaNode.getId();
-						}
-					},
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.CREATE},
-					auth);
-			
+			if (afegir) {
+				metaDocuments.add(metaDocument);
+			}
 		}
 		return metaDocuments;
 	}

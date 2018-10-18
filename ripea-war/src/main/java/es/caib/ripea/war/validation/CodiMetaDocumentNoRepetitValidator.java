@@ -25,6 +25,7 @@ public class CodiMetaDocumentNoRepetitValidator implements ConstraintValidator<C
 	private String campId;
 	private String campCodi;
 	private String campEntitatId;
+	private String campMetaExpedientId;
 
 	@Autowired
 	private MetaDocumentService metaDocumentService;
@@ -36,24 +37,31 @@ public class CodiMetaDocumentNoRepetitValidator implements ConstraintValidator<C
 		this.campId = constraintAnnotation.campId();
 		this.campCodi = constraintAnnotation.campCodi();
 		this.campEntitatId = constraintAnnotation.campEntitatId();
+		this.campMetaExpedientId = constraintAnnotation.campMetaExpedientId();
 	}
 
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 		try {
-			final String id = BeanUtils.getProperty(value, campId);
 			final String codi = BeanUtils.getProperty(value, campCodi);
-			final Long entitatId = new Long(BeanUtils.getSimpleProperty(value, campEntitatId));
-			MetaDocumentDto metaDocument = metaDocumentService.findByEntitatCodi(
-					entitatId,
-					codi);
-			if (metaDocument == null) {
-				return true;
+			if (codi != null && !codi.isEmpty()) {
+				final String id = BeanUtils.getProperty(value, campId);
+				final Long entitatId = new Long(BeanUtils.getSimpleProperty(value, campEntitatId));
+				final Long metaExpedientId = new Long(BeanUtils.getSimpleProperty(value, campMetaExpedientId));
+				MetaDocumentDto metaDocument = metaDocumentService.findByCodi(
+						entitatId,
+						metaExpedientId,
+						codi);
+				if (metaDocument == null) {
+					return true;
+				} else {
+					if (id == null)
+						return false;
+					else
+						return id.equals(metaDocument.getId().toString());
+				}
 			} else {
-				if (id == null)
-					return false;
-				else
-					return id.equals(metaDocument.getId().toString());
+				return true;
 			}
         } catch (final Exception ex) {
         	LOGGER.error("Error al validar si el codi de meta-document és únic", ex);

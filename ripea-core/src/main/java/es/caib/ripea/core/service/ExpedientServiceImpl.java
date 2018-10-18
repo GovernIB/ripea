@@ -132,8 +132,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExpedientEntity.class,
 					"No es pot crear un expedient sense un meta-expedient associat");
 		}
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
 				metaExpedientId,
 				false,
 				false,
@@ -308,7 +313,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitatId,
+					entitat,
 					metaExpedientId,
 					false,
 					true,
@@ -734,8 +739,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"expedientIds=" + expedientIds + ", " +
 				"format=" + format + ")");
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
 				metaExpedientId,
 				true,
 				false,
@@ -828,7 +838,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitatId,
+					entitat,
 					filtre.getMetaExpedientId(),
 					true,
 					false,
@@ -930,7 +940,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitatId,
+					entitat,
 					filtre.getMetaExpedientId(),
 					true,
 					false,

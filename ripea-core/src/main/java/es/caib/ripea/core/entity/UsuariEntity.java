@@ -37,7 +37,7 @@ public class UsuariEntity implements Serializable {
 	private boolean rebreEmailsBustia = true;
 	@Column(name = "emails_agrupats")
 	private boolean rebreEmailsAgrupats = true;
-	
+
 	@Version
 	private long version = 0;
 

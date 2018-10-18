@@ -34,4 +34,6 @@ public @interface CodiMetaDadaNoRepetit {
 
 	String campEntitatId();
 
+	String campMetaNodeId();
+
 }

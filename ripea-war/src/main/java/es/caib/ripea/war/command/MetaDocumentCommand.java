@@ -24,11 +24,14 @@ import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@CodiMetaDocumentNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
+@CodiMetaDocumentNoRepetit(
+		campId = "id",
+		campCodi = "codi",
+		campEntitatId = "entitatId",
+		campMetaExpedientId = "metaExpedientId")
 public class MetaDocumentCommand {
 
 	private Long id;
-
 	@NotEmpty @Size(max=64)
 	private String codi;
 	@NotEmpty @Size(max=256)
@@ -37,9 +40,8 @@ public class MetaDocumentCommand {
 	private String descripcio;
 	private boolean globalExpedient;
 	@NotNull
-	private MultiplicitatEnumDto globalMultiplicitat;
-	private boolean globalReadOnly;
-	private boolean FirmaPortafirmesActiva;
+	private MultiplicitatEnumDto multiplicitat;
+	private boolean firmaPortafirmesActiva;
 	@Size(max=64)
 	private String portafirmesDocumentTipus;
 	@Size(max=64)
@@ -52,10 +54,8 @@ public class MetaDocumentCommand {
 	@Size(max=64)
 	private String firmaPassarelaCustodiaTipus;
 	protected MultipartFile plantilla;
-
 	private Long entitatId;
-
-
+	private Long metaExpedientId;
 
 	public Long getId() {
 		return id;
@@ -87,23 +87,17 @@ public class MetaDocumentCommand {
 	public void setGlobalExpedient(boolean globalExpedient) {
 		this.globalExpedient = globalExpedient;
 	}
-	public MultiplicitatEnumDto getGlobalMultiplicitat() {
-		return globalMultiplicitat;
+	public MultiplicitatEnumDto getMultiplicitat() {
+		return multiplicitat;
 	}
-	public void setGlobalMultiplicitat(MultiplicitatEnumDto globalMultiplicitat) {
-		this.globalMultiplicitat = globalMultiplicitat;
-	}
-	public boolean isGlobalReadOnly() {
-		return globalReadOnly;
-	}
-	public void setGlobalReadOnly(boolean globalReadOnly) {
-		this.globalReadOnly = globalReadOnly;
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
 	}
 	public boolean isFirmaPortafirmesActiva() {
-		return FirmaPortafirmesActiva;
+		return this.firmaPortafirmesActiva;
 	}
 	public void setFirmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
-		FirmaPortafirmesActiva = firmaPortafirmesActiva;
+		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
 	}
 	public String getPortafirmesDocumentTipus() {
 		return portafirmesDocumentTipus;
@@ -158,6 +152,12 @@ public class MetaDocumentCommand {
 	}
 	public void setEntitatId(Long entitatId) {
 		this.entitatId = entitatId;
+	}
+	public Long getMetaExpedientId() {
+		return metaExpedientId;
+	}
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
 	}
 
 	public static List<MetaDocumentCommand> toEntitatCommands(

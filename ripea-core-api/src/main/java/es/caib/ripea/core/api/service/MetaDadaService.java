@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -25,6 +24,8 @@ public interface MetaDadaService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
 	 * @param metaDada
 	 *            Informació de la meta-dada a crear.
 	 * @return La MetaDada creada.
@@ -34,6 +35,7 @@ public interface MetaDadaService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaDadaDto create(
 			Long entitatId,
+			Long metaNodeId,
 			MetaDadaDto metaDada) throws NotFoundException;
 
 	/**
@@ -42,6 +44,8 @@ public interface MetaDadaService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
 	 * @param metaDada
 	 *            Informació de la meta-dada a modificar.
 	 * @return La meta-dada modificada.
@@ -51,28 +55,8 @@ public interface MetaDadaService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaDadaDto update(
 			Long entitatId,
+			Long metaNodeId,
 			MetaDadaDto metaDada) throws NotFoundException;
-
-	/**
-	 * Marca com a activa/inactiva la meta-dada amb el mateix id
-	 * que l'especificat.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param id
-	 *            Atribut id de la meta-dada a esborrar.
-	 * @param activa
-	 *            true si la meta-dada es vol activar o false en cas
-	 *            contrari.
-	 * @return La meta-dada modificada.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public MetaDadaDto updateActiva(
-			Long entitatId,
-			Long id,
-			boolean activa) throws NotFoundException;
 
 	/**
 	 * Esborra la meta-dada amb el mateix id que l'especificat.
@@ -88,13 +72,97 @@ public interface MetaDadaService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaDadaDto delete(
 			Long entitatId,
+			Long metaNodeId,
 			Long id) throws NotFoundException;
+
+	/**
+	 * Marca com a activa/inactiva la meta-dada amb el mateix id
+	 * que l'especificat.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
+	 * @param id
+	 *            Atribut id de la meta-dada a esborrar.
+	 * @param activa
+	 *            true si la meta-dada es vol activar o false en cas
+	 *            contrari.
+	 * @return La meta-dada modificada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaDadaDto updateActiva(
+			Long entitatId,
+			Long metaNodeId,
+			Long id,
+			boolean activa) throws NotFoundException;
+
+	/**
+	 * Mou una meta-dada del meta-expedient una posició cap amunt.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
+	 * @param metaDadaId
+	 *            Id de la meta-dada a moure.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void moveUp(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId) throws NotFoundException;
+
+	/**
+	 * Mou una meta-dada del meta-expedient una posició cap avall.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
+	 * @param metaDadaId
+	 *            Id de la meta-dada a moure.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void moveDown(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId) throws NotFoundException;
+
+	/**
+	 * Mou una meta-dada del meta-document a una altra posició i reorganitza.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
+	 * @param metaDadaId
+	 *            Id de la meta-dada a moure.
+	 * @param posicio
+	 *            Posició a on moure la meta-dada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void moveTo(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId,
+			int posicio) throws NotFoundException;
 
 	/**
 	 * Consulta una meta-dada donat el seu id.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
 	 * @param id
 	 *            Atribut id de la meta-dada a trobar.
 	 * @return La meta-dada amb l'id especificat o null si no s'ha trobat.
@@ -104,6 +172,7 @@ public interface MetaDadaService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaDadaDto findById(
 			Long entitatId,
+			Long metaNodeId,
 			Long id) throws NotFoundException;
 
 	/**
@@ -111,6 +180,8 @@ public interface MetaDadaService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
 	 * @param codi
 	 *            Atribut codi de la meta-dada a trobar.
 	 * @return La meta-dada amb el codi especificat o null si no s'ha trobat.
@@ -118,15 +189,18 @@ public interface MetaDadaService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public MetaDadaDto findByEntitatCodi(
+	public MetaDadaDto findByCodi(
 			Long entitatId,
+			Long metaNodeId,
 			String codi) throws NotFoundException;
 
 	/**
-	 * Llistat paginat amb totes les meta-dades.
+	 * Llistat paginat amb totes les meta-dades d'un meta-node.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param metaNodeId
+	 *            Id del meta-node.
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de meta-dades.
@@ -134,31 +208,29 @@ public interface MetaDadaService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<MetaDadaDto> findAllByEntitatPaginat(
+	public PaginaDto<MetaDadaDto> findByMetaNodePaginat(
 			Long entitatId,
+			Long metaNodeId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
-	 * Llistat amb les meta-dades actives per a una entitat.
+	 * Llistat amb les meta-dades actives per a un meta-node.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param incloureGlobalsExpedient
-	 *            Indica si s'han de retornar les meta-dades globals per expedient.
-	 * @param incloureGlobalsDocument
-	 *            Indica si s'han de mostrar les meta-dades globals per document.
+	 * @param metaNodeId
+	 *            Id del meta-node.
 	 * @return La pàgina de meta-dades.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<MetaDadaDto> findActiveByEntitat(
+	public List<MetaDadaDto> findActiveByMetaNode(
 			Long entitatId,
-			boolean incloureGlobalsExpedient,
-			boolean incloureGlobalsDocument) throws NotFoundException;
+			Long metaNodeId) throws NotFoundException;
 
 	/**
-	 * Llistat amb les meta-dades d'un node.
+	 * Llistat amb les meta-dades associades a un node.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
@@ -169,23 +241,7 @@ public interface MetaDadaService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<MetaNodeMetaDadaDto> findByNode(
-			Long entitatId,
-			Long nodeId) throws NotFoundException;
-
-	/**
-	 * Llistat amb les meta-dades actives donat un meta-node.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param nodeId
-	 *            Id del node.
-	 * @return la llista amb les meta-dades actives.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public List<MetaDadaDto> findByNodePerCreacio(
+	public List<MetaDadaDto> findByNode(
 			Long entitatId,
 			Long nodeId) throws NotFoundException;
 

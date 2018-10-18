@@ -18,54 +18,67 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
- * Controlador per al manteniment de meta-dades.
+ * Controlador per al manteniment de les meta-dades dels meta-expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/metaDada")
-public class MetaDadaController extends BaseAdminController {
+@RequestMapping("/metaExpedient")
+public class MetaExpedientMetaDadaController extends BaseAdminController {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
+	@Autowired
+	private MetaExpedientService metaExpedientService;
 
-
-
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"metaExpedient",
+				metaExpedientService.findById(
+						entitatActual.getId(),
+						metaExpedientId));
 		return "metaDadaList";
 	}
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
-				metaDadaService.findAllByEntitatPaginat(
+				metaDadaService.findByMetaNodePaginat(
 						entitatActual.getId(),
+						metaExpedientId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				"id");
 		return dtr;
 	}
 
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			Model model) {
-		return get(request, null, model);
+		return get(request, metaExpedientId, null, model);
 	}
-	@RequestMapping(value = "/{metaDadaId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -73,19 +86,23 @@ public class MetaDadaController extends BaseAdminController {
 		if (metaDadaId != null)
 			metaDada = metaDadaService.findById(
 					entitatActual.getId(),
+					metaExpedientId,
 					metaDadaId);
 		MetaDadaCommand command = null;
-		if (metaDada != null)
+		if (metaDada != null) {
 			command = MetaDadaCommand.asCommand(metaDada);
-		else
+		} else {
 			command = new MetaDadaCommand();
-		model.addAttribute(command);
+		}
 		command.setEntitatId(entitatActual.getId());
+		command.setMetaNodeId(metaExpedientId);
+		model.addAttribute(command);
 		return "metaDadaForm";
 	}
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
@@ -96,6 +113,7 @@ public class MetaDadaController extends BaseAdminController {
 		if (command.getId() != null) {
 			metaDadaService.update(
 					entitatActual.getId(),
+					metaExpedientId,
 					MetaDadaCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -104,6 +122,7 @@ public class MetaDadaController extends BaseAdminController {
 		} else {
 			metaDadaService.create(
 					entitatActual.getId(),
+					metaExpedientId,
 					MetaDadaCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -112,13 +131,15 @@ public class MetaDadaController extends BaseAdminController {
 		}
 	}
 
-	@RequestMapping(value = "/{metaDadaId}/enable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
 	public String enable(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
+				metaExpedientId,
 				metaDadaId,
 				true);
 		return getAjaxControllerReturnValueSuccess(
@@ -126,13 +147,15 @@ public class MetaDadaController extends BaseAdminController {
 				"redirect:../../metaDada",
 				"metadada.controller.activada.ok");
 	}
-	@RequestMapping(value = "/{metaDadaId}/disable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
 	public String disable(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
+				metaExpedientId,
 				metaDadaId,
 				false);
 		return getAjaxControllerReturnValueSuccess(
@@ -141,13 +164,15 @@ public class MetaDadaController extends BaseAdminController {
 				"metadada.controller.desactivada.ok");
 	}
 
-	@RequestMapping(value = "/{metaDadaId}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		metaDadaService.delete(
 				entitatActual.getId(),
+				metaExpedientId,
 				metaDadaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,

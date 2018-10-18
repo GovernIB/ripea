@@ -557,7 +557,9 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			var href = $(this).attr('href');
 			if (!href.startsWith('http://') && !href.startsWith('/')) {
 				if ($('div.has-error', href).length) {
-					$(this).prepend('<span class="fa fa-warning text-danger"></span> ');
+					if ($('span.fa-warning', this).length == 0) {
+						$(this).prepend('<span class="fa fa-warning text-danger"></span> ');
+					}
 				}
 			}
 		});

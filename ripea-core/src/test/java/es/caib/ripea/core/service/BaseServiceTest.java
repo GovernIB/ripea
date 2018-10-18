@@ -83,10 +83,12 @@ public class BaseServiceTest {
 							elementsCreats.add(
 									metaDadaService.create(
 											entitatId,
+											null, // TODO
 											(MetaDadaDto)element));
 						} else if (element instanceof MetaDocumentDto) {
 							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
 									entitatId,
+									null, // TODO
 									(MetaDocumentDto)element,
 									null,
 									null,
@@ -94,7 +96,7 @@ public class BaseServiceTest {
 							elementsCreats.add(metaDocumentCreat);
 							if (((MetaDocumentDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
-									metaExpedientService.updatePermis(
+									metaExpedientService.permisUpdate(
 											entitatId,
 											metaDocumentCreat.getId(),
 											permis);
@@ -107,7 +109,7 @@ public class BaseServiceTest {
 							elementsCreats.add(metaExpedientCreat);
 							if (((MetaExpedientDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
-									metaExpedientService.updatePermis(
+									metaExpedientService.permisUpdate(
 											entitatId,
 											metaExpedientCreat.getId(),
 											permis);
@@ -138,10 +140,12 @@ public class BaseServiceTest {
 				} else if (element instanceof MetaDadaDto) {
 					metaDadaService.delete(
 							entitatId,
+							null, // TODO
 							((MetaDadaDto)element).getId());
 				} else if (element instanceof MetaDocumentDto) {
 					metaDocumentService.delete(
 							entitatId,
+							null, // TODO
 							((MetaDocumentDto)element).getId());
 				} else if (element instanceof MetaExpedientDto) {
 					metaExpedientService.delete(

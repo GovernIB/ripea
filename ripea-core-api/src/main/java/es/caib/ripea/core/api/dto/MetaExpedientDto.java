@@ -29,9 +29,7 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String notificacioOficiTitol;
 	private String notificacioOficiText;
 	private Long pareId;
-	private List<MetaExpedientMetaDocumentDto> metaDocuments;
-
-
+	private List<MetaDocumentDto> metaDocuments;
 
 	public String getClassificacioSia() {
 		return classificacioSia;
@@ -117,10 +115,10 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	public void setPareId(Long pareId) {
 		this.pareId = pareId;
 	}
-	public List<MetaExpedientMetaDocumentDto> getMetaDocuments() {
+	public List<MetaDocumentDto> getMetaDocuments() {
 		return metaDocuments;
 	}
-	public void setMetaDocuments(List<MetaExpedientMetaDocumentDto> metaDocuments) {
+	public void setMetaDocuments(List<MetaDocumentDto> metaDocuments) {
 		this.metaDocuments = metaDocuments;
 	}
 

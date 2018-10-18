@@ -25,6 +25,7 @@ public class CodiMetaDadaNoRepetitValidator implements ConstraintValidator<CodiM
 	private String campId;
 	private String campCodi;
 	private String campEntitatId;
+	private String campMetaNodeId;
 
 	@Autowired
 	private MetaDadaService metaDadaService;
@@ -36,6 +37,7 @@ public class CodiMetaDadaNoRepetitValidator implements ConstraintValidator<CodiM
 		this.campId = constraintAnnotation.campId();
 		this.campCodi = constraintAnnotation.campCodi();
 		this.campEntitatId = constraintAnnotation.campEntitatId();
+		this.campMetaNodeId = constraintAnnotation.campMetaNodeId();
 	}
 
 	@Override
@@ -44,8 +46,10 @@ public class CodiMetaDadaNoRepetitValidator implements ConstraintValidator<CodiM
 			final String id = BeanUtils.getProperty(value, campId);
 			final String codi = BeanUtils.getProperty(value, campCodi);
 			final Long entitatId = new Long(BeanUtils.getSimpleProperty(value, campEntitatId));
-			MetaDadaDto metaDada = metaDadaService.findByEntitatCodi(
+			final Long metaNodeId = new Long(BeanUtils.getSimpleProperty(value, campMetaNodeId));
+			MetaDadaDto metaDada = metaDadaService.findByCodi(
 					entitatId,
+					metaNodeId,
 					codi);
 			if (metaDada == null) {
 				return true;

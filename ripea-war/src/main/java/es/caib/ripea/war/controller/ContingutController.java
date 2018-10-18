@@ -433,7 +433,7 @@ public class ContingutController extends BaseUserController {
 				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 		model.addAttribute(
 				"metaDocuments",
-				metaDocumentService.findActiveByEntitatAndContenidorPerCreacio(
+				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
 						contingut.getId()));
 		if (contingut instanceof ExpedientDto) {

@@ -14,9 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
-	private boolean globalExpedient;
-	private MultiplicitatEnumDto globalMultiplicitat;
-	private boolean globalReadOnly;
+	private MultiplicitatEnumDto multiplicitat;
 	private boolean firmaPortafirmesActiva;
 	private String portafirmesDocumentTipus;
 	private String portafirmesFluxId;
@@ -28,23 +26,11 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private String plantillaNom;
 	private String plantillaContentType;
 
-	public boolean isGlobalExpedient() {
-		return globalExpedient;
+	public MultiplicitatEnumDto getMultiplicitat() {
+		return multiplicitat;
 	}
-	public void setGlobalExpedient(boolean globalExpedient) {
-		this.globalExpedient = globalExpedient;
-	}
-	public MultiplicitatEnumDto getGlobalMultiplicitat() {
-		return globalMultiplicitat;
-	}
-	public void setGlobalMultiplicitat(MultiplicitatEnumDto globalMultiplicitat) {
-		this.globalMultiplicitat = globalMultiplicitat;
-	}
-	public boolean isGlobalReadOnly() {
-		return globalReadOnly;
-	}
-	public void setGlobalReadOnly(boolean globalReadOnly) {
-		this.globalReadOnly = globalReadOnly;
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
 	}
 	public boolean isFirmaPortafirmesActiva() {
 		return firmaPortafirmesActiva;

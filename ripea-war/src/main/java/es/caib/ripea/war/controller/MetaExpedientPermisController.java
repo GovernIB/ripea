@@ -36,8 +36,6 @@ public class MetaExpedientPermisController extends BaseAdminController {
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 
-
-
 	@RequestMapping(value = "/{metaExpedientId}/permis", method = RequestMethod.GET)
 	public String permis(
 			HttpServletRequest request,
@@ -60,7 +58,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				metaExpedientService.findPermis(
+				metaExpedientService.permisFind(
 						entitatActual.getId(),
 						metaExpedientId),
 				"id");
@@ -87,7 +85,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 						metaExpedientId));
 		PermisDto permis = null;
 		if (permisId != null) {
-			List<PermisDto> permisos = metaExpedientService.findPermis(
+			List<PermisDto> permisos = metaExpedientService.permisFind(
 					entitatActual.getId(),
 					metaExpedientId);
 			for (PermisDto p: permisos) {
@@ -120,7 +118,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 							metaExpedientId));
 			return "metaExpedientPermisForm";
 		}
-		metaExpedientService.updatePermis(
+		metaExpedientService.permisUpdate(
 				entitatActual.getId(),
 				metaExpedientId,
 				PermisCommand.asDto(command));
@@ -137,7 +135,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaExpedientService.deletePermis(
+		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,
 				permisId);

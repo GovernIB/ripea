@@ -19,18 +19,16 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaDada"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaDadaCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
+		<form:hidden path="metaNodeId"/>
 		<rip:inputText name="codi" textKey="metadada.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true"/>
-		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
 		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto"/>
-		<rip:inputCheckbox name="globalExpedient" textKey="metadada.form.camp.global.expedient"/>
-		<rip:inputCheckbox name="globalDocument" textKey="metadada.form.camp.global.document"/>
-		<rip:inputSelect name="globalMultiplicitat" textKey="metadada.form.camp.global.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
-		<rip:inputCheckbox name="globalReadOnly" textKey="metadada.form.camp.global.readonly"/>
+		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
+		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

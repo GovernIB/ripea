@@ -43,7 +43,9 @@ public class EntitatPermisAdminController extends BaseAdminController {
 	public String permis(
 			HttpServletRequest request,
 			Model model) {
-		getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"entitat",
+				getEntitatActualComprovantPermisos(request));
 		return "adminPermis";
 	}
 	@RequestMapping(value = "datatable", method = RequestMethod.GET)

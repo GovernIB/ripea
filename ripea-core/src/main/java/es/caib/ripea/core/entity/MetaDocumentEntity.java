@@ -10,9 +10,12 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -28,13 +31,8 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 @EntityListeners(AuditingEntityListener.class)
 public class MetaDocumentEntity extends MetaNodeEntity {
 
-	@Column(name = "global_expedient")
-	private boolean globalExpedient;
-	@Enumerated(EnumType.STRING)
-	@Column(name = "global_multiplicitat")
-	private MultiplicitatEnumDto globalMultiplicitat;
-	@Column(name = "global_readonly")
-	private boolean globalReadOnly;
+	@Column(name = "multiplicitat")
+	private MultiplicitatEnumDto multiplicitat;
 	@Column(name = "firma_pfirma")
 	private boolean firmaPortafirmesActiva;
 	@Column(name = "portafirmes_doctip", length = 64)
@@ -60,17 +58,13 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "plantilla_contingut")
 	private byte[] plantillaContingut;
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "meta_expedient_id")
+	@ForeignKey(name = "ipa_metaexp_metadoc_fk")
+	private MetaExpedientEntity metaExpedient;
 
-
-
-	public boolean isGlobalExpedient() {
-		return globalExpedient;
-	}
-	public MultiplicitatEnumDto getGlobalMultiplicitat() {
-		return globalMultiplicitat;
-	}
-	public boolean isGlobalReadOnly() {
-		return globalReadOnly;
+	public MultiplicitatEnumDto getMultiplicitat() {
+		return multiplicitat;
 	}
 	public boolean isFirmaPortafirmesActiva() {
 		return firmaPortafirmesActiva;
@@ -107,14 +101,15 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public byte[] getPlantillaContingut() {
 		return plantillaContingut;
 	}
+	public MetaExpedientEntity getMetaExpedient() {
+		return metaExpedient;
+	}
 
 	public void update(
 			String codi,
 			String nom,
 			String descripcio,
-			boolean globalExpedient,
-			MultiplicitatEnumDto globalMultiplicitat,
-			boolean globalReadOnly,
+			MultiplicitatEnumDto multiplicitat,
 			boolean firmaPortafirmesActiva,
 			String portafirmesDocumentTipus,
 			String portafirmesFluxId,
@@ -127,9 +122,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				codi,
 				nom,
 				descripcio);
-		this.globalExpedient = globalExpedient;
-		this.globalMultiplicitat = globalMultiplicitat;
-		this.globalReadOnly = globalReadOnly;
+		this.multiplicitat = multiplicitat;
 		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
 		this.portafirmesDocumentTipus = portafirmesDocumentTipus;
 		this.portafirmesFluxId = portafirmesFluxId;
@@ -152,38 +145,36 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String codi,
-			String nom) {
+			String nom,
+			MultiplicitatEnumDto multiplicitat,
+			MetaExpedientEntity metaExpedient) {
 		return new Builder(
 				entitat,
 				codi,
-				nom);
+				nom,
+				multiplicitat,
+				metaExpedient);
 	}
 	public static class Builder {
 		MetaDocumentEntity built;
 		Builder(
 				EntitatEntity entitat,
 				String codi,
-				String nom) {
+				String nom,
+				MultiplicitatEnumDto multiplicitat,
+				MetaExpedientEntity metaExpedient) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;
 			built.nom = nom;
+			built.multiplicitat = multiplicitat;
+			built.metaExpedient = metaExpedient;
 			built.tipus = MetaNodeTipusEnum.DOCUMENT;
+			built.firmaPortafirmesActiva = false;
+			built.firmaPassarelaActiva = false;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
-			return this;
-		}
-		public Builder globalExpedient(boolean globalExpedient) {
-			built.globalExpedient = globalExpedient;
-			return this;
-		}
-		public Builder globalMultiplicitat(MultiplicitatEnumDto globalMultiplicitat) {
-			built.globalMultiplicitat = globalMultiplicitat;
-			return this;
-		}
-		public Builder globalReadOnly(boolean globalReadOnly) {
-			built.globalReadOnly = globalReadOnly;
 			return this;
 		}
 		public Builder portafirmesDocumentTipus(String portafirmesDocumentTipus) {
@@ -227,6 +218,36 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			responsablesStr.append(responsable);
 		}
 		return responsablesStr.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
+		result = prime * result + ((metaExpedient == null) ? 0 : metaExpedient.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MetaDocumentEntity other = (MetaDocumentEntity) obj;
+		if (codi == null) {
+			if (other.codi != null)
+				return false;
+		} else if (!codi.equals(other.codi))
+			return false;
+		if (metaExpedient == null) {
+			if (other.metaExpedient != null)
+				return false;
+		} else if (!metaExpedient.equals(other.metaExpedient))
+			return false;
+		return true;
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

@@ -31,7 +31,6 @@ import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -87,17 +86,17 @@ public class ExpedientServiceTest extends BaseServiceTest {
 		metaDada.setNom("Metadada de test");
 		metaDada.setDescripcio("Descripció de test");
 		metaDada.setTipus(MetaDadaTipusEnumDto.TEXT);
-		metaDada.setGlobalExpedient(false);
+		/*metaDada.setGlobalExpedient(false);
 		metaDada.setGlobalDocument(false);
 		metaDada.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDada.setGlobalReadOnly(false);
+		metaDada.setGlobalReadOnly(false);*/
 		metaDocument = new MetaDocumentDto();
 		metaDocument.setCodi("TEST1");
 		metaDocument.setNom("Metadocument de test");
 		metaDocument.setDescripcio("Descripció de test");
-		metaDocument.setGlobalExpedient(false);
+		/*metaDocument.setGlobalExpedient(false);
 		metaDocument.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDocument.setGlobalReadOnly(false);
+		metaDocument.setGlobalReadOnly(false);*/
 		metaDocument.setFirmaPortafirmesActiva(false);
 		metaDocument.setPortafirmesDocumentTipus("1234");
 		metaDocument.setPortafirmesFluxId("1234");

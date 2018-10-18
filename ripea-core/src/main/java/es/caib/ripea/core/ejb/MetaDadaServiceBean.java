@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDadaService;
 
 /**
@@ -37,87 +37,141 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto create(
 			Long entitatId,
+			Long metaNodeId,
 			MetaDadaDto metaDada) {
-		return delegate.create(entitatId, metaDada);
+		return delegate.create(
+				entitatId,
+				metaNodeId,
+				metaDada);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto update(
 			Long entitatId,
+			Long metaNodeId,
 			MetaDadaDto metaDada) {
-		return delegate.update(entitatId, metaDada);
+		return delegate.update(
+				entitatId,
+				metaNodeId,
+				metaDada);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto updateActiva(
 			Long entitatId,
+			Long metaNodeId,
 			Long id,
 			boolean activa) {
-		return delegate.updateActiva(entitatId, id, activa);
+		return delegate.updateActiva(
+				entitatId,
+				metaNodeId,
+				id,
+				activa);
+	}
+
+	@Override
+	public void moveUp(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId) throws NotFoundException {
+		delegate.moveUp(
+				entitatId,
+				metaNodeId,
+				metaDadaId);
+	}
+
+	@Override
+	public void moveDown(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId) throws NotFoundException {
+		delegate.moveDown(
+				entitatId,
+				metaNodeId,
+				metaDadaId);
+	}
+
+	@Override
+	public void moveTo(
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId,
+			int posicio) throws NotFoundException {
+		delegate.moveTo(
+				entitatId,
+				metaNodeId,
+				metaDadaId,
+				posicio);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto delete(
 			Long entitatId,
-			Long metaDadaId) {
-		return delegate.delete(entitatId, metaDadaId);
+			Long metaNodeId,
+			Long id) {
+		return delegate.delete(
+				entitatId,
+				metaNodeId,
+				id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDadaDto findById(
 			Long entitatId,
+			Long metaNodeId,
 			Long id) {
 		return delegate.findById(
 				entitatId,
+				metaNodeId,
 				id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public MetaDadaDto findByEntitatCodi(
+	public MetaDadaDto findByCodi(
 			Long entitatId,
+			Long metaNodeId,
 			String codi) {
-		return delegate.findByEntitatCodi(entitatId, codi);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<MetaDadaDto> findAllByEntitatPaginat(
-			Long entitatId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAllByEntitatPaginat(entitatId, paginacioParams);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaDadaDto> findActiveByEntitat(
-			Long entitatId,
-			boolean incloureGlobalsExpedient,
-			boolean incloureGlobalsDocument) {
-		return delegate.findActiveByEntitat(
+		return delegate.findByCodi(
 				entitatId,
-				incloureGlobalsExpedient,
-				incloureGlobalsDocument);
+				metaNodeId,
+				codi);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaDadaDto> findByMetaNodePaginat(
+			Long entitatId,
+			Long metaNodeId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findByMetaNodePaginat(
+				entitatId,
+				metaNodeId,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<MetaDadaDto> findActiveByMetaNode(
+			Long entitatId,
+			Long metaNodeId) {
+		return delegate.findActiveByMetaNode(
+				entitatId,
+				metaNodeId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<MetaNodeMetaDadaDto> findByNode(
+	public List<MetaDadaDto> findByNode(
 			Long entitatId,
 			Long nodeId) {
-		return delegate.findByNode(entitatId, nodeId);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public List<MetaDadaDto> findByNodePerCreacio(
-			Long entitatId,
-			Long nodeId) {
-		return delegate.findByNodePerCreacio(entitatId, nodeId);
+		return delegate.findByNode(
+				entitatId,
+				nodeId);
 	}
 
 }

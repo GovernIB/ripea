@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -66,9 +65,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentCreate.setCodi("TEST1");
 		metaDocumentCreate.setNom("Metadocument de test");
 		metaDocumentCreate.setDescripcio("Descripció de test");
-		metaDocumentCreate.setGlobalExpedient(false);
+		/*metaDocumentCreate.setGlobalExpedient(false);
 		metaDocumentCreate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDocumentCreate.setGlobalReadOnly(false);
+		metaDocumentCreate.setGlobalReadOnly(false);*/
 		metaDocumentCreate.setFirmaPortafirmesActiva(false);
 		metaDocumentCreate.setPortafirmesDocumentTipus("1234");
 		metaDocumentCreate.setPortafirmesFluxId("1234");
@@ -80,9 +79,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentUpdate.setCodi("TEST2");
 		metaDocumentUpdate.setNom("Metadocument de test2");
 		metaDocumentUpdate.setDescripcio("Descripció de test2");
-		metaDocumentUpdate.setGlobalExpedient(true);
+		/*metaDocumentUpdate.setGlobalExpedient(true);
 		metaDocumentUpdate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDocumentUpdate.setGlobalReadOnly(true);
+		metaDocumentUpdate.setGlobalReadOnly(true);*/
 		metaDocumentUpdate.setFirmaPortafirmesActiva(true);
 		metaDocumentUpdate.setPortafirmesDocumentTipus("12341");
 		metaDocumentUpdate.setPortafirmesFluxId("12342");
@@ -126,6 +125,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
 						MetaDocumentDto trobat = metaDocumentService.findById(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDocumentCreat.getId());
 						assertNotNull(trobat);
 						assertNotNull(trobat.getId());
@@ -150,6 +150,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						metaDocumentUpdate.setId(metaDocumentCreat.getId());
 						MetaDocumentDto modificat = metaDocumentService.update(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDocumentUpdate,
 								null,
 								null,
@@ -180,6 +181,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
 						MetaDocumentDto esborrat = metaDocumentService.delete(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDocumentCreat.getId());
 						comprovarMetaDocumentCoincideix(
 								metaDocumentCreate,
@@ -187,6 +189,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						try {
 							metaDocumentService.findById(
 									entitatCreada.getId(),
+									null, // TODO
 									metaDocumentCreat.getId());
 							fail("El meta-document esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
@@ -209,6 +212,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
 						MetaDocumentDto desactivat = metaDocumentService.updateActiu(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDocumentCreat.getId(),
 								false);
 						assertEquals(
@@ -216,6 +220,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								desactivat.isActiu());
 						MetaDocumentDto activat = metaDocumentService.updateActiu(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDocumentCreat.getId(),
 								true);
 						assertEquals(
@@ -241,7 +246,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		assertEquals(
 				original.getDescripcio(),
 				perComprovar.getDescripcio());
-		assertEquals(
+		/*assertEquals(
 				original.isGlobalExpedient(),
 				perComprovar.isGlobalExpedient());
 		assertEquals(
@@ -249,7 +254,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 				perComprovar.getGlobalMultiplicitat());
 		assertEquals(
 				original.isGlobalReadOnly(),
-				perComprovar.isGlobalReadOnly());
+				perComprovar.isGlobalReadOnly());*/
 		assertEquals(
 				original.isFirmaPortafirmesActiva(),
 				perComprovar.isFirmaPortafirmesActiva());

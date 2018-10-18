@@ -3,24 +3,16 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -64,11 +56,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@JoinColumn(name = "pare_id")
 	@ForeignKey(name = "ipa_pare_metaexp_fk")
 	private MetaExpedientEntity pare;
-	@OneToMany(
-			mappedBy = "metaExpedient",
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private Set<MetaExpedientMetaDocumentEntity> metaDocuments = new HashSet<MetaExpedientMetaDocumentEntity>();
 
 	public String getClassificacioSia() {
 		return classificacioSia;
@@ -112,9 +99,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	public MetaExpedientEntity getPare() {
 		return pare;
 	}
-	public Set<MetaExpedientMetaDocumentEntity> getMetaDocuments() {
-		return metaDocuments;
-	}
 
 	public void update(
 			String codi,
@@ -152,27 +136,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		this.notificacioOficiTitol = notificacioOficiTitol;
 		this.notificacioOficiText = notificacioOficiText;
 		this.pare = pare;
-	}
-
-	public void metaDocumentAdd(
-			MetaDocumentEntity metaDocument,
-			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) {
-		MetaExpedientMetaDocumentEntity metaExpedientMetaDocument = MetaExpedientMetaDocumentEntity.getBuilder(
-				this,
-				metaDocument,
-				multiplicitat,
-				readOnly,
-				metaDocuments.size()).build();
-		metaDocuments.add(metaExpedientMetaDocument);
-	}
-	public void metaDocumentDelete(MetaExpedientMetaDocumentEntity metaExpedientMetaDocument) {
-		Iterator<MetaExpedientMetaDocumentEntity> it = metaDocuments.iterator();
-		while (it.hasNext()) {
-			MetaExpedientMetaDocumentEntity memd = it.next();
-			if (memd.getId().equals(metaExpedientMetaDocument.getId()))
-				it.remove();
-		}
 	}
 
 	public static Builder getBuilder(

@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -67,19 +66,19 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 		metaDadaCreate.setNom("Metadada de test");
 		metaDadaCreate.setDescripcio("Descripció de test");
 		metaDadaCreate.setTipus(MetaDadaTipusEnumDto.TEXT);
-		metaDadaCreate.setGlobalExpedient(false);
+		/*metaDadaCreate.setGlobalExpedient(false);
 		metaDadaCreate.setGlobalDocument(false);
 		metaDadaCreate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDadaCreate.setGlobalReadOnly(false);
+		metaDadaCreate.setGlobalReadOnly(false);*/
 		metaDadaUpdate = new MetaDadaDto();
 		metaDadaUpdate.setCodi("TEST2");
 		metaDadaUpdate.setNom("Metadada de test2");
 		metaDadaUpdate.setDescripcio("Descripció de test2");
 		metaDadaUpdate.setTipus(MetaDadaTipusEnumDto.SENCER);
-		metaDadaUpdate.setGlobalExpedient(true);
+		/*metaDadaUpdate.setGlobalExpedient(true);
 		metaDadaUpdate.setGlobalDocument(true);
 		metaDadaUpdate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_1);
-		metaDadaUpdate.setGlobalReadOnly(true);
+		metaDadaUpdate.setGlobalReadOnly(true);*/
 		permisUserRead = new PermisDto();
 		permisUserRead.setRead(true);
 		permisUserRead.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
@@ -116,6 +115,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
 						MetaDadaDto trobada = metaDadaService.findById(
 								entitatCreada.getId(),
+								null, // TODO
 								metadadaCreada.getId());
 						assertNotNull(trobada);
 						assertNotNull(trobada.getId());
@@ -140,6 +140,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						metaDadaUpdate.setId(metadadaCreada.getId());
 						MetaDadaDto modificada = metaDadaService.update(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDadaUpdate);
 						assertNotNull(modificada);
 						assertNotNull(modificada.getId());
@@ -167,6 +168,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
 						MetaDadaDto esborrada = metaDadaService.delete(
 								entitatCreada.getId(),
+								null, // TODO
 								metadadaCreada.getId());
 						comprovarMetaDadaCoincideix(
 								metaDadaCreate,
@@ -174,6 +176,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						try {
 							metaDadaService.findById(
 									entitatCreada.getId(),
+									null, // TODO
 									metadadaCreada.getId());
 							fail("La meta-dada esborrada no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
@@ -196,6 +199,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
 						MetaDadaDto desactivada = metaDadaService.updateActiva(
 								entitatCreada.getId(),
+								null, // TODO
 								metadadaCreada.getId(),
 								false);
 						assertEquals(
@@ -203,6 +207,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 								desactivada.isActiva());
 						MetaDadaDto activada = metaDadaService.updateActiva(
 								entitatCreada.getId(),
+								null, // TODO
 								metadadaCreada.getId(),
 								true);
 						assertEquals(
@@ -223,8 +228,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
-						MetaDadaDto trobada = metaDadaService.findByEntitatCodi(
+						MetaDadaDto trobada = metaDadaService.findByCodi(
 								entitatCreada.getId(),
+								null, // TODO
 								metadadaCreada.getCodi());
 						comprovarMetaDadaCoincideix(
 								metadadaCreada,
@@ -245,6 +251,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						metaDadaService.create(
 								entitatCreada.getId(),
+								null, // TODO
 								metaDadaCreate);
 					}
 				},
@@ -269,7 +276,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 		assertEquals(
 				original.getTipus(),
 				perComprovar.getTipus());
-		assertEquals(
+		/*assertEquals(
 				original.isGlobalExpedient(),
 				perComprovar.isGlobalExpedient());
 		assertEquals(
@@ -280,7 +287,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 				perComprovar.getGlobalMultiplicitat());
 		assertEquals(
 				original.isGlobalReadOnly(),
-				perComprovar.isGlobalReadOnly());
+				perComprovar.isGlobalReadOnly());*/
 	}
 
 }

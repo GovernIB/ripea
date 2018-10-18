@@ -13,13 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaNodeMetaDadaDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -37,18 +33,18 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@Autowired
 	MetaDocumentService delegate;
 
-
-
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto create(
 			Long entitatId,
+			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut) {
 		return delegate.create(
 				entitatId,
+				metaExpedientId,
 				metaDocument,
 				plantillaNom,
 				plantillaContentType,
@@ -59,12 +55,14 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto update(
 			Long entitatId,
+			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut) {
 		return delegate.update(
 				entitatId,
+				metaExpedientId,
 				metaDocument,
 				plantillaNom,
 				plantillaContentType,
@@ -75,187 +73,100 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
+			Long metaExpedientId,
 			Long id,
 			boolean actiu) {
-		return delegate.updateActiu(entitatId, id, actiu);
+		return delegate.updateActiu(
+				entitatId,
+				metaExpedientId,
+				id,
+				actiu);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto delete(
 			Long entitatId,
+			Long metaExpedientId,
 			Long metaDocumentId) {
-		return delegate.delete(entitatId, metaDocumentId);
+		return delegate.delete(
+				entitatId,
+				metaExpedientId,
+				metaDocumentId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto findById(
 			Long entitatId,
+			Long metaExpedientId,
 			Long id) {
 		return delegate.findById(
 				entitatId,
+				metaExpedientId,
 				id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public MetaDocumentDto findByEntitatCodi(
+	public MetaDocumentDto findByCodi(
 			Long entitatId,
+			Long metaExpedientId,
 			String codi) {
-		return delegate.findByEntitatCodi(entitatId, codi);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaDocumentDto> findByEntitat(
-			Long entitatId) {
-		return delegate.findByEntitat(entitatId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<MetaDocumentDto> findByEntitatPaginat(
-			Long entitatId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findByEntitatPaginat(entitatId, paginacioParams);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaDocumentDto> findByEntitatAndActiveTrue(
-			Long entitatId,
-			boolean incloureGlobalsExpedient) {
-		return delegate.findByEntitatAndActiveTrue(
+		return delegate.findByCodi(
 				entitatId,
-				incloureGlobalsExpedient);
+				metaExpedientId,
+				codi);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findByMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "tothom"})
 	public FitxerDto getPlantilla(
 			Long entitatId,
+			Long contingutId,
 			Long id) {
-		return delegate.getPlantilla(entitatId, id);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaCreate(
-			Long entitatId,
-			Long id,
-			Long metaDadaId,
-			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) {
-		delegate.metaDadaCreate(entitatId, id, metaDadaId, multiplicitat, readOnly);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaUpdate(
-			Long entitatId,
-			Long id,
-			Long metaNodeMetaDadaId,
-			MultiplicitatEnumDto multiplicitat,
-			boolean readOnly) {
-		delegate.metaDadaUpdate(entitatId, id, metaNodeMetaDadaId, multiplicitat, readOnly);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaDelete(
-			Long entitatId,
-			Long id,
-			Long metaDadaId) {
-		delegate.metaDadaDelete(entitatId, id, metaDadaId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaMoveUp(
-			Long entitatId,
-			Long id,
-			Long metaDadaId) {
-		delegate.metaDadaMoveUp(entitatId, id, metaDadaId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaMoveDown(
-			Long entitatId,
-			Long id,
-			Long metaDadaId) {
-		delegate.metaDadaMoveDown(entitatId, id, metaDadaId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void metaDadaMoveTo(
-			Long entitatId,
-			Long id,
-			Long metaDadaId,
-			int posicio) {
-		delegate.metaDadaMoveTo(entitatId, id, metaDadaId, posicio);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public MetaNodeMetaDadaDto metaDadaFind(
-			Long entitatId,
-			Long id,
-			Long metaNodeMetaDadaId) {
-		return delegate.metaDadaFind(entitatId, id, metaNodeMetaDadaId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaDadaDto> metaDadaFindGlobals(
-			Long entitatId) {
-		return delegate.metaDadaFindGlobals(entitatId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<PermisDto> findPermis(Long entitatId, Long id) {
-		return delegate.findPermis(entitatId, id);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void updatePermis(Long entitatId, Long id, PermisDto permis) {
-		delegate.updatePermis(entitatId, id, permis);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void deletePermis(Long entitatId, Long id, Long permisId) {
-		delegate.deletePermis(entitatId, id, permisId);
+		return delegate.getPlantilla(
+				entitatId,
+				contingutId,
+				id);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<MetaDocumentDto> findActiveByEntitatAndContenidorPerCreacio(
+	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contenidorId) {
-		return delegate.findActiveByEntitatAndContenidorPerCreacio(
+		return delegate.findActiusPerCreacio(
 				entitatId,
 				contenidorId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<MetaDocumentDto> findActiveByEntitatAndDocumentPerModificacio(
+	public List<MetaDocumentDto> findActiusPerModificacio(
 			Long entitatId,
 			Long documentId) throws NotFoundException {
-		return delegate.findActiveByEntitatAndDocumentPerModificacio(
+		return delegate.findActiusPerModificacio(
 				entitatId,
 				documentId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<PortafirmesDocumentTipusDto> findPortafirmesDocumentTipus() {
-		return delegate.findPortafirmesDocumentTipus();
+	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
+		return delegate.portafirmesFindDocumentTipus();
 	}
 
 }

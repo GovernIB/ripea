@@ -36,8 +36,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientMetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaNodeMetaDadaEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -45,8 +43,6 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientMetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaNodeMetaDadaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -71,10 +67,6 @@ public class CacheHelper {
 	private MetaDadaRepository metaDadaRepository;
 	@Resource
 	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
-	private MetaNodeMetaDadaRepository metaNodeMetaDadaRepository;
-	@Resource
-	private MetaExpedientMetaDocumentRepository metaExpedientMetaDocumentRepository;
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
@@ -126,39 +118,13 @@ public class CacheHelper {
 		logger.debug("Consulta dels errors de validació pel node (nodeId=" + node.getId() + ")");
 		List<ValidacioErrorDto> errors = new ArrayList<ValidacioErrorDto>();
 		List<DadaEntity> dades = dadaRepository.findByNode(node);
-		// Valida dades globals
-		List<MetaDadaEntity> metaDadesGlobals = null;
-		if (node instanceof ExpedientEntity)
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalExpedientTrueAndActivaTrueOrderByIdAsc(
-					node.getEntitat());
-		else
-			metaDadesGlobals = metaDadaRepository.findByEntitatAndGlobalDocumentTrueAndActivaTrueOrderByIdAsc(
-					node.getEntitat());
-		if (metaDadesGlobals != null) {
-			for (MetaDadaEntity metaDada: metaDadesGlobals) {
-				if (metaDada.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDada.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
-					boolean trobada = false;
-					for (DadaEntity dada: dades) {
-						if (dada.getMetaDada().equals(metaDada)) {
-							trobada = true;
-							break;
-						}
-					}
-					if (!trobada)
-						errors.add(
-								crearValidacioError(
-										metaDada,
-										metaDada.getGlobalMultiplicitat()));
-				}
-			}
-		}
 		// Valida dades específiques del meta-node
-		List<MetaNodeMetaDadaEntity> metaNodeMetaDades = metaNodeMetaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode());
-		for (MetaNodeMetaDadaEntity metaNodeMetaDada: metaNodeMetaDades) {
-			if (metaNodeMetaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaNodeMetaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode());
+		for (MetaDadaEntity metaDada: metaDades) {
+			if (metaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 				boolean trobada = false;
 				for (DadaEntity dada: dades) {
-					if (dada.getMetaDada() != null && dada.getMetaDada().equals(metaNodeMetaDada.getMetaDada())) {
+					if (dada.getMetaDada() != null && dada.getMetaDada().equals(metaDada)) {
 						trobada = true;
 						break;
 					}
@@ -166,8 +132,8 @@ public class CacheHelper {
 				if (!trobada)
 					errors.add(
 							crearValidacioError(
-									metaNodeMetaDada.getMetaDada(),
-									metaNodeMetaDada.getMultiplicitat()));
+									metaDada,
+									metaDada.getMultiplicitat()));
 			}
 		}
 		if (node instanceof ExpedientEntity) {
@@ -175,11 +141,10 @@ public class CacheHelper {
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
 					expedient,
 					0);
-			// Valida documents globals
-			List<MetaDocumentEntity> metaDocumentsGlobals = metaDocumentRepository.findByEntitatAndGlobalExpedientTrueAndActiuTrueOrderByNomAsc(
-					node.getEntitat());
-			for (MetaDocumentEntity metaDocument: metaDocumentsGlobals) {
-				if (metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getGlobalMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
+			// Valida documents específics del meta-node
+			List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(expedient.getMetaExpedient());
+			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
+				if (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 					boolean trobat = false;
 					for (DocumentEntity document: documents) {
 						if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaDocument)) {
@@ -191,25 +156,7 @@ public class CacheHelper {
 						errors.add(
 								crearValidacioError(
 										metaDocument,
-										metaDocument.getGlobalMultiplicitat()));
-				}
-			}
-			// Valida documents específics del meta-node
-			List<MetaExpedientMetaDocumentEntity> metaExpedientMetaDocuments = metaExpedientMetaDocumentRepository.findByMetaExpedient(expedient.getMetaExpedient());
-			for (MetaExpedientMetaDocumentEntity metaExpedientMetaDocument: metaExpedientMetaDocuments) {
-				if (metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaExpedientMetaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
-					boolean trobat = false;
-					for (DocumentEntity document: documents) {
-						if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaExpedientMetaDocument.getMetaDocument())) {
-							trobat = true;
-							break;
-						}
-					}
-					if (!trobat)
-						errors.add(
-								crearValidacioError(
-										metaExpedientMetaDocument.getMetaDocument(),
-										metaExpedientMetaDocument.getMultiplicitat()));
+										metaDocument.getMultiplicitat()));
 				}
 			}
 		}
