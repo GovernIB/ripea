@@ -411,6 +411,50 @@ public class ContingutController extends BaseUserController {
 		return null;
 	}
 
+	@RequestMapping(value = "/contingutDetail/{contingutId}", method = RequestMethod.GET)
+	public String contingutDetailGet(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutId,
+				true,
+				true);
+		omplirModelPerMostrarContingut(
+				request,
+				entitatActual,
+				contingut,
+				SessioHelper.desmarcarLlegit(request),
+				model);
+		return "contingutDetail";
+	}
+
+	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/icones", method = RequestMethod.GET)
+	public String contingutDetailCanviVistaIcones(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		SessioHelper.updateContenidorVista(
+				request,
+				CONTENIDOR_VISTA_ICONES);
+		return "redirect:../../" + contingutId;
+	}
+
+	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
+	public String contingutDetailCanviVistaLlistat(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		SessioHelper.updateContenidorVista(
+				request,
+				CONTENIDOR_VISTA_LLISTAT);
+		return "redirect:../../" + contingutId;
+	}
+
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
