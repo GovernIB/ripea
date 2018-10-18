@@ -7,7 +7,6 @@
 <%@ attribute name="mostrarObrir" required="false" rtexprvalue="true"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
 
-
 <c:set var="expedientPareObertOInexistent" value="${empty contingut.expedientPare or contingut.expedientPare.estat == 'OBERT'}"/>
 <c:set var="mostrarSeparador" value="${false}"/>
 <div <c:if test="${not empty id}">id="${id}" </c:if>class="dropdown<c:if test="${not modeLlistat}"> text-center</c:if><c:if test="${not empty className}"> ${className}</c:if>">
