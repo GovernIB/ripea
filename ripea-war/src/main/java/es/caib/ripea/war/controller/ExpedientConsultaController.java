@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.Cookie;
@@ -32,6 +33,7 @@ import org.springframework.web.util.WebUtils;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
@@ -71,9 +73,11 @@ public class ExpedientConsultaController extends BaseUserController {
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId()));
+		
+		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedientsPermisCreacio);
 		model.addAttribute(
 				getFiltreCommand(request));
 		model.addAttribute(
@@ -88,6 +92,15 @@ public class ExpedientConsultaController extends BaseUserController {
 						"expedient.estat.enum."));
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
+		
+		if (metaExpedientsPermisCreacio == null || metaExpedientsPermisCreacio.size() <= 0)
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.sense.permisos.crear"));
+		
+		
 		return "expedientUserList";
 	}
 

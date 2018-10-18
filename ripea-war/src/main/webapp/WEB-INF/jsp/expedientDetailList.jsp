@@ -19,7 +19,6 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
-	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
@@ -32,6 +31,21 @@ table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
 table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
 	cursor: pointer;
 }
+
+.container{width: 98%}
+
+.buttons {
+    position: absolute;
+    top: 138px;
+    right: 2%;
+}
+
+.buttons a {
+	float: right;
+	margin-left: 10px;
+}
+
+
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
@@ -68,11 +82,15 @@ $(document).ready(function() {
 			);
 			return false;
 		});
-		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
+
+		$("#taulaDades_wrapper .col-md-3").addClass('col-md-4');
+		$("#taulaDades_wrapper .col-md-3").removeClass('col-md-3');
+		$("#taulaDades_wrapper .col-md-9").addClass('col-md-8');
+		$("#taulaDades_wrapper .col-md-9").removeClass('col-md-9');
+
+
 	});
-	if (mostrarMeusExpedients) {
-		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
-	}
+
 	$('#meusExpedientsBtn').click(function() {
 		mostrarMeusExpedients = !$(this).hasClass('active');
 		// Modifica el formulari
@@ -83,6 +101,28 @@ $(document).ready(function() {
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
 	})
+
+
+
+		 
+		        
+
+		 
+
+	$("#taulaDades").on("click", "tr", function(e){
+		var idRow = $(this).closest('tr').attr('id');
+		var id = idRow.substring(4); 
+
+		
+
+		 $("#frame").attr("src", "<c:url value="/nodeco/contingutDetail/"/>" + id);
+	
+
+
+
+
+	});
+	
 	
 });
 function setCookie(cname,cvalue) {
@@ -111,9 +151,9 @@ function getCookie(cname) {
 <body>
 
 
-	<div data-toggle="botons-titol">
+	<div class="buttons" >
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
-		<a  style="float: right" href="<c:url value="/expedientDetail"/>"  class="btn btn-primary""><spring:message code="expedient.list.canviVista"/></a>
+		<a  style="float: right" href="<c:url value="/expedient"/>"  class="btn btn-primary"> <spring:message code="expedient.list.canviVista"/></a>
 	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
@@ -160,42 +200,38 @@ function getCookie(cname) {
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="btn-group pull-right">
 			
-			<button type="button" id="seleccioAll"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
-			<button type="button" id="seleccioNone"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			<button type="button"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    			<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
-  			</button>
-			<ul class="dropdown-menu">
-				<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
-				<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
-			</ul>
+
 			<c:if test="${not empty metaExpedientsPermisCreacio}">
-				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
+				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" data-refresh="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 			</c:if>
 		</div>
 	</script>
-	<script id="rowhrefTemplate" type="text/x-jsrender">contingut/{{:id}}</script>
-	<table id="taulaDades" 
-			data-toggle="datatable" 
-			data-url="<c:url value="/expedient/datatable"/>" 
-			class="table table-bordered table-striped table-hover" 
-			data-default-order="9" 
-			data-default-dir="desc"
-			data-botons-template="#botonsTemplate"
-			data-rowhref-template="#rowhrefTemplate"
-			data-selection-enabled="true"
-			style="width:100%">
-		<thead>
-			<tr>
+	
+	
+	<div class="row">
+		<div class="col-md-4">
+			<table id="taulaDades" 
+					data-toggle="datatable" 
+					data-url="<c:url value="/expedient/datatable"/>" 
+					class="table table-bordered table-striped table-hover" 
+					data-default-order="8" 
+					data-default-dir="desc"
+					data-botons-template="#botonsTemplate"
+					style="width:100%">
+				<thead>
+					<tr>
+
+
+
 				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
-				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
+				<th data-col-name="metaNode.nom" width="15%" data-visible="false"><spring:message code="expedient.list.user.columna.tipus"/></th>
+				<th data-col-name="numero" width="30%"><spring:message code="expedient.list.user.columna.numero"/></th>
+				<th data-col-name="nom" data-template="#cellNomTemplate" width="70%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
 						{{if !valid}}
@@ -212,8 +248,8 @@ function getCookie(cname) {
 						{{:nom}}
 					</script>
 				</th>
-				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%"><spring:message code="expedient.list.user.columna.createl"/></th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
+				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%" data-visible="false"><spring:message code="expedient.list.user.columna.createl"/></th>
+				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%" data-visible="false">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'OBERT'}}
@@ -229,47 +265,26 @@ function getCookie(cname) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualWrite}}
-									<li><a href="expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
-								{{/if}}
-								{{if metaNode.usuariActualDelete}}
-									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-								{{/if}}
-								<li role="separator" class="divider"></li>
-								{{if metaNode.usuariActualWrite}}
-									{{if !agafat}}
-										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
-									{{else}}
-										{{if agafatPer.codi != '${pageContext.request.userPrincipal.name}'}}
-											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
-										{{else}}
-											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
-										{{/if}}
-									{{/if}}
-									<li><a href="expedient/{{:id}}/relacionar" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-									{{if estat == 'OBERT'}}
-										{{if valid && estat == 'OBERT'}}
-											<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
-										{{/if}}
-									{{else}}
-										<li><a href="expedient/{{:id}}/reobrir" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
-									{{/if}}
-								{{/if}}
-								<li role="separator" class="divider"></li>
-								<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-								<li><a href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-							</ul>
-						</div>
-					</script>
+				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%" data-visible="false"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				<th data-col-name="id" data-orderable="false" width="10%" data-visible="false">
+			
 				</th>
-			</tr>
-		</thead>
-	</table>
+						
+						
+		
+					</tr>
+				</thead>
+			</table>
+		</div>				
+		<div class="col-md-8">
+		
+		     <iframe id="frame" src="" width="100%" height="600px" style="border: none;" ></iframe>
+
+		
+		
+		
+		</div>
+			
+			
+	</div>			
 </body>

@@ -138,6 +138,7 @@ public class ContingutController extends BaseUserController {
 				CONTENIDOR_VISTA_ICONES);
 		return "redirect:../../" + contingutId;
 	}
+
 	@RequestMapping(value = "/contingut/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
 	public String canviVistaIcones(
 			HttpServletRequest request,

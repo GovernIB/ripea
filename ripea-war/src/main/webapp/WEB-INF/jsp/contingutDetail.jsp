@@ -6,6 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+
 <c:set var="potModificarContingut" value="${false}"/>
 <c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty contingut.metaNode or contingut.metaNode.usuariActualWrite}"/></c:if>
 <c:set var="agafatPerUsuariActual" value="${false}"/>
@@ -31,17 +32,41 @@
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
 	<meta name="subtitle" content="${serveiPerTitol}"/>
+	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>	
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	
+	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
+	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+
+	<!-- Llibreria per a compatibilitat amb HTML5 -->
+	<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
-	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
-	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>    
+    
+	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
 	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
 <style>
@@ -343,128 +368,12 @@ $(document).ready(function() {
 </head>
 <body>
 	<rip:blocContenidorPath contingut="${contingut}"/>
-	<div class="row">
-		<c:set var="contingutClass">col-md-12</c:set>
-		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
-			<c:set var="contingutClass">col-md-9</c:set>
-			<div class="col-md-3" id="colInfo">
-				<%--                    --%>
-				<%-- Columna informació --%>
-				<%--                    --%>
-				<div id="contenidor-info" class="well">
-					<h3>
-						<spring:message code="contingut.info.informacio"/>
-						<c:if test="${pluginArxiuActiu}">
-							<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs" data-toggle="modal">Arxiu</a>
-						</c:if>
-					</h3>
-					<dl>
-						<dt>
-							<c:choose>
-								<c:when test="${contingut.expedient or contingut.document}">
-									<spring:message code="contingut.info.titol"/>
-								</c:when>
-								<c:otherwise>
-									<spring:message code="contingut.info.nom"/>
-								</c:otherwise>
-							</c:choose>
-						</dt>
-						<dd>${contingut.nom}</dd>
-						<dt><spring:message code="contingut.info.tipus"/></dt>
-						<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
-						<c:if test="${contingut.expedient}">
-							<c:if test="${not empty contingut.metaNode}">
-								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
-								<dd>${contingut.metaNode.nom}</dd>
-							</c:if>
-							<dt><spring:message code="contingut.info.numero"/></dt>
-							<dd>${contingut.codi}/${contingut.sequencia}/${contingut.any}</dd>
-							<dt><spring:message code="contingut.info.estat"/></dt>
-							<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
-						</c:if>
-						<c:if test="${contingut.document}">
-							<c:if test="${not empty contingut.metaNode}">
-								<dt><spring:message code="contingut.info.meta.document"/></dt>
-								<dd>${contingut.metaNode.nom}</dd>
-							</c:if>
-							<dt><spring:message code="contingut.info.data"/></dt>
-							<dd><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></dd>
-							<dt><spring:message code="contingut.info.estat"/></dt>
-							<dd><spring:message code="document.estat.enum.${contingut.estat}"/></dd>
-							<c:if test="${contingut.versioCount gt 0}">
-								<dt><spring:message code="contingut.info.versio"/></dt>
-								<dd>${contingut.versioDarrera}</dd>
-							</c:if>
-						</c:if>
-					</dl>
-					<c:if test="${contingut.expedient or contingut.document}">
-						<a href="#informacioEni" class="btn btn-default btn-xs pull-right" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="informacioEni" style="margin-top:-3.5em">
-						<spring:message code="contingut.info.mes"/> ...
-						</a>
-						<div class="collapse" id="informacioEni">
-							<dl>
-								<c:if test="${contingut.expedient}">
-									<dt><spring:message code="contingut.info.nti.identificador"/></dt>
-									<dd style="overflow:hidden;text-overflow:ellipsis" title="${contingut.ntiIdentificador}">${contingut.ntiIdentificador}</dd>
-									<dt><spring:message code="contingut.info.nti.organ"/></dt>
-									<dd>${contingut.ntiOrganoDescripcio}</dd>
-									<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
-									<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-									<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-									<dd>${contingut.ntiClasificacionSia}</dd>
-								</c:if>
-								<c:if test="${contingut.document}">
-									<dt><spring:message code="contingut.info.nti.identificador"/></dt>
-									<dd style="overflow:hidden;text-overflow:ellipsis" title="${contingut.ntiIdentificador}">${contingut.ntiIdentificador}</dd>
-									<dt><spring:message code="contingut.info.nti.organ"/></dt>
-									<dd>${contingut.ntiOrganoDescripcio}</dd>
-									<dt><spring:message code="contingut.info.nti.data.captura"/></dt>
-									<dd><fmt:formatDate value="${contingut.dataCaptura}" pattern="dd/MM/yyyy"/></dd>
-									<dt><spring:message code="contingut.info.nti.origen"/></dt>
-									<dd><spring:message code="document.nti.origen.enum.${contingut.ntiOrigen}"/></dd>
-									<dt><spring:message code="contingut.info.nti.estat.elab"/></dt>
-									<dd><spring:message code="document.nti.estela.enum.${contingut.ntiEstadoElaboracion}"/></dd>
-									<dt><spring:message code="contingut.info.nti.tipus.doc"/></dt>
-									<dd><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></dd>
-									<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
-										<dt><spring:message code="contingut.info.nti.doc.origen.id"/></dt>
-										<dd>${contingut.ntiIdDocumentoOrigen}</dd>
-									</c:if>
-								</c:if>
-							</dl>
-						</div>
-					</c:if>
-					<c:if test="${not empty relacionats}">
-						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
-							<spring:message code="contingut.info.relacionats"/>
-						</h4>
-						<ul class="list-unstyled">
-							<c:forEach var="expedientRelacionat" items="${relacionats}">
-								<c:if test="${!expedientRelacionat.esborrat}">
-									<li>
-										<span class="fa ${iconaExpedientObert}"></span>
-										<a href="${expedientRelacionat.id}">
-											[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] 
-											${expedientRelacionat.nom} 
-										</a>
-										<c:if test="${potModificarContingut}">
-											<a href="<c:url value="/expedient/${contingut.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
-												<span class="fa fa-trash-o"></span>
-											</a> 
-										</c:if>
-									</li>
-								</c:if>
-							</c:forEach>
-						</ul>
-					</c:if>
-					<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
-				</div>
-				<%--                     --%>
-				<%-- /Columna informació --%>
-				<%--                     --%>
-			</div>
-		</c:if>
-		<div class="${contingutClass}" id="colContent">
+	<div>
+		
+
+
+
+		<div class="col-sm-9" id="colContent">
 			<c:if test="${contingut.node and (not contingut.valid or contingut.alerta)}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
 					<span class="fa fa-exclamation-triangle"></span>
@@ -611,10 +520,10 @@ $(document).ready(function() {
 						<c:otherwise>
 							<div class="text-right" id="contingut-botons">
 								<div class="btn-group">
-									<a href="<c:url value="/contingut/${contingut.id}/canviVista/icones"/>" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
+									<a href="<c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/>" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
 										<span class="fa fa-th"></span>
 									</a>
-									<a href="<c:url value="/contingut/${contingut.id}/canviVista/llistat"/>" class="btn btn-default<c:if test="${vistaLlistat}"> active</c:if>">
+									<a href="<c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/llistat"/>" class="btn btn-default<c:if test="${vistaLlistat}"> active</c:if>">
 										<span class="fa fa-th-list"></span>
 									</a>
 								</div>
@@ -635,7 +544,7 @@ $(document).ready(function() {
 										</ul>
 									</div>
 								</c:if>
-								<c:if test="${agafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut))}">
+								<c:if test="${agafatPerUsuariActual and (contingut.carpeta or ((contingut.expedient or contingut.document) and potModificarContingut))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
@@ -648,7 +557,7 @@ $(document).ready(function() {
 									</div>
 								</c:if>
 							</div>
-							<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/>
 						</c:otherwise>
 					</c:choose>
 					<%--                    --%>
@@ -672,40 +581,40 @@ $(document).ready(function() {
 										</tr>
 									</thead>
 									<tbody>
-										<c:forEach var="metaDada" items="${metaDades}">
+										<c:forEach var="metaNodeMetaDada" items="${metaDades}">
 											<c:set var="dadaValor"></c:set>
 											<c:forEach var="dada" items="${contingut.dades}">
-												<c:if test="${dada.metaDada.codi == metaDada.codi}">
+												<c:if test="${dada.metaDada.codi == metaNodeMetaDada.metaDada.codi}">
 													<c:set var="dadaValor">${dada.valorMostrar}</c:set>
 												</c:if>
 											</c:forEach>
-											<c:set var="isMultiple" value="${metaDada.multiplicitat == 'M_0_N' or metaNodeMetaDada.multiplicitat == 'M_1_N'}"/>
+											<c:set var="isMultiple" value="${metaNodeMetaDada.multiplicitat == 'M_0_N' or metaNodeMetaDada.multiplicitat == 'M_1_N'}"/>
 											<c:set var="multipleClass" value=""/>
 											<c:if test="${isMultiple}"><c:set var="multipleClass" value=" multiple"/></c:if>
 											<tr>
-												<td>${metaDada.nom}</td>
+												<td>${metaNodeMetaDada.metaDada.nom}</td>
 												<td>
 													<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
-														<label class="hidden" for="${metaDada.codi}"></label>
+														<label class="hidden" for="${metaNodeMetaDada.metaDada.codi}"></label>
 														<div>
 															<c:choose>
-																<c:when test="${metaDada.tipus == 'DATA'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'DATA'}">
+																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaDada.tipus == 'IMPORT'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'IMPORT'}">
+																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaDada.tipus == 'SENCER'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'SENCER'}">
+																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaDada.tipus == 'FLOTANT'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'FLOTANT'}">
+																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
 																</c:when>
-																<c:when test="${metaDada.tipus == 'BOOLEA'}">
-																	<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
+																<c:when test="${metaNodeMetaDada.metaDada.tipus == 'BOOLEA'}">
+																	<form:checkbox path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" name="${metaNodeMetaDada.metaDada.codi}"></form:checkbox>
 																</c:when>
 																<c:otherwise>
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
+																	<form:input path="${metaNodeMetaDada.metaDada.codi}" id="${metaNodeMetaDada.metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
 																</c:otherwise>
 															</c:choose>
 															<span class="" aria-hidden="true"></span>
@@ -916,6 +825,128 @@ $(document).ready(function() {
 				</c:if>
 			</div>
 		</div>
+		
+		
+		
+		
+		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
+			<div class="col-sm-3" id="colInfo">
+				<%--                    --%>
+				<%-- Columna informació --%>
+				<%--                    --%>
+				<div id="contenidor-info" class="well">
+					<h3>
+						<spring:message code="contingut.info.informacio"/>
+						<c:if test="${pluginArxiuActiu}">
+							<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs" data-toggle="modal">Arxiu</a>
+						</c:if>
+					</h3>
+					<dl>
+						<dt>
+							<c:choose>
+								<c:when test="${contingut.expedient or contingut.document}">
+									<spring:message code="contingut.info.titol"/>
+								</c:when>
+								<c:otherwise>
+									<spring:message code="contingut.info.nom"/>
+								</c:otherwise>
+							</c:choose>
+						</dt>
+						<dd>${contingut.nom}</dd>
+						<dt><spring:message code="contingut.info.tipus"/></dt>
+						<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
+						<c:if test="${contingut.expedient}">
+							<c:if test="${not empty contingut.metaNode}">
+								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
+								<dd>${contingut.metaNode.nom}</dd>
+							</c:if>
+							<dt><spring:message code="contingut.info.numero"/></dt>
+							<dd>${contingut.codi}/${contingut.sequencia}/${contingut.any}</dd>
+							<dt><spring:message code="contingut.info.estat"/></dt>
+							<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
+						</c:if>
+						<c:if test="${contingut.document}">
+							<c:if test="${not empty contingut.metaNode}">
+								<dt><spring:message code="contingut.info.meta.document"/></dt>
+								<dd>${contingut.metaNode.nom}</dd>
+							</c:if>
+							<dt><spring:message code="contingut.info.data"/></dt>
+							<dd><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></dd>
+							<dt><spring:message code="contingut.info.estat"/></dt>
+							<dd><spring:message code="document.estat.enum.${contingut.estat}"/></dd>
+							<c:if test="${contingut.versioCount gt 0}">
+								<dt><spring:message code="contingut.info.versio"/></dt>
+								<dd>${contingut.versioDarrera}</dd>
+							</c:if>
+						</c:if>
+					</dl>
+					<c:if test="${contingut.expedient or contingut.document}">
+						<a href="#informacioEni" class="btn btn-default btn-xs pull-right" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="informacioEni" style="margin-top:-3.5em">
+						<spring:message code="contingut.info.mes"/> ...
+						</a>
+						<div class="collapse" id="informacioEni">
+							<dl>
+								<c:if test="${contingut.expedient}">
+									<dt><spring:message code="contingut.info.nti.identificador"/></dt>
+									<dd style="overflow:hidden;text-overflow:ellipsis" title="${contingut.ntiIdentificador}">${contingut.ntiIdentificador}</dd>
+									<dt><spring:message code="contingut.info.nti.organ"/></dt>
+									<dd>${contingut.ntiOrganoDescripcio}</dd>
+									<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
+									<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+									<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
+									<dd>${contingut.ntiClasificacionSia}</dd>
+								</c:if>
+								<c:if test="${contingut.document}">
+									<dt><spring:message code="contingut.info.nti.identificador"/></dt>
+									<dd style="overflow:hidden;text-overflow:ellipsis" title="${contingut.ntiIdentificador}">${contingut.ntiIdentificador}</dd>
+									<dt><spring:message code="contingut.info.nti.organ"/></dt>
+									<dd>${contingut.ntiOrganoDescripcio}</dd>
+									<dt><spring:message code="contingut.info.nti.data.captura"/></dt>
+									<dd><fmt:formatDate value="${contingut.dataCaptura}" pattern="dd/MM/yyyy"/></dd>
+									<dt><spring:message code="contingut.info.nti.origen"/></dt>
+									<dd><spring:message code="document.nti.origen.enum.${contingut.ntiOrigen}"/></dd>
+									<dt><spring:message code="contingut.info.nti.estat.elab"/></dt>
+									<dd><spring:message code="document.nti.estela.enum.${contingut.ntiEstadoElaboracion}"/></dd>
+									<dt><spring:message code="contingut.info.nti.tipus.doc"/></dt>
+									<dd><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></dd>
+									<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
+										<dt><spring:message code="contingut.info.nti.doc.origen.id"/></dt>
+										<dd>${contingut.ntiIdDocumentoOrigen}</dd>
+									</c:if>
+								</c:if>
+							</dl>
+						</div>
+					</c:if>
+					<c:if test="${not empty relacionats}">
+						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
+							<spring:message code="contingut.info.relacionats"/>
+						</h4>
+						<ul class="list-unstyled">
+							<c:forEach var="expedientRelacionat" items="${relacionats}">
+								<c:if test="${!expedientRelacionat.esborrat}">
+									<li>
+										<span class="fa ${iconaExpedientObert}"></span>
+										<a href="${expedientRelacionat.id}">
+											[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] 
+											${expedientRelacionat.nom} 
+										</a>
+										<c:if test="${potModificarContingut}">
+											<a href="<c:url value="/expedient/${contingut.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
+												<span class="fa fa-trash-o"></span>
+											</a> 
+										</c:if>
+									</li>
+								</c:if>
+							</c:forEach>
+						</ul>
+					</c:if>
+					<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false" nodeco="true"/>
+				</div>
+				<%--                     --%>
+				<%-- /Columna informació --%>
+				<%--                     --%>
+			</div>
+		</c:if>		
 	</div>
 </body>
 </html>

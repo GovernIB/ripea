@@ -9,9 +9,9 @@
 		<c:forEach var="contingutPath" items="${contingut.path}" varStatus="status">
 			<li>
 				<c:choose>
-					<c:when test="${contingutPath.expedient}"><a href="<c:url value="/contingut/${contingutPath.id}"/>"><span class="fa ${iconaExpedientObert}" title="<spring:message code="contingut.icona.expedient"/>"></span> ${contingutPath.nom}</a></c:when>
-					<c:when test="${contingutPath.document}"><a href="<c:url value="/contingut/${contingutPath.id}"/>"><span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span> ${contingutPath.nom}</a></c:when>
-					<c:when test="${contingutPath.carpeta}"><a href="<c:url value="/contingut/${contingutPath.id}"/>"><span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span> ${contingutPath.nom}</a></c:when>
+					<c:when test="${contingutPath.expedient}"><a href="${contingutPath.id}"><span class="fa ${iconaExpedientObert}" title="<spring:message code="contingut.icona.expedient"/>"></span> ${contingutPath.nom}</a></c:when>
+					<c:when test="${contingutPath.document}"><a href="${contingutPath.id}"><span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span> ${contingutPath.nom}</a></c:when>
+					<c:when test="${contingutPath.carpeta}"><a href="${contingutPath.id}"><span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span> ${contingutPath.nom}</a></c:when>
 				</c:choose>
 			</li>
 		</c:forEach>

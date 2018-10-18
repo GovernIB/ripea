@@ -22,7 +22,9 @@
 		</c:forEach>
 	</ul>
 	<br/>
-	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%">
+	<script id="rowhrefTemplate" type="text/x-jsrender">../nodeco/integracio/${codiActual}/{{:index}}</script>	
+	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%"
+	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="excepcioMessage" data-visible="false"></th>

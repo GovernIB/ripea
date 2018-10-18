@@ -23,19 +23,44 @@
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisCommand *:disabled").removeAttr('disabled');
 		});
+
+		$("#selectAll").on('change', function() {
+			if ($(this).prop("checked"))
+				$("div.permisosInput :checkbox").prop('checked', true);
+			else
+				$("div.permisosInput :checkbox").prop('checked', false);
+		});
+
+		$("div.permisosInput :checkbox").on('change', function() {
+			var totsSeleccionats = true;
+			$("div.permisosInput :checkbox").each(function() {
+				  if(!$(this).prop('checked'))
+					  totsSeleccionats = false;
+			});
+			$("#selectAll").prop('checked', totsSeleccionats);
+		});
 	});
 </script>
+<style>
+	.permisosInput {margin-left: 45px}
+</style>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaDocument/${metaDocument.id}/permis"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect name="principalTipus" textKey="metadocument.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
-		<rip:inputText name="principalNom" textKey="metadocument.permis.form.camp.principal" disabled="${not empty permisCommand.id}"/>
-		<rip:inputCheckbox name="create" textKey="metadocument.permis.form.camp.creacio"/>
-		<rip:inputCheckbox name="read" textKey="metadocument.permis.form.camp.consulta"/>
-		<rip:inputCheckbox name="write" textKey="metadocument.permis.form.camp.modificacio"/>
-		<rip:inputCheckbox name="delete" textKey="metadocument.permis.form.camp.eliminacio"/>
+		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
+		<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
+		
+		<rip:inputCheckbox name="selectAll" textKey="metaexpedient.permis.form.camp.all"/>
+		<div class="permisosInput">
+			<rip:inputCheckbox name="create" textKey="metadocument.permis.form.camp.creacio"/>
+			<rip:inputCheckbox name="read" textKey="metadocument.permis.form.camp.consulta"/>
+			<rip:inputCheckbox name="write" textKey="metadocument.permis.form.camp.modificacio"/>
+			<rip:inputCheckbox name="delete" textKey="metadocument.permis.form.camp.eliminacio"/>
+		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaDocument/${metaDocument.id}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
