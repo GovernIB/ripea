@@ -31,6 +31,8 @@ public class UsuariEntity implements Serializable {
 	private String nif;
 	@Column(name = "email", length = 200)
 	private String email;
+	@Column(name="idioma", length = 2)
+	private String idioma;
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
 	@Column(name = "rebre_emails")
@@ -55,6 +57,9 @@ public class UsuariEntity implements Serializable {
 	public String getEmail() {
 		return email;
 	}
+	public String getIdioma() {
+		return idioma;
+	}
 	public boolean isInicialitzat() {
 		return inicialitzat;
 	}
@@ -77,9 +82,11 @@ public class UsuariEntity implements Serializable {
 	
 	public void update(
 			boolean rebreEmailsBustia,
-			boolean rebreEmailsAgrupats) {
+			boolean rebreEmailsAgrupats,
+			String idioma) {
 		this.rebreEmailsBustia = rebreEmailsBustia;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
+		this.idioma = idioma;
 	}
 
 	/**
@@ -99,12 +106,14 @@ public class UsuariEntity implements Serializable {
 			String codi,
 			String nom,
 			String nif,
-			String email) {
+			String email,
+			String idioma) {
 		return new Builder(
 				codi,
 				nom,
 				nif,
-				email);
+				email,
+				idioma);
 	}
 
 	/**
@@ -117,12 +126,14 @@ public class UsuariEntity implements Serializable {
 		Builder(String codi,
 				String nom,
 				String nif,
-				String email) {
+				String email,
+				String idioma) {
 			built = new UsuariEntity();
 			built.codi = codi;
 			built.nom = nom;
 			built.nif = nif;
 			built.email = email;
+			built.idioma = idioma;
 			built.inicialitzat = true;
 		}
 		public UsuariEntity build() {

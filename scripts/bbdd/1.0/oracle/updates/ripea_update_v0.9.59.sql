@@ -1,0 +1,1 @@
+alter table ipa.ipa_usuari add idioma varchar2(2) default 'ca' not null;

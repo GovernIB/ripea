@@ -53,6 +53,20 @@ public class EnumHelper {
 		}
 		return resposta;
 	}
+	public static HtmlOption getOneOptionForEnum(
+			Class<?> enumeracio,
+			String textKeyPrefix) {
+		HtmlOption resposta = null;
+		if (enumeracio.isEnum()) {
+			for (Object e : enumeracio.getEnumConstants()) {
+				if (textKeyPrefix.contains(((Enum<?>) e).name())) {
+					resposta = new HtmlOption(((Enum<?>) e).name(),
+							(textKeyPrefix != null) ? textKeyPrefix : ((Enum<?>) e).name());
+				}
+			}
+		}
+		return resposta;
+	}
 	public static List<HtmlOption> getOptionsForArray(
 			String[] values,
 			String[] texts) {
