@@ -106,6 +106,31 @@ public class ContingutController extends BaseUserController {
 				model);
 		return "contingut";
 	}
+	
+	
+	
+	
+	
+	@RequestMapping(value = "/contingutDetail/{contingutId}", method = RequestMethod.GET)
+	public String contingutDetailGet(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutId,
+				true,
+				true);
+		omplirModelPerMostrarContingut(
+				request,
+				entitatActual,
+				contingut,
+				SessioHelper.desmarcarLlegit(request),
+				model);
+		return "contingutDetail";
+	}
+	
 
 	@RequestMapping(value = "/contingut/{contingutId}/delete", method = RequestMethod.GET)
 	public String delete(
@@ -149,6 +174,32 @@ public class ContingutController extends BaseUserController {
 				CONTENIDOR_VISTA_LLISTAT);
 		return "redirect:../../" + contingutId;
 	}
+	
+	
+	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/icones", method = RequestMethod.GET)
+	public String canviVistaDetallLlistat(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		SessioHelper.updateContenidorVista(
+				request,
+				CONTENIDOR_VISTA_ICONES);
+		return "redirect:../../" + contingutId;
+	}
+	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
+	public String canviVistaDetallIcones(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		SessioHelper.updateContenidorVista(
+				request,
+				CONTENIDOR_VISTA_LLISTAT);
+		return "redirect:../../" + contingutId;
+	}
+	
+	
 
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.GET)
 	public String moureForm(

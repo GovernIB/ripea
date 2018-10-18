@@ -6,6 +6,8 @@
 <%@ attribute name="contingut" required="true" rtexprvalue="true" type="java.lang.Object"%>
 <%@ attribute name="mostrarExpedients" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ attribute name="mostrarNoExpedients" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
+<%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
+
 <c:choose>
 	<c:when test="${mostrarExpedients and mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsNoRegistres}"/></c:when>
 	<c:when test="${mostrarExpedients and not mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsExpedients}"/></c:when>
@@ -31,7 +33,7 @@
 									<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
 									${fill.nom}
 								</p>
-								<rip:blocContenidorAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}"/>
+								<rip:blocContenidorAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}" nodeco="${nodeco}"/>
 							</div>
 						</div>
 						<script>
@@ -85,7 +87,7 @@
 						<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${fill.createdBy.nom}</td>
 						<td>
-							<rip:blocContenidorAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}"/>
+							<rip:blocContenidorAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}" nodeco="${nodeco}"/>
 						</td>
 					</tr>
 				</c:forEach>
