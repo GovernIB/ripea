@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
+import es.caib.ripea.core.api.dto.IntegracioEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -51,6 +53,17 @@ public class IntegracioController extends BaseUserController {
 			@PathVariable String codi,
 			Model model) {
 		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
+		
+		for (IntegracioDto integracio : integracions) {
+			for (IntegracioEnumDto integracioEnum : IntegracioEnumDto.values()) {
+				if (integracio.getCodi() == integracioEnum.name()) {
+					integracio.setNom(
+							EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class,
+							"integracio.list.pipella." + integracio.getCodi()).getText());
+				}
+			}
+		}
+		
 		model.addAttribute(
 				"integracions",
 				integracions);

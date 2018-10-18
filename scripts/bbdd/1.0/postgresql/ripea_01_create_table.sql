@@ -6,6 +6,7 @@ CREATE TABLE IPA_USUARI
   NIF           character varying(9)            NOT NULL,
   NOM           character varying(200),
   EMAIL         character varying(200),
+  IDIOMA 		character varying(2) 	 		DEFAULT 'CA'
   VERSION       bigint                          NOT NULL
 );
 

@@ -87,6 +87,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
+			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.ripea.default.user.language");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
 				usuari = usuariRepository.save(
@@ -94,7 +95,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 								dadesUsuari.getCodi(),
 								dadesUsuari.getNom(),
 								dadesUsuari.getNif(),
-								dadesUsuari.getEmail()).build());
+								dadesUsuari.getEmail(),
+								idioma).build());
 			} else {
 				throw new NotFoundException(
 						auth.getName(),
@@ -133,7 +135,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
 		usuari.update(
 				dto.getRebreEmailsBustia(), 
-				dto.getRebreEmailsAgrupats());
+				dto.getRebreEmailsAgrupats(),
+				dto.getIdioma());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
