@@ -27,6 +27,7 @@
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
 	</title>
+	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>	
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
@@ -44,6 +45,40 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
 	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+	
+	
+	
+	
+	
+	<c:if test="${isContingutDetail}">
+		<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	    
+		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
+		<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
+		<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
+		<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+	
+		<!-- Llibreria per a compatibilitat amb HTML5 -->
+		<!--[if lt IE 9]>
+	      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+	    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+		<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+		<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+		<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+		<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+		<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
+		<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
+		<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+		<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+		<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+		<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	
+	</c:if>
+	
+	
+	
+	
 <style>
 .tab-content {
 	margin-top: .8em;
@@ -178,6 +213,11 @@ $(document).ready(function() {
 		}
 		return false;
 	});
+
+
+
+
+	
 });
 </script>
 </c:if>
@@ -338,12 +378,16 @@ $(document).ready(function() {
 		$('#pipella-contingut').removeClass( "active" );
 		$('#pipella-registres').addClass( "active" );
 	}
+
+	<c:if test="${isContingutDetail}">
+		$( "#colInfo" ).insertAfter( "#colContent" );
+	</c:if >
 });
 </script>
 </head>
 <body>
 	<rip:blocContenidorPath contingut="${contingut}"/>
-	<div class="row">
+	<div>
 		<c:set var="contingutClass">col-md-12</c:set>
 		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
 			<c:set var="contingutClass">col-md-9</c:set>
@@ -457,7 +501,14 @@ $(document).ready(function() {
 							</c:forEach>
 						</ul>
 					</c:if>
-					<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
+					<c:choose>
+					    <c:when test="${isContingutDetail}">
+					      	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false" nodeco="true"/>
+					    </c:when>    
+					    <c:otherwise>
+					    	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
+					    </c:otherwise>
+					</c:choose>							
 				</div>
 				<%--                     --%>
 				<%-- /Columna informació --%>
@@ -611,10 +662,28 @@ $(document).ready(function() {
 						<c:otherwise>
 							<div class="text-right" id="contingut-botons">
 								<div class="btn-group">
-									<a href="<c:url value="/contingut/${contingut.id}/canviVista/icones"/>" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
+								
+									<c:choose>
+									    <c:when test="${isContingutDetail}">
+									      	<c:set var="iconesVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/></c:set>
+									    </c:when>    
+									    <c:otherwise>
+									    	<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/icones"/></c:set>
+									    </c:otherwise>
+									</c:choose>						
+									<a href="${iconesVistaUrl}" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
 										<span class="fa fa-th"></span>
 									</a>
-									<a href="<c:url value="/contingut/${contingut.id}/canviVista/llistat"/>" class="btn btn-default<c:if test="${vistaLlistat}"> active</c:if>">
+										
+									<c:choose>
+									    <c:when test="${isContingutDetail}">
+									      	<c:set var="llistatVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/llistat"/></c:set>
+									    </c:when>    
+									    <c:otherwise>
+									    	<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/llistat"/></c:set>
+									    </c:otherwise>
+									</c:choose>									
+									<a href="${llistatVistaUrl}" class="btn btn-default<c:if test="${vistaLlistat}"> active</c:if>">
 										<span class="fa fa-th-list"></span>
 									</a>
 								</div>
@@ -648,7 +717,16 @@ $(document).ready(function() {
 									</div>
 								</c:if>
 							</div>
-							<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							<c:choose>
+							    <c:when test="${isContingutDetail}">
+							      	<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/>
+							    </c:when>    
+							    <c:otherwise>
+							    	<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							    </c:otherwise>
+							</c:choose>								
+							
+							
 						</c:otherwise>
 					</c:choose>
 					<%--                    --%>

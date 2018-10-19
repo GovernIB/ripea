@@ -115,6 +115,7 @@ $(document).ready(function() {
 
 		
 
+		 $("#frame").append("<div style='text-align: center; margin-bottom: 60px; margin-top: 60px;''><span class='fa fa-circle-o-notch fa-spin fa-3x'/></div>");
 		 $("#frame").attr("src", "<c:url value="/nodeco/contingutDetail/"/>" + id);
 	
 

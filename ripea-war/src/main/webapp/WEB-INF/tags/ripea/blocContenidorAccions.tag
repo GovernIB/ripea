@@ -39,12 +39,10 @@
 				</c:if>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
-			<c:if test="${contingut.carpeta or empty contingut.metaNode or contingut.metaNode.usuariActualDelete}">
-				<c:if test="${not contingut.document or contingut.estat == 'REDACCIO'}">
+
 					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
-				</c:if>
-			</c:if>
+
 			<c:if test="${contingut.expedient}">
 				<c:if test="${mostrarSeparador}">
 					<c:set var="mostrarSeparador" value="${false}"/>
