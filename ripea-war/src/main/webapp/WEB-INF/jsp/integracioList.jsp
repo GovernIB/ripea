@@ -18,7 +18,7 @@
 <body>
 	<ul class="nav nav-tabs" role="tablist">
 		<c:forEach var="integracio" items="${integracions}">
-			<li<c:if test="${integracio.codi == codiActual}"> class="active"</c:if>><a href="<c:url value="/integracio/${integracio.codi}"/>">${integracio.nom}</a></li>
+			<li<c:if test="${integracio.codi == codiActual}"> class="active"</c:if>><a href="<c:url value="/integracio/${integracio.codi}"/>"><spring:message code="${integracio.nom}"/></a></li>
 		</c:forEach>
 	</ul>
 	<br/>

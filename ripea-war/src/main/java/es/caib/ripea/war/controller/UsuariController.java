@@ -4,15 +4,20 @@
 package es.caib.ripea.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import es.caib.ripea.core.api.dto.IdiomaEnumDto;
 import es.caib.ripea.core.api.dto.ReglaTipusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -50,11 +55,17 @@ public class UsuariController  extends BaseAdminController {
 			Model model) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
+		model.addAttribute(
+				"idiomaEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						IdiomaEnumDto.class,
+						"usuari.form.camp.idioma.enum."));
 		return "usuariForm";
 	}
 	@RequestMapping(value = "/configuracio", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
+			HttpServletResponse response,
 			@Valid UsuariCommand command,
 			BindingResult bindingResult,
 			Model model) {
@@ -63,6 +74,10 @@ public class UsuariController  extends BaseAdminController {
 		}
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
+		
+		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+        localeResolver.setLocale(request, response, StringUtils.parseLocaleString(aplicacioService.getUsuariActual().getIdioma()));
+        
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:/",
