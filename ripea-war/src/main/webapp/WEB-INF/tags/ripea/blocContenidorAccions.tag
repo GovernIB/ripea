@@ -19,7 +19,7 @@
 		<c:if test="${contingut.expedientPare.agafat and expedientPareObertOInexistent}">
 			<c:choose>
 				<c:when test="${contingut.expedient and (empty contingut.metaNode or contingut.metaNode.usuariActualWrite)}">
-					<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 				<c:when test="${contingut.document and (empty contingut.metaNode or contingut.metaNode.usuariActualWrite) and contingut.estat == 'REDACCIO'}">
@@ -39,12 +39,10 @@
 				</c:if>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
-			<c:if test="${contingut.carpeta or empty contingut.metaNode or contingut.metaNode.usuariActualDelete}">
-				<c:if test="${not contingut.document or contingut.estat == 'REDACCIO'}">
+
 					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
-				</c:if>
-			</c:if>
+
 			<c:if test="${contingut.expedient}">
 				<c:if test="${mostrarSeparador}">
 					<c:set var="mostrarSeparador" value="${false}"/>
