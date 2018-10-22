@@ -104,25 +104,20 @@ $(document).ready(function() {
 
 
 
-		 
-		        
-
-		 
-
 	$("#taulaDades").on("click", "tr", function(e){
-		var idRow = $(this).closest('tr').attr('id');
-		var id = idRow.substring(4); 
-
 		
-
-		 $("#frame").attr("src", "<c:url value="/nodeco/contingutDetail/"/>" + id);
-	
-
-
-
+		if (e.target.id!="dropdownButton" && e.target.id!="deleteFromDropdown" && e.target.id!="exportarFromDropdown" && $(e.target).attr('class')!="fa fa-cog" && $(e.target).attr('class')!="caret"){
+			var idRow = $(this).closest('tr').attr('id');
+			var id = idRow.substring(4); 
+			$("#frame").append("<div style='text-align: center; margin-bottom: 60px; margin-top: 60px;''><span class='fa fa-circle-o-notch fa-spin fa-3x'/></div>");
+			$("#frame").attr("src", "<c:url value="/nodeco/contingutDetail/"/>" + id);
+		}
 
 	});
-	
+
+
+
+
 	
 });
 function setCookie(cname,cvalue) {
@@ -266,9 +261,46 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%" data-visible="false"><spring:message code="expedient.list.user.columna.agafatper"/></th>
-				<th data-col-name="id" data-orderable="false" width="10%" data-visible="false">
-			
-				</th>
+				
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown" >
+							<button id="dropdownButton" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
+								{{if metaNode.usuariActualWrite}}
+									<li><a href="expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+								{{/if}}
+								{{if metaNode.usuariActualDelete}}
+									<li><a id="deleteFromDropdown" href="contingut/{{:id}}/delete?isExpedientDetail=true" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{/if}}
+								<li role="separator" class="divider"></li>
+								{{if metaNode.usuariActualWrite}}
+									{{if !agafat}}
+										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+									{{else}}
+										{{if agafatPer.codi != '${pageContext.request.userPrincipal.name}'}}
+											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+										{{else}}
+											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
+										{{/if}}
+									{{/if}}
+									<li><a href="expedient/{{:id}}/relacionar" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+									{{if estat == 'OBERT'}}
+										{{if valid && estat == 'OBERT'}}
+											<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+										{{/if}}
+									{{else}}
+										<li><a href="expedient/{{:id}}/reobrir" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
+									{{/if}}
+								{{/if}}
+								<li role="separator" class="divider"></li>
+								<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
+								<li><a id="exportarFromDropdown" href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+							</ul>
+						</div>
+					</script>
+				</th>				
 						
 						
 		

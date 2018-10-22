@@ -380,7 +380,7 @@ public class ContingutDocumentController extends BaseUserController {
 		if (contingut.getPare() != null)
 			return "redirect:../../contingut/" + contingutId;
 		else
-			return "redirect:../../escriptori";
+			return "redirect:../../expedient";
 	}
 	
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/descarregarImprimible", method = RequestMethod.GET)
@@ -414,7 +414,7 @@ public class ContingutDocumentController extends BaseUserController {
 		if (contingut.getPare() != null)
 			return "redirect:../../contingut/" + contingutId;
 		else
-			return "redirect:../../escriptori";
+			return "redirect:../../expedient";
 
 	}
 	
