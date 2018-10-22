@@ -501,14 +501,12 @@ $(document).ready(function() {
 							</c:forEach>
 						</ul>
 					</c:if>
-					<c:choose>
-					    <c:when test="${isContingutDetail}">
-					      	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false" nodeco="true"/>
-					    </c:when>    
-					    <c:otherwise>
-					    	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
-					    </c:otherwise>
-					</c:choose>							
+		
+				    <c:if test="${!isContingutDetail}">
+				      	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
+				    </c:if>    
+
+									
 				</div>
 				<%--                     --%>
 				<%-- /Columna informació --%>

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
@@ -46,11 +47,13 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
 /**
@@ -136,7 +139,11 @@ public class ContingutController extends BaseUserController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
+			@RequestParam(required = false, defaultValue = "false") Boolean isExpedientDetail,
 			Model model) throws IOException {
+
+
+	
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutDto contingut = contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -146,10 +153,21 @@ public class ContingutController extends BaseUserController {
 		contingutService.deleteReversible(
 				entitatActual.getId(),
 				contingutId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../expedient",
-				"contingut.controller.element.esborrat.ok");
+		
+
+		if(isExpedientDetail){
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../expedientDetail",
+					"contingut.controller.element.esborrat.ok");
+		} else {
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../expedient",
+					"contingut.controller.element.esborrat.ok");
+		}
+
+
 	}
 
 	@RequestMapping(value = "/contingut/{contingutId}/canviVista/icones", method = RequestMethod.GET)

@@ -83,6 +83,14 @@ $(document).ready(function() {
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
 	})
+
+
+
+	$(".email-user").click(function(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	    alert("Button Clicked");
+	});	
 	
 });
 function setCookie(cname,cvalue) {
