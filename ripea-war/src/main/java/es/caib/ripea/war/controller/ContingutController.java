@@ -148,7 +148,7 @@ public class ContingutController extends BaseUserController {
 				contingutId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../escriptori",
+				(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../expedient",
 				"contingut.controller.element.esborrat.ok");
 	}
 
