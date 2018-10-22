@@ -14,11 +14,25 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script type="text/javascript">
+	</script>
 </head>
 <body>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/entitat/{{:id}}</script>
-	<table id="entitats" data-toggle="datatable" data-url="<c:url value="/entitat/datatable"/>" data-search-enabled="false" data-default-order="2" data-default-dir="asc" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%"
-	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
+	<table 
+		id="entitats" 
+		data-toggle="datatable" 
+		data-url="<c:url value="/entitat/datatable"/>" 
+		data-search-enabled="false"
+		data-default-order="2" 
+		data-default-dir="asc" 
+		data-botons-template="#botonsTemplate"
+		data-save-state="true"
+		data-mantenir-paginacio="${mantenirPaginacio}"
+		class="table table-striped table-bordered" 
+		style="width:100%"
+		data-rowhref-template="#rowhrefTemplate" 
+		data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>

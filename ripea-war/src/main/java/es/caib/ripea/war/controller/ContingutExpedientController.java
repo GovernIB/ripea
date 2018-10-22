@@ -44,6 +44,7 @@ public class ContingutExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		return get(request, contingutId, null, model);
 	}
 	@RequestMapping(value = "/{contingutId}/expedient/{expedientId}", method = RequestMethod.GET)
@@ -52,6 +53,7 @@ public class ContingutExpedientController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@PathVariable Long expedientId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -81,6 +83,7 @@ public class ContingutExpedientController extends BaseUserController {
 			@Validated({Create.class}) ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
 		return postUpdate(
 				request,
 				contingutId,
@@ -95,6 +98,7 @@ public class ContingutExpedientController extends BaseUserController {
 			@Validated({Update.class}) ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
