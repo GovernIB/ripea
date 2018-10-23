@@ -201,6 +201,7 @@ function getCookie(cname) {
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
+				<th data-col-name="fillsSigned" data-visible="false"></th>
 				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
@@ -272,7 +273,11 @@ function getCookie(cname) {
 								{{/if}}
 								<li role="separator" class="divider"></li>
 								<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-								<li><a href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+								{{if fillsSigned}}
+									<li><a href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+								{{else}}
+									<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+								{{/if}}
 							</ul>
 						</div>
 					</script>

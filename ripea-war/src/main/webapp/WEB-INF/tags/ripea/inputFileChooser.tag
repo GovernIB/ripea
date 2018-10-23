@@ -16,7 +16,7 @@
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
 <c:choose>
-	<c:when test="${not empty contingutOrigen.escriptoriPare}"><c:set var="contenidorBaseId" value="${contingutOrigen.escriptoriPare.id}"/></c:when>
+	<c:when test="${not empty contingutOrigen.expedientPare}"><c:set var="contenidorBaseId" value="${contingutOrigen.expedientPare.id}"/></c:when>
 	<c:otherwise><c:set var="contenidorBaseId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
 <c:choose>
@@ -75,14 +75,14 @@ function refrescarFileChooser(campPath, contenidorId) {
 			$("input#" + campPath).val(data.id);
 			var path = "";
 			if (data.id == '${contenidorBaseId}') {
-				if (data.escriptori)
-					path += '<span class="fa fa-desktop"></span> Escriptori';
+				if (data.expedient)
+					path += '<span class="fa fa-desktop"></span> Expedient';
 				if (data.expedient)
 					path += data.nom;
 			} else {
 				path += data.pathAsStringExploradorAmbNom;
 			}
-			path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Escriptori');
+			path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Expedient');
 			path = path.replaceAll('#X#', '<span class="fa fa-briefcase"></span>');
 			path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
 			path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
