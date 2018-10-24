@@ -31,7 +31,15 @@ public class ExpedientDto extends NodeDto {
 	private String sistraClau;
 	private UsuariDto agafatPer;
 	private String numero;
+	private boolean fillsSigned;
 
+
+	public boolean isFillsSigned() {
+		return fillsSigned;
+	}
+	public void setFillsSigned(boolean fillsSigned) {
+		this.fillsSigned = fillsSigned;
+	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}

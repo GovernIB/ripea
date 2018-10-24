@@ -7,6 +7,7 @@
 <%@ attribute name="mostrarObrir" required="false" rtexprvalue="true"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
 
+
 <c:set var="expedientPareObertOInexistent" value="${empty contingut.expedientPare or contingut.expedientPare.estat == 'OBERT'}"/>
 <c:set var="mostrarSeparador" value="${false}"/>
 <div <c:if test="${not empty id}">id="${id}" </c:if>class="dropdown<c:if test="${not modeLlistat}"> text-center</c:if><c:if test="${not empty className}"> ${className}</c:if>">
@@ -61,7 +62,7 @@
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>
-								<li><a href="<c:url value=" onclick="/>"alert('<spring:message code="contingut.expedient.tancar.error.no.valid"/>');return false;"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+								<li class="disabled"><a href="#"/><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:otherwise>
 						</c:choose>
 					</c:when>
@@ -135,13 +136,29 @@
 		</c:if>
 		<li><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 		<c:if test="${contingut.expedient or contingut.document}">
-			<c:if test="${!empty nodeco}">
-				<li><a href="<c:url value="/nodeco/contingut/${contingut.id}/exportar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-			</c:if>
-			<c:if test="${empty nodeco}">
-				<li><a href="<c:url value="/contingut/${contingut.id}/exportar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-			</c:if>			
-
+		
+		
+		
+		<c:choose>
+			<c:when test="${!empty nodeco}">
+				<c:set var="exportarUrl"><c:url value="/nodeco/contingut/${contingut.id}/exportar"/></c:set>	
+			</c:when>
+			<c:otherwise>
+				<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
+			</c:otherwise>
+		</c:choose>		
+		
+		<c:set var="contingutEstat">${contingut.estat}</c:set>	
+		<c:choose>
+			<c:when test="${contingutEstat!='CUSTODIAT'}">
+				<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+			</c:when>
+			<c:otherwise>
+				<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+			</c:otherwise>
+		</c:choose>				
+		
+		
 		</c:if>
 	</ul>
 </div>
