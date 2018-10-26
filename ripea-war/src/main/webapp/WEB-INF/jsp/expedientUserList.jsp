@@ -83,15 +83,11 @@ $(document).ready(function() {
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
 	})
-
-
-
 	$(".email-user").click(function(e) {
-	    e.preventDefault();
-	    e.stopPropagation();
-	    alert("Button Clicked");
+		e.preventDefault();
+		e.stopPropagation();
+		alert("Button Clicked");
 	});	
-	
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -117,11 +113,9 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
-
-
-	<div data-toggle="botons-titol">
+	<div class="text-right" data-toggle="botons-titol">
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
-		<a  style="float: right" href="<c:url value="/expedientDetail"/>"  class="btn btn-primary""><spring:message code="expedient.list.canviVista"/></a>
+		<a href="<c:url value="/expedientDetail"/>"  class="btn btn-primary""><spring:message code="expedient.list.canviVista"/></a>
 	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
@@ -166,17 +160,20 @@ function getCookie(cname) {
 		</div>
 	</form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<div class="btn-group pull-right">
-			
-			<button type="button" id="seleccioAll"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
-			<button type="button" id="seleccioNone"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			<button type="button"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    			<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
-  			</button>
-			<ul class="dropdown-menu">
-				<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
-				<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
-			</ul>
+		<div class="text-right">
+			<div class="btn-group">
+				<button id="seleccioAll"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></button>
+				<button id="seleccioNone"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
+				<div class="btn-group">
+					<button<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		  					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
+							</button>
+					<ul class="dropdown-menu">
+						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
+						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
+					</ul>
+				</div>
+			</div>
 			<c:if test="${not empty metaExpedientsPermisCreacio}">
 				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 			</c:if>

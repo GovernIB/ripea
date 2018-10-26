@@ -5,7 +5,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
 <c:set var="potModificarContingut" value="${false}"/>
 <c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty contingut.metaNode or contingut.metaNode.usuariActualWrite}"/></c:if>
 <c:set var="agafatPerUsuariActual" value="${false}"/>
@@ -27,7 +26,6 @@
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
 	</title>
-	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>	
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
@@ -45,45 +43,22 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
 	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
-	
-	
-	
-	
-	
 	<c:if test="${isContingutDetail}">
-		<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
-	    
+		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
 		<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
 		<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
 		<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
-	
 		<!-- Llibreria per a compatibilitat amb HTML5 -->
 		<!--[if lt IE 9]>
 	      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	    <![endif]-->
 	    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
-		<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
-		<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
-		<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-		<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-		<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
-		<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
-		<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
-		<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-		<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
-		<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
-	
 	</c:if>
-	
-	
-	
-	
 <style>
 .tab-content {
 	margin-top: .8em;
 }
-
 #contenidor-contingut {
 	margin-left: 0;
 	margin-right: -11px;
@@ -213,11 +188,6 @@ $(document).ready(function() {
 		}
 		return false;
 	});
-
-
-
-
-	
 });
 </script>
 </c:if>
