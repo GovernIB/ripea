@@ -180,7 +180,7 @@ function getCookie(cname) {
 		</div>
 	</script>
 	<script id="rowhrefTemplate" type="text/x-jsrender">contingut/{{:id}}</script>
-	<table id="taulaDades" 
+	<table id="taulaExpedients"
 			data-toggle="datatable" 
 			data-url="<c:url value="/expedient/datatable"/>" 
 			class="table table-bordered table-striped table-hover" 
@@ -189,6 +189,8 @@ function getCookie(cname) {
 			data-botons-template="#botonsTemplate"
 			data-rowhref-template="#rowhrefTemplate"
 			data-selection-enabled="true"
+			data-save-state="true"
+			data-mantenir-paginacio="${mantenirPaginacio}"
 			style="width:100%">
 		<thead>
 			<tr>

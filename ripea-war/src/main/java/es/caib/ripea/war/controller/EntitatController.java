@@ -33,16 +33,21 @@ public class EntitatController extends BaseController {
 	@Autowired
 	private EntitatService entitatService;
 
-
-
 	@RequestMapping(method = RequestMethod.GET)
-	public String get() {
+	public String get(Model model, HttpServletRequest request) {
+		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		if(mantenirPaginacio) {
+			model.addAttribute("mantenirPaginacio", true);
+		}else {
+			model.addAttribute("mantenirPaginacio", false);
+		}
 		return "entitatList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			Model model) {
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				entitatService.findPaginat(
@@ -52,12 +57,14 @@ public class EntitatController extends BaseController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNew(Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		return get(null, model);
 	}
 	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
 	public String get(
 			@PathVariable Long entitatId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitat = null;
 		if (entitatId != null)
 			entitat = entitatService.findById(entitatId);

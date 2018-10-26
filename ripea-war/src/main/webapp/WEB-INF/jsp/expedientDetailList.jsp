@@ -147,7 +147,7 @@ function getCookie(cname) {
 <body>
 
 
-	<div class="buttons" >
+	<div class="buttons">
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
 		<a  style="float: right" href="<c:url value="/expedient"/>"  class="btn btn-primary"> <spring:message code="expedient.list.canviVista"/></a>
 	</div>
@@ -213,6 +213,8 @@ function getCookie(cname) {
 					data-default-order="8" 
 					data-default-dir="desc"
 					data-botons-template="#botonsTemplate"
+					data-save-state="true"
+					data-mantenir-paginacio="${mantenirPaginacio}"
 					style="width:100%">
 				<thead>
 					<tr>

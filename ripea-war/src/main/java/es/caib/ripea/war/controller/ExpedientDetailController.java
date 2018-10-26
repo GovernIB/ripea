@@ -73,7 +73,6 @@ public class ExpedientDetailController extends BaseUserController {
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId()));
-		
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",

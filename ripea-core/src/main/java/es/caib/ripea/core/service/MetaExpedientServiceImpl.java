@@ -285,7 +285,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<MetaExpedientDto> findByEntitatPaginat(
+	public PaginaDto<MetaExpedientDto> findByEntitat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) {
 		logger.debug("Consulta paginada dels meta-expedients de l'entitat (entitatId=" + entitatId + ")");

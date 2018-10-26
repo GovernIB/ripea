@@ -5,6 +5,7 @@ package es.caib.ripea.core.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,7 +26,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Sort sort);
-	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Pageable pageable);
+	Page<MetaExpedientEntity> findByEntitat(EntitatEntity entitat, Pageable pageable);
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 
 }

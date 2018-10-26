@@ -65,6 +65,7 @@ public class ExpedientController extends BaseUserController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		return get(request, null, model);
 	}
 	@RequestMapping(value = "/{expedientId}", method = RequestMethod.GET)
@@ -72,6 +73,7 @@ public class ExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -99,6 +101,7 @@ public class ExpedientController extends BaseUserController {
 			@Validated({Create.class}) ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -124,6 +127,7 @@ public class ExpedientController extends BaseUserController {
 			@Validated({Update.class}) ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -146,6 +150,7 @@ public class ExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		expedientService.agafarUser(
 				entitatActual.getId(),
@@ -161,6 +166,7 @@ public class ExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		expedientService.alliberarUser(
 				entitatActual.getId(),
@@ -176,6 +182,7 @@ public class ExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientTancarCommand command = new ExpedientTancarCommand();
 		command.setId(expedientId);
@@ -196,6 +203,7 @@ public class ExpedientController extends BaseUserController {
 			@Valid ExpedientTancarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -222,6 +230,7 @@ public class ExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientRelacionarCommand command = new ExpedientRelacionarCommand();
 		command.setEntitatId(entitatActual.getId());
@@ -256,6 +265,7 @@ public class ExpedientController extends BaseUserController {
 			@Validated(Relacionar.class) ExpedientRelacionarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -286,7 +296,9 @@ public class ExpedientController extends BaseUserController {
 	public String expedientRelacioDelete(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
-			@PathVariable Long relacionatId) {
+			@PathVariable Long relacionatId,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (expedientService.relacioDelete(
 				entitatActual.getId(),
@@ -311,7 +323,9 @@ public class ExpedientController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse relacioDatatable(
 			HttpServletRequest request,
-			ExpedientFiltreCommand filtre) {
+			ExpedientFiltreCommand filtre,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
@@ -334,7 +348,9 @@ public class ExpedientController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse enviamentDatatable(
 			HttpServletRequest request,
-			@PathVariable Long expedientId) {
+			@PathVariable Long expedientId,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
