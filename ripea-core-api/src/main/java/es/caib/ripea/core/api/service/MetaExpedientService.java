@@ -145,7 +145,7 @@ public interface MetaExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<MetaExpedientDto> findByEntitatPaginat(
+	public PaginaDto<MetaExpedientDto> findByEntitat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 

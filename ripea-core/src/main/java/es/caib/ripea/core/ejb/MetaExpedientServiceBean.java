@@ -84,10 +84,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<MetaExpedientDto> findByEntitatPaginat(
+	public PaginaDto<MetaExpedientDto> findByEntitat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findByEntitatPaginat(entitatId, paginacioParams);
+		return delegate.findByEntitat(entitatId, paginacioParams);
 	}
 
 	@Override

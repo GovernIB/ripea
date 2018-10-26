@@ -198,7 +198,11 @@ body {
 							</c:when>
 							<c:when test="${isRolActualUsuari}">
 								<c:if test="${teAccesExpedients}">
-									<a href="<c:url value="/expedient"/>" class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
+									<a href="
+										<c:url value="/expedient">
+											<c:param name="mantenirPaginacio" value="false" />
+										</c:url>"
+									class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
 								</c:if>
 							</c:when>
 						</c:choose>

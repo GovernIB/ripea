@@ -30,8 +30,18 @@
 		<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
 	</div>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
-	<table id="metaexpedients" data-toggle="datatable" data-url="<c:url value="/metaExpedient/datatable"/>" data-info-type="search" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered"
-	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
+	<table 
+		id="metaexpedients" 
+		data-toggle="datatable" 
+		data-url="<c:url value="/metaExpedient/datatable"/>" 
+		data-info-type="search" 
+		data-default-order="1" 
+		data-default-dir="asc" 
+		class="table table-striped table-bordered"
+		data-rowhref-template="#rowhrefTemplate" 
+		data-rowhref-toggle="modal"
+		data-save-state="true"
+		data-mantenir-paginacio="${mantenirPaginacio}">
 		<thead>
 			<tr>
 				<th data-col-name="codi"><spring:message code="metaexpedient.list.columna.codi"/></th>

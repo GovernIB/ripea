@@ -38,8 +38,15 @@ public class MetaExpedientController extends BaseAdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			Model model) {
 		getEntitatActualComprovantPermisos(request);
+		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		if(mantenirPaginacio) {
+			model.addAttribute("mantenirPaginacio", true);
+		}else {
+			model.addAttribute("mantenirPaginacio", false);
+		}
 		return "metaExpedientList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -50,7 +57,7 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
-				metaExpedientService.findByEntitatPaginat(
+				metaExpedientService.findByEntitat(
 						entitatActual.getId(),
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				"id");

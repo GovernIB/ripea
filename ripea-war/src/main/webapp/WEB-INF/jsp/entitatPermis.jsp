@@ -50,6 +50,6 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right"><a class="btn btn-default" href="../../entitat/${entitat.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.permis.boto.nou.permis"/></a></p>
 	</script>
-	<a href="<c:url value="/entitat"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span> <spring:message code="comu.boto.tornar"/></a>
+	<a href="<c:url value="/entitat?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span> <spring:message code="comu.boto.tornar"/></a>
 </body>
 </html>

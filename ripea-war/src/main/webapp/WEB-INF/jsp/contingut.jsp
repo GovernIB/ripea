@@ -214,6 +214,8 @@ $(document).ready(function() {
 		return false;
 	});
 
+	
+
 
 
 
@@ -382,10 +384,24 @@ $(document).ready(function() {
 	<c:if test="${isContingutDetail}">
 		$( "#colInfo" ).insertAfter( "#colContent" );
 	</c:if >
+
+	$("#botoTornaDesDeContingutExpedient").click(function(){
+		if(document.referrer.indexOf('?') != -1){
+			var url =  document.referrer.substr(0, document.referrer.indexOf('?')) + "?mantenirPaginacio=true";
+		}else{
+			var url =  document.referrer + "?mantenirPaginacio=true";
+		}
+		window.location.replace(url);
+	});
 });
 </script>
 </head>
 <body>
+	<c:if test="${!isContingutDetail}">
+		<div data-toggle="botons-titol">
+			<button id="botoTornaDesDeContingutExpedient" data-toggle="button" class="btn btn-default"><span class="fa fa-arrow-left"></span><spring:message code="comu.boto.tornar"/></button>
+		</div>
+	</c:if>
 	<rip:blocContenidorPath contingut="${contingut}"/>
 	<div>
 		<c:set var="contingutClass">col-md-12</c:set>

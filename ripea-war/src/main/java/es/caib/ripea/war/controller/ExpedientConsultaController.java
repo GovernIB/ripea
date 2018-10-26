@@ -69,11 +69,16 @@ public class ExpedientConsultaController extends BaseUserController {
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
 			HttpServletRequest request,
 			Model model) {
+		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		if(mantenirPaginacio) {
+			model.addAttribute("mantenirPaginacio", true);
+		}else {
+			model.addAttribute("mantenirPaginacio", false);
+		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId()));
-		
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
@@ -98,9 +103,7 @@ public class ExpedientConsultaController extends BaseUserController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.sense.permisos.crear"));
-		
-		
+							"expedient.controller.exportacio.sense.permisos.crear"));		
 		return "expedientUserList";
 	}
 

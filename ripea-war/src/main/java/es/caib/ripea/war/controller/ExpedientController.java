@@ -65,7 +65,7 @@ public class ExpedientController extends BaseUserController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", false);
+		model.addAttribute("mantenirPaginacio", true);
 		return get(request, null, model);
 	}
 	@RequestMapping(value = "/{expedientId}", method = RequestMethod.GET)

@@ -33,11 +33,14 @@ public class EntitatController extends BaseController {
 	@Autowired
 	private EntitatService entitatService;
 
-
-
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(Model model) {
-		model.addAttribute("mantenirPaginacio", false);
+	public String get(Model model, HttpServletRequest request) {
+		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		if(mantenirPaginacio) {
+			model.addAttribute("mantenirPaginacio", true);
+		}else {
+			model.addAttribute("mantenirPaginacio", false);
+		}
 		return "entitatList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
