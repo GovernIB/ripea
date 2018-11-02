@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.1</version>
+		<version>${version.project}</version>
 	</parent>
 	<artifactId>ripea-core</artifactId>
 	<packaging>ejb</packaging>
@@ -230,13 +230,13 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin-impl</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-lib-common</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 			<type>pom</type>
 		</dependency>
 		<dependency>
@@ -289,14 +289,23 @@
 					</componentProperties>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/version.properties</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/version.properties</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 	<repositories>
 		<repository>

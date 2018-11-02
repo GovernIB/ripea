@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.1</version>
+		<version>${version.project}</version>
 	</parent>
 	<artifactId>ripea-ear</artifactId>
 	<packaging>ear</packaging>
@@ -33,24 +33,24 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-lib-common</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 			<type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin-impl</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-core</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-war</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
 	</dependencies>

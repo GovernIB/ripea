@@ -9,7 +9,6 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -43,7 +42,7 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	private String version;
+	private Properties versionProperties;
 
 	@Resource
 	private UsuariRepository usuariRepository;
@@ -66,16 +65,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String getVersioActual() {
 		logger.debug("Obtenint versió actual de l'aplicació");
-		if (version == null) {
-			try {
-				version = IOUtils.toString(
-						getClass().getResourceAsStream("versio"),
-						"UTF-8");
-			} catch (IOException e) {
-				version = "???";
-			}
+		try {
+			return getVersionProperties().getProperty("app.version");
+		} catch (IOException ex) {
+			logger.error("No s'ha pogut llegir el fitxer version.properties", ex);
+			return "???";
 		}
-		return version;
 	}
 
 	@Transactional
@@ -251,6 +246,16 @@ public class AplicacioServiceImpl implements AplicacioService {
 			dto.setRols(rols);
 		}
 		return dto;
+	}
+
+	private Properties getVersionProperties() throws IOException {
+		if (versionProperties == null) {
+			versionProperties = new Properties();
+			versionProperties.load(
+					getClass().getResourceAsStream(
+							"/es/caib/ripea/core/version/version.properties"));
+		}
+		return versionProperties;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);

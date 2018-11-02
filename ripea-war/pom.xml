@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.1</version>
+		<version>${version.project}</version>
 	</parent>
 	<artifactId>ripea-war</artifactId>
 	<packaging>war</packaging>
@@ -244,12 +244,6 @@
 			<artifactId>notib-client</artifactId>
 			<version>${notib.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-applet</artifactId>
-			<version>${ripea.version}</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
@@ -298,17 +292,17 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-core</artifactId>
-					<version>${ripea.version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-plugin-impl</artifactId>
-					<version>${ripea.version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-lib-common</artifactId>
-					<version>${ripea.version}</version>
+					<version>${project.version}</version>
 					<type>pom</type>
 				</dependency>
 			</dependencies>
@@ -345,7 +339,7 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-lib-common</artifactId>
-					<version>${ripea.version}</version>
+					<version>${project.version}</version>
 					<scope>provided</scope>
 					<type>pom</type>
 				</dependency>
@@ -411,7 +405,7 @@
 					</webResources>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!--plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.3</version>
@@ -427,7 +421,7 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>ripea-applet</artifactId>
-									<version>${ripea.version}</version>
+									<version>${project.version}</version>
 									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
@@ -436,7 +430,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin-->
 		</plugins>
 		<finalName>ripea</finalName>
 	</build>

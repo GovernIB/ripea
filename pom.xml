@@ -1,12 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.caib.ripea</groupId>
 	<artifactId>ripea</artifactId>
-	<version>0.1</version>
+	<version>${version.project}</version>
 	<packaging>pom</packaging>
 	<properties>
-		<ripea.version>0.1</ripea.version>
 		<github.global.server>github</github.global.server>
 		<spring.version>3.2.17.RELEASE</spring.version>
 		<spring-security.version>3.2.9.RELEASE</spring-security.version>
@@ -15,20 +15,26 @@
 		<hibernate.validator.version>4.1.0.Final</hibernate.validator.version>
 		<ehcache.version>2.10.1</ehcache.version>
 		<orika.version>1.1.7</orika.version>
-		<!--orika.version>1.4.6</orika.version-->
+		<!--orika.version>1.4.6</orika.version -->
 		<groovy.version>2.1.6</groovy.version>
 		<jackson.version>2.7.0</jackson.version>
 		<xdocreport.version>1.0.3</xdocreport.version>
 		<bouncycastle.version>1.46</bouncycastle.version>
 		<cxf.version>2.2.12</cxf.version>
+		<slf4j.version>1.5.11</slf4j.version>
 		<portafib.version>1.1.0</portafib.version>
 		<regweb.version>3.0.5</regweb.version>
 		<dir3caib.version>1.0.7</dir3caib.version>
-		<slf4j.version>1.5.11</slf4j.version>
 		<notib.version>0.1</notib.version>
+		<maven.test.skip>true</maven.test.skip>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+		<version.main>0.9</version.main>
+		<version.revision>8</version.revision>
+		<version.full>${version.main}.${version.revision}</version.full>
+		<version.project>${version.main}</version.project>
 	</properties>
 	<modules>
 		<module>ripea-core</module>
@@ -76,6 +82,22 @@
 						<phase>deploy</phase>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

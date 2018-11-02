@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.1</version>
+		<version>${version.project}</version>
 	</parent>
 	<artifactId>ripea-lib-common</artifactId>
 	<packaging>pom</packaging>
@@ -282,12 +282,12 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-core-api</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin</artifactId>
-			<version>${ripea.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>
