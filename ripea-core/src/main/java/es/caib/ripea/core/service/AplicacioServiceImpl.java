@@ -82,7 +82,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
-			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.ripea.default.user.language");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
 				usuari = usuariRepository.save(
@@ -91,7 +90,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 								dadesUsuari.getNom(),
 								dadesUsuari.getNif(),
 								dadesUsuari.getEmail(),
-								idioma).build());
+								getIdiomaPerDefecte()).build());
 			} else {
 				throw new NotFoundException(
 						auth.getName(),
@@ -256,6 +255,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 							"/es/caib/ripea/core/version/version.properties"));
 		}
 		return versionProperties;
+	}
+
+	private String getIdiomaPerDefecte() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.usuari.idioma.defecte",
+				"CA");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
