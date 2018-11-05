@@ -88,8 +88,6 @@ public class UsuariHelper {
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
-			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.ripea.default.user.language");
-
 			// Primer cream l'usuari amb dades fictícies i després l'actualitzam.
 			// Així evitam possibles bucles infinits a l'hora de guardar registre
 			// de les peticions al plugin d'usuaris.
@@ -99,7 +97,7 @@ public class UsuariHelper {
 							auth.getName(),
 							"00000000X",
 							auth.getName() + "@" + "caib.es",
-							idioma).build());
+							getIdiomaPerDefecte()).build());
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
 				usuari.update(
@@ -114,6 +112,12 @@ public class UsuariHelper {
 			}
 		}
 		return usuari;
+	}
+
+	private String getIdiomaPerDefecte() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.usuari.idioma.defecte",
+				"CA");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(UsuariHelper.class);
