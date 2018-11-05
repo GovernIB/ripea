@@ -31,15 +31,8 @@ public class ExpedientDto extends NodeDto {
 	private String sistraClau;
 	private UsuariDto agafatPer;
 	private String numero;
-	private boolean fillsSigned;
+	private boolean conteDocumentsFirmats;
 
-
-	public boolean isFillsSigned() {
-		return fillsSigned;
-	}
-	public void setFillsSigned(boolean fillsSigned) {
-		this.fillsSigned = fillsSigned;
-	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -142,6 +135,12 @@ public class ExpedientDto extends NodeDto {
 	public void setNumero(String numero) {
 		this.numero = numero;
 	}
+	public boolean isConteDocumentsFirmats() {
+		return conteDocumentsFirmats;
+	}
+	public void setConteDocumentsFirmats(boolean conteDocumentsFirmats) {
+		this.conteDocumentsFirmats = conteDocumentsFirmats;
+	}
 
 	public MetaExpedientDto getMetaExpedient() {
 		return (MetaExpedientDto)getMetaNode();
@@ -150,7 +149,7 @@ public class ExpedientDto extends NodeDto {
 	public boolean isAgafat() {
 		return agafatPer != null;
 	}
-	
+
 	protected ExpedientDto copiarContenidor(ContingutDto original) {
 		ExpedientDto copia = new ExpedientDto();
 		copia.setId(original.getId());

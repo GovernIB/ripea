@@ -70,16 +70,19 @@ public class ExpedientConsultaController extends BaseUserController {
 			HttpServletRequest request,
 			Model model) {
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if(mantenirPaginacio) {
+		if (mantenirPaginacio) {
 			model.addAttribute("mantenirPaginacio", true);
-		}else {
+		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
-				metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId()));
-		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
+				metaExpedientsPermisLectura);
+		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
+				entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
 				metaExpedientsPermisCreacio);
@@ -97,13 +100,13 @@ public class ExpedientConsultaController extends BaseUserController {
 						"expedient.estat.enum."));
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
-		
-		if (metaExpedientsPermisCreacio == null || metaExpedientsPermisCreacio.size() <= 0)
+		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.sense.permisos.crear"));		
+							"expedient.controller.sense.permis.lectura"));
+		}
 		return "expedientUserList";
 	}
 

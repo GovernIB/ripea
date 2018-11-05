@@ -36,9 +36,9 @@ public class EntitatController extends BaseController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(Model model, HttpServletRequest request) {
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if(mantenirPaginacio) {
+		if (mantenirPaginacio) {
 			model.addAttribute("mantenirPaginacio", true);
-		}else {
+		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
 		return "entitatList";

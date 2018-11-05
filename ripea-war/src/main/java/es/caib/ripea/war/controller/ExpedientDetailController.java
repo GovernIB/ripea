@@ -70,9 +70,11 @@ public class ExpedientDetailController extends BaseUserController {
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
-				metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId()));
+				metaExpedientsPermisLectura);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
@@ -91,15 +93,13 @@ public class ExpedientDetailController extends BaseUserController {
 						"expedient.estat.enum."));
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
-		
-		if (metaExpedientsPermisCreacio == null || metaExpedientsPermisCreacio.size() <= 0)
+		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.sense.permisos.crear"));
-		
-		
+							"expedient.controller.sense.permis.lectura"));
+		}
 		return "expedientDetailList";
 	}
 

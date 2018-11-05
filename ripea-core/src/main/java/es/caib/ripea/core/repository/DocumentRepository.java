@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -26,6 +27,10 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
 	List<DocumentEntity> findByExpedient(ExpedientEntity expedient);
+
+	List<DocumentEntity> findByExpedientAndEstat(
+			ExpedientEntity expedient,
+			DocumentEstatEnumDto estat);
 
 	List<DocumentEntity> findByExpedientAndEsborrat(
 			ExpedientEntity expedient,

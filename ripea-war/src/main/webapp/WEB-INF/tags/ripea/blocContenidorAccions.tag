@@ -6,8 +6,6 @@
 <%@ attribute name="modeLlistat" required="true" rtexprvalue="true"%>
 <%@ attribute name="mostrarObrir" required="false" rtexprvalue="true"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
-
-
 <c:set var="expedientPareObertOInexistent" value="${empty contingut.expedientPare or contingut.expedientPare.estat == 'OBERT'}"/>
 <c:set var="mostrarSeparador" value="${false}"/>
 <div <c:if test="${not empty id}">id="${id}" </c:if>class="dropdown<c:if test="${not modeLlistat}"> text-center</c:if><c:if test="${not empty className}"> ${className}</c:if>">
@@ -40,10 +38,8 @@
 				</c:if>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
-
-					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-					<c:set var="mostrarSeparador" value="${true}"/>
-
+			<%--li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+			<c:set var="mostrarSeparador" value="${true}"/--%>
 			<c:if test="${contingut.expedient}">
 				<c:if test="${mostrarSeparador}">
 					<c:set var="mostrarSeparador" value="${false}"/>
@@ -94,8 +90,11 @@
 							<li><a href="<c:url value="/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
 						</c:when>
 						<c:otherwise>
-							<li><a href="<c:url value=" onclick="/>"alert('<spring:message code="contingut.document.firmar.error.no.valid"/>');return false;"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
+							<li class="disabled"><a href="#"/><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
 						</c:otherwise>
+						<%--c:otherwise>
+							<li><a href="<c:url value=" onclick="/>"alert('<spring:message code="contingut.document.firmar.error.no.valid"/>');return false;"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
+						</c:otherwise--%>
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
@@ -105,8 +104,11 @@
 							<li><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 						</c:when>
 						<c:otherwise>
-							<li><a href="<c:url value=" onclick="/>"alert('<spring:message code="contingut.document.firmar.error.no.valid"/>');return false;"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+							<li class="disabled"><a href="#"/><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 						</c:otherwise>
+						<%--c:otherwise>
+							<li><a href="<c:url value=" onclick="/>"alert('<spring:message code="contingut.document.firmar.error.no.valid"/>');return false;"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+						</c:otherwise--%>
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
@@ -136,29 +138,23 @@
 		</c:if>
 		<li><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 		<c:if test="${contingut.expedient or contingut.document}">
-		
-		
-		
-		<c:choose>
-			<c:when test="${!empty nodeco}">
-				<c:set var="exportarUrl"><c:url value="/nodeco/contingut/${contingut.id}/exportar"/></c:set>	
-			</c:when>
-			<c:otherwise>
-				<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
-			</c:otherwise>
-		</c:choose>		
-		
-		<c:set var="contingutEstat">${contingut.estat}</c:set>	
-		<c:choose>
-			<c:when test="${contingutEstat!='CUSTODIAT'}">
-				<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-			</c:when>
-			<c:otherwise>
-				<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-			</c:otherwise>
-		</c:choose>				
-		
-		
+			<c:choose>
+				<c:when test="${!empty nodeco}">
+					<c:set var="exportarUrl"><c:url value="/nodeco/contingut/${contingut.id}/exportar"/></c:set>	
+				</c:when>
+				<c:otherwise>
+					<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
+				</c:otherwise>
+			</c:choose>		
+			<c:set var="contingutEstat">${contingut.estat}</c:set>	
+			<c:choose>
+				<c:when test="${contingutEstat != 'CUSTODIAT'}">
+					<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+				</c:otherwise>
+			</c:choose>				
 		</c:if>
 	</ul>
 </div>

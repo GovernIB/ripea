@@ -26,6 +26,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -56,6 +57,7 @@ import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
@@ -87,6 +89,8 @@ public class ContingutHelper {
 	private ContingutMovimentRepository contenidorMovimentRepository;
 	@Autowired
 	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
+	@Autowired
+	private DocumentRepository documentRepository;
 
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
@@ -161,6 +165,10 @@ public class ContingutHelper {
 			dto.setMetaNode(metaNode);
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+			boolean conteDocumentsFirmats = !documentRepository.findByExpedientAndEstat(
+					expedient,
+					DocumentEstatEnumDto.CUSTODIAT).isEmpty();
+			dto.setConteDocumentsFirmats(conteDocumentsFirmats);
 			resposta = dto;
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;

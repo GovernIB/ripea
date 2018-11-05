@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -31,7 +30,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -46,7 +44,6 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -1003,19 +1000,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ambPathIPermisos,
 				false,
 				false);
-		
-		//checking if expedient has all documents signed
-		boolean allFillsSigned = false;
-		if (!expedient.getFills().isEmpty()){
-			allFillsSigned = true;
-			for(ContingutEntity cont: expedient.getFills()){
-				DocumentEntity doc = (DocumentEntity) cont;
-				if (doc.getEstat()!=DocumentEstatEnumDto.CUSTODIAT){
-					allFillsSigned = false;
-				}
-			}
-		}
-		expedientDto.setFillsSigned(allFillsSigned);
 		return expedientDto;
 	}
 

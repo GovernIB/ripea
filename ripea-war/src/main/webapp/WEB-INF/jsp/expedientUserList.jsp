@@ -35,7 +35,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
-var columnaAgafatPer = 12;
+var columnaAgafatPer = 13;
 $(document).ready(function() {
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
@@ -87,7 +87,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		e.stopPropagation();
 		alert("Button Clicked");
-	});	
+	});
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -166,8 +166,8 @@ function getCookie(cname) {
 				<button id="seleccioNone"<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
 					<button<c:if test="${empty expedientFiltreCommand.metaExpedientId}"> disabled="disabled"</c:if> class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		  					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
-							</button>
+  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
+					</button>
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
@@ -200,7 +200,7 @@ function getCookie(cname) {
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
-				<th data-col-name="fillsSigned" data-visible="false"></th>
+				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
 				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
@@ -231,9 +231,9 @@ function getCookie(cname) {
 						{{/if}}
 						{{if ambRegistresSenseLlegir}}
 							<span class="fa-stack" aria-hidden="true">
-          						<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
-          						<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
-        					</span>
+								<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
+								<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
+							</span>
 						{{/if}}
 					</script>
 				</th>
@@ -272,10 +272,10 @@ function getCookie(cname) {
 								{{/if}}
 								<li role="separator" class="divider"></li>
 								<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-								{{if fillsSigned}}
+								{{if conteDocumentsFirmats}}
 									<li><a href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
 								{{else}}
-									<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+									<li class="disabled"><a><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
 								{{/if}}
 							</ul>
 						</div>
