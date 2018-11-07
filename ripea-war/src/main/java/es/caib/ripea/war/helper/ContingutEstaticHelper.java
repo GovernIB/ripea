@@ -26,6 +26,7 @@ public class ContingutEstaticHelper {
 			"/css/",
 			"/font/",
 			"/img/",
-			"/js/"};
+			"/js/",
+			"/error"};
 
 }

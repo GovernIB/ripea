@@ -36,12 +36,13 @@ import es.caib.ripea.plugin.dadesext.TipusVia;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
 
 /**
- * Implementació de proves del plugin d'unitats organitzatives.
+ * Implementació del plugin de dades externes que consulta la informació
+ * a DIR3CAIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class DadesExternesPluginDir3 implements DadesExternesPlugin {
-	
+
 	@Override
 	public List<Pais> paisFindAll() throws SistemaExternException {
 		try {
@@ -117,7 +118,7 @@ public class DadesExternesPluginDir3 implements DadesExternesPlugin {
 					ex);
 		}
 	}
-	
+
 	@Override
 	public List<Provincia> provinciaFindByComunitat(
 			String comunitatCodi) throws SistemaExternException {
@@ -285,19 +286,36 @@ public class DadesExternesPluginDir3 implements DadesExternesPlugin {
 	}
 
 	private String getServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dadesext.service.url");
+		String url = PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.dadesext.dir3.service.url");
+		if (url != null) {
+			return url;
+		} else {
+			return PropertiesHelper.getProperties().getProperty(
+					"es.caib.ripea.plugin.dadesext.service.url");
+		}
 	}
 	private String getUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username");
+		String username = PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.dadesext.dir3.service.username");
+		if (username != null) {
+			return username;
+		} else {
+			return PropertiesHelper.getProperties().getProperty(
+					"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username");
+		}
 	}
 	private String getPassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password");
+		String password = PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.dadesext.dir3.service.password");
+		if (password != null) {
+			return password;
+		} else {
+			return PropertiesHelper.getProperties().getProperty(
+					"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password");
+		}
 	}
 
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesExternesPluginDir3.class);
 
 }

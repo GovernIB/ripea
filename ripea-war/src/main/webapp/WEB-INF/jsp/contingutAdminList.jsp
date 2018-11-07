@@ -89,8 +89,16 @@ $(document).ready(function() {
 		</div>
 	</form:form>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/log/{{:id}}</script>
-	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/contingutAdmin/datatable"/>" data-filter="#contingutFiltreCommand" data-default-order="11" data-default-dir="asc" class="table table-bordered table-striped"
-	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
+	<table
+		id="taulaDades"
+		data-toggle="datatable"
+		data-url="<c:url value="/contingutAdmin/datatable"/>"
+		data-filter="#contingutFiltreCommand"
+		data-default-order="9"
+		data-default-dir="asc"
+		class="table table-bordered table-striped"
+		data-rowhref-template="#rowhrefTemplate"
+		data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
@@ -98,14 +106,12 @@ $(document).ready(function() {
 				<th data-col-name="expedient" data-visible="false">#</th>
 				<th data-col-name="carpeta" data-visible="false">#</th>
 				<th data-col-name="document" data-visible="false">#</th>
-				<th data-col-name="arxiv" data-visible="false">#</th>
-				<th data-col-name="bustia" data-visible="false">#</th>
 				<th data-col-name="registre" data-visible="false">#</th>
 				<th data-col-name="esborrat" data-visible="false">#</th>
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="25%">
 					<spring:message code="contingut.admin.columna.nom"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
-						{{if expedient}}<span class="fa ${iconaExpedient}"></span>{{else document}}<span class="fa ${iconaDocument}"></span>{{else carpeta}}<span class="fa ${iconaCarpeta}"></span>{{else registre}}<span class="fa ${iconaAnotacioRegistre}"></span>{{else arxiv}}<span class="fa ${iconaArxiu}"></span>{{else bustia}}<span class="fa ${iconaBustia}"></span>{{/if}}
+						{{if expedient}}<span class="fa ${iconaExpedient}"></span>{{else document}}<span class="fa ${iconaDocument}"></span>{{else carpeta}}<span class="fa ${iconaCarpeta}"></span>{{else registre}}<span class="fa ${iconaAnotacioRegistre}"></span>{{/if}}
 						{{:nom}}
 						{{if esborrat}}<span class="fa fa-trash-o pull-right" title="<spring:message code="contingut.admin.columna.esborrat"/>"></span>{{/if}}
 					</script>
@@ -113,21 +119,18 @@ $(document).ready(function() {
 				<%--th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.metanode"/></th--%>
 				<th data-col-name="createdBy.nom" width="10%"><spring:message code="contingut.admin.columna.creat.per"/></th>
 				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.creat.el"/></th>
-				<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false" width="30%">
+				<%--th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false" width="30%">
 					<spring:message code="contingut.admin.columna.situacio"/>
 					<script id="cellPathTemplate" type="text/x-jsrender">
 						{{for path}}/
-							{{if escriptori}}<span class="fa ${iconaEscriptori}" title="<spring:message code="contingut.path.escriptori"/>"></span>
-							{{else expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
+							{{if expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
 							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
-							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>
-							{{else arxiv}}{{if #getIndex() == 0}}<span class="fa ${iconaUnitat}" title="<spring:message code="contingut.icona.unitat"/>"></span>{{else}}<span class="fa ${iconaArxiu}" title="<spring:message code="contingut.icona.arxiu"/>"></span>{{/if}}
-							{{else bustia}}{{if #getIndex() == 0}}<span class="fa ${iconaUnitat}" title="<spring:message code="contingut.icona.unitat"/>"></span>{{else}}<span class="fa ${iconaBustia}" title="<spring:message code="contingut.icona.bustia"/>"></span>{{/if}}{{/if}}
-							{{if escriptori}}{{:createdBy.nom}}{{else}}{{:nom}}{{/if}}
+							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>{{/if}}
+							{{:nom}}
 						{{/for}}
 					</script>
-				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				</th--%>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
