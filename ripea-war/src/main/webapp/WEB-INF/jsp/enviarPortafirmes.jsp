@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<c:set var="titol"><spring:message code="execucions.massives.portafirmes.titol"/></c:set>
+<c:set var="titol"><spring:message code="accio.massiva.portafirmes.titol"/></c:set>
 <html>
 <head>
 	<title>${titol}</title>
@@ -22,8 +22,8 @@
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/massiu/crear/portafirmes"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="portafirmesEnviarCommand" role="form">
-		<rip:inputDate name="dataInici" textKey="execucions.massives.general.data.inici" required="false"/>
-		<rip:inputCheckbox name="enviarCorreu" textKey="execucions.massives.general.enviar.correu"/>
+		<rip:inputDate name="dataInici" textKey="accio.massiva.general.data.inici" required="false"/>
+		<rip:inputCheckbox name="enviarCorreu" textKey="accio.massiva.general.enviar.correu"/>
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>

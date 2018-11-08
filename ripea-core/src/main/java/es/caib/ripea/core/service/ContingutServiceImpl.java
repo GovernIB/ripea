@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -1405,7 +1404,7 @@ public class ContingutServiceImpl implements ContingutService {
 				(filtre.getTipusExpedient() == null),
 				filtre.getTipusExpedient(),
 				(filtre.getExpedientId() == null),
-				Arrays.asList(filtre.getExpedientId()),
+				filtre.getExpedientId(),
 				(filtre.getTipusDocument() == null),
 				filtre.getTipusDocument(),
 				(filtre.getNom() == null),
@@ -1418,13 +1417,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true);
 		List<Long> docIds = new ArrayList<Long>();
 		for (DocumentEntity document: preDocuments) {
-			contingutHelper.comprovarContingutDinsExpedientModificable(
-					entitatId,
-					document.getId(),
-					false,
-					true,
-					false,
-					false);
+			docIds.add(document.getId());
 		}
 		if (!docIds.isEmpty()) {
 			return paginacioHelper.toPaginaDto(
@@ -1435,7 +1428,7 @@ public class ContingutServiceImpl implements ContingutService {
 					new Converter<DocumentEntity, DocumentDto>() {
 						@Override
 						public DocumentDto convert(DocumentEntity source) {
-							return (DocumentDto)contingutHelper.toContingutDto(
+							DocumentDto dto = (DocumentDto)contingutHelper.toContingutDto(
 									source,
 									false,
 									false,
@@ -1444,6 +1437,8 @@ public class ContingutServiceImpl implements ContingutService {
 									true,
 									true,
 									false);
+							dto.setPerConvertirJson(true);
+							return dto;
 						}
 					});
 		} else {

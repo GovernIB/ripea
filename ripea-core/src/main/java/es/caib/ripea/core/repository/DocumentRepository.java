@@ -51,6 +51,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("ids") List<Long> ids,
 			Pageable pageable);
 	
+	
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -59,7 +60,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    c.entitat = :entitat " +
 			"and c.estat = 0 " +
 			"and (:esNullMetaExpedientId = true or c.expedient.metaNode.id = :metaExpedientId) " +
-			"and (:esNullExpedientIds = true or c.expedient.id in (:expedientIds)) " +
+			"and (:esNullExpedientId = true or c.expedient.id = :expedientId) " +
 			"and (:esNullMetaDocumentId = true or c.metaNode.id = :metaDocumentId) " +
 			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or c.lastModifiedDate >= :dataInici) " +
@@ -69,8 +70,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullMetaExpedientId") boolean esNullMetaExpedientId,
 			@Param("metaExpedientId") Long metaExpedientId,
-			@Param("esNullExpedientIds") boolean esNullExpedientIds,
-			@Param("expedientIds") List<Long> expedientIds,
+			@Param("esNullExpedientId") boolean esNullExpedientId,
+			@Param("expedientId") Long expedientId,
 			@Param("esNullMetaDocumentId") boolean esNullMetaDocumentId,
 			@Param("metaDocumentId") Long metaDocumentId,
 			@Param("esNullNom") boolean esNullNom,

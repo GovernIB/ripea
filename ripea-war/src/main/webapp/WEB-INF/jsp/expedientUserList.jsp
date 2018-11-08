@@ -179,6 +179,14 @@ function getCookie(cname) {
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
 					</ul>
 				</div>
+				<div class="btn-group">
+					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="massiu/portafirmes"><spring:message code="massiu.portafirmes.firma"/></a></li>
+					</ul>
+				</div>
 			</div>
 			<c:if test="${not empty metaExpedientsPermisCreacio}">
 				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
