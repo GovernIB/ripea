@@ -202,6 +202,14 @@ body {
 										<c:param name="mantenirPaginacio" value="false" />
 									</c:url>"
 								class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
+								<div class="btn-group">
+									<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li><a href="massiu/portafirmes"><spring:message code="massiu.portafirmes.firma"/></a></li>
+									</ul>
+								</div>								
 							</c:when>
 						</c:choose>
 						<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">
