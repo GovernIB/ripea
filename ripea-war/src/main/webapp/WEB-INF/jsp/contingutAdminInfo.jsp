@@ -39,8 +39,6 @@
 			<dd>${contingut.metaNode.nom}</dd>
 		</c:if>
 		<c:if test="${contingut.expedient}">
-			<dt><spring:message code="contingut.admin.info.camp.arxiu"/></dt>
-			<dd>${contingut.arxiu.nom}</dd>
 			<dt><spring:message code="contingut.admin.info.camp.numero"/></dt>
 			<dd>${contingut.numero}</dd>
 			<dt><spring:message code="contingut.admin.info.camp.estat"/></dt>

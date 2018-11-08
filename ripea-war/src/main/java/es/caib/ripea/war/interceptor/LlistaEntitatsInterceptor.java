@@ -23,12 +23,11 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	private EntitatService entitatService;
 
-
 	@Override
 	public boolean preHandle(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			Object handler) throws Exception {
+			Object handler) {
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
 			EntitatHelper.findEntitatsAccessibles(
 					request,

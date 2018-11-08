@@ -20,15 +20,9 @@
 		<sec:intercept-url pattern="/ws/bantel*" access="isAnonymous()"/>
 		<sec:intercept-url pattern="/rest/notib*" access="isAnonymous()"/>
 		<sec:intercept-url pattern="/rest/notib/notificaCanvi*" access="isAnonymous()"/>
-		
-		<sec:intercept-url pattern="/rest/v0/bustia" access="hasRole('IPA_BSTWS')"/>
-		<sec:intercept-url pattern="/rest/v1/bustia" access="hasRole('IPA_BSTWS')"/>
 		<sec:intercept-url pattern="/entitat*" access="hasRole('IPA_SUPER')"/>
 		<sec:intercept-url pattern="/permis*" access="hasRole('IPA_ADMIN')"/>
 		<sec:intercept-url pattern="/metaExpedient*" access="hasRole('IPA_ADMIN')"/>
-		<sec:intercept-url pattern="/metaDocument*" access="hasRole('IPA_ADMIN')"/>
-		<sec:intercept-url pattern="/metaCarpeta*" access="hasRole('IPA_ADMIN')"/>
-		<sec:intercept-url pattern="/metaDada*" access="hasRole('IPA_ADMIN')"/>
 		<sec:intercept-url pattern="/*" access="hasRole('tothom')"/>
 		<sec:custom-filter position="PRE_AUTH_FILTER" ref="preauthFilter"/>
 		<sec:anonymous/>
