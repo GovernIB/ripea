@@ -25,6 +25,9 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <style>
+#expedientFiltreForm {
+	margin-bottom: 15px;
+}
 table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
 	background-color: #fcf8e3;
 	color: #666666;
@@ -114,8 +117,11 @@ function getCookie(cname) {
 </head>
 <body>
 	<div class="text-right" data-toggle="botons-titol">
+		<div class="btn-group">
+			<button class="btn btn-default active"><span class="fa fa-list-alt"></span></button>
+			<a href="<c:url value="/expedientDetail"/>" class="btn btn-default"><span class="fa fa-columns"></span></a>
+		</div>
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
-		<a href="<c:url value="/expedientDetail"/>"  class="btn btn-primary""><spring:message code="expedient.list.canviVista"/></a>
 	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
@@ -180,18 +186,19 @@ function getCookie(cname) {
 		</div>
 	</script>
 	<script id="rowhrefTemplate" type="text/x-jsrender">contingut/{{:id}}</script>
-	<table id="taulaDades"
-			data-toggle="datatable" 
-			data-url="<c:url value="/expedient/datatable"/>" 
-			class="table table-bordered table-striped table-hover" 
-			data-default-order="9" 
-			data-default-dir="desc"
-			data-botons-template="#botonsTemplate"
-			data-rowhref-template="#rowhrefTemplate"
-			data-selection-enabled="true"
-			data-save-state="true"
-			data-mantenir-paginacio="${mantenirPaginacio}"
-			style="width:100%">
+	<table
+		id="taulaDades"
+		data-toggle="datatable" 
+		data-url="<c:url value="/expedient/datatable"/>" 
+		class="table table-bordered table-striped table-hover" 
+		data-default-order="9" 
+		data-default-dir="desc"
+		data-botons-template="#botonsTemplate"
+		data-rowhref-template="#rowhrefTemplate"
+		data-selection-enabled="true"
+		data-save-state="true"
+		data-mantenir-paginacio="${mantenirPaginacio}"
+		style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
@@ -244,14 +251,11 @@ function getCookie(cname) {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualWrite}}
-									<li><a href="expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
-								{{/if}}
 								{{if metaNode.usuariActualDelete}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
-								<li role="separator" class="divider"></li>
 								{{if metaNode.usuariActualWrite}}
+									<li role="separator" class="divider"></li>
 									{{if !agafat}}
 										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
@@ -260,14 +264,6 @@ function getCookie(cname) {
 										{{else}}
 											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 										{{/if}}
-									{{/if}}
-									<li><a href="expedient/{{:id}}/relacionar" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-									{{if estat == 'OBERT'}}
-										{{if valid && estat == 'OBERT'}}
-											<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
-										{{/if}}
-									{{else}}
-										<li><a href="expedient/{{:id}}/reobrir" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
 									{{/if}}
 								{{/if}}
 								<li role="separator" class="divider"></li>

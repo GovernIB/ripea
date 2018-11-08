@@ -7,8 +7,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:set var="potModificarContingut" value="${false}"/>
 <c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty contingut.metaNode or contingut.metaNode.usuariActualWrite}"/></c:if>
-<c:set var="agafatPerUsuariActual" value="${false}"/>
-<c:if test="${contingut.expedient and contingut.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="agafatPerUsuariActual" value="${true}"/></c:if>
+<c:set var="expedientAgafatPerUsuariActual" value="${false}"/>
+<c:if test="${contingut.expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -147,6 +147,21 @@ ul.interessats {
 }
 #nodeDades input.multiple {
 	width: 280px; !important
+}
+#colInfo {
+	padding-left: 0;
+}
+#colContent {
+	padding-right: 0;
+}
+#alerta-no-agafat {
+	margin-bottom: 15px;
+}
+#contenidor-info {
+	margin-bottom: 0;
+}
+#contenidor-info h3 {
+	padding-bottom: 6px;
 }
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -355,6 +370,23 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
+	<c:if test="${not empty contingut.expedientPare.agafatPer}">
+		<div class="text-right" data-toggle="botons-titol">
+			<ul class="list-group">
+	  			<li class="list-group-item" style="padding: 6px 12px">
+	  				<spring:message code="contingut.info.agafat.per"/>:
+	  				${contingut.expedientPare.agafatPer.nom}
+	  			</li>
+	  		</ul>
+		</div>
+	</c:if>
+	<c:if test="${not expedientAgafatPerUsuariActual}">
+		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
+			<span class="fa fa-info-circle"></span>
+			<spring:message code="contingut.alerta.no.agafat"/>
+			<a href="<c:url value="../expedient/${contingut.expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
+		</div>
+	</c:if>
 	<rip:blocContenidorPath contingut="${contingut}"/>
 	<div>
 		<c:set var="contingutClass">col-md-12</c:set>
@@ -368,7 +400,7 @@ $(document).ready(function() {
 					<h3>
 						<spring:message code="contingut.info.informacio"/>
 						<c:if test="${pluginArxiuActiu}">
-							<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs" data-toggle="modal">Arxiu</a>
+							<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs pull-right" data-toggle="modal">Arxiu</a>
 						</c:if>
 					</h3>
 					<dl>
@@ -470,12 +502,9 @@ $(document).ready(function() {
 							</c:forEach>
 						</ul>
 					</c:if>
-		
 				    <c:if test="${!isContingutDetail}">
 				      	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
 				    </c:if>    
-
-									
 				</div>
 				<%--                     --%>
 				<%-- /Columna informació --%>
@@ -495,18 +524,9 @@ $(document).ready(function() {
 						<c:when test="${not contingut.valid and not contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document"/></c:when>
 						<c:when test="${contingut.valid and contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document.segonpla"/></c:when>
 					</c:choose>
-
 					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.mesinfo"/></a>
-					
-					
-					
-					
 				</div>
 			</c:if>
-			
-			
-			
-			
 			<%--          --%>
 			<%-- Pipelles --%>
 			<%--          --%>
@@ -629,7 +649,6 @@ $(document).ready(function() {
 						<c:otherwise>
 							<div class="text-right" id="contingut-botons">
 								<div class="btn-group">
-								
 									<c:choose>
 									    <c:when test="${isContingutDetail}">
 									      	<c:set var="iconesVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/></c:set>
@@ -641,7 +660,6 @@ $(document).ready(function() {
 									<a href="${iconesVistaUrl}" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
 										<span class="fa fa-th"></span>
 									</a>
-										
 									<c:choose>
 									    <c:when test="${isContingutDetail}">
 									      	<c:set var="llistatVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/llistat"/></c:set>
@@ -671,7 +689,7 @@ $(document).ready(function() {
 										</ul>
 									</div>
 								</c:if>
-								<c:if test="${agafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut))}">
+								<c:if test="${expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
@@ -708,7 +726,9 @@ $(document).ready(function() {
 						<c:choose>
 							<c:when test="${not empty metaDades}">
 								<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
-									<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+										<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+									</c:if>
 									<table class="table table-striped table-bordered" style="width:100%">
 									<thead>
 										<tr>
@@ -734,23 +754,30 @@ $(document).ready(function() {
 														<label class="hidden" for="${metaDada.codi}"></label>
 														<div>
 															<c:choose>
-																<c:when test="${metaDada.tipus == 'DATA'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
-																</c:when>
-																<c:when test="${metaDada.tipus == 'IMPORT'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
-																</c:when>
-																<c:when test="${metaDada.tipus == 'SENCER'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
-																</c:when>
-																<c:when test="${metaDada.tipus == 'FLOTANT'}">
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
-																</c:when>
-																<c:when test="${metaDada.tipus == 'BOOLEA'}">
-																	<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
+																<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+																	<c:choose>
+																		<c:when test="${metaDada.tipus == 'DATA'}">
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
+																		</c:when>
+																		<c:when test="${metaDada.tipus == 'IMPORT'}">
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+																		</c:when>
+																		<c:when test="${metaDada.tipus == 'SENCER'}">
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
+																		</c:when>
+																		<c:when test="${metaDada.tipus == 'FLOTANT'}">
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+																		</c:when>
+																		<c:when test="${metaDada.tipus == 'BOOLEA'}">
+																			<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
+																		</c:when>
+																		<c:otherwise>
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
+																		</c:otherwise>
+																	</c:choose>
 																</c:when>
 																<c:otherwise>
-																	<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
+																	<rip:inputFixed>${dadaValor}</rip:inputFixed>
 																</c:otherwise>
 															</c:choose>
 															<span class="" aria-hidden="true"></span>
@@ -761,7 +788,9 @@ $(document).ready(function() {
 										</c:forEach>
 									</tbody>
 									</table>
-									<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+										<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+									</c:if>
 								</form:form>
 							</c:when>
 							<c:otherwise>
@@ -815,7 +844,7 @@ $(document).ready(function() {
 							</thead>
 						</table>
 						<script id="taulaInteressatsBotonsTemplate" type="text/x-jsrender">
-							<c:if test="${potModificarContingut}">
+							<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut}">
 								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.id}/interessat/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 							</c:if>
 						</script>

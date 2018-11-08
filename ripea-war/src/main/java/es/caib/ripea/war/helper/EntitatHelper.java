@@ -37,7 +37,6 @@ public class EntitatHelper {
 		List<EntitatDto> entitats = (List<EntitatDto>)request.getAttribute(
 				REQUEST_ATTRIBUTE_ENTITATS);
 		if (entitats == null && entitatService != null) {
-			System.out.println(">>> " + request.getRequestURI() + ", " + request.getUserPrincipal());
 			entitats = entitatService.findAccessiblesUsuariActual();
 			request.setAttribute(REQUEST_ATTRIBUTE_ENTITATS, entitats);
 		}

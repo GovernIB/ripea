@@ -148,8 +148,11 @@ function getCookie(cname) {
 
 
 	<div class="buttons">
+		<div class="btn-group">
+			<a href="<c:url value="/expedient"/>" class="btn btn-default"><span class="fa fa-list-alt"></span></a>
+			<button class="btn btn-default active"><span class="fa fa-columns"></span></button>
+		</div>
 		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
-		<a  style="float: right" href="<c:url value="/expedient"/>"  class="btn btn-primary"> <spring:message code="expedient.list.canviVista"/></a>
 	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">

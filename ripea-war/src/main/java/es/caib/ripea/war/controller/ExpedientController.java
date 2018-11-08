@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -31,13 +32,13 @@ import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.ContenidorCommand.Create;
+import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
 import es.caib.ripea.war.command.ExpedientRelacionarCommand;
 import es.caib.ripea.war.command.ExpedientRelacionarCommand.Relacionar;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
-import es.caib.ripea.war.command.ContenidorCommand.Create;
-import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
@@ -149,15 +150,22 @@ public class ExpedientController extends BaseUserController {
 	public String agafar(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
+			@RequestParam(required = false) String contingutId,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		expedientService.agafarUser(
 				entitatActual.getId(),
 				expedientId);
+		String url;
+		if (contingutId != null) {
+			url = "redirect:../../contingut/" + contingutId;
+		} else {
+			url = "redirect:../../contingut/" + expedientId;
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../contingut/" + expedientId,
+				url,
 				"expedient.controller.agafat.ok");
 	}
 

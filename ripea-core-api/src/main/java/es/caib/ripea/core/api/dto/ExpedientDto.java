@@ -5,8 +5,6 @@ package es.caib.ripea.core.api.dto;
 
 import java.util.Date;
 
-
-
 /**
  * Informació d'un expedient.
  * 
