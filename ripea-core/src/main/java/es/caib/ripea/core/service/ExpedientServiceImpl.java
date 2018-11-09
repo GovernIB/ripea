@@ -296,6 +296,35 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				true);
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
+			Long entitatId,
+			ExpedientFiltreDto filtre,
+			Long expedientId,
+			PaginacioParamsDto paginacioParams) {
+		logger.debug("Consultant els expedients segons el filtre per usuaris ("
+				+ "entitatId=" + entitatId + ", "
+				+ "filtre=" + filtre + ", "
+				+ "paginacioParams=" + paginacioParams + 
+				"id del expedient relacionat" + expedientId +")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		return findAmbFiltrePaginat(
+				entitatId,
+				filtre,
+				paginacioParams,
+				false,
+				true,
+				expedientId);
+	}
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -822,6 +851,26 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return fitxer;
 	}
 
+	
+	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
+			Long entitatId,
+			ExpedientFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			boolean accesAdmin,
+			boolean comprovarAccesMetaExpedients) {
+	
+		return findAmbFiltrePaginat(
+				entitatId,
+				filtre,
+				paginacioParams,
+				accesAdmin,
+				comprovarAccesMetaExpedients,
+				null
+				);
+	}
+	
+	
+		
 
 
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
@@ -829,7 +878,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			boolean accesAdmin,
-			boolean comprovarAccesMetaExpedients) {
+			boolean comprovarAccesMetaExpedients,
+			Long expedientId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				(!accesAdmin),
@@ -866,36 +916,92 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (filtre.isMeusExpedients()) {
 				agafatPer = usuariHelper.getUsuariAutenticat();
 			}
+			
+			// id of expedient clicked to get "Relacionar expedient" view, in this view only list of expedients not already related with clicked expedient should be shown 
+			ExpedientEntity expedient=null;
+			List <ExpedientEntity> expedientRelacionats=new ArrayList<>();
+			if (expedientId!=null){
+				expedient = entityComprovarHelper.comprovarExpedient(
+						entitatId,
+						expedientId,
+						false,
+						false,
+						true,
+						false,
+						false);
+				
+				expedientRelacionats = expedientRepository.findExpedientsRelacionats(expedient);
+				expedientRelacionats.add(expedient);
+			}
+			
+			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] {"codi", "any", "sequencia"});
-			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndFiltre(
-					entitat,
-					metaExpedientsPermesos,
-					metaExpedient == null,
-					metaExpedient,
-					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
-					filtre.getNumero() == null ? "" : filtre.getNumero(),
-					filtre.getNom() == null || filtre.getNom().isEmpty(),
-					filtre.getNom() == null ? "" : filtre.getNom(),
-					filtre.getDataCreacioInici() == null,
-					filtre.getDataCreacioInici(),
-					filtre.getDataCreacioFi() == null,
-					filtre.getDataCreacioFi(),
-					filtre.getDataTancatInici() == null,
-					filtre.getDataTancatInici(),
-					filtre.getDataTancatFi() == null,
-					filtre.getDataTancatFi(),
-					filtre.getEstat() == null,
-					filtre.getEstat(),
-					agafatPer == null,
-					agafatPer,
-					filtre.getSearch() == null,
-					filtre.getSearch() == null ? "" : filtre.getSearch(),
-					filtre.getTipusId() == null,
-					filtre.getTipusId(),
-					paginacioHelper.toSpringDataPageable(
-							paginacioParams,
-							ordenacioMap));
+			Page<ExpedientEntity> paginaExpedients;
+			
+			if(!expedientRelacionats.isEmpty()){
+				paginaExpedients = expedientRepository.findByEntitatAndFiltre(
+						entitat,
+						metaExpedientsPermesos,
+						metaExpedient == null,
+						metaExpedient,
+						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+						filtre.getNumero() == null ? "" : filtre.getNumero(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() == null ? "" : filtre.getNom(),
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						filtre.getDataCreacioFi(),
+						filtre.getDataTancatInici() == null,
+						filtre.getDataTancatInici(),
+						filtre.getDataTancatFi() == null,
+						filtre.getDataTancatFi(),
+						filtre.getEstat() == null,
+						filtre.getEstat(),
+						agafatPer == null,
+						agafatPer,
+						filtre.getSearch() == null,
+						filtre.getSearch() == null ? "" : filtre.getSearch(),
+						filtre.getTipusId() == null,
+						filtre.getTipusId(),
+						expedientRelacionats,
+						paginacioHelper.toSpringDataPageable(
+								paginacioParams,
+								ordenacioMap));
+				
+			} else {
+				paginaExpedients = expedientRepository.findByEntitatAndFiltre(
+						entitat,
+						metaExpedientsPermesos,
+						metaExpedient == null,
+						metaExpedient,
+						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+						filtre.getNumero() == null ? "" : filtre.getNumero(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() == null ? "" : filtre.getNom(),
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						filtre.getDataCreacioFi(),
+						filtre.getDataTancatInici() == null,
+						filtre.getDataTancatInici(),
+						filtre.getDataTancatFi() == null,
+						filtre.getDataTancatFi(),
+						filtre.getEstat() == null,
+						filtre.getEstat(),
+						agafatPer == null,
+						agafatPer,
+						filtre.getSearch() == null,
+						filtre.getSearch() == null ? "" : filtre.getSearch(),
+						filtre.getTipusId() == null,
+						filtre.getTipusId(),
+						paginacioHelper.toSpringDataPageable(
+								paginacioParams,
+								ordenacioMap));
+			}
+			
+			
 			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
 					paginaExpedients,
 					ExpedientDto.class,
@@ -907,6 +1013,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 									true);
 						}
 					});
+			
 			for (ExpedientDto e: result) {
 				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(
 						false,
@@ -920,6 +1027,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				
 				e.setAlerta(enAlerta);
 			}
+			
 			return result;
 		} else {
 			return paginacioHelper.getPaginaDtoBuida(

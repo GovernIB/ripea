@@ -56,13 +56,30 @@
 	    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	</c:if>
 <style>
+
+span {
+	display: inline-block;
+}
+span.align-right {
+	text-align: right;
+}
+span a {
+	font-size: 14px;
+}
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .tab-content {
 	margin-top: .8em;
 }
+
 #contenidor-contingut {
 	margin-left: 0;
 	margin-right: -11px;
 }
+
 #contenidor-contingut li.element-contingut {
 	margin: 0 0 0px 0;
 	padding: 0 10px 0 0;
@@ -74,92 +91,119 @@
 	*display: inline;
 	_height: 140px;
 }
+
 #contenidor-contingut .thumbnail {
 	margin-bottom: 0 !important;
 	border: 2px solid #f9f9f9;
 }
+
 #contenidor-contingut .thumbnail:hover {
 	border: 2px solid #ddd;
 	background-color: #f5f5f5;
 	cursor: pointer;
 }
+
 #contenidor-contingut .thumbnail h4 {
 	margin-top: 4px;
 }
+
 #contenidor-contingut .thumbnail a {
 	text-decoration: none;
 }
+
 #contenidor-contingut .caption p {
+	
 }
+
 #contenidor-contingut .caption .dropdown-menu {
 	text-align: left;
 }
+
 #contenidor-contingut .caption .dropdown-menu li {
 	width: 100%;
 	margin: 0;
 	padding: 0;
 }
+
 #contenidor-info h3 {
 	font-weight: bold;
 	margin-top: 0;
 	border-bottom: 1px solid #e3e3e3;
 	padding-bottom: .6em;
 }
+
 #contenidor-info h4 {
 	font-weight: bold;
 	margin-top: 0;
 	border-bottom: 1px solid #f5f5f5;
 	padding-bottom: .6em;
 }
+
 #contenidor-info dt {
 	color: #999;
 	font-size: small;
 	font-style: italic;
 	font-weight: normal;
 }
+
 #contenidor-info dd {
 	font-size: medium;
 	font-weight: bold;
 	margin-bottom: 0.4em;
 }
+
 #contingut-botons {
 	margin-bottom: .8em;
 }
+
 h4.interessats {
 	padding-bottom: 0 !important;
 	margin-bottom: 4px !important;
 }
+
 ul.interessats {
 	padding-left: 1em !important;
 }
+
 .element-hover .thumbnail {
 	border: 2px solid #ddd !important;
 	background-color: #f5f5f5;
 }
+
 .right {
 	float: right;
 }
+
 #nodeDades .form-group {
 	margin-bottom: 6px;
 }
+
 #nodeDades input.form-control {
 	width: 322px;
 }
+
 #nodeDades input.multiple {
-	width: 280px; !important
+	width: 280px;
+	!
+	important
 }
+
 #colInfo {
 	padding-left: 0;
 }
+
 #colContent {
 	padding-right: 0;
 }
+
 #alerta-no-agafat {
 	margin-bottom: 15px;
 }
+
 #contenidor-info {
 	margin-bottom: 0;
 }
+
 #contenidor-info h3 {
 	padding-bottom: 6px;
 }
@@ -391,8 +435,8 @@ $(document).ready(function() {
 	<div>
 		<c:set var="contingutClass">col-md-12</c:set>
 		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
-			<c:set var="contingutClass">col-md-9</c:set>
-			<div class="col-md-3" id="colInfo">
+			<c:set var="contingutClass">col-md-9 col-sm-8</c:set>
+			<div class="col-md-3 col-sm-4" id="colInfo">
 				<%--                    --%>
 				<%-- Columna informació --%>
 				<%--                    --%>
@@ -414,7 +458,7 @@ $(document).ready(function() {
 								</c:otherwise>
 							</c:choose>
 						</dt>
-						<dd>${contingut.nom}</dd>
+						<dd class="ellipsis">${contingut.nom}</dd>
 						<dt><spring:message code="contingut.info.tipus"/></dt>
 						<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
 						<c:if test="${contingut.expedient}">
@@ -486,17 +530,21 @@ $(document).ready(function() {
 						<ul class="list-unstyled">
 							<c:forEach var="expedientRelacionat" items="${relacionats}">
 								<c:if test="${!expedientRelacionat.esborrat}">
-									<li>
-										<span class="fa ${iconaExpedientObert}"></span>
-										<a href="${expedientRelacionat.id}">
-											[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] 
-											${expedientRelacionat.nom} 
-										</a>
-										<c:if test="${potModificarContingut}">
-											<a href="<c:url value="/expedient/${contingut.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
-												<span class="fa fa-trash-o"></span>
-											</a> 
-										</c:if>
+									<li style="font-size:14px; line-height: 25px;">
+										<span style="width:10%" class="fa ${iconaExpedientObert}"></span>
+										<span style="width:76%" class="ellipsis">
+											<a href="${expedientRelacionat.id}">
+												[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] 
+												${expedientRelacionat.nom} 
+											</a>
+										</span>
+										 <span style="width:10%; height: 16px;" class="align-right qqq">
+											<c:if test="${potModificarContingut}">
+												<a href="<c:url value="/expedient/${contingut.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
+													<span class="fa fa-trash-o"></span>
+												</a> 
+											</c:if>										 
+								        </span>	
 									</li>
 								</c:if>
 							</c:forEach>

@@ -331,15 +331,17 @@ public class ExpedientController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse relacioDatatable(
 			HttpServletRequest request,
+			@PathVariable Long expedientId,
 			ExpedientFiltreCommand filtre,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				expedientService.findAmbFiltreUser(
+				expedientService.findAmbFiltreNoRelacionat(
 						entitatActual.getId(), 
 						ExpedientFiltreCommand.asDto(filtre), 
+						expedientId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
 	}
 

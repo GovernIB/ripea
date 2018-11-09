@@ -335,4 +335,9 @@ public interface ExpedientService {
 			Collection<Long> expedientIds,
 			String format) throws IOException, NotFoundException;
 
+	@PreAuthorize("hasRole('tothom')")
+	PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
+			Long entitatId, ExpedientFiltreDto filtre, Long expedientId,
+			PaginacioParamsDto paginacioParams);
+
 }
