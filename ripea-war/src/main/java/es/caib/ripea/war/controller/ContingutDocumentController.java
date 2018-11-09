@@ -38,11 +38,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -128,7 +129,9 @@ public class ContingutDocumentController extends BaseUserController {
 					contingutId,
 					false,
 					false);
-			if (contingut.getExpedientPare() != null) {
+			if (contingut.isExpedient()) {
+				command.setNtiOrgano(((ExpedientDto)contingut).getNtiOrgano());
+			} else if (contingut.getExpedientPare() != null) {
 				command.setNtiOrgano(contingut.getExpedientPare().getNtiOrgano());
 			}
 			omplirModelFormulari(

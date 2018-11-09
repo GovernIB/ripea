@@ -415,14 +415,15 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:if test="${not empty expedientPare.agafatPer}">
+	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer}">
 		<div class="text-right" data-toggle="botons-titol">
-			<c:choose>
+			<%--c:choose>
 				<c:when test="${not empty contingut.pare}"><c:url var="botoTornarUrl" value="/contingut/${contingut.pare.id}"/><c:set var="botoTornarIcon" value="level-up"/></c:when>
 				<c:otherwise><c:url var="botoTornarUrl" value="/expedient"/><c:set var="botoTornarIcon" value="close"/></c:otherwise>
 			</c:choose>
 			<a href="${botoTornarUrl}" class="btn btn-default pull-right">
-				<span class="fa fa-${botoTornarIcon}"></span></a>
+				<span class="fa fa-${botoTornarIcon}"></span>
+			</a--%>
 			<ul class="list-group pull-right">
 	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
 	  				<spring:message code="contingut.info.agafat.per"/>:

@@ -197,9 +197,6 @@ $(document).ready(function() {
 											<c:when test="${moviment.origen.expedient}"><spring:message code="contingut.tipus.enum.EXPEDIENT"/></c:when>
 											<c:when test="${moviment.origen.carpeta}"><spring:message code="contingut.tipus.enum.CARPETA"/></c:when>
 											<c:when test="${moviment.origen.document}"><spring:message code="contingut.tipus.enum.DOCUMENT"/></c:when>
-											<c:when test="${moviment.origen.escriptori}"><spring:message code="contingut.tipus.enum.ESCRIPTORI"/></c:when>
-											<c:when test="${moviment.origen.arxiv}"><spring:message code="contingut.tipus.enum.ARXIU"/></c:when>
-											<c:when test="${moviment.origen.bustia}"><spring:message code="contingut.tipus.enum.BUSTIA"/></c:when>
 										</c:choose>#${moviment.origen.id}
 									</c:if>
 								</td>
@@ -208,9 +205,6 @@ $(document).ready(function() {
 										<c:when test="${moviment.desti.expedient}"><spring:message code="contingut.tipus.enum.EXPEDIENT"/></c:when>
 										<c:when test="${moviment.desti.carpeta}"><spring:message code="contingut.tipus.enum.CARPETA"/></c:when>
 										<c:when test="${moviment.desti.document}"><spring:message code="contingut.tipus.enum.DOCUMENT"/></c:when>
-										<c:when test="${moviment.desti.escriptori}"><spring:message code="contingut.tipus.enum.ESCRIPTORI"/></c:when>
-										<c:when test="${moviment.desti.arxiv}"><spring:message code="contingut.tipus.enum.ARXIU"/></c:when>
-										<c:when test="${moviment.desti.bustia}"><spring:message code="contingut.tipus.enum.BUSTIA"/></c:when>
 									</c:choose>#${moviment.desti.id}
 								</td>
 								<td>${moviment.comentari}</td>
