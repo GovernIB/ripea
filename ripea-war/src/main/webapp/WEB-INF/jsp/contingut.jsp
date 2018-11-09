@@ -446,8 +446,8 @@ $(document).ready(function() {
 	<div>
 		<c:set var="contingutClass">col-md-12</c:set>
 		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
-			<c:set var="contingutClass">col-md-9 col-sm-8</c:set>
-			<div class="col-md-3 col-sm-4" id="colInfo">
+			<c:set var="contingutClass">${isContingutDetail ? 'col-md-8' : 'col-md-9'} col-sm-8</c:set>
+			<div class="${isContingutDetail ? 'col-md-4' : 'col-md-3'} col-sm-4" id="colInfo">
 				<%--                    --%>
 				<%-- Columna informació --%>
 				<%--                    --%>
