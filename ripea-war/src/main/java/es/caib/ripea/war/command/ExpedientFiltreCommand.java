@@ -28,7 +28,7 @@ public class ExpedientFiltreCommand {
 	private Date dataTancatInici;
 	private Date dataTancatFi;
 	private boolean meusExpedients;
-	private String search;
+
 	private Long tipusId;
 
 	public Long getArxiuId() {
@@ -91,12 +91,6 @@ public class ExpedientFiltreCommand {
 	}
 	public void setMeusExpedients(boolean meusExpedients) {
 		this.meusExpedients = meusExpedients;
-	}
-	public String getSearch() {
-		return search;
-	}
-	public void setSearch(String search) {
-		this.search = search;
 	}
 	public Long getTipusId() {
 		return tipusId;
