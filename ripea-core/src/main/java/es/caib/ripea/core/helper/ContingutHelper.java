@@ -236,6 +236,18 @@ public class ContingutHelper {
 		resposta.setEsborrat(contingut.getEsborrat());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
+		if (contingut.getExpedient() != null) {
+			resposta.setExpedientPare(
+					(ExpedientDto)toContingutDto(
+							contingut.getExpedient(),
+							ambPermisos,
+							false,
+							false,
+							false,
+							false,
+							false,
+							false));
+		}
 		resposta.setEntitat(
 				conversioTipusHelper.convertir(
 						contingut.getEntitat(),
@@ -307,7 +319,7 @@ public class ContingutHelper {
 						fillPath.addAll(resposta.getPath());
 					fillPath.add(toContingutDto(
 							contingut,
-							false,
+							ambPermisos,
 							false,
 							false,
 							false,

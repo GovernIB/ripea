@@ -1407,6 +1407,16 @@ public class PluginHelper {
 		accioParams.put(
 				"dataCaducitat",
 				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
+		accioParams.put("documentTipus", documentTipus);
+		if (responsables != null) {
+			accioParams.put("responsables", Arrays.toString(responsables));
+		}
+		if (fluxTipus != null) {
+			accioParams.put("fluxTipus", fluxTipus.toString());
+		}
+		if (fluxId != null) {
+			accioParams.put("fluxId", fluxId);
+		}
 		long t0 = System.currentTimeMillis();
 		if (annexos != null) {
 			StringBuilder annexosIds = new StringBuilder();

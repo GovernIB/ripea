@@ -177,6 +177,19 @@ public interface MetaDocumentService {
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
+	 * Llistat paginat amb tots els meta-documents de l'entitat.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @return La llista de meta-documents.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<MetaDocumentDto> findByEntitat(
+			Long entitatId) throws NotFoundException;
+
+	/**
 	 * Retorna la plantilla asociada al meta-document.
 	 * 
 	 * @param entitatId

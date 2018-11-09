@@ -1437,7 +1437,6 @@ public class ContingutServiceImpl implements ContingutService {
 									true,
 									true,
 									false);
-							dto.setPerConvertirJson(true);
 							return dto;
 						}
 					});
