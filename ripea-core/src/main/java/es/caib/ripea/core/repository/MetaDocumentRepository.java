@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 
@@ -36,5 +37,8 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 
 	List<MetaDocumentEntity> findByMetaExpedientIdIn(
 			List<Long> metaExpedientIds);
+
+	List<MetaDocumentEntity> findByEntitat(
+			EntitatEntity entitat);
 
 }

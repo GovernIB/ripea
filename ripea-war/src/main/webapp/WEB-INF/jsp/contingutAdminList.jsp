@@ -47,7 +47,7 @@ $(document).ready(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
 		} else if (tipus == 'DOCUMENT') {
-			$.get("<c:url value="/metaDocument/findAll"/>")
+			$.get("<c:url value="/metaExpedient/metaDocument/findAll"/>")
 			.done(metaNodeRefresh)
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
@@ -116,20 +116,20 @@ $(document).ready(function() {
 						{{if esborrat}}<span class="fa fa-trash-o pull-right" title="<spring:message code="contingut.admin.columna.esborrat"/>"></span>{{/if}}
 					</script>
 				</th>
-				<%--th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.metanode"/></th--%>
+				<th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.metanode"/></th>
 				<th data-col-name="createdBy.nom" width="10%"><spring:message code="contingut.admin.columna.creat.per"/></th>
 				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.creat.el"/></th>
-				<%--th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false" width="30%">
+				<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false" width="30%">
 					<spring:message code="contingut.admin.columna.situacio"/>
 					<script id="cellPathTemplate" type="text/x-jsrender">
-						{{for path}}/
+						{{if path}}{{for path}}/
 							{{if expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
 							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
 							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>{{/if}}
 							{{:nom}}
-						{{/for}}
+						{{/for}}{{/if}}
 					</script>
-				</th--%>
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

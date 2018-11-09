@@ -196,4 +196,13 @@ public class MetaDocumentController extends BaseAdminController {
 				"metadocument.controller.esborrat.ok");
 	}
 
+	@RequestMapping(value = "/metaDocument/findAll", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaDocumentDto> findAll(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaDocumentService.findByEntitat(entitatActual.getId());
+	}
+
 }

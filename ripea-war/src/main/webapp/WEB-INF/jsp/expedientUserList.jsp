@@ -251,11 +251,7 @@ function getCookie(cname) {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualDelete}}
-									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-								{{/if}}
 								{{if metaNode.usuariActualWrite}}
-									<li role="separator" class="divider"></li>
 									{{if !agafat}}
 										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
@@ -266,12 +262,8 @@ function getCookie(cname) {
 										{{/if}}
 									{{/if}}
 								{{/if}}
-								<li role="separator" class="divider"></li>
-								<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-								{{if conteDocumentsFirmats}}
-									<li><a href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-								{{else}}
-									<li class="disabled"><a><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+								{{if metaNode.usuariActualDelete}}
+									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 							</ul>
 						</div>

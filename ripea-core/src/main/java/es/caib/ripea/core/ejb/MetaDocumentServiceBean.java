@@ -132,6 +132,13 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<MetaDocumentDto> findByEntitat(
+			Long entitatId) throws NotFoundException {
+		return delegate.findByEntitat(entitatId);
+	}
+
+	@Override
 	@RolesAllowed({"IPA_ADMIN", "tothom"})
 	public FitxerDto getPlantilla(
 			Long entitatId,

@@ -45,7 +45,6 @@ public class ContenidorExploradorController extends BaseUserController {
 				true,
 				false);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
-		contenidor.setPerConvertirJson(true);
 		return contenidor;
 	}
 

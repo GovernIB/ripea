@@ -5,10 +5,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<c:set var="expedientPare" value="${contingut.expedientPare}"/>
+<c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
 <c:set var="potModificarContingut" value="${false}"/>
-<c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty contingut.metaNode or contingut.metaNode.usuariActualWrite}"/></c:if>
+<c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty expedientPare.metaNode or expedientPare.metaNode.usuariActualWrite}"/></c:if>
 <c:set var="expedientAgafatPerUsuariActual" value="${false}"/>
-<c:if test="${contingut.expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientAgafatPerUsuariActual" value="${true}"/></c:if>
+<c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -400,7 +402,6 @@ $(document).ready(function() {
 	$('form#nodeDades td .form-group').on('clone.multifield', function(event, clon) {
 		$('input', clon).change(nodeDadesInputChange);
 	});
-	
 	if(${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
 		$('#registres').addClass( "active in" );
@@ -414,12 +415,21 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:if test="${not empty contingut.expedientPare.agafatPer}">
+	<c:if test="${not empty expedientPare.agafatPer}">
 		<div class="text-right" data-toggle="botons-titol">
-			<ul class="list-group">
-	  			<li class="list-group-item" style="padding: 6px 12px">
+			<c:choose>
+				<c:when test="${not empty contingut.pare}"><c:url var="botoTornarUrl" value="/contingut/${contingut.pare.id}"/><c:set var="botoTornarIcon" value="level-up"/></c:when>
+				<c:otherwise><c:url var="botoTornarUrl" value="/expedient"/><c:set var="botoTornarIcon" value="close"/></c:otherwise>
+			</c:choose>
+			<a href="${botoTornarUrl}" class="btn btn-default pull-right">
+				<span class="fa fa-${botoTornarIcon}"></span></a>
+			<ul class="list-group pull-right">
+	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
 	  				<spring:message code="contingut.info.agafat.per"/>:
-	  				${contingut.expedientPare.agafatPer.nom}
+	  				${expedientPare.agafatPer.nom}&nbsp;
+	  				<c:if test="${expedientAgafatPerUsuariActual}">
+	  					<a href="<c:url value="/expedient/${expedientPare.id}/alliberar"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
+	  				</c:if>
 	  			</li>
 	  		</ul>
 		</div>
@@ -428,7 +438,7 @@ $(document).ready(function() {
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
 			<span class="fa fa-info-circle"></span>
 			<spring:message code="contingut.alerta.no.agafat"/>
-			<a href="<c:url value="../expedient/${contingut.expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
+			<a href="<c:url value="../expedient/${expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
 	<rip:blocContenidorPath contingut="${contingut}"/>
@@ -551,7 +561,7 @@ $(document).ready(function() {
 						</ul>
 					</c:if>
 				    <c:if test="${!isContingutDetail}">
-				      	<rip:blocContenidorAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
+				      	<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
 				    </c:if>    
 				</div>
 				<%--                     --%>
@@ -752,10 +762,10 @@ $(document).ready(function() {
 							</div>
 							<c:choose>
 							    <c:when test="${isContingutDetail}">
-							      	<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/>
+							      	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/>
 							    </c:when>    
 							    <c:otherwise>
-							    	<rip:blocContenidorContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							    	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
 							    </c:otherwise>
 							</c:choose>								
 							
@@ -798,23 +808,23 @@ $(document).ready(function() {
 											<tr>
 												<td>${metaDada.nom}</td>
 												<td>
-													<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
-														<label class="hidden" for="${metaDada.codi}"></label>
-														<div>
-															<c:choose>
-																<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+													<c:choose>
+														<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+															<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
+																<label class="hidden" for="${metaDada.codi}"></label>
+																<div>
 																	<c:choose>
-																		<c:when test="${metaDada.tipus == 'DATA'}">
-																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
-																		</c:when>
-																		<c:when test="${metaDada.tipus == 'IMPORT'}">
-																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
-																		</c:when>
 																		<c:when test="${metaDada.tipus == 'SENCER'}">
 																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
 																		</c:when>
 																		<c:when test="${metaDada.tipus == 'FLOTANT'}">
 																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+																		</c:when>
+																		<c:when test="${metaDada.tipus == 'IMPORT'}">
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+																		</c:when>
+																		<c:when test="${metaDada.tipus == 'DATA'}">
+																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
 																		</c:when>
 																		<c:when test="${metaDada.tipus == 'BOOLEA'}">
 																			<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
@@ -823,14 +833,20 @@ $(document).ready(function() {
 																			<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
 																		</c:otherwise>
 																	</c:choose>
+																	<span class="" aria-hidden="true"></span>
+																</div>
+															</div>
+														</c:when>
+														<c:otherwise>
+															<%--c:choose>
+																<c:when test="${metaDada.tipus == 'SENCER' or metaDada.tipus == 'FLOTANT' or metaDada.tipus == 'IMPORT'}">
+																	<div class="text-right">${dadaValor}</div>
 																</c:when>
-																<c:otherwise>
-																	<rip:inputFixed>${dadaValor}</rip:inputFixed>
-																</c:otherwise>
-															</c:choose>
-															<span class="" aria-hidden="true"></span>
-														</div>
-													</div>
+																<c:otherwise>${dadaValor}</c:otherwise>
+															</c:choose--%>
+															${dadaValor}
+														</c:otherwise>
+													</c:choose>
 												</td>
 											</tr>
 										</c:forEach>

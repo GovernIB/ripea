@@ -90,6 +90,14 @@ $(document).ready(function() {
 		$("#taulaDades_wrapper .col-md-9").removeClass('col-md-9');
 
 
+		$( "tbody td:nth-child(2)" ).css({ 
+		    "max-width": "20px",
+		    "overflow": "hidden",
+		    "text-overflow": "ellipsis",
+		    "white-space": "nowrap"
+		})
+
+
 	});
 
 	$('#meusExpedientsBtn').click(function() {

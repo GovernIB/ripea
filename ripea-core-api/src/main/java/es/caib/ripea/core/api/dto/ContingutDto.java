@@ -21,6 +21,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected String nom;
 	protected List<ContingutDto> fills;
 	protected List<ContingutDto> path;
+	protected ExpedientDto expedientPare;
 	protected EntitatDto entitat;
 	protected int esborrat;
 	protected String arxiuUuid;
@@ -29,7 +30,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected UsuariDto darrerMovimentUsuari;
 	protected String darrerMovimentComentari;
 	private boolean alerta;
-	protected boolean perConvertirJson;
 
 	public Long getId() {
 		return id;
@@ -57,6 +57,12 @@ public abstract class ContingutDto extends AuditoriaDto {
 	}
 	public EntitatDto getEntitat() {
 		return entitat;
+	}
+	public void setExpedientPare(ExpedientDto expedientPare) {
+		this.expedientPare = expedientPare;
+	}
+	public ExpedientDto getExpedientPare() {
+		return expedientPare;
 	}
 	public void setEntitat(EntitatDto entitat) {
 		this.entitat = entitat;
@@ -96,17 +102,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 	}
 	public void setDarrerMovimentComentari(String darrerMovimentComentari) {
 		this.darrerMovimentComentari = darrerMovimentComentari;
-	}
-	public boolean isPerConvertirJson() {
-		return perConvertirJson;
-	}
-	public void setPerConvertirJson(boolean perConvertirJson) {
-		this.perConvertirJson = perConvertirJson;
-		if (fills != null) {
-			for (ContingutDto fill: fills) {
-				fill.setPerConvertirJson(perConvertirJson);
-			}
-		}
 	}
 
 	public ContingutDto getPare() {
@@ -168,25 +163,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 		} else {
 			return getPathAsStringExplorador() + " / " + nom;
 		}
-	}
-
-	public ExpedientDto getExpedientPare() {
-		if (this instanceof ExpedientDto) {
-			if (perConvertirJson)
-				return (ExpedientDto)copiarContenidor(this);
-			else
-				return (ExpedientDto)this;
-		}
-		if (getPath() == null) {
-			return null;
-		}
-		for (int i = getPath().size() - 1; i >= 0; i--) {
-			ContingutDto contenidor = getPath().get(i);
-			if (contenidor instanceof ExpedientDto) {
-				return (ExpedientDto)contenidor;
-			}
-		}
-		return null;
 	}
 
 	public List<ExpedientDto> getFillsExpedients() {

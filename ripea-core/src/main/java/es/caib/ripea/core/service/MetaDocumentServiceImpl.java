@@ -286,25 +286,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}
 
-//	@Transactional(readOnly = true)
-//	@Override
-//	public List<MetaDocumentDto> findByMetaExpedient(
-//			Long entitatId,
-//			Long metaExpedientId) {
-//		logger.debug("Consulta de tots els meta-documents del meta-expedient (" +
-//				"entitatId=" + entitatId + ", " +
-//				"metaExpedientId=" + metaExpedientId + ")");
-//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-//				entitatId,
-//				false,
-//				true,
-//				false);
-//		return conversioTipusHelper.convertirList(
-//				metaDocumentRepository.findByEntitatOrderByNomAsc(
-//						entitat),
-//						MetaDocumentDto.class);
-//	}
-
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
@@ -344,25 +325,21 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}
 
-//	@Transactional(readOnly=true)
-//	@Override
-//	public List<MetaDocumentDto> findByMetaExpedientAndActiveTrue(
-//			Long entitatId,
-//			Long metaExpedientId) {
-//		logger.debug("Consulta dels meta-documents actius del meta-expedient (" +
-//				"entitatId=" + entitatId + ", " +
-//				"metaExpedientId=" + metaExpedientId + ")");
-//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-//				entitatId,
-//				false,
-//				true,
-//				false);
-//		return conversioTipusHelper.convertirList(
-//				metaDocumentRepository.findByEntitatAndActiuTrueAndGlobalsOrderByNomAsc(
-//						entitat,
-//						incloureGlobalsExpedient),
-//						MetaDocumentDto.class);
-//	}
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaDocumentDto> findByEntitat(
+			Long entitatId) {
+		logger.debug("Consulta dels meta-documents de l'entitat (" +
+				"entitatId=" + entitatId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		return conversioTipusHelper.convertirList(
+				metaDocumentRepository.findByEntitat(entitat),
+				MetaDocumentDto.class);
+	}
 
 	@Transactional(readOnly = true)
 	@Override
