@@ -215,11 +215,11 @@ public class DocumentServiceImpl implements DocumentService {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
-		contingutHelper.comprovarNomValid(
-				entity.getPare(),
-				document.getNom(),
-				id,
-				DocumentEntity.class);
+//		contingutHelper.comprovarNomValid(
+//				entity.getPare(),
+//				document.getNom(),
+//				id,
+//				DocumentEntity.class);
 		cacheHelper.evictErrorsValidacioPerNode(entity);
 		String nomOriginal = entity.getNom();
 		entity.update(
@@ -250,9 +250,11 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 		DocumentDto dto = toDocumentDto(entity);
-		contingutHelper.arxiuPropagarModificacio(
-				entity,
-				fitxer);
+		if (fitxer != null) {
+			contingutHelper.arxiuPropagarModificacio(
+					entity,
+					fitxer);
+		}
 		return dto;
 	}
 

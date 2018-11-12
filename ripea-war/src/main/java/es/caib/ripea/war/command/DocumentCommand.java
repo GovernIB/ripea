@@ -30,7 +30,7 @@ import es.caib.ripea.war.validation.NomDocumentNoRepetit;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@NomDocumentNoRepetit(groups = {CreateDigital.class, UpdateDigital.class, CreateFisic.class, UpdateFisic.class})
+@NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class})
 @DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
 public class DocumentCommand extends ContenidorCommand {
 

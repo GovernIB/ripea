@@ -103,7 +103,7 @@ $(document).ready(function() {
 				<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true"/>
 				<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
 				<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
-				<c:if test="${empty documentCommand.id}">
+
 					<rip:inputRadio name="origen" textKey="contingut.document.form.camp.origen" botons="true" optionItems="${digitalOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 					<div id="input-origen-arxiu" class="hidden">
 						<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
@@ -119,7 +119,7 @@ $(document).ready(function() {
 		    				</div>
 						</rip:inputFixed>
 					</div>
-				</c:if>
+			
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades_nti">
 				<rip:inputDate name="dataCaptura" textKey="contingut.document.form.camp.nti.datacap" required="true"/>
