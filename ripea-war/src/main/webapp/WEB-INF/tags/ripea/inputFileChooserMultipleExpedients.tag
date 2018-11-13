@@ -35,12 +35,12 @@
 		<c:if test="${required}">*</c:if>
 	</label>
 	<div class="controls col-xs-${campInputSize}">
-		<div id="file-chooser-${campPath}-input" class="input-group">
+		<div id="file-chooser-input" class="input-group">
 			<form:hidden path="${campPath}" id="${campPath}" disabled="${disabled}"/>
-			<div id="file-chooser-${campPath}-panel" class="panel panel-default">
-				<div id="file-chooser-${campPath}-path" class="panel-heading"></div>
-				<div id="file-chooser-${campPath}-content" class="panel-body"></div>
-			</div>
+<%-- 			<div id="file-chooser-panel" class="panel panel-default"> --%>
+<%-- 				<div id="file-chooser-path" class="panel-heading"></div> --%>
+<%-- 				<div id="file-chooser-content" class="panel-body"></div> --%>
+<!-- 			</div>		 -->
 		</div>
 		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 	</div>
@@ -70,11 +70,19 @@ function refrescarFileChooser(campPath, contenidorId) {
 		url: '<c:url value="/contenidor/exploraAllWithSameExpedientType/${contenidorBaseId}/"/>' + contenidorId, // returns container with given contenidorId
 		async: false,
 		timeout: 20000,
-		success: function(data) { //returns container of the given element (it returns the folder in which document is situated and if there is no parent folder it returns expedient)
+		success: function(dataTable) { //returns container of the given element (it returns the folder in which document is situated and if there is no parent folder it returns expedient)
 			var ocultarExpedients = <c:choose><c:when test="${ocultarExpedients}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarCarpetes = <c:choose><c:when test="${ocultarCarpetes}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
-			$("input#" + campPath).val(data.id);
+
+			
+		//	$("input#" + campPath).val(data.id);
+		
+		
+		
+		$.each(dataTable, function( key, data ) {
+  
+
 			
 			// SETTING PATH IN THE PANEL HEADER
 			var path = "";
@@ -89,36 +97,67 @@ function refrescarFileChooser(campPath, contenidorId) {
 				path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
 				path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
 			}
-			$("#file-chooser-" + campPath + "-path").html(path);
+
+
+			$("#file-chooser-input").append('<div id="file-chooser-panel-'+data.id+'" class="panel panel-default"></div>');
+
+			<%-- 			<div id="file-chooser-panel" class="panel panel-default"> --%>
+			<%-- 				<div id="file-chooser-path" class="panel-heading"></div> --%>
+			<%-- 				<div id="file-chooser-content" class="panel-body"></div> --%>
+			<%-- 			</div>		  --%>
+
+			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-path-'+data.id+'" class="panel-heading"></div>');
+			$("#file-chooser-path-"+data.id).html('');
+			$("#file-chooser-path-"+data.id).append(path);
+			
+
+
+			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-content-'+data.id+'" class="panel-heading"></div>');
+			
+
 
 			// SETTING CONTENT IN THE PANEL BODY
-			$("#file-chooser-" + campPath + "-content").html('');
-			$('<div class="list-group">').appendTo("#file-chooser-" + campPath + "-content");
-			if (data.id != '${contenidorBaseId}')
-				$('<a href="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-" + campPath + "-content");
-			for (var i = 0; i < data.fills.length; i++) {
-				var ocultar = (data.fills[i].expedient && ocultarExpedients) || (data.fills[i].carpeta && ocultarCarpetes) || (data.fills[i].document && ocultarDocuments);
-				if (!ocultar && data.fills[i].id != '${contingutOrigen.id}') {
-					var htmlIcona = '';
-					if (data.fills[i].expedient)
-						htmlIcona += '<span class="fa fa-briefcase"></span> ';
-					if (data.fills[i].carpeta)
-						htmlIcona += '<span class="fa fa-folder"></span> ';
-					else if (data.fills[i].document)
-						htmlIcona += '<span class="fa fa-file"></span> ';
-					if ((data.fills[i].expedient || data.fills[i].carpeta) && data.fills[i].id != '${contingutOrigen.id}')
-						$('<a href="' + data.fills[i].id + '" class="list-group-item">' + htmlIcona + data.fills[i].nom + '</a>').appendTo("#file-chooser-" + campPath + "-content");
-					else
-						$('<div class="list-group-item text-muted" style="border:none">' + htmlIcona + data.fills[i].nom + '</div>').appendTo("#file-chooser-" + campPath + "-content");
+			$("#file-chooser-content-"+data.id).html('');
+			$('<div class="list-group">').appendTo("#file-chooser-content"+data.id);
+			if (!data.expedient){
+				$('<a href="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
+			}
+			if(data.fills){
+				for (var i = 0; i < data.fills.length; i++) {
+					var ocultar = (data.fills[i].expedient && ocultarExpedients) || (data.fills[i].carpeta && ocultarCarpetes) || (data.fills[i].document && ocultarDocuments);
+					if (!ocultar && data.fills[i].id != '${contingutOrigen.id}') {
+						var htmlIcona = '';
+						if (data.fills[i].expedient)
+							htmlIcona += '<span class="fa fa-briefcase"></span> ';
+						if (data.fills[i].carpeta)
+							htmlIcona += '<span class="fa fa-folder"></span> ';
+						else if (data.fills[i].document)
+							htmlIcona += '<span class="fa fa-file"></span> ';
+						if ((data.fills[i].expedient || data.fills[i].carpeta) && data.fills[i].id != '${contingutOrigen.id}')
+							$('<a href="' + data.fills[i].id + '" class="list-group-item">' + htmlIcona + data.fills[i].nom + '</a>').appendTo("#file-chooser-content-"+data.id);
+						else
+							$('<div class="list-group-item text-muted" style="border:none">' + htmlIcona + data.fills[i].nom + '</div>').appendTo("#file-chooser-content-"+data.id);
+					}
 				}
 			}
-			$('</div>').appendTo("#file-chooser-" + campPath + "-content");
+			$('</div>').appendTo("#file-chooser-content-"+data.id);
 
+
+			
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
 			$('#file-chooser-' + campPath + '-content a').click(function() {
 				refrescarFileChooser(campPath, $(this).attr('href'));
 				return false;
 			});
+
+
+
+
+			
+
+
+		});
+			
 			webutilModalAdjustHeight();
 		},
 		error: function(xhr, textStatus, errorThrown) {
