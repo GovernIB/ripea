@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
@@ -341,6 +342,7 @@ public interface ExpedientService {
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId);
+	List<ContingutDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId);
+
 
 }

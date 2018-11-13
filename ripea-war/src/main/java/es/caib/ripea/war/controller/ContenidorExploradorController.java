@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +58,7 @@ public class ContenidorExploradorController extends BaseUserController {
 	
 	@RequestMapping(value = "/exploraAllWithSameExpedientType/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ContingutDto getAllWithTheSameType(
+	public List<ContingutDto> getAllWithTheSameType(
 			HttpServletRequest request,
 			@PathVariable Long contenidorArrelId,
 			@PathVariable Long contenidorId,
@@ -80,18 +81,23 @@ public class ContenidorExploradorController extends BaseUserController {
 			metaExpedientId = exp.getMetaNode().getId();
 		}
 		
-		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId);
-		
-//		expedients.remove(exp);
-//		for(ExpedientDto expedient: expedients){
-//			
-//		}
-//		expedien
-//		expedients.add
+		List<ContingutDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId);
 		
 		
+		List<ContingutDto> expedientsReplaced = new ArrayList<>();
 		
-		return contenidor;
+		
+		for(ContingutDto expedient: expedients){
+			if(!expedient.getId().equals(exp.getId())){
+				expedientsReplaced.add(expedient);
+			} else {
+				expedientsReplaced.add(contenidor);
+			}
+		}
+
+		
+		
+		return expedientsReplaced;
 	}
 
 }

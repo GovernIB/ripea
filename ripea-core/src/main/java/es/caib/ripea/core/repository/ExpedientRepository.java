@@ -199,8 +199,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    ExpedientEntity e " +
 			"where " +
 			"    e.entitat = :entitat " +
-			"and e.metaNode = :metaNode)")
-	List<ExpedientEntity> findByEntitatAndMetaExpedient(
+			"and e.metaNode = :metaNode "
+			+ "and e != :expedient)")
+	List<ExpedientEntity> findByEntitatAndMetaExpedientWithoutGivenExp(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNode") MetaNodeEntity metaNode);
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("expedient") ExpedientEntity expedient);
 }

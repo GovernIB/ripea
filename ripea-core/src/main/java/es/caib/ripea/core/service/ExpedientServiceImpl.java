@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -330,7 +331,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 	@Transactional
 	@Override
-	public List<ExpedientDto> findByEntitatAndMetaExpedient(
+	public List<ContingutDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {
 		logger.debug("Consultant els expedients("
@@ -351,21 +352,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-
 		
-		List<ExpedientEntity> expedientsEnt = expedientRepository.findByEntitatAndMetaExpedient(
+		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(
 				entitat, 
 				metaExpedient);
-		
-		List<ExpedientDto> expedientsDto = new ArrayList<>(); 
-		for(ExpedientEntity exp: expedientsEnt){
-			expedientsDto.add(toExpedientDto(
+
+		List<ContingutDto> expedientsDto = new ArrayList<>(); 
+		for(ContingutEntity exp: expedientsEnt){
+			expedientsDto.add(contingutHelper.toContingutDto(
 					exp,
-					true));
+					true,
+					false,
+					false,
+					false,
+					true,
+					false,
+					false));
 		}
 		
 		return expedientsDto;
-		
 	}
 	
 
