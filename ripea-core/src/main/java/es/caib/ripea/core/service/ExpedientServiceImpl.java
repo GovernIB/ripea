@@ -325,6 +325,49 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientId);
 	}
 	
+	
+	
+	
+	@Transactional
+	@Override
+	public List<ExpedientDto> findByEntitatAndMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		logger.debug("Consultant els expedients("
+				+ "entitatId=" + entitatId + ", "
+				+ "metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = null;
+		if (metaExpedientId != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					false,
+					true,
+					false,
+					false);
+		}
+
+		
+		List<ExpedientEntity> expedientsEnt = expedientRepository.findByEntitatAndMetaExpedient(
+				entitat, 
+				metaExpedient);
+		
+		List<ExpedientDto> expedientsDto = new ArrayList<>(); 
+		for(ExpedientEntity exp: expedientsEnt){
+			expedientsDto.add(toExpedientDto(
+					exp,
+					true));
+		}
+		
+		return expedientsDto;
+		
+	}
+	
 
 	@Transactional(readOnly = true)
 	@Override

@@ -201,4 +201,17 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.findPerUserAndTipus(entitatId, metaExpedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")	
+	public PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(Long entitatId, ExpedientFiltreDto filtre,
+			Long expedientId, PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltreNoRelacionat(entitatId, filtre, expedientId, paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("tothom")	
+	public List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId) {
+		return delegate.findByEntitatAndMetaExpedient(entitatId, metaExpedientId);
+	}
+
 }

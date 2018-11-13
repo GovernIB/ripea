@@ -67,7 +67,7 @@ String.prototype.replaceAll = function(search, replacement) {
 function refrescarFileChooser(campPath, contenidorId) {
 	$.ajax({
 		type: "GET",
-		url: '<c:url value="/contenidor/explora/${contenidorBaseId}/"/>' + contenidorId, // returns container with given contenidorId
+		url: '<c:url value="/contenidor/exploraAllWithSameExpedientType/${contenidorBaseId}/"/>' + contenidorId, // returns container with given contenidorId
 		async: false,
 		timeout: 20000,
 		success: function(data) { //returns container of the given element (it returns the folder in which document is situated and if there is no parent folder it returns expedient)
@@ -76,13 +76,12 @@ function refrescarFileChooser(campPath, contenidorId) {
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			$("input#" + campPath).val(data.id);
 			
-			// SEETING PATH IN THE PANEL HEADER
+			// SETTING PATH IN THE PANEL HEADER
 			var path = "";
-			if (data.id == '${contenidorBaseId}') { // if the returned container is the root container
-				if (data.expedient) { // if it is an expedient
-					path += '<span class="fa fa-desktop"></span> Expedient: ';
-					path += data.nom;
-				}
+			if (data.expedient) { // if it is an expedient
+				path += '<span class="fa fa-desktop"></span> Expedient: ';
+				path += data.nom;
+			
 			} else {  
 				path += data.pathAsStringExploradorAmbNom;
 				path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Expedient');
@@ -92,7 +91,7 @@ function refrescarFileChooser(campPath, contenidorId) {
 			}
 			$("#file-chooser-" + campPath + "-path").html(path);
 
-			// SEETING CONTENT IN THE PANEL BODY
+			// SETTING CONTENT IN THE PANEL BODY
 			$("#file-chooser-" + campPath + "-content").html('');
 			$('<div class="list-group">').appendTo("#file-chooser-" + campPath + "-content");
 			if (data.id != '${contenidorBaseId}')

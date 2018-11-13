@@ -340,4 +340,7 @@ public interface ExpedientService {
 			Long entitatId, ExpedientFiltreDto filtre, Long expedientId,
 			PaginacioParamsDto paginacioParams);
 
+	@PreAuthorize("hasRole('tothom')")
+	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId);
+
 }

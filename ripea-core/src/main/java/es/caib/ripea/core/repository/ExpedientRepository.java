@@ -191,4 +191,16 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode);
+	
+	
+	@Query(	"select" +
+			"    e " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.metaNode = :metaNode)")
+	List<ExpedientEntity> findByEntitatAndMetaExpedient(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaNode") MetaNodeEntity metaNode);
 }

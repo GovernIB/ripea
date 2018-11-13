@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.ExpedientService;
 
 /**
  * Controlador per a navegar pels contenidors.
@@ -28,6 +32,8 @@ public class ContenidorExploradorController extends BaseUserController {
 
 	@Autowired
 	private ContingutService contenidorService;
+	@Autowired
+	private ExpedientService expedientService;
 
 
 
@@ -45,6 +51,46 @@ public class ContenidorExploradorController extends BaseUserController {
 				true,
 				false);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
+		return contenidor;
+	}
+	
+	
+	@RequestMapping(value = "/exploraAllWithSameExpedientType/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ContingutDto getAllWithTheSameType(
+			HttpServletRequest request,
+			@PathVariable Long contenidorArrelId,
+			@PathVariable Long contenidorId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contenidor = contenidorService.findAmbIdUser(
+				entitatActual.getId(),
+				contenidorId,
+				true,
+				false);
+		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
+		
+		Long metaExpedientId;
+		ExpedientDto exp;
+		if(contenidor.isExpedient()){
+			exp = (ExpedientDto) contenidor; 
+			metaExpedientId = exp.getMetaNode().getId();
+		} else {
+			exp = (ExpedientDto) contenidor.getExpedientPare(); 
+			metaExpedientId = exp.getMetaNode().getId();
+		}
+		
+		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId);
+		
+//		expedients.remove(exp);
+//		for(ExpedientDto expedient: expedients){
+//			
+//		}
+//		expedien
+//		expedients.add
+		
+		
+		
 		return contenidor;
 	}
 
