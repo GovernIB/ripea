@@ -13,9 +13,6 @@
 		</property>
 	</bean>
 	
-	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
-	
-	
 	<import resource="classpath:es/caib/ripea/core/api/context/application-context-ejb-client.xml" />
 	<import resource="classpath:es/caib/ripea/war/context/application-context-security.xml" />
 
