@@ -145,21 +145,19 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 				}
 			}
 			$('</div>').appendTo("#file-chooser-content-"+data.id);
-	
-			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
-			$("#file-chooser-content-"+data.id + " a").click(function() {
-				refrescarOne(campPath, $(this).attr('data-id'), data.id);
-				
-			});
-			
-			
+
 			//removing previously visually selected container
 			$('.selected').css('border-color', '');
 			$('.selected').removeClass("selected");
 			//selecting chosen visualy container
 			$('#file-chooser-panel-'+contenidorId).css('border-color', '#810f0f');
 			$('#file-chooser-panel-'+contenidorId).addClass("selected");
-			
+
+	
+			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
+			$("#file-chooser-content-"+data.id + " a").click(function() {
+				refrescarOne(campPath, $(this).attr('data-id'), data.id);
+			});
 				
 			webutilModalAdjustHeight();
 			
@@ -178,7 +176,7 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 
 
 
-function refrescarFileChooser(campPath, contenidorId) {
+function loadFileChooser(campPath, contenidorId) {
 	$.ajax({
 		type: "GET",
 		url: '<c:url value="/contenidor/exploraAllWithSameExpedientType/${contenidorBaseId}/"/>' + contenidorId, // returns container with given contenidorId
@@ -242,15 +240,34 @@ function refrescarFileChooser(campPath, contenidorId) {
 				}
 			}
 			$('</div>').appendTo("#file-chooser-content-"+data.id);
+
+			//selecting visualy chosen container
+			$('#file-chooser-panel-'+contenidorId).css('border-color', '#810f0f');
+			$('#file-chooser-panel-'+contenidorId).addClass("selected");
+
 			
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
 			$("#file-chooser-content-"+data.id + " a").click(function() {
 				refrescarOne(campPath, $(this).attr('data-id'), data.id);
 			});
 
-			//selecting chosen visualy container
-			$('#file-chooser-panel-'+contenidorId).css('border-color', '#810f0f');
-			$('#file-chooser-panel-'+contenidorId).addClass("selected");
+
+			// SETTING EVENT HANDLER FOR CLICKING ANY PANEL
+			$("#file-chooser-panel-"+data.id).click(function() {
+				console.log('panel clicked!:'+data.id);
+
+// 				//removing previously visually selected container
+// 				$('.selected').css('border-color', '');
+// 				$('.selected').removeClass("selected");
+// 				//selecting chosen visualy container
+// 				$('#file-chooser-panel-'+data.id).css('border-color', '#810f0f');
+// 				$('#file-chooser-panel-'+data.id).addClass("selected");
+
+// 	 			$("input#" + campPath).val(data.id);
+				
+			});
+
+			
 
 
 		});
@@ -267,6 +284,6 @@ function refrescarFileChooser(campPath, contenidorId) {
     });
 }
 $(document).ready(function() {
-	refrescarFileChooser('${campPath}', '${contenidorInicialId}');
+	loadFileChooser('${campPath}', '${contenidorInicialId}');
 });
 </script>
