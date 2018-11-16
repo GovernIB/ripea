@@ -40,7 +40,7 @@ public class ContenidorExploradorController extends BaseUserController {
 
 	@RequestMapping(value = "/explora/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ContingutDto get(
+	public ContingutDto get1(
 			HttpServletRequest request,
 			@PathVariable Long contenidorArrelId,
 			@PathVariable Long contenidorId,
@@ -52,6 +52,24 @@ public class ContenidorExploradorController extends BaseUserController {
 				true,
 				false);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
+		return contenidor;
+	}	
+	
+	
+	@RequestMapping(value = "/explora/{contenidorId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ContingutDto get(
+			HttpServletRequest request,
+//			@PathVariable Long contenidorArrelId,
+			@PathVariable Long contenidorId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contenidor = contenidorService.findAmbIdUser(
+				entitatActual.getId(),
+				contenidorId,
+				true,
+				false);
+//		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		return contenidor;
 	}
 	

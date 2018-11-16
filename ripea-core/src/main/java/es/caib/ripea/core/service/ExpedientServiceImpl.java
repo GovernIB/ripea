@@ -362,8 +362,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedientsDto.add(contingutHelper.toContingutDto(
 					exp,
 					true,
-					false,
-					false,
+					true,
+					true,
 					false,
 					true,
 					false,
