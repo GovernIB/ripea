@@ -35,7 +35,7 @@
 		<c:if test="${required}">*</c:if>
 	</label>
 	<div class="controls col-xs-${campInputSize}">
-		<div id="file-chooser-input" class="input-group">
+		<div id="file-chooser-input" class="input-group" style="width: 70%;">
 			<form:hidden path="${campPath}" id="${campPath}" disabled="${disabled}"/>
 <%-- 			<div id="file-chooser-panel-id" class="panel panel-default"> --%>
 <%-- 				<div id="file-chooser-path-id" class="panel-heading"></div> --%>
@@ -70,6 +70,18 @@ a.list-group-item {
 .panel-default:hover {
     background-color: #c3daee;
     border-color: #afcee9;
+}
+.panel + .panel {
+    border-top: 0;
+}
+
+.panel-heading {
+    border-bottom: 0px;
+}
+
+.panel, .panel>.panel-heading {
+    margin-bottom: 0px;
+    border-radius: 0px;
 }
 
 </style>
@@ -115,20 +127,23 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			
  			
 
-			// removing content of the selected panel
-			$("#file-chooser-panel-"+prevContenidorId).attr("id","file-chooser-panel-"+data.id);
-			$("#file-chooser-panel-"+data.id).html('');
+// 			// removing content of the selected panel
+// 			$("#file-chooser-panel-"+prevContenidorId).attr("id","file-chooser-panel-"+data.id);
+// 			$("#file-chooser-panel-"+data.id).html('');
+
+			$("#file-chooser-input").html('');
+			$("#file-chooser-input").append('<div id="file-chooser-panel-'+data.id+'" class="panel panel-default"></div>');
 
 	
 			// SETTING PATH IN THE PANEL HEADER
 			var path = "";
 			if (data.expedient) { // if it is an expedient
-				path += '<span class="fa fa-desktop"></span> Expedient: ';
+				path += '<span class="fa fa-desktop"></span>  ';
 				path += data.nom;
 			
 			} else {  
 				path += data.pathAsStringExploradorAmbNom;
-				path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Expedient');
+				path = path.replaceAll('#E#', '<span class="fa fa-folder-open"></span> ');
 				path = path.replaceAll('#X#', '<span class="fa fa-briefcase"></span>');
 				path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
 				path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
@@ -144,8 +159,10 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			// SETTING CONTENT IN THE PANEL BODY
 			$("#file-chooser-content-"+data.id).html('');
 			$('<div class="list-group">').appendTo("#file-chooser-content"+data.id);
-			if (!data.expedient){
+			if (!data.expedient) {
 				$('<a data-id="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
+			} else {
+				$('<a data-id="returnAll" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
 			}
 			if(data.fills){
 				for (var i = 0; i < data.fills.length; i++) {
@@ -172,7 +189,13 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 	
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
 			$("#file-chooser-content-"+data.id + " a").click(function() {
-				refrescarOne(campPath, $(this).attr('data-id'), data.id);
+
+				if($(this).attr('data-id')=='returnAll'){
+					loadFileChooser(campPath, data.id)
+				} else {
+					refrescarOne(campPath, $(this).attr('data-id'), data.id);
+				}
+				
 			});
 				
 			webutilModalAdjustHeight();
@@ -201,18 +224,19 @@ function loadFileChooser(campPath, contenidorId) {
 			var ocultarCarpetes = <c:choose><c:when test="${ocultarCarpetes}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 
-		
+		$("#file-chooser-input").html('');
+
 		$.each(dataTable, function( key, data ) {
 
 			// SETTING PATH IN THE PANEL HEADER
 			var path = "";
 			if (data.expedient) { // if it is an expedient
-				path += '<span class="fa fa-desktop"></span> Expedient: ';
+				path += '<span class="fa fa-desktop"></span> ';
 				path += data.nom;
 			
 			} else {  
 				path += data.pathAsStringExploradorAmbNom;
-				path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Expedient');
+				path = path.replaceAll('#E#', '<span class="fa fa-folder-open"></span> ');
 				path = path.replaceAll('#X#', '<span class="fa fa-briefcase"></span>');
 				path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
 				path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
@@ -223,42 +247,53 @@ function loadFileChooser(campPath, contenidorId) {
 			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-path-'+data.id+'" class="panel-heading"></div>');
 			$("#file-chooser-path-"+data.id).html('');
 			$("#file-chooser-path-"+data.id).append(path);
-			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-content-'+data.id+'" class="panel-body"></div>');
+
 
 
 			// SETTING CONTENT IN THE PANEL BODY
-			$("#file-chooser-content-"+data.id).html('');
-			$('<div class="list-group">').appendTo("#file-chooser-content"+data.id);
-			if (!data.expedient){
-				$('<a data-id="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
-			}
-			if(data.fills){
-				for (var i = 0; i < data.fills.length; i++) {
-					var ocultar = (data.fills[i].expedient && ocultarExpedients) || (data.fills[i].carpeta && ocultarCarpetes) || (data.fills[i].document && ocultarDocuments);
-					if (!ocultar && data.fills[i].id != '${contingutOrigen.id}') {
-						var htmlIcona = '';
-						if (data.fills[i].expedient)
-							htmlIcona += '<span class="fa fa-briefcase"></span> ';
-						if (data.fills[i].carpeta)
-							htmlIcona += '<span class="fa fa-folder"></span> ';
-						else if (data.fills[i].document)
-							htmlIcona += '<span class="fa fa-file"></span> ';
-						if ((data.fills[i].expedient || data.fills[i].carpeta) && data.fills[i].id != '${contingutOrigen.id}')
-							$('<a data-id="' + data.fills[i].id + '" class="list-group-item">' + htmlIcona + data.fills[i].nom + '</a>').appendTo("#file-chooser-content-"+data.id);
-						else
-							$('<div class="list-group-item text-muted" style="border:none">' + htmlIcona + data.fills[i].nom + '</div>').appendTo("#file-chooser-content-"+data.id);
-					}
-				}
-			}
-			$('</div>').appendTo("#file-chooser-content-"+data.id);
+// 			$("#file-chooser-content-"+data.id).html('');
+// 			$('<div class="list-group">').appendTo("#file-chooser-content"+data.id);
+// 			if (!data.expedient){
+// 				$('<a data-id="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
+// 			}
+// 			if(data.fills){
+// 				for (var i = 0; i < data.fills.length; i++) {
+// 					var ocultar = (data.fills[i].expedient && ocultarExpedients) || (data.fills[i].carpeta && ocultarCarpetes) || (data.fills[i].document && ocultarDocuments);
+// 					if (!ocultar && data.fills[i].id != '${contingutOrigen.id}') {
+// 						var htmlIcona = '';
+// 						if (data.fills[i].expedient)
+// 							htmlIcona += '<span class="fa fa-briefcase"></span> ';
+// 						if (data.fills[i].carpeta)
+// 							htmlIcona += '<span class="fa fa-folder"></span> ';
+// 						else if (data.fills[i].document)
+// 							htmlIcona += '<span class="fa fa-file"></span> ';
+// 						if ((data.fills[i].expedient || data.fills[i].carpeta) && data.fills[i].id != '${contingutOrigen.id}')
+// 							$('<a data-id="' + data.fills[i].id + '" class="list-group-item">' + htmlIcona + data.fills[i].nom + '</a>').appendTo("#file-chooser-content-"+data.id);
+// 						else
+// 							$('<div class="list-group-item text-muted" style="border:none">' + htmlIcona + data.fills[i].nom + '</div>').appendTo("#file-chooser-content-"+data.id);
+// 					}
+// 				}
+// 			}
+// 			$('</div>').appendTo("#file-chooser-content-"+data.id);
 
 			changeSelected(contenidorId, campPath);
 
 			
+// 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
+// 			$("#file-chooser-content-"+data.id + " a").click(function() {
+// 				refrescarOne(campPath, $(this).attr('data-id'), data.id);
+// 			});
+
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
-			$("#file-chooser-content-"+data.id + " a").click(function() {
-				refrescarOne(campPath, $(this).attr('data-id'), data.id);
+			$(".panel").click(function() {
+				
+				var idStr = $(this).attr('id');
+				var idStrRes = idStr.replace("file-chooser-panel-", "");
+
+				$("#file-chooser-input").html('<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>');
+				refrescarOne(campPath, idStrRes, data.id);	
 			});
+
 
 			// SETTING EVENT HANDLER FOR CLICKING ANY PANEL
 			$("#file-chooser-panel-"+data.id).click(function(event) {
