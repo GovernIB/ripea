@@ -58,6 +58,20 @@ div.list-group {
 a.list-group-item {
 	border: none !important;
 }
+
+.panel-default>.panel-heading:hover {
+    background-color: #c3daee;
+    border-color: #afcee9;
+}
+.panel-default:hover>.panel-heading {
+    background-color: #c3daee;
+    border-color: #afcee9;
+}
+.panel-default:hover {
+    background-color: #c3daee;
+    border-color: #afcee9;
+}
+
 </style>
 <script>
 String.prototype.replaceAll = function(search, replacement) {
@@ -65,6 +79,25 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.split(search).join(replacement);
 };
 
+
+
+function changeSelected(selectedId, campPath) {
+	//removing previously visually selected container
+	$('.selected').css('border-color', '');
+	$('.selected .panel-heading').css('border-color', '');
+	$('.selected .panel-heading').css('background-color', '');
+	$('.selected').removeClass("selected");
+	//selecting visually chosen container
+	$('#file-chooser-panel-'+selectedId).css('border-color', '#2e6da4');
+	$('#file-chooser-path-'+selectedId).css('background-color', '#337ab7');
+	$('#file-chooser-path-'+selectedId).css('border-color', '#2e6da4');
+
+
+
+	$('#file-chooser-panel-'+selectedId).addClass("selected");
+	$("input#" + campPath).val(selectedId);
+	
+}
 
 
 function refrescarOne(campPath, contenidorId, prevContenidorId) {
@@ -80,24 +113,12 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 
 			
- 			$("input#" + campPath).val(contenidorId);
-
-
  			
-// 			var	expId;
-// 			if (data.expedient) {
-// 				expId = data.id
-// 			} else {
-// 				expId = data.expedientPare.id;
-// 			}
 
-			
-
-
+			// removing content of the selected panel
 			$("#file-chooser-panel-"+prevContenidorId).attr("id","file-chooser-panel-"+data.id);
 			$("#file-chooser-panel-"+data.id).html('');
 
-	
 	
 			// SETTING PATH IN THE PANEL HEADER
 			var path = "";
@@ -146,12 +167,7 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			}
 			$('</div>').appendTo("#file-chooser-content-"+data.id);
 
-			//removing previously visually selected container
-			$('.selected').css('border-color', '');
-			$('.selected').removeClass("selected");
-			//selecting chosen visualy container
-			$('#file-chooser-panel-'+contenidorId).css('border-color', '#810f0f');
-			$('#file-chooser-panel-'+contenidorId).addClass("selected");
+			changeSelected(contenidorId, campPath);
 
 	
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
@@ -174,8 +190,6 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 
 
 
-
-
 function loadFileChooser(campPath, contenidorId) {
 	$.ajax({
 		type: "GET",
@@ -186,9 +200,6 @@ function loadFileChooser(campPath, contenidorId) {
 			var ocultarExpedients = <c:choose><c:when test="${ocultarExpedients}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarCarpetes = <c:choose><c:when test="${ocultarCarpetes}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
-
-			
-		$("input#" + campPath).val(contenidorId);
 
 		
 		$.each(dataTable, function( key, data ) {
@@ -241,9 +252,7 @@ function loadFileChooser(campPath, contenidorId) {
 			}
 			$('</div>').appendTo("#file-chooser-content-"+data.id);
 
-			//selecting visualy chosen container
-			$('#file-chooser-panel-'+contenidorId).css('border-color', '#810f0f');
-			$('#file-chooser-panel-'+contenidorId).addClass("selected");
+			changeSelected(contenidorId, campPath);
 
 			
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
@@ -251,24 +260,14 @@ function loadFileChooser(campPath, contenidorId) {
 				refrescarOne(campPath, $(this).attr('data-id'), data.id);
 			});
 
-
 			// SETTING EVENT HANDLER FOR CLICKING ANY PANEL
-			$("#file-chooser-panel-"+data.id).click(function() {
-				console.log('panel clicked!:'+data.id);
+			$("#file-chooser-panel-"+data.id).click(function(event) {
 
-// 				//removing previously visually selected container
-// 				$('.selected').css('border-color', '');
-// 				$('.selected').removeClass("selected");
-// 				//selecting chosen visualy container
-// 				$('#file-chooser-panel-'+data.id).css('border-color', '#810f0f');
-// 				$('#file-chooser-panel-'+data.id).addClass("selected");
-
-// 	 			$("input#" + campPath).val(data.id);
-				
+				// if element is triggered by "a" element, is processed in refrescarOne() element, not here
+				if(!$(event.target).is("a")){
+					changeSelected(data.id, campPath);
+				}
 			});
-
-			
-
 
 		});
 			
