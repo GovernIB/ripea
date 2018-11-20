@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -323,6 +324,53 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				true,
 				expedientId);
+	}
+	
+	
+	
+	
+	@Transactional
+	@Override
+	public List<ContingutDto> findByEntitatAndMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		logger.debug("Consultant els expedients("
+				+ "entitatId=" + entitatId + ", "
+				+ "metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = null;
+		if (metaExpedientId != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					false,
+					true,
+					false,
+					false);
+		}
+		
+		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(
+				entitat, 
+				metaExpedient);
+
+		List<ContingutDto> expedientsDto = new ArrayList<>(); 
+		for(ContingutEntity exp: expedientsEnt){
+			expedientsDto.add(contingutHelper.toContingutDto(
+					exp,
+					true,
+					true,
+					true,
+					false,
+					true,
+					false,
+					false));
+		}
+		
+		return expedientsDto;
 	}
 	
 

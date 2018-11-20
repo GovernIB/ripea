@@ -14,6 +14,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
@@ -199,6 +200,18 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId) throws NotFoundException {
 		return delegate.findPerUserAndTipus(entitatId, metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")	
+	public PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(Long entitatId, ExpedientFiltreDto filtre,
+			Long expedientId, PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltreNoRelacionat(entitatId, filtre, expedientId, paginacioParams);
+	}
+
+	@Override
+	public List<ContingutDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId) {
+		return delegate.findByEntitatAndMetaExpedient(entitatId, metaExpedientId);
 	}
 
 }

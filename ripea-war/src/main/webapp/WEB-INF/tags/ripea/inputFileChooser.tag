@@ -9,17 +9,19 @@
 <%@ attribute name="ocultarExpedients" required="false" rtexprvalue="true"%>
 <%@ attribute name="ocultarCarpetes" required="false" rtexprvalue="true"%>
 <%@ attribute name="ocultarDocuments" required="false" rtexprvalue="true"%>
-<%@ attribute name="contingutOrigen" required="true" rtexprvalue="true" type="java.lang.Object"%>
+<%@ attribute name="contingutOrigen" required="true" rtexprvalue="true" type="java.lang.Object"%> <!-- document which we are moving -->
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
-<c:choose>
+<!-- setting root container of document we are moving  -->
+<c:choose> 
 	<c:when test="${not empty contingutOrigen.expedientPare}"><c:set var="contenidorBaseId" value="${contingutOrigen.expedientPare.id}"/></c:when>
 	<c:otherwise><c:set var="contenidorBaseId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
-<c:choose>
+<!-- setting parent container of document we are moving  -->
+<c:choose> 
 	<c:when test="${not empty contingutOrigen.pare}"><c:set var="contenidorInicialId" value="${contingutOrigen.pare.id}"/></c:when>
 	<c:otherwise><c:set var="contenidorInicialId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
@@ -65,28 +67,32 @@ String.prototype.replaceAll = function(search, replacement) {
 function refrescarFileChooser(campPath, contenidorId) {
 	$.ajax({
 		type: "GET",
-		url: '<c:url value="/contenidor/explora/${contenidorBaseId}/"/>' + contenidorId,
+		url: '<c:url value="/contenidor/explora/${contenidorBaseId}/"/>' + contenidorId, // returns container with given contenidorId
 		async: false,
 		timeout: 20000,
-		success: function(data) {
+		success: function(data) { //returns container of the given element (it returns the folder in which document is situated and if there is no parent folder it returns expedient)
 			var ocultarExpedients = <c:choose><c:when test="${ocultarExpedients}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarCarpetes = <c:choose><c:when test="${ocultarCarpetes}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			$("input#" + campPath).val(data.id);
+			
+			// SEETING PATH IN THE PANEL HEADER
 			var path = "";
-			if (data.id == '${contenidorBaseId}') {
-				if (data.expedient)
-					path += '<span class="fa fa-desktop"></span> Expedient';
-				if (data.expedient)
+			if (data.id == '${contenidorBaseId}') { // if the returned container is the root container
+				if (data.expedient) { // if it is an expedient
+					path += '<span class="fa fa-desktop"></span> Expedient: ';
 					path += data.nom;
-			} else {
+				}
+			} else {  
 				path += data.pathAsStringExploradorAmbNom;
+				path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Expedient');
+				path = path.replaceAll('#X#', '<span class="fa fa-briefcase"></span>');
+				path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
+				path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
 			}
-			path = path.replaceAll('#E#', '<span class="fa fa-desktop"></span> Expedient');
-			path = path.replaceAll('#X#', '<span class="fa fa-briefcase"></span>');
-			path = path.replaceAll('#C#', '<span class="fa fa-folder"></span>');
-			path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
 			$("#file-chooser-" + campPath + "-path").html(path);
+
+			// SEETING CONTENT IN THE PANEL BODY
 			$("#file-chooser-" + campPath + "-content").html('');
 			$('<div class="list-group">').appendTo("#file-chooser-" + campPath + "-content");
 			if (data.id != '${contenidorBaseId}')
@@ -108,6 +114,8 @@ function refrescarFileChooser(campPath, contenidorId) {
 				}
 			}
 			$('</div>').appendTo("#file-chooser-" + campPath + "-content");
+
+			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
 			$('#file-chooser-' + campPath + '-content a').click(function() {
 				refrescarFileChooser(campPath, $(this).attr('href'));
 				return false;
