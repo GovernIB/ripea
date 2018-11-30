@@ -36,7 +36,7 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"where " +
 			"e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and e.metaNode = :metaNode)")
+			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
 	List<ContingutEntity> findByEntitatAndMetaExpedient(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNode") MetaNodeEntity metaNode);

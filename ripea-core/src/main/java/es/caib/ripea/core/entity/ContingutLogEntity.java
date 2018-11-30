@@ -34,10 +34,11 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "tipus", nullable = false)
 	private LogTipusEnumDto tipus;
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "contingut_id")
-	@ForeignKey(name = "ipa_contingut_contlog_fk")
-	protected ContingutEntity contingut;
+//	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "contingut_id")
+//	@ForeignKey(name = "ipa_contingut_contlog_fk")
+	@Column(name = "contingut_id")
+	protected Long contingutId;
 	@Column(name = "objecte_id", length = 64)
 	private String objecteId;
 	@Column(name = "objecte_tipus")
@@ -62,8 +63,8 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 	public LogTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public ContingutEntity getContingut() {
-		return contingut;
+	public Long getContingutId() {
+		return contingutId;
 	}
 	public ContingutMovimentEntity getContingutMoviment() {
 		return contingutMoviment;
@@ -96,19 +97,19 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 
 	public static Builder getBuilder(
 			LogTipusEnumDto tipus,
-			ContingutEntity contingut) {
+			Long contingutId) {
 		return new Builder(
 				tipus,
-				contingut);
+				contingutId);
 	}
 	public static class Builder {
 		ContingutLogEntity built;
 		Builder(
 				LogTipusEnumDto tipus,
-				ContingutEntity contingut) {
+				Long contingutId) {
 			built = new ContingutLogEntity();
 			built.tipus = tipus;
-			built.contingut = contingut;
+			built.contingutId = contingutId;
 		}
 		public Builder objecte(Persistable<? extends Serializable> objecte) {
 			built.objecteId = objecte.getId().toString();

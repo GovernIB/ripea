@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 
 /**
@@ -18,7 +17,7 @@ import es.caib.ripea.core.entity.ContingutMovimentEntity;
  */
 public interface ContingutMovimentRepository extends JpaRepository<ContingutMovimentEntity, Long> {
 
-	List<ContingutMovimentEntity> findByContingutOrderByCreatedDateAsc(
-			ContingutEntity contingut);
+	List<ContingutMovimentEntity> findByContingutIdOrderByCreatedDateAsc(
+			Long contingutId);
 
 }

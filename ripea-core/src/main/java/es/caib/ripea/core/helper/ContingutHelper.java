@@ -883,14 +883,21 @@ public class ContingutHelper {
 					true);
 		
 		ContingutMovimentEntity contenidorMoviment = ContingutMovimentEntity.getBuilder(
-				contingut,
-				contingut.getPare(),
-				desti,
+				contingut.getId(),
+				contingut.getPare().getId(),
+				desti.getId(),
 				usuariHelper.getUsuariAutenticat(),
 				comentari).build();
 		contingut.updateDarrerMoviment(
 				contenidorMovimentRepository.save(contenidorMoviment));
 		contingut.updatePare(desti);
+		
+		if (desti.getExpedient() == null) {
+			contingut.updateExpedient((ExpedientEntity) desti);
+		} else {
+			contingut.updateExpedient(desti.getExpedient());
+		}
+		
 		return contenidorMoviment;
 	}
 

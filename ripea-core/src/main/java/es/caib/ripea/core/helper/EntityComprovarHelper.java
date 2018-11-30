@@ -613,18 +613,18 @@ public class EntityComprovarHelper {
 						+ "usuari=" + auth.getName() + ")");
 			}
 		}
-		if (comprovarPermisCreate) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaNode.getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.WRITE},
-					auth);
-			if (!granted) {
-				throw new SecurityException("Sense permisos per a modificar el node ("
-						+ "id=" + nodeId + ", "
-						+ "usuari=" + auth.getName() + ")");
-			}
-		}
+//		if (comprovarPermisCreate) {
+//			boolean granted = permisosHelper.isGrantedAll(
+//					metaNode.getId(),
+//					MetaNodeEntity.class,
+//					new Permission[] {ExtendedPermission.WRITE},
+//					auth);
+//			if (!granted) {
+//				throw new SecurityException("Sense permisos per a modificar el node ("
+//						+ "id=" + nodeId + ", "
+//						+ "usuari=" + auth.getName() + ")");
+//			}
+//		}
 		if (comprovarPermisDelete) {
 			boolean granted = permisosHelper.isGrantedAll(
 					metaNode.getId(),

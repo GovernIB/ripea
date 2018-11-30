@@ -153,8 +153,8 @@ public class ContingutLogHelper {
 
 	public List<ContingutLogDto> findLogsContingut(
 			ContingutEntity contingut) {
-		List<ContingutLogEntity> logs = contingutLogRepository.findByContingutOrderByCreatedDateAsc(
-				contingut);
+		List<ContingutLogEntity> logs = contingutLogRepository.findByContingutIdOrderByCreatedDateAsc(
+				contingut.getId());
 		List<ContingutLogDto> dtos = new ArrayList<ContingutLogDto>();
 		for (ContingutLogEntity log: logs) {
 			ContingutLogDto dto = new ContingutLogDto();
@@ -165,14 +165,14 @@ public class ContingutLogHelper {
 	}
 
 	public ContingutLogDetallsDto findLogDetalls(
-			ContingutEntity contingut,
+			Long contingutId,
 			Long contingutLogId) {
 		ContingutLogEntity log = contingutLogRepository.findOne(contingutLogId);
-		if (!log.getContingut().equals(contingut)) {
+		if (!log.getContingutId().equals(contingutId)) {
 			throw new ValidationException(
 					contingutLogId,
 					ContingutLogEntity.class,
-					"El contingut del log (id=" + log.getContingut().getId() + ") no coincideix amb el contingut (id=" + contingut.getId() + ") expecificat");
+					"El contingut del log (id=" + log.getContingutId() + ") no coincideix amb el contingut (id=" + contingutId + ") expecificat");
 		}
 		ContingutLogDetallsDto detalls = new ContingutLogDetallsDto();
 		emplenarLogDto(log, detalls);
@@ -180,77 +180,76 @@ public class ContingutLogHelper {
 			detalls.setContingutMoviment(
 					toContingutMovimentDto(
 							log.getContingutMoviment(),
-							contenidorHelper.toContingutDto(
-									log.getContingutMoviment().getContingut())));
+							log.getContingutMoviment().getContingutId()));
 		}
 		if (log.getPare() != null) {
 			ContingutLogDto pare = new ContingutLogDto();
 			emplenarLogDto(log.getPare(), pare);
 			detalls.setPare(pare);
 		}
-		if (log.getObjecteId() != null) {
-			String objecteNom = null;
-			switch (log.getObjecteTipus()) {
-			case CONTINGUT:
-			case CARPETA:
-			case DOCUMENT:
-			case EXPEDIENT:
-			case REGISTRE:
-				ContingutEntity c = contingutRepository.findOne(
-						new Long(log.getObjecteId()));
-				objecteNom = c.getNom();
-				break;
-			case DADA:
-				DadaEntity dada = dadaRepository.findOne(
-						new Long(log.getObjecteId()));
-				objecteNom = dada.getMetaDada().getNom();
-				break;
-			case INTERESSAT:
-				InteressatEntity interessat = interessatRepository.findOne(
-						new Long(log.getObjecteId()));
-				objecteNom = interessat.getIdentificador();
-				break;
-			case NOTIFICACIO:
-				DocumentNotificacioEntity notificacio = documentNotificacioRepository.findOne(
-						new Long(log.getObjecteId()));
-				objecteNom = notificacio.getAssumpte();
-				break;
-			case PUBLICACIO:
-				DocumentPublicacioEntity publicacio = documentPublicacioRepository.findOne(
-						new Long(log.getObjecteId()));
-				objecteNom = publicacio.getAssumpte();
-				break;
-			case RELACIO:
-				String[] ids = log.getObjecteId().split("#");
-				if (ids.length >= 2) {
-					ContingutEntity exp1 = contingutRepository.findOne(
-							new Long(ids[0]));
-					ContingutEntity exp2 = contingutRepository.findOne(
-							new Long(ids[1]));
-					objecteNom = exp1.getNom() + " <-> " + exp2.getNom();
-					break;
-				}
-			case ALTRES:
-			default:
-				objecteNom = "???" + log.getObjecteTipus().name() + "#" + log.getObjecteId() + "???";
-				break;
-			}
-			detalls.setObjecteNom(objecteNom);
-		}
+//		if (log.getObjecteId() != null) {
+//			String objecteNom = null;
+//			switch (log.getObjecteTipus()) {
+//			case ContingutId:
+//			case CARPETA:
+//			case DOCUMENT:
+//			case EXPEDIENT:
+//			case REGISTRE:
+//				ContingutEntity c = contingutRepository.findOne(
+//						new Long(log.getObjecteId()));
+//				objecteNom = c.getNom();
+//				break;
+//			case DADA:
+//				DadaEntity dada = dadaRepository.findOne(
+//						new Long(log.getObjecteId()));
+//				objecteNom = dada.getMetaDada().getNom();
+//				break;
+//			case INTERESSAT:
+//				InteressatEntity interessat = interessatRepository.findOne(
+//						new Long(log.getObjecteId()));
+//				objecteNom = interessat.getIdentificador();
+//				break;
+//			case NOTIFICACIO:
+//				DocumentNotificacioEntity notificacio = documentNotificacioRepository.findOne(
+//						new Long(log.getObjecteId()));
+//				objecteNom = notificacio.getAssumpte();
+//				break;
+//			case PUBLICACIO:
+//				DocumentPublicacioEntity publicacio = documentPublicacioRepository.findOne(
+//						new Long(log.getObjecteId()));
+//				objecteNom = publicacio.getAssumpte();
+//				break;
+//			case RELACIO:
+//				String[] ids = log.getObjecteId().split("#");
+//				if (ids.length >= 2) {
+//					ContingutEntity exp1 = contingutRepository.findOne(
+//							new Long(ids[0]));
+//					ContingutEntity exp2 = contingutRepository.findOne(
+//							new Long(ids[1]));
+//					objecteNom = exp1.getNom() + " <-> " + exp2.getNom();
+//					break;
+//				}
+//			case ALTRES:
+//			default:
+//				objecteNom = "???" + log.getObjecteTipus().name() + "#" + log.getObjecteId() + "???";
+//				break;
+//			}
+//			detalls.setObjecteNom(objecteNom);
+//		}
 		return detalls;
 	}
 
 	public List<ContingutMovimentDto> findMovimentsContingut(
 			ContingutEntity contingut) {
-		List<ContingutMovimentEntity> moviments = contingutMovimentRepository.findByContingutOrderByCreatedDateAsc(
-				contingut);
-		ContingutDto contingutDto = contenidorHelper.toContingutDto(contingut);
+		List<ContingutMovimentEntity> moviments = contingutMovimentRepository.findByContingutIdOrderByCreatedDateAsc(
+				contingut.getId());
+
 		List<ContingutMovimentDto> dtos = new ArrayList<ContingutMovimentDto>();
 		for (ContingutMovimentEntity moviment: moviments) {
 			dtos.add(
 					toContingutMovimentDto(
 							moviment,
-							contingutDto));
+							contingut.getId()));
 		}
 		return dtos;
 	}
@@ -269,7 +268,7 @@ public class ContingutLogHelper {
 			boolean logContingutPare,
 			boolean logExpedientSuperior) {
 		ContingutLogEntity logPare = logSave(
-				contingut,
+				contingut.getId(),
 				tipus,
 				null,
 				contingutMoviment,
@@ -284,22 +283,22 @@ public class ContingutLogHelper {
 					logContingutSuperior(
 							contingut,
 							tipus,
-							contingut.getPare(),
+							contingut.getPare().getId(),
 							logPare);
 				}
 			} else {
-				if (contingutMoviment.getOrigen() != null) {
+				if (contingutMoviment.getOrigenId() != null) {
 					logContingutSuperior(
 							contingut,
 							tipus,
-							contingutMoviment.getOrigen(),
+							contingutMoviment.getOrigenId(),
 							logPare);
 				}
-				if (contingutMoviment.getDesti() != null) {
+				if (contingutMoviment.getDestiId() != null) {
 					logContingutSuperior(
 							contingut,
 							tipus,
-							contingutMoviment.getDesti(),
+							contingutMoviment.getDestiId(),
 							logPare);
 				}
 			}
@@ -314,21 +313,21 @@ public class ContingutLogHelper {
 					logExpedientSuperior(
 						contingut,
 						tipus,
-						contingut,
+						contingut.getId(),
 						logPare);
 				} else {
-					if (contingutMoviment.getOrigen() != null) {
+					if (contingutMoviment.getOrigenId() != null) {
 						logExpedientSuperior(
 								contingut,
 								tipus,
-								contingutMoviment.getOrigen(),
+								contingutMoviment.getOrigenId(),
 								logPare);
 					}
-					if (contingutMoviment.getDesti() != null) {
+					if (contingutMoviment.getDestiId() != null) {
 						logExpedientSuperior(
 								contingut,
 								tipus,
-								contingutMoviment.getDesti(),
+								contingutMoviment.getDestiId(),
 								logPare);
 					}
 				}
@@ -340,28 +339,28 @@ public class ContingutLogHelper {
 	private void logExpedientSuperior(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
-			ContingutEntity contingutSuperior,
+			Long contingutSuperiorId,
 			ContingutLogEntity contingutLogPare) {
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-				contingutSuperior,
-				false,
-				false,
-				false);
-		if (expedientSuperior != null) {
+//		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
+//				contingutSuperior,
+//				false,
+//				false,
+//				false);
+		if (contingutSuperiorId != null) {
 			logContingutSuperior(
 					contingut,
 					tipus,
-					expedientSuperior,
+					contingutSuperiorId,
 					contingutLogPare);
 		}
 	}
 	private void logContingutSuperior(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
-			ContingutEntity contingutSuperior,
+			Long contingutSuperiorId,
 			ContingutLogEntity contingutLogPare) {
 		logSave(
-				contingutSuperior,
+				contingutSuperiorId,
 				LogTipusEnumDto.MODIFICACIO,
 				contingutLogPare,
 				null,
@@ -373,7 +372,7 @@ public class ContingutLogHelper {
 	}
 
 	private ContingutLogEntity logSave(
-			ContingutEntity contingut,
+			Long contingutId,
 			LogTipusEnumDto tipus,
 			ContingutLogEntity pare,
 			ContingutMovimentEntity contingutMoviment,
@@ -383,7 +382,7 @@ public class ContingutLogHelper {
 			String param1,
 			String param2) {
 		logger.debug("Guardant log per contenidor (" +
-				"contingutId=" + contingut.getId() + ", " +
+				"contingutId=" + contingutId + ", " +
 				"tipus=" + tipus + ", " +
 				"logPareId=" + ((pare != null) ? pare.getId() : null) + ", " +
 				"contingutMovimentId=" + ((contingutMoviment != null) ? contingutMoviment.getId() : null) + ", " +
@@ -393,7 +392,7 @@ public class ContingutLogHelper {
 				"param2=" + param2 + ")");
 		Builder logBuilder = ContingutLogEntity.getBuilder(
 				tipus,
-				contingut).
+				contingutId).
 				param1(param1).
 				param2(param2).
 				pare(pare).
@@ -444,25 +443,23 @@ public class ContingutLogHelper {
 
 	private ContingutMovimentDto toContingutMovimentDto(
 			ContingutMovimentEntity moviment,
-			ContingutDto contingut) {
+			Long contingutId) {
 		ContingutMovimentDto dto = new ContingutMovimentDto();
 		dto.setId(moviment.getId());
 		if (moviment.getCreatedDate() != null)
 			dto.setData(moviment.getCreatedDate().toDate());
 		dto.setComentari(moviment.getComentari());
-		dto.setContingut(contingut);
+		dto.setContingutId(contingutId);
 		dto.setRemitent(
 				conversioTipusHelper.convertir(
 						moviment.getRemitent(),
 						UsuariDto.class));
-		if (moviment.getOrigen() != null) {
-			dto.setOrigen(
-					contenidorHelper.toContingutDto(
-							moviment.getOrigen()));
+		if (moviment.getOrigenId() != null) {
+			dto.setOrigenId(
+					moviment.getOrigenId());
 		}
-		dto.setDesti(
-				contenidorHelper.toContingutDto(
-						moviment.getDesti()));
+		dto.setDestiId(
+				moviment.getDestiId());
 		return dto;
 	}
 

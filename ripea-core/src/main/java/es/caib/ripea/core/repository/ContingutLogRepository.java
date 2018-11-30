@@ -18,7 +18,7 @@ import es.caib.ripea.core.entity.ContingutLogEntity;
  */
 public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity, Long> {
 
-	List<ContingutLogEntity> findByContingutOrderByCreatedDateAsc(
-			ContingutEntity contingut);
+	List<ContingutLogEntity> findByContingutIdOrderByCreatedDateAsc(
+			Long contingutId);
 
 }

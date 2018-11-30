@@ -16,9 +16,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ContingutMovimentDto implements Serializable {
 
 	private Long id;
-	private ContingutDto contingut;
-	private ContingutDto origen;
-	private ContingutDto desti;
+	private Long contingutId;
+	private Long origenId;
+	private Long destiId;
 	private Date data;
 	private UsuariDto remitent;
 	private String comentari;
@@ -31,23 +31,23 @@ public class ContingutMovimentDto implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public ContingutDto getContingut() {
-		return contingut;
+	public Long getContingutId() {
+		return contingutId;
 	}
-	public void setContingut(ContingutDto contingut) {
-		this.contingut = contingut;
+	public void setContingutId(Long contingutId) {
+		this.contingutId = contingutId;
 	}
-	public ContingutDto getOrigen() {
-		return origen;
+	public Long getOrigenId() {
+		return origenId;
 	}
-	public void setOrigen(ContingutDto origen) {
-		this.origen = origen;
+	public void setOrigenId(Long origenId) {
+		this.origenId = origenId;
 	}
-	public ContingutDto getDesti() {
-		return desti;
+	public Long getDestiId() {
+		return destiId;
 	}
-	public void setDesti(ContingutDto desti) {
-		this.desti = desti;
+	public void setDestiId(Long destiId) {
+		this.destiId = destiId;
 	}
 	public Date getData() {
 		return data;
