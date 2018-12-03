@@ -289,12 +289,12 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false);
-//		if (contingut.getPare() != null) {
-//			contingut.getPare().getFills().remove(contingut);
-//		}
+		if (contingut.getPare() != null) {
+			contingut.getPare().getFills().remove(contingut);
+		}
 		contingutRepository.delete(contingut);
-		// Propaga l'acció a l'arxiu
-		contingutHelper.arxiuPropagarEliminacio(contingut);
+//		// Propaga l'acció a l'arxiu
+//		contingutHelper.arxiuPropagarEliminacio(contingut);
 //		// Registra al log l'eliminació definitiva del contingut
 //		contingutLogHelper.log(
 //				contingut,
@@ -330,13 +330,13 @@ public class ContingutServiceImpl implements ContingutService {
 					ContingutEntity.class,
 					"Aquest contingut no està esborrat");
 		}
-		if (contingut.getPare() == null) {
-			logger.error("Aquest contingut no te pare (contingutId=" + contingutId + ")");
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"Aquest contingut no te pare");
-		}
+//		if (contingut.getPare() == null) {
+//			logger.error("Aquest contingut no te pare (contingutId=" + contingutId + ")");
+//			throw new ValidationException(
+//					contingutId,
+//					ContingutEntity.class,
+//					"Aquest contingut no te pare");
+//		}
 		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
 				contingut.getPare(),
 				contingut.getNom(),

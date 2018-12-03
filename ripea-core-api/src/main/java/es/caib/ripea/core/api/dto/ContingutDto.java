@@ -30,7 +30,14 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected UsuariDto darrerMovimentUsuari;
 	protected String darrerMovimentComentari;
 	private boolean alerta;
-
+	private boolean hasFills;
+	
+	public boolean isHasFills() {
+		return hasFills;
+	}
+	public void setHasFills(boolean hasFills) {
+		this.hasFills = hasFills;
+	}
 	public Long getId() {
 		return id;
 	}

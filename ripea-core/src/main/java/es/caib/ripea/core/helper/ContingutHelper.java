@@ -236,6 +236,11 @@ public class ContingutHelper {
 		resposta.setEsborrat(contingut.getEsborrat());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
+		if(!contingut.getFills().isEmpty()){
+			resposta.setHasFills(true);
+		} else {
+			resposta.setHasFills(false);
+		}
 		if (contingut.getExpedient() != null) {
 			resposta.setExpedientPare(
 					(ExpedientDto)toContingutDto(
