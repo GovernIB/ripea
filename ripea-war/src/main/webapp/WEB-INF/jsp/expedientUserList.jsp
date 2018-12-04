@@ -116,19 +116,16 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
-	</div>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedientsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="expedient.list.user.placeholder.tipusExpedient" inline="true"/>
+			</div>		
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="expedient.list.user.placeholder.titol"/>
-			</div>
-			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedientsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="expedient.list.user.placeholder.tipusExpedient" inline="true"/>
 			</div>
 			<div class="col-md-3">
 				<rip:inputSelect name="estat" optionItems="${expedientEstatEnumOptions}" optionValueAttribute="value" emptyOption="true" optionTextKeyAttribute="text" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
@@ -137,21 +134,19 @@ function getCookie(cname) {
 		<div class="row">
 			<div class="col-md-9">
 				<div class="row">
-					<div class="col-md-3">
+					<div class="col-md-4">
 						<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
 					</div>
-					<div class="col-md-3">
+					<div class="col-md-4">
 						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
 					</div>
-					<div class="col-md-3">
-						<rip:inputDate name="dataTancatInici" inline="true" placeholderKey="expedient.list.user.placeholder.tancat.inici"/>
-					</div>
-					<div class="col-md-3">
-						<rip:inputDate name="dataTancatFi" inline="true" placeholderKey="expedient.list.user.placeholder.tancat.fi"/>
-					</div>
+					<div class="col-md-4">
+						<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
+					</div>						
 				</div>
 				<rip:inputHidden name="meusExpedients"/>
 			</div>
+			
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
