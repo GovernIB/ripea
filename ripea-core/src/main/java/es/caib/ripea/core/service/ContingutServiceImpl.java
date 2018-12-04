@@ -330,13 +330,13 @@ public class ContingutServiceImpl implements ContingutService {
 					ContingutEntity.class,
 					"Aquest contingut no està esborrat");
 		}
-		if (contingut.getPare() == null) {
-			logger.error("Aquest contingut no te pare (contingutId=" + contingutId + ")");
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"Aquest contingut no te pare");
-		}
+//		if (contingut.getPare() == null) {
+//			logger.error("Aquest contingut no te pare (contingutId=" + contingutId + ")");
+//			throw new ValidationException(
+//					contingutId,
+//					ContingutEntity.class,
+//					"Aquest contingut no te pare");
+//		}
 		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
 				contingut.getPare(),
 				contingut.getNom(),
