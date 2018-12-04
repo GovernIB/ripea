@@ -46,7 +46,7 @@ public class BustiaV0Test {
 		BustiaV0 bustia = new BustiaV0Service(url).getBustiaV0ServicePort();
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<Handler>();
-		handlerChain.add(new LogMessageHandler());
+		//handlerChain.add(new LogMessageHandler());
 		if (USERNAME != null) {
 			BindingProvider bp = (BindingProvider)bustia;
 			bp.getBinding().setHandlerChain(handlerChain);

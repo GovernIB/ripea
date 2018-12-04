@@ -17,6 +17,8 @@
 	<rip:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
+	$('#passarela-form').css('height', '300px');
+	webutilModalAdjustHeight();
 	$('#motiu').on('keyup', function (event) {
 		if ($(this).val() == 'testlimit' || $(this).val() == 'limittest' || $(this).val() == 'limitest') {
 			$('#inputFile').removeClass('hidden');
@@ -36,7 +38,7 @@ $(document).ready(function() {
 		</div>
 	</c:if>
 	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/firmaPassarela"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="passarelaFirmaEnviarCommand" role="form" enctype="multipart/form-data">
+	<form:form id="passarela-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="passarelaFirmaEnviarCommand" role="form" enctype="multipart/form-data">
 		<rip:inputTextarea name="motiu" textKey="passarelafirma.form.camp.motiu" required="true"/>
 		<%--rip:inputText name="lloc" textKey="passarelafirma.form.camp.lloc" required="true"/--%>
 		<div id="inputFile" class="hidden">

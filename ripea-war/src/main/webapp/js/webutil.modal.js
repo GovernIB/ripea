@@ -211,9 +211,11 @@
 				
 				iframe.on('load', function () {
 					localStorage['relval_' + settings.dataTableId] = undefined;
-//					$(this).removeData('retval');
-					var pathname = this.contentDocument.location.pathname;
-					if (pathname == webutilModalTancarPath()) {
+					var pathname;
+					if (this.contentDocument) {
+						pathname = this.contentDocument.location.pathname;
+					}
+					if (pathname && pathname == webutilModalTancarPath()) {
 						$('button.close', $(this).closest('.modal-dialog')).trigger('click');
 						if (settings.refreshMissatges && !settings.refreshPagina) {
 							webutilRefreshMissatges();
