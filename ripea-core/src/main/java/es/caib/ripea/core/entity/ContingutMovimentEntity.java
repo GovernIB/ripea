@@ -30,18 +30,21 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class ContingutMovimentEntity extends RipeaAuditable<Long> {
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "contingut_id")
-	@ForeignKey(name = "ipa_contingut_contmov_fk")
-	protected ContingutEntity contingut;
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@JoinColumn(name = "origen_id")
-	@ForeignKey(name = "ipa_origen_contmov_fk")
-	protected ContingutEntity origen;
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "desti_id")
-	@ForeignKey(name = "ipa_desti_contmov_fk")
-	protected ContingutEntity desti;
+//	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "contingut_id")
+//	@ForeignKey(name = "ipa_contingut_contmov_fk")
+	@Column(name = "contingut_id")
+	protected Long contingutId;
+//	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "origen_id")
+//	@ForeignKey(name = "ipa_origen_contmov_fk")
+	@Column(name = "origen_id")
+	protected Long origenId;
+//	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "desti_id")
+//	@ForeignKey(name = "ipa_desti_contmov_fk")
+	@Column(name = "desti_id")
+	protected Long destiId;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "remitent_codi")
 	@ForeignKey(name = "ipa_remitent_contmov_fk")
@@ -50,14 +53,14 @@ public class ContingutMovimentEntity extends RipeaAuditable<Long> {
 	protected String comentari;
 
 
-	public ContingutEntity getContingut() {
-		return contingut;
+	public Long getContingutId() {
+		return contingutId;
 	}
-	public ContingutEntity getOrigen() {
-		return origen;
+	public Long getOrigenId() {
+		return origenId;
 	}
-	public ContingutEntity getDesti() {
-		return desti;
+	public Long getDestiId() {
+		return destiId;
 	}
 	public UsuariEntity getRemitent() {
 		return remitent;
@@ -67,9 +70,9 @@ public class ContingutMovimentEntity extends RipeaAuditable<Long> {
 	}
 
 	public static Builder getBuilder(
-			ContingutEntity contenidor,
-			ContingutEntity origen,
-			ContingutEntity desti,
+			Long contenidor,
+			Long origen,
+			Long desti,
 			UsuariEntity remitent,
 			String comentari) {
 		return new Builder(
@@ -80,8 +83,8 @@ public class ContingutMovimentEntity extends RipeaAuditable<Long> {
 				comentari);
 	}
 	public static Builder getBuilder(
-			ContingutEntity contenidor,
-			ContingutEntity desti,
+			Long contenidor,
+			Long desti,
 			UsuariEntity remitent,
 			String comentari) {
 		return new Builder(
@@ -94,15 +97,15 @@ public class ContingutMovimentEntity extends RipeaAuditable<Long> {
 	public static class Builder {
 		ContingutMovimentEntity built;
 		Builder(
-				ContingutEntity contingut,
-				ContingutEntity origen,
-				ContingutEntity desti,
+				Long contingutId,
+				Long origenId,
+				Long destiId,
 				UsuariEntity remitent,
 				String comentari) {
 			built = new ContingutMovimentEntity();
-			built.contingut = contingut;
-			built.origen = origen;
-			built.desti = desti;
+			built.contingutId = contingutId;
+			built.origenId = origenId;
+			built.destiId = destiId;
 			built.remitent = remitent;
 			built.comentari = comentari;
 		}

@@ -29,7 +29,7 @@ public class SessioInterceptor extends HandlerInterceptorAdapter {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		SessioHelper.processarAutenticacio(request, aplicacioService);
+		SessioHelper.processarAutenticacio(request, response, aplicacioService);
 		return true;
 	}
 

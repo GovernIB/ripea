@@ -14,6 +14,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
@@ -213,6 +214,15 @@ public class ExpedientServiceBean implements ExpedientService {
 				filtre,
 				expedientId,
 				paginacioParams);
+	}
+
+	@Override
+	public List<ContingutDto> findByEntitatAndMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegate.findByEntitatAndMetaExpedient(
+				entitatId,
+				metaExpedientId);
 	}
 
 }

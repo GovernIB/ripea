@@ -37,14 +37,8 @@ public class RipeaController {
 
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String get(
-			HttpServletRequest request,
-			HttpServletResponse response) {
-		/*LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-        localeResolver.setLocale(
-        		request,
-        		response,
-        		StringUtils.parseLocaleString(
-        				aplicacioService.getUsuariActual().getIdioma()));*/
+			HttpServletRequest request) {
+		
 		if (RolHelper.isRolActualSuperusuari(request)) {
 			return "redirect:entitat";
 		} else {

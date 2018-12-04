@@ -75,10 +75,7 @@ public class UsuariController  extends BaseAdminController {
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
 		
-		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-        localeResolver.setLocale(request, response, StringUtils.parseLocaleString(aplicacioService.getUsuariActual().getIdioma()));
-        
-			return getModalControllerReturnValueSuccess(
+		return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:/",
 					"usuari.controller.modificat.ok");

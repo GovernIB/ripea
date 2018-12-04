@@ -105,6 +105,7 @@ $(document).ready(function() {
 				<th data-col-name="escriptori" data-visible="false">#</th>
 				<th data-col-name="expedient" data-visible="false">#</th>
 				<th data-col-name="carpeta" data-visible="false">#</th>
+				<th data-col-name="hasFills" data-visible="false">#</th>
 				<th data-col-name="document" data-visible="false">#</th>
 				<th data-col-name="registre" data-visible="false">#</th>
 				<th data-col-name="esborrat" data-visible="false">#</th>
@@ -139,7 +140,11 @@ $(document).ready(function() {
 								<li><a href="contingutAdmin/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 								{{if esborrat}}
 								<li><a href="contingutAdmin/{{:id}}/undelete" data-toggle="ajax"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="contingut.admin.boto.recuperar"/></a></li>
-								<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{if hasFills}}
+									<li class="disabled"><a data-toggle="ajax" ><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{else}}
+									<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{/if}}								
 								{{/if}}
 							</ul>
 						</div>

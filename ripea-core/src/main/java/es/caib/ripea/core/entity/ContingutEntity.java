@@ -138,6 +138,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	public void updatePare(ContingutEntity pare) {
 		this.pare = pare;
 	}
+	public void updateExpedient(ExpedientEntity expedient) {
+		this.expedient = expedient;
+	}
 	public void updateEsborrat(int esborrat) {
 		this.esborrat = esborrat;
 	}

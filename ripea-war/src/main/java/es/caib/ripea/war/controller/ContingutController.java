@@ -139,8 +139,6 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@RequestParam(required = false, defaultValue = "false") Boolean isExpedientDetail,
 			Model model) throws IOException {
-
-
 	
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutDto contingut = contingutService.findAmbIdUser(
@@ -151,7 +149,6 @@ public class ContingutController extends BaseUserController {
 		contingutService.deleteReversible(
 				entitatActual.getId(),
 				contingutId);
-		
 
 		if(isExpedientDetail){
 			return getAjaxControllerReturnValueSuccess(

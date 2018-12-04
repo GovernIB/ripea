@@ -41,7 +41,7 @@ $(document).ready(function() {
 							$('td.log-info-accio-data', $newTd).text(data.pare.createdDateAmbFormat);
 							$('td.log-info-accio-usuari', $newTd).text(data.pare.createdBy.nom);
 							$('td.log-info-accio-tipus', $newTd).text(logTipusEnumText[data.pare.tipus]);
-							$('td.log-info-accio-objecte', $newTd).text("[" + logObjecteTipusEnumText[data.objecteTipus] + "#" + data.objecteId + "] " + data.objecteNom);
+							$('td.log-info-accio-objecte', $newTd).text("[" + logObjecteTipusEnumText[data.objecteTipus] + "#" + data.objecteId + "] " /*+ data.objecteNom*/);
 							if (data.param1 !== null || data.param2 !== null) {
 								if (data.pare.param1 !== null)
 									$('td.log-info-accio-param1-valor', $newTd).text(data.pare.param1);
@@ -54,8 +54,8 @@ $(document).ready(function() {
 							$('div.log-info-accio', $newTd).remove();
 						}
 						if (data.contingutMoviment != null) {
-							$('td.log-info-moviment-origen', $newTd).text("[#" + data.contingutMoviment.origen.id + "] " + data.contingutMoviment.origen.nom);
-							$('td.log-info-moviment-desti', $newTd).text("[#" + data.contingutMoviment.desti.id + "] " + data.contingutMoviment.desti.nom);
+							$('td.log-info-moviment-origen', $newTd).text("[#" + data.contingutMoviment.origenId + "] " );
+							$('td.log-info-moviment-desti', $newTd).text("[#" + data.contingutMoviment.destiId + "] ");
 						} else {
 							$('div.log-info-moviment', $newTd).remove();
 						}
@@ -192,20 +192,22 @@ $(document).ready(function() {
 								<td><fmt:formatDate value="${moviment.data}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 								<td>${moviment.remitent.nom}</td>
 								<td>
-									<c:if test="${not empty moviment.origen}">
-										<c:choose>
-											<c:when test="${moviment.origen.expedient}"><spring:message code="contingut.tipus.enum.EXPEDIENT"/></c:when>
-											<c:when test="${moviment.origen.carpeta}"><spring:message code="contingut.tipus.enum.CARPETA"/></c:when>
-											<c:when test="${moviment.origen.document}"><spring:message code="contingut.tipus.enum.DOCUMENT"/></c:when>
-										</c:choose>#${moviment.origen.id}
+									<c:if test="${not empty moviment.origenId}">
+<%-- 										<c:choose> --%>
+<%-- 											<c:when test="${moviment.origen.expedient}"><spring:message code="contingut.tipus.enum.EXPEDIENT"/></c:when> --%>
+<%-- 											<c:when test="${moviment.origen.carpeta}"><spring:message code="contingut.tipus.enum.CARPETA"/></c:when> --%>
+<%-- 											<c:when test="${moviment.origen.document}"><spring:message code="contingut.tipus.enum.DOCUMENT"/></c:when> --%>
+<%-- 										</c:choose> --%>
+										#${moviment.origenId}
 									</c:if>
 								</td>
 								<td>
-									<c:choose>
-										<c:when test="${moviment.desti.expedient}"><spring:message code="contingut.tipus.enum.EXPEDIENT"/></c:when>
-										<c:when test="${moviment.desti.carpeta}"><spring:message code="contingut.tipus.enum.CARPETA"/></c:when>
-										<c:when test="${moviment.desti.document}"><spring:message code="contingut.tipus.enum.DOCUMENT"/></c:when>
-									</c:choose>#${moviment.desti.id}
+<%-- 									<c:choose> --%>
+<%-- 										<c:when test="${moviment.desti.expedient}"><spring:message code="contingut.tipus.enum.EXPEDIENT"/></c:when> --%>
+<%-- 										<c:when test="${moviment.desti.carpeta}"><spring:message code="contingut.tipus.enum.CARPETA"/></c:when> --%>
+<%-- 										<c:when test="${moviment.desti.document}"><spring:message code="contingut.tipus.enum.DOCUMENT"/></c:when> --%>
+<%-- 									</c:choose> --%>
+									#${moviment.destiId}
 								</td>
 								<td>${moviment.comentari}</td>
 							</tr>

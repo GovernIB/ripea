@@ -293,16 +293,16 @@ public class ContingutServiceImpl implements ContingutService {
 			contingut.getPare().getFills().remove(contingut);
 		}
 		contingutRepository.delete(contingut);
-		// Propaga l'acció a l'arxiu
-		contingutHelper.arxiuPropagarEliminacio(contingut);
-		// Registra al log l'eliminació definitiva del contingut
-		contingutLogHelper.log(
-				contingut,
-				LogTipusEnumDto.ELIMINACIODEF,
-				null,
-				null,
-				true,
-				true);
+//		// Propaga l'acció a l'arxiu
+//		contingutHelper.arxiuPropagarEliminacio(contingut);
+//		// Registra al log l'eliminació definitiva del contingut
+//		contingutLogHelper.log(
+//				contingut,
+//				LogTipusEnumDto.ELIMINACIODEF,
+//				null,
+//				null,
+//				true,
+//				true);
 		return dto;
 	}
 
@@ -803,11 +803,11 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId);
+//		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+//				entitat,
+//				contingutId);
 		return contingutLogHelper.findLogDetalls(
-				contingut,
+				contingutId,
 				contingutLogId);
 	}
 
@@ -820,13 +820,13 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre d'accions pel contingut usuari normal ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
-				entitatId,
-				contingutId,
-				true,
-				false);
+//		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
+//				entitatId,
+//				contingutId,
+//				true,
+//				false);
 		return contingutLogHelper.findLogDetalls(
-				contingut,
+				contingutId,
 				contingutLogId);
 	}
 
