@@ -141,7 +141,7 @@ function getCookie(cname) {
 						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
 					</div>
 					<div class="col-md-4">
-						<button id="meusExpedientsBtn" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-desktop"></span> <spring:message code="expedient.list.user.meus"/></button>
+						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span></button>
 					</div>						
 				</div>
 				<rip:inputHidden name="meusExpedients"/>
