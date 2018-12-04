@@ -20,7 +20,16 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDocument/new" data-toggle="modal" data-datatable-id="metadocuments"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.list.boto.nou"/></a>
 	</div>
-	<table id="metadocuments" data-toggle="datatable" data-url="<c:url value="metaDocument/datatable"/>" data-info-type="search" data-default-order="2" data-default-dir="asc" class="table table-striped table-bordered" style="width:100%">
+	<table
+		id="metadocuments"
+		data-toggle="datatable"
+		data-url="<c:url value="metaDocument/datatable"/>"
+		data-info-type="search"
+		data-default-order="2"
+		data-default-dir="asc"
+		data-drag-enabled="true"
+		class="table table-striped table-bordered"
+		style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
@@ -34,7 +43,7 @@
 				</th>
 				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="10%">
 					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
-						<a href="metaDocument/{{:id}}/metaDada" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metadocument.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
+						<a href="metaDocument/{{:id}}/metaDada" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;Permisos&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

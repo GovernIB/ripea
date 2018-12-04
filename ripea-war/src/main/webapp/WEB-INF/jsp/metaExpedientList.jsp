@@ -54,22 +54,22 @@
 				</th>
 				<th data-col-name="metaDocumentsCount" data-template="#cellMetaDocumentsTemplate" data-orderable="false" width="10%">
 					<script id="cellMetaDocumentsTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/metaDocument" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.documents"/>&nbsp;<span class="badge">{{:metaDocumentsCount}}</span></a>
+						<a href="metaExpedient/{{:id}}/metaDocument" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.documents"/>&nbsp;<span class="badge">{{:metaDocumentsCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="10%">
 					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/metaDada" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
+						<a href="metaExpedient/{{:id}}/metaDada" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
 					</script>
 				</th>
-				<%--th data-col-name="arxiusCount" data-template="#cellArxiusTemplate" data-orderable="false" width="10%">
+				<th data-col-name="arxiusCount" data-template="#cellArxiusTemplate" data-orderable="false" width="10%">
 					<script id="cellArxiusTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/arxiu" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.arxius"/>&nbsp;<span class="badge">{{:arxiusCount}}</span></a>
+						<a href="metaExpedient/{{:id}}/estat" class="btn btn-default">Estats&nbsp;<span class="badge">0</span></a>
 					</script>
-				</th--%>
+				</th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
