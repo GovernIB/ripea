@@ -157,6 +157,9 @@
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
+				<th data-col-name="expedient" data-visible="false"></th>
+				<th data-col-name="carpeta" data-visible="false"></th>
+				<th data-col-name="document" data-visible="false"></th>
 				<th data-col-name="tipus" data-orderable="true" width="15%" data-template="#cellTipusTemplate">
 					<spring:message code="accio.massiva.list.column.tipuselement"/>
 					<script id="cellTipusTemplate" type="text/x-jsrender">
@@ -168,15 +171,12 @@
 				<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
 					<spring:message code="accio.massiva.list.column.ubicacio"/>
 					<script id="cellPathTemplate" type="text/x-jsrender">
-						{{for path}}/
-							{{if escriptori}}<span class="fa ${iconaEscriptori}" title="<spring:message code="contingut.path.escriptori"/>"></span>
-							{{else expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
+						{{if path}}{{for path}}/
+							{{if expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
 							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
-							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>
-							{{else arxiv}}{{if #getIndex() == 0}}<span class="fa ${iconaUnitat}" title="<spring:message code="contingut.icona.unitat"/>"></span>{{else}}<span class="fa ${iconaArxiu}" title="<spring:message code="contingut.icona.arxiu"/>"></span>{{/if}}
-							{{else bustia}}{{if #getIndex() == 0}}<span class="fa ${iconaUnitat}" title="<spring:message code="contingut.icona.unitat"/>"></span>{{else}}<span class="fa ${iconaBustia}" title="<spring:message code="contingut.icona.bustia"/>"></span>{{/if}}{{/if}}
-							{{if escriptori}}{{:createdBy.nom}}{{else}}{{:nom}}{{/if}}
-						{{/for}}
+							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>{{/if}}
+							{{:nom}}
+						{{/for}}{{/if}}
 					</script>
 				</th>
 				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
