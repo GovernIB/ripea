@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class MetaExpedientEntity extends MetaNodeEntity {
 
-	@Column(name = "clasif_sia", length = 6, nullable = false)
+	@Column(name = "clasif_sia", length = 30, nullable = false)
 	private String classificacioSia;
 	@Column(name = "serie_doc", length = 30, nullable = false)
 	private String serieDocumental;

@@ -95,8 +95,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getCodi(),
 				metaExpedient.getNom(),
 				metaExpedient.getDescripcio(),
-				metaExpedient.getClassificacioSia(),
 				metaExpedient.getSerieDocumental(),
+				metaExpedient.getClassificacioSia(),
 				metaExpedient.isNotificacioActiva(),
 				entitat,
 				metaExpedientPare).
