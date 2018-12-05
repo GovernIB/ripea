@@ -47,6 +47,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -106,6 +107,7 @@ public class ContingutController extends BaseUserController {
 				SessioHelper.desmarcarLlegit(request),
 				model);
 		model.addAttribute("isContingutDetail", false);		
+		model.addAttribute("isMostrarCarpeta", PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));	
 		return "contingut";
 	}
 	
@@ -533,7 +535,7 @@ public class ContingutController extends BaseUserController {
 		}
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
-			contingutVista = CONTENIDOR_VISTA_ICONES;
+			contingutVista = CONTENIDOR_VISTA_LLISTAT;
 		model.addAttribute(
 				"vistaIcones",
 				new Boolean(CONTENIDOR_VISTA_ICONES.equals(contingutVista)));

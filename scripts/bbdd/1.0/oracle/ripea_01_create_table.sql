@@ -64,7 +64,7 @@ CREATE TABLE IPA_METAEXPEDIENT
 (
   ID                 NUMBER(19)                 NOT NULL,
   PARE_ID            NUMBER(19),
-  CLASIF_SIA         VARCHAR2(6)                NOT NULL,
+  CLASIF_SIA         VARCHAR2(30)                NOT NULL,
   SERIE_DOC          VARCHAR2(30)               NOT NULL,
   NOT_ACTIVA         NUMBER(1)                  NOT NULL,
   NOT_SEU_PROC_CODI  VARCHAR2(44),
@@ -260,7 +260,7 @@ CREATE TABLE IPA_EXPEDIENT
   NTI_IDENTIF        VARCHAR2(52)               NOT NULL,
   NTI_ORGANO         VARCHAR2(9)                NOT NULL,
   NTI_FECHA_APE      TIMESTAMP(6)               NOT NULL,
-  NTI_CLASIF_SIA     VARCHAR2(6)                NOT NULL,
+  NTI_CLASIF_SIA     VARCHAR2(30)                NOT NULL,
   SISTRA_BANTEL_NUM  VARCHAR2(16),
   SISTRA_PUBLICAT    NUMBER(1),
   SISTRA_UNITAT_ADM  VARCHAR2(9),
