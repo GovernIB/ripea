@@ -78,6 +78,7 @@
 						<td>
 							<rip:blocIconaContingut contingut="${fill}"/>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
+							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							&nbsp;${fill.nom}
 						</td>
 						<td>

@@ -31,7 +31,7 @@ public class MetaExpedientCommand {
 	private String nom;
 	@Size(max=1024)
 	private String descripcio;
-	@NotEmpty @Size(max = 6)
+	@NotEmpty @Size(max = 30)
 	private String classificacioSia;
 	@Size(max = 30)
 	private String serieDocumental;
