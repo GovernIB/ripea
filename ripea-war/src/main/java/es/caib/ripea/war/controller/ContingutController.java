@@ -47,7 +47,6 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -106,8 +105,8 @@ public class ContingutController extends BaseUserController {
 				contingut,
 				SessioHelper.desmarcarLlegit(request),
 				model);
-		model.addAttribute("isContingutDetail", false);		
-		model.addAttribute("isMostrarCarpeta", PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));	
+		model.addAttribute("isContingutDetail", false);
+		model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByPrefix("es.caib.ripea.creacio.carpetes.activa").toString()));
 		return "contingut";
 	}
 	
