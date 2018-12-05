@@ -79,8 +79,10 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 			<c:if test="${contingut.documentTipus != 'FISIC'}">
+				<c:if test="${contingut.custodiat}">
+					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
+				</c:if>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
-				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
 			<c:if test="${potModificarExpedientPare}">
