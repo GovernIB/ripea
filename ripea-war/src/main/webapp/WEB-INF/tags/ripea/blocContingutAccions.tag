@@ -127,6 +127,9 @@
 			<li role="separator" class="divider"></li>
 		</c:if>
 		<li><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
+		<c:if test="${contingut.expedient}">
+			<li><a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-comments"></span>&nbsp;<spring:message code="comu.boto.comentaris"/>...</a></li>
+		</c:if>
 		<c:if test="${contingut.expedient or contingut.document}">
 			<c:choose>
 				<c:when test="${!empty nodeco}">

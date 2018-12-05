@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
@@ -343,6 +344,15 @@ public interface ExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ContingutDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text);
+
+	@PreAuthorize("hasRole('tothom')")
+	List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean hasWritePermission(Long expedientId);
 
 
 }
