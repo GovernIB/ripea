@@ -710,17 +710,6 @@ $(document).ready(function() {
 								<div class="btn-group">
 									<c:choose>
 									    <c:when test="${isContingutDetail}">
-									      	<c:set var="iconesVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/></c:set>
-									    </c:when>    
-									    <c:otherwise>
-									    	<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/icones"/></c:set>
-									    </c:otherwise>
-									</c:choose>						
-									<a href="${iconesVistaUrl}" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
-										<span class="fa fa-th"></span>
-									</a>
-									<c:choose>
-									    <c:when test="${isContingutDetail}">
 									      	<c:set var="llistatVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/llistat"/></c:set>
 									    </c:when>    
 									    <c:otherwise>
@@ -730,6 +719,17 @@ $(document).ready(function() {
 									<a href="${llistatVistaUrl}" class="btn btn-default<c:if test="${vistaLlistat}"> active</c:if>">
 										<span class="fa fa-th-list"></span>
 									</a>
+									<c:choose>
+									    <c:when test="${isContingutDetail}">
+									      	<c:set var="iconesVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/></c:set>
+									    </c:when>    
+									    <c:otherwise>
+									    	<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/icones"/></c:set>
+									    </c:otherwise>
+									</c:choose>						
+									<a href="${iconesVistaUrl}" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
+										<span class="fa fa-th"></span>
+									</a>									
 								</div>
 								<c:if test="${contingut.escriptori}">
 									<div id="boto-accions-massives" class="btn-group">

@@ -535,7 +535,7 @@ public class ContingutController extends BaseUserController {
 		}
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
-			contingutVista = CONTENIDOR_VISTA_ICONES;
+			contingutVista = CONTENIDOR_VISTA_LLISTAT;
 		model.addAttribute(
 				"vistaIcones",
 				new Boolean(CONTENIDOR_VISTA_ICONES.equals(contingutVista)));
