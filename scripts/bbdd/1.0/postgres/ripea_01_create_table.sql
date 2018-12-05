@@ -585,3 +585,15 @@ CREATE TABLE IPA_ACL_OBJECT_IDENTITY
   OWNER_SID           bigint                    NOT NULL,
   ENTRIES_INHERITING  boolean                   NOT NULL
 );
+
+
+CREATE TABLE IPA_EXP_COMMENT
+(
+  ID                   BIGINT         NOT NULL,
+  EXPEDIENT_ID         BIGINT 		  NOT NULL,
+  TEXT				   character varying (1024),
+  CREATEDDATE          timestamp without time zone,
+  LASTMODIFIEDDATE     timestamp without time zone,
+  CREATEDBY_CODI       character varying(64),
+  LASTMODIFIEDBY_CODI  character varying(64)
+);

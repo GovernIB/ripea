@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -26,8 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -61,6 +65,8 @@ public class ExpedientController extends BaseUserController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String get(
@@ -168,6 +174,55 @@ public class ExpedientController extends BaseUserController {
 				url,
 				"expedient.controller.agafat.ok");
 	}
+	
+	@RequestMapping(value = "/{expedientId}/comentaris", method = RequestMethod.GET)
+	public String comentaris(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"contingut",
+				contingutService.findAmbIdUser(
+						entitatActual.getId(),
+						expedientId,
+						true,
+						false));
+		
+		boolean hasWritePermisions = expedientService.hasWritePermission(expedientId);
+		model.addAttribute(
+				"hasWritePermisions",
+				hasWritePermisions);
+		
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		model.addAttribute(
+				"usuariActual",
+				usuariActual);
+		
+		return "expedientComentaris";
+	}	
+	
+	
+	
+	@RequestMapping(value = "/{contingutId}/comentaris/publicar", method = RequestMethod.POST)
+	@ResponseBody
+	public List<ExpedientComentariDto> publicarComentari(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@RequestParam String text,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (text != null && !text.isEmpty()) {
+			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text);
+		}
+			
+		return expedientService.findComentarisPerContingut(
+				entitatActual.getId(), 
+				contingutId);
+	}
+
+
 
 	@RequestMapping(value = "/{expedientId}/alliberar", method = RequestMethod.GET)
 	public String alliberar(
