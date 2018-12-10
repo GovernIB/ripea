@@ -30,7 +30,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ContingutComentariDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -46,6 +48,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -67,6 +70,7 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -83,6 +87,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
@@ -275,6 +281,106 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false);
 	}
 
+	
+	
+	@Transactional
+	@Override
+	public boolean publicarComentariPerExpedient(
+			Long entitatId,
+			Long expedientId,
+			String text) {
+		logger.debug("Obtenint els comentaris pel contingut ("
+				+ "entitatId=" + entitatId + ", "
+				+ "nodeId=" + expedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				true);
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false);
+
+		//truncam a 1024 caracters
+		if (text.length() > 1024)
+			text = text.substring(0, 1024);
+		ExpedientComentariEntity comentari = ExpedientComentariEntity.getBuilder(
+				expedient, 
+				text).build();
+		expedientComentariRepository.save(comentari);
+		return true;
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientComentariDto> findComentarisPerContingut(
+			Long entitatId,
+			Long expedientId) {
+		logger.debug("Obtenint els comentaris pel expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "nodeId=" + expedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false, 
+				true);
+
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false);
+		
+		List<ExpedientComentariEntity> expcoms = 
+				expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(expedient);
+
+		return conversioTipusHelper.convertirList(
+				expcoms, 
+				ExpedientComentariDto.class);
+	}	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public boolean hasWritePermission(
+			Long expedientId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		if (comprovarPermisRead) {
+//			boolean granted = permisosHelper.isGrantedAll(
+//					metaNode.getId(),
+//					MetaNodeEntity.class,
+//					new Permission[] {ExtendedPermission.READ},
+//					auth);
+//			if (!granted) {
+//				throw new SecurityException("Sense permisos per accedir al node ("
+//						+ "id=" + nodeId + ", "
+//						+ "usuari=" + auth.getName() + ")");
+//			}
+//		}
+		
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		
+	
+		boolean granted = permisosHelper.isGrantedAll(
+				expedient.getMetaExpedient().getId(),
+				MetaNodeEntity.class,
+				new Permission[] {ExtendedPermission.WRITE},
+				auth);	
+		
+		return granted;
+
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
@@ -783,8 +889,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				expedientId,
 				false,
-				false,
 				true,
+				false,
 				false,
 				false);
 		List<ExpedientEntity> relacionats = new ArrayList<ExpedientEntity>();
@@ -1156,6 +1262,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ambPathIPermisos,
 				false,
 				false);
+		
+		expedientDto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
+		
 		return expedientDto;
 	}
 

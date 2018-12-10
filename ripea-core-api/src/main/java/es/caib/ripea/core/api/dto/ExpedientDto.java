@@ -30,7 +30,15 @@ public class ExpedientDto extends NodeDto {
 	private UsuariDto agafatPer;
 	private String numero;
 	private boolean conteDocumentsFirmats;
+	private long numComentaris;
+	
 
+	public long getNumComentaris() {
+		return numComentaris;
+	}
+	public void setNumComentaris(long numComentaris) {
+		this.numComentaris = numComentaris;
+	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}
