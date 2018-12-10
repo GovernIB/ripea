@@ -234,8 +234,13 @@ function getCookie(cname) {
 							</span>
 						{{/if}}
 					</script>
-				</th>
+				</th>			
 				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="5%">
+					<script id="cellPermisosTemplate" type="text/x-jsrender">
+							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+					</script>
+				</th>					
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

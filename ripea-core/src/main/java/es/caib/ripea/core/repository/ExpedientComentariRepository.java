@@ -6,6 +6,8 @@ package es.caib.ripea.core.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -20,6 +22,15 @@ public interface ExpedientComentariRepository extends JpaRepository<ExpedientCom
 	
 	List<ExpedientComentariEntity> findByExpedientOrderByCreatedDateAsc(
 			ExpedientEntity expedient);
+	
+	@Query(	  "select "
+			+ "    count(comment) "
+			+ "from "
+			+ "    ExpedientComentariEntity comment "
+			+ "where "
+			+ "    comment.expedient = :expedient")
+	long countByExpedient(
+			@Param("expedient") ExpedientEntity expedient);	
 
 
 }

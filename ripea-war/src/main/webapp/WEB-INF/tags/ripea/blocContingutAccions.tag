@@ -51,6 +51,7 @@
 				</c:if>
 				<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/relacionar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+				<li><a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-comments"></span>&nbsp;<spring:message code="comu.boto.comentaris"/>...</a></li>
 				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
 				<c:choose>
@@ -127,9 +128,6 @@
 			<li role="separator" class="divider"></li>
 		</c:if>
 		<li><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-		<c:if test="${contingut.expedient}">
-			<li><a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-comments"></span>&nbsp;<spring:message code="comu.boto.comentaris"/>...</a></li>
-		</c:if>
 		<c:if test="${contingut.expedient or contingut.document}">
 			<c:choose>
 				<c:when test="${!empty nodeco}">

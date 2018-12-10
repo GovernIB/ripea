@@ -1262,6 +1262,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ambPathIPermisos,
 				false,
 				false);
+		
+		expedientDto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
+		
 		return expedientDto;
 	}
 
