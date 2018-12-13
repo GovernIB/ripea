@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutLogEntity;
 
 /**

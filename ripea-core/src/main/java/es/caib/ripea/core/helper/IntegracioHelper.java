@@ -218,18 +218,22 @@ public class IntegracioHelper {
 	
 	private void afegirParametreUsuari(
 			IntegracioAccioDto accio) {
-		String usuariNomCodi = "";
+		String usuariNomCodi = null;
 		UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 		if (usuari != null) {
 			usuariNomCodi = usuari.getNom() + " (" + usuari.getCodi() + ")";
 		} else {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null)
+			if (auth != null) {
 				usuariNomCodi = auth.getName();
+			}
 		}
-		if(accio.getParametres() == null)
-			accio.setParametres(new HashMap<String, String>());
-		accio.getParametres().put("usuari", usuariNomCodi);
+		if (usuariNomCodi != null) {
+			if (accio.getParametres() == null) {
+				accio.setParametres(new HashMap<String, String>());
+			}
+			accio.getParametres().put("usuari", usuariNomCodi);
+		}
 	}
 
 	private IntegracioDto novaIntegracio(

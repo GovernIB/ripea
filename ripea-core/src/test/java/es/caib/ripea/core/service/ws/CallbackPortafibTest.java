@@ -47,7 +47,7 @@ public class CallbackPortafibTest {
 			//   70 - DOCUMENT_REBUTJAT;
 			//   80 - DOCUMENT_PAUSAT;
 			new CallbackPortafibTest().test(
-					61347,
+					61535,
 					60);
 		} catch (Exception ex) {
 			ex.printStackTrace();

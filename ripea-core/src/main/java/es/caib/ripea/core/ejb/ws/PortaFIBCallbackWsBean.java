@@ -3,8 +3,6 @@
  */
 package es.caib.ripea.core.ejb.ws;
 
-import javax.annotation.Resource;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.jws.WebService;
@@ -16,7 +14,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.portafib.ws.callback.api.v1.CallBackException;
 import es.caib.portafib.ws.callback.api.v1.PortaFIBCallBackWs;
 import es.caib.portafib.ws.callback.api.v1.PortaFIBEvent;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.service.ws.callbackportafib.PortaFIBCallBackWsImpl;
 
 /**
@@ -39,13 +36,13 @@ import es.caib.ripea.core.service.ws.callbackportafib.PortaFIBCallBackWsImpl;
 @Interceptors(SpringBeanAutowiringInterceptor.class)
 public class PortaFIBCallbackWsBean implements PortaFIBCallBackWs {
 
-	@Resource
-	private SessionContext sessionContext;
+	//@Resource
+	//private SessionContext sessionContext;
 	@Autowired
 	private PortaFIBCallBackWsImpl delegate;
 
-	@Autowired
-	private UsuariHelper usuariHelper;
+	//@Autowired
+	//private UsuariHelper usuariHelper;
 
 
 
@@ -56,9 +53,9 @@ public class PortaFIBCallbackWsBean implements PortaFIBCallBackWs {
 
 	@Override
 	public void event(PortaFIBEvent event) throws CallBackException {
-		usuariHelper.generarUsuariAutenticatEjb(
+		/*usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
-				true);
+				true);*/
 		delegate.event(event);
 	}
 

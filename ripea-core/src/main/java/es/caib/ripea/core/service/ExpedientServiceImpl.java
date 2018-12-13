@@ -30,7 +30,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ContingutComentariDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -292,12 +291,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug("Obtenint els comentaris pel contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				true);
-		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -306,7 +304,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-
 		//truncam a 1024 caracters
 		if (text.length() > 1024)
 			text = text.substring(0, 1024);
@@ -326,13 +323,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug("Obtenint els comentaris pel expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false, 
 				true);
-
-		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,

@@ -15,7 +15,6 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
@@ -26,9 +25,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface ContingutRepository extends JpaRepository<ContingutEntity, Long> {
-	
-	
-	
+
 	@Query(	"select" +
 			"    e " +
 			"from" +

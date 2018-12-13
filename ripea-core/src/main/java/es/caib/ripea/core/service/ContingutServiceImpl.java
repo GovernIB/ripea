@@ -798,7 +798,7 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre d'accions pel contingut usuari normal ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
@@ -820,6 +820,11 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre d'accions pel contingut usuari normal ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
 //		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 //				entitatId,
 //				contingutId,
