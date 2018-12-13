@@ -270,6 +270,54 @@ var publicacioEstatText = new Array();
 publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/>";
 </c:forEach>
 $(document).ready(function() {
+	$("#mostraDetallSignants").click(function(){
+		$('#detallSignants').html("");
+		$('#detallSignants').append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
+		$.get("../contingut/" + ${contingut.id} + "/document/" + ${contingut.id} + "/mostraDetallSignants", function(data){
+			if (data.estatOk) {
+				$('#detallSignants').html("");
+				if(data.objecte != null && data.objecte.length > 0){
+					data.objecte.forEach(function(firma){
+						if(firma != null){
+							if(firma.responsableNom == null){
+								firma.responsableNom = "";
+							}
+							if(firma.responsableNif == null){
+								firma.responsableNif = "";
+							}
+							if(firma.data == null){
+								firma.data = "";
+							}
+							if(firma.emissorCertificat == null){
+								firma.emissorCertificat = "";
+							}
+							$("#detallSignants").append(
+								  "<tr><th><strong>"
+								+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
+								+ "</strong></th><th>"
+								+ firma.responsableNom
+								+ "</th></tr><tr><td><strong>"
+								+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
+								+ "</strong></td><td>"
+								+ firma.responsableNif
+								+ "</td></tr><tr><td><strong>"
+								+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
+								+ "</strong></td><td>"
+								+ firma.data
+								+ "</td></tr><tr><td><strong>"
+								+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
+								+ "</strong></td><td>"
+								+ firma.emissorCertificat
+								+ "</td></tr>");
+						}
+					})
+				}
+			}else{
+				$('#detallSignants').html("");
+			}
+			webutilRefreshMissatges();
+		});
+	});
 	$('#contenidor-contingut li').mouseover(function() {
 		$('a.btn', this).removeClass('hidden');
 	});
@@ -674,9 +722,10 @@ $(document).ready(function() {
 							<c:if test="${contingut.custodiat}">
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h3 class="panel-title">
-											<span class="fa fa-bookmark" title="Document firmat"></span>
+										<h3 class="panel-title" style="height: 36px;">
+											<span class="fa fa-bookmark" title="Document firmat" style="margin-top: 10px;"></span>
 											<spring:message code="contingut.document.info.firma"/>
+											<button id="mostraDetallSignants" class="btn btn-default pull-right"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.mostrar.info.signants"/></button>
 										</h3>
 									</div>
 									<table class="table table-bordered">
@@ -698,9 +747,11 @@ $(document).ready(function() {
 												<td>${contingut.ntiCsvRegulacion}</td>
 											</tr>
 										</tbody>
+										<tbody id="detallSignants">
+										</tbody>
 									</table>
 								</div>
-								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a>
+								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.imprimible"/></a>
 							</c:if>
 							<c:if test="${contingut.documentTipus != 'FISIC'}">
 								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>

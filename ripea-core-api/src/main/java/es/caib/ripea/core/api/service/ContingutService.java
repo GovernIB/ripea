@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.AnotacioRegistreFiltreDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -468,6 +469,18 @@ public interface ContingutService {
 	public List<Long> findIdsMassiusAmbFiltre(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException;
+	
+	/**
+	 * Consulta el detall de les signatures del document elegit.
+	 * 
+	 * @param contingut
+	 *            Contingut en bytes del document.
+	 * @return la informació de les signatures del document.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'informacio amb el contingut en bytes especificat.
+	 */
+	public List<ArxiuFirmaDetallDto> getDetallSignants(
+			byte[] contingut) throws NotFoundException;
 
 	/**
 	 * Consulta el amb el programar accions massives

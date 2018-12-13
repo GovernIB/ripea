@@ -57,6 +57,8 @@ import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentCommand.UpdateFisic;
 import es.caib.ripea.war.escaneig.EscaneigConfig;
 import es.caib.ripea.war.escaneig.EscaneigHelper;
+import es.caib.ripea.war.helper.AjaxHelper;
+import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.ArxiuTemporalHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -350,6 +352,30 @@ public class ContingutDocumentController extends BaseUserController {
 				contingutId,
 				model);
 		return "contingutDocumentForm";
+	}
+	
+	@RequestMapping(value = "/{contingutId}/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
+	@ResponseBody
+	public AjaxFormResponse mostraDetallSignants(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@PathVariable Long documentId,
+			Model model) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				documentId,
+				true,
+				false);
+		if (contingut instanceof DocumentDto) {
+			FitxerDto fitxer = documentService.descarregar(
+					entitatActual.getId(),
+					documentId,
+					null);
+			Object objecte = contingutService.getDetallSignants(fitxer.getContingut());
+			return AjaxHelper.generarAjaxFormOk(objecte);
+		}
+		return null;
 	}
 
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/descarregar", method = RequestMethod.GET)
