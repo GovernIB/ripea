@@ -142,7 +142,7 @@ public class DocumentHelper {
 						null,
 						versio,
 						true,
-						true);
+						false);
 				fitxer = new FitxerDto();
 				fitxer.setContentType(document.getFitxerContentType());
 				fitxer.setNom(document.getFitxerNom());
