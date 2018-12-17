@@ -24,7 +24,7 @@
 		<c:if test="${potModificarExpedientPare}">
 			<c:choose>
 				<c:when test="${contingut.expedient}">
-					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 				<c:when test="${contingut.document and contingut.estat == 'REDACCIO'}">

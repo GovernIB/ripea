@@ -17,7 +17,7 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  */
 public class ExpedientCommand extends ContenidorCommand {
 
-	@NotNull(groups = {Create.class, Update.class})
+	@NotNull(groups = {Create.class})
 	protected Long metaNodeId;
 	private String tancatMotiu;
 	private int any;

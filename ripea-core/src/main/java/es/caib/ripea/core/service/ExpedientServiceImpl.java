@@ -193,7 +193,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public ExpedientDto update(
 			Long entitatId,
 			Long id,
-			String nom) {
+			String nom
+			) {
 		logger.debug("Actualitzant dades de l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
@@ -235,6 +236,68 @@ public class ExpedientServiceImpl implements ExpedientService {
 				null);
 		return dto;
 	}
+	
+	@Transactional
+	@Override
+	public ExpedientDto update(
+			Long entitatId,
+			Long id,
+			String nom,
+			int any
+			) {
+		logger.debug("Actualitzant dades de l'expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ", "
+				+ "nom=" + nom + ")");
+		contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				id,
+				false,
+				true,
+				false,
+				false);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				id,
+				false,
+				false,
+				true,
+				false,
+				false);
+		contingutHelper.comprovarNomValid(
+				expedient.getPare(),
+				nom,
+				id,
+				ExpedientEntity.class);
+		String nomOriginal = expedient.getNom();
+		expedient.update(nom);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(expedient.getNom())) ? expedient.getNom() : null,
+				null,
+				false,
+				false);
+		
+		int anyOriginal = expedient.getAny();
+		expedient.updateAny(any);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(anyOriginal!=(expedient.getAny())) ? String.valueOf(expedient.getAny()) : null,
+				null,
+				false,
+				false);
+		
+		ExpedientDto dto = toExpedientDto(
+				expedient,
+				true);
+		contingutHelper.arxiuPropagarModificacio(
+				expedient,
+				null);
+		return dto;
+	}
+
 
 	@Transactional(readOnly = true)
 	@Override

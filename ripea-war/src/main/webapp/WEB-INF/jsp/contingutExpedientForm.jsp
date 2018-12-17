@@ -28,7 +28,14 @@
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
 		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true"/>
-		<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom"/>
+		<c:choose>
+			<c:when test="${empty expedientCommand.id}">
+				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom"/>
+			</c:when>
+			<c:otherwise>
+				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true"/>
+			</c:otherwise>
+		</c:choose>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

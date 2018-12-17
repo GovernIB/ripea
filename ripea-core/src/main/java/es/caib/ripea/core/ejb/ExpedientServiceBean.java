@@ -246,4 +246,9 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.hasWritePermission(expedientId);
 	}
 
+	@Override
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any) {
+		return delegate.update(entitatId, id, nom, any);
+	}
+
 }

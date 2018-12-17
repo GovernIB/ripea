@@ -189,6 +189,11 @@ public class ExpedientEntity extends NodeEntity {
 			String nom) {
 		this.nom = nom;
 	}
+	
+	public void updateAny(
+			int any) {
+		this.any = any;
+	}
 	public void updateAnySequenciaCodi(
 			int any,
 			long sequencia,

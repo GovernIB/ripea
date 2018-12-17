@@ -450,6 +450,8 @@ public class PluginHelper {
 				expedient.updateArxiu(
 						expedientCreat.getIdentificador());
 			} else {
+				if (interessats.isEmpty())
+					interessats = null;
 				getArxiuPlugin().expedientModificar(
 						toArxiuExpedient(
 								expedient.getArxiuUuid(),

@@ -145,7 +145,8 @@ public class ExpedientController extends BaseUserController {
 		expedientService.update(
 				entitatActual.getId(),
 				command.getId(),
-				command.getNom());
+				command.getNom(),
+				command.getAny());
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../expedient",

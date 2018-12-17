@@ -354,5 +354,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	boolean hasWritePermission(Long expedientId);
 
+	@PreAuthorize("hasRole('tothom')")
+	ExpedientDto update(Long entitatId, Long id, String nom, int any);
+
 
 }
