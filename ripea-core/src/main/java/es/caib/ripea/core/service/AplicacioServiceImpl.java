@@ -227,6 +227,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 				"prefix=" + prefix + ")");
 		return PropertiesHelper.getProperties().findByPrefix(prefix);
 	}
+	
+	@Override
+	public String propertyFindByNom(String nom) {
+		logger.debug("Consulta del valor del propertat amb nom");
+		return PropertiesHelper.getProperties().getProperty(nom);
+	}
 
 
 

@@ -178,4 +178,7 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public Properties propertyFindByPrefix(String prefix);
 
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	String propertyFindByNom(String nom);
+
 }

@@ -800,7 +800,7 @@ $(document).ready(function() {
 										</ul>
 									</div>
 								</c:if>
-								<c:if test="${expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut))}">
+								<c:if test="${expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut)) and contingut.estat != 'TANCAT'}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
@@ -836,10 +836,12 @@ $(document).ready(function() {
 						<%--               --%>
 						<%-- Pipella dades --%>
 						<%--               --%>
+					
+						
 						<c:choose>
 							<c:when test="${not empty metaDades}">
 								<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
-									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 										<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 									</c:if>
 									<table class="table table-striped table-bordered" style="width:100%">
@@ -864,7 +866,7 @@ $(document).ready(function() {
 												<td>${metaDada.nom}</td>
 												<td>
 													<c:choose>
-														<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+														<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 															<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																<label class="hidden" for="${metaDada.codi}"></label>
 																<div>
@@ -907,7 +909,7 @@ $(document).ready(function() {
 										</c:forEach>
 									</tbody>
 									</table>
-									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 										<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 									</c:if>
 								</form:form>
@@ -963,7 +965,7 @@ $(document).ready(function() {
 							</thead>
 						</table>
 						<script id="taulaInteressatsBotonsTemplate" type="text/x-jsrender">
-							<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut}">
+							<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.id}/interessat/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 							</c:if>
 						</script>

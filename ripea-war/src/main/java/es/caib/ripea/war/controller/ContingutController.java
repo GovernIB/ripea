@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,7 +107,8 @@ public class ContingutController extends BaseUserController {
 				SessioHelper.desmarcarLlegit(request),
 				model);
 		model.addAttribute("isContingutDetail", false);
-		model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByPrefix("es.caib.ripea.creacio.carpetes.activa").toString()));
+		
+		model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
 		return "contingut";
 	}
 	

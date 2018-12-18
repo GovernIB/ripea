@@ -43,7 +43,7 @@
 				</th>
 				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="10%">
 					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
-						<a href="metaDocument/{{:id}}/metaDada" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;Permisos&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
+						<a href="metaDocument/{{:id}}/metaDada" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

@@ -139,4 +139,9 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.propertyFindByPrefix(prefix);
 	}
 
+	@Override
+	public String propertyFindByNom(String nom) {
+		return delegate.propertyFindByNom(nom);
+	}
+
 }
