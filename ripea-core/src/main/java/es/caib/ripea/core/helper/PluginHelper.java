@@ -413,7 +413,7 @@ public class PluginHelper {
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			String organCodiDir3 = "12345678Z"; // TODO agafar codi DIR3 del tipus d'expedient
+			String organCodiDir3 = expedient.getEntitat().getUnitatArrel();
 			MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 			String classificacio;
 			if (metaExpedient.getClassificacioSia() != null) {
