@@ -24,6 +24,7 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -397,6 +398,13 @@ public class EntityComprovarHelper {
 						"L'expedient no està agafat per cap usuari");
 			}
 		}
+
+		// if expedient estat has write permissions don't need to check metaExpedient permissions
+		if (comprovarPermisWrite && expedient.getExpedientEstat()!=null) {
+			if (hasEstatWritePermissons(expedient.getExpedientEstat().getId()))
+				comprovarPermisWrite = false;
+		}
+		
 		comprovarPermisosMetaNode(
 				expedient.getMetaExpedient(),
 				expedientId,
@@ -405,6 +413,38 @@ public class EntityComprovarHelper {
 				comprovarPermisCreate,
 				comprovarPermisDelete);
 		return expedient;
+	}
+	
+	
+	/**
+	 * checking if expedient estat has modify permissions
+	 * @param estatId
+	 * @return
+	 */
+	public boolean hasEstatWritePermissons(Long estatId){
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		return permisosHelper.isGrantedAll(
+				estatId,
+				ExpedientEstatEntity.class,
+				new Permission[] {ExtendedPermission.WRITE},
+				auth);
+	}
+	
+	
+	/**
+	 * checking if expedient estat has modify permissions
+	 * @param estatId
+	 * @return
+	 */
+	public boolean hasMetaExpedientWritePermissons(Long metaExpedientId){
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		return permisosHelper.isGrantedAll(
+				metaExpedientId,
+				MetaExpedientEntity.class,
+				new Permission[] {ExtendedPermission.WRITE},
+				auth);
 	}
 
 	public DocumentEntity comprovarDocument(

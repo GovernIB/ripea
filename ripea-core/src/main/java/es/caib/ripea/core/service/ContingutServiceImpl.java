@@ -1095,9 +1095,6 @@ public class ContingutServiceImpl implements ContingutService {
 					case TANCAT:
 						arxiuDetall.setEniEstat(ExpedientEstatEnumDto.TANCAT);
 						break;
-					case INDEX_REMISSIO:
-						arxiuDetall.setEniEstat(ExpedientEstatEnumDto.INDEX_REMISSIO);
-						break;
 					}
 				}
 				arxiuDetall.setEniInteressats(metadades.getInteressats());

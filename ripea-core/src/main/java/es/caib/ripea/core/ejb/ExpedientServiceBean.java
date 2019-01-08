@@ -17,11 +17,13 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientService;
 
@@ -250,5 +252,69 @@ public class ExpedientServiceBean implements ExpedientService {
 	public ExpedientDto update(Long entitatId, Long id, String nom, int any) {
 		return delegate.update(entitatId, id, nom, any);
 	}
+
+	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findExpedientEstatByMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
+	}
+
+	@Override
+	public ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id) {
+		return delegate.findExpedientEstatById(entitatId, id);
+	}
+
+	@Override
+	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
+		return delegate.createExpedientEstat(entitatId, estat);
+	}
+
+	@Override
+	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
+		return delegate.updateExpedientEstat(entitatId, estat);
+	}
+
+	@Override
+	public ExpedientEstatDto moveTo(Long entitatId, Long metaExpedientId, Long expedientEstatId, int posicio)
+			throws NotFoundException {
+		return delegate.moveTo(entitatId, metaExpedientId, expedientEstatId, posicio);
+	}
+
+	@Override
+	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId) throws NotFoundException {
+		return delegate.deleteExpedientEstat(entitatId, expedientEstatId);
+	}
+
+	@Override
+	public List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId) {
+		return delegate.findExpedientEstats(entitatId, expedientId);
+	}
+
+
+	@Override
+	public ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId) {
+		return delegate.changeEstatOfExpedient(entitatId, expedientId, expedientEstatId);
+	}
+
+	@Override
+	public List<PermisDto> estatPermisFind(Long entitatId, Long estatId) {
+		return delegate.estatPermisFind(entitatId, estatId);
+	}
+
+	@Override
+	public void estatPermisUpdate(Long entitatId, Long estatId, PermisDto permis) {
+		delegate.estatPermisUpdate(entitatId, estatId, permis);
+	}
+
+	@Override
+	public void estatPermisDelete(Long entitatId, Long estatId, Long permisId) {
+		delegate.estatPermisDelete(entitatId, estatId, permisId);
+	}
+
+	@Override
+	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId) {
+		return delegate.findExpedientEstatByMetaExpedient(entitatId, metaExpedientId);
+	}
+
+
 
 }

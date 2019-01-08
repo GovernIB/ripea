@@ -31,8 +31,39 @@ public class ExpedientDto extends NodeDto {
 	private String numero;
 	private boolean conteDocumentsFirmats;
 	private long numComentaris;
-	
+	private Long expedientEstatId;
+	private Long expedientEstatNextInOrder;
+	private boolean usuariActualWrite;
 
+	
+	public boolean isUsuariActualWrite() {
+		return usuariActualWrite;
+	}
+
+	public void setUsuariActualWrite(boolean usuariActualWrite) {
+		this.usuariActualWrite = usuariActualWrite;
+	}
+	
+	private ExpedientEstatDto expedientEstat;
+
+	public ExpedientEstatDto getExpedientEstat() {
+		return expedientEstat;
+	}
+	public void setExpedientEstat(ExpedientEstatDto expedientEstat) {
+		this.expedientEstat = expedientEstat;
+	}
+	public Long getExpedientEstatNextInOrder() {
+		return expedientEstatNextInOrder;
+	}
+	public void setExpedientEstatNextInOrder(Long expedientEstatNextInOrder) {
+		this.expedientEstatNextInOrder = expedientEstatNextInOrder;
+	}
+	public Long getExpedientEstatId() {
+		return expedientEstatId;
+	}
+	public void setExpedientEstatId(Long expedientEstatId) {
+		this.expedientEstatId = expedientEstatId;
+	}
 	public long getNumComentaris() {
 		return numComentaris;
 	}

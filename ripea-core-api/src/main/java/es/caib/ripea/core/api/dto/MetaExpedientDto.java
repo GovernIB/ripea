@@ -30,7 +30,16 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String notificacioOficiText;
 	private Long pareId;
 	private List<MetaDocumentDto> metaDocuments;
+	
+	private int expedientEstatsCount;
+	
 
+	public int getExpedientEstatsCount() {
+		return expedientEstatsCount;
+	}
+	public void setExpedientEstatsCount(int expedientEstatsCount) {
+		this.expedientEstatsCount = expedientEstatsCount;
+	}
 	public String getClassificacioSia() {
 		return classificacioSia;
 	}

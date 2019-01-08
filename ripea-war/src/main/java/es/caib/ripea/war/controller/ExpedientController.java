@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -321,6 +322,110 @@ public class ExpedientController extends BaseUserController {
 						"expedient.estat.enum."));
 		return "expedientRelacionarForm";
 	}
+	
+
+	
+	@RequestMapping(value = "/{expedientId}/canviarEstat", method = RequestMethod.GET)
+	public String canviarEstatGet(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
+		
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = null;
+		if (expedientId != null) {
+			expedient = expedientService.findById(
+					entitatActual.getId(),
+					expedientId);
+		}
+		
+		List<ExpedientEstatDto> expedientEstats = expedientService.findExpedientEstats(
+				entitatActual.getId(),
+				expedientId);
+		ExpedientEstatDto expedientEstatObert = new ExpedientEstatDto();
+		expedientEstatObert.setNom("OBERT");
+		expedientEstats.add(0, expedientEstatObert);
+		
+		
+		ExpedientCommand command = null;
+		if (expedient != null) {
+			command = ExpedientCommand.asCommand(expedient);
+			if(expedient.getExpedientEstatNextInOrder()!=null){ 
+				command.setExpedientEstatId(expedient.getExpedientEstatNextInOrder());
+			} else { // if the state is obert
+				if(expedientEstats.size()>1){ //if there are custom states to choose from
+					command.setExpedientEstatId(expedientEstats.get(1).getId());
+				} else {
+					command.setExpedientEstatId(null);
+				}
+				
+			}
+			
+		} else {
+			command = new ExpedientCommand();
+		}
+		command.setEntitatId(entitatActual.getId());
+		model.addAttribute(command);
+		
+		
+
+		
+		model.addAttribute(
+				"expedientEstats",
+				expedientEstats);
+		return "expedientChooseEstatForm";
+		
+	}
+	
+	
+	
+	
+	@RequestMapping(value = "/canviarEstat", method = RequestMethod.POST)
+	public String canviarEstatPost(
+			HttpServletRequest request,
+			ExpedientCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+//			model.addAttribute(
+//					"metaExpedients",
+//					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+			return "expedientEstatsForm";
+		}
+		expedientService.changeEstatOfExpedient(
+				entitatActual.getId(),
+				command.getId(),
+				command.getExpedientEstatId()
+				);
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../expedient",
+				"expedient.controller.estatModificat.ok");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@RequestMapping(value = "/{expedientId}/relacionar", method = RequestMethod.POST)
 	public String expedientRelacionarPost(
 			HttpServletRequest request,

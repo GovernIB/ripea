@@ -16,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
@@ -57,7 +58,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstat = true or e.estat = :estat) " +
+			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
+			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) ")
@@ -78,8 +80,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("tancatInici") Date tancatInici,
 			@Param("esNullTancatFi") boolean esNullTancatFi,
 			@Param("tancatFi") Date tancatFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEnumDto estat,
+			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullAgafatPer") boolean esNullAgafatPer,
 			@Param("agafatPer") UsuariEntity agafatPer,
 			@Param("esNullSearch") boolean esNullSearch,
@@ -104,7 +108,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstat = true or e.estat = :estat) " +
+			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
+			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
@@ -126,8 +131,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("tancatInici") Date tancatInici,
 			@Param("esNullTancatFi") boolean esNullTancatFi,
 			@Param("tancatFi") Date tancatFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEnumDto estat,
+			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullAgafatPer") boolean esNullAgafatPer,
 			@Param("agafatPer") UsuariEntity agafatPer,
 			@Param("esNullSearch") boolean esNullSearch,

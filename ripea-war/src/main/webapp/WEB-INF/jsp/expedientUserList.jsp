@@ -72,6 +72,14 @@ $(document).ready(function() {
 			return false;
 		});
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
+
+		$("span[class^='stateColor-']").each(function( index ) {
+
+		    var fullClassNameString = this.className;
+		    var colorString = fullClassNameString.substring(11);
+		    $(this).parent().css( "background-color", colorString );	
+		});
+		
 	});
 	if (mostrarMeusExpedients) {
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
@@ -91,6 +99,28 @@ $(document).ready(function() {
 		e.stopPropagation();
 		alert("Button Clicked");
 	});
+
+
+	$('#metaExpedientId').on('change', function() {
+		var tipus = $(this).val();
+		$('#expedientEstatId').select2('val', '', true);
+		$('#expedientEstatId option[value!=""]').remove();
+		var metaNodeRefresh = function(data) {
+			for (var i = 0; i < data.length; i++) {
+				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+			}
+		};
+		if (tipus != "") {
+			$.get("<c:url value="/expedientEstat/values/"/>"+tipus)
+			.done(metaNodeRefresh)
+			.fail(function() {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+		}
+	});
+
+
+			
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -113,6 +143,8 @@ function getCookie(cname) {
     }
     return "";
 }
+
+
 </script>
 </head>
 <body>
@@ -128,7 +160,7 @@ function getCookie(cname) {
 				<rip:inputText name="nom" inline="true" placeholderKey="expedient.list.user.placeholder.titol"/>
 			</div>
 			<div class="col-md-3">
-				<rip:inputSelect name="estat" optionItems="${expedientEstatEnumOptions}" optionValueAttribute="value" emptyOption="true" optionTextKeyAttribute="text" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
+				<rip:inputSelect name="expedientEstatId" optionItems="${expedientEstatsOptions}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
 			</div>
 		</div>
 		<div class="row">
@@ -192,10 +224,12 @@ function getCookie(cname) {
 		style="width:100%">
 		<thead>
 			<tr>
+				<th data-col-name="usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
+				<th data-col-name="expedientEstat" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
@@ -222,16 +256,24 @@ function getCookie(cname) {
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'OBERT'}}
-							<span class="fa fa-folder-open"></span>&nbsp;<spring:message code="expedient.estat.enum.OBERT"/>
+						{{if expedientEstat != null && estat != 'TANCAT'}}
+							<span class="fa fa-folder-open"></span>&nbsp;{{:expedientEstat.nom}}
 						{{else}}
-							<span class="fa fa-folder"></span>&nbsp;<spring:message code="expedient.estat.enum.TANCAT"/>
+							{{if estat == 'OBERT'}}
+								<span class="fa fa-folder-open"></span>&nbsp;<spring:message code="expedient.estat.enum.OBERT"/>
+							{{else}}
+								<span class="fa fa-folder"></span>&nbsp;<spring:message code="expedient.estat.enum.TANCAT"/>
+							{{/if}}
 						{{/if}}
+
 						{{if ambRegistresSenseLlegir}}
 							<span class="fa-stack" aria-hidden="true">
 								<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
 								<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
 							</span>
+						{{/if}}
+						{{if expedientEstat != null && expedientEstat.color!=null}}
+							<span class="stateColor-{{:expedientEstat.color}}"></span>
 						{{/if}}
 					</script>
 				</th>			
@@ -247,7 +289,7 @@ function getCookie(cname) {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualWrite}}
+								{{if metaNode.usuariActualWrite || usuariActualWrite}}
 									{{if !agafat}}
 										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}

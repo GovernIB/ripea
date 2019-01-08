@@ -12,7 +12,7 @@
 <c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientPareAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:set var="expedientPareObert" value="${empty expedientPare or expedientPare.estat == 'OBERT'}"/>
 <c:set var="potModificarExpedientPare" value="${false}"/>
-<c:if test="${expedientPareAgafatPerUsuariActual and expedientPareObert and (not contingut.node or expedientPare.metaNode.usuariActualWrite)}"><c:set var="potModificarExpedientPare" value="${true}"/></c:if>
+<c:if test="${expedientPareAgafatPerUsuariActual and expedientPareObert and (not contingut.node or expedientPare.metaNode.usuariActualWrite) or expedientPare.usuariActualWrite}"><c:set var="potModificarExpedientPare" value="${true}"/></c:if>
 <c:set var="mostrarSeparador" value="${false}"/>
 <div <c:if test="${not empty id}">id="${id}" </c:if>class="dropdown<c:if test="${not modeLlistat}"> text-center</c:if><c:if test="${not empty className}"> ${className}</c:if>">
 	<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle<c:if test="${not modeLlistat}"> btn-xs</c:if>"><span class="fa fa-cog"></span><c:if test="${modeLlistat}">&nbsp;<spring:message code="comu.boto.accions"/></c:if>&nbsp;<span class="caret caret-white"></span></button>
@@ -21,7 +21,7 @@
 			<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
-		<c:if test="${potModificarExpedientPare}">
+		<c:if test="${potModificarExpedientPare || (contingut.expedient && contingut.usuariActualWrite) }">
 			<c:choose>
 				<c:when test="${contingut.expedient}">
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
@@ -50,6 +50,7 @@
 					<li role="separator" class="divider"></li>
 				</c:if>
 				<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
+				<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/relacionar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-comments"></span>&nbsp;<spring:message code="comu.boto.comentaris"/>...</a></li>
 				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>

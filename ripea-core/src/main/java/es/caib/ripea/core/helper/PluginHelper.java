@@ -2765,9 +2765,6 @@ public class PluginHelper {
 			case TANCAT:
 				metadades.setEstat(ExpedientEstat.TANCAT);
 				break;
-			case INDEX_REMISSIO:
-				metadades.setEstat(ExpedientEstat.INDEX_REMISSIO);
-				break;
 			}
 		}
 		metadades.setOrgans(ntiOrgans);

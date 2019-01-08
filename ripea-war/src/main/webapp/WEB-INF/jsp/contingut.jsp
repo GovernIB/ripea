@@ -8,7 +8,7 @@
 <c:set var="expedientPare" value="${contingut.expedientPare}"/>
 <c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
 <c:set var="potModificarContingut" value="${false}"/>
-<c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty expedientPare.metaNode or expedientPare.metaNode.usuariActualWrite}"/></c:if>
+<c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty expedientPare.metaNode or expedientPare.metaNode.usuariActualWrite or expedientPare.usuariActualWrite}"/></c:if>
 <c:set var="expedientAgafatPerUsuariActual" value="${false}"/>
 <c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
@@ -528,7 +528,14 @@ $(document).ready(function() {
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.codi}/${contingut.sequencia}/${contingut.any}</dd>
 							<dt><spring:message code="contingut.info.estat"/></dt>
-							<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
+							<c:choose>
+								<c:when test="${contingut.expedientEstat!=null}">
+									<dd> ${contingut.expedientEstat.nom} </dd>
+								</c:when>
+								<c:otherwise>
+									<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
+								</c:otherwise>
+							</c:choose>								
 						</c:if>
 						<c:if test="${contingut.document}">
 							<c:if test="${not empty contingut.metaNode}">

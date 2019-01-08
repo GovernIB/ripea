@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
@@ -31,16 +33,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -49,6 +55,7 @@ import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -70,6 +77,7 @@ import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.ExpedientComentariRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -88,6 +96,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private ExpedientComentariRepository expedientComentariRepository;
+	@Autowired
+	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
@@ -175,6 +185,32 @@ public class ExpedientServiceImpl implements ExpedientService {
 				new Date(),
 				any,
 				true);
+		
+		
+		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
+		
+		//find inicial state if exists
+		ExpedientEstatEntity estatInicial = null;
+		for (ExpedientEstatEntity expedientEstat : expedientEstats) {
+			if (expedientEstat.isInicial()){
+				estatInicial = expedientEstat;
+			}
+		}
+		//set inicial estat if exists
+		if (estatInicial != null) {
+			expedient.updateExpedientEstat(estatInicial);
+			
+			//if estat has usuari responsable agafar expedient by this user
+			if (estatInicial.getResponsableCodi()!=null) {
+				agafarByUserWithCodi(
+						entitatId, 
+						expedient.getId(),
+						estatInicial.getResponsableCodi());
+			}
+		}
+		
+		
+		
 		contingutLogHelper.logCreacio(
 				expedient,
 				false,
@@ -427,7 +463,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 //		}
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		
 	
 		boolean granted = permisosHelper.isGrantedAll(
 				expedient.getMetaExpedient().getId(),
@@ -435,9 +470,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 				new Permission[] {ExtendedPermission.WRITE},
 				auth);	
 		
+		if (!granted && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())){ 
+			granted = true;
+		}
+		
 		return granted;
 
 	}
+	
+
+
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -461,6 +503,530 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				true);
 	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public ExpedientEstatDto findExpedientEstatById(
+			Long entitatId,
+			Long id) {
+		logger.debug("Obtenint l'estat del expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+
+		
+		ExpedientEstatEntity estat =  expedientEstatRepository.findOne(id);
+		
+		ExpedientEstatDto dto = conversioTipusHelper.convertir(
+				estat,
+				ExpedientEstatDto.class);
+		dto.setMetaExpedientId(estat.getMetaExpedient().getId());
+		
+		return dto;
+
+	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		logger.debug("Consultant els estats del expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "metaExpedientId=" + metaExpedientId + ", "
+				+ "paginacioParams=" + paginacioParams + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = null;
+		if (metaExpedientId != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		Page<ExpedientEstatEntity> paginaExpedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
+					metaExpedient,
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams));
+		 
+		PaginaDto<ExpedientEstatDto> result = paginacioHelper.toPaginaDto(
+				paginaExpedientEstats,
+				ExpedientEstatDto.class);
+		
+		
+		for (ExpedientEstatDto expedientEstatDto : result.getContingut()) {
+
+			List<PermisDto> permisos = permisosHelper.findPermisos(expedientEstatDto.getId(),
+					ExpedientEstatEntity.class);
+			int permisosCount;
+			if (permisos == null)
+				permisosCount = 0;
+			else
+				permisosCount = permisos.size();
+			
+			expedientEstatDto.setPermisosCount(permisosCount);
+		}
+		
+		return result;
+
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		logger.debug("Consultant els estats del expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = null;
+		if (metaExpedientId != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
+					metaExpedient);
+		 
+		return conversioTipusHelper.convertirList(
+				expedientEstats,
+				ExpedientEstatDto.class);
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientEstatDto> findExpedientEstats(
+			Long entitatId,
+			Long expedientId) {
+		logger.debug("Consultant els estas dels expedients ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientId=" + expedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false);
+
+		
+		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
+		 
+		return conversioTipusHelper.convertirList(
+				expedientEstats,
+				ExpedientEstatDto.class);
+	}
+		
+	
+
+	@Transactional
+	@Override
+	public ExpedientEstatDto createExpedientEstat(
+			Long entitatId,
+			ExpedientEstatDto estat) {
+		logger.debug("Creant un nou estat d'expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"estat=" + estat + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				estat.getMetaExpedientId(),
+				true,
+				true,
+				false,
+				false);
+		
+		int ordre = expedientEstatRepository.countByMetaExpedient(metaExpedient);
+		
+		
+		ExpedientEstatEntity expedientEstat = ExpedientEstatEntity.getBuilder(
+				estat.getCodi(),
+				estat.getNom(),
+				ordre,
+				estat.getColor(),
+				metaExpedient,
+				estat.getResponsableCodi()).
+				build();
+		
+		//if inicial of the modified state is true set inicial of other states to false
+		if(estat.isInicial()){
+			List<ExpedientEstatEntity> expedientEstats =  expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient);
+			for (ExpedientEstatEntity expEst: expedientEstats){
+				if(!expEst.equals(expedientEstat)){
+					expEst.updateInicial(false);
+				}
+			}
+			expedientEstat.updateInicial(true);
+		} else {
+			expedientEstat.updateInicial(false);
+		}
+		
+		return conversioTipusHelper.convertir(
+				expedientEstatRepository.save(expedientEstat),
+				ExpedientEstatDto.class);
+	}
+
+	@Transactional
+	@Override
+	public ExpedientEstatDto updateExpedientEstat(
+			Long entitatId,
+			ExpedientEstatDto estat) {
+		logger.debug("Actualitzant estat d'expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"estat=" + estat + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				estat.getMetaExpedientId(),
+				true,
+				true,
+				false,
+				false);
+		
+		
+		ExpedientEstatEntity expedientEstat = expedientEstatRepository.findOne(estat.getId());
+		expedientEstat.update(
+				estat.getCodi(),
+				estat.getNom(),
+				estat.getColor(),
+				metaExpedient,
+				estat.getResponsableCodi());
+		
+		//if inicial of the modified state is true set inicial of other states to false
+		if(estat.isInicial()){
+			List<ExpedientEstatEntity> expedientEstats =  expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient);
+			for (ExpedientEstatEntity expEst: expedientEstats){
+				if(!expEst.equals(expedientEstat)){
+					expEst.updateInicial(false);
+				}
+			}
+			expedientEstat.updateInicial(true);
+		} else {
+			expedientEstat.updateInicial(false);
+		}
+		
+		return conversioTipusHelper.convertir(
+				expedientEstat,
+				ExpedientEstatDto.class);
+	}
+	
+	
+	@Transactional
+	@Override
+	public ExpedientDto changeEstatOfExpedient(
+			Long entitatId,
+			Long expedientId,
+			Long expedientEstatId) {
+		logger.debug("Canviant estat del expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ", " +
+				"expedientEstatId=" + expedientEstatId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false);
+		
+		ExpedientEstatEntity estat;
+		if(expedientEstatId!=null){
+			estat = expedientEstatRepository.findOne(expedientEstatId);
+		} else { // if it is null it means that "OBERT" state was choosen
+			estat = null;
+		}
+		
+		String codiEstatAnterior;
+		if(expedient.getExpedientEstat()!=null){
+			codiEstatAnterior = expedient.getExpedientEstat().getCodi();
+		} else {
+			codiEstatAnterior = messageHelper.getMessage("expedient.estat.enum.OBERT");
+		}
+		
+		expedient.updateExpedientEstat(
+				estat);
+		
+		
+		// log change of state
+		String codiEstatNou;
+		if(expedient.getExpedientEstat()!=null){
+			codiEstatNou = expedient.getExpedientEstat().getCodi();
+		} else {
+			codiEstatNou = messageHelper.getMessage("expedient.estat.enum.OBERT");
+		}
+		if(!codiEstatAnterior.equals(codiEstatNou)){
+			contingutLogHelper.log(
+					expedient,
+					LogTipusEnumDto.CANVI_ESTAT,
+					codiEstatAnterior,
+					codiEstatNou,
+					false,
+					false);
+		}
+		
+		// if new state has usuari responsable agafar by this user
+		if (estat.getResponsableCodi() != null) {
+			agafarByUserWithCodi(
+					entitatId, 
+					expedientId,
+					estat.getResponsableCodi());
+		}
+		
+		return toExpedientDto(
+				expedient,
+				false);
+	}
+	
+	
+	
+	
+	
+	@Override
+	@Transactional
+	public ExpedientEstatDto deleteExpedientEstat(
+			Long entitatId,
+			Long expedientEstatId) throws NotFoundException {
+		logger.debug("Esborrant esta del expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientEstatId=" + expedientEstatId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		
+		ExpedientEstatEntity entity = expedientEstatRepository.findOne(expedientEstatId);
+		
+		expedientEstatRepository.delete(entity);
+		
+		return conversioTipusHelper.convertir(
+				entity,
+				ExpedientEstatDto.class);
+	}
+	
+	
+	
+	@Transactional
+	@Override
+	public List<PermisDto> estatPermisFind(
+			Long entitatId,
+			Long estatId) {
+		logger.debug("Consulta dels permisos de l'estat ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + estatId +  ")"); 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+
+		return permisosHelper.findPermisos(
+				estatId,
+				ExpedientEstatEntity.class);
+	}
+
+	@Transactional
+	@Override
+	public void estatPermisUpdate(
+			Long entitatId,
+			Long estatId,
+			PermisDto permis) {
+		logger.debug("Modificació del permis l'estat ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + estatId + ", "
+				+ "permis=" + permis + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+
+		permisosHelper.updatePermis(
+				estatId,
+				ExpedientEstatEntity.class,
+				permis);
+	}
+
+	@Transactional
+	@Override
+	public void estatPermisDelete(
+			Long entitatId,
+			Long estatId,
+			Long permisId) {
+		logger.debug("Eliminació del permis del l'estat ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + estatId + ", "
+				+ "permisId=" + permisId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+
+		permisosHelper.deletePermis(
+				estatId,
+				ExpedientEstatEntity.class,
+				permisId);
+	}
+
+	
+	private void agafarByUserWithCodi(
+			Long entitatId,
+			Long expedientId,
+			String codi) {
+		logger.debug("Agafant l'expedient com a usuari ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientId=" + expedientId + ", "
+				+ "usuari=" + codi + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
+				expedient,
+				false,
+				false,
+				false);
+		if (expedientSuperior != null) {
+			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
+			throw new ValidationException(
+					expedientId,
+					ExpedientEntity.class,
+					"No es pot agafar un expedient no arrel");
+		}
+		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
+		UsuariEntity usuariOriginal = expedient.getAgafatPer();
+		UsuariEntity usuariNou = usuariHelper.getUsuariByCodi(codi);
+		
+		 
+		
+		expedient.updateAgafatPer(usuariNou);
+		if (usuariOriginal != null) {
+			// Avisa a l'usuari que li han pres
+			emailHelper.emailUsuariContingutAgafatSensePermis(
+					expedient,
+					usuariOriginal,
+					usuariNou);
+		}
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.AGAFAR,
+				null,
+				null,
+				false,
+				false);
+	}
+	
+	@Override
+	@Transactional
+	public ExpedientEstatDto moveTo(
+			Long entitatId,
+			Long metaExpedientId,
+			Long expedientEstatId,
+			int posicio) throws NotFoundException {
+		logger.debug("Movent estat del expedient a la posició especificada ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientEstatId=" + expedientEstatId + ", "
+				+ "posicio=" + posicio + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		
+		ExpedientEstatEntity estat = expedientEstatRepository.findOne(expedientEstatId);
+
+		canviPosicio(
+				estat,
+				posicio);
+		
+		return conversioTipusHelper.convertir(
+				estat,
+				ExpedientEstatDto.class);
+	}
+	
+	
+	private void canviPosicio(
+			ExpedientEstatEntity estat,
+			int posicio) {
+		List<ExpedientEstatEntity> estats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
+				estat.getMetaExpedient());
+		if (posicio >= 0 && posicio < estats.size()) {
+			if (posicio < estat.getOrdre()) {
+				for (ExpedientEstatEntity est: estats) {
+					if (est.getOrdre() >= posicio && est.getOrdre() < estat.getOrdre()) {
+						est.updateOrdre(est.getOrdre() + 1);
+					}
+				}
+			} else if (posicio > estat.getOrdre()) {
+				for (ExpedientEstatEntity est: estats) {
+					if (est.getOrdre() > estat.getOrdre() && est.getOrdre() <= posicio) {
+						est.updateOrdre(est.getOrdre() - 1);
+					}
+				}
+			}
+			estat.updateOrdre(posicio);
+		}
+	}
+	
+	
 	
 	
 	@Transactional(readOnly = true)
@@ -507,12 +1073,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 		MetaExpedientEntity metaExpedient = null;
-		if (metaExpedientId != null) {
+		if (metaExpedientId != null) {						
+			
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					metaExpedientId,
-					false,
 					true,
+					false,
 					false,
 					false);
 		}
@@ -520,18 +1087,51 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(
 				entitat, 
 				metaExpedient);
+		
+		
 
 		List<ContingutDto> expedientsDto = new ArrayList<>(); 
-		for(ContingutEntity exp: expedientsEnt){
-			expedientsDto.add(contingutHelper.toContingutDto(
-					exp,
-					true,
-					true,
-					true,
-					false,
-					true,
-					false,
-					false));
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		boolean granted = permisosHelper.isGrantedAll(
+				metaExpedientId,
+				MetaNodeEntity.class,
+				new Permission[] {ExtendedPermission.WRITE},
+				auth);
+
+		
+		// if meta expedient has write permissions add all expedients
+		if(entityComprovarHelper.hasMetaExpedientWritePermissons(metaExpedientId)){
+			
+			for(ContingutEntity exp: expedientsEnt){
+					expedientsDto.add(contingutHelper.toContingutDto(
+							exp,
+							true,
+							true,
+							true,
+							false,
+							true,
+							false,
+							false));
+					
+			} 
+		} else { //if not add only expedients having estat with permisions 
+			
+			for(ContingutEntity exp: expedientsEnt){
+				ExpedientEntity expedient = (ExpedientEntity) exp;
+				if (expedient.getExpedientEstat()!=null && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())){
+					expedientsDto.add(contingutHelper.toContingutDto(
+							exp,
+							true,
+							true,
+							true,
+							false,
+							true,
+							false,
+							false));
+					}
+			}
 		}
 		
 		return expedientsDto;
@@ -618,6 +1218,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "usuari=" + auth.getName() + ")");
+		
+		
+		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -626,6 +1229,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
+		
+
+		
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
 				false,
@@ -657,6 +1263,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 	}
+	
+	
 	
 	@Transactional
 	@Override
@@ -784,6 +1392,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedient.updateEstat(
 				ExpedientEstatEnumDto.TANCAT,
 				motiu);
+		
+		expedient.updateExpedientEstat(null);
 		contingutLogHelper.log(
 				expedient,
 				LogTipusEnumDto.TANCAMENT,
@@ -1146,6 +1756,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientRelacionats.add(expedient);
 			}
 			
+			ExpedientEstatEnumDto chosenEstatEnum = null;
+			ExpedientEstatEntity chosenEstat = null;
+			Long estatId = filtre.getExpedientEstatId();
+			if(estatId != null){
+				if (estatId.intValue() <= 0) { // if estat is 0 or less the given estat is enum
+					int estatIdInt = -estatId.intValue();
+					chosenEstatEnum = ExpedientEstatEnumDto.values()[estatIdInt];
+				} else { //given estat is estat from database
+					chosenEstat = expedientEstatRepository.findOne(estatId);
+				}
+			}
 			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] {"codi", "any", "sequencia"});
@@ -1169,8 +1790,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getDataTancatInici(),
 						filtre.getDataTancatFi() == null,
 						filtre.getDataTancatFi(),
-						filtre.getEstat() == null,
-						filtre.getEstat(),
+						chosenEstatEnum == null,
+						chosenEstatEnum,
+						chosenEstat == null,
+						chosenEstat,
 						agafatPer == null,
 						agafatPer,
 						filtre.getSearch() == null,
@@ -1200,8 +1823,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getDataTancatInici(),
 						filtre.getDataTancatFi() == null,
 						filtre.getDataTancatFi(),
-						filtre.getEstat() == null,
-						filtre.getEstat(),
+						chosenEstatEnum == null,
+						chosenEstatEnum,
+						chosenEstat == null,
+						chosenEstat,
 						agafatPer == null,
 						agafatPer,
 						filtre.getSearch() == null,
@@ -1320,8 +1945,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ambPathIPermisos,
 				false,
 				false);
-		
-		expedientDto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
 		
 		return expedientDto;
 	}

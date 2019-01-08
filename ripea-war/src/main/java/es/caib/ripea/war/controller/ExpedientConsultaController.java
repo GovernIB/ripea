@@ -5,6 +5,8 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -93,11 +96,38 @@ public class ExpedientConsultaController extends BaseUserController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
+//		model.addAttribute(
+//				"expedientEstatEnumOptions",
+//				EnumHelper.getOptionsForEnum(
+//						ExpedientEstatEnumDto.class,
+//						"expedient.estat.enum."));
+		
+		
+
+		
+		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		Long metaExpedientId = (Long)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_METAEXP_ID);
+		
+//		for(ExpedientEstatEnumDto exp: ExpedientEstatEnumDto.values()){
+//			int ord = exp.ordinal();
+//			expedientEstatsOptions.add(new ExpedientEstatDto(exp.name(), Long.valueOf(-ord)));
+//		}
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+
+		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
+		
+		
 		model.addAttribute(
-				"expedientEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						ExpedientEstatEnumDto.class,
-						"expedient.estat.enum."));
+				"expedientEstatsOptions",
+				expedientEstatsOptions);
+		
+		
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {

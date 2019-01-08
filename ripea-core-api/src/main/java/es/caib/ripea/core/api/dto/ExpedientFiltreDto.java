@@ -21,6 +21,7 @@ public class ExpedientFiltreDto implements Serializable {
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
 	private String numero;
+	private Long expedientEstatId;
 	private ExpedientEstatEnumDto estat;
 	private Date dataTancatInici;
 	private Date dataTancatFi;
@@ -60,6 +61,12 @@ public class ExpedientFiltreDto implements Serializable {
 	}
 	public void setNumero(String numero) {
 		this.numero = numero;
+	}
+	public Long getExpedientEstatId() {
+		return expedientEstatId;
+	}
+	public void setExpedientEstatId(Long expedientEstatId) {
+		this.expedientEstatId = expedientEstatId;
 	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;

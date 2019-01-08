@@ -24,7 +24,7 @@ public class ExpedientFiltreCommand {
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
 	private String numero;
-	private ExpedientEstatEnumDto estat;
+	private Long expedientEstatId;
 	private Date dataTancatInici;
 	private Date dataTancatFi;
 	private boolean meusExpedients;
@@ -68,11 +68,11 @@ public class ExpedientFiltreCommand {
 	public void setNumero(String numero) {
 		this.numero = numero;
 	}
-	public ExpedientEstatEnumDto getEstat() {
-		return estat;
+	public Long getExpedientEstatId() {
+		return expedientEstatId;
 	}
-	public void setEstat(ExpedientEstatEnumDto estat) {
-		this.estat = estat;
+	public void setExpedientEstatId(Long expedientEstatId) {
+		this.expedientEstatId = expedientEstatId;
 	}
 	public Date getDataTancatInici() {
 		return dataTancatInici;

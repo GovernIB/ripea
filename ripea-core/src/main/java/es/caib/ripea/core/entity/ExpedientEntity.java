@@ -43,6 +43,12 @@ public class ExpedientEntity extends NodeEntity {
 
 	@Column(name = "estat", nullable = false)
 	protected ExpedientEstatEnumDto estat;
+	
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "expedient_estat_id")
+	@ForeignKey(name = "ipa_expestat_expedient_fk")
+	private ExpedientEstatEntity expedientEstat;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "tancat_data")
 	protected Date tancatData;
@@ -137,6 +143,9 @@ public class ExpedientEntity extends NodeEntity {
 	public String getCodi() {
 		return codi;
 	}
+	public ExpedientEstatEntity getExpedientEstat() {
+		return expedientEstat;
+	}
 	public String getNtiVersion() {
 		return ntiVersion;
 	}
@@ -226,6 +235,11 @@ public class ExpedientEntity extends NodeEntity {
 		if (ExpedientEstatEnumDto.TANCAT.equals(estat))
 			this.tancatData = new Date();
 	}
+	public void updateExpedientEstat(
+			ExpedientEstatEntity expedientEstat) {
+		this.expedientEstat = expedientEstat;
+	}
+	
 	public void updateAgafatPer(
 			UsuariEntity usuari) {
 		this.agafatPer = usuari;

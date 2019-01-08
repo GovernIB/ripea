@@ -30,6 +30,7 @@ import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -47,6 +48,7 @@ import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -58,6 +60,8 @@ import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExpedientComentariRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
@@ -91,6 +95,10 @@ public class ContingutHelper {
 	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
+	@Autowired
+	ExpedientComentariRepository expedientComentariRepository;
+	@Autowired
+	ExpedientEstatRepository expedientEstatRepository;
 
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
@@ -169,6 +177,37 @@ public class ContingutHelper {
 					expedient,
 					DocumentEstatEnumDto.CUSTODIAT).isEmpty();
 			dto.setConteDocumentsFirmats(conteDocumentsFirmats);
+			
+			dto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
+
+			// expedient estat
+			if(expedient.getExpedientEstat()!=null){
+				ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getExpedientEstat().getMetaExpedient(), expedient.getExpedientEstat().getOrdre()+1);
+				if(estat!=null){
+					dto.setExpedientEstatNextInOrder(estat.getId());
+				} else {//if there is no estat with higher order, choose previous 
+					dto.setExpedientEstatNextInOrder(expedient.getExpedientEstat().getId());
+				}
+				
+				dto.setExpedientEstat(conversioTipusHelper.convertir(
+						expedient.getExpedientEstat(),
+						ExpedientEstatDto.class));
+				
+				//omplir permision for expedient estat
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				dto.setUsuariActualWrite(
+						permisosHelper.isGrantedAll(
+								expedient.getExpedientEstat().getId(),
+								ExpedientEstatEntity.class,
+								new Permission[] {ExtendedPermission.WRITE},
+								auth));
+			}
+
+			
+
+
+			
+			
 			resposta = dto;
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
@@ -434,6 +473,16 @@ public class ContingutHelper {
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
+			if(comprovarPermisWrite){
+				ExpedientEntity expedient = (ExpedientEntity)contingut;
+				// if expedient estat has write permissions don't need to check metaExpedient permissions
+				if (comprovarPermisWrite && expedient.getExpedientEstat()!=null) {
+					if (hasEstatPermissons(expedient.getExpedientEstat().getId()))
+						comprovarPermisWrite = false;
+				}
+			}
+			
+			
 			comprovarPermisosNode(
 					(NodeEntity)contingut,
 					comprovarPermisRead,
@@ -701,6 +750,13 @@ public class ContingutHelper {
 						MetaNodeEntity.class,
 						new Permission[] {ExtendedPermission.WRITE},
 						auth);
+				
+				// if expedient estat has write permissions don't need to check metaExpedient permissions
+				if (!granted && expedientSuperior.getExpedientEstat()!=null) {
+					if (hasEstatPermissons(expedientSuperior.getExpedientEstat().getId()))
+						granted = true;
+				}
+				
 				if (!granted) {
 					throw new PermissionDeniedException(
 							expedientSuperior.getMetaExpedient().getId(),
@@ -711,6 +767,22 @@ public class ContingutHelper {
 			}
 		}
 		return expedientSuperior;
+	}
+	
+	
+	/**
+	 * checking if expedient estat has modify permissions
+	 * @param estatId
+	 * @return
+	 */
+	private boolean hasEstatPermissons(Long estatId){
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		return permisosHelper.isGrantedAll(
+				estatId,
+				ExpedientEstatEntity.class,
+				new Permission[] {ExtendedPermission.WRITE},
+				auth);
 	}
 
 	public void calcularSequenciaExpedient(

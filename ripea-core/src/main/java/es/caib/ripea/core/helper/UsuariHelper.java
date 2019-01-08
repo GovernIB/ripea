@@ -113,6 +113,40 @@ public class UsuariHelper {
 		}
 		return usuari;
 	}
+	
+	
+	public UsuariEntity getUsuariByCodi(String codi) {
+		
+		UsuariEntity usuari = usuariRepository.findOne(codi);
+		if (usuari == null) {
+			logger.debug("Consultant plugin de dades d'usuari (" +
+					"usuariCodi=" + codi + ")");
+			// Primer cream l'usuari amb dades fictícies i després l'actualitzam.
+			// Així evitam possibles bucles infinits a l'hora de guardar registre
+			// de les peticions al plugin d'usuaris.
+			usuari = usuariRepository.save(
+					UsuariEntity.getBuilder(
+							codi,
+							codi,
+							"00000000X",
+							codi + "@" + "caib.es",
+							getIdiomaPerDefecte()).build());
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(codi);
+			if (dadesUsuari != null) {
+				usuari.update(
+						dadesUsuari.getNom(),
+						dadesUsuari.getNif(),
+						dadesUsuari.getEmail());
+				usuariRepository.save(usuari);
+			} else {
+				throw new NotFoundException(
+						codi,
+						UsuariEntity.class);
+			}
+		}
+		return usuari;
+	}
+	
 
 	private String getIdiomaPerDefecte() {
 		return PropertiesHelper.getProperties().getProperty(

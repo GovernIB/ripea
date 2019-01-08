@@ -33,6 +33,7 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -65,7 +66,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private PermisosHelper permisosHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
-
+	@Resource
+	private ExpedientEstatRepository expedientEstatRepository;
 
 
 	@Transactional
@@ -313,8 +315,20 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaNodeHelper.omplirPermisosPerMetaNodes(
 				resposta.getContingut(),
 				true);
+		
+		for(MetaExpedientDto metaExpedient:  resposta.getContingut()){
+			metaExpedient.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
+		}
+		
+		
 		return resposta;
 	}
+	
+	
+	
+	
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override

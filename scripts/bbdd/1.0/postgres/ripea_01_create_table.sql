@@ -265,7 +265,8 @@ CREATE TABLE IPA_EXPEDIENT
   SISTRA_PUBLICAT    boolean,
   SISTRA_UNITAT_ADM  character varying(9),
   SISTRA_CLAU        character varying(100),
-  AGAFAT_PER_CODI    character varying(64)
+  AGAFAT_PER_CODI    character varying(64),
+  EXPEDIENT_ESTAT_ID BIGINT
 );
 
 
@@ -596,4 +597,22 @@ CREATE TABLE IPA_EXP_COMMENT
   LASTMODIFIEDDATE     timestamp without time zone,
   CREATEDBY_CODI       character varying(64),
   LASTMODIFIEDBY_CODI  character varying(64)
+);
+
+CREATE TABLE IPA_EXPEDIENT_ESTAT
+(
+	ID                  BIGINT               			NOT NULL,
+	CODI 			    character varying(256)						NOT NULL,
+	NOM 			    character varying(256)						NOT NULL,
+	ORDRE 			    BIGINT							NOT NULL,
+	COLOR 			    character varying(256),					  
+    METAEXPEDIENT_ID    BIGINT,               
+    INICIAL             boolean,
+    RESPONSABLE_CODI    character varying(64),
+    
+	
+    CREATEDDATE         timestamp without time zone,
+    LASTMODIFIEDDATE    timestamp without time zone,
+    CREATEDBY_CODI      character varying(256),
+    LASTMODIFIEDBY_CODI character varying(256)
 );

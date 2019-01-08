@@ -62,9 +62,9 @@
 						<a href="metaExpedient/{{:id}}/metaDada" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
 					</script>
 				</th>
-				<th data-col-name="arxiusCount" data-template="#cellArxiusTemplate" data-orderable="false" width="10%">
+				<th data-col-name="expedientEstatsCount" data-template="#cellArxiusTemplate" data-orderable="false" width="10%">
 					<script id="cellArxiusTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/estat" class="btn btn-default">Estats&nbsp;<span class="badge">0</span></a>
+						<a href="expedientEstat/{{:id}}" class="btn btn-default"><spring:message code="metaexpedient.list.boto.estats"/>&nbsp;<span class="badge">{{:expedientEstatsCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">

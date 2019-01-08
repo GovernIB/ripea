@@ -22,8 +22,15 @@ public class ExpedientCommand extends ContenidorCommand {
 	private String tancatMotiu;
 	private int any;
 	private long sequencia;
+	private Long expedientEstatId;
 
 
+	public Long getExpedientEstatId() {
+		return expedientEstatId;
+	}
+	public void setExpedientEstatId(Long expedientEstatId) {
+		this.expedientEstatId = expedientEstatId;
+	}
 	public Long getMetaNodeId() {
 		return metaNodeId;
 	}
