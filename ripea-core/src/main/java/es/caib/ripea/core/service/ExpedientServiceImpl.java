@@ -818,7 +818,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		
 		// if new state has usuari responsable agafar by this user
-		if (estat.getResponsableCodi() != null) {
+		if (estat != null && estat.getResponsableCodi() != null) {
 			agafarByUserWithCodi(
 					entitatId, 
 					expedientId,
