@@ -11,6 +11,17 @@
 <c:if test="${contingut.node}"><c:set var="potModificarContingut" value="${empty expedientPare.metaNode or expedientPare.metaNode.usuariActualWrite or expedientPare.usuariActualWrite}"/></c:if>
 <c:set var="expedientAgafatPerUsuariActual" value="${false}"/>
 <c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientAgafatPerUsuariActual" value="${true}"/></c:if>
+<c:set var="expedientTancat" value="${false}"/>
+<c:choose>
+	<c:when test="${contingut.expedient}">
+		<c:if test="${contingut.estat == 'TANCAT'}"><c:set var="expedientTancat" value="${true}"/></c:if>
+	</c:when>
+	<c:otherwise>
+		<c:if test="${contingut.expedientPare.estat == 'TANCAT'}"><c:set var="expedientTancat" value="${true}"/></c:if>
+	</c:otherwise>
+</c:choose>
+
+
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -848,7 +859,7 @@ $(document).ready(function() {
 						<c:choose>
 							<c:when test="${not empty metaDades}">
 								<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
-									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 										<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 									</c:if>
 									<table class="table table-striped table-bordered" style="width:100%">
@@ -873,7 +884,7 @@ $(document).ready(function() {
 												<td>${metaDada.nom}</td>
 												<td>
 													<c:choose>
-														<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+														<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 															<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																<label class="hidden" for="${metaDada.codi}"></label>
 																<div>
@@ -916,7 +927,7 @@ $(document).ready(function() {
 										</c:forEach>
 									</tbody>
 									</table>
-									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+									<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 										<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 									</c:if>
 								</form:form>
