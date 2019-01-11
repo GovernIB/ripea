@@ -173,16 +173,12 @@ public class EntitatServiceImpl implements EntitatService {
 		PaginaDto<EntitatDto> resposta;
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			resposta = paginacioHelper.toPaginaDto(
-					entitatRepository.findByFiltrePaginat(
-							paginacioParams.getFiltre() == null || paginacioParams.getFiltre().isEmpty(),
-							paginacioParams.getFiltre(),
+					entitatRepository.findBy(
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					EntitatDto.class);
 		} else {
 			resposta = paginacioHelper.toPaginaDto(
-					entitatRepository.findByFiltrePaginat(
-							paginacioParams.getFiltre() == null || paginacioParams.getFiltre().isEmpty(),
-							paginacioParams.getFiltre(),
+					entitatRepository.findBy(
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					EntitatDto.class);
 		}

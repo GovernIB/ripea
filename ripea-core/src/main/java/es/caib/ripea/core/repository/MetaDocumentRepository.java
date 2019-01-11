@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -28,13 +30,31 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 
 	List<MetaDocumentEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
+	
+	
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.metaExpedient = :metaExpedient " +
+			"and (:esNullFiltre = true or lower(md.codi) like lower('%'||:filtre||'%') or lower(md.nom) like lower('%'||:filtre||'%')) ")
 	Page<MetaDocumentEntity> findByMetaExpedient(
-			MetaExpedientEntity metaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,	
 			Pageable pageable);
+	
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.metaExpedient = :metaExpedient " +
+			"and (:esNullFiltre = true or lower(md.codi) like lower('%'||:filtre||'%') or lower(md.nom) like lower('%'||:filtre||'%')) ")
 	List<MetaDocumentEntity> findByMetaExpedient(
-			MetaExpedientEntity metaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,	
 			Sort sort);
 
+	
 	List<MetaDocumentEntity> findByMetaExpedientIdIn(
 			List<Long> metaExpedientIds);
 

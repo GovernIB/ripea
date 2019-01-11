@@ -12,11 +12,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
@@ -74,13 +77,16 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				true,
 				false);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
+		
+		int ordre = metaDadaRepository.countByMetaNode(metaNode);
+		
 		MetaDadaEntity entity = MetaDadaEntity.getBuilder(
 				metaDada.getCodi(),
 				metaDada.getNom(),
 				metaDada.getTipus(),
 				metaDada.getMultiplicitat(),
 				metaDada.isReadOnly(),
-				0,
+				ordre,
 				metaNode).
 				descripcio(metaDada.getDescripcio()).
 				build();
@@ -122,6 +128,12 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entity,
 				MetaDadaDto.class);
 	}
+	
+	
+	
+
+	
+
 
 	@Transactional
 	@Override
@@ -266,6 +278,58 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				metaDada,
 				posicio);
 	}
+	
+	
+//	
+//	@Override
+//	@Transactional
+//	public void moveTo(
+//			Long entitatId,
+//			Long metaExpedientId,
+//			Long metaDadaId,
+//			int posicio) throws NotFoundException {
+//		logger.debug("Movent metadada del expedient a la posició especificada ("
+//				+ "entitatId=" + entitatId + ", "
+//				+ "metaDadaId=" + metaDadaId + ", "
+//				+ "posicio=" + posicio + ")");
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				true,
+//				false);
+//		
+//		MetaDadaEntity metaDada = metaDadaRepository.findOne(metaDadaId);
+//
+//		canviPosicio(
+//				metaDada,
+//				posicio);
+//
+//	}
+//	
+//
+//	
+//	private void canviPosicio(
+//			MetaDadaEntity metaDada,
+//			int posicio) {
+//		List<MetaDadaEntity> metadades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(
+//				metaDada.getMetaNode());
+//		if (posicio >= 0 && posicio < metadades.size()) {
+//			if (posicio < metaDada.getOrdre()) {
+//				for (MetaDadaEntity est: metadades) {
+//					if (est.getOrdre() >= posicio && est.getOrdre() < metaDada.getOrdre()) {
+//						est.updateOrdre(est.getOrdre() + 1);
+//					}
+//				}
+//			} else if (posicio > metaDada.getOrdre()) {
+//				for (MetaDadaEntity est: metadades) {
+//					if (est.getOrdre() > metaDada.getOrdre() && est.getOrdre() <= posicio) {
+//						est.updateOrdre(est.getOrdre() - 1);
+//					}
+//				}
+//			}
+//			metaDada.updateOrdre(posicio);
+//		}
+//	}	
 
 	@Transactional(readOnly=true)
 	@Override
@@ -340,12 +404,16 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			resposta = paginacioHelper.toPaginaDto(
 					metaDadaRepository.findByMetaNode(
 							metaNode,
+							paginacioParams.getFiltre() == null,
+							paginacioParams.getFiltre(),
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaDadaDto.class);
 		} else {
 			resposta = paginacioHelper.toPaginaDto(
 					metaDadaRepository.findByMetaNode(
 							metaNode,
+							paginacioParams.getFiltre() == null,
+							paginacioParams.getFiltre(),
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaDadaDto.class);
 		}
@@ -369,7 +437,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitat,
 				metaNodeId);
 		return conversioTipusHelper.convertirList(
-				metaDadaRepository.findByMetaNodeAndActivaTrue(metaNode),
+				metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(metaNode),
 				MetaDadaDto.class);
 	}
 
@@ -394,7 +462,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				false,
 				false);
 		return conversioTipusHelper.convertirList(
-				metaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode()),
+				metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(node.getMetaNode()),
 				MetaDadaDto.class);
 	}
 

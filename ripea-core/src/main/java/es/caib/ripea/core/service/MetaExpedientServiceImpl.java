@@ -301,12 +301,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			resposta = paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
+							paginacioParams.getFiltre() == null,
+							paginacioParams.getFiltre(),
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaExpedientDto.class);
 		} else {
 			resposta = paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
+							paginacioParams.getFiltre() == null,
+							paginacioParams.getFiltre(),
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaExpedientDto.class);
 		}

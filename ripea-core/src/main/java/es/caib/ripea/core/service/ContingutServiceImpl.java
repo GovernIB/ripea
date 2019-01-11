@@ -1616,7 +1616,8 @@ public class ContingutServiceImpl implements ContingutService {
 					contingutDesti,
 					entitat,
 					contingutDesti.getExpedient(),
-					documentOrigen.getUbicacio());
+					documentOrigen.getUbicacio(),
+					documentOrigen.getNtiIdDocumentoOrigen());
 		}
 		if (creat != null) {
 			if (creat instanceof NodeEntity) {

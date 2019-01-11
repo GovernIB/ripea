@@ -67,6 +67,25 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 				"id");
 		return dtr;
 	}
+	
+	
+	@RequestMapping(value = "/metaDada/{metaNodeId}/{metaDadaId}/move/{posicio}", method = RequestMethod.GET)
+	public String move(
+			HttpServletRequest request,
+			@PathVariable Long metaNodeId,
+			@PathVariable Long metaDadaId,
+			@PathVariable int posicio) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		metaDadaService.moveTo(
+				entitatActual.getId(),
+				metaNodeId,
+				metaDadaId,
+				posicio);
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:metaDada/"+metaNodeId,
+				null);
+	}
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/new", method = RequestMethod.GET)
 	public String getNew(

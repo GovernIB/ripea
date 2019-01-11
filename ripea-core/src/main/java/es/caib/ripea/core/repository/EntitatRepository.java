@@ -52,4 +52,12 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 			@Param("filtre") String filtre,
 			Sort sort);
 
+	
+
+	Page<EntitatEntity> findBy(
+			Pageable pageable);
+
+
+	List<EntitatEntity> findBy(
+			Sort sort);
 }

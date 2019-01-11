@@ -264,6 +264,7 @@ public class DocumentEntity extends NodeEntity {
 			String nom,
 			Date data,
 			Date dataCaptura,
+			String ntiIdDocumentoOrigen,
 			String ntiVersion,
 			String ntiOrgano,
 			NtiOrigenEnumDto ntiOrigen,
@@ -279,6 +280,7 @@ public class DocumentEntity extends NodeEntity {
 				nom,
 				data,
 				dataCaptura,
+				ntiIdDocumentoOrigen,
 				ntiVersion,
 				ntiOrgano,
 				ntiOrigen,
@@ -297,6 +299,7 @@ public class DocumentEntity extends NodeEntity {
 				String nom,
 				Date data,
 				Date dataCaptura,
+				String ntiIdDocumentoOrigen,
 				String ntiVersion,
 				String ntiOrgano,
 				NtiOrigenEnumDto ntiOrigen,
@@ -312,6 +315,7 @@ public class DocumentEntity extends NodeEntity {
 			built.nom = nom;
 			built.data = data;
 			built.dataCaptura = dataCaptura;
+			built.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;
 			built.ntiVersion = ntiVersion;
 			built.ntiIdentificador = new Long(System.currentTimeMillis()).toString();
 			built.ntiOrgano = ntiOrgano;
@@ -329,10 +333,7 @@ public class DocumentEntity extends NodeEntity {
 			built.ubicacio = ubicacio;
 			return this;
 		}
-		public Builder ntiIdDocumentoOrigen(String ntiIdDocumentoOrigen) {
-			built.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;
-			return this;
-		}
+
 		public Builder ntiTipoFirma(DocumentNtiTipoFirmaEnumDto ntiTipoFirma) {
 			built.ntiTipoFirma = ntiTipoFirma;
 			return this;

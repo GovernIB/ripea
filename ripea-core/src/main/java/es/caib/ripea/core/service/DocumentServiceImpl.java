@@ -166,7 +166,8 @@ public class DocumentServiceImpl implements DocumentService {
 				contingut,
 				contingut.getEntitat(),
 				expedientSuperior,
-				document.getUbicacio());
+				document.getUbicacio(),
+				document.getNtiIdDocumentoOrigen());
 		if (fitxer != null) {
 			documentHelper.actualitzarFitxerDocument(
 					entity,

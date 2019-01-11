@@ -119,7 +119,7 @@ public class CacheHelper {
 		List<ValidacioErrorDto> errors = new ArrayList<ValidacioErrorDto>();
 		List<DadaEntity> dades = dadaRepository.findByNode(node);
 		// Valida dades específiques del meta-node
-		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeAndActivaTrue(node.getMetaNode());
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(node.getMetaNode());
 		for (MetaDadaEntity metaDada: metaDades) {
 			if (metaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
 				boolean trobada = false;

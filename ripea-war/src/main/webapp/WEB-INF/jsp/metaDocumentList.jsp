@@ -27,7 +27,6 @@
 		data-info-type="search"
 		data-default-order="2"
 		data-default-dir="asc"
-		data-drag-enabled="true"
 		class="table table-striped table-bordered"
 		style="width:100%">
 		<thead>

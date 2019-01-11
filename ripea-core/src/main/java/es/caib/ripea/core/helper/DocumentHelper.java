@@ -83,13 +83,15 @@ public class DocumentHelper {
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			ExpedientEntity expedient,
-			String ubicacio) {
+			String ubicacio,
+			String ntiIdDocumentoOrigen) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
 				DocumentEstatEnumDto.REDACCIO,
 				nom,
 				data,
 				dataCaptura,
+				ntiIdDocumentoOrigen,
 				"1.0",
 				ntiOrgano,
 				ntiOrigen,
@@ -98,7 +100,8 @@ public class DocumentHelper {
 				metaDocument,
 				pare,
 				entitat,
-				expedient).
+				expedient
+				).
 				ubicacio(ubicacio).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);

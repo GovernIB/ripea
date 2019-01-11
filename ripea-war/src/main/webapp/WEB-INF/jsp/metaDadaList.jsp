@@ -21,20 +21,42 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/webjars/Sortable/1.4.2/Sortable.min.js"/>"></script>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#metadades').on('dragupdate.dataTable', function (event, itemId, index) {
+		$.ajax({
+
+		    <c:choose>
+				<c:when test="${not empty metaDocument}">
+				url: "<c:url value="/ajax/metaExpedient/metaDada/"/>" + ${metaDocument.id} + "/" + itemId + "/move/" + index,
+				</c:when>
+				<c:otherwise>
+					url: "<c:url value="/ajax/metaExpedient/metaDada/"/>" + ${metaExpedient.id} + "/" + itemId + "/move/" + index,				
+				</c:otherwise>
+			</c:choose>
+			
+			async: false
+		});
+	});
+});
+</script>	
 </head>
 <body>
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
 	</div>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-info-type="search" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
+	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-default-order="0" data-default-dir="asc" data-info-type="search" data-drag-enabled="true" class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				<th data-col-name="codi"><spring:message code="metadada.list.columna.codi"/></th>
-				<th data-col-name="nom"><spring:message code="metadada.list.columna.nom"/></th>
-				<th data-col-name="tipus" data-renderer="enum(MetaDadaTipusEnumDto)">
+				<th data-col-name="ordre" data-visible="false"></th>
+				<th data-col-name="codi" data-orderable="false"><spring:message code="metadada.list.columna.codi"/></th>
+				<th data-col-name="nom" data-orderable="false"><spring:message code="metadada.list.columna.nom"/></th>
+				<th data-col-name="tipus"  data-orderable="false" data-renderer="enum(MetaDadaTipusEnumDto)">
 					<spring:message code="metadada.list.columna.tipus"/>
 				</th>
-				<th data-col-name="activa" data-template="#cellActivaTemplate">
+				<th data-col-name="activa" data-orderable="false" data-template="#cellActivaTemplate" >
 					<spring:message code="metadada.list.columna.activa"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
