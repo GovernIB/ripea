@@ -99,7 +99,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		if (metaDadaId != null)
 			metaDada = metaDadaService.findById(
 					entitatActual.getId(),
-					metaExpedientId,
+					metaDocumentId,
 					metaDadaId);
 		MetaDadaCommand command = null;
 		if (metaDada != null) {
