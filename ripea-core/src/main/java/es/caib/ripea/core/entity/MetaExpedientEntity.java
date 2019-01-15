@@ -3,12 +3,16 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ForeignKey;
@@ -56,6 +60,17 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@JoinColumn(name = "pare_id")
 	@ForeignKey(name = "ipa_pare_metaexp_fk")
 	private MetaExpedientEntity pare;
+	
+	
+	@OneToMany(mappedBy = "metaExpedient", cascade = {CascadeType.ALL})
+	protected Set<MetaExpedientSequenciaEntity> sequencies;
+		
+	@OneToMany(mappedBy = "metaExpedient", cascade = {CascadeType.ALL})
+	protected Set<MetaDocumentEntity> metaDocuments;
+	
+	@OneToMany(mappedBy = "metaExpedient", cascade = {CascadeType.ALL})
+	protected Set<ExpedientEstatEntity> estats;
+	
 
 	public String getClassificacioSia() {
 		return classificacioSia;

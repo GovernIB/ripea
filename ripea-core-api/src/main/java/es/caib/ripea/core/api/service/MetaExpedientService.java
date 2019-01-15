@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -82,11 +83,12 @@ public interface MetaExpedientService {
 	 * @return El meta-expedient esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws SQLException 
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id) throws NotFoundException, SQLException;
 
 	/**
 	 * Consulta un meta-expedient donat el seu id.

@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -168,13 +169,38 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaExpedientService.delete(
-				entitatActual.getId(),
-				metaExpedientId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaExpedient",
-				"metaexpedient.controller.esborrat.ok");
+		try{
+			metaExpedientService.delete(
+					entitatActual.getId(),
+					metaExpedientId);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../metaExpedient",
+					"metaexpedient.controller.esborrat.ok");
+		} catch (Exception exc) {
+			if (exc.getCause() != null && exc.getCause().getCause() != null) {
+				String excMsg = exc.getCause().getCause().getMessage();
+				if (excMsg.contains("ORA-02292")) {
+					return getAjaxControllerReturnValueError(
+							request, 
+							"redirect:../../esborrat",
+							"meta.expedient.noespotesborrar");
+				} else {
+					return getAjaxControllerReturnValueErrorMessageText(
+							request, 
+							"redirect:../../esborrat",
+							exc.getCause().getCause().getMessage());
+				}
+			} else {
+				return getAjaxControllerReturnValueErrorMessageText(
+						request, 
+						"redirect:../../metaExpedient",
+						exc.getMessage());
+			}
+		}
+
+		
+		
 	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)

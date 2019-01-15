@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -60,7 +61,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long metaExpedientId) {
+			Long metaExpedientId) throws SQLException{
 		return delegate.delete(entitatId, metaExpedientId);
 	}
 
