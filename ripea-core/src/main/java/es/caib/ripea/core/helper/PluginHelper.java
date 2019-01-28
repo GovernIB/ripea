@@ -1700,42 +1700,42 @@ public class PluginHelper {
 		}
 	}
 
-	public RegistreAnotacioResposta registreEntradaConsultar(
-			String identificador,
-			String entitatCodi) {
-		String accioDescripcio = "Consulta d'una anotació d'entrada";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("identificador", identificador);
-		long t0 = System.currentTimeMillis();
-		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			RegistreAnotacioResposta resposta = getRegistrePlugin().entradaConsultar(
-					identificador,
-					auth.getName(),
-					entitatCodi);
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_REGISTRE,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			return resposta;
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de registre";
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_REGISTRE,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
-		}
-	}
+//	public RegistreAnotacioResposta registreEntradaConsultar(
+//			String identificador,
+//			String entitatCodi) {
+//		String accioDescripcio = "Consulta d'una anotació d'entrada";
+//		Map<String, String> accioParams = new HashMap<String, String>();
+//		accioParams.put("identificador", identificador);
+//		long t0 = System.currentTimeMillis();
+//		try {
+//			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//			RegistreAnotacioResposta resposta = getRegistrePlugin().entradaConsultar(
+//					identificador,
+//					auth.getName(),
+//					entitatCodi);
+//			integracioHelper.addAccioOk(
+//					IntegracioHelper.INTCODI_REGISTRE,
+//					accioDescripcio,
+//					accioParams,
+//					IntegracioAccioTipusEnumDto.ENVIAMENT,
+//					System.currentTimeMillis() - t0);
+//			return resposta;
+//		} catch (Exception ex) {
+//			String errorDescripcio = "Error al accedir al plugin de registre";
+//			integracioHelper.addAccioError(
+//					IntegracioHelper.INTCODI_REGISTRE,
+//					accioDescripcio,
+//					accioParams,
+//					IntegracioAccioTipusEnumDto.ENVIAMENT,
+//					System.currentTimeMillis() - t0,
+//					errorDescripcio,
+//					ex);
+//			throw new SistemaExternException(
+//					IntegracioHelper.INTCODI_REGISTRE,
+//					errorDescripcio,
+//					ex);
+//		}
+//	}
 
 	/*public CiutadaExpedientInformacio ciutadaExpedientCrear(
 			ExpedientEntity expedient,
@@ -3469,27 +3469,27 @@ public class PluginHelper {
 		}
 		return conversioPlugin;
 	}
-	private RegistrePlugin getRegistrePlugin() {
-		if (registrePlugin == null) {
-			String pluginClass = getPropertyPluginRegistre();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					registrePlugin = (RegistrePlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_REGISTRE,
-							"Error al crear la instància del plugin de registre",
-							ex);
-				}
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_REGISTRE,
-						"No està configurada la classe per al plugin de registre");
-			}
-		}
-		return registrePlugin;
-	}
+//	private RegistrePlugin getRegistrePlugin() {
+//		if (registrePlugin == null) {
+//			String pluginClass = getPropertyPluginRegistre();
+//			if (pluginClass != null && pluginClass.length() > 0) {
+//				try {
+//					Class<?> clazz = Class.forName(pluginClass);
+//					registrePlugin = (RegistrePlugin)clazz.newInstance();
+//				} catch (Exception ex) {
+//					throw new SistemaExternException(
+//							IntegracioHelper.INTCODI_REGISTRE,
+//							"Error al crear la instància del plugin de registre",
+//							ex);
+//				}
+//			} else {
+//				throw new SistemaExternException(
+//						IntegracioHelper.INTCODI_REGISTRE,
+//						"No està configurada la classe per al plugin de registre");
+//			}
+//		}
+//		return registrePlugin;
+//	}
 	/*private CiutadaPlugin getCiutadaPlugin() {
 		if (ciutadaPlugin == null) {
 			String pluginClass = getPropertyPluginCiutada();

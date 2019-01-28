@@ -38,7 +38,6 @@ public class IntegracioHelper {
 
 	public static final int DEFAULT_MAX_ACCIONS = 20;
 
-	public static final String INTCODI_REGISTRE = "REGISTRE";
 	public static final String INTCODI_USUARIS = "USUARIS";
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_CIUTADA = "CIUTADA";
@@ -59,12 +58,6 @@ public class IntegracioHelper {
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
-		integracions.add(
-				novaIntegracio(
-						INTCODI_REGISTRE));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_UNITATS));
 		integracions.add(
 				novaIntegracio(
 						INTCODI_PFIRMA));
@@ -89,9 +82,6 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_SIGNATURA));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_VALIDASIG));
 		integracions.add(
 				novaIntegracio(
 						INTCODI_NOTIFICACIO));
@@ -240,9 +230,7 @@ public class IntegracioHelper {
 			String codi) {
 		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);
-		if (INTCODI_REGISTRE.equals(codi)) {
-			integracio.setNom("Registre");
-		} else if (INTCODI_PFIRMA.equals(codi)) {
+		if (INTCODI_PFIRMA.equals(codi)) {
 			integracio.setNom("Portafirmes");
 		} else if (INTCODI_ARXIU.equals(codi)) {
 			integracio.setNom("Arxiu digital");
@@ -250,8 +238,6 @@ public class IntegracioHelper {
 			integracio.setNom("Conversió doc.");
 		} else if (INTCODI_USUARIS.equals(codi)) {
 			integracio.setNom("Usuaris");
-		} else if (INTCODI_UNITATS.equals(codi)) {
-			integracio.setNom("Unitats admin.");
 		} else if (INTCODI_CIUTADA.equals(codi)) {
 			integracio.setNom("Com. ciutadà");
 		} else if (INTCODI_CALLBACK.equals(codi)) {
@@ -260,8 +246,6 @@ public class IntegracioHelper {
 			integracio.setNom("Dades ext.");
 		} else if (INTCODI_SIGNATURA.equals(codi)) {
 			integracio.setNom("Signatura");
-		} else if (INTCODI_VALIDASIG.equals(codi)) {
-			integracio.setNom("Valida sig.");
 		} else if (INTCODI_NOTIFICACIO.equals(codi)) {
 			integracio.setNom("Notificació");
 		}
