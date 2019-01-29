@@ -186,14 +186,37 @@ public class MetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDocumentService.delete(
-				entitatActual.getId(),
-				metaExpedientId,
-				metaDocumentId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaDocument",
-				"metadocument.controller.esborrat.ok");
+		try{
+			metaDocumentService.delete(
+					entitatActual.getId(),
+					metaExpedientId,
+					metaDocumentId);	
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../metaDocument",
+					"metadocument.controller.esborrat.ok");
+		
+		} catch (Exception exc) {
+			if (exc.getCause() != null && exc.getCause().getCause() != null) {
+				String excMsg = exc.getCause().getCause().getMessage();
+				if (excMsg.contains("ORA-02292")) {
+					return getAjaxControllerReturnValueError(
+							request, 
+							"redirect:../../esborrat",
+							"meta.document.noespotesborrar");
+				} else {
+					return getAjaxControllerReturnValueErrorMessageText(
+							request, 
+							"redirect:../../esborrat",
+							exc.getCause().getCause().getMessage());
+				}
+			} else {
+				return getAjaxControllerReturnValueErrorMessageText(
+						request, 
+						"redirect:../../metaExpedient",
+						exc.getMessage());
+			}
+		}		
 	}
 
 	@RequestMapping(value = "/metaDocument/findAll", method = RequestMethod.GET)
