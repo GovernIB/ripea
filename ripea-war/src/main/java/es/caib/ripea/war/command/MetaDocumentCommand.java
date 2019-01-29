@@ -18,12 +18,16 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
+import es.caib.ripea.war.validation.PortafirmesDocumentTipusNotEmpty;
+import es.caib.ripea.war.validation.ResponsableNotEmpty;
 
 /**
  * Command per al manteniment de meta-documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ResponsableNotEmpty
+@PortafirmesDocumentTipusNotEmpty
 @CodiMetaDocumentNoRepetit(
 		campId = "id",
 		campCodi = "codi",

@@ -98,6 +98,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNom(),
 				metaDocument.getMultiplicitat(),
 				metaExpedient).
+				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
 				descripcio(metaDocument.getDescripcio()).
 				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
 				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).

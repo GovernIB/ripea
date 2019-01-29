@@ -173,6 +173,12 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.firmaPortafirmesActiva = false;
 			built.firmaPassarelaActiva = false;
 		}
+		
+		public Builder firmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
+			built.firmaPortafirmesActiva = firmaPortafirmesActiva;
+			return this;
+		}
+		
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;
