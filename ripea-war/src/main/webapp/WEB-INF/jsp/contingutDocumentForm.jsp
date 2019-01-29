@@ -127,7 +127,6 @@ $(document).ready(function() {
 				<rip:inputSelect name="ntiOrigen" textKey="contingut.document.form.camp.nti.origen" required="true" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<rip:inputSelect name="ntiEstadoElaboracion" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<rip:inputSelect name="ntiTipoDocumental" textKey="contingut.document.form.camp.nti.tipdoc" required="true" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.nti.iddoc"/>
 			</div>
 		</div>
 		<div id="modal-botons" class="well">

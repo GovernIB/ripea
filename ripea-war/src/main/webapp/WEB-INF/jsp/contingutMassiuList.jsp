@@ -149,7 +149,7 @@
 		data-url="<c:url value="/massiu/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
-		data-default-order="3" 
+		data-default-order="7" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
