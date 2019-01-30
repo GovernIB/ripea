@@ -36,6 +36,30 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+	
+<script type="text/javascript">
+	$(document).ready(function() {
+
+
+        if($("#firmaPortafirmesActiva").prop("checked") == true){
+        	$("label[for='portafirmesDocumentTipus']").append( " *" );
+        	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
+        }
+
+		$("#firmaPortafirmesActiva").on('change', function(){
+	            if($(this).prop("checked") == true){
+	            	$("label[for='portafirmesDocumentTipus']").append( " *" );
+	            	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
+	            }
+	            else if($(this).prop("checked") == false){
+	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
+	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
+	            }			
+		});
+	});
+</script>
+	
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDocumentCommand.metaExpedientId}/metaDocument"/></c:set>
