@@ -72,7 +72,16 @@
 				</c:choose>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
-			<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+			
+			<c:choose>
+				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats}">
+					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+				</c:when>
+				<c:otherwise>
+					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+				</c:otherwise>
+			</c:choose>			
+			
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
 		<c:if test="${contingut.document}">
