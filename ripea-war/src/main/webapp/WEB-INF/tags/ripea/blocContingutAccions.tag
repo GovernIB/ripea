@@ -152,7 +152,7 @@
 			</c:choose>		
 			<c:set var="contingutEstat">${contingut.estat}</c:set>	
 			<c:choose>
-				<c:when test="${contingutEstat != 'CUSTODIAT'}">
+				<c:when test="${contingut.document && contingutEstat != 'CUSTODIAT' || contingut.expedient && !contingut.conteDocumentsFirmats}">
 					<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
 				</c:when>
 				<c:otherwise>

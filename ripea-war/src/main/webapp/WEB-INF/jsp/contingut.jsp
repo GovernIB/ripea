@@ -818,7 +818,7 @@ $(document).ready(function() {
 										</ul>
 									</div>
 								</c:if>
-								<c:if test="${expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut)) and contingut.estat != 'TANCAT'}">
+								<c:if test="${expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT'))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
