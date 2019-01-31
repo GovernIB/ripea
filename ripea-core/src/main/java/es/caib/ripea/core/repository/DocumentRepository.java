@@ -63,8 +63,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullExpedientId = true or c.expedient.id = :expedientId) " +
 			"and (:esNullMetaDocumentId = true or c.metaNode.id = :metaDocumentId) " +
 			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullDataInici = true or c.lastModifiedDate >= :dataInici) " +
-			"and (:esNullDataFi = true or c.lastModifiedDate <= :dataFi) " +
+			"and (:esNullDataInici = true or c.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or c.createdDate <= :dataFi) " +
 			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) ")
 	public List<DocumentEntity> findDocumentMassiuByFiltre(
 			@Param("entitat") EntitatEntity entitat,

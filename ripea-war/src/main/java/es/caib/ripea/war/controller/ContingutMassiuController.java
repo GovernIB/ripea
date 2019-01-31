@@ -32,11 +32,13 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
@@ -67,6 +69,8 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 	private ExpedientService expedientService;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private MetaDocumentService metaDocumentService;
 
 	@RequestMapping(value = "/portafirmes", method = RequestMethod.GET)
 	public String getDocuments(
@@ -218,6 +222,25 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), metaExpedientId);
 		return expedients;
 	}
+	
+	
+	
+	@RequestMapping(value = "/metaDocuments/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaDocumentDto> findMetaDocuments(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
+		metaDocuments = metaDocumentService.findByMetaExpedient(entitatActual.getId(), metaExpedientId);
+		
+		return metaDocuments;
+	}	
+	
+	
+	
 
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody

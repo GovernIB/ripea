@@ -247,5 +247,9 @@ public interface MetaDocumentService {
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus();
+	
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId);
 
 }

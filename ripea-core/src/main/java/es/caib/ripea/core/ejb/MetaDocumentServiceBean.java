@@ -176,4 +176,10 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 		return delegate.portafirmesFindDocumentTipus();
 	}
 
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId) {
+		return delegate.findByMetaExpedient(entitatId, metaExpedientId);
+	}
+
 }

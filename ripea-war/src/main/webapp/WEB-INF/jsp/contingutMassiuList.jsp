@@ -40,20 +40,30 @@
 	$(document).ready(function() {
 		
 		$('#tipusExpedient').on('change', function() {
+
 			var tipus = $(this).val();
-			$('#expedientId').select2('val', '', true);
-			$('#expedientId option[value!=""]').remove();
-			var metaNodeRefresh = function(data) {
-				for (var i = 0; i < data.length; i++) {
-					$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-				}
-			};
+			
 			if (tipus != undefined && tipus != "") {
-				$.get("<c:url value="/massiu/expedients/"/>" + tipus)
-				.done(metaNodeRefresh)
-				.fail(function() {
+				$.get("<c:url value="/massiu/expedients/"/>" + tipus).done(function(data){
+					$('#expedientId').select2('val', '', true);
+					$('#expedientId option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					}
+				}).fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");
 				});
+
+				
+				$.get("<c:url value="/massiu/metaDocuments/"/>" + tipus).done(function(data){
+					$('#tipusDocument').select2('val', '', true);
+					$('#tipusDocument option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#tipusDocument').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					}
+				}).fail(function() {
+					alert("<spring:message code="error.jquery.ajax"/>");
+				});			
 			}
 		});
 		

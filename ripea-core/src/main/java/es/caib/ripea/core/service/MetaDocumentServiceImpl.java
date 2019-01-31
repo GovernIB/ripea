@@ -329,6 +329,33 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				true);
 		return resposta;
 	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaDocumentDto> findByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		logger.debug("Consulta dels meta-documents del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
+
+		return conversioTipusHelper.convertirList(
+				metaDocumentRepository.findByMetaExpedient(metaExpedient),
+				MetaDocumentDto.class);
+	}
+	
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override

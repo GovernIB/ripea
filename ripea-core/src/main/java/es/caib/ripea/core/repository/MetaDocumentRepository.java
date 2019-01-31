@@ -53,6 +53,7 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Sort sort);
+	
 
 	
 	List<MetaDocumentEntity> findByMetaExpedientIdIn(
