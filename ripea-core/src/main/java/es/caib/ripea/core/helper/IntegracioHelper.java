@@ -69,9 +69,6 @@ public class IntegracioHelper {
 						INTCODI_ARXIU));
 		integracions.add(
 				novaIntegracio(
-						INTCODI_CIUTADA));
-		integracions.add(
-				novaIntegracio(
 						INTCODI_USUARIS));
 		integracions.add(
 				novaIntegracio(
@@ -79,9 +76,6 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_DADESEXT));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_SIGNATURA));
 		integracions.add(
 				novaIntegracio(
 						INTCODI_NOTIFICACIO));
@@ -238,14 +232,10 @@ public class IntegracioHelper {
 			integracio.setNom("Conversió doc.");
 		} else if (INTCODI_USUARIS.equals(codi)) {
 			integracio.setNom("Usuaris");
-		} else if (INTCODI_CIUTADA.equals(codi)) {
-			integracio.setNom("Com. ciutadà");
-		} else if (INTCODI_CALLBACK.equals(codi)) {
+		}  else if (INTCODI_CALLBACK.equals(codi)) {
 			integracio.setNom("Callback PF");
 		} else if (INTCODI_DADESEXT.equals(codi)) {
 			integracio.setNom("Dades ext.");
-		} else if (INTCODI_SIGNATURA.equals(codi)) {
-			integracio.setNom("Signatura");
 		} else if (INTCODI_NOTIFICACIO.equals(codi)) {
 			integracio.setNom("Notificació");
 		}
