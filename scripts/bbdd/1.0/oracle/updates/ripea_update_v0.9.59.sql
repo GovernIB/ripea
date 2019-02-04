@@ -1,1 +1,0 @@
-alter table ipa_usuari add idioma varchar2(2) default 'CA' not null;

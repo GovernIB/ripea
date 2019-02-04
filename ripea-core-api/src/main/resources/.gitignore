@@ -1,9 +1,0 @@
-# Maven 
-target/
-
-# eclipse project file
-.settings/
-.classpath
-.project
-
-/rebel.xml
