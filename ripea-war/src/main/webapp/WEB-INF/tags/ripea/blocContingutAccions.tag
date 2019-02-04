@@ -58,8 +58,8 @@
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
 						<c:choose>
-							<c:when test="${contingut.valid}">
-								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+							<c:when test="${contingut.valid && contingut.conteDocumentsFirmats}">
+								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>
 								<li class="disabled"><a href="#"/><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
