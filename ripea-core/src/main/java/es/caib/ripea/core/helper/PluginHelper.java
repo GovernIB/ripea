@@ -25,8 +25,6 @@ import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.plugins.arxiu.api.Carpeta;
@@ -104,8 +102,6 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.caib.ripea.plugin.registre.RegistreAnotacioResposta;
-import es.caib.ripea.plugin.registre.RegistrePlugin;
 import es.caib.ripea.plugin.signatura.SignaturaPlugin;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
@@ -129,7 +125,6 @@ public class PluginHelper {
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
 	private PortafirmesPlugin portafirmesPlugin;
 	private ConversioPlugin conversioPlugin;
-	private RegistrePlugin registrePlugin;
 	//private CiutadaPlugin ciutadaPlugin;
 	private DadesExternesPlugin dadesExternesPlugin;
 	private IArxiuPlugin arxiuPlugin;
@@ -3623,10 +3618,6 @@ public class PluginHelper {
 	private String getPropertyPluginConversio() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.conversio.class");
-	}
-	private String getPropertyPluginRegistre() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.registre.class");
 	}
 	/*private String getPropertyPluginCiutada() {
 		return PropertiesHelper.getProperties().getProperty(

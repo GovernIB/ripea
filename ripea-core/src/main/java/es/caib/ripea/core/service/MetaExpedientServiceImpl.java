@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -204,7 +203,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id) throws SQLException{
+			Long id) {
 		logger.debug("Esborrant meta-expedient (id=" + id +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -219,7 +218,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false);
 		metaExpedientRepository.delete(metaExpedient);
-		
 		return conversioTipusHelper.convertir(
 				metaExpedient,
 				MetaExpedientDto.class);

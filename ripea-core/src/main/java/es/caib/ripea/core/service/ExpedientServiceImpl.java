@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,6 @@ import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
@@ -33,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
@@ -43,7 +40,6 @@ import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -503,9 +499,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				true);
 	}
-	
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientEstatDto findExpedientEstatById(
@@ -514,28 +508,19 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug("Obtenint l'estat del expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-
-		
 		ExpedientEstatEntity estat =  expedientEstatRepository.findOne(id);
-		
 		ExpedientEstatDto dto = conversioTipusHelper.convertir(
 				estat,
 				ExpedientEstatDto.class);
 		dto.setMetaExpedientId(estat.getMetaExpedient().getId());
-		
 		return dto;
-
 	}
-	
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(
@@ -621,8 +606,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientEstats,
 				ExpedientEstatDto.class);
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientEstatDto> findExpedientEstats(
@@ -631,12 +615,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug("Consultant els estas dels expedients ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -645,16 +628,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-
-		
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
-		 
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
 				ExpedientEstatDto.class);
 	}
-		
-	
 
 	@Transactional
 	@Override
@@ -728,8 +706,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		
-		
 		ExpedientEstatEntity expedientEstat = expedientEstatRepository.findOne(estat.getId());
 		expedientEstat.update(
 				estat.getCodi(),
@@ -737,9 +713,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				estat.getColor(),
 				metaExpedient,
 				estat.getResponsableCodi());
-		
 		//if inicial of the modified state is true set inicial of other states to false
-		if(estat.isInicial()){
+		if (estat.isInicial()){
 			List<ExpedientEstatEntity> expedientEstats =  expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient);
 			for (ExpedientEstatEntity expEst: expedientEstats){
 				if(!expEst.equals(expedientEstat)){
@@ -750,13 +725,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		} else {
 			expedientEstat.updateInicial(false);
 		}
-		
 		return conversioTipusHelper.convertir(
 				expedientEstat,
 				ExpedientEstatDto.class);
 	}
-	
-	
+
 	@Transactional
 	@Override
 	public ExpedientDto changeEstatOfExpedient(
@@ -767,12 +740,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"expedientEstatId=" + expedientEstatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -781,25 +753,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		
 		ExpedientEstatEntity estat;
-		if(expedientEstatId!=null){
+		if (expedientEstatId!=null){
 			estat = expedientEstatRepository.findOne(expedientEstatId);
 		} else { // if it is null it means that "OBERT" state was choosen
 			estat = null;
 		}
-		
 		String codiEstatAnterior;
-		if(expedient.getExpedientEstat()!=null){
+		if (expedient.getExpedientEstat()!=null){
 			codiEstatAnterior = expedient.getExpedientEstat().getCodi();
 		} else {
 			codiEstatAnterior = messageHelper.getMessage("expedient.estat.enum.OBERT");
 		}
-		
 		expedient.updateExpedientEstat(
 				estat);
-		
-		
 		// log change of state
 		String codiEstatNou;
 		if(expedient.getExpedientEstat()!=null){
@@ -829,11 +796,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedient,
 				false);
 	}
-	
-	
-	
-	
-	
+
 	@Override
 	@Transactional
 	public ExpedientEstatDto deleteExpedientEstat(
@@ -842,23 +805,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug("Esborrant esta del expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientEstatId=" + expedientEstatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		
 		ExpedientEstatEntity entity = expedientEstatRepository.findOne(expedientEstatId);
-		
 		expedientEstatRepository.delete(entity);
-		
 		return conversioTipusHelper.convertir(
 				entity,
 				ExpedientEstatDto.class);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	public List<PermisDto> estatPermisFind(
@@ -867,7 +825,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug("Consulta dels permisos de l'estat ("
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + estatId +  ")"); 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
@@ -888,7 +846,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + estatId + ", "
 				+ "permis=" + permis + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
@@ -910,7 +868,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + estatId + ", "
 				+ "permisId=" + permisId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
@@ -922,7 +880,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				permisId);
 	}
 
-	
 	private void agafarByUserWithCodi(
 			Long entitatId,
 			Long expedientId,
@@ -973,7 +930,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 	}
-	
+
 	@Override
 	@Transactional
 	public ExpedientEstatDto moveTo(
@@ -985,24 +942,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientEstatId=" + expedientEstatId + ", "
 				+ "posicio=" + posicio + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		
 		ExpedientEstatEntity estat = expedientEstatRepository.findOne(expedientEstatId);
-
 		canviPosicio(
 				estat,
 				posicio);
-		
 		return conversioTipusHelper.convertir(
 				estat,
 				ExpedientEstatDto.class);
 	}
-	
-	
+
 	private void canviPosicio(
 			ExpedientEstatEntity estat,
 			int posicio) {
@@ -1094,7 +1047,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
-		boolean granted = permisosHelper.isGrantedAll(
+		permisosHelper.isGrantedAll(
 				metaExpedientId,
 				MetaNodeEntity.class,
 				new Permission[] {ExtendedPermission.WRITE},

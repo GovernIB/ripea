@@ -88,7 +88,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException, SQLException;
+			Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un meta-expedient donat el seu id.
