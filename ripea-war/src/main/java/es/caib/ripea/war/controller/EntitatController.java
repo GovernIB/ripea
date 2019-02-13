@@ -3,7 +3,11 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +20,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.EntitatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -28,7 +35,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/entitat")
-public class EntitatController extends BaseController {
+public class EntitatController extends BaseUserController {
 
 	@Autowired
 	private EntitatService entitatService;
@@ -78,12 +85,16 @@ public class EntitatController extends BaseController {
 	public String save(
 			HttpServletRequest request,
 			@Valid EntitatCommand command,
-			BindingResult bindingResult) {
+			BindingResult bindingResult) throws NotFoundException, IOException {
 		if (bindingResult.hasErrors()) {
 			return "entitatForm";
 		}
 		if (command.getId() != null) {
-			entitatService.update(EntitatCommand.asDto(command));
+			EntitatDto entitat = entitatService.update(EntitatCommand.asDto(command));
+			entitatService.evictEntitatsAccessiblesUsuari();
+			request.getSession().setAttribute(
+					"EntitatHelper.entitatActual",
+					entitat);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:entitat",
@@ -96,6 +107,33 @@ public class EntitatController extends BaseController {
 					"entitat.controller.creada.ok");
 		}
 	}
+	
+	
+	@RequestMapping(value = "/getEntitatLogo", method = RequestMethod.GET)
+	public String getEntitatLogo(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
+		if (entitatActual.getLogoImgBytes() != null) {
+			writeFileToResponse(
+					null,
+					entitatActual.getLogoImgBytes(),
+					response);
+		} else {
+			try {
+				writeFileToResponse(
+						null, 
+						entitatService.getLogo(), 
+						response);
+			} catch (Exception ex) {
+				System.out.println(ex.getMessage());
+			}
+		}
+		return null;
+	}
+	
 
 	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)
 	public String enable(

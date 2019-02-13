@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -34,7 +36,29 @@ public class EntitatCommand {
 	private String cif;
 	@NotEmpty @Size(max=9)
 	private String unitatArrel;
-
+	private MultipartFile logoImg;
+	private String capsaleraColorFons;
+	private String capsaleraColorLletra;
+	
+	
+	public String getCapsaleraColorLletra() {
+		return capsaleraColorLletra;
+	}
+	public void setCapsaleraColorLletra(String capsaleraColorLletra) {
+		this.capsaleraColorLletra = capsaleraColorLletra;
+	}
+	public String getCapsaleraColorFons() {
+		return capsaleraColorFons;
+	}
+	public void setCapsaleraColorFons(String capsaleraColorFons) {
+		this.capsaleraColorFons = capsaleraColorFons;
+	}
+	public MultipartFile getLogoImg() {
+		return logoImg;
+	}
+	public void setLogoImg(MultipartFile logoImg) {
+		this.logoImg = logoImg;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -83,10 +107,12 @@ public class EntitatCommand {
 				dto,
 				EntitatCommand.class);
 	}
-	public static EntitatDto asDto(EntitatCommand command) {
-		return ConversioTipusHelper.convertir(
+	public static EntitatDto asDto(EntitatCommand command) throws IOException {
+		EntitatDto entitat = ConversioTipusHelper.convertir(
 				command,
 				EntitatDto.class);
+		entitat.setLogoImgBytes(command.getLogoImg().getBytes());
+		return entitat;
 	}
 
 	@Override

@@ -39,7 +39,10 @@ CREATE TABLE IPA_ENTITAT
   CREATEDBY_CODI       character varying(64),
   CREATEDDATE          timestamp without time zone,
   LASTMODIFIEDBY_CODI  character varying(64),
-  LASTMODIFIEDDATE     timestamp without time zone
+  LASTMODIFIEDDATE     timestamp without time zone,
+  LOGO_IMG 			   oid,
+  CAPSALERA_COLOR_FONS character varying(32),
+  CAPSALERA_COLOR_LLETRA character varying(32)
 );
 
 

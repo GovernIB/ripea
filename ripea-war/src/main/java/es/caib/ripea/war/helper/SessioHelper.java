@@ -47,6 +47,16 @@ public class SessioHelper {
 			LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
 			
 			request.getSession().setAttribute(
+					"SessionHelper.capsaleraLogo", 
+					aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.logo"));
+			request.getSession().setAttribute(
+					"SessionHelper.capsaleraColorFons", 
+					aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.fons"));
+			request.getSession().setAttribute(
+					"SessionHelper.capsaleraColorLletra", 
+					aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.lletra"));
+			
+			request.getSession().setAttribute(
 					SESSION_ATTRIBUTE_IDIOMA_USUARI, 
 					idioma_usuari);
 			

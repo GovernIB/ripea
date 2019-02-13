@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -204,5 +206,10 @@ public interface EntitatService {
 			Long id,
 			Long permisId) throws NotFoundException;
 
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	byte[] getLogo() throws NoSuchFileException, IOException;
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	void evictEntitatsAccessiblesUsuari();
 
 }
