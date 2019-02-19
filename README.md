@@ -20,6 +20,3 @@ Actualment encara es troba en procés però es pot dir que les principals caract
 * [Manual d'instal·lació](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/odt/00_ripea_instalar.odt)
 ## <a name="v_estable"></a> Versió estable
 ### [v0.9.65](https://github.com/GovernIB/ripea/releases/tag/v0.9.65)
-## <a name="captures"></a> Captures de pantalla
-![Plana Principal](https://github.com/GovernIB/maven/raw/binaris/ripea/projectinfo_Attachments/screenshots/Captura_1.png)<br/>
-Plana Principal
