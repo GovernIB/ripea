@@ -4,6 +4,7 @@
 <c:set var="iconaExpedientObert" value="fa-folder-open" scope="request"/>
 <c:set var="iconaExpedientTancat" value="fa-folder" scope="request"/>
 <c:set var="iconaDocument" value="fa-file-text-o" scope="request"/>
+<c:set var="iconaImportacio" value="fa-file-o" scope="request"/>
 <c:set var="iconaCarpeta" value="fa-folder-o" scope="request"/>
 <c:set var="iconaBustia" value="fa-inbox" scope="request"/>
 <c:set var="iconaArxiu" value="fa-archive" scope="request"/>

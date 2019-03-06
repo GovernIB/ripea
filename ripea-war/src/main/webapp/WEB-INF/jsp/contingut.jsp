@@ -737,7 +737,7 @@ $(document).ready(function() {
 									</c:choose>
 								</tbody>
 							</table>
-							<c:if test="${contingut.custodiat}">
+							
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										<h3 class="panel-title" style="height: 36px;">
@@ -770,7 +770,6 @@ $(document).ready(function() {
 									</table>
 								</div>
 								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.imprimible"/></a>
-							</c:if>
 							<c:if test="${contingut.documentTipus != 'FISIC'}">
 								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 							</c:if>
@@ -828,7 +827,10 @@ $(document).ready(function() {
 											<li><a href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
 											<c:if test="${isMostrarCarpeta}">
 												<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>
-											</c:if>												
+											</c:if>
+											<c:if test="${isMostrarImportacio}">
+												<li><a href="<c:url value="/contingut/${contingut.id}/importacio/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaImportacio}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.importacio"/>...</a></li>
+											</c:if>													
 										</ul>
 									</div>
 								</c:if>
