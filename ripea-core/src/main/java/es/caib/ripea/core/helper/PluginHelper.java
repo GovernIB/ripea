@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
+import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
@@ -1381,6 +1382,69 @@ public class PluginHelper {
 		}
 	}
 
+	public List<ContingutArxiu> getCustodyIdDocuments(String numeroRegistre) {
+		String accioDescripcio = "Importar documents";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("numeroRegistre", numeroRegistre);
+		long t0 = System.currentTimeMillis();
+		try {
+			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
+					numeroRegistre);
+			
+			return contingutArxiu;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	public Document importarDocument(
+			String arxiuUuidPare,
+			String arxiuUuid,
+			boolean moureDocument) {
+		String accioDescripcio = "Importar documents";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		ContingutArxiu nouContingut = new ContingutArxiu(ContingutTipus.DOCUMENT);
+		accioParams.put("arxiuUuid", arxiuUuid);
+		long t0 = System.currentTimeMillis();
+		try {
+			Document document = getArxiuPlugin().documentDetalls(
+					arxiuUuid, 
+					null, 
+					false);
+			
+			if (moureDocument) {
+				nouContingut = getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
+			}
+			document.setIdentificador(nouContingut.getIdentificador());
+			return document;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
 	public String portafirmesUpload(
 			DocumentEntity document,
 			String motiu,
