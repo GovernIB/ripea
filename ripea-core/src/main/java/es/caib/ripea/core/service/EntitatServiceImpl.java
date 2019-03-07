@@ -32,9 +32,9 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosEntitatHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
 
 /**
  * Implementació del servei de gestió d'entitats.
