@@ -69,11 +69,9 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			}
 			notificacioNotib.setConcepte(notificacio.getConcepte());
 			notificacioNotib.setDescripcio(notificacio.getDescripcio());
-			notificacioNotib.setEnviamentDataProgramada(
-					toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+			notificacioNotib.setEnviamentDataProgramada(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 			notificacioNotib.setRetard(notificacio.getRetard());
-			notificacioNotib.setCaducitat(
-					toXmlGregorianCalendar(notificacio.getCaducitat()));
+			notificacioNotib.setCaducitat(toXmlGregorianCalendar(notificacio.getCaducitat()));
 			Document document = new Document();
 			document.setArxiuNom(notificacio.getDocumentArxiuNom());
 			document.setContingutBase64(
@@ -89,8 +87,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 						notificacio.getPagadorPostalDir3Codi());
 				pagadorPostal.setContracteNum(
 						notificacio.getPagadorPostalContracteNum());
-				pagadorPostal.setContracteDataVigencia(
-						toXmlGregorianCalendar(notificacio.getPagadorPostalContracteDataVigencia()));
+				pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(notificacio.getPagadorPostalContracteDataVigencia()));
 				pagadorPostal.setFacturacioClientCodi(
 						notificacio.getPagadorPostalFacturacioClientCodi());
 				notificacioNotib.setPagadorPostal(pagadorPostal);
@@ -99,8 +96,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 				PagadorCie pagadorCie = new PagadorCie();
 				pagadorCie.setDir3Codi(
 						notificacio.getPagadorCieDir3Codi());
-				pagadorCie.setContracteDataVigencia(
-						toXmlGregorianCalendar(notificacio.getPagadorCieContracteDataVigencia()));
+				pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(notificacio.getPagadorCieContracteDataVigencia()));
 				notificacioNotib.setPagadorCie(pagadorCie);
 			}
 			if (notificacio.getEnviaments() != null) {
