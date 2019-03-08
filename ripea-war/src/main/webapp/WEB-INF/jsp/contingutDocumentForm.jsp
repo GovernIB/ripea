@@ -26,10 +26,16 @@
 	<rip:modalHead/>
 <script>
 $(document).ready(function() {
+	if("${nomDocument}" != ""){
+		$(".fileinput").removeClass("fileinput-new");
+		$(".fileinput").addClass("fileinput-exists");
+		$(".fileinput-filename").append("${nomDocument}");
+	}
+	
 	$('#documentTipus').val('DIGITAL');
 	$('#metaNodeId').on('change', function() {
 		if ($(this).val()) {
-			$.get("../metaDocument/" +  $(this).val())
+			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
 			.done(function(data) {
 				if (data.plantillaNom) {
 					$('#info-plantilla-si').removeClass('hidden');

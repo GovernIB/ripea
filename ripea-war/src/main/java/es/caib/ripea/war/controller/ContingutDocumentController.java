@@ -113,11 +113,12 @@ public class ContingutDocumentController extends BaseUserController {
 		DocumentCommand command = null;
 		if (document != null) {
 			command = DocumentCommand.asCommand(document);
-			omplirModelFormulari(
+			omplirModelFormulariAmbDocument(
 					request,
 					command,
 					documentId,
-					model);
+					model,
+					document);
 		} else {
 			command = new DocumentCommand();
 			Date ara = new Date();
@@ -142,6 +143,8 @@ public class ContingutDocumentController extends BaseUserController {
 					contingutId,
 					model);
 		}
+		model.addAttribute("contingutId", contingutId);
+		model.addAttribute("documentId", documentId);
 		command.setEntitatId(entitatActual.getId());
 		command.setPareId(contingutId);
 		command.setOrigen(DocumentFisicOrigenEnum.DISC);
@@ -559,6 +562,18 @@ public class ContingutDocumentController extends BaseUserController {
 		}
 	}
 
+	private void omplirModelFormulariAmbDocument(
+			HttpServletRequest request,
+			DocumentCommand command,
+			Long contingutId,
+			Model model,
+			DocumentDto document) throws ClassNotFoundException, IOException {
+		if(document.getFitxerNom() != null) {
+			model.addAttribute("nomDocument", document.getFitxerNom());
+		}
+		omplirModelFormulari(request, command, contingutId, model);
+	}
+	
 	private void omplirModelFormulari(
 			HttpServletRequest request,
 			DocumentCommand command,
@@ -607,5 +622,6 @@ public class ContingutDocumentController extends BaseUserController {
 						DocumentNtiTipoDocumentalEnumDto.class,
 						"document.nti.tipdoc.enum."));
 	}
+
 
 }
