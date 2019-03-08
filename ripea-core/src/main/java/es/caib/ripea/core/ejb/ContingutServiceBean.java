@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.RegistreAnotacioDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 
 /**
@@ -305,6 +306,21 @@ public class ContingutServiceBean implements ContingutService {
 				entitatId,
 				filtre,
 				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ContingutDto link(
+			Long entitatId, 
+			Long contingutOrigenId, 
+			Long contingutDestiId, 
+			boolean recursiu)
+			throws NotFoundException, ValidationException {
+		return delegate.link(
+				entitatId, 
+				contingutOrigenId, 
+				contingutDestiId, 
+				recursiu);
 	}
 
 }

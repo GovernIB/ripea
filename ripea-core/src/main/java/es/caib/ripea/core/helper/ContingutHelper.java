@@ -1082,6 +1082,22 @@ public class ContingutHelper {
 					desti.getArxiuUuid());
 		}
 	}
+	
+	public ContingutArxiu arxiuPropagarLink(
+			ContingutEntity contingut,
+			ContingutEntity desti) {
+		if (contingut instanceof DocumentEntity) {
+			ContingutArxiu nouContingut = pluginHelper.arxiuDocumentLink(
+					(DocumentEntity)contingut,
+					desti.getArxiuUuid());
+			return nouContingut;
+		} else {
+			throw new ValidationException(
+					contingut.getId(),
+					contingut.getClass(),
+					"Només es pot enllaçar un contingut del tipus document");
+		}
+	}
 
 	public void arxiuPropagarMoviment(
 			ContingutEntity contingut,

@@ -172,6 +172,7 @@ function getCookie(cname) {
 					<div class="col-md-4">
 						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
 					</div>
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<div class="col-md-4">
 						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span></button>
 					</div>						
@@ -181,7 +182,7 @@ function getCookie(cname) {
 			
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
+					
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>

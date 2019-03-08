@@ -44,9 +44,29 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	private Set<MetaNodeEntity> metaNodes = new HashSet<MetaNodeEntity>();
 	@Version
 	private long version = 0;
-
-
-
+	@Column(name = "logo_img")
+	private byte[] logoImgBytes;
+	@Column(name = "capsalera_color_fons", length = 7)
+	private String capsaleraColorFons;
+	@Column(name = "capsalera_color_lletra", length = 7)
+	private String capsaleraColorLletra;
+	
+	
+	public String getCapsaleraColorLletra() {
+		return capsaleraColorLletra;
+	}
+	public void setCapsaleraColorLletra(String capsaleraColorLletra) {
+		this.capsaleraColorLletra = capsaleraColorLletra;
+	}
+	public String getCapsaleraColorFons() {
+		return capsaleraColorFons;
+	}
+	public void setCapsaleraColorFons(String capsaleraColorFons) {
+		this.capsaleraColorFons = capsaleraColorFons;
+	}
+	public byte[] getLogoImgBytes() {
+		return logoImgBytes;
+	}
 	public String getCodi() {
 		return codi;
 	}
@@ -71,14 +91,23 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			String nom,
 			String descripcio,
 			String cif,
-			String unitatArrel) {
+			String unitatArrel,
+			String capsaleraColorFons,
+			String capsaleraColorLletra) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.cif = cif;
 		this.unitatArrel = unitatArrel;
+		this.capsaleraColorFons = capsaleraColorFons;
+		this.capsaleraColorLletra = capsaleraColorLletra;
 	}
-
+	
+	public void updateLogoImgBytes(
+			byte[] logoImgBytes) {
+		this.logoImgBytes = logoImgBytes;
+	}
+	
 	public void updateActiva(
 			boolean activa) {
 		this.activa = activa;
@@ -136,7 +165,23 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 		public EntitatEntity build() {
 			return built;
 		}
+		
+		public Builder logoImgBytes(byte[] logoImgBytes) {
+			built.logoImgBytes = logoImgBytes;
+			return this;
+		}
+		public Builder capsaleraColorFons(String capsaleraColorFons) {
+			built.capsaleraColorFons = capsaleraColorFons;
+			return this;
+		}
+
+		public Builder capsaleraColorLletra(String capsaleraColorLletra) {
+			built.capsaleraColorLletra = capsaleraColorLletra;
+			return this;
+		}
 	}
+	
+	
 
 	@Override
 	public int hashCode() {

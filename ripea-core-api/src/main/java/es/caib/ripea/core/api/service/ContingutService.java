@@ -179,6 +179,31 @@ public interface ContingutService {
 			Long contingutOrigenId,
 			Long contingutDestiId,
 			boolean recursiu) throws NotFoundException, ValidationException;
+	
+	/**
+	 * Enllaça un contingut al destí especificat.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contingut.
+	 * @param contingutOrigenId
+	 *            Atribut id del contingut que es vol enllaçar.
+	 * @param contingutDestiId
+	 *            Atribut id del contingut a on es vol posar el contingut.
+	 * @param recursiu
+	 *            Amb el valor 'true' indica que .
+	 * @return El contingut creat amb l'enllaç.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws ValidationException
+	 *             Si ja existeix un altre contingut amb el mateix nom
+	 *             a dins el destí.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ContingutDto link(
+			Long entitatId,
+			Long contingutOrigenId,
+			Long contingutDestiId,
+			boolean recursiu) throws NotFoundException, ValidationException;
 
 	/**
 	 * Obté la informació del contingut especificat.

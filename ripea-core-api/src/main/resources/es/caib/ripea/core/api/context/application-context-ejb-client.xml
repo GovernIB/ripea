@@ -68,5 +68,9 @@
 			id="execucioMassivaService"
 			jndi-name="ripea/ExecucioMassivaServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.ExecucioMassivaService"/>
+	<jee:local-slsb
+			id="importacioService"
+			jndi-name="ripea/ImportacioServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ImportacioService"/>
 
 </beans>

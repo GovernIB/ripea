@@ -3,6 +3,11 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -27,6 +32,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosEntitatHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -56,6 +62,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 
 
+	
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
@@ -67,7 +74,11 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getNom(),
 				entitat.getDescripcio(),
 				entitat.getCif(),
-				entitat.getUnitatArrel()).build();
+				entitat.getUnitatArrel()).
+				logoImgBytes(entitat.getLogoImgBytes()).
+				capsaleraColorFons(entitat.getCapsaleraColorFons()).
+				capsaleraColorLletra(entitat.getCapsaleraColorLletra()).
+				build();
 		return conversioTipusHelper.convertir(
 				entitatRepository.save(entity),
 				EntitatDto.class);
@@ -89,11 +100,30 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getNom(),
 				entitat.getDescripcio(),
 				entitat.getCif(),
-				entitat.getUnitatArrel());
+				entitat.getUnitatArrel(),
+				entitat.getCapsaleraColorFons(),
+				entitat.getCapsaleraColorLletra());
+		
+		if (entitat.getLogoImgBytes()!=null) {
+			entity.updateLogoImgBytes(entitat.getLogoImgBytes());
+		}
+		
 		return conversioTipusHelper.convertir(
 				entity,
 				EntitatDto.class);
 	}
+	
+	
+	@Transactional
+	@Override
+	public byte[] getLogo() throws NoSuchFileException, IOException{
+
+		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.ripea.capsalera.logo");
+		Path path = Paths.get(filePath);
+		
+		return Files.readAllBytes(path);
+	}
+	
 
 	@Transactional
 	@Override
@@ -196,6 +226,16 @@ public class EntitatServiceImpl implements EntitatService {
 				"usuari=" + auth.getName() + ")");
 		return cacheHelper.findEntitatsAccessiblesUsuari(auth.getName());
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public void evictEntitatsAccessiblesUsuari() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("Consulta les entitats accessibles per l'usuari actual (" +
+				"usuari=" + auth.getName() + ")");
+		cacheHelper.evictEntitatsAccessiblesUsuari(auth.getName());
+	}
+	
 
 	@Transactional
 	@Override

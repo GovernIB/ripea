@@ -25,7 +25,30 @@ public class EntitatDto extends AuditoriaDto {
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
 	private boolean usuariActualAdministration;
-
+	
+	private byte[] logoImgBytes;
+	private String capsaleraColorFons;
+	private String capsaleraColorLletra;
+	
+	
+	public String getCapsaleraColorLletra() {
+		return capsaleraColorLletra;
+	}
+	public void setCapsaleraColorLletra(String capsaleraColorLletra) {
+		this.capsaleraColorLletra = capsaleraColorLletra;
+	}
+	public String getCapsaleraColorFons() {
+		return capsaleraColorFons;
+	}
+	public void setCapsaleraColorFons(String capsaleraColorFons) {
+		this.capsaleraColorFons = capsaleraColorFons;
+	}
+	public byte[] getLogoImgBytes() {
+		return logoImgBytes;
+	}
+	public void setLogoImgBytes(byte[] logoImgBytes) {
+		this.logoImgBytes = logoImgBytes;
+	}
 	public Long getId() {
 		return id;
 	}

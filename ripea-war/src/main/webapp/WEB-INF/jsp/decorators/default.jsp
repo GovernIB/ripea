@@ -69,7 +69,42 @@ body {
 	color:#666666;
 	padding-top: 120px;
 }
+
+<%-- If capsaleraColorFons is defined for entitat use it, if not look if there is capsaleraColorFons defined for application and use it, if not default color is used 	--%>
+<c:choose>
+	<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons}">
+		.navbar-app {
+			background-color: ${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons};
+		}
+	</c:when>
+	<c:otherwise>
+		<c:if test="${sessionScope['SessionHelper.capsaleraColorFons']!=null  && not empty sessionScope['SessionHelper.capsaleraColorFons']}">
+			.navbar-app {
+				background-color: ${sessionScope['SessionHelper.capsaleraColorFons']};
+			}		
+		</c:if>		
+	</c:otherwise>
+</c:choose>
+
+<%-- If capsaleraColorLletra is defined for entitat use it, if not look if there is capsaleraColorLletra defined for application and use it, if not default color is used 	--%>
+<c:choose>
+	<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra}">
+		.navbar-app .list-inline li.dropdown>a {
+			color: ${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra};
+		}
+	</c:when>
+	<c:otherwise>
+		<c:if test="${sessionScope['SessionHelper.capsaleraColorLletra']!=null  && not empty sessionScope['SessionHelper.capsaleraColorLletra']}">
+			.navbar-app .list-inline li.dropdown>a {
+				color: ${sessionScope['SessionHelper.capsaleraColorLletra']};
+			}		
+		</c:if>		
+	</c:otherwise>
+</c:choose>
+
+
 </style>
+
 </head>
 <body>
 
@@ -84,7 +119,16 @@ body {
 				</button--%>
 				<div class="navbar-brand">
 					<div id="govern-logo" class="pull-left">
-						<img src="<c:url value="/img/Logo_APB_Ripea.png"/>"  height="65" alt="Govern de les Illes Balears" />
+					
+						<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
+						<c:choose>
+							<c:when test="${sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && not empty sessionScope['EntitatHelper.entitatActual'].logoImgBytes}">
+								<img src="<c:url value="/entitat/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
+							</c:when>
+							<c:otherwise>
+								<img src="<c:url value="/img/Logo_APB_Ripea.png"/>"  height="65" alt="Govern de les Illes Balears" />
+							</c:otherwise>
+						</c:choose>
 					</div>
 					<div id="app-logo" class="pull-left">
 						<img src="<c:url value="/img/logo.png"/>" alt="RIPEA" />

@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -133,6 +135,17 @@ public class EntitatServiceBean implements EntitatService {
 		delegate.deletePermisAdmin(
 				id,
 				permisId);
+	}
+
+	@Override
+	public byte[] getLogo() throws NoSuchFileException, IOException {
+		return delegate.getLogo();
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void evictEntitatsAccessiblesUsuari() {
+		delegate.evictEntitatsAccessiblesUsuari();
 	}
 
 }

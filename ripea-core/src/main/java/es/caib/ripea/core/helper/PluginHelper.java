@@ -1083,6 +1083,44 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	public ContingutArxiu arxiuDocumentLink(
+			DocumentEntity document,
+			String arxiuUuidDesti) {
+		String accioDescripcio = "Enllaçar document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
+		long t0 = System.currentTimeMillis();
+		try {
+			//Empram el mètode carpetaCopiar per no disposar d'un mètode específic per vincular.
+			ContingutArxiu nouContingut = getArxiuPlugin().carpetaCopiar(
+					document.getArxiuUuid(),
+					arxiuUuidDesti);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return nouContingut;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
 
 	public void arxiuDocumentMoure(
 			DocumentEntity document,
