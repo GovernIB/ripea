@@ -34,6 +34,7 @@ import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.InteressatRepository;
 
@@ -58,7 +59,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
-
+	@Autowired
+	private PluginHelper pluginHelper;
 
 
 	@Transactional
@@ -175,6 +177,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			pare.updateRepresentant(interessatEntity);
 		}
 		expedient.addInteressat(interessatEntity);
+		
+		pluginHelper.arxiuExpedientActualitzar(expedient);
+		
 		// Registra al log la creació de l'interessat
 		contingutLogHelper.log(
 				expedient,

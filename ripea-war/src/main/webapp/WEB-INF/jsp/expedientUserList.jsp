@@ -205,7 +205,7 @@ function getCookie(cname) {
 				</div>
 			</div>
 			<c:if test="${not empty metaExpedientsPermisCreacio}">
-				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
+				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" data-maximized="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 			</c:if>
 		</div>
 	</script>

@@ -27,16 +27,16 @@
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
-		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true"/>
+		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true" labelSize="2"/>
 		<c:choose>
 			<c:when test="${empty expedientCommand.id}">
-				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom"/>
+				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
 			</c:when>
 			<c:otherwise>
-				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true"/>
+				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true" labelSize="2"/>
 			</c:otherwise>
 		</c:choose>
-		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true"/>
+		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
