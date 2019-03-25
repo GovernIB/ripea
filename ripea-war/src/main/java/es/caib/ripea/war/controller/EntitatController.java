@@ -94,7 +94,7 @@ public class EntitatController extends BaseUserController {
 			entitatService.evictEntitatsAccessiblesUsuari();
 			request.getSession().setAttribute(
 					"EntitatHelper.entitatActual",
-					entitat);
+					null);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:entitat",
