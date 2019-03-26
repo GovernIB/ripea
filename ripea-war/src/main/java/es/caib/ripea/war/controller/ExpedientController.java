@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +32,7 @@ import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -41,13 +43,12 @@ import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
-import es.caib.ripea.war.command.ExpedientRelacionarCommand;
-import es.caib.ripea.war.command.ExpedientRelacionarCommand.Relacionar;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -58,6 +59,7 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 @RequestMapping("/expedient")
 public class ExpedientController extends BaseUserController {
 
+	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
 	@Autowired
 	private ContingutService contingutService;
 	@Autowired
@@ -290,39 +292,6 @@ public class ExpedientController extends BaseUserController {
 				"expedient.controller.tancar.ok");
 	}
 
-	@RequestMapping(value = "/{expedientId}/relacionar", method = RequestMethod.GET)
-	public String expedientRelacionarGet(
-			HttpServletRequest request,
-			@PathVariable Long expedientId,
-			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ExpedientRelacionarCommand command = new ExpedientRelacionarCommand();
-		command.setEntitatId(entitatActual.getId());
-		command.setExpedientId(expedientId);
-		model.addAttribute(command);
-		model.addAttribute(
-				"expedient",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						expedientId,
-						true,
-						false));
-		model.addAttribute("expedientId", expedientId);
-		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
-		model.addAttribute(filtre);
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerLectura(
-						entitatActual.getId()));
-		model.addAttribute(
-				"expedientEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						ExpedientEstatEnumDto.class,
-						"expedient.estat.enum."));
-		return "expedientRelacionarForm";
-	}
-	
 
 	
 	@RequestMapping(value = "/{expedientId}/canviarEstat", method = RequestMethod.GET)
@@ -424,43 +393,172 @@ public class ExpedientController extends BaseUserController {
 	
 	
 	
-	
-	
-	@RequestMapping(value = "/{expedientId}/relacionar", method = RequestMethod.POST)
-	public String expedientRelacionarPost(
+	@RequestMapping(value = "/{expedientId}/relacionarList", method = RequestMethod.GET)
+	public String expedientRelacionarGetList(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
-			ExpedientFiltreCommand filtre,
-			@Validated(Relacionar.class) ExpedientRelacionarCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-		model.addAttribute("mantenirPaginacio", true);
+			Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"expedient",
-					contingutService.findAmbIdUser(
-							entitatActual.getId(),
-							expedientId,
-							true,
-							false));
-			model.addAttribute(filtre);
-			model.addAttribute(
-					"expedientEstatEnumOptions",
-					EnumHelper.getOptionsForEnum(
-							ExpedientEstatEnumDto.class,
-							"expedient.estat.enum."));
-			return "expedientRelacionarForm";
+		model.addAttribute(
+				"expedient",
+				contingutService.findAmbIdUser(
+						entitatActual.getId(),
+						expedientId,
+						true,
+						false));
+		model.addAttribute("expedientId", expedientId);
+		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
+		model.addAttribute(filtre);
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActiusAmbEntitatPerLectura(
+						entitatActual.getId()));
+		model.addAttribute(
+				"expedientEstatEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						ExpedientEstatEnumDto.class,
+						"expedient.estat.enum."));
+		
+	
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId());
+		model.addAttribute(
+				"metaExpedientsPermisLectura",
+				metaExpedientsPermisLectura);
+
+		
+		ExpedientFiltreCommand expedientFiltreCommand = getRelacionarFiltreCommand(request);
+		
+//		Long metaExpedientId = null;
+//		if (expedientFiltreCommand != null) {
+//			metaExpedientId = expedientFiltreCommand.getMetaExpedientId();
+//		}
+		
+		model.addAttribute(
+				"expedientFiltreCommand",
+				expedientFiltreCommand);
+		
+		
+		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+
+		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
+		
+		
+		model.addAttribute(
+				"expedientEstatsOptions",
+				expedientEstatsOptions);
+		
+		
+		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.sense.permis.lectura"));
 		}
+		return "expedientRelacionarForm";
+	}
+	
+	
+	
+	@RequestMapping(value = "/{expedientId}/relacionarList", method = RequestMethod.POST)
+	public String expedientRelacionarPostList(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@Valid ExpedientFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+		getEntitatActualComprovantPermisos(request);
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_FILTRE);
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_RELACIONAR_FILTRE,
+						filtreCommand);
+			}
+		}
+		return "redirect:/modal/expedient/"+expedientId+"/relacionarList";
+	}
+	
+	
+	private ExpedientFiltreCommand getRelacionarFiltreCommand(
+			HttpServletRequest request) {
+		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RELACIONAR_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new ExpedientFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_FILTRE,
+					filtreCommand);
+		}
+		return filtreCommand;
+	}
+	
+	
+	@RequestMapping(value = "/{expedientId}/relacionar/{relacionatId}", method = RequestMethod.GET)
+	public String expedientRelacionar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long relacionatId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
 		expedientService.relacioCreate(
 				entitatActual.getId(),
-				command.getExpedientId(),
-				command.getRelacionatId());
+				expedientId,
+				relacionatId);
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/../../contingut/" + expedientId,
 				"expedient.controller.relacionat.ok");
 	}
+	
+
+	
+	
+
+	@RequestMapping(value = "/{expedientId}/relacio/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse relacioDatatable(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+
+		ExpedientFiltreCommand filtreCommand = getRelacionarFiltreCommand(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return DatatablesHelper.getDatatableResponse(
+				request,
+				expedientService.findAmbFiltreNoRelacionat(
+						entitatActual.getId(), 
+						ExpedientFiltreCommand.asDto(filtreCommand), 
+						expedientId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
+	}
+
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	}
+
+	
 	@RequestMapping(value = "/{expedientId}/relacio/{relacionatId}/delete", method = RequestMethod.GET)
 	public String expedientRelacioDelete(
 			HttpServletRequest request,
@@ -488,33 +586,9 @@ public class ExpedientController extends BaseUserController {
 		return "redirect:/contingut/" + expedientId;
 	}
 
-	@RequestMapping(value = "/{expedientId}/relacio/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse relacioDatatable(
-			HttpServletRequest request,
-			@PathVariable Long expedientId,
-			ExpedientFiltreCommand filtre,
-			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				expedientService.findAmbFiltreNoRelacionat(
-						entitatActual.getId(), 
-						ExpedientFiltreCommand.asDto(filtre), 
-						expedientId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
-	}
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
+	
+	
+	
 	@RequestMapping(value = "/{expedientId}/enviament/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse enviamentDatatable(

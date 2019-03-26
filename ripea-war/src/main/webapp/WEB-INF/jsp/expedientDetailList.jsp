@@ -299,7 +299,7 @@ function getCookie(cname) {
 											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 										{{/if}}
 									{{/if}}
-									<li><a href="expedient/{{:id}}/relacionar" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+									<li><a href="expedient/{{:id}}/relacionarList" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
 									{{if estat == 'OBERT'}}
 										{{if valid && estat == 'OBERT'}}
 											<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
