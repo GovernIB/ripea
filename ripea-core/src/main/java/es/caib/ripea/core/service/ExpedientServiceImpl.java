@@ -510,7 +510,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				+ "id=" + id + ")");
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
+				false,
 				false,
 				false);
 		ExpedientEstatEntity estat =  expedientEstatRepository.findOne(id);
@@ -533,15 +533,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 				+ "paginacioParams=" + paginacioParams + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
+				true,
 				false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					metaExpedientId,
-					true,
+					false,
 					false,
 					false,
 					false);
@@ -651,8 +651,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				estat.getMetaExpedientId(),
-				true,
-				true,
+				false,
+				false,
 				false,
 				false);
 		
@@ -702,8 +702,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				estat.getMetaExpedientId(),
-				true,
-				true,
+				false,
+				false,
 				false,
 				false);
 		ExpedientEstatEntity expedientEstat = expedientEstatRepository.findOne(estat.getId());

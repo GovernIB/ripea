@@ -34,7 +34,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/expedientEstat")
-public class ExpedientEstatController extends BaseUserController {
+public class ExpedientEstatController extends BaseAdminController {
 
 
 
