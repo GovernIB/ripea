@@ -74,7 +74,7 @@
 			</c:if>
 			
 			<c:choose>
-				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats}">
+				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats || contingut.document && contingut.estat == 'FIRMA_PENDENT'}">
 					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 				</c:when>
 				<c:otherwise>
