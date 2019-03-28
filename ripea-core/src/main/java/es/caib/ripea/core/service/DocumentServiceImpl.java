@@ -251,11 +251,11 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 		DocumentDto dto = toDocumentDto(entity);
-		if (fitxer != null) {
-			contingutHelper.arxiuPropagarModificacio(
-					entity,
-					fitxer);
-		}
+	
+		contingutHelper.arxiuPropagarModificacio(
+				entity,
+				fitxer);
+		
 		return dto;
 	}
 
