@@ -453,6 +453,7 @@ function canviVisibilitat(tipus) {
 	<form:form id="interessatform" action="${formAction}" method="post" cssClass="form-horizontal" commandName="interessatCommand">
 		<form:hidden path="entitatId"/>
 		<form:hidden path="id"/>
+		<form:hidden path="expedientId"/>
 		<input type="hidden" id="id"/>
 		<!-- FILA: Tipus d'interessat -->
 		<rip:inputSelect name="tipus" textKey="interessat.form.camp.tipus" optionItems="${tipusEnumOptions}" optionTextKeyAttribute="text" optionValueAttribute="value" labelSize="2" />

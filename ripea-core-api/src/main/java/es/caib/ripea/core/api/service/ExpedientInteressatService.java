@@ -229,6 +229,8 @@ public interface ExpedientInteressatService {
 	 *            NIF de l'interessat per a la consulta.
 	 * @param llinatges
 	 *            Llinatges de l'interessat per a la consulta.
+	 * @param expedientId 
+	 * 			  Id del expedient del interessat  
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -238,7 +240,8 @@ public interface ExpedientInteressatService {
 			String documentNum,
 			String nom,
 			String llinatge1,
-			String llinatge2) throws NotFoundException;
+			String llinatge2,
+			Long expedientId) throws NotFoundException;
 
 	/**
 	 * Consulta els interessats per nom i identificador.
@@ -249,6 +252,8 @@ public interface ExpedientInteressatService {
 	 *            NIF de l'interessat per a la consulta.
 	 * @param llinatges
 	 *            Llinatges de l'interessat per a la consulta.
+	 * @param expedientId 
+	 * 			  Id del expedient del interessat              
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -256,19 +261,24 @@ public interface ExpedientInteressatService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<InteressatPersonaJuridicaDto> findByFiltrePersonaJuridica(
 			String documentNum,
-			String raoSocial) throws NotFoundException;
+			String raoSocial,
+			Long expedientId) throws NotFoundException;
 
 	/**
 	 * Consulta els interessats per nom i identificador.
 	 * 
 	 * @param organCodi
 	 *            codi de l'organ de l'administració per a la consulta.
+	 * @param expedientId 
+	 * 			  Id del expedient del interessat              
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<InteressatAdministracioDto> findByFiltreAdministracio(
-			String organCodi) throws NotFoundException;
+			String organCodi,
+			Long expedientId) throws NotFoundException;
+
 
 }

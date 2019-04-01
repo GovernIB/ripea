@@ -36,6 +36,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 
 /**
@@ -48,7 +49,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 
 	@Autowired
 	private InteressatRepository interessatRepository;
-
+	@Autowired
+	private ExpedientRepository expedientRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -590,12 +592,15 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			String documentNum,
 			String nom,
 			String llinatge1,
-			String llinatge2) {
+			String llinatge2,
+			Long expedientId) {
 		logger.debug("Consulta interessats de tipus ciutadà ("
 				+ "nom=" + nom + ", "
 				+ "documentNum=" + documentNum + ", "
 				+ "llinatge1=" + llinatge1 + ", "
 				+ "llinatge2=" + llinatge2 + ")");
+		
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		return conversioTipusHelper.convertirList(
 				interessatRepository.findByFiltrePersonaFisica(
 						nom == null,
@@ -605,7 +610,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 						llinatge1 == null,
 						llinatge1,
 						llinatge2 == null,
-						llinatge2),
+						llinatge2,
+						expedient),
 				InteressatPersonaFisicaDto.class);
 	}
 
@@ -613,28 +619,36 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	@Override
 	public List<InteressatPersonaJuridicaDto> findByFiltrePersonaJuridica(
 			String documentNum,
-			String raoSocial) {
+			String raoSocial,
+			Long expedientId) {
 		logger.debug("Consulta interessats de tipus ciutadà ("
 				+ "raoSocial=" + raoSocial + ", "
 				+ "documentNum=" + documentNum + ")");
+		
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		return conversioTipusHelper.convertirList(
 				interessatRepository.findByFiltrePersonaJuridica(
 						documentNum == null,
 						documentNum,
 						raoSocial == null,
-						raoSocial),
+						raoSocial,
+						expedient),
 				InteressatPersonaJuridicaDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<InteressatAdministracioDto> findByFiltreAdministracio(
-			String organCodi) {
+			String organCodi,
+			Long expedientId) {
 		logger.debug("Consulta interessats de tipus administració ("
 				+ "organCodi=" + organCodi + ")");
+		
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		List<InteressatAdministracioEntity> administracions = interessatRepository.findByFiltreAdministracio(
 				organCodi == null,
-				organCodi);
+				organCodi,
+				expedient);
 		return conversioTipusHelper.convertirList(
 				administracions,
 				InteressatAdministracioDto.class);

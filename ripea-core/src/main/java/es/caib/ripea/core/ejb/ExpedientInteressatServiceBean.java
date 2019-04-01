@@ -135,30 +135,36 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 			String documentNum,
 			String nom,
 			String llinatge1,
-			String llinatge2) {
+			String llinatge2,
+			Long expedientId) {
 		return delegate.findByFiltrePersonaFisica(
 				documentNum,
 				nom,
 				llinatge1,
-				llinatge2);
+				llinatge2,
+				expedientId);
 	}
 	
 	@Override
 	@RolesAllowed("tothom")
 	public List<InteressatPersonaJuridicaDto> findByFiltrePersonaJuridica(
 			String documentNum,
-			String raoSocial) {
+			String raoSocial,
+			Long expedientId) {
 		return delegate.findByFiltrePersonaJuridica(
 				documentNum, 
-				raoSocial);
+				raoSocial,
+				expedientId);
 	}
 	
 	@Override
 	@RolesAllowed("tothom")
 	public List<InteressatAdministracioDto> findByFiltreAdministracio(
-			String organCodi) {
+			String organCodi,
+			Long expedientId) {
 		return delegate.findByFiltreAdministracio(
-				organCodi);
+				organCodi,
+				expedientId);
 	}
 
 }

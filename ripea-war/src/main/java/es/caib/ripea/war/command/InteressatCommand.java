@@ -96,7 +96,15 @@ public class InteressatCommand  {
 	protected String filtreProvincia;
 	protected String filtreLocalitat;
 	protected Boolean filtreArrel;
-
+	
+	protected Long expedientId;
+	
+	public Long getExpedientId() {
+		return expedientId;
+	}
+	public void setExpedientId(Long expedientId) {
+		this.expedientId = expedientId;
+	}
 	public Long getId() {
 		return id;
 	}

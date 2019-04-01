@@ -62,6 +62,7 @@ public class ExpedientInteressatController extends BaseUserController {
 		InteressatCommand interessatCommand = new InteressatCommand();
 		interessatCommand.setEntitatId(entitatActual.getId());
 		interessatCommand.setPais("724");
+		interessatCommand.setExpedientId(expedientId);
 		model.addAttribute("interessatCommand", interessatCommand);
 		model.addAttribute("expedientId", expedientId);
 		ompleModel(request, model, entitatActual.getCodi());

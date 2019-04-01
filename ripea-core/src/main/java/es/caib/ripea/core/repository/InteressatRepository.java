@@ -71,6 +71,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "and (:esNullDocumentNum = true or inter.documentNum = :documentNum) "
 			+ "and (:esNullLlinatge1 = true or inter.llinatge1 = :llinatge1) "
 			+ "and (:esNullLlinatge2 = true or inter.llinatge2 = :llinatge2) "
+			+ "and (inter.expedient = :expedient) "
 			+ "and inter.esRepresentant = false "
 			+ "order by "
 			+ "    inter.llinatge1 desc, inter.llinatge2 desc, inter.nom desc")
@@ -82,7 +83,8 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullLlinatge1") boolean esNullLlinatge1,
 			@Param("llinatge1") String llinatge1,
 			@Param("esNullLlinatge2") boolean esNullLlinatge2,
-			@Param("llinatge2") String llinatge2);
+			@Param("llinatge2") String llinatge2,
+			@Param("expedient") ExpedientEntity expedient);
 
 	@Query(	  "select inter "
 			+ "from InteressatPersonaJuridicaEntity inter "
@@ -96,6 +98,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "where "
 			+ "    (:esNullDocumentNum = true or inter.documentNum = :documentNum) "
 			+ "and (:esNullRaoSocial = true or inter.raoSocial = :raoSocial) "
+			+ "and (inter.expedient = :expedient) "
 			+ "and inter.esRepresentant = false "
 			+ "order by "
 			+ "    inter.raoSocial desc")
@@ -103,7 +106,8 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullDocumentNum") boolean esNullDocumentNum,
 			@Param("documentNum") String documentNum,
 			@Param("esNullRaoSocial") boolean esNullRaoSocial,
-			@Param("raoSocial") String raoSocial);
+			@Param("raoSocial") String raoSocial,
+			@Param("expedient") ExpedientEntity expedient);
 	
 	@Query(	  "select inter "
 			+ "from InteressatAdministracioEntity inter "
@@ -116,10 +120,12 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "    InteressatAdministracioEntity inter "
 			+ "where "
 			+ "    (:esNullOrganCodi = true or inter.organCodi = :organCodi) "
+			+ "and (inter.expedient = :expedient) "
 			+ "order by "
 			+ "    inter.organNom desc")
 	List<InteressatAdministracioEntity> findByFiltreAdministracio(
 			@Param("esNullOrganCodi") boolean esNullOrganCodi,
-			@Param("organCodi") String organCodi);
+			@Param("organCodi") String organCodi,
+			@Param("expedient") ExpedientEntity expedient);
 	
 }

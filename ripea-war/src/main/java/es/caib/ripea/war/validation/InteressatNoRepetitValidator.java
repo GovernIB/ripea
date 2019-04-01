@@ -53,16 +53,19 @@ public class InteressatNoRepetitValidator implements ConstraintValidator<Interes
 						interessat.getDocumentNum(), 
 						interessat.getNom(), 
 						interessat.getLlinatge1(), 
-						interessat.getLlinatge2());
+						interessat.getLlinatge2(),
+						interessat.getExpedientId());
 				existeix = interessats.size() > 0;
 			} else if (InteressatTipusEnumDto.PERSONA_JURIDICA.equals(tipus)) {
 				List<InteressatPersonaJuridicaDto> interessats = expedientInteressatService.findByFiltrePersonaJuridica(
 						interessat.getDocumentNum(),
-						interessat.getRaoSocial());
+						interessat.getRaoSocial(),
+						interessat.getExpedientId());
 				existeix = interessats.size() > 0;
 			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(tipus)) {
 				List<InteressatAdministracioDto> interessats = expedientInteressatService.findByFiltreAdministracio(
-						interessat.getOrganCodi());
+						interessat.getOrganCodi(),
+						interessat.getExpedientId());
 				existeix = interessats.size() > 0;
 			} else {
 				throw new RuntimeException("No s'ha pogut comprovar si l'interessat ja està donat d'alta: tipus desconegut");
