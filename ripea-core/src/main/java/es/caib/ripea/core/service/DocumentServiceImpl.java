@@ -216,11 +216,11 @@ public class DocumentServiceImpl implements DocumentService {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
-//		contingutHelper.comprovarNomValid(
-//				entity.getPare(),
-//				document.getNom(),
-//				id,
-//				DocumentEntity.class);
+		contingutHelper.comprovarNomValid(
+				entity.getPare(),
+				document.getNom(),
+				id,
+				DocumentEntity.class);
 		cacheHelper.evictErrorsValidacioPerNode(entity);
 		String nomOriginal = entity.getNom();
 		entity.update(

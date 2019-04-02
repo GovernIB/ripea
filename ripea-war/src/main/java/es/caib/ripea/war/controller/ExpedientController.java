@@ -119,16 +119,24 @@ public class ExpedientController extends BaseUserController {
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
 		}
-		expedientService.create(
-				entitatActual.getId(),
-				command.getMetaNodeId(),
-				null,
-				command.getAny(),
-				command.getNom());
+		try {
+			expedientService.create(
+					entitatActual.getId(),
+					command.getMetaNodeId(),
+					null,
+					command.getAny(),
+					command.getNom());
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../expedient",
 				"expedient.controller.creat.ok");
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			model.addAttribute(
+					"metaExpedients",
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+			return "contingutExpedientForm";
+		}
 	}
 	@RequestMapping(value = "/{expedientId}/update", method = RequestMethod.POST)
 	public String postUpdate(
@@ -145,15 +153,23 @@ public class ExpedientController extends BaseUserController {
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
 		}
-		expedientService.update(
-				entitatActual.getId(),
-				command.getId(),
-				command.getNom(),
-				command.getAny());
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../expedient",
-				"expedient.controller.modificat.ok");
+		try {
+			expedientService.update(
+					entitatActual.getId(),
+					command.getId(),
+					command.getNom(),
+					command.getAny());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../expedient",
+					"expedient.controller.modificat.ok");
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			model.addAttribute(
+					"metaExpedients",
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+			return "contingutExpedientForm";
+		}		
 	}
 
 	@RequestMapping(value = "/{expedientId}/agafar", method = RequestMethod.GET)

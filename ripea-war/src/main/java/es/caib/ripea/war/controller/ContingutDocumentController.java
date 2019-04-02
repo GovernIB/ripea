@@ -166,11 +166,23 @@ public class ContingutDocumentController extends BaseUserController {
 					model);
 			return "contingutDocumentForm";
 		}
-		return createUpdateDocument(
-				request,
-				command,
-				bindingResult,
-				model);
+		try {
+			return createUpdateDocument(
+					request,
+					command,
+					bindingResult,
+					model);
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			omplirModelFormulari(
+					request,
+					command,
+					contingutId,
+					model);
+			return "contingutDocumentForm";
+		}
+		
+		
 	}
 	@RequestMapping(value = "/{contingutId}/document/digital/update", method = RequestMethod.POST)
 	public String postDigitalUpdate(
@@ -187,11 +199,21 @@ public class ContingutDocumentController extends BaseUserController {
 					model);
 			return "contingutDocumentForm";
 		}
-		return createUpdateDocument(
-				request,
-				command,
-				bindingResult,
-				model);
+		try {
+			return createUpdateDocument(
+					request,
+					command,
+					bindingResult,
+					model);
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			omplirModelFormulari(
+					request,
+					command,
+					contingutId,
+					model);
+			return "contingutDocumentForm";
+		}
 	}
 	@RequestMapping(value = "/{contingutId}/document/fisic/new", method = RequestMethod.POST)
 	public String postFisicNew(

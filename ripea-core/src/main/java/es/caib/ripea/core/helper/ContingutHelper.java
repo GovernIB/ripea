@@ -998,6 +998,12 @@ public class ContingutHelper {
 					objectClass,
 					"El nom de l'expedient no és vàlid (no pot començar amb un \".\")");
 		}
+		if (nom.endsWith(" ")) {
+			throw new ValidationException(
+					objectId,
+					objectClass,
+					"El nom de l'expedient no és vàlid (no pot acabar amb un \" \")");
+		}
 		if (contingutPare != null) {
 			for (ContingutEntity fill: contingutPare.getFills()) {
 				if (fill.getNom().equals(nom)) {
