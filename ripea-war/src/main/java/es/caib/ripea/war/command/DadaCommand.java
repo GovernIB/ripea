@@ -118,6 +118,26 @@ public class DadaCommand {
 		return null;
 	}
 
+	/*public static List<DadaDto> asDto(List<DadaCommand> command) {		
+		List<DadaDto> dades = new ArrayList<DadaDto>();
+		
+		for (DadaCommand dada : command) {
+			DadaDto dadaDto = ConversioTipusHelper.convertir(
+					dada,
+					DadaDto.class);
+			MetaDadaDto metaDada = new MetaDadaDto();
+
+			metaDada.setValor(dada.getValorText());
+			metaDada.setId(dada.getMetaDadaId());
+			metaDada.setCodi(codi);
+			dadaDto.setMetaDada(metaDada);
+			dadaDto.setValor(dada.getValor());
+			
+			dades.add(dadaDto);
+		}
+			
+		return dades;
+	}*/
 	/*public static DadaCommand asCommand(DadaDto dto) throws Exception {
 		DadaCommand command = ConversioTipusHelper.convertir(
 				dto,

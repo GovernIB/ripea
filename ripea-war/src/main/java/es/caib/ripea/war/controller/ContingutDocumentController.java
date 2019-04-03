@@ -4,17 +4,21 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.fundaciobit.plugins.scanweb.api.IScanWebPlugin;
 import org.fundaciobit.plugins.scanweb.api.ScanWebMode;
 import org.fundaciobit.plugins.scanweb.api.ScanWebStatus;
@@ -36,18 +40,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
@@ -60,6 +67,7 @@ import es.caib.ripea.war.escaneig.EscaneigHelper;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.ArxiuTemporalHelper;
+import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
@@ -82,12 +90,14 @@ public class ContingutDocumentController extends BaseUserController {
 	private DocumentService documentService;
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-
+	@Autowired
+	private MetaDadaService metaDadaService;
 	@Autowired
 	private EscaneigHelper escaneigHelper;
 	@Autowired
 	private ArxiuTemporalHelper arxiuTemporalHelper;
-
+	@Autowired
+	private BeanGeneratorHelper beanGeneratorHelper;
 
 
 	@RequestMapping(value = "/{contingutId}/document/new", method = RequestMethod.GET)
@@ -124,9 +134,9 @@ public class ContingutDocumentController extends BaseUserController {
 			Date ara = new Date();
 			command.setData(ara);
 			command.setDataCaptura(ara);
-			command.setNtiOrigen(NtiOrigenEnumDto.O0);
-			command.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
-			command.setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
+			//command.setNtiOrigen(NtiOrigenEnumDto.O0);
+			//command.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+			//command.setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
 			ContingutDto contingut = contingutService.findAmbIdUser(
 					entitatActual.getId(),
 					contingutId,
@@ -157,7 +167,7 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@Validated({CreateDigital.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -190,7 +200,7 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@Validated({UpdateDigital.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -221,7 +231,7 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@Validated({CreateFisic.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -242,7 +252,7 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@Validated({UpdateFisic.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -525,6 +535,22 @@ public class ContingutDocumentController extends BaseUserController {
 				response);
 		return null;
 	}
+	
+	@RequestMapping(value = "/{contingutId}/metaDocument/{metaDocumentId}/dadesnti", method = RequestMethod.GET)
+	@ResponseBody
+	public MetaDocumentDto metaDocumentDadesNti(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model,
+			@PathVariable Long contingutId,
+			@PathVariable Long metaDocumentId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		MetaDocumentDto document = metaDocumentService.getDadesNti(
+				entitatActual.getId(), 
+				contingutId, 
+				metaDocumentId);
+		return document;
+	}
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -541,9 +567,11 @@ public class ContingutDocumentController extends BaseUserController {
 			HttpServletRequest request,
 			DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException {
+			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = null;
+		List<DadaDto> dades = new ArrayList<DadaDto>();
+		Map<String, Object> valors = new HashMap<String, Object>();
 		switch (command.getOrigen()) {
 		case DISC:
 			if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
@@ -562,11 +590,44 @@ public class ContingutDocumentController extends BaseUserController {
 			break;
 		}
 		if (command.getId() == null) {
-			documentService.create(
+			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					command.getPareId(),
 					DocumentCommand.asDto(command),
 					fitxer);
+			//Valor per defecte d'algunes metadades
+			List<MetaDadaDto> metadades = metaDadaService.findByNode(
+					entitatActual.getId(), 
+					document.getId());
+			
+			for (MetaDadaDto metadada : metadades) {
+				DadaDto dada = new DadaDto();
+				dada.setMetaDada(metadada);
+				dada.setValor(metadada.getValor());
+				dades.add(dada);
+			}
+			Object dadesCommand = beanGeneratorHelper.generarCommandDadesNode(
+					entitatActual.getId(),
+					document.getId(),
+					dades);
+				
+			for (DadaDto dada : dades) {
+				MetaDadaDto metaDada = metaDadaService.findById(
+						entitatActual.getId(), 
+						command.getMetaNodeId(),
+						dada.getMetaDada().getId());
+
+				Object valor = PropertyUtils.getSimpleProperty(dadesCommand, metaDada.getCodi());
+
+				if (valor != null && (!(valor instanceof String) || !((String) valor).isEmpty())) {
+					valors.put(metaDada.getCodi(), valor);
+				}
+			}	
+			contingutService.dadaSave(
+					entitatActual.getId(),
+					document.getId(),
+					valors);
+			
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + command.getPareId(),

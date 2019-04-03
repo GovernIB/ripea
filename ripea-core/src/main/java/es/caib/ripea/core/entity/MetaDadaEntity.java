@@ -42,6 +42,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	private MetaDadaTipusEnumDto tipus;
 	@Column(name = "multiplicitat")
 	private MultiplicitatEnumDto multiplicitat;
+	@Column(name = "valor")
+	private String valor;
 	@Column(name = "descripcio", length = 1024)
 	private String descripcio;
 	@Column(name = "activa")
@@ -69,6 +71,9 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
+	public String getValor() {
+		return valor;
+	}
 	public String getDescripcio() {
 		return descripcio;
 	}
@@ -93,12 +98,14 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			String nom,
 			MetaDadaTipusEnumDto tipus,
 			MultiplicitatEnumDto multiplicitat,
+			String valor,
 			String descripcio,
 			boolean readOnly) {
 		this.codi = codi;
 		this.nom = nom;
 		this.tipus = tipus;
 		this.multiplicitat = multiplicitat;
+		this.valor = valor;
 		this.descripcio = descripcio;
 		this.readOnly = readOnly;
 	}
@@ -126,6 +133,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			String nom,
 			MetaDadaTipusEnumDto tipus,
 			MultiplicitatEnumDto multiplicitat,
+			String valor,
 			boolean readOnly,
 			int ordre,
 			MetaNodeEntity metaNode) {
@@ -134,6 +142,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				nom,
 				tipus,
 				multiplicitat,
+				valor,
 				readOnly,
 				ordre,
 				metaNode);
@@ -145,6 +154,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				String nom,
 				MetaDadaTipusEnumDto tipus,
 				MultiplicitatEnumDto multiplicitat,
+				String valor,
 				boolean readOnly,
 				int ordre,
 				MetaNodeEntity metaNode) {
@@ -153,6 +163,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			built.nom = nom;
 			built.tipus = tipus;
 			built.multiplicitat = multiplicitat;
+			built.valor = valor;
 			built.readOnly = readOnly;
 			built.ordre = ordre;
 			built.metaNode = metaNode;

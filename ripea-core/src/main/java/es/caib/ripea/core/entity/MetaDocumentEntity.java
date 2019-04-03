@@ -18,8 +18,11 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 
 /**
  * Classe del model de dades que representa un meta-document.
@@ -62,7 +65,17 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = "ipa_metaexp_metadoc_fk")
 	private MetaExpedientEntity metaExpedient;
-
+	
+	@Column(name = "nti_origen", length = 2)
+	@Enumerated(EnumType.STRING)
+	private NtiOrigenEnumDto ntiOrigen;
+	@Column(name = "nti_estela", length = 4)
+	@Enumerated(EnumType.STRING)
+	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+	@Column(name = "nti_tipdoc", length = 4)
+	@Enumerated(EnumType.STRING)
+	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
@@ -105,6 +118,15 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		return metaExpedient;
 	}
 
+	public NtiOrigenEnumDto getNtiOrigen() {
+		return ntiOrigen;
+	}
+	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
+		return ntiEstadoElaboracion;
+	}
+	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+		return ntiTipoDocumental;
+	}
 	public void update(
 			String codi,
 			String nom,
@@ -117,7 +139,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			String portafirmesCustodiaTipus,
 			boolean firmaPassarelaActiva,
-			String firmaPassarelaCustodiaTipus) {
+			String firmaPassarelaCustodiaTipus,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
 		update(
 				codi,
 				nom,
@@ -131,6 +156,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus;
 		this.firmaPassarelaActiva = firmaPassarelaActiva;
 		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus;
+		this.ntiOrigen = ntiOrigen;
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+		this.ntiTipoDocumental = ntiTipoDocumental;
 	}
 
 	public void updatePlantilla(
@@ -147,13 +175,19 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String codi,
 			String nom,
 			MultiplicitatEnumDto multiplicitat,
-			MetaExpedientEntity metaExpedient) {
+			MetaExpedientEntity metaExpedient,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
 		return new Builder(
 				entitat,
 				codi,
 				nom,
 				multiplicitat,
-				metaExpedient);
+				metaExpedient,
+				ntiOrigen,
+				ntiEstadoElaboracion,
+				ntiTipoDocumental);
 	}
 	public static class Builder {
 		MetaDocumentEntity built;
@@ -162,7 +196,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				String codi,
 				String nom,
 				MultiplicitatEnumDto multiplicitat,
-				MetaExpedientEntity metaExpedient) {
+				MetaExpedientEntity metaExpedient,
+				NtiOrigenEnumDto ntiOrigen,
+				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+				DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;
@@ -172,6 +209,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.tipus = MetaNodeTipusEnum.DOCUMENT;
 			built.firmaPortafirmesActiva = false;
 			built.firmaPassarelaActiva = false;
+			built.ntiOrigen = ntiOrigen;
+			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
+			built.ntiTipoDocumental = ntiTipoDocumental;
 		}
 		
 		public Builder firmaPortafirmesActiva(boolean firmaPortafirmesActiva) {

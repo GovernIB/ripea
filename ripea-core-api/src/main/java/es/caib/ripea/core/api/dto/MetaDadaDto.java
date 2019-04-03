@@ -20,6 +20,7 @@ public class MetaDadaDto implements Serializable {
 	private MetaDadaTipusEnumDto tipus;
 	private String descripcio;
 	private MultiplicitatEnumDto multiplicitat;
+	private String valor;
 	private boolean readOnly;
 	private int ordre;
 	private boolean activa;
@@ -56,6 +57,12 @@ public class MetaDadaDto implements Serializable {
 	}
 	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
 		this.multiplicitat = multiplicitat;
+	}
+	public String getValor() {
+		return valor;
+	}
+	public void setValor(String valor) {
+		this.valor = valor;
 	}
 	public boolean isReadOnly() {
 		return readOnly;

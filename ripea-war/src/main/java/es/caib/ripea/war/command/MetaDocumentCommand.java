@@ -13,9 +13,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
 import es.caib.ripea.war.validation.PortafirmesDocumentTipusNotEmpty;
@@ -60,7 +63,11 @@ public class MetaDocumentCommand {
 	protected MultipartFile plantilla;
 	private Long entitatId;
 	private Long metaExpedientId;
-
+	
+	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private NtiOrigenEnumDto ntiOrigen;
+	
 	public Long getId() {
 		return id;
 	}
@@ -163,7 +170,24 @@ public class MetaDocumentCommand {
 	public void setMetaExpedientId(Long metaExpedientId) {
 		this.metaExpedientId = metaExpedientId;
 	}
-
+	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
+		return ntiEstadoElaboracion;
+	}
+	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+	}
+	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+		return ntiTipoDocumental;
+	}
+	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+		this.ntiTipoDocumental = ntiTipoDocumental;
+	}
+	public NtiOrigenEnumDto getNtiOrigen() {
+		return ntiOrigen;
+	}
+	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
+		this.ntiOrigen = ntiOrigen;
+	}
 	public static List<MetaDocumentCommand> toEntitatCommands(
 			List<MetaDocumentDto> dtos) {
 		List<MetaDocumentCommand> commands = new ArrayList<MetaDocumentCommand>();

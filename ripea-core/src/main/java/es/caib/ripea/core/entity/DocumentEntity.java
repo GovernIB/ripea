@@ -103,6 +103,9 @@ public class DocumentEntity extends NodeEntity {
 	public String getUbicacio() {
 		return ubicacio;
 	}
+	public EntitatEntity getEntitat() {
+		return entitat;
+	}
 	public ExpedientEntity getExpedient() {
 		return expedient;
 	}

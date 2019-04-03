@@ -28,6 +28,7 @@
 		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true"/>
 		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto"/>
 		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
+		<rip:inputText name="valor" textKey="metadada.form.camp.valor"/>
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

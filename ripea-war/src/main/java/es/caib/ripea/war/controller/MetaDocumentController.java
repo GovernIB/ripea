@@ -18,13 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -107,6 +111,22 @@ public class MetaDocumentController extends BaseAdminController {
 		model.addAttribute(
 				"portafirmesDocumentTipus",
 				tipus);
+		//Dades nti
+		model.addAttribute(
+				"ntiOrigenOptions",
+				EnumHelper.getOptionsForEnum(
+						NtiOrigenEnumDto.class,
+						"document.nti.origen.enum."));
+		model.addAttribute(
+				"ntiEstatElaboracioOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentNtiEstadoElaboracionEnumDto.class,
+						"document.nti.estela.enum."));
+		model.addAttribute(
+				"ntiTipusDocumentalOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentNtiTipoDocumentalEnumDto.class,
+						"document.nti.tipdoc.enum."));
 		return "metaDocumentForm";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.POST)

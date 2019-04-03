@@ -97,7 +97,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getCodi(),
 				metaDocument.getNom(),
 				metaDocument.getMultiplicitat(),
-				metaExpedient).
+				metaExpedient,
+				metaDocument.getNtiOrigen(),
+				metaDocument.getNtiEstadoElaboracion(),
+				metaDocument.getNtiTipoDocumental()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
 				descripcio(metaDocument.getDescripcio()).
 				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
@@ -156,7 +159,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getPortafirmesFluxTipus(),
 				metaDocument.getPortafirmesCustodiaTipus(),
 				metaDocument.isFirmaPassarelaActiva(),
-				metaDocument.getFirmaPassarelaCustodiaTipus());
+				metaDocument.getFirmaPassarelaCustodiaTipus(),
+				metaDocument.getNtiOrigen(),
+				metaDocument.getNtiEstadoElaboracion(),
+				metaDocument.getNtiTipoDocumental());
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
 					plantillaNom,
@@ -405,6 +411,38 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		fitxer.setContentType(metaDocumentEntitiy.getPlantillaContentType());
 		fitxer.setContingut(metaDocumentEntitiy.getPlantillaContingut());
 		return fitxer;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public MetaDocumentDto getDadesNti(
+			Long entitatId,
+			Long contingutId,
+			Long id) {
+		logger.debug("Obtenint plantilla del meta-document (" +
+				"entitatId=" + entitatId + ", " +
+				"contingutId=" + contingutId + ", " +
+				"id=" + id +  ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				true);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, contingutId);
+		ExpedientEntity expedientSuperior;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
+			expedientSuperior = (ExpedientEntity)contingut;
+		} else {
+			expedientSuperior = contingut.getExpedient();
+		}
+		MetaExpedientEntity metaExpedient = expedientSuperior.getMetaExpedient();
+		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
+				entitat,
+				metaExpedient,
+				id);
+		return conversioTipusHelper.convertir(
+				metaDocumentEntitiy, 
+				MetaDocumentDto.class);
 	}
 
 	@Transactional(readOnly = true)

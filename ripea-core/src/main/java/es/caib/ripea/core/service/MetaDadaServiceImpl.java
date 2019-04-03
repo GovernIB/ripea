@@ -82,6 +82,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				metaDada.getNom(),
 				metaDada.getTipus(),
 				metaDada.getMultiplicitat(),
+				metaDada.getValor(),
 				metaDada.isReadOnly(),
 				ordre,
 				metaNode).
@@ -119,6 +120,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				metaDada.getNom(),
 				metaDada.getTipus(),
 				metaDada.getMultiplicitat(),
+				metaDada.getValor(),
 				metaDada.getDescripcio(),
 				metaDada.isReadOnly());
 		return conversioTipusHelper.convertir(
