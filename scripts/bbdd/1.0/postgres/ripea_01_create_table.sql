@@ -111,7 +111,10 @@ CREATE TABLE IPA_METADOCUMENT
   PLANTILLA_NOM           character varying(256),
   PLANTILLA_CONTENT_TYPE  character varying(256),
   PLANTILLA_CONTINGUT     oid,
-  META_EXPEDIENT_ID       bigint                   NOT NULL
+  META_EXPEDIENT_ID       bigint                   NOT NULL,
+  NTI_ORIGEN 			  character varying(2),
+  NTI_ESTELA 			  character varying(4),
+  NTI_TIPDOC 			  character varying(4)
 );
 
 
@@ -131,7 +134,8 @@ CREATE TABLE IPA_METADADA
   CREATEDBY_CODI        character varying(64),
   CREATEDDATE           timestamp without time zone,
   LASTMODIFIEDBY_CODI   character varying(64),
-  LASTMODIFIEDDATE      timestamp without time zone
+  LASTMODIFIEDDATE      timestamp without time zone,
+  VALOR 				character varying(255)
 );
 
 
