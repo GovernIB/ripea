@@ -108,6 +108,8 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isContingutDetail", false);
 		model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
 		model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+		model.addAttribute("isMostrarCopiarMoure", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
+		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
 		return "contingut";
 	}
 	
@@ -197,7 +199,7 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutOrigenId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		omplirModelPerMoureOCopiar(
+		omplirModelPerMoureOCopiarVincular(
 				entitatActual,
 				contingutOrigenId,
 				model);
@@ -215,7 +217,7 @@ public class ContingutController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			omplirModelPerMoureOCopiar(
+			omplirModelPerMoureOCopiarVincular(
 					entitatActual,
 					contingutOrigenId,
 					model);
@@ -258,7 +260,7 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutOrigenId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		omplirModelPerMoureOCopiar(
+		omplirModelPerMoureOCopiarVincular(
 				entitatActual,
 				contingutOrigenId,
 				model);
@@ -276,7 +278,7 @@ public class ContingutController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			omplirModelPerMoureOCopiar(
+			omplirModelPerMoureOCopiarVincular(
 					entitatActual,
 					contingutOrigenId,
 					model);
@@ -293,6 +295,47 @@ public class ContingutController extends BaseUserController {
 				"contingut.controller.element.copiat.ok");
 	}
 
+	@RequestMapping(value = "/contingut/{contingutOrigenId}/vincular", method = RequestMethod.GET)
+	public String vincularForm(
+			HttpServletRequest request,
+			@PathVariable Long contingutOrigenId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		omplirModelPerMoureOCopiarVincular(
+				entitatActual,
+				contingutOrigenId,
+				model);
+		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
+		command.setOrigenId(contingutOrigenId);
+		model.addAttribute(command);
+		return "contingutVincularForm";
+	}
+	@RequestMapping(value = "/contingut/{contingutOrigenId}/vincular", method = RequestMethod.POST)
+	public String vincular(
+			HttpServletRequest request,
+			@PathVariable Long contingutOrigenId,
+			@Valid ContingutMoureCopiarEnviarCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			omplirModelPerMoureOCopiarVincular(
+					entitatActual,
+					contingutOrigenId,
+					model);
+			return "contingutVincularForm";
+		}
+		ContingutDto contingutCreat = contingutService.link(
+				entitatActual.getId(),
+				contingutOrigenId,
+				command.getDestiId(),
+				true);
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../" + contingutCreat.getId(),
+				"contingut.controller.element.vinculat.ok");
+	}
+	
 	@RequestMapping(value = "/contingut/{contingutId}/errors", method = RequestMethod.GET)
 	public String errors(
 			HttpServletRequest request,
@@ -573,7 +616,7 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
 	}
 
-	private void omplirModelPerMoureOCopiar(
+	private void omplirModelPerMoureOCopiarVincular(
 			EntitatDto entitatActual,
 			Long contingutOrigenId,
 			Model model) {

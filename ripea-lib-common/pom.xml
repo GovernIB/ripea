@@ -289,5 +289,21 @@
 			<artifactId>ripea-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.fundaciobit.plugins</groupId>
+			<artifactId>plugin-arxiu-filesystem</artifactId>
+			<version>1.0.0</version>
+			<exclusions>
+        		<exclusion>
+        			<groupId>org.fundaciobit.plugins</groupId>
+					<artifactId>plugin-arxiu-api</artifactId>
+        		</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.fundaciobit.plugins</groupId>
+			<artifactId>plugin-arxiu-apb</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 </project>

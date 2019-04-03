@@ -602,6 +602,120 @@ public class ContingutServiceImpl implements ContingutService {
 		return dto;
 	}
 
+	@Transactional
+	@Override
+	public ContingutDto link(
+			Long entitatId,
+			Long contingutOrigenId,
+			Long contingutDestiId,
+			boolean recursiu) {
+		logger.debug("Copiant el contingut ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutOrigenId=" + contingutOrigenId + ", "
+				+ "contingutDestiId=" + contingutDestiId + ", "
+				+ "recursiu=" + recursiu + ")");
+		ContingutEntity contingutOrigen = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutOrigenId,
+				true,
+				false,
+				false,
+				false);
+		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutDestiId,
+				false,
+				false,
+				false,
+				false);
+		// Comprova el tipus del contingut que es vol moure
+		if (!(contingutOrigen instanceof DocumentEntity)) {
+			throw new ValidationException(
+					contingutOrigenId,
+					contingutOrigen.getClass(),
+					"Només es poden enllaçar documents");
+		}
+		// Mirar què passa amb els documents firmats
+		//if (contingutOrigen instanceof DocumentEntity) {
+		//	DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+		//	if (documentOrigen.isFirmat()) {
+		//		throw new ValidationException(
+		//				contingutOrigenId,
+		//				contingutOrigen.getClass(),
+		//				"No es poden enllaçar documents firmats");
+		//	}
+		//}
+		// Es comprova que es poden crear elements d'aquest tipus a l'expedient destí
+		if (contingutOrigen instanceof DocumentEntity) {
+			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					documentOrigen.getMetaDocument(),
+					documentOrigen.getId(),
+					false,
+					false,
+					true,
+					false);
+		}
+		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
+				contingutOrigen,
+				true,
+				false,
+				false);
+		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
+				contingutDesti,
+				true,
+				false,
+				false);
+		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
+			throw new ValidationException(
+					contingutOrigenId,
+					contingutOrigen.getClass(),
+					"Només es pot enllaçar un contingut a un expedient del mateix tipus que l'actual");
+		}
+		// Comprova que el nom no sigui duplicat
+		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
+				contingutDesti,
+				contingutOrigen.getNom(),
+				0) != null;
+		if (nomDuplicat) {
+			throw new ValidationException(
+					contingutOrigenId,
+					ContingutEntity.class,
+					"Ja existeix un altre contingut amb el mateix nom dins el contingut destí ("
+							+ "contingutDestiId=" + contingutDestiId + ")");
+		}
+		//Crea el link del document dins l'arxiu digital
+		ContingutArxiu nouContingut = contingutHelper.arxiuPropagarLink(
+				contingutOrigen,
+				contingutDesti);
+		
+		// Realitza la còpia del contingut
+		ContingutEntity contingutCopia = vincularContingut(
+				contingutOrigen.getEntitat(),
+				contingutOrigen,
+				contingutDesti,
+				nouContingut.getIdentificador(),
+				recursiu);
+		contingutLogHelper.log(
+				contingutCopia,
+				LogTipusEnumDto.COPIA,
+				null,
+				null,
+				true,
+				true);
+		ContingutDto dto = contingutHelper.toContingutDto(
+				contingutOrigen,
+				true,
+				false,
+				false,
+				false,
+				false,
+				false,
+				false);
+		return dto;
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -1641,6 +1755,70 @@ public class ContingutServiceImpl implements ContingutService {
 								entitat,
 								fill,
 								creat,
+								recursiu);
+					}
+				}
+			}
+		}
+		return creat;
+	}
+	
+	private ContingutEntity vincularContingut(
+			EntitatEntity entitat,
+			ContingutEntity contingutOrigen,
+			ContingutEntity contingutDesti,
+			String uuidDocumentoOrigen,
+			boolean recursiu) {
+		ContingutEntity creat = null;
+		if (contingutOrigen instanceof DocumentEntity) {
+			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+			creat = documentHelper.crearNouDocument(
+					documentOrigen.getDocumentTipus(),
+					documentOrigen.getNom(),
+					documentOrigen.getData(),
+					documentOrigen.getDataCaptura(),
+					documentOrigen.getNtiOrgano(),
+					documentOrigen.getNtiOrigen(),
+					documentOrigen.getNtiEstadoElaboracion(),
+					documentOrigen.getNtiTipoDocumental(),
+					documentOrigen.getMetaDocument(),
+					contingutDesti,
+					entitat,
+					contingutDesti.getExpedient(),
+					documentOrigen.getUbicacio(),
+					uuidDocumentoOrigen);
+		}
+		if (creat != null) {
+			if (creat instanceof DocumentEntity) {
+				DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;		
+				creat.updateArxiu(uuidDocumentoOrigen);
+				creat.updateExpedient((ExpedientEntity)contingutDesti);
+				creat.updatePare(contingutDesti);
+				((DocumentEntity) creat).updateFitxer(
+						documentOrigen.getFitxerNom(), 
+						documentOrigen.getFitxerContentType(), 
+						null);
+			}
+			if (creat instanceof NodeEntity) {
+				NodeEntity nodeOrigen = (NodeEntity)contingutOrigen;
+				NodeEntity nodeDesti = (NodeEntity)creat;
+				for (DadaEntity dada: dadaRepository.findByNode(nodeOrigen)) {
+					DadaEntity dadaNova = DadaEntity.getBuilder(
+							dada.getMetaDada(),
+							nodeDesti,
+							dada.getValor(),
+							dada.getOrdre()).build();
+					dadaRepository.save(dadaNova);
+				}
+			}
+			if (recursiu) {
+				for (ContingutEntity fill: contingutOrigen.getFills()) {
+					if (fill instanceof CarpetaEntity || fill instanceof DocumentEntity) {
+						vincularContingut(
+								entitat,
+								fill,
+								creat,
+								uuidDocumentoOrigen,
 								recursiu);
 					}
 				}

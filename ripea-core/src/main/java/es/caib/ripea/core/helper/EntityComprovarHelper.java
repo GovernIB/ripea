@@ -442,7 +442,7 @@ public class EntityComprovarHelper {
 		
 		return permisosHelper.isGrantedAll(
 				metaExpedientId,
-				MetaExpedientEntity.class,
+				MetaNodeEntity.class,
 				new Permission[] {ExtendedPermission.WRITE},
 				auth);
 	}
