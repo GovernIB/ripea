@@ -120,9 +120,15 @@ body {
 				<div class="navbar-brand">
 					<div id="govern-logo" class="pull-left">
 					
+					
+		
+			
+				
+					
+					
 						<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
 						<c:choose>
-							<c:when test="${sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && not empty sessionScope['EntitatHelper.entitatActual'].logoImgBytes}">
+							<c:when test="${sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0}">
 								<img src="<c:url value="/entitat/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
 							</c:when>
 							<c:otherwise>

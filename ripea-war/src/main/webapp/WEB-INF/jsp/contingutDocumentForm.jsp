@@ -34,6 +34,29 @@ $(document).ready(function() {
 	
 	$('#documentTipus').val('DIGITAL');
 	$('#metaNodeId').on('change', function() {
+		if($('#id').val() == '') {
+			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+			.done(function(data) {			
+				$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+				$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
+				$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+				$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+				$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
+				$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
+			})
+		} else {
+			if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
+				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+				.done(function(data) {			
+					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+					$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+					$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
+					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
+				})
+			}
+		}
 		if ($(this).val()) {
 			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
 			.done(function(data) {
@@ -79,7 +102,9 @@ $(document).ready(function() {
 		$(this).attr('action', actionProcessed);
 		return true;
 	});
-	$('#metaNodeId').trigger('change');
+	if($('#id').val() == '') {
+		$('#metaNodeId').trigger('change');
+	}
 	$('input[type=radio][name=origen][value=${documentCommand.origen}]').trigger('change');
 });
 </script>
@@ -130,9 +155,9 @@ $(document).ready(function() {
 			<div role="tabpanel" class="tab-pane" id="dades_nti">
 				<rip:inputDate name="dataCaptura" textKey="contingut.document.form.camp.nti.datacap" required="true"/>
 				<rip:inputText name="ntiOrgano" textKey="contingut.document.form.camp.nti.organo" required="true"/>
-				<rip:inputSelect name="ntiOrigen" textKey="contingut.document.form.camp.nti.origen" required="true" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputSelect name="ntiEstadoElaboracion" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputSelect name="ntiTipoDocumental" textKey="contingut.document.form.camp.nti.tipdoc" required="true" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" required="true" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" required="true" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 			</div>
 		</div>
 		<div id="modal-botons" class="well">

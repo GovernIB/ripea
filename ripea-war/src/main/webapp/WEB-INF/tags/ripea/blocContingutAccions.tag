@@ -56,7 +56,7 @@
 				</c:if>
 				<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
-				<li><a href="<c:url value="/expedient/${contingut.id}/relacionar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+				<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-comments"></span>&nbsp;<spring:message code="comu.boto.comentaris"/>...</a></li>
 				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
@@ -79,7 +79,7 @@
 			</c:if>
 			
 			<c:choose>
-				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats}">
+				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats || contingut.document && contingut.estat == 'FIRMA_PENDENT'}">
 					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 				</c:when>
 				<c:otherwise>

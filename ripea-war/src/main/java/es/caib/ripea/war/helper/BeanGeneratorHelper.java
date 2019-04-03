@@ -124,6 +124,73 @@ public class BeanGeneratorHelper {
 		return generarCommand(noms, tipus, valors);
 	}
 
+	public Object generarCommandDadaNode(
+			Long entitatId,
+			Long nodeId,
+			DadaDto dada) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {		
+		String nom;
+		Class<?> tipus;
+		Object valor = (dada != null) ? new Object() : null;
+
+		MetaDadaDto metaDada = metaDadaService.findById(
+				entitatId, 
+				nodeId, 
+				dada.getMetaDada().getId());
+		nom = metaDada.getCodi();
+		boolean isMultiple = (MultiplicitatEnumDto.M_0_N.equals(metaDada.getMultiplicitat()) || MultiplicitatEnumDto.M_1_N.equals(metaDada.getMultiplicitat()));
+		Object dadaValor = new Object();
+		if (dada != null) {
+			if (nom.equals(dada.getMetaDada().getCodi())) {
+				dadaValor = dada.getValor();
+			}
+		}
+		switch (metaDada.getTipus()) {
+			case BOOLEA:
+				tipus = (isMultiple) ? Boolean[].class : Boolean.class;
+				if (valor != null) {
+					valor = (dadaValor != null ) ? dadaValor : null;
+				}
+			break;
+			case DATA:
+				tipus = (isMultiple) ? Date[].class : Date.class;
+				if (valor != null) {
+					valor = (dadaValor != null) ? dadaValor : null;
+				}
+			break;
+			case FLOTANT:
+				tipus = (isMultiple) ? Double[].class : Double.class;
+				if (valor != null) {
+					valor = (dadaValor != null) ? dadaValor : null;
+				}
+				break;
+			case IMPORT:
+				tipus = (isMultiple) ? BigDecimal[].class : BigDecimal.class;
+				if (valor != null) {
+					valor = (dadaValor != null) ? dadaValor : null;
+				}
+				break;
+			case SENCER:
+				tipus = (isMultiple) ? Long[].class : Long.class;
+				if (valor != null) {
+					valor = (dadaValor != null) ? dadaValor : null;
+				}
+				break;
+			case TEXT:
+				tipus = (isMultiple) ? String[].class : String.class;
+				if (valor != null) {
+					valor = (dadaValor != null) ? dadaValor : null;
+				}
+				break;
+			default:
+				tipus = (isMultiple) ? String[].class : String.class;
+				if (valor != null) {
+					valor = (dadaValor != null) ? dadaValor : null;
+				}
+				break;
+			}
+			
+		return generarCommandUnic(nom, tipus, valor);
+	}
 	private Object generarCommand(
 			String[] noms,
 			Class<?>[] tipus,
@@ -143,6 +210,26 @@ public class BeanGeneratorHelper {
 						valors[i]);
 			}
 		}
+		return command;
+	}
+	
+	private Object generarCommandUnic(
+			String nom,
+			Class<?> tipus,
+			Object valor) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		BeanGenerator bg = new BeanGenerator();
+		bg.addProperty(
+					nom,
+					tipus);
+		
+		Object command = bg.create();
+		if (valor != null) {
+			PropertyUtils.setSimpleProperty(
+						command,
+						nom,
+						valor);
+		}
+		
 		return command;
 	}
 

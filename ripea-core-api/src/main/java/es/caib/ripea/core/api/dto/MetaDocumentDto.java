@@ -25,7 +25,10 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private String firmaPassarelaCustodiaTipus;
 	private String plantillaNom;
 	private String plantillaContentType;
-
+	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private NtiOrigenEnumDto ntiOrigen;
+	
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
@@ -92,7 +95,25 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	public void setPlantillaContentType(String plantillaContentType) {
 		this.plantillaContentType = plantillaContentType;
 	}
-
+	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
+		return ntiEstadoElaboracion;
+	}
+	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+	}
+	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+		return ntiTipoDocumental;
+	}
+	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+		this.ntiTipoDocumental = ntiTipoDocumental;
+	}
+	public NtiOrigenEnumDto getNtiOrigen() {
+		return ntiOrigen;
+	}
+	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
+		this.ntiOrigen = ntiOrigen;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

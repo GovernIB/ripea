@@ -40,6 +40,7 @@ public class MetaDadaCommand {
 	private MetaDadaTipusEnumDto tipus;
 	@NotNull
 	private MultiplicitatEnumDto multiplicitat;
+	private String valor;
 	@Size(max=1024)
 	private String descripcio;
 	private Long entitatId;
@@ -74,6 +75,12 @@ public class MetaDadaCommand {
 	}
 	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
 		this.multiplicitat = multiplicitat;
+	}
+	public String getValor() {
+		return valor;
+	}
+	public void setValor(String valor) {
+		this.valor = valor;
 	}
 	public String getDescripcio() {
 		return descripcio;

@@ -36,6 +36,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			int esborrat);
 
+	List<DocumentEntity> findByEntitat(EntitatEntity entitat);
+	
 	List<DocumentEntity> findByExpedientAndMetaNodeAndEsborrat(
 			ExpedientEntity expedient,
 			MetaNodeEntity metaNode,

@@ -207,6 +207,25 @@ public interface MetaDocumentService {
 			Long entitatId,
 			Long contingutId,
 			Long id) throws NotFoundException;
+	
+	/**
+	 * Retorna les dades d'un metadocument, entre elles les dades NTI.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param contingutId
+	 *            Identificador del contingut pare a on es vol crear el document.
+	 * @param id
+	 *            Atribut id del meta-document.
+	 * @return La plantilla del meta-document o null si no n'hi ha.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
+	public MetaDocumentDto getDadesNti(
+			Long entitatId,
+			Long contingutId,
+			Long id) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-documents actius donada una entitat i un contenidor 

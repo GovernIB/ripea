@@ -182,4 +182,13 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 		return delegate.findByMetaExpedient(entitatId, metaExpedientId);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "tothom"})
+	public MetaDocumentDto getDadesNti(Long entitatId, Long contingutId, Long id) throws NotFoundException {
+		return delegate.getDadesNti(
+				entitatId, 
+				contingutId, 
+				id);
+	}
+
 }
