@@ -134,7 +134,11 @@ public class CarpetaServiceImpl implements CarpetaService {
 				null,
 				false,
 				false);
-		return toCarpetaDto(carpeta);
+		CarpetaDto dto = toCarpetaDto(carpeta);
+		contingutHelper.arxiuPropagarModificacio(
+				carpeta,
+				null);
+		return dto;
 	}
 
 	@Transactional(readOnly = true)
