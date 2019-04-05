@@ -94,7 +94,6 @@ $(document).ready(function() {
 		id="taulaDades"
 		data-toggle="datatable"
 		data-url="<c:url value="/contingutAdmin/datatable"/>"
-		data-filter="#contingutFiltreCommand"
 		data-default-order="9"
 		data-default-dir="asc"
 		class="table table-bordered table-striped"
