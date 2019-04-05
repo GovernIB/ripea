@@ -23,14 +23,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutFiltreCommand;
 import es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -143,8 +147,33 @@ public class ContingutAdminController extends BaseAdminController {
 				contingutService.findMovimentsPerContingutAdmin(
 						entitatActual.getId(),
 						contingutId));
+		model.addAttribute(
+				"logTipusEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						LogTipusEnumDto.class,
+						"log.tipus.enum."));
+		model.addAttribute(
+				"logObjecteTipusEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						LogObjecteTipusEnumDto.class,
+						"log.objecte.tipus.enum."));		
 		return "contingutLog";
 	}
+	
+	@RequestMapping(value = "/{contingutId}/log/{contingutLogId}/detalls", method = RequestMethod.GET)
+	@ResponseBody
+	public ContingutLogDetallsDto logDetalls(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@PathVariable Long contingutLogId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return contingutService.findLogDetallsPerContingutUser(
+				entitatActual.getId(),
+				contingutId,
+				contingutLogId);
+	}
+
 
 	@RequestMapping(value = "/{contingutId}/undelete", method = RequestMethod.GET)
 	public String undelete(
