@@ -159,7 +159,7 @@ public class ExpedientEstatController extends BaseAdminController {
 //			emplenarModelFormulari(
 //					request,
 //					model);
-			return "reglaForm";
+			return "expedientEstatForm";
 		}
 		if (command.getId() != null) {
 			expedientService.updateExpedientEstat(
