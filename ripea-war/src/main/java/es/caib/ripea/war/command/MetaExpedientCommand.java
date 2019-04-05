@@ -33,7 +33,7 @@ public class MetaExpedientCommand {
 	private String descripcio;
 	@NotEmpty @Size(max = 30)
 	private String classificacioSia;
-	@Size(max = 30)
+	@NotEmpty @Size(max = 30)
 	private String serieDocumental;
 	private boolean notificacioActiva;
 	@Size(max = 44)
