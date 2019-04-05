@@ -154,7 +154,7 @@ CREATE TABLE IPA_INTERESSAT
 (
   ID                   NUMBER(19)               NOT NULL,
   DTYPE                VARCHAR2(256)            NOT NULL,
-  NOM                  VARCHAR2(30)             NOT NULL,
+  NOM                  VARCHAR2(30),
   LLINATGE1            VARCHAR2(30),
   LLINATGE2            VARCHAR2(30),
   DOCUMENT_TIPUS       VARCHAR2(40)             NOT NULL,

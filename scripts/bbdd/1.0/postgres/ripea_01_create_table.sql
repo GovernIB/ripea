@@ -143,7 +143,7 @@ CREATE TABLE IPA_INTERESSAT
 (
   ID                   BIGINT                   NOT NULL,
   DTYPE                character varying(256)   NOT NULL,
-  NOM                  character varying(30)    NOT NULL,
+  NOM                  character varying(30),
   LLINATGE1            character varying(30),
   LLINATGE2            character varying(30),
   DOCUMENT_TIPUS       character varying(40)    NOT NULL,
