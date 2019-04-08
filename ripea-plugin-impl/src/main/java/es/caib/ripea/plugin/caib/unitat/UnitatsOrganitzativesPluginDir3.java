@@ -24,6 +24,7 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -113,6 +114,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			Boolean esUnitatArrel,
 			Long provincia, 
 			String municipi) throws SistemaExternException {
+		List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
 		try {
 			URL url = new URL(getServiceCercaUrl()
 					+ "?codigo=" + codi
@@ -122,20 +124,23 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					+ "&conOficinas=" + (ambOficines != null && ambOficines ? "true" : "false")
 					+ "&unidadRaiz=" + (esUnitatArrel != null && esUnitatArrel ? "true" : "false")
 					+ "&provincia="+ (provincia != null ? provincia : "-1")
-					+ "&localidad=" + (municipi != null ? municipi : "-1"));
+					+ "&localidad=" + (municipi != null ? municipi : "-1")
+					+ "&vigentes=true");
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
 			httpConnection.setDoOutput(true);
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			List<UnitatOrganitzativa> unitats = mapper.readValue(
+			unitats = mapper.readValue(
 					httpConnection.getInputStream(), 
 					TypeFactory.defaultInstance().constructCollectionType(
 							List.class,  
 							UnitatOrganitzativa.class));
 			Collections.sort(unitats);
 			return unitats;
+		} catch ( JsonMappingException e) {
+			 // No results
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar les unitats organitzatives via REST (" +
@@ -149,6 +154,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					"municipi=" + municipi + ")",
 					ex);
 		}
+		return unitats;
 	}
 
 
