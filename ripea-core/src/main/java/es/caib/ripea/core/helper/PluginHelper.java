@@ -769,14 +769,14 @@ public class PluginHelper {
 			DocumentEntity document,
 			FitxerDto fitxer,
 			ContingutEntity contingutPare,
-			String classificacioDocumental) {
+			String serieDocumental) {
 		String accioDescripcio = "Actualització de les dades d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
 		accioParams.put("contingutPareId", contingutPare.getId().toString());
 		accioParams.put("contingutPareNom", contingutPare.getNom());
-		accioParams.put("classificacioDocumental", classificacioDocumental);
+		accioParams.put("serieDocumental", serieDocumental);
 		long t0 = System.currentTimeMillis();
 		try {
 			if (document.getArxiuUuid() == null) {
@@ -794,7 +794,8 @@ public class PluginHelper {
 								document.getNtiEstadoElaboracion(),
 								document.getNtiTipoDocumental(),
 								DocumentEstat.ESBORRANY,
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus())),
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental),
 						contingutPare.getArxiuUuid());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Document documentDetalls = getArxiuPlugin().documentDetalls(
@@ -822,7 +823,8 @@ public class PluginHelper {
 								document.getNtiEstadoElaboracion(),
 								document.getNtiTipoDocumental(),
 								DocumentEstat.ESBORRANY,
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus())));
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental));
 				document.updateArxiu(null);
 			}
 			integracioHelper.addAccioOk(
@@ -1006,6 +1008,13 @@ public class PluginHelper {
 		accioParams.put("fitxerPdfFirmatTamany", new Long(fitxerPdfFirmat.getTamany()).toString());
 		accioParams.put("fitxerPdfFirmatContentType", fitxerPdfFirmat.getContentType());
 		long t0 = System.currentTimeMillis();
+		
+		String serieDocumental = null;
+		ExpedientEntity expedientSuperior = document.getExpedient();
+		if (expedientSuperior != null) {
+			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
+		}
+		
 		try {
 			getArxiuPlugin().documentModificar(
 					toArxiuDocument(
@@ -1021,7 +1030,8 @@ public class PluginHelper {
 							document.getNtiEstadoElaboracion(),
 							document.getNtiTipoDocumental(),
 							DocumentEstat.DEFINITIU,
-							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus())));
+							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+							serieDocumental));
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -2884,11 +2894,13 @@ public class PluginHelper {
 			DocumentNtiEstadoElaboracionEnumDto ntiEstatElaboracio,
 			DocumentNtiTipoDocumentalEnumDto ntiTipusDocumental,
 			DocumentEstat estat,
-			boolean enPaper) {
+			boolean enPaper,
+			String serieDocumental) {
 		Document document = new Document();
 		document.setNom(nom);
 		document.setIdentificador(identificador);
 		DocumentMetadades metadades = new DocumentMetadades();
+		metadades.setSerieDocumental(serieDocumental);
 		metadades.setIdentificador(ntiIdentificador);
 		if (ntiOrigen != null) {
 			switch (ntiOrigen) {
