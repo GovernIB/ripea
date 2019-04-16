@@ -50,6 +50,8 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
@@ -765,11 +767,13 @@ public class PluginHelper {
 		}
 	}
 
-	public void arxiuDocumentActualitzar(
+	public String arxiuDocumentActualitzar(
 			DocumentEntity document,
 			FitxerDto fitxer,
 			ContingutEntity contingutPare,
-			String serieDocumental) {
+			String serieDocumental,
+			List<ArxiuFirmaDto> firmes,
+			boolean ambFirmaSeparada) {
 		String accioDescripcio = "Actualització de les dades d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -786,16 +790,17 @@ public class PluginHelper {
 								document.getNom(),
 								fitxer,
 								null,
-								null,
+								firmes,
 								null,
 								document.getNtiOrigen(),
 								Arrays.asList(document.getNtiOrgano()),
 								document.getDataCaptura(),
 								document.getNtiEstadoElaboracion(),
 								document.getNtiTipoDocumental(),
-								DocumentEstat.ESBORRANY,
+								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental),
+								serieDocumental,
+								ambFirmaSeparada),
 						contingutPare.getArxiuUuid());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Document documentDetalls = getArxiuPlugin().documentDetalls(
@@ -822,11 +827,84 @@ public class PluginHelper {
 								document.getDataCaptura(),
 								document.getNtiEstadoElaboracion(),
 								document.getNtiTipoDocumental(),
-								DocumentEstat.ESBORRANY,
+								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental));
+								serieDocumental,
+								ambFirmaSeparada));
 				document.updateArxiu(null);
 			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return document.getId().toString();
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	public void arxiuFirmaActualitzar(
+			DocumentEntity document,
+			FitxerDto fitxer,
+			ContingutEntity contingutPare,
+			String serieDocumental,
+			List<ArxiuFirmaDto> firmes,
+			boolean ambFirmaSeparada) {
+		String accioDescripcio = "Actualització de les dades de la firma seprada";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		accioParams.put("contingutPareId", contingutPare.getId().toString());
+		accioParams.put("contingutPareNom", contingutPare.getNom());
+		accioParams.put("serieDocumental", serieDocumental);
+		long t0 = System.currentTimeMillis();
+		try {
+			if (document.getArxiuUuid() == null) {
+				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
+						toArxiuDocument(
+								null,
+								document.getNom(),
+								fitxer,
+								null,
+								firmes,
+								null,
+								document.getNtiOrigen(),
+								Arrays.asList(document.getNtiOrgano()),
+								document.getDataCaptura(),
+								document.getNtiEstadoElaboracion(),
+								document.getNtiTipoDocumental(),
+								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental,
+								ambFirmaSeparada),
+						contingutPare.getArxiuUuid());
+				if (getArxiuPlugin().suportaMetadadesNti()) {
+					Document documentDetalls = getArxiuPlugin().documentDetalls(
+							documentCreat.getIdentificador(),
+							null,
+							false);
+					propagarMetadadesDocument(
+							documentDetalls,
+							document);
+				}
+				document.updateArxiu(
+						documentCreat.getIdentificador());
+			}
+			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -1031,7 +1109,8 @@ public class PluginHelper {
 							document.getNtiTipoDocumental(),
 							DocumentEstat.DEFINITIU,
 							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-							serieDocumental));
+							serieDocumental,
+							false));
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -1058,6 +1137,67 @@ public class PluginHelper {
 		}
 	}
 
+	public String arxiuDocumentGuardarFitxerFirmat(
+			DocumentEntity document,
+			List<ArxiuFirmaDto> firmes) {
+		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
+		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
+		String accioDescripcio = "Guardar PDF firmat com a document definitiu";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		long t0 = System.currentTimeMillis();
+		
+		String serieDocumental = null;
+		ExpedientEntity expedientSuperior = document.getExpedient();
+		if (expedientSuperior != null) {
+			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
+		}
+		try {
+			getArxiuPlugin().documentCrear(
+					toArxiuDocument(
+							document.getArxiuUuid(),
+							document.getNom(),
+							null,
+							null,
+							firmes,
+							null,
+							document.getNtiOrigen(),
+							Arrays.asList(document.getNtiOrgano()),
+							document.getDataCaptura(),
+							document.getNtiEstadoElaboracion(),
+							document.getNtiTipoDocumental(),
+							DocumentEstat.DEFINITIU,
+							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+							serieDocumental,
+							false),
+					document.getPare().getArxiuUuid());
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			document.updateEstat(
+					DocumentEstatEnumDto.CUSTODIAT);
+			return document.getId().toString();
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
 	public void arxiuDocumentCopiar(
 			DocumentEntity document,
 			String arxiuUuidDesti) {
@@ -2432,6 +2572,89 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(
+			byte[] documentContingut,
+			byte[] firmaContingut,
+			FitxerDto fitxer) {
+		String accioDescripcio = "Obtenir informació de document firmat";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		long t0 = System.currentTimeMillis();
+		try {
+			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
+			if (firmaContingut != null) {
+				validationRequest.setSignedDocumentData(documentContingut);
+				validationRequest.setSignatureData(firmaContingut);
+			} else {
+				validationRequest.setSignatureData(documentContingut);
+			}
+			SignatureRequestedInformation sri = new SignatureRequestedInformation();
+			sri.setReturnSignatureTypeFormatProfile(true);
+			sri.setReturnCertificateInfo(true);
+			sri.setReturnValidationChecks(false);
+			sri.setValidateCertificateRevocation(false);
+			sri.setReturnCertificates(false);
+			sri.setReturnTimeStampInfo(false);
+			validationRequest.setSignatureRequestedInformation(sri);
+			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
+			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
+			ArxiuFirmaDto firma = new ArxiuFirmaDto();
+			if (validateSignatureResponse.getSignatureDetailInfo() != null) {
+				for (SignatureDetailInfo signatureInfo: validateSignatureResponse.getSignatureDetailInfo()) {
+					ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+					signatureInfo.getSignDate();
+					TimeStampInfo timeStampInfo = signatureInfo.getTimeStampInfo();
+					if (timeStampInfo != null) {
+						detall.setData(timeStampInfo.getCreationTime());
+					} else {
+						detall.setData(signatureInfo.getSignDate());
+					}
+					CertificateInfo certificateInfo = signatureInfo.getCertificateInfo();
+					if (certificateInfo != null) {
+						detall.setResponsableNif(certificateInfo.getNifResponsable());
+						detall.setResponsableNom(certificateInfo.getNombreApellidosResponsable());
+						detall.setEmissorCertificat(certificateInfo.getOrganizacionEmisora());
+					}
+					detalls.add(detall);
+				}
+				firma.setAutofirma(false);
+				if (firmaContingut != null) {
+					firma.setContingut(firmaContingut);
+				} else {
+					firma.setContingut(documentContingut);
+				}
+				firma.setDetalls(detalls);
+				firma.setPerfil(toArxiuFirmaPerfilEnum(validateSignatureResponse.getSignProfile()));
+				firma.setTipus(toArxiuFirmaTipusEnum(
+						validateSignatureResponse.getSignType(),
+						validateSignatureResponse.getSignFormat()));
+				firma.setTipusMime(fitxer.getContentType());
+				firmes.add(firma);
+			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_VALIDASIG,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return firmes;
+		} catch (Exception ex) {
+			String errorDescripcio = ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_VALIDASIG,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_VALIDASIG,
+					errorDescripcio,
+					ex);
+		}
+	}
 
 	@SuppressWarnings("incomplete-switch")
 	public void notificacioEnviar(
@@ -2895,7 +3118,8 @@ public class PluginHelper {
 			DocumentNtiTipoDocumentalEnumDto ntiTipusDocumental,
 			DocumentEstat estat,
 			boolean enPaper,
-			String serieDocumental) {
+			String serieDocumental,
+			boolean ambFirmaSeparada) {
 		Document document = new Document();
 		document.setNom(nom);
 		document.setIdentificador(identificador);
@@ -3006,9 +3230,15 @@ public class PluginHelper {
 			String extensioAmbPunt = (fitxerExtensio.startsWith(".")) ? fitxerExtensio.toLowerCase() : "." + fitxerExtensio.toLowerCase();
 			extensio = DocumentExtensio.toEnum(extensioAmbPunt);
 			contingut = new DocumentContingut();
-			contingut.setArxiuNom(fitxer.getNom());
-			contingut.setContingut(fitxer.getContingut());
-			contingut.setTipusMime(fitxer.getContentType());
+			if (ambFirmaSeparada != false) {
+				contingut.setArxiuNom(fitxer.getFirmaNom());
+				contingut.setContingut(fitxer.getContingutFirma());
+				contingut.setTipusMime(fitxer.getFirmaContentType());
+			} else {
+				contingut.setArxiuNom(fitxer.getNom());
+				contingut.setContingut(fitxer.getContingut());
+				contingut.setTipusMime(fitxer.getContentType());
+			}
 			document.setContingut(contingut);
 		}
 		if (firmaPdf != null) {
@@ -3022,6 +3252,8 @@ public class PluginHelper {
 			extensio = DocumentExtensio.PDF;
 		}
 		if (firmes != null && firmes.size() > 0) {
+			Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
+			
 			if (document.getFirmes() == null)
 				document.setFirmes(new ArrayList<Firma>());
 			for (ArxiuFirmaDto firmaDto: firmes) {
@@ -3090,6 +3322,9 @@ public class PluginHelper {
 				}
 				firma.setTipusMime(firmaDto.getTipusMime());
 				document.getFirmes().add(firma);
+				
+				metadadesAddicionals.put("detallsFirma", firmaDto.getDetalls());
+				metadades.setMetadadesAddicionals(metadadesAddicionals);
 			}
 		}
 		if (extensio != null) {
@@ -3441,7 +3676,7 @@ public class PluginHelper {
 		}
 		documentDb.updateNti(
 				obtenirNumeroVersioEniDocument(
-						documentArxiu.getMetadades().getVersioNti()),
+				documentArxiu.getMetadades().getVersioNti()),
 				documentArxiu.getMetadades().getIdentificador(),
 				organs,
 				origen,
@@ -3463,6 +3698,47 @@ public class PluginHelper {
 		return null;
 	}
 
+
+	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {		
+		ArxiuFirmaPerfilEnumDto perfilFirma = null;
+		switch (perfil) {
+		case "AdES-BES":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.BES;
+		case "AdES-EPES":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.EPES;
+		case "PAdES-LTV":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.LTV;
+		case "AdES-T":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.T;
+		case "AdES-C":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.C;
+		case "AdES-X":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.X;
+		case "AdES-XL":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.XL;
+		case "AdES-A":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.A;
+		}
+		return perfilFirma;
+	}
+	private ArxiuFirmaTipusEnumDto toArxiuFirmaTipusEnum(
+			String tipus,
+			String format) {		
+		ArxiuFirmaTipusEnumDto tipusFirma = null;
+		if (tipus.equals("PAdES") || format.equals("implicit_enveloped/attached")) {
+			tipusFirma = ArxiuFirmaTipusEnumDto.PADES;
+		} else if (tipus.equals("XAdES") && format.equals("explicit/detached")) {
+			tipusFirma = ArxiuFirmaTipusEnumDto.XADES_DET;
+		} else if (tipus.equals("XAdES") && format.equals("implicit_enveloping/attached")) {
+			tipusFirma = ArxiuFirmaTipusEnumDto.XADES_ENV;
+		} else if (tipus.equals("CAdES") && format.equals("explicit/detached")) {
+			tipusFirma = ArxiuFirmaTipusEnumDto.CADES_DET;
+		} else if (tipus.equals("CAdES") && format.equals("implicit_enveloping/attached")) {
+			tipusFirma = ArxiuFirmaTipusEnumDto.CADES_ATT;
+		}
+		return tipusFirma;
+	}
+	
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 		if (dadesUsuariPlugin == null) {
 			String pluginClass = getPropertyPluginDadesUsuari();
@@ -3654,7 +3930,6 @@ public class PluginHelper {
 								"es.caib.ripea.",
 								PropertiesHelper.getProperties().findAll());
 					}
-					//validaSignaturaPlugin = (IValidateSignaturePlugin)PluginsManager.instancePluginByClassName(pluginClass);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_VALIDASIG,
@@ -3662,14 +3937,12 @@ public class PluginHelper {
 							ex);
 				}
 			} else {
-//				throw new SistemaExternException(
-//						IntegracioHelper.INTCODI_VALIDASIG,
-//						"No està configurada la classe per al plugin de validació de signatures");
 				return null;
 			}
 		}
 		return validaSignaturaPlugin;
 	}
+	
 	private SignaturaPlugin getSignaturaPlugin() {
 		if (signaturaPlugin == null) {
 			String pluginClass = getPropertyPluginSignatura();

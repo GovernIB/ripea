@@ -21,17 +21,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.FirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
@@ -99,7 +103,8 @@ public class ContingutHelper {
 	ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
 	ExpedientEstatRepository expedientEstatRepository;
-
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -1018,7 +1023,8 @@ public class ContingutHelper {
 
 	public void arxiuPropagarModificacio(
 			ContingutEntity contingut,
-			FitxerDto fitxer) {
+			FitxerDto fitxer,
+			List<ArxiuFirmaDto> firmes) {
 		String serieDocumental = null;
 		ExpedientEntity expedientSuperior = contingut.getExpedient();
 		if (expedientSuperior != null) {
@@ -1029,12 +1035,41 @@ public class ContingutHelper {
 				pluginHelper.arxiuExpedientActualitzar(
 						(ExpedientEntity)contingut);
 			} else if (contingut instanceof DocumentEntity) {
-				pluginHelper.arxiuDocumentActualitzar(
+				String custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
 						(DocumentEntity)contingut,
 						fitxer,
 						contingut.getPare(),
-						serieDocumental);
+						serieDocumental,
+						firmes,
+						false);
 				documentHelper.actualitzarVersionsDocument((DocumentEntity)contingut);
+				//Si la firma ve separada
+				//if (contingutFirma != null) {
+				//	pluginHelper.arxiuFirmaActualitzar(
+				//			(DocumentEntity)contingutFirma,
+				//			fitxer,
+				//			contingut.getPare(),
+				//			serieDocumental,
+				//			firmes,
+				//			true);
+				//}
+				if (firmes != null) {
+					// Custodia el document firmat
+					((DocumentEntity) contingut).updateEstat(
+							DocumentEstatEnumDto.CUSTODIAT);
+					((DocumentEntity) contingut).updateInformacioCustodia(
+							new Date(),
+							custodiaDocumentId,
+							((DocumentEntity) contingut).getCustodiaCsv());
+					// Registra al log la custòdia de la firma del document
+					contingutLogHelper.log(
+							((DocumentEntity) contingut),
+							LogTipusEnumDto.ARXIU_CUSTODIAT,
+							custodiaDocumentId,
+							null,
+							false,
+							false);
+				}
 			} else if (contingut instanceof CarpetaEntity) {
 				pluginHelper.arxiuCarpetaActualitzar(
 						(CarpetaEntity)contingut,

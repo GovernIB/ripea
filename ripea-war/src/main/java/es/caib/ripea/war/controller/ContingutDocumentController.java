@@ -44,6 +44,8 @@ import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -58,6 +60,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
+import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
 import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
@@ -158,6 +161,7 @@ public class ContingutDocumentController extends BaseUserController {
 		command.setEntitatId(entitatActual.getId());
 		command.setPareId(contingutId);
 		command.setOrigen(DocumentFisicOrigenEnum.DISC);
+		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 		model.addAttribute(command);
 		return "contingutDocumentForm";
 	}
@@ -165,7 +169,7 @@ public class ContingutDocumentController extends BaseUserController {
 	public String postDigitalNew(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			@Validated({CreateDigital.class}) DocumentCommand command,
+			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
@@ -403,11 +407,12 @@ public class ContingutDocumentController extends BaseUserController {
 				true,
 				false);
 		if (contingut instanceof DocumentDto) {
-			FitxerDto fitxer = documentService.descarregar(
+			FitxerDto fitxer = documentService.infoDocument(
 					entitatActual.getId(),
 					documentId,
 					null);
 			Object objecte = contingutService.getDetallSignants(fitxer.getContingut());
+			
 			return AjaxHelper.generarAjaxFormOk(objecte);
 		}
 		return null;
@@ -589,6 +594,11 @@ public class ContingutDocumentController extends BaseUserController {
 			}
 			break;
 		}
+		if (command.isAmbFirma()) {
+			fitxer.setFirmaNom(command.getFirma().getOriginalFilename());
+			fitxer.setContentType(command.getFirma().getContentType());
+			fitxer.setContingutFirma(command.getFirma().getBytes());
+		}
 		if (command.getId() == null) {
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
@@ -681,6 +691,11 @@ public class ContingutDocumentController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						DocumentFisicOrigenEnum.class,
 						"document.fisic.origen.enum."));
+		model.addAttribute(
+				"tipusFirmaOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentTipusFirmaEnumDto.class,
+						"document.tipus.firma.enum."));
 		String tempId = command.getEscanejatTempId();
 		if (tempId != null) {
 			model.addAttribute(

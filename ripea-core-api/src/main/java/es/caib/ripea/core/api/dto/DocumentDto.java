@@ -24,7 +24,12 @@ public class DocumentDto extends NodeDto {
 	private String fitxerNomEnviamentPortafirmes;
 	private String fitxerContentType;
 	private byte[] fitxerContingut;
-	private Date dataCaptura;
+	private boolean ambFirma;
+	private String firmaNom;
+	private String firmaContentType;
+	private byte[] firmaContingut;
+	private DocumentTipusFirmaEnumDto tipusFirma;
+ 	private Date dataCaptura;
 	private String ntiVersion;
 	private String ntiIdentificador;
 	private String ntiOrgano;
@@ -105,6 +110,36 @@ public class DocumentDto extends NodeDto {
 	}
 	public void setFitxerContingut(byte[] fitxerContingut) {
 		this.fitxerContingut = fitxerContingut;
+	}
+	public boolean isAmbFirma() {
+		return ambFirma;
+	}
+	public void setAmbFirma(boolean ambFirma) {
+		this.ambFirma = ambFirma;
+	}
+	public String getFirmaNom() {
+		return firmaNom;
+	}
+	public void setFirmaNom(String firmaNom) {
+		this.firmaNom = firmaNom;
+	}
+	public String getFirmaContentType() {
+		return firmaContentType;
+	}
+	public void setFirmaContentType(String firmaContentType) {
+		this.firmaContentType = firmaContentType;
+	}
+	public byte[] getFirmaContingut() {
+		return firmaContingut;
+	}
+	public void setFirmaContingut(byte[] firmaContingut) {
+		this.firmaContingut = firmaContingut;
+	}
+	public DocumentTipusFirmaEnumDto getTipusFirma() {
+		return tipusFirma;
+	}
+	public void setTipusFirma(DocumentTipusFirmaEnumDto tipusFirma) {
+		this.tipusFirma = tipusFirma;
 	}
 	public Date getDataCaptura() {
 		return dataCaptura;
