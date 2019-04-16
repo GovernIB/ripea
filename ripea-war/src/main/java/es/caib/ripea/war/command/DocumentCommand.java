@@ -13,17 +13,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
+import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
-import es.caib.ripea.war.command.DocumentCommand.UpdateFisic;
+import es.caib.ripea.war.command.DocumentCommand.UpdateFirmaSeparada;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.DocumentDigitalExistent;
 import es.caib.ripea.war.validation.NomDocumentNoRepetit;
+import es.caib.ripea.war.validation.ValidIfSeparada;
 
 /**
  * Command per al manteniment de documents.
@@ -32,6 +35,7 @@ import es.caib.ripea.war.validation.NomDocumentNoRepetit;
  */
 @NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class})
 @DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
+@ValidIfSeparada(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 public class DocumentCommand extends ContenidorCommand {
 
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
@@ -45,6 +49,10 @@ public class DocumentCommand extends ContenidorCommand {
 	private Date data;
 	private MultipartFile arxiu;
 	private DocumentFisicOrigenEnum origen;
+	private boolean ambFirma;
+	private MultipartFile firma;
+	@NotNull(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
+	private DocumentTipusFirmaEnumDto tipusFirma = DocumentTipusFirmaEnumDto.ADJUNT;
 	private String escanejatTempId;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date dataCaptura;
@@ -98,6 +106,18 @@ public class DocumentCommand extends ContenidorCommand {
 	public void setOrigen(DocumentFisicOrigenEnum origen) {
 		this.origen = origen;
 	}
+	public boolean isAmbFirma() {
+		return ambFirma;
+	}
+	public void setAmbFirma(boolean ambFirma) {
+		this.ambFirma = ambFirma;
+	}
+	public MultipartFile getFirma() {
+		return firma;
+	}
+	public void setFirma(MultipartFile firma) {
+		this.firma = firma;
+	}
 	public String getEscanejatTempId() {
 		return escanejatTempId;
 	}
@@ -141,6 +161,12 @@ public class DocumentCommand extends ContenidorCommand {
 		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;
 	}
 
+	public DocumentTipusFirmaEnumDto getTipusFirma() {
+		return tipusFirma;
+	}
+	public void setTipusFirma(DocumentTipusFirmaEnumDto tipusFirma) {
+		this.tipusFirma = tipusFirma;
+	}
 	public static DocumentCommand asCommand(DocumentDto dto) {
 		DocumentCommand command = ConversioTipusHelper.convertir(
 				dto,
@@ -167,10 +193,12 @@ public class DocumentCommand extends ContenidorCommand {
 	public interface UpdateDigital {}
 	public interface CreateFisic {}
 	public interface UpdateFisic {}
-
+	
+	public interface CreateFirmaSeparada {}
+	public interface UpdateFirmaSeparada {}
+	
 	public enum DocumentFisicOrigenEnum {
 		DISC,
 		ESCANER
 	}
-
 }

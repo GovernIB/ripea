@@ -377,7 +377,8 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		contingutHelper.arxiuPropagarModificacio(
 				contingut,
-				fitxer);
+				fitxer,
+				null);
 		if (fitxer != null) {
 			fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 		}
@@ -1946,6 +1947,7 @@ public class ContingutServiceImpl implements ContingutService {
 		FileOutputStream outContent = new FileOutputStream(fContent);
 		FitxerDto fitxer = documentHelper.getFitxerAssociat(
 				document,
+				false,
 				null);
 		outContent.write(fitxer.getContingut());
 		outContent.close();

@@ -188,4 +188,16 @@ public class DocumentServiceBean implements DocumentService {
 				arxiuContingut);
 	}
 
+	@Override	
+	@RolesAllowed("tothom")
+	public FitxerDto infoDocument(
+			Long entitatId, 
+			Long id, 
+			String versio) throws NotFoundException {
+		return delegate.infoDocument(
+				entitatId, 
+				id, 
+				versio);
+	}
+
 }

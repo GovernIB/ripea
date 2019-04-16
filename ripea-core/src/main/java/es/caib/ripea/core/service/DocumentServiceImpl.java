@@ -28,12 +28,16 @@ import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
@@ -140,6 +144,7 @@ public class DocumentServiceImpl implements DocumentService {
 				expedientSuperior,
 				metaDocument,
 				0);
+		List<ArxiuFirmaDto> firmes = null;
 		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
 			throw new ValidationException(
 					"<creacio>",
@@ -173,6 +178,11 @@ public class DocumentServiceImpl implements DocumentService {
 					entity,
 					fitxer);
 		}
+		if (document.isAmbFirma()) {
+			firmes = validaFirmaDocument(
+					entity, 
+					fitxer);
+		}
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
@@ -180,7 +190,8 @@ public class DocumentServiceImpl implements DocumentService {
 		DocumentDto dto = toDocumentDto(entity);
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
-				fitxer);
+				fitxer,
+				firmes);
 		return dto;
 	}
 
@@ -204,6 +215,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 		MetaDocumentEntity metaDocument = null;
+		List<ArxiuFirmaDto> firmes = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					entity.getEntitat(),
@@ -242,6 +254,11 @@ public class DocumentServiceImpl implements DocumentService {
 					entity,
 					fitxer);
 		}
+		if (document.isAmbFirma()) {
+			firmes = validaFirmaDocument(
+					entity, 
+					fitxer);
+		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				entity,
@@ -254,7 +271,8 @@ public class DocumentServiceImpl implements DocumentService {
 	
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
-				fitxer);
+				fitxer,
+				firmes);
 		
 		return dto;
 	}
@@ -314,6 +332,34 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
+	public FitxerDto infoDocument(
+			Long entitatId,
+			Long id,
+			String versio) {
+		logger.debug("Descarregant contingut del document ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ", "
+				+ "versio=" + versio + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				id,
+				true,
+				false);
+		if (document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF06) {
+			return documentHelper.getFitxerAssociat(
+					document,
+					true,
+					versio);
+		} else {
+			return documentHelper.getFitxerAssociat(
+					document,
+					false,
+					versio);
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
@@ -329,6 +375,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 		return documentHelper.getFitxerAssociat(
 				document,
+				false,
 				versio);
 	}
 
@@ -710,7 +757,6 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 	}
 
-	private static final String CLAU_SECRETA = "R1p3AR1p3AR1p3AR";
 	private String firmaClientXifrar(
 			ObjecteFirmaApplet objecte) throws Exception {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -728,6 +774,8 @@ public class DocumentServiceImpl implements DocumentService {
 		byte[] xifrat = cipher.doFinal(baos.toByteArray());
 		return new String(Base64.encode(xifrat));
 	}
+
+	private static final String CLAU_SECRETA = "R1p3AR1p3AR1p3AR";
 	private ObjecteFirmaApplet firmaAppletDesxifrar(
 			String missatge,
 			String key) throws Exception {
@@ -785,6 +833,34 @@ public class DocumentServiceImpl implements DocumentService {
 			this.documentId = documentId;
 		}
 		private static final long serialVersionUID = -6929597339153341365L;
+	}
+	
+	private List<ArxiuFirmaDto> validaFirmaDocument(
+			DocumentEntity document,
+			FitxerDto fitxer) {
+		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
+				+ "documentID=" + document.getId() + ")");
+		List<ArxiuFirmaDto> firmes;
+		if (fitxer.getContingutFirma().length > 0) {
+			firmes = pluginHelper.validaSignaturaObtenirFirmes(
+					fitxer.getContingut(), 
+					fitxer.getContingutFirma(),
+					fitxer);
+		} else {
+			firmes = pluginHelper.validaSignaturaObtenirFirmes(
+					fitxer.getContingut(), 
+					null,
+					fitxer);
+		}
+		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.DOC_FIRMAT,
+				null,
+				null,
+				false,
+				false);
+		return firmes;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);

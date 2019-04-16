@@ -132,10 +132,11 @@ public class DocumentHelper {
 
 	public FitxerDto getFitxerAssociat(
 			DocumentEntity document) {
-		return getFitxerAssociat(document, null);
+		return getFitxerAssociat(document, false, null);
 	}
 	public FitxerDto getFitxerAssociat(
 			DocumentEntity document,
+			boolean firma,
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
@@ -150,13 +151,24 @@ public class DocumentHelper {
 				fitxer.setContentType(document.getFitxerContentType());
 				fitxer.setNom(document.getFitxerNom());
 				byte[] contingut = null;
-				if (arxiuDocument.getContingut() != null) {
-					contingut = arxiuDocument.getContingut().getContingut();
+				if (firma) {
+					if (arxiuDocument.getFirmes().get(0).getContingut() != null) {
+						contingut = arxiuDocument.getFirmes().get(0).getContingut();
+					} else {
+						throw new ValidationException(
+								"El document no no te cap contingut de firma associat a dins l'arxiu (" +
+								"documentId=" + document.getId() + ", " +
+								"arxiuUuid=" + document.getArxiuUuid() + ")");
+					}
 				} else {
-					throw new ValidationException(
-							"El document no no te cap contingut associat a dins l'arxiu (" +
-							"documentId=" + document.getId() + ", " +
-							"arxiuUuid=" + document.getArxiuUuid() + ")");
+					if (arxiuDocument.getContingut() != null) {
+						contingut = arxiuDocument.getContingut().getContingut();
+					} else {
+						throw new ValidationException(
+								"El document no no te cap contingut associat a dins l'arxiu (" +
+								"documentId=" + document.getId() + ", " +
+								"arxiuUuid=" + document.getArxiuUuid() + ")");
+					}
 				}
 				fitxer.setContingut(contingut);
 			} else {
@@ -200,8 +212,6 @@ public class DocumentHelper {
 			return null;
 		}
 	}
-
-
 
 	public SistemaExternException portafirmesEnviar(
 			DocumentPortafirmesEntity documentPortafirmes) {

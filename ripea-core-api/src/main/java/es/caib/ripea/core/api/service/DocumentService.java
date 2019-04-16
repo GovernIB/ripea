@@ -155,6 +155,25 @@ public interface DocumentService {
 			Long expedientId) throws NotFoundException;
 
 	/**
+	 * Recupera el contingut d'un document.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param id
+	 *            Atribut id del document del qual es vol descarregar el contingut.
+	 * @param versio
+	 *            El número de versió del document que es vol descarregar.
+	 * @return el fitxer amb el contingut.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto infoDocument(
+			Long entitatId,
+			Long id,
+			String versio) throws NotFoundException;
+	
+	/**
 	 * Descarrega el contingut d'un document.
 	 * 
 	 * @param entitatId

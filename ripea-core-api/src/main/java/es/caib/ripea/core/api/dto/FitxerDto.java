@@ -18,7 +18,10 @@ public class FitxerDto implements Serializable {
 	private String contentType;
 	private byte[] contingut;
 	private long tamany;
-
+	private String firmaNom;
+	private String firmaContentType;
+	private byte[] contingutFirma;
+	private long firmaTamany;
 
 
 	public String getNom() {
@@ -35,6 +38,30 @@ public class FitxerDto implements Serializable {
 	}
 	public byte[] getContingut() {
 		return contingut;
+	}
+	public String getFirmaNom() {
+		return firmaNom;
+	}
+	public void setFirmaNom(String firmaNom) {
+		this.firmaNom = firmaNom;
+	}
+	public String getFirmaContentType() {
+		return firmaContentType;
+	}
+	public void setFirmaContentType(String firmaContentType) {
+		this.firmaContentType = firmaContentType;
+	}
+	public byte[] getContingutFirma() {
+		return contingutFirma;
+	}
+	public void setContingutFirma(byte[] contingutFirma) {
+		this.contingutFirma = contingutFirma;
+	}
+	public long getFirmaTamany() {
+		return firmaTamany;
+	}
+	public void setFirmaTamany(long firmaTamany) {
+		this.firmaTamany = firmaTamany;
 	}
 	public void setContingut(byte[] contingut) {
 		this.contingut = contingut;

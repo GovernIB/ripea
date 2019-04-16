@@ -94,6 +94,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 		CarpetaDto dto = toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
+				null,
 				null);
 		return dto;
 	}
@@ -137,6 +138,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 		CarpetaDto dto = toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
+				null,
 				null);
 		return dto;
 	}

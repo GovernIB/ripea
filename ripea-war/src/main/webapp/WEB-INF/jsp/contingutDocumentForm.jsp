@@ -85,6 +85,26 @@ $(document).ready(function() {
 		}
 		webutilModalAdjustHeight();
 	});
+	$('input[type=checkbox][name=ambFirma]').on('change', function() {
+		if($(this).prop("checked") == true){
+			$('#input-firma').removeClass('hidden');
+			if($('input[type=radio][name=tipusFirma]').val() != 'SEPARAT') {
+				$('#input-firma-arxiu').addClass('hidden');
+			}
+		} else {
+			$('#input-firma').addClass('hidden');
+		}
+		webutilModalAdjustHeight();
+	});
+	$('input[type=radio][name=tipusFirma]').on('change', function() {
+		if ($(this).val() == 'SEPARAT') {
+			$('#input-firma-arxiu').removeClass('hidden');
+		} else {
+			$('#input-firma-arxiu').addClass('hidden');
+		}
+		webutilModalAdjustHeight();
+	});
+	
 	$(document).on('submit','form#documentCommand', function() {
 		var action = $(this).attr('action');
 		var lastSlashIndex = action.lastIndexOf('/');
@@ -106,6 +126,9 @@ $(document).ready(function() {
 		$('#metaNodeId').trigger('change');
 	}
 	$('input[type=radio][name=origen][value=${documentCommand.origen}]').trigger('change');
+	$('input[type=checkbox][name=ambFirma').trigger('change');
+	$('input[type=radio][name=tipusFirma][value=${documentCommand.tipusFirma}]').trigger('change');
+	
 });
 </script>
 </head>
@@ -134,23 +157,28 @@ $(document).ready(function() {
 				<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true"/>
 				<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
 				<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
-
-					<rip:inputRadio name="origen" textKey="contingut.document.form.camp.origen" botons="true" optionItems="${digitalOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-					<div id="input-origen-arxiu" class="hidden">
-						<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
+				<rip:inputRadio name="origen" textKey="contingut.document.form.camp.origen" botons="true" optionItems="${digitalOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<div id="input-origen-arxiu" class="hidden">
+					<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
+				</div>
+				<div id="input-origen-escaner" class="hidden">
+					<rip:inputFixed name="escanejatTempId" padding="false" textKey="contingut.document.form.camp.escaneig">
+						<rip:inputHidden name="escanejatTempId"/>
+						<div class="input-group">
+							<input type="text" class="form-control" disabled="disabled" value="${escanejat.nom}"/>
+							<span class="input-group-btn">
+								<button class="btn btn-default" name="hola" type="submit"><span class="fa fa-print"></span> <spring:message code="contingut.document.form.boto.escaneig"/></button>
+							</span>
+		    			</div>
+					</rip:inputFixed>
+				</div>
+				<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+				<div id="input-firma" class="hidden">
+					<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+					<div id="input-firma-arxiu" class="hidden">
+						<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
 					</div>
-					<div id="input-origen-escaner" class="hidden">
-						<rip:inputFixed name="escanejatTempId" padding="false" textKey="contingut.document.form.camp.escaneig">
-							<rip:inputHidden name="escanejatTempId"/>
-							<div class="input-group">
-								<input type="text" class="form-control" disabled="disabled" value="${escanejat.nom}"/>
-								<span class="input-group-btn">
-									<button class="btn btn-default" name="hola" type="submit"><span class="fa fa-print"></span> <spring:message code="contingut.document.form.boto.escaneig"/></button>
-								</span>
-		    				</div>
-						</rip:inputFixed>
-					</div>
-			
+				</div>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades_nti">
 				<rip:inputDate name="dataCaptura" textKey="contingut.document.form.camp.nti.datacap" required="true"/>
