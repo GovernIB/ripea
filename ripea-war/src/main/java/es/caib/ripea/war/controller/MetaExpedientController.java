@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
