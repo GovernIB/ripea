@@ -3680,9 +3680,18 @@ public class PluginHelper {
 			}
 		}
 		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
+		String ntiCsv = null;
+		String ntiCsvRegulacion = null;
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-			Firma firma = documentArxiu.getFirmes().get(0);
-			switch (firma.getTipus()) {
+			
+			FirmaTipus firmaTipus = null;
+			for (Firma firma : documentArxiu.getFirmes()) {
+				if (firma.getTipus() != FirmaTipus.CSV) {
+					firmaTipus = firma.getTipus();
+					break;
+				}
+			}
+			switch (firmaTipus) {
 			case CSV:
 				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
 				break;
@@ -3710,7 +3719,13 @@ public class PluginHelper {
 			case OOXML:
 				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
 				break;
+			}
 			
+			for (Firma firma : documentArxiu.getFirmes()) {
+				if (firma.getTipus() == FirmaTipus.CSV) {
+					ntiCsvRegulacion = firma.getCsvRegulacio();
+					ntiCsv = firma.getContingut() != null ? new String(firma.getContingut()) : null;
+				}
 			}
 		}
 		documentDb.updateNti(
@@ -3723,8 +3738,8 @@ public class PluginHelper {
 				ntiTipoDocumental,
 				documentArxiu.getMetadades().getIdentificadorOrigen(),
 				ntiTipoFirma,
-				null,
-				null);
+				ntiCsv,
+				ntiCsvRegulacion);
 	}
 	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
 	private String obtenirNumeroVersioEniDocument(String versio) {
