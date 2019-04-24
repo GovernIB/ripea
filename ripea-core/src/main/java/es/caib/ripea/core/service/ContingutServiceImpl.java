@@ -32,7 +32,6 @@ import es.caib.ripea.core.api.dto.AnotacioRegistreFiltreDto;
 import es.caib.ripea.core.api.dto.ArxiuContingutDto;
 import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
@@ -377,7 +376,9 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		contingutHelper.arxiuPropagarModificacio(
 				contingut,
-				fitxer,
+				null,
+				false,
+				false,
 				null);
 		if (fitxer != null) {
 			fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
@@ -1583,15 +1584,6 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				filtre);
 	}
-	
-	@Transactional(readOnly = true)
-	@Override
-	public List<ArxiuFirmaDetallDto> getDetallSignants(byte[] contingut) throws NotFoundException {
-		logger.debug("Consultant el detall d'un document");
-		return pluginHelper.validaSignaturaObtenirDetalls(contingut, null);
-	}
-
-
 
 	/*private ContingutEntity contingutHelper.comprovarContingutDinsExpedient(
 			Long entitatId,
@@ -1947,7 +1939,6 @@ public class ContingutServiceImpl implements ContingutService {
 		FileOutputStream outContent = new FileOutputStream(fContent);
 		FitxerDto fitxer = documentHelper.getFitxerAssociat(
 				document,
-				false,
 				null);
 		outContent.write(fitxer.getContingut());
 		outContent.close();

@@ -17,7 +17,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.AnotacioRegistreFiltreDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -286,15 +285,6 @@ public class ContingutServiceBean implements ContingutService {
 				entitatId,
 				filtre);
 	}
-	
-	@Override
-	@RolesAllowed("tothom")
-	public List<ArxiuFirmaDetallDto> getDetallSignants(byte[] contingut)
-			throws NotFoundException {
-		return delegate.getDetallSignants(contingut);
-	}
-	
-	
 
 	@Override
 	@RolesAllowed("tothom")

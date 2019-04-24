@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -177,10 +178,25 @@ public class DocumentCommand extends ContenidorCommand {
 			command.setMetaNodeId(dto.getMetaNode().getId());
 		return command;
 	}
-	public static DocumentDto asDto(DocumentCommand command) {
+	public static DocumentDto asDto(DocumentCommand command) throws IOException{
 		DocumentDto dto = ConversioTipusHelper.convertir(
 				command,
 				DocumentDto.class);
+			
+		if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
+			dto.setFitxerNom(command.getArxiu().getOriginalFilename());
+			dto.setFitxerContentType(command.getArxiu().getContentType());
+			dto.setFitxerContingut(command.getArxiu().getBytes());
+		}
+
+		if (command.isAmbFirma()) {
+			dto.setFirmaNom(command.getFirma().getOriginalFilename());
+			dto.setFirmaContentType(command.getFirma().getContentType());
+			dto.setFirmaContingut(command.getFirma().getBytes());
+		}
+		
+		dto.setFirmaSeparada(command.getTipusFirma() == DocumentTipusFirmaEnumDto.SEPARAT ? true : false);
+
 		if (command.getMetaNodeId() != null) {
 			MetaDocumentDto metaDocument = new MetaDocumentDto();
 			metaDocument.setId(command.getMetaNodeId());

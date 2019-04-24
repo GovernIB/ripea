@@ -13,6 +13,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -39,13 +40,11 @@ public class DocumentServiceBean implements DocumentService {
 	public DocumentDto create(
 			Long entitatId,
 			Long contenidorId,
-			DocumentDto document,
-			FitxerDto fitxer) {
+			DocumentDto document) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
-				document,
-				fitxer);
+				document);
 	}
 
 	@Override
@@ -53,13 +52,11 @@ public class DocumentServiceBean implements DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			Long id,
-			DocumentDto document,
-			FitxerDto fitxer) {
+			DocumentDto document) {
 		return delegate.update(
 				entitatId,
 				id,
-				document,
-				fitxer);
+				document);
 	}
 
 	@Override
@@ -195,6 +192,18 @@ public class DocumentServiceBean implements DocumentService {
 			Long id, 
 			String versio) throws NotFoundException {
 		return delegate.infoDocument(
+				entitatId, 
+				id, 
+				versio);
+	}
+
+	@Override	
+	@RolesAllowed("tothom")
+	public List<ArxiuFirmaDetallDto> getDetallSignants(
+			Long entitatId,
+			Long id,
+			String versio) throws NotFoundException {
+		return delegate.getDetallSignants(
 				entitatId, 
 				id, 
 				versio);

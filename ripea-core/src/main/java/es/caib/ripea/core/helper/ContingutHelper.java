@@ -28,12 +28,10 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.FirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
@@ -1024,6 +1022,8 @@ public class ContingutHelper {
 	public void arxiuPropagarModificacio(
 			ContingutEntity contingut,
 			FitxerDto fitxer,
+			boolean documentAmbFirma,
+			boolean firmaSeparada,
 			List<ArxiuFirmaDto> firmes) {
 		String serieDocumental = null;
 		ExpedientEntity expedientSuperior = contingut.getExpedient();
@@ -1037,11 +1037,12 @@ public class ContingutHelper {
 			} else if (contingut instanceof DocumentEntity) {
 				String custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
 						(DocumentEntity)contingut,
-						fitxer,
 						contingut.getPare(),
 						serieDocumental,
-						firmes,
-						false);
+						fitxer,
+						documentAmbFirma,
+						firmaSeparada,
+						firmes);
 				documentHelper.actualitzarVersionsDocument((DocumentEntity)contingut);
 				//Si la firma ve separada
 				//if (contingutFirma != null) {

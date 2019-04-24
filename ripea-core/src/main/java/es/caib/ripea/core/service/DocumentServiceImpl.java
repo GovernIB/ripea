@@ -28,16 +28,15 @@ import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
@@ -102,13 +101,11 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto create(
 			Long entitatId,
 			Long contingutId,
-			DocumentDto document,
-			FitxerDto fitxer) {
+			DocumentDto document) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"contingutId=" + contingutId + ", " +
-				"document=" + document + ", " +
-				"fitxer=" + fitxer + ")");
+				"document=" + document + ")");
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -144,7 +141,6 @@ public class DocumentServiceImpl implements DocumentService {
 				expedientSuperior,
 				metaDocument,
 				0);
-		List<ArxiuFirmaDto> firmes = null;
 		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
 			throw new ValidationException(
 					"<creacio>",
@@ -173,25 +169,33 @@ public class DocumentServiceImpl implements DocumentService {
 				expedientSuperior,
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen());
-		if (fitxer != null) {
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(document.getFitxerNom());
+		fitxer.setContentType(document.getFitxerContentType());
+		fitxer.setContingut(document.getFitxerContingut());
+		List<ArxiuFirmaDto> firmes = null;
+		if (document.getFitxerContingut() != null) {
 			documentHelper.actualitzarFitxerDocument(
 					entity,
 					fitxer);
-		}
-		if (document.isAmbFirma()) {
-			firmes = validaFirmaDocument(
-					entity, 
-					fitxer);
+			if (document.isAmbFirma()) {
+				firmes = validaFirmaDocument(
+						entity, 
+						fitxer,
+						document.getFirmaContingut());
+			}
 		}
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
 				true);
-		DocumentDto dto = toDocumentDto(entity);
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
 				fitxer,
+				document.isAmbFirma(),
+				document.isFirmaSeparada(),
 				firmes);
+		DocumentDto dto = toDocumentDto(entity);
 		return dto;
 	}
 
@@ -200,13 +204,11 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			Long id,
-			DocumentDto document,
-			FitxerDto fitxer) {
+			DocumentDto document) {
 		logger.debug("Actualitzant el document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
-				"document=" + document + ", " +
-				"fitxer=" + fitxer + ")");
+				"document=" + document + ")");
 		DocumentEntity entity = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
 				id,
@@ -249,31 +251,36 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getNtiTipoFirma(),
 				document.getNtiCsv(),
 				document.getNtiCsvRegulacion());
-		if (fitxer != null) {
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(document.getFitxerNom());
+		fitxer.setContentType(document.getFitxerContentType());
+		fitxer.setContingut(document.getFitxerContingut());
+		if (document.getFitxerContingut() != null) {
 			documentHelper.actualitzarFitxerDocument(
 					entity,
 					fitxer);
-		}
-		if (document.isAmbFirma()) {
-			firmes = validaFirmaDocument(
-					entity, 
-					fitxer);
+			if (document.isAmbFirma()) {
+				firmes = validaFirmaDocument(
+						entity, 
+						fitxer,
+						document.getFirmaContingut());
+			}
 		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				entity,
 				LogTipusEnumDto.MODIFICACIO,
 				(!nomOriginal.equals(document.getNom())) ? document.getNom() : null,
-				(fitxer != null) ? "VERSIO_NOVA" : null,
+				(document.getFitxerContingut() != null) ? "VERSIO_NOVA" : null,
 				false,
 				false);
 		DocumentDto dto = toDocumentDto(entity);
-	
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
 				fitxer,
+				document.isAmbFirma(),
+				document.isFirmaSeparada(),
 				firmes);
-		
 		return dto;
 	}
 
@@ -345,19 +352,42 @@ public class DocumentServiceImpl implements DocumentService {
 				id,
 				true,
 				false);
-		if (document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF06) {
-			return documentHelper.getFitxerAssociat(
-					document,
-					true,
-					versio);
-		} else {
-			return documentHelper.getFitxerAssociat(
-					document,
-					false,
-					versio);
-		}
+		return documentHelper.getFitxerAssociat(
+				document,
+				versio);
 	}
-	
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<ArxiuFirmaDetallDto> getDetallSignants(
+			Long entitatId,
+			Long id,
+			String versio) throws NotFoundException {
+		logger.debug("Consultant el detall de les firmes d'un document ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ", "
+				+ "versio=" + versio + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				id,
+				true,
+				false);
+		if (document.getArxiuUuid() != null) {
+			if (pluginHelper.isArxiuPluginActiu()) {
+				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+						document,
+						null,
+						versio,
+						true,
+						false);
+				return pluginHelper.validaSignaturaObtenirDetalls(
+						documentHelper.getContingutFromArxiuDocument(arxiuDocument),
+						documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument));
+			}
+		}
+		return null;
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto descarregar(
@@ -375,7 +405,6 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 		return documentHelper.getFitxerAssociat(
 				document,
-				false,
 				versio);
 	}
 
@@ -637,7 +666,7 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 		return pluginHelper.conversioConvertirPdf(
-				documentHelper.getFitxerAssociat(document),
+				documentHelper.getFitxerAssociat(document, null),
 				null);
 	}
 
@@ -834,24 +863,17 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		private static final long serialVersionUID = -6929597339153341365L;
 	}
-	
+
 	private List<ArxiuFirmaDto> validaFirmaDocument(
 			DocumentEntity document,
-			FitxerDto fitxer) {
+			FitxerDto fitxer,
+			byte[] contingutFirma) {
 		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
 				+ "documentID=" + document.getId() + ")");
-		List<ArxiuFirmaDto> firmes;
-		if (fitxer.getContingutFirma().length > 0) {
-			firmes = pluginHelper.validaSignaturaObtenirFirmes(
-					fitxer.getContingut(), 
-					fitxer.getContingutFirma(),
-					fitxer);
-		} else {
-			firmes = pluginHelper.validaSignaturaObtenirFirmes(
-					fitxer.getContingut(), 
-					null,
-					fitxer);
-		}
+		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
+				fitxer.getContingut(), 
+				(contingutFirma != null && contingutFirma.length > 0) ? contingutFirma : null,
+				fitxer.getContentType());
 		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
 		contingutLogHelper.log(
 				document,

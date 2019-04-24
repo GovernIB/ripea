@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -33,8 +34,6 @@ public interface DocumentService {
 	 *            Atribut id del contenidor a on es vol crear el document.
 	 * @param document
 	 *            Informació del document que es vol crear.
-	 * @param fitxer
-	 *            Informació del fitxer.
 	 * @return El document creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -45,8 +44,7 @@ public interface DocumentService {
 	public DocumentDto create(
 			Long entitatId,
 			Long contenidorId,
-			DocumentDto document,
-			FitxerDto fitxer) throws NotFoundException, ValidationException;
+			DocumentDto document) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
@@ -57,8 +55,6 @@ public interface DocumentService {
 	 *            Atribut id del document que es vol modificar.
 	 * @param document
 	 *            Informació del document que es vol crear.
-	 * @param fitxer
-	 *            Informació del fitxer.
 	 * @return El document modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -69,8 +65,7 @@ public interface DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			Long id,
-			DocumentDto document,
-			FitxerDto fitxer) throws NotFoundException, ValidationException;
+			DocumentDto document) throws NotFoundException, ValidationException;
 
 	/**
 	 * Consulta un document donat el seu id.
@@ -172,7 +167,25 @@ public interface DocumentService {
 			Long entitatId,
 			Long id,
 			String versio) throws NotFoundException;
-	
+
+	/**
+	 * Consulta el detall de les signatures del document.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param id
+	 *            Atribut id del document del qual es vol descarregar el contingut.
+	 * @param versio
+	 *            El número de versió del document que es vol descarregar.
+	 * @return la informació de les signatures del document.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'informacio amb el contingut en bytes especificat.
+	 */
+	public List<ArxiuFirmaDetallDto> getDetallSignants(
+			Long entitatId,
+			Long id,
+			String versio) throws NotFoundException;
+
 	/**
 	 * Descarrega el contingut d'un document.
 	 * 

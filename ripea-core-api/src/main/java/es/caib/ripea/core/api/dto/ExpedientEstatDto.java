@@ -1,7 +1,5 @@
 package es.caib.ripea.core.api.dto;
 
-
-
 /**
  * 
  * @author Limit Tecnologies <limit@limit.es>
@@ -101,7 +99,5 @@ public class ExpedientEstatDto  {
 	public ExpedientEstatDto() {
 		super();
 	}
-
-	private static final long serialVersionUID = 2049469376271209018L;
 
 }

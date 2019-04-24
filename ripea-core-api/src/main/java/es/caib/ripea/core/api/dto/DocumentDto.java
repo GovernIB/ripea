@@ -44,7 +44,15 @@ public class DocumentDto extends NodeDto {
 	private String versioDarrera;
 	private int versioCount;
 	private List<DocumentVersioDto> versions;
+	private boolean firmaSeparada;
+	
 
+	public boolean isFirmaSeparada() {
+		return firmaSeparada;
+	}
+	public void setFirmaSeparada(boolean firmaSeparada) {
+		this.firmaSeparada = firmaSeparada;
+	}
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
 	}

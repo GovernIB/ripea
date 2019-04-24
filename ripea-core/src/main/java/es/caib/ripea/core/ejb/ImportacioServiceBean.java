@@ -12,11 +12,9 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ImportacioService;
 
 /**

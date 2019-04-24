@@ -95,6 +95,8 @@ public class CarpetaServiceImpl implements CarpetaService {
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
 				null,
+				false,
+				false,
 				null);
 		return dto;
 	}
@@ -139,6 +141,8 @@ public class CarpetaServiceImpl implements CarpetaService {
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
 				null,
+				false,
+				false,
 				null);
 		return dto;
 	}

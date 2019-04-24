@@ -39,12 +39,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -392,7 +392,7 @@ public class ContingutDocumentController extends BaseUserController {
 				model);
 		return "contingutDocumentForm";
 	}
-	
+
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
 	@ResponseBody
 	public AjaxFormResponse mostraDetallSignants(
@@ -401,21 +401,11 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long documentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
+		List<ArxiuFirmaDetallDto> detallSignants = documentService.getDetallSignants(
 				entitatActual.getId(),
 				documentId,
-				true,
-				false);
-		if (contingut instanceof DocumentDto) {
-			FitxerDto fitxer = documentService.infoDocument(
-					entitatActual.getId(),
-					documentId,
-					null);
-			Object objecte = contingutService.getDetallSignants(fitxer.getContingut());
-			
-			return AjaxHelper.generarAjaxFormOk(objecte);
-		}
-		return null;
+				null);
+		return AjaxHelper.generarAjaxFormOk(detallSignants);
 	}
 
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/descarregar", method = RequestMethod.GET)
@@ -574,10 +564,10 @@ public class ContingutDocumentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		FitxerDto fitxer = null;
+		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
 		Map<String, Object> valors = new HashMap<String, Object>();
-		switch (command.getOrigen()) {
+		/*switch (command.getOrigen()) {
 		case DISC:
 			if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
 				fitxer = new FitxerDto();
@@ -598,13 +588,12 @@ public class ContingutDocumentController extends BaseUserController {
 			fitxer.setFirmaNom(command.getFirma().getOriginalFilename());
 			fitxer.setContentType(command.getFirma().getContentType());
 			fitxer.setContingutFirma(command.getFirma().getBytes());
-		}
+		}*/
 		if (command.getId() == null) {
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					command.getPareId(),
-					DocumentCommand.asDto(command),
-					fitxer);
+					DocumentCommand.asDto(command));
 			//Valor per defecte d'algunes metadades
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
 					entitatActual.getId(), 
@@ -646,8 +635,7 @@ public class ContingutDocumentController extends BaseUserController {
 			documentService.update(
 					entitatActual.getId(),
 					command.getId(),
-					DocumentCommand.asDto(command),
-					fitxer);
+					DocumentCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../contingut/" + command.getPareId(),

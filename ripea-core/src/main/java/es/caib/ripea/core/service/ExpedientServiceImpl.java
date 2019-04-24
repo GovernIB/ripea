@@ -217,6 +217,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		contingutHelper.arxiuPropagarModificacio(
 				expedient,
 				null,
+				false,
+				false,
 				null);
 		return dto;
 	}
@@ -267,6 +269,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		contingutHelper.arxiuPropagarModificacio(
 				expedient,
 				null,
+				false,
+				false,
 				null);
 		return dto;
 	}
@@ -329,6 +333,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		contingutHelper.arxiuPropagarModificacio(
 				expedient,
 				null,
+				false,
+				false,
 				null);
 		return dto;
 	}
