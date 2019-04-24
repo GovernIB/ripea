@@ -4,7 +4,6 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,13 +19,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.EntitatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -90,7 +87,7 @@ public class EntitatController extends BaseUserController {
 			return "entitatForm";
 		}
 		if (command.getId() != null) {
-			EntitatDto entitat = entitatService.update(EntitatCommand.asDto(command));
+			entitatService.update(EntitatCommand.asDto(command));
 			entitatService.evictEntitatsAccessiblesUsuari();
 			request.getSession().setAttribute(
 					"EntitatHelper.entitatActual",

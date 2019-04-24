@@ -3,13 +3,9 @@
  */
 package es.caib.ripea.war.command;
 
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.NotEmpty;
 
-import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 /**

@@ -6,9 +6,6 @@ package es.caib.ripea.war.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.ripea.war.command.MetaDocumentCommand;
 
 /**
@@ -33,7 +30,5 @@ public class PortafirmesDocumentTipusNotEmptyValidator implements ConstraintVali
 			return true;
         
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(PortafirmesDocumentTipusNotEmptyValidator.class);
 
 }
