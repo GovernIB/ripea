@@ -3124,7 +3124,7 @@ public class PluginHelper {
 		document.setNom(nom);
 		document.setIdentificador(identificador);
 		DocumentMetadades metadades = new DocumentMetadades();
-		metadades.setSerieDocumental(serieDocumental);
+		//metadades.setSerieDocumental(serieDocumental);
 		metadades.setIdentificador(ntiIdentificador);
 		if (ntiOrigen != null) {
 			switch (ntiOrigen) {
