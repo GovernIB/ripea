@@ -1096,9 +1096,18 @@ public class PluginHelper {
 			fitxerAmbFirma.setNom(fitxerPdfFirmat.getNom());
 			fitxerAmbFirma.setContingut(fitxerPdfFirmat.getContingut());
 			fitxerAmbFirma.setContentType("application/pdf");
-			ArxiuFirmaDto firma = new ArxiuFirmaDto();
-			firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
-			firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+			List<ArxiuFirmaDto> firmes = null;
+			if (getPropertyArxiuFirmaDetallsActiu()) {
+				firmes = validaSignaturaObtenirFirmes(
+						fitxerPdfFirmat.getContingut(), 
+						null,
+						fitxerAmbFirma.getContentType());
+			} else {
+				ArxiuFirmaDto firma = new ArxiuFirmaDto();
+				firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
+				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+				firmes = Arrays.asList(firma);
+			}
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
@@ -1106,7 +1115,7 @@ public class PluginHelper {
 							fitxerAmbFirma,
 							true,
 							false,
-							Arrays.asList(firma),
+							firmes,
 							null,
 							document.getNtiOrigen(),
 							Arrays.asList(document.getNtiOrgano()),
@@ -3198,7 +3207,7 @@ public class PluginHelper {
 					document.getFirmes().add(firma);
 				}
 			}
-			if (firmes != null && ! firmes.isEmpty() && getPropertyArxiuMetadadesAddicionalsActiu()) {
+			if (firmes != null && ! firmes.isEmpty() && getPropertyArxiuFirmaDetallsActiu()) {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
 				metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
 				metadades.setMetadadesAddicionals(metadadesAddicionals);
@@ -4099,9 +4108,9 @@ public class PluginHelper {
 				"es.caib.ripea.plugin.signatura.signarAnnexos");
 	}
 
-	private boolean getPropertyArxiuMetadadesAddicionalsActiu() {
+	private boolean getPropertyArxiuFirmaDetallsActiu() {
 		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.arxiu.metadades.addicionals.actiu");
+				"es.caib.ripea.arxiu.firma.detalls.actiu");
 	}
 
 	private Integer getPropertyNotificacioRetardNumDies() {
