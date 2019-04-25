@@ -1099,7 +1099,7 @@ public class PluginHelper {
 			ArxiuFirmaDto firma = new ArxiuFirmaDto();
 			firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
 			firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
-			getArxiuPlugin().documentModificar(
+			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
 							document.getNom(),
@@ -1124,6 +1124,19 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
+			
+			if (getArxiuPlugin().suportaMetadadesNti()) {
+				Document documentDetalls = getArxiuPlugin().documentDetalls(
+						documentModificat.getIdentificador(),
+						null,
+						false);
+				propagarMetadadesDocument(
+						documentDetalls,
+						document);
+			}
+			
+			
+			
 			return document.getId().toString();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -3185,7 +3198,7 @@ public class PluginHelper {
 					document.getFirmes().add(firma);
 				}
 			}
-			if (firmes != null && ! firmes.isEmpty()) {
+			if (firmes != null && ! firmes.isEmpty() && getPropertyArxiuMetadadesAddicionalsActiu()) {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
 				metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
 				metadades.setMetadadesAddicionals(metadadesAddicionals);
@@ -4084,6 +4097,11 @@ public class PluginHelper {
 	private boolean getPropertyPluginRegistreSignarAnnexos() {
 		return PropertiesHelper.getProperties().getAsBoolean(
 				"es.caib.ripea.plugin.signatura.signarAnnexos");
+	}
+
+	private boolean getPropertyArxiuMetadadesAddicionalsActiu() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.ripea.arxiu.metadades.addicionals.actiu");
 	}
 
 	private Integer getPropertyNotificacioRetardNumDies() {
