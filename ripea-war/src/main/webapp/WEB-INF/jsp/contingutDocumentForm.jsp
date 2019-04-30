@@ -33,19 +33,9 @@ $(document).ready(function() {
 	}
 	
 	$('#documentTipus').val('DIGITAL');
-	$('#metaNodeId').on('change', function() {
-		if($('#id').val() == '') {
-			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
-			.done(function(data) {			
-				$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-				$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-				$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-				$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
-				$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
-				$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
-			})
-		} else {
-			if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
+	if(${!empty documentCommand.id}){
+		$('#metaNodeId').on('change', function() {
+			if($('#id').val() == '') {
 				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
@@ -55,26 +45,39 @@ $(document).ready(function() {
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
-			}
-		}
-		if ($(this).val()) {
-			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
-			.done(function(data) {
-				if (data.plantillaNom) {
-					$('#info-plantilla-si').removeClass('hidden');
-					$('#info-plantilla-si a').attr('href', '../metaDocument/' + data.id + '/plantilla');
-				} else {
-					$('#info-plantilla-si').addClass('hidden');
+			} else {
+				if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
+					$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+					.done(function(data) {			
+						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
+						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					})
 				}
-				webutilModalAdjustHeight();
-			})
-			.fail(function() {
-				alert("<spring:message code="contingut.document.form.alert.plantilla"/>");
-			});
-		} else {
-			$('#info-plantilla-si').addClass('hidden');
-		}
-	});
+			}
+			if ($(this).val()) {
+				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
+				.done(function(data) {
+					if (data.plantillaNom) {
+						$('#info-plantilla-si').removeClass('hidden');
+						$('#info-plantilla-si a').attr('href', '../metaDocument/' + data.id + '/plantilla');
+					} else {
+						$('#info-plantilla-si').addClass('hidden');
+					}
+					webutilModalAdjustHeight();
+				})
+				.fail(function() {
+					alert("<spring:message code="contingut.document.form.alert.plantilla"/>");
+				});
+			} else {
+				$('#info-plantilla-si').addClass('hidden');
+			}
+		});
+	}
+
 	$('input[type=radio][name=origen]').on('change', function() {
 		if ($(this).val() == 'DISC') {
 			$('#input-origen-arxiu').removeClass('hidden');
