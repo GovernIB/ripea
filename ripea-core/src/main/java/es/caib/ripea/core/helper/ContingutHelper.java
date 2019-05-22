@@ -993,31 +993,36 @@ public class ContingutHelper {
 	public void comprovarNomValid(
 			ContingutEntity contingutPare,
 			String nom,
-			Object objectId,
+			Long id,
 			Class<?> objectClass) {
 		if (nom.startsWith(".")) {
 			throw new ValidationException(
-					objectId,
+					id,
 					objectClass,
-					"El nom de l'expedient no és vàlid (no pot començar amb un \".\")");
+					"El nom del contingut no és vàlid (no pot començar amb un \".\")");
 		}
 		if (nom.endsWith(" ")) {
 			throw new ValidationException(
-					objectId,
+					id,
 					objectClass,
-					"El nom de l'expedient no és vàlid (no pot acabar amb un \" \")");
+					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
 		if (contingutPare != null) {
 			for (ContingutEntity fill: contingutPare.getFills()) {
-				if (fill.getNom().equals(nom)) {
+				if ((!fill.getId().equals(id) && fill.getNom().equals(nom))  ) {
 					throw new ValidationException(
-							objectId,
+							id,
 							objectClass,
 							"Ja existeix un altre contingut amb el mateix nom");
 				}
 			}
 		}
 	}
+	
+	
+
+	
+	
 
 	public void arxiuPropagarModificacio(
 			ContingutEntity contingut,

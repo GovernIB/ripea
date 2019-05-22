@@ -135,7 +135,7 @@ public class DocumentServiceImpl implements DocumentService {
 		contingutHelper.comprovarNomValid(
 				contingut,
 				document.getNom(),
-				"<creacio>",
+				null,
 				DocumentEntity.class);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
 				expedientSuperior,
@@ -251,10 +251,14 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getNtiTipoFirma(),
 				document.getNtiCsv(),
 				document.getNtiCsvRegulacion());
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(document.getFitxerNom());
-		fitxer.setContentType(document.getFitxerContentType());
-		fitxer.setContingut(document.getFitxerContingut());
+		FitxerDto fitxer = null;
+		if (document.getFitxerContingut() != null) {
+			fitxer = new FitxerDto();
+			fitxer.setNom(document.getFitxerNom());
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setContingut(document.getFitxerContingut());
+		}
+
 		if (document.getFitxerContingut() != null) {
 			documentHelper.actualitzarFitxerDocument(
 					entity,

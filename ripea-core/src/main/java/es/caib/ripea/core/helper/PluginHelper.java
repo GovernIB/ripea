@@ -3165,7 +3165,7 @@ public class PluginHelper {
 				ntiDataCaptura,
 				ntiEstatElaboracio,
 				ntiTipusDocumental,
-				fitxer.getExtensio(),
+				fitxer != null ? fitxer.getExtensio() : null,
 				ntiOrgans,
 				metadades);
 		document.setMetadades(metadades);
@@ -3388,8 +3388,10 @@ public class PluginHelper {
 		}
 		metadades.setTipusDocumental(tipusDocumental);
 		DocumentExtensio extensio = null;
-		String extensioAmbPunt = (fitxerExtensio.startsWith(".")) ? fitxerExtensio.toLowerCase() : "." + fitxerExtensio.toLowerCase();
-		extensio = DocumentExtensio.toEnum(extensioAmbPunt);
+		if (fitxerExtensio != null) {
+			String extensioAmbPunt = (fitxerExtensio.startsWith(".")) ? fitxerExtensio.toLowerCase(): "." + fitxerExtensio.toLowerCase();
+			extensio = DocumentExtensio.toEnum(extensioAmbPunt);
+		}
 		if (extensio != null) {
 			metadades.setExtensio(extensio);
 			DocumentFormat format = null;

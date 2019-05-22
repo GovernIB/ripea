@@ -169,7 +169,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		contingutHelper.comprovarNomValid(
 				contingutPare,
 				nom,
-				"<creacio>",
+				null,
 				ExpedientEntity.class);
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,

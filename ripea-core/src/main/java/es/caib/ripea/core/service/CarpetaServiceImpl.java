@@ -78,7 +78,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 		contingutHelper.comprovarNomValid(
 				contingut,
 				nom,
-				"<creacio>",
+				null,
 				CarpetaEntity.class);
 		CarpetaEntity carpeta = CarpetaEntity.getBuilder(
 				nom,
