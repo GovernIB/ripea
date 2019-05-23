@@ -17,12 +17,14 @@ import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDadaNoRepetit;
+import es.caib.ripea.war.validation.CodiMetaDadaNomValid;
 
 /**
  * Command per al manteniment de meta-dades.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@CodiMetaDadaNomValid
 @CodiMetaDadaNoRepetit(
 		campId = "id",
 		campCodi = "codi",
