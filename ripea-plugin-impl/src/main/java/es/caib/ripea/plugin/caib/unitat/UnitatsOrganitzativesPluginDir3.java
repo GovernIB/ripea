@@ -279,8 +279,13 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			return null;
 	}
 	private String getServiceCercaUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.unitats.cerca.dir3.service.url");
+		String serviceUrl = PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.unitats.organitzatives.dir3.consulta.rest.service.url");
+		if (serviceUrl == null) {
+			serviceUrl = PropertiesHelper.getProperties().getProperty(
+					"es.caib.ripea.plugin.unitats.cerca.dir3.service.url");
+		}
+		return serviceUrl;
 	}
 
 }
