@@ -80,30 +80,6 @@ public class ExpedientEstatController extends BaseAdminController {
 	}
 	
 	
-	@RequestMapping(value = "/values/{metaExpedientId}", method = RequestMethod.GET)
-	@ResponseBody
-	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		
-		List<ExpedientEstatDto> estatsFromDatabase = expedientService.findExpedientEstatByMetaExpedient(
-				entitatActual.getId(),
-				metaExpedientId);
-		
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-
-		expedientEstatsOptions.addAll(estatsFromDatabase);
-		
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));		
-
-		return expedientEstatsOptions;
-	}
-	
-	
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,

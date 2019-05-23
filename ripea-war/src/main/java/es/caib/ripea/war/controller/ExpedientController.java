@@ -307,7 +307,31 @@ public class ExpedientController extends BaseUserController {
 				"redirect:../../contingut/" + expedientId,
 				"expedient.controller.tancar.ok");
 	}
+	
 
+	@RequestMapping(value = "/estatValues/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		
+		List<ExpedientEstatDto> estatsFromDatabase = expedientService.findExpedientEstatByMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId);
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+
+		expedientEstatsOptions.addAll(estatsFromDatabase);
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));		
+
+		return expedientEstatsOptions;
+	}
+	
 
 	
 	@RequestMapping(value = "/{expedientId}/canviarEstat", method = RequestMethod.GET)

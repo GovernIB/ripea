@@ -111,7 +111,7 @@ $(document).ready(function() {
 			}
 		};
 		if (tipus != "") {
-			$.get("<c:url value="/expedientEstat/values/"/>"+tipus)
+			$.get("<c:url value="/expedient/estatValues/"/>"+tipus)
 			.done(metaNodeRefresh)
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
