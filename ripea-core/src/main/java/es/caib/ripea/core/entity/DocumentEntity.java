@@ -84,7 +84,7 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "nti_tipdoc", length = 4, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
-	@Column(name = "nti_idorig", length = 48, nullable = false)
+	@Column(name = "nti_idorig", length = 48)
 	private String ntiIdDocumentoOrigen;
 	@Column(name = "nti_tipfir", length = 4)
 	@Enumerated(EnumType.STRING)

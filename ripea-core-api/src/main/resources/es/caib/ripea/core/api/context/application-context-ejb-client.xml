@@ -71,6 +71,14 @@
 	<jee:local-slsb
 			id="importacioService"
 			jndi-name="ripea/ImportacioServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ImportacioService"/>
-
+			business-interface="es.caib.ripea.core.api.service.ImportacioService"/>	
+	<jee:local-slsb
+			id="backofficeWsService"
+			jndi-name="ripea/BackofficeWsServiceBean/local"
+			business-interface="es.caib.distribucio.ws.backoffice.Backoffice"/>		
+	<jee:local-slsb
+			id="expedientPeticioService"
+			jndi-name="ripea/ExpedientPeticioServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ExpedientPeticioService"/>	
+		
 </beans>

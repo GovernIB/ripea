@@ -55,5 +55,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	
 	
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
+	
+	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
+	
 
 }

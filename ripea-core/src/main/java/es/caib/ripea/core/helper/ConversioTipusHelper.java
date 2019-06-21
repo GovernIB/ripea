@@ -21,7 +21,6 @@ import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDetallDto;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
@@ -100,33 +99,6 @@ public class ConversioTipusHelper {
 						target.setError(source.getError());
 						target.setLlegida(source.getLlegida().booleanValue());
 						target.setContingutId(source.getContingut().getId());
-						return target;
-					}
-				});
-		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<RegistreAnnexEntity, RegistreAnnexDetallDto>() {
-					public RegistreAnnexDetallDto convert(RegistreAnnexEntity source, Type<? extends RegistreAnnexDetallDto> destinationClass) {
-						RegistreAnnexDetallDto target = new RegistreAnnexDetallDto();
-						target.setId(source.getId());
-						target.setTitol(source.getTitol());
-						target.setFitxerNom(source.getTitol());
-						target.setFitxerTamany(source.getFitxerTamany());
-						target.setFitxerTipusMime(source.getFitxerTipusMime());
-						target.setDataCaptura(source.getDataCaptura());
-						target.setLocalitzacio(source.getLocalitzacio());
-						if (source.getOrigenCiutadaAdmin() != null)
-							target.setOrigenCiutadaAdmin(source.getOrigenCiutadaAdmin().toString());
-						if (source.getNtiTipusDocument() != null)
-							target.setNtiTipusDocument(source.getNtiTipusDocument().toString());
-						if (source.getSicresTipusDocument() != null)
-							target.setSicresTipusDocument(source.getSicresTipusDocument().toString());
-						if (source.getNtiElaboracioEstat() != null)
-							target.setNtiElaboracioEstat(source.getNtiElaboracioEstat().toString());
-						target.setObservacions(source.getObservacions());
-						target.setFirmaMode(source.getFirmaMode());
-						target.setTimestamp(source.getTimestamp());
-						target.setValidacioOCSP(source.getValidacioOCSP());
-						target.setFitxerArxiuUuid(source.getFitxerArxiuUuid());
 						return target;
 					}
 				});

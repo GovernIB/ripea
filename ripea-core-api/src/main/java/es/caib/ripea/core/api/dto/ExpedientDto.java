@@ -34,8 +34,18 @@ public class ExpedientDto extends NodeDto {
 	private Long expedientEstatId;
 	private Long expedientEstatNextInOrder;
 	private boolean usuariActualWrite;
-
 	
+	private boolean peticions;
+
+
+	public boolean isPeticions() {
+		return peticions;
+	}
+
+	public void setPeticions(boolean peticions) {
+		this.peticions = peticions;
+	}
+
 	public boolean isUsuariActualWrite() {
 		return usuariActualWrite;
 	}

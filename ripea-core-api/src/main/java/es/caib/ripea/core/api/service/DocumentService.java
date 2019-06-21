@@ -18,6 +18,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
+
 /**
  * Declaració dels mètodes per a gestionar documents.
  * 
@@ -30,7 +31,7 @@ public interface DocumentService {
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
-	 * @param contenidorId
+	 * @param pareId
 	 *            Atribut id del contenidor a on es vol crear el document.
 	 * @param document
 	 *            Informació del document que es vol crear.
@@ -43,7 +44,7 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto create(
 			Long entitatId,
-			Long contenidorId,
+			Long pareId,
 			DocumentDto document) throws NotFoundException, ValidationException;
 
 	/**
@@ -362,5 +363,6 @@ public interface DocumentService {
 			byte[] arxiuContingut) throws NotFoundException, SistemaExternException;
 
 	FitxerDto descarregarImprimible(Long entitatId, Long id, String versio);
+
 
 }

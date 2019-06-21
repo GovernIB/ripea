@@ -489,7 +489,8 @@ public class ContingutServiceImpl implements ContingutService {
 				false);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
-				contingutDesti);
+				contingutDesti,
+				expedientDesti.getArxiuUuid());
 		return dto;
 	}
 
@@ -747,13 +748,7 @@ public class ContingutServiceImpl implements ContingutService {
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
-		List<ContingutEntity> continguts = contingutRepository.findRegistresByPareId(dto.getId());
-		if (!continguts.isEmpty()) {
-			long numAlertes = alertaRepository.countByLlegidaAndContinguts(
-				false,
-				continguts);
-			dto.setAlerta(numAlertes > 0);
-		}
+
 		return dto;
 	}
 
@@ -1041,7 +1036,6 @@ public class ContingutServiceImpl implements ContingutService {
 						tipusCarpeta,
 						tipusDocument,
 						tipusExpedient,
-						tipusRegistre,
 						(filtre.getNom() == null),
 						filtre.getNom(),
 						(metaNode == null),
@@ -1070,50 +1064,7 @@ public class ContingutServiceImpl implements ContingutService {
 				});
 	}
 	
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<RegistreAnotacioDto> findAnotacionsRegistre(
-			Long entitatId,
-			AnotacioRegistreFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta d'anotacions de registre per usuari admin ("
-				+ "entitatId=" + entitatId + ", "
-				+ "filtre=" + filtre + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		Date dataCreacioInici = toDateInicialDia(filtre.getDataCreacioInici());
-		Date dataCreacioFi = toDateFinalDia(filtre.getDataCreacioFi());
-		return paginacioHelper.toPaginaDto(
-				registreRepository.findByFiltrePaginat(
-						entitat, 
-						(filtre.getUnitatOrganitzativa() == null),
-						filtre.getUnitatOrganitzativa(),
-						(dataCreacioInici == null),
-						dataCreacioInici,
-						(dataCreacioFi == null),
-						dataCreacioFi,
-						(filtre.getEstat() == null),
-						filtre.getEstat(),
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
-				RegistreAnotacioDto.class,
-				new Converter<RegistreEntity, RegistreAnotacioDto>() {
-					@Override
-					public RegistreAnotacioDto convert(RegistreEntity source) {
-						return (RegistreAnotacioDto)contingutHelper.toContingutDto(
-								source,
-								false,
-								false,
-								false,
-								false,
-								true,
-								false,
-								false);
-					}
-				});
-	}
+
 
 	@Transactional(readOnly = true)
 	@Override

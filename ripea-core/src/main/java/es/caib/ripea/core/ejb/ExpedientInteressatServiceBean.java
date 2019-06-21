@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 
 /**
@@ -48,8 +49,9 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 			Long entitatId,
 			Long expedientId,
 			Long interessatId,
-			InteressatDto representant) {
-		return delegate.create(entitatId, expedientId, interessatId, representant);
+			InteressatDto representant,
+			boolean propagarArxiu) {
+		return delegate.create(entitatId, expedientId, interessatId, representant, propagarArxiu);
 	}
 
 	@Override
@@ -166,5 +168,7 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 				organCodi,
 				expedientId);
 	}
+
+
 
 }

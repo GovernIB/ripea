@@ -112,7 +112,10 @@ public class ContingutExpedientController extends BaseUserController {
 					contingutId,
 					command.getMetaNodeId(),
 					command.getAny(),
-					command.getNom());
+					command.getNom(),
+					null,
+					false,
+					false);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + contingutId,

@@ -23,6 +23,7 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -493,6 +494,30 @@ public class DocumentHelper {
 		}
 		return (DocumentEntity)node;
 	}
+	
+	public List<ArxiuFirmaDto> validaFirmaDocument(
+			DocumentEntity document,
+			FitxerDto fitxer,
+			byte[] contingutFirma) {
+		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
+				+ "documentID=" + document.getId() + ")");
+		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
+				fitxer.getContingut(), 
+				(contingutFirma != null && contingutFirma.length > 0) ? contingutFirma : null,
+				fitxer.getContentType());
+		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.DOC_FIRMAT,
+				null,
+				null,
+				false,
+				false);
+		return firmes;
+	}
+	
+	
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 

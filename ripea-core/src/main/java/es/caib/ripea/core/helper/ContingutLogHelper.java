@@ -467,8 +467,6 @@ public class ContingutLogHelper {
 			objecteTipus = LogObjecteTipusEnumDto.DOCUMENT;
 		} else if (contingut instanceof CarpetaEntity) {
 			objecteTipus = LogObjecteTipusEnumDto.CARPETA;
-		} else if (contingut instanceof RegistreEntity) {
-			objecteTipus = LogObjecteTipusEnumDto.REGISTRE;
 		} else {
 			objecteTipus = LogObjecteTipusEnumDto.CONTINGUT;
 		}

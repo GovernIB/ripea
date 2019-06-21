@@ -99,7 +99,7 @@ public class ContenidorExploradorController extends BaseUserController {
 			metaExpedientId = exp.getMetaNode().getId();
 		}
 		
-		List<ContingutDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId);
+		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId);
 		
 		
 		List<ContingutDto> expedientsReplaced = new ArrayList<>();

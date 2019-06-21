@@ -38,7 +38,6 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
 import es.caib.ripea.core.api.dto.NodeDto;
-import es.caib.ripea.core.api.dto.RegistreAnotacioDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -147,6 +146,7 @@ public class ContingutHelper {
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+		// EXPEDIENT
 		if (deproxied instanceof ExpedientEntity) {
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
 			ExpedientDto dto = new ExpedientDto();
@@ -166,6 +166,7 @@ public class ContingutHelper {
 			dto.setSistraUnitatAdministrativa(expedient.getSistraUnitatAdministrativa());
 			dto.setSistraClau(expedient.getSistraClau());
 			dto.setNumero(expedient.getNumero());
+			dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions().isEmpty() ? true : false);
 			dto.setAgafatPer(
 					conversioTipusHelper.convertir(
 							expedient.getAgafatPer(),
@@ -205,13 +206,9 @@ public class ContingutHelper {
 								new Permission[] {ExtendedPermission.WRITE},
 								auth));
 			}
-
-			
-
-
-			
-			
 			resposta = dto;
+			
+		// DOCUMENT
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
@@ -262,17 +259,14 @@ public class ContingutHelper {
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
+			
+		// CARPETA
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
 			resposta = dto;
-		} else if (deproxied instanceof RegistreEntity) {
-			RegistreEntity registre = (RegistreEntity)deproxied;
-			RegistreAnotacioDto dto = conversioTipusHelper.convertir(
-					registre,
-					RegistreAnotacioDto.class);
-			dto.setLlegida(registre.getLlegida() == null || registre.getLlegida());
-			resposta = dto;
-		}
+		} 
+		
+		// CONTINGUT
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setEsborrat(contingut.getEsborrat());
@@ -429,7 +423,16 @@ public class ContingutHelper {
 		}
 		return (NodeEntity)contingut;
 	}
-
+	/**
+	 * 
+	 * @param entitatId
+	 * @param contingutId
+	 * @param comprovarPermisRead
+	 * @param comprovarPermisWrite
+	 * @param comprovarPermisCreate
+	 * @param comprovarPermisDelete
+	 * @return contingut with id == @param contingutId
+	 */
 	public ContingutEntity comprovarContingutDinsExpedientModificable(
 			Long entitatId,
 			Long contingutId,
@@ -446,14 +449,14 @@ public class ContingutHelper {
 				entitat,
 				contingutId);
 		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = getExpedientSuperior(
+		ExpedientEntity expedient = getExpedientSuperior(
 				contingut,
 				true,
 				false,
 				true);
-		if (expedientSuperior != null) {
+		if (expedient != null) {
 			// Comprova que l'usuari actual te agafat l'expedient
-			UsuariEntity agafatPer = expedientSuperior.getAgafatPer();
+			UsuariEntity agafatPer = expedient.getAgafatPer();
 			if (agafatPer != null) {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				if (!auth.getName().equals(agafatPer.getCodi())) {
@@ -477,10 +480,10 @@ public class ContingutHelper {
 		}
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			if(comprovarPermisWrite){
-				ExpedientEntity expedient = (ExpedientEntity)contingut;
+				ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
 				// if expedient estat has write permissions don't need to check metaExpedient permissions
-				if (comprovarPermisWrite && expedient.getExpedientEstat()!=null) {
-					if (hasEstatPermissons(expedient.getExpedientEstat().getId()))
+				if (comprovarPermisWrite && expedientEntity.getExpedientEstat()!=null) {
+					if (hasEstatPermissons(expedientEntity.getExpedientEstat().getId()))
 						comprovarPermisWrite = false;
 				}
 			}
@@ -714,9 +717,9 @@ public class ContingutHelper {
 			boolean incloureActual,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite) {
-		ExpedientEntity expedientSuperior = null;
+		ExpedientEntity expedient = null;
 		if (incloureActual && contingut instanceof ExpedientEntity) {
-			expedientSuperior = (ExpedientEntity)contingut;
+			expedient = (ExpedientEntity)contingut;
 		} else {
 			List<ContingutEntity> path = getPathContingut(contingut);
 			// Si el contenidor és arrel el path retorna null i s'ha de comprovar
@@ -725,23 +728,23 @@ public class ContingutHelper {
 				Collections.reverse(pathInvers);
 				for (ContingutEntity contenidorPath: pathInvers) {
 					if (contenidorPath instanceof ExpedientEntity) {
-						expedientSuperior = (ExpedientEntity)contenidorPath;
+						expedient = (ExpedientEntity)contenidorPath;
 						break;
 					}
 				}
 			}
 		}
-		if (expedientSuperior != null) {
+		if (expedient != null) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (comprovarPermisRead) {
 				boolean granted = permisosHelper.isGrantedAll(
-						expedientSuperior.getMetaExpedient().getId(),
+						expedient.getMetaExpedient().getId(),
 						MetaNodeEntity.class,
 						new Permission[] {ExtendedPermission.READ},
 						auth);
 				if (!granted) {
 					throw new PermissionDeniedException(
-							expedientSuperior.getMetaExpedient().getId(),
+							expedient.getMetaExpedient().getId(),
 							MetaExpedientEntity.class,
 							auth.getName(),
 							"READ");
@@ -749,27 +752,27 @@ public class ContingutHelper {
 			}
 			if (comprovarPermisWrite) {
 				boolean granted = permisosHelper.isGrantedAll(
-						expedientSuperior.getMetaExpedient().getId(),
+						expedient.getMetaExpedient().getId(),
 						MetaNodeEntity.class,
 						new Permission[] {ExtendedPermission.WRITE},
 						auth);
 				
 				// if expedient estat has write permissions don't need to check metaExpedient permissions
-				if (!granted && expedientSuperior.getExpedientEstat()!=null) {
-					if (hasEstatPermissons(expedientSuperior.getExpedientEstat().getId()))
+				if (!granted && expedient.getExpedientEstat()!=null) {
+					if (hasEstatPermissons(expedient.getExpedientEstat().getId()))
 						granted = true;
 				}
 				
 				if (!granted) {
 					throw new PermissionDeniedException(
-							expedientSuperior.getMetaExpedient().getId(),
+							expedient.getMetaExpedient().getId(),
 							MetaExpedientEntity.class,
 							auth.getName(),
 							"WRITE");
 				}
 			}
 		}
-		return expedientSuperior;
+		return expedient;
 	}
 	
 	
@@ -866,62 +869,6 @@ public class ContingutHelper {
 		expedient.updateNtiIdentificador(ntiIdentificador);
 	}
 
-	public long[] countFillsAmbPermisReadByContinguts(
-			EntitatEntity entitat,
-			List<? extends ContingutEntity> continguts,
-			boolean comprovarPermisos) {
-		long[] resposta = new long[continguts.size()];
-		if (!continguts.isEmpty()) {
-			List<Object[]> countFillsTotals = contingutRepository.countByPares(
-					entitat,
-					continguts);
-			List<Object[]> countNodesTotals = nodeRepository.countByPares(
-					entitat,
-					continguts);
-			List<Object[]> countNodesByPares;
-			if (comprovarPermisos) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				List<MetaNodeEntity> metaNodesPermesos = metaNodeRepository.findByEntitat(entitat);
-				permisosHelper.filterGrantedAll(
-						metaNodesPermesos,
-						new ObjectIdentifierExtractor<MetaNodeEntity>() {
-							public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-								return metaNode.getId();
-							}
-						},
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth);
-				if (!metaNodesPermesos.isEmpty()) {
-					countNodesByPares = nodeRepository.countAmbPermisReadByPares(
-							entitat,
-							continguts,
-							metaNodesPermesos);
-				} else {
-					countNodesByPares = new ArrayList<Object[]>();
-				}
-			} else {
-				countNodesByPares = nodeRepository.countByPares(
-						entitat,
-						continguts);
-			}
-			for (int i = 0; i < continguts.size(); i++) {
-				ContingutEntity contingut = continguts.get(i);
-				Long total = getCountByContingut(
-						contingut,
-						countFillsTotals);
-				Long totalNodes = getCountByContingut(
-						contingut,
-						countNodesTotals);
-				Long totalNodesPermisRead = getCountByContingut(
-						contingut,
-						countNodesByPares);
-				resposta[i] = total - totalNodes + totalNodesPermisRead;
-				
-			}
-		}
-		return resposta;
-	}
 
 	/*public Set<String> findUsuarisAmbPermisReadPerContenidor(
 			ContingutEntity contingut) {
@@ -990,6 +937,13 @@ public class ContingutHelper {
 		return contingutRepository.findOne(contingutActual.getId());
 	}
 
+	/**
+	 * Check if given name (@param nom) doesnt already exist inside given container (@param contingutPare)
+	 * @param contingutPare
+	 * @param nom
+	 * @param objectId
+	 * @param objectClass
+	 */
 	public void comprovarNomValid(
 			ContingutEntity contingutPare,
 			String nom,
@@ -1030,56 +984,52 @@ public class ContingutHelper {
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
 			List<ArxiuFirmaDto> firmes) {
+
 		String serieDocumental = null;
-		ExpedientEntity expedientSuperior = contingut.getExpedient();
-		if (expedientSuperior != null) {
-			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
+		ExpedientEntity expedient = contingut.getExpedient();
+		if (expedient != null) {
+			serieDocumental = expedient.getMetaExpedient().getSerieDocumental();
 		}
 		if (pluginHelper.isArxiuPluginActiu()) {
+
+			//##################### EXPEDIENT #####################
 			if (contingut instanceof ExpedientEntity) {
-				pluginHelper.arxiuExpedientActualitzar(
-						(ExpedientEntity)contingut);
+				pluginHelper.arxiuExpedientActualitzar((ExpedientEntity) contingut);
+
+			//##################### DOCUMENT #####################
 			} else if (contingut instanceof DocumentEntity) {
 				String custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
-						(DocumentEntity)contingut,
+						(DocumentEntity) contingut,
 						contingut.getPare(),
 						serieDocumental,
 						fitxer,
 						documentAmbFirma,
 						firmaSeparada,
 						firmes);
-				documentHelper.actualitzarVersionsDocument((DocumentEntity)contingut);
-				//Si la firma ve separada
-				//if (contingutFirma != null) {
-				//	pluginHelper.arxiuFirmaActualitzar(
-				//			(DocumentEntity)contingutFirma,
-				//			fitxer,
-				//			contingut.getPare(),
-				//			serieDocumental,
-				//			firmes,
-				//			true);
-				//}
+				documentHelper.actualitzarVersionsDocument((DocumentEntity) contingut);
+
 				if (firmes != null) {
 					// Custodia el document firmat
-					((DocumentEntity) contingut).updateEstat(
-							DocumentEstatEnumDto.CUSTODIAT);
+					((DocumentEntity) contingut).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 					((DocumentEntity) contingut).updateInformacioCustodia(
 							new Date(),
 							custodiaDocumentId,
 							((DocumentEntity) contingut).getCustodiaCsv());
 					// Registra al log la custòdia de la firma del document
-					contingutLogHelper.log(
-							((DocumentEntity) contingut),
+					contingutLogHelper.log((
+							(DocumentEntity) contingut),
 							LogTipusEnumDto.ARXIU_CUSTODIAT,
 							custodiaDocumentId,
 							null,
 							false,
 							false);
 				}
+
+			//##################### CARPETA #####################
 			} else if (contingut instanceof CarpetaEntity) {
-				pluginHelper.arxiuCarpetaActualitzar(
-						(CarpetaEntity)contingut,
+				pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
 						contingut.getPare());
+
 			} else {
 				throw new ValidationException(
 						contingut.getId(),
@@ -1146,18 +1096,21 @@ public class ContingutHelper {
 		}
 	}
 
-	public void arxiuPropagarMoviment(
+	public String arxiuPropagarMoviment(
 			ContingutEntity contingut,
-			ContingutEntity desti) {
+			ContingutEntity desti,
+			String expedientDestiUuid) {
 		if (contingut instanceof DocumentEntity) {
-			pluginHelper.arxiuDocumentMoure(
+			return pluginHelper.arxiuDocumentMoure(
 					(DocumentEntity)contingut,
-					desti.getArxiuUuid());
+					desti.getArxiuUuid(),
+					expedientDestiUuid);
 		} else if (contingut instanceof CarpetaEntity) {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingut,
 					desti.getArxiuUuid());
 		}
+		return null;
 	}
 
 

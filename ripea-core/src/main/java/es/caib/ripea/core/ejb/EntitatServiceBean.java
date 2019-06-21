@@ -148,4 +148,10 @@ public class EntitatServiceBean implements EntitatService {
 		delegate.evictEntitatsAccessiblesUsuari();
 	}
 
+	@Override
+	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	public EntitatDto findByUnitatArrel(String unitatArrel) {
+		return delegate.findByUnitatArrel(unitatArrel);
+	}
+
 }

@@ -92,6 +92,27 @@ public class EntityComprovarHelper {
 	@Resource
 	private PermisosHelper permisosHelper;
 
+	
+	
+	public EntitatEntity comprovarEntitat(
+			String entitatCodi,
+			boolean comprovarPermisUsuari,
+			boolean comprovarPermisAdmin,
+			boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
+
+		EntitatEntity entitat = entitatRepository.findByUnitatArrel(entitatCodi);
+
+		if (entitat == null) {
+			throw new NotFoundException(entitatCodi, EntitatEntity.class);
+		}
+		return comprovarEntitat(
+				entitat.getId(),
+				comprovarPermisUsuari,
+				comprovarPermisAdmin,
+				comprovarPermisUsuariOrAdmin);
+
+	}
+	
 
 
 	public EntitatEntity comprovarEntitat(
@@ -294,7 +315,7 @@ public class EntityComprovarHelper {
 					id,
 					ContingutEntity.class);
 		}
-		if (!contingut.getEntitat().equals(entitat)) {
+		if (!contingut.getEntitat().getId().equals(entitat.getId())) {
 			throw new ValidationException(
 					id,
 					ContingutEntity.class,

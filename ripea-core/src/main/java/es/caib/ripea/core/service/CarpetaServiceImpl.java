@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.helper.CarpetaHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -23,6 +24,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 
 /**
@@ -37,7 +39,8 @@ public class CarpetaServiceImpl implements CarpetaService {
 	private EntitatRepository entitatRepository;
 	@Resource
 	private CarpetaRepository carpetaRepository;
-
+	@Resource
+	private ContingutRepository contingutRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -50,6 +53,8 @@ public class CarpetaServiceImpl implements CarpetaService {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ContingutLogHelper contingutLogHelper;
+	@Resource
+	private CarpetaHelper carpetaHelper;
 
 
 
@@ -57,48 +62,17 @@ public class CarpetaServiceImpl implements CarpetaService {
 	@Override
 	public CarpetaDto create(
 			Long entitatId,
-			Long contingutId,
+			Long pareId,
 			String nom) {
-		logger.debug("Creant nova carpeta ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ", "
-				+ "nom=" + nom + ")");
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+
+		return carpetaHelper.create(
 				entitatId,
-				contingutId,
-				false,
-				false,
-				false,
-				false);
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
-				true,
-				false,
-				false);
-		contingutHelper.comprovarNomValid(
-				contingut,
+				pareId,
 				nom,
-				null,
-				CarpetaEntity.class);
-		CarpetaEntity carpeta = CarpetaEntity.getBuilder(
-				nom,
-				contingut,
-				contingut.getEntitat(),
-				expedientSuperior).build();
-		carpeta = carpetaRepository.save(carpeta);
-		// Registra al log la creació de la carpeta
-		contingutLogHelper.logCreacio(
-				carpeta,
-				true,
-				true);
-		CarpetaDto dto = toCarpetaDto(carpeta);
-		contingutHelper.arxiuPropagarModificacio(
-				carpeta,
-				null,
 				false,
+				null,
 				false,
 				null);
-		return dto;
 	}
 
 	@Transactional
@@ -137,7 +111,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				null,
 				false,
 				false);
-		CarpetaDto dto = toCarpetaDto(carpeta);
+		CarpetaDto dto = carpetaHelper.toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
 				null,
@@ -163,21 +137,10 @@ public class CarpetaServiceImpl implements CarpetaService {
 		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
 				contingut.getEntitat(),
 				id);
-		return toCarpetaDto(carpeta);
+		return carpetaHelper.toCarpetaDto(carpeta);
 	}
 
-	private CarpetaDto toCarpetaDto(
-			CarpetaEntity carpeta) {
-		return (CarpetaDto)contingutHelper.toContingutDto(
-				carpeta,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false);
-	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaServiceImpl.class);
 

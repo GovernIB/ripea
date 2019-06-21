@@ -95,35 +95,34 @@ public class DocumentServiceImpl implements DocumentService {
 	private ContingutLogHelper contingutLogHelper;
 
 
-
 	@Transactional
 	@Override
 	public DocumentDto create(
 			Long entitatId,
-			Long contingutId,
+			Long pareId,
 			DocumentDto document) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
-				"contingutId=" + contingutId + ", " +
+				"pareId=" + pareId + ", " +
 				"document=" + document + ")");
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
-				contingutId,
+				pareId,
 				false,
 				false,
 				false,
 				false);
-		ExpedientEntity expedientSuperior;
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			expedientSuperior = (ExpedientEntity)contingut;
+		ExpedientEntity expedient;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(pare.getTipus())) {
+			expedient = (ExpedientEntity)pare;
 		} else {
-			expedientSuperior = contingut.getExpedient();
+			expedient = pare.getExpedient();
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					contingut.getEntitat(),
-					expedientSuperior.getMetaExpedient(),
+					pare.getEntitat(),
+					expedient.getMetaExpedient(),
 					document.getMetaDocument().getId(),
 					true);
 		} else {
@@ -133,12 +132,12 @@ public class DocumentServiceImpl implements DocumentService {
 					"No es pot crear un document sense un meta-document associat");
 		}
 		contingutHelper.comprovarNomValid(
-				contingut,
+				pare,
 				document.getNom(),
 				null,
 				DocumentEntity.class);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
-				expedientSuperior,
+				expedient,
 				metaDocument,
 				0);
 		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
@@ -146,13 +145,13 @@ public class DocumentServiceImpl implements DocumentService {
 					"<creacio>",
 					ExpedientEntity.class,
 					"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
-					"metaExpedientId=" + expedientSuperior.getMetaExpedient().getId() + ", " +
+					"metaExpedientId=" + expedient.getMetaExpedient().getId() + ", " +
 					"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
-					"expedientId=" + expedientSuperior.getId() + ")");
+					"expedientId=" + expedient.getId() + ")");
 		}
-		if (expedientSuperior != null) {
-			cacheHelper.evictErrorsValidacioPerNode(expedientSuperior);
+		if (expedient != null) {
+			cacheHelper.evictErrorsValidacioPerNode(expedient);
 		}
 		DocumentEntity entity = documentHelper.crearNouDocument(
 				document.getDocumentTipus(),
@@ -164,9 +163,9 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getNtiEstadoElaboracion(),
 				document.getNtiTipoDocumental(),
 				metaDocument,
-				contingut,
-				contingut.getEntitat(),
-				expedientSuperior,
+				pare,
+				pare.getEntitat(),
+				expedient,
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen());
 		FitxerDto fitxer = new FitxerDto();
@@ -179,7 +178,7 @@ public class DocumentServiceImpl implements DocumentService {
 					entity,
 					fitxer);
 			if (document.isAmbFirma()) {
-				firmes = validaFirmaDocument(
+				firmes =documentHelper.validaFirmaDocument(
 						entity, 
 						fitxer,
 						document.getFirmaContingut());
@@ -198,6 +197,14 @@ public class DocumentServiceImpl implements DocumentService {
 		DocumentDto dto = toDocumentDto(entity);
 		return dto;
 	}
+	
+	
+
+	
+
+	
+
+	
 
 	@Transactional
 	@Override
@@ -264,7 +271,7 @@ public class DocumentServiceImpl implements DocumentService {
 					entity,
 					fitxer);
 			if (document.isAmbFirma()) {
-				firmes = validaFirmaDocument(
+				firmes = documentHelper.validaFirmaDocument(
 						entity, 
 						fitxer,
 						document.getFirmaContingut());
@@ -384,9 +391,11 @@ public class DocumentServiceImpl implements DocumentService {
 						versio,
 						true,
 						false);
-				return pluginHelper.validaSignaturaObtenirDetalls(
+				List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
 						documentHelper.getContingutFromArxiuDocument(arxiuDocument),
-						documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument));
+						documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
+						null);
+				return arxiuFirmes.get(0).getDetalls();
 			}
 		}
 		return null;
@@ -868,26 +877,7 @@ public class DocumentServiceImpl implements DocumentService {
 		private static final long serialVersionUID = -6929597339153341365L;
 	}
 
-	private List<ArxiuFirmaDto> validaFirmaDocument(
-			DocumentEntity document,
-			FitxerDto fitxer,
-			byte[] contingutFirma) {
-		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
-				+ "documentID=" + document.getId() + ")");
-		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
-				fitxer.getContingut(), 
-				(contingutFirma != null && contingutFirma.length > 0) ? contingutFirma : null,
-				fitxer.getContentType());
-		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.DOC_FIRMAT,
-				null,
-				null,
-				false,
-				false);
-		return firmes;
-	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
 

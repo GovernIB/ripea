@@ -124,7 +124,22 @@ public class ExpedientEntity extends NodeEntity {
 			name = "ipa_expedient_rel_rel_fk",
 			inverseName = "ipa_expedient_rel_exp_fk")
 	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
+	
+	
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientPeticioEntity> peticions = new ArrayList<ExpedientPeticioEntity>();
 
+
+	
+	public List<ExpedientPeticioEntity> getPeticions() {
+		return peticions;
+	}
+	public void addExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity) {
+		this.peticions.add(expedientPeticioEntity);
+	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}

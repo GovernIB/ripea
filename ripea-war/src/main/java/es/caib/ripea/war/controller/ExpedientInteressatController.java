@@ -298,7 +298,8 @@ public class ExpedientInteressatController extends BaseUserController {
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
-					interessatDto);	
+					interessatDto,
+					true);	
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),

@@ -9,16 +9,19 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -56,7 +59,9 @@ public interface ExpedientService {
 			Long metaExpedientId,
 			Long pareId,
 			Integer any,
-			String nom) throws NotFoundException, ValidationException;
+			String nom,
+			Long expedientPeticioId,
+			boolean associarInteressats) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un expedient.
@@ -345,7 +350,7 @@ public interface ExpedientService {
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('tothom')")
-	List<ContingutDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId);
+	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text);
@@ -395,5 +400,19 @@ public interface ExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean retryCreateDocFromAnnex(Long registreAnnexId,
+			Long expedientPeticioId);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean retryNotificarDistribucio(Long expedientPeticioId);
+
+	@PreAuthorize("hasRole('tothom')")
+	void incorporar(Long entitatId,
+			Long expedientId,
+			Long expedientPeticioId,
+			boolean associarInteressats);
+	
 
 }

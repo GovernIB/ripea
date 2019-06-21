@@ -49,29 +49,7 @@
 	</c:if>
 	<c:if test="${contingut.alerta}">
 	
-			<table 
-				id="taulaAlertes"
-				data-toggle="datatable"
-				data-url="<c:url value="/contingut/${contingut.id}/errors/datatable"/>"
-				data-paging-enabled="false"
-				class="table table-bordered table-striped"
-				data-row-info="true"
-				style="width:100%">
-				<thead>
-					<tr>
-						<th data-col-name="id" data-visible="false">#</th>
-						<th data-col-name="error" data-visible="false">#</th>
-						<th data-col-name="text" data-orderable="false" width="90%"><spring:message code="contingut.error.llista.text"/></th>
-						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsRegistreTemplate" width="10%">
-							<script id="cellAccionsRegistreTemplate" type="text/x-jsrender">
-								<button class="btn btn-default" href="errors/{{:id}}/llegir" data-toggle="ajax" data-confirm="<spring:message code="contingut.error.confirmacio.llegir"/>">
-									<span class="fa fa-file-text-o"></span>&nbsp;&nbsp;<spring:message code="contingut.error.boto.llegir"/>
-								</button>
-							</script>
-						</th>
-					</tr>
-				</thead>
-			</table>
+
 			
 	</c:if>
 	<c:if test="${!contingut.valid && contingut.alerta}">		

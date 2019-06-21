@@ -81,8 +81,6 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.RegistreAnnexEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -659,43 +657,7 @@ public class PluginHelper {
 		}
 	}
 
-	public void arxiuExpedientTemporalTancar(
-			RegistreEntity registre) {
-		String accioDescripcio = "Tancament d'un expedient temporal relacionada amb una anotació de registre";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("expedientArxiuUuid", registre.getExpedientArxiuUuid());
-		accioParams.put("expedientNumero", registre.getExpedientNumero());
-		accioParams.put("registreNom", registre.getNom());
-		accioParams.put("registreNumero", registre.getNumero());
-		accioParams.put("registreEntitat", registre.getEntitatCodi());
-		accioParams.put("registreUnitatAdmin", registre.getUnitatAdministrativa());
-		long t0 = System.currentTimeMillis();
-		try {
-			getArxiuPlugin().expedientTancar(
-					registre.getExpedientArxiuUuid());
-			registre.updateArxiuEsborrat();
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_ARXIU,
-					errorDescripcio,
-					ex);
-		}
-	}
+
 
 	public void arxiuExpedientReobrir(
 			ExpedientEntity expedient) {
@@ -940,13 +902,66 @@ public class PluginHelper {
 				ambContingut,
 				false);
 	}
+	
+	
 	public Document arxiuDocumentConsultar(
 			ContingutEntity contingut,
-			String nodeId,
+			String arxiuUuid,
 			String versio,
 			boolean ambContingut,
 			boolean ambVersioImprimible) {
 		String accioDescripcio = "Consulta d'un document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		if (contingut != null) {
+			accioParams.put("contingutId", contingut.getId().toString());
+			accioParams.put("contingutNom", contingut.getNom());
+		}
+		if (arxiuUuid != null) {
+			accioParams.put("arxiuUuid", arxiuUuid);
+		}
+		accioParams.put("versio", versio);
+		accioParams.put("ambContingut", new Boolean(ambContingut).toString());
+		long t0 = System.currentTimeMillis();
+		try {
+			String arxiuUuidConsulta = (contingut != null && contingut instanceof DocumentEntity) ? contingut.getArxiuUuid() : arxiuUuid;
+			Document documentDetalls = getArxiuPlugin().documentDetalls(
+					arxiuUuidConsulta,
+					versio,
+					ambContingut);
+			boolean generarVersioImprimible = false;
+			if (ambVersioImprimible && ambContingut && documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
+				for (Firma firma : documentDetalls.getFirmes()) {
+					if (documentDetalls.getContingut().getTipusMime().equals("application/pdf") && (firma.getTipus() == FirmaTipus.PADES || firma.getTipus() == FirmaTipus.CADES_ATT || firma.getTipus() == FirmaTipus.CADES_DET)) {
+						generarVersioImprimible = true;
+					}
+				}
+			}
+			if (generarVersioImprimible) {
+				documentDetalls.setContingut(getArxiuPlugin().documentImprimible(documentDetalls.getIdentificador()));
+			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return documentDetalls;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+		/*String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("contingutId", contingut.getId().toString());
 		accioParams.put("contingutNom", contingut.getNom());
@@ -998,7 +1013,7 @@ public class PluginHelper {
 					IntegracioHelper.INTCODI_ARXIU,
 					errorDescripcio,
 					ex);
-		}
+		}*/
 	}
 
 	public void arxiuDocumentEsborrar(
@@ -1298,25 +1313,33 @@ public class PluginHelper {
 		}
 	}
 
-	public void arxiuDocumentMoure(
+	public String arxiuDocumentMoure(
 			DocumentEntity document,
-			String arxiuUuidDesti) {
+			String arxiuUuidDesti,
+			String expedientDestiUuid) {
 		String accioDescripcio = "Moure document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
+		accioParams.put("arxiuUuidOrigen", document.getArxiuUuid());
 		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		try {
-			getArxiuPlugin().documentMoure(
+			ContingutArxiu nouDocumentArxiu = getArxiuPlugin().documentMoure(
 					document.getArxiuUuid(),
-					arxiuUuidDesti);
+					arxiuUuidDesti,
+					expedientDestiUuid);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			if (nouDocumentArxiu != null) {
+				return nouDocumentArxiu.getIdentificador();
+			} else {
+				return null;
+			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2478,133 +2501,23 @@ public class PluginHelper {
 		return this.getPropertyPluginRegistreSignarAnnexos();
 	}
 
-	public byte[] signaturaRipeaSignar(
-			RegistreAnnexEntity annex,
-			byte[] annexContingut) {
-		String accioDescripcio = "Signatura del document des del servidor";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"annexId",
-				annex.getId().toString());
-		accioParams.put(
-				"annexNom",
-				annex.getFitxerNom());
-		long t0 = System.currentTimeMillis();
-		try {
-			String motiu = "Autofirma en servidor de RIPEA";
-			String tipusFirma;
-			if ("application/pdf".equalsIgnoreCase(annex.getFitxerTipusMime()))
-				tipusFirma = "PADES";
-			else
-				tipusFirma = "CADES";
-			
-			byte[] firmaContingut = getSignaturaPlugin().signar(
-					annex.getId().toString(),
-					annex.getFitxerNom(),
-					motiu,
-					tipusFirma,
-					annexContingut);
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_SIGNATURA,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			return firmaContingut;
-		} catch (Exception ex) {
-			String errorDescripcio = "Error en accedir al plugin de signatura";
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_SIGNATURA,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_SIGNATURA,
-					errorDescripcio,
-					ex);
-		}
-	}
-
-	public boolean isValidaSignaturaPluginActiu() {
-		return getValidaSignaturaPlugin() != null;
-	}
-
-	public List<ArxiuFirmaDetallDto> validaSignaturaObtenirDetalls(
-			byte[] documentContingut,
-			byte[] firmaContingut) {
-		String accioDescripcio = "Obtenir informació de document firmat";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		long t0 = System.currentTimeMillis();
-		try {
-			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
-			if (firmaContingut != null) {
-				validationRequest.setSignedDocumentData(documentContingut);
-				validationRequest.setSignatureData(firmaContingut);
-			} else {
-				validationRequest.setSignatureData(documentContingut);
-			}
-			SignatureRequestedInformation sri = new SignatureRequestedInformation();
-			sri.setReturnSignatureTypeFormatProfile(true);
-			sri.setReturnCertificateInfo(true);
-			sri.setReturnValidationChecks(false);
-			sri.setValidateCertificateRevocation(false);
-			sri.setReturnCertificates(false);
-			sri.setReturnTimeStampInfo(false);
-			validationRequest.setSignatureRequestedInformation(sri);
-			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
-			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
-			if (validateSignatureResponse.getSignatureDetailInfo() != null) {
-				for (SignatureDetailInfo signatureInfo: validateSignatureResponse.getSignatureDetailInfo()) {
-					ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
-					signatureInfo.getSignDate();
-					TimeStampInfo timeStampInfo = signatureInfo.getTimeStampInfo();
-					if (timeStampInfo != null) {
-						detall.setData(timeStampInfo.getCreationTime());
-					} else {
-						detall.setData(signatureInfo.getSignDate());
-					}
-					CertificateInfo certificateInfo = signatureInfo.getCertificateInfo();
-					if (certificateInfo != null) {
-						detall.setResponsableNif(certificateInfo.getNifResponsable());
-						detall.setResponsableNom(certificateInfo.getNombreApellidosResponsable());
-						detall.setEmissorCertificat(certificateInfo.getOrganizacionEmisora());
-					}
-					detalls.add(detall);
-				}
-			}
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_VALIDASIG,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			return detalls;
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de validar signatures";
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_VALIDASIG,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.RECEPCIO,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_VALIDASIG,
-					errorDescripcio,
-					ex);
-		}
-	}
-	
 	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(
 			byte[] documentContingut,
 			byte[] firmaContingut,
-			String contentType) {
+			String firmaContentType) {
 		String accioDescripcio = "Obtenir informació de document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
+		if (documentContingut != null) {
+			accioParams.put("documentContingut", documentContingut.length + " bytes");
+		} else {
+			accioParams.put("documentContingut", "<null>");
+		}
+		if (firmaContingut != null) {
+			accioParams.put("firmaContingut", firmaContingut.length + " bytes");
+		} else {
+			accioParams.put("firmaContingut", "<null>");
+		}
+		accioParams.put("firmaContentType", firmaContentType);
 		long t0 = System.currentTimeMillis();
 		try {
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
@@ -2655,7 +2568,7 @@ public class PluginHelper {
 				firma.setTipus(toArxiuFirmaTipusEnum(
 						validateSignatureResponse.getSignType(),
 						validateSignatureResponse.getSignFormat()));
-				firma.setTipusMime(contentType);
+				firma.setTipusMime(firmaContentType);
 				firmes.add(firma);
 			}
 			integracioHelper.addAccioOk(
@@ -3167,6 +3080,7 @@ public class PluginHelper {
 				ntiTipusDocumental,
 				fitxer != null ? fitxer.getExtensio() : null,
 				ntiOrgans,
+				serieDocumental,
 				metadades);
 		document.setMetadades(metadades);
 		document.setEstat(estat);
@@ -3288,6 +3202,7 @@ public class PluginHelper {
 			DocumentNtiTipoDocumentalEnumDto ntiTipusDocumental,
 			String fitxerExtensio,
 			List<String> ntiOrgans,
+			String serieDocumental,
 			DocumentMetadades metadades){
 		metadades.setIdentificador(ntiIdentificador);
 		if (ntiOrigen != null) {
@@ -3502,6 +3417,7 @@ public class PluginHelper {
 			metadades.setFormat(format);
 		}
 		metadades.setOrgans(ntiOrgans);
+		metadades.setSerieDocumental(serieDocumental);
 	}
 
 	private DocumentExtensio getArxiuFormatExtensio(String extensio) {

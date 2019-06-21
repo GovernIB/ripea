@@ -30,34 +30,12 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jcl</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxws-maven-plugin</artifactId>
-				<version>2.4.1</version>
-				<executions>
-					<execution>
-						<id>generate-reports-ws-code</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wsimport</goal>
-						</goals>
-						<configuration>
-							<wsdlUrls>
-								<wsdlUrl>${basedir}/../doc/wsdl/bustiav0.wsdl</wsdlUrl>
-								<wsdlUrl>${basedir}/../doc/wsdl/bustiav1.wsdl</wsdlUrl>
-							</wsdlUrls>
-							<vmArgs>
-								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-							</vmArgs>
-							<verbose>true</verbose>
-							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+
 </project>

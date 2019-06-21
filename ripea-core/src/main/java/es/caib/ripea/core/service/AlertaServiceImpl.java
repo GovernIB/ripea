@@ -125,33 +125,7 @@ public class AlertaServiceImpl implements AlertaService {
 		return resposta;
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public PaginaDto<AlertaDto> findPaginatByLlegida(
-			boolean llegida,
-			Long contingutId,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta de totes les alertes paginades (paginacioParams=" + paginacioParams + ")");
-		PaginaDto<AlertaDto> resposta;
-		List<ContingutEntity> continguts = contingutRepository.findRegistresByPareId(contingutId);
-		continguts.add(contingutRepository.findOne(contingutId));
-		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {	
-			resposta = paginacioHelper.toPaginaDto(
-					alertaRepository.findByLlegidaAndContinguts(
-							llegida,
-							continguts,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					AlertaDto.class);
-		} else {
-			resposta = paginacioHelper.toPaginaDto(
-					alertaRepository.findByLlegidaAndContinguts(
-							llegida,
-							continguts,
-							paginacioHelper.toSpringDataSort(paginacioParams)),
-					AlertaDto.class);
-		}
-		return resposta;
-	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(AlertaServiceImpl.class);
 

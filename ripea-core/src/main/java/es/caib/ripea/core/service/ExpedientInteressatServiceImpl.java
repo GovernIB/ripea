@@ -71,7 +71,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long entitatId,
 			Long expedientId,
 			InteressatDto interessat) {
-		return create(entitatId, expedientId, null, interessat);
+		return create(entitatId, expedientId, null, interessat, true);
 	}
 
 	@Transactional
@@ -80,7 +80,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long entitatId,
 			Long expedientId,
 			Long interessatId,
-			InteressatDto interessat) {
+			InteressatDto interessat,
+			boolean propagarArxiu) {
 		if (interessatId != null) {
 			logger.debug("Creant nou representant ("
 					+ "entitatId=" + entitatId + ", "
@@ -180,7 +181,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		}
 		expedient.addInteressat(interessatEntity);
 		
-		pluginHelper.arxiuExpedientActualitzar(expedient);
+		if (propagarArxiu) {
+			pluginHelper.arxiuExpedientActualitzar(expedient);
+		}
 		
 		// Registra al log la creació de l'interessat
 		contingutLogHelper.log(

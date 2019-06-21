@@ -14,16 +14,19 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientService;
 
@@ -47,13 +50,17 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long contenidorId,
 			Long metaExpedientId,
 			Integer any,
-			String nom) {
+			String nom,
+			Long expedientPeticioId,
+			boolean associarInteressats) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
 				metaExpedientId,
 				any,
-				nom);
+				nom,
+				expedientPeticioId,
+				associarInteressats);
 	}
 
 	@Override
@@ -220,7 +227,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public List<ContingutDto> findByEntitatAndMetaExpedient(
+	public List<ExpedientDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {
 		return delegate.findByEntitatAndMetaExpedient(
@@ -315,6 +322,24 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.findExpedientEstatByMetaExpedient(entitatId, metaExpedientId);
 	}
 
+	@Override
+	public boolean retryCreateDocFromAnnex(Long registreAnnexId,
+			Long expedientPeticioId) {
+		return delegate.retryCreateDocFromAnnex(registreAnnexId, expedientPeticioId);		
+	}
 
+	@Override
+	public boolean retryNotificarDistribucio(Long expedientPeticioId) {
+		return delegate.retryNotificarDistribucio(expedientPeticioId);
+	}
+
+	@Override
+	public void incorporar(Long entitatId,
+			Long expedientId,
+			Long expedientPeticioId,
+			boolean associarInteressats) {
+		delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats);
+		
+	}
 
 }

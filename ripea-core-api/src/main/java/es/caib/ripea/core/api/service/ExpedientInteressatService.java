@@ -58,7 +58,8 @@ public interface ExpedientInteressatService {
 			Long id, 
 			Long expedientId, 
 			Long interessatId,
-			InteressatDto representant) throws NotFoundException;
+			InteressatDto representant,
+			boolean propagarArxiu) throws NotFoundException;
 
 	/**
 	 * Modifica un representant associat a un interessat.
@@ -279,6 +280,7 @@ public interface ExpedientInteressatService {
 	public List<InteressatAdministracioDto> findByFiltreAdministracio(
 			String organCodi,
 			Long expedientId) throws NotFoundException;
+
 
 
 }

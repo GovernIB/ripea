@@ -399,24 +399,7 @@ public interface ContingutService {
 			ContingutFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 	
-	/**
-	 * Obté una llista d'anotacions de registre donades d'alta dins RIPEA
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat.
-	 * @param filtre
-	 *            El filtre de la consulta.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return Una pàgina amb els continguts trobats.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<RegistreAnotacioDto> findAnotacionsRegistre(
-			Long entitatId,
-			AnotacioRegistreFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+
 
 	/**
 	 * Obté una llista dels continguts esborrats permetent especificar dades

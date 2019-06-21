@@ -35,16 +35,6 @@ public class UsuariController  extends BaseAdminController {
 	private AplicacioService aplicacioService;
 
 
-	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			Model model) {
-		model.addAttribute(
-				"reglaTipusEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						ReglaTipusEnumDto.class,
-						"regla.tipus.enum."));
-		return "reglaList";
-	}
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
 	public String getConfiguracio(

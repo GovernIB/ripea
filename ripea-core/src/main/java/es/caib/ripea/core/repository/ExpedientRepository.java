@@ -34,6 +34,27 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			int any,
 			long sequencia);
 	
+	@Query(	"from" +
+			"    ExpedientEntity e "
+			+ "where "
+			+ "	 e.entitat = :entitat " 
+			+ "	and e.metaNode = :metaNode " +
+			"and e.codi||'/'||e.sequencia||'/'||e.any = :numero")
+	ExpedientEntity findByEntitatAndMetaNodeAndNumero(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("numero") String numero);
+	
+	
+	@Query(	"from" +
+			"    ExpedientEntity e "
+			+ "where "
+			+ "	 e.entitat = :entitat " +
+			"and e.codi||'/'||e.sequencia||'/'||e.any = :numero")
+	ExpedientEntity findByEntitatAndNumero(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("numero") String numero);
+	
 	
 	@Query(	"select "
 			+ "e.relacionatsAmb from" +
@@ -42,7 +63,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			+ " e = :expedient")
 	List<ExpedientEntity> findExpedientsRelacionats(
 			@Param("expedient") ExpedientEntity expedient);
-	
 	
 	
 	@Query(	"from" +
@@ -212,4 +232,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("expedient") ExpedientEntity expedient);
+	
+	
+	
 }

@@ -131,6 +131,10 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	public List<AlertaEntity> getAlertes() {
 		return alertes;
 	}
+	
+	public void addFill(ContingutEntity fill) {
+		this.fills.add(fill);
+	}
 
 	public void update(String nom) {
 		this.nom = nom;

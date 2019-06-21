@@ -212,4 +212,7 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	void evictEntitatsAccessiblesUsuari();
 
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	EntitatDto findByUnitatArrel(String unitatArrel);
+
 }

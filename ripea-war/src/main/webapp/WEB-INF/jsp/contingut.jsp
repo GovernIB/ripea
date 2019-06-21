@@ -373,6 +373,10 @@ $(document).ready(function() {
 		var api = new $.fn.dataTable.Api(settings);
 		$('#enviaments-count').html(api.page.info().recordsTotal);
 	});
+	$('#taulaAnotacions').on('draw.dt', function (e, settings) {
+		var api = new $.fn.dataTable.Api(settings);
+		$('#anotacions-count').html(api.page.info().recordsTotal);
+	});	
 	$('.element-draggable').draggable({
 		containment: 'parent',
 		helper: 'clone',
@@ -463,9 +467,9 @@ $(document).ready(function() {
 	});
 	if(${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
-		$('#registres').addClass( "active in" );
+		$('#peticions').addClass( "active in" );
 		$('#pipella-contingut').removeClass( "active" );
-		$('#pipella-registres').addClass( "active" );
+		$('#pipella-peticions').addClass( "active" );
 	}
 	<c:if test="${isContingutDetail}">
 		$( "#colInfo" ).insertAfter( "#colContent" );
@@ -652,12 +656,11 @@ $(document).ready(function() {
 					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.mesinfo"/></a>
 				</div>
 			</c:if>
-			<%--          --%>
-			<%-- Pipelles --%>
-			<%--          --%>
+			
+			<!------------------------------ TABLIST ------------------------------------->
 			<ul class="nav nav-tabs">
-				<li class="active" id="pipella-contingut"><a href="#contingut" data-toggle="tab">
-					<spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsNoRegistresCount}</span></a>
+				<li class="active" id="pipella-contingut">
+					<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsNoRegistresCount}</span></a>
 				</li>
 				<c:if test="${contingut.document or contingut.expedient}">
 					<li>
@@ -671,6 +674,11 @@ $(document).ready(function() {
 					<li>
 						<a href="#enviaments" data-toggle="tab"><spring:message code="contingut.tab.enviaments"/>&nbsp;<span class="badge" id="enviaments-count">${enviamentsCount}</span></a>
 					</li>
+					<c:if test="${contingut.peticions}">
+						<li>
+							<a href="#anotacions" data-toggle="tab"><spring:message code="contingut.tab.anotacions"/>&nbsp;<span class="badge" id="anotacions-count"></span></a>
+						</li>
+					</c:if>
 				</c:if>
 				<c:if test="${contingut.document and fn:length(contingut.versions) gt 0}">
 					<li>
@@ -678,9 +686,7 @@ $(document).ready(function() {
 					</li>
 				</c:if>
 			</ul>
-			<%--           --%>
-			<%-- /Pipelles --%>
-			<%--           --%>
+
 			<div class="tab-content">
 				<div class="tab-pane active in" id="contingut">
 					<%--                   --%>
@@ -944,10 +950,9 @@ $(document).ready(function() {
 					</div>
 				</c:if>
 				<c:if test="${contingut.expedient}">
+				
+					<!------------------------------ TABPANEL INTERESSATS ------------------------------------->	
 					<div class="tab-pane" id="interessats">
-						<%--                     --%>
-						<%-- Pipella interessats --%>
-						<%--                     --%>
 						<table id="taulaInteressats" data-toggle="datatable" data-url="<c:url value="/contingut/${contingut.id}/interessat/datatable"/>" data-paging-enabled="false" data-botons-template="#taulaInteressatsBotonsTemplate" class="table table-striped table-bordered" style="width:100%">
 							<thead>
 								<tr>
@@ -990,9 +995,6 @@ $(document).ready(function() {
 								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.id}/interessat/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 							</c:if>
 						</script>
-						<%--                      --%>
-						<%-- /Pipella interessats --%>
-						<%--                      --%>
 					</div>
 					<div class="tab-pane" id="enviaments">
 						<%--                    --%>
@@ -1088,6 +1090,36 @@ $(document).ready(function() {
 						<%-- /Pipella enviaments --%>
 						<%--                     --%>
 					</div>
+					
+					<!--  If expedient came form DISTRIBUCIO and was created from peticion -->
+					<c:if test="${contingut.peticions}">
+					<!------------------------------ TABPANEL ANOTACIONS ------------------------------------->				
+						<div class="tab-pane" id="anotacions">
+							<table
+								id="taulaAnotacions"
+								data-toggle="datatable"
+								data-url="<c:url value="/expedientPeticio/${contingut.id}/datatable"/>"
+								data-paging-enabled="false"
+								data-agrupar="5"
+								class="table table-bordered table-striped"
+								style="width:100%">
+								<thead>
+									<tr>
+										<th data-col-name="registre.extracte" data-orderable="false" width="25%"><spring:message code="contingut.anotacions.columna.extracte"/></th>
+										<th data-col-name="registre.data" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.anotacions.columna.data"/></th>
+										<th data-col-name="registre.destiDescripcio" data-orderable="false" width="25%"><spring:message code="contingut.anotacions.columna.destiDescripcio"/></th>
+
+										<th data-col-name="id" data-orderable="false" data-template="#cellAnotacioAccionsTemplate" width="10%">
+											<script id="cellAnotacioAccionsTemplate" type="text/x-jsrender">
+											<a href="<c:url value="/expedientPeticio/{{:id}}"/>" data-maximized="true" class="btn btn-primary" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>
+										</script>
+										</th>
+									</tr>
+								</thead>
+							</table>
+						</div>						
+					</c:if>
+					
 				</c:if>
 				<c:if test="${contingut.document and contingut.versioCount gt 0}">
 					<div class="tab-pane" id="versions">

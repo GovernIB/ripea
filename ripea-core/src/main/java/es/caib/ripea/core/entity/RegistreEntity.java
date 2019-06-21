@@ -11,390 +11,146 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.registre.RegistreProcesEstatEnum;
-import es.caib.ripea.core.api.registre.RegistreProcesEstatSistraEnum;
-import es.caib.ripea.core.api.registre.RegistreTipusEnum;
+import es.caib.ripea.core.audit.RipeaAuditable;
 
 /**
- * Classe del model de dades que representa una anotació al
- * registre.
+ * Classe del model de dades que representa una anotació al registre.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(	name = "ipa_registre",
-		uniqueConstraints = {
-				@UniqueConstraint(
-						name = "ipa_reg_mult_uk",
-						columnNames = {
-								"entitat_codi",
-								"llibre_codi",
-								"tipus",
-								"numero",
-								"data"})})
+@Table(name = "ipa_registre")
 @EntityListeners(AuditingEntityListener.class)
-public class RegistreEntity extends ContingutEntity {
+public class RegistreEntity extends RipeaAuditable<Long> {
 
-	private static final int ERROR_MAX_LENGTH = 1000;
-
-	@Column(name = "tipus", length = 1, nullable = false)
-	private String registreTipus;
-	@Column(name = "unitat_adm", length = 21, nullable = false)
-	private String unitatAdministrativa;
-	@Column(name = "unitat_adm_desc", length = 100)
-	private String unitatAdministrativaDescripcio;
-	@Column(name = "numero", length = 100, nullable = false)
-	private String numero;
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "data", nullable = false)
-	private Date data;
-	@Column(name = "identificador", length = 100, nullable = false)
-	private String identificador;
-	@Column(name = "entitat_codi", length = 21, nullable = false)
-	private String entitatCodi;
-	@Column(name = "entitat_desc", length = 100)
-	private String entitatDescripcio;
-	@Column(name = "oficina_codi", length = 21, nullable = false)
-	private String oficinaCodi;
-	@Column(name = "oficina_desc", length = 100)
-	private String oficinaDescripcio;
-	@Column(name = "llibre_codi", length = 4, nullable = false)
-	private String llibreCodi;
-	@Column(name = "llibre_desc", length = 100)
-	private String llibreDescripcio;
-	@Column(name = "extracte", length = 240)
-	private String extracte;
-	@Column(name = "assumpte_tipus_codi", length = 16, nullable = false)
-	private String assumpteTipusCodi;
-	@Column(name = "assumpte_tipus_desc", length = 100)
-	private String assumpteTipusDescripcio;
-	@Column(name = "assumpte_codi", length = 16)
-	private String assumpteCodi;
-	@Column(name = "assumpte_desc", length = 100)
-	private String assumpteDescripcio;
-	@Column(name = "referencia", length = 16)
-	private String referencia;
-	@Column(name = "expedient_num", length = 80)
-	private String expedientNumero;
-	@Column(name = "expedient_arxiu_uuid", length = 100)
-	private String expedientArxiuUuid;
-	@Column(name = "num_orig", length = 80)
-	private String numeroOrigen;
-	@Column(name = "idioma_codi", length = 2, nullable = false)
-	private String idiomaCodi;
-	@Column(name = "idioma_desc", length = 100)
-	private String idiomaDescripcio;
-	@Column(name = "transport_tipus_codi", length = 2)
-	private String transportTipusCodi;
-	@Column(name = "transport_tipus_desc", length = 100)
-	private String transportTipusDescripcio;
-	@Column(name = "transport_num", length = 20)
-	private String transportNumero;
-	@Column(name = "usuari_codi", length = 20)
-	private String usuariCodi;
-	@Column(name = "usuari_nom", length = 80)
-	private String usuariNom;
-	@Column(name = "usuari_contacte", length = 160)
-	private String usuariContacte;
 	@Column(name = "aplicacio_codi", length = 20)
 	private String aplicacioCodi;
 	@Column(name = "aplicacio_versio", length = 15)
 	private String aplicacioVersio;
-	@Column(name = "docfis_codi", length = 1)
-	private String documentacioFisicaCodi;
-	@Column(name = "docfis_desc", length = 100)
-	private String documentacioFisicaDescripcio;
-	@Column(name = "observacions", length = 50)
-	private String observacions;
+	@Column(name = "assumpte_codi_codi", length = 16)
+	private String assumpteCodiCodi;
+	@Column(name = "assumpte_codi_desc", length = 100)
+	private String assumpteCodiDescripcio;
+	@Column(name = "assumpte_tipus_codi", length = 16, nullable = false)
+	private String assumpteTipusCodi;
+	@Column(name = "assumpte_tipus_desc", length = 100)
+	private String assumpteTipusDescripcio;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data", nullable = false)
+	private Date data;
+	@Column(name = "doc_fisica_codi", length = 1)
+	private String docFisicaCodi;
+	@Column(name = "doc_fisica_desc", length = 100)
+	private String docFisicaDescripcio;
+	@Column(name = "entitat_codi", length = 21, nullable = false)
+	private String entitatCodi;
+	@Column(name = "entitat_desc", length = 100)
+	private String entitatDescripcio;
+	@Column(name = "expedient_numero", length = 80)
+	private String expedientNumero;
 	@Column(name = "exposa", length = 4000)
 	private String exposa;
+	@Column(name = "extracte", length = 240)
+	private String extracte;
+	@Column(name = "procediment_codi", length = 20)
+	private String procedimentCodi;
+	@Column(name = "identificador", length = 100, nullable = false)
+	private String identificador;
+	@Column(name = "idioma_codi", length = 2, nullable = false)
+	private String idiomaCodi;
+	@Column(name = "idioma_desc", length = 100)
+	private String idiomaDescripcio;
+	@Column(name = "llibre_codi", length = 4, nullable = false)
+	private String llibreCodi;
+	@Column(name = "llibre_desc", length = 100)
+	private String llibreDescripcio;
+	@Column(name = "observacions", length = 50)
+	private String observacions;
+	@Column(name = "oficina_codi", length = 21, nullable = false)
+	private String oficinaCodi;
+	@Column(name = "oficina_desc", length = 100)
+	private String oficinaDescripcio;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "origen_data")
+	private Date origenData;
+	@Column(name = "origen_registre_num", length = 80)
+	private String origenRegistreNumero;
+	@Column(name = "ref_externa", length = 16)
+	private String refExterna;
 	@Column(name = "solicita", length = 4000)
 	private String solicita;
-	@Column(name = "motiu_rebuig", length = 1024)
-	private String motiuRebuig;
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "proces_data")
-	private Date procesData;
-	@Enumerated(EnumType.STRING)
-	@Column(name = "proces_estat", length = 16, nullable = false)
-	private RegistreProcesEstatEnum procesEstat;
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "data_orig")
-	private Date dataOrigen;
-	@Column(name = "oficina_orig_codi", length = 21)
-	private String oficinaOrigenCodi;
-	@Column(name = "oficina_orig_desc", length = 100)
-	private String oficinaOrigenDescripcio;
-	@Enumerated(EnumType.STRING)
-	@Column(name = "proces_estat_sistra", length = 16)
-	private RegistreProcesEstatSistraEnum procesEstatSistra;
-	@Column(name = "sistra_id_tram", length = 20)
-	private String identificadorTramitSistra;
-	@Column(name = "sistra_id_proc", length = 100)
-	private String identificadorProcedimentSistra;
-	@Column(name = "proces_error", length = ERROR_MAX_LENGTH)
-	private String procesError;
-	@Column(name = "proces_intents")
-	private Integer procesIntents;
+	@Column(name = "transport_num", length = 20)
+	private String transportNumero;
+	@Column(name = "transport_tipus_codi", length = 2)
+	private String transportTipusCodi;
+	@Column(name = "transport_tipus_desc", length = 100)
+	private String transportTipusDescripcio;
+	@Column(name = "usuari_codi", length = 20)
+	private String usuariCodi;
+	@Column(name = "usuari_nom", length = 80)
+	private String usuariNom;
+	@Column(name = "desti_codi", length = 21, nullable = false)
+	private String destiCodi;
+	@Column(name = "desti_descripcio", length = 100)
+	private String destiDescripcio;
+	
+	
+	
+
 	@OneToMany(
 			mappedBy = "registre",
-			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<RegistreInteressatEntity> interessats = new ArrayList<RegistreInteressatEntity>();
+	
 	@OneToMany(
 			mappedBy = "registre",
-			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
-			orphanRemoval = true)
+			orphanRemoval = true,
+			fetch = FetchType.EAGER)
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
-	@Column(name = "justificant_arxiu_uuid", length = 100)
-	private String justificantArxiuUuid;
-	@Column(name = "llegida")
-	private Boolean llegida;
-
-	public RegistreTipusEnum getRegistreTipus() {
-		return RegistreTipusEnum.valorAsEnum(registreTipus);
-	}
-	public String getUnitatAdministrativa() {
-		return unitatAdministrativa;
-	}
-	public String getUnitatAdministrativaDescripcio() {
-		return unitatAdministrativaDescripcio;
-	}
-	public String getNumero() {
-		return numero;
-	}
-	public Date getData() {
-		return data;
-	}
-	public Date getDataOrigen() {
-		return dataOrigen;
-	}
-	public String getIdentificador() {
-		return identificador;
-	}
-	public String getEntitatCodi() {
-		return entitatCodi;
-	}
-	public String getEntitatDescripcio() {
-		return entitatDescripcio;
-	}
-	public String getOficinaCodi() {
-		return oficinaCodi;
-	}
-	public String getOficinaDescripcio() {
-		return oficinaDescripcio;
-	}
-	public String getOficinaOrigenCodi() {
-		return oficinaOrigenCodi;
-	}
-	public String getOficinaOrigenDescripcio() {
-		return oficinaOrigenDescripcio;
-	}
-	public String getLlibreCodi() {
-		return llibreCodi;
-	}
-	public String getLlibreDescripcio() {
-		return llibreDescripcio;
-	}
-	public String getExtracte() {
-		return extracte;
-	}
-	public String getAssumpteTipusCodi() {
-		return assumpteTipusCodi;
-	}
-	public String getAssumpteTipusDescripcio() {
-		return assumpteTipusDescripcio;
-	}
-	public String getAssumpteCodi() {
-		return assumpteCodi;
-	}
-	public String getAssumpteDescripcio() {
-		return assumpteDescripcio;
-	}
-	public String getReferencia() {
-		return referencia;
-	}
-	public String getExpedientNumero() {
-		return expedientNumero;
-	}
-	public String getExpedientArxiuUuid() {
-		return expedientArxiuUuid;
-	}
-	public String getNumeroOrigen() {
-		return numeroOrigen;
-	}
-	public String getIdiomaCodi() {
-		return idiomaCodi;
-	}
-	public String getIdiomaDescripcio() {
-		return idiomaDescripcio;
-	}
-	public String getTransportTipusCodi() {
-		return transportTipusCodi;
-	}
-	public String getTransportTipusDescripcio() {
-		return transportTipusDescripcio;
-	}
-	public String getTransportNumero() {
-		return transportNumero;
-	}
-	public String getUsuariNom() {
-		return usuariNom;
-	}
-	public String getUsuariContacte() {
-		return usuariContacte;
-	}
-	public String getAplicacioCodi() {
-		return aplicacioCodi;
-	}
-	public String getAplicacioVersio() {
-		return aplicacioVersio;
-	}
-	public String getDocumentacioFisicaCodi() {
-		return documentacioFisicaCodi;
-	}
-	public String getDocumentacioFisicaDescripcio() {
-		return documentacioFisicaDescripcio;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public String getExposa() {
-		return exposa;
-	}
-	public String getSolicita() {
-		return solicita;
-	}
-	public String getMotiuRebuig() {
-		return motiuRebuig;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public Date getProcesData() {
-		return procesData;
-	}
-	public RegistreProcesEstatEnum getProcesEstat() {
-		return procesEstat;
-	}
-	public RegistreProcesEstatSistraEnum getProcesEstatSistra() {
-		return procesEstatSistra;
-	}
-	public String getProcesError() {
-		return procesError;
-	}
-	public Integer getProcesIntents() {
-		return procesIntents;
-	}
-	public List<RegistreInteressatEntity> getInteressats() {
-		return interessats;
-	}
-	public List<RegistreAnnexEntity> getAnnexos() {
-		return annexos;
-	}
-	public String getJustificantArxiuUuid() {
-		return justificantArxiuUuid;
-	}
-	public Boolean getLlegida() {
-		return llegida;
-	}
-//	public Date getDataDistribucioAsincrona() {
-//		return dataDistribucioAsincrona;
-//	}
-	
-	public void updateRebuig(
-			String motiuRebuig) {
-		this.motiuRebuig = motiuRebuig;
-	}
-	public void updateProces(
-			Date procesData,
-			RegistreProcesEstatEnum procesEstat,
-			String procesError) {
-		this.procesData = procesData;
-		this.procesEstat = procesEstat;
-		if (procesIntents == null) {
-			procesIntents = new Integer(1);
-		} else {
-			procesIntents = new Integer(procesIntents.intValue() + 1);
-		}
-		if (procesError != null) {
-			if (procesError.length() > ERROR_MAX_LENGTH)
-				this.procesError = procesError.substring(0, ERROR_MAX_LENGTH);	
-			else
-				this.procesError = procesError;
-		} else {
-			this.procesError = null;
-		}
-	}
 	
 	
-	public void updateProcesSistra(RegistreProcesEstatSistraEnum procesEstatSistra) {
-		this.procesEstatSistra = procesEstatSistra;
-	}
-	public void updateIdentificadorTramitSistra(String identificadorTramit) {
-		this.identificadorTramitSistra = identificadorTramit;
-	}
-	public void updateIdentificadorProcedimentSistra(String identificadorProcediment) {
-		this.identificadorProcedimentSistra = identificadorProcediment;
-	}
-	public void updateJustificantUuid(String justificantArxiuUuid) {
-		this.justificantArxiuUuid = justificantArxiuUuid;
-	}
-	public void updateLlegida(Boolean llegida) {
-		this.llegida = llegida;
-	}
-	public void updateExpedientArxiuUuid(String expedientArxiuUuid) {
-		this.expedientArxiuUuid = expedientArxiuUuid;
-	}
-//	public void updateDataDistribucioAsincrona(Date dataDistribucioAsincrona) {
-//		this.dataDistribucioAsincrona = dataDistribucioAsincrona;
-//	}
+	
+	
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "entitat_id")
+	protected EntitatEntity entitat;
 
 	public static Builder getBuilder(
-			EntitatEntity entitat,
-			RegistreTipusEnum tipus,
-			String unitatAdministrativa,
-			String unitatAdministrativaDescripcio,
-			String numero,
-			Date data,
-			String identificador,
-			String extracte,
-			String oficinaCodi,
-			String llibreCodi,
 			String assumpteTipusCodi,
+			Date data,
+			String entitatCodi,
+			String identificador,
 			String idiomaCodi,
-			RegistreProcesEstatEnum procesEstat,
-			ContingutEntity pare) {
+			String llibreCodi,
+			String oficinaCodi,
+			String destiCodi,
+			EntitatEntity entitat) {
 		return new Builder(
-				entitat,
-				tipus,
-				unitatAdministrativa,
-				unitatAdministrativaDescripcio,
-				numero,
-				data,
-				identificador,
-				extracte,
-				oficinaCodi,
-				llibreCodi,
 				assumpteTipusCodi,
+				data,
+				entitatCodi,
+				identificador,
 				idiomaCodi,
-				procesEstat,
-				pare);
+				llibreCodi,
+				oficinaCodi,
+				destiCodi,
+				entitat);
 	}
+	
+	
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta classe.
@@ -403,208 +159,451 @@ public class RegistreEntity extends ContingutEntity {
 	 */
 	public static class Builder {
 		RegistreEntity built;
+
 		Builder(
-				EntitatEntity entitat,
-				RegistreTipusEnum tipus,
-				String unitatAdministrativa,
-				String unitatdAministrativaDescripcio,
-				String numero,
-				Date data,
-				String identificador,
-				String extracte,
-				String oficinaCodi,
-				String llibreCodi,
 				String assumpteTipusCodi,
+				Date data,
+				String entitatCodi,
+				String identificador,
 				String idiomaCodi,
-				RegistreProcesEstatEnum procesEstat,
-				ContingutEntity pare) {
+				String llibreCodi,
+				String oficinaCodi,
+				String destiCodi,
+				EntitatEntity entitat) {
 			built = new RegistreEntity();
-			if (extracte != null) {
-				built.nom = numero + " - " + extracte;
-			} else {
-				built.nom = numero;
-			}
-			built.tipus = ContingutTipusEnumDto.REGISTRE;
-			built.entitat = entitat;
-			built.registreTipus = tipus.getValor();
-			built.unitatAdministrativa = unitatAdministrativa;
-			built.unitatAdministrativaDescripcio = unitatdAministrativaDescripcio;
-			built.numero = numero;
-			built.data = data;
-			built.identificador = identificador;
-			built.extracte = extracte;
-			built.oficinaCodi = oficinaCodi;
-			built.llibreCodi = llibreCodi;
 			built.assumpteTipusCodi = assumpteTipusCodi;
-			built.idiomaCodi = idiomaCodi;
-			built.procesEstat = procesEstat;
-			built.pare = pare;
-		}
-		public Builder entitatCodi(String entitatCodi) {
+			built.data = data;
 			built.entitatCodi = entitatCodi;
-			return this;
+			built.identificador = identificador;
+			built.idiomaCodi = idiomaCodi;
+			built.llibreCodi = llibreCodi;
+			built.oficinaCodi = oficinaCodi;
+			built.destiCodi = destiCodi;
+			built.entitat = entitat;
 		}
-		public Builder entitatDescripcio(String entitatDescripcio) {
-			built.entitatDescripcio = entitatDescripcio;
-			return this;
-		}
-		public Builder oficinaDescripcio(String oficinaDescripcio) {
-			built.oficinaDescripcio = oficinaDescripcio;
-			return this;
-		}
-		public Builder llibreDescripcio(String llibreDescripcio) {
-			built.llibreDescripcio = llibreDescripcio;
-			return this;
-		}
-		public Builder assumpteTipusDescripcio(String assumpteTipusDescripcio) {
-			built.assumpteTipusDescripcio = assumpteTipusDescripcio;
-			return this;
-		}
-		public Builder assumpteCodi(String assumpteCodi) {
-			built.assumpteCodi = assumpteCodi;
-			return this;
-		}
-		public Builder assumpteDescripcio(String assumpteDescripcio) {
-			built.assumpteDescripcio = assumpteDescripcio;
-			return this;
-		}
-		public Builder referencia(String referencia) {
-			built.referencia = referencia;
-			return this;
-		}
-		public Builder expedientNumero(String expedientNumero) {
-			built.expedientNumero = expedientNumero;
-			return this;
-		}
-		public Builder numeroOrigen(String numeroOrigen) {
-			built.numeroOrigen = numeroOrigen;
-			return this;
-		}
-		public Builder idiomaDescripcio(String idiomaDescripcio) {
-			built.idiomaDescripcio = idiomaDescripcio;
-			return this;
-		}
-		public Builder transportTipusCodi(String transportTipusCodi) {
-			built.transportTipusCodi = transportTipusCodi;
-			return this;
-		}
-		public Builder transportTipusDescripcio(String transportTipusDescripcio) {
-			built.transportTipusDescripcio = transportTipusDescripcio;
-			return this;
-		}
-		public Builder transportNumero(String transportNumero) {
-			built.transportNumero = transportNumero;
-			return this;
-		}
-		public Builder usuariCodi(String usuariCodi) {
-			built.usuariCodi = usuariCodi;
-			return this;
-		}
-		public Builder usuariNom(String usuariNom) {
-			built.usuariNom = usuariNom;
-			return this;
-		}
-		public Builder usuariContacte(String usuariContacte) {
-			built.usuariContacte = usuariContacte;
-			return this;
-		}
+
 		public Builder aplicacioCodi(String aplicacioCodi) {
 			built.aplicacioCodi = aplicacioCodi;
 			return this;
 		}
+
 		public Builder aplicacioVersio(String aplicacioVersio) {
 			built.aplicacioVersio = aplicacioVersio;
 			return this;
 		}
-		public Builder documentacioFisicaCodi(String documentacioFisicaCodi) {
-			built.documentacioFisicaCodi = documentacioFisicaCodi;
+
+		public Builder assumpteCodiCodi(String assumpteCodiCodi) {
+			built.assumpteCodiCodi = assumpteCodiCodi;
 			return this;
 		}
-		public Builder documentacioFisicaDescripcio(String documentacioFisicaDescripcio) {
-			built.documentacioFisicaDescripcio = documentacioFisicaDescripcio;
+
+		public Builder assumpteCodiDescripcio(String assumpteCodiDescripcio) {
+			built.assumpteCodiDescripcio = assumpteCodiDescripcio;
 			return this;
 		}
-		public Builder observacions(String observacions) {
-			built.observacions = observacions;
+
+		public Builder assumpteTipusDescripcio(String assumpteTipusDescripcio) {
+			built.assumpteTipusDescripcio = assumpteTipusDescripcio;
 			return this;
 		}
+
+		public Builder docFisicaCodi(String docFisicaCodi) {
+			built.docFisicaCodi = docFisicaCodi;
+			return this;
+		}
+
+		public Builder docFisicaDescripcio(String docFisicaDescripcio) {
+			built.docFisicaDescripcio = docFisicaDescripcio;
+			return this;
+		}
+
+		public Builder entitatDescripcio(String entitatDescripcio) {
+			built.entitatDescripcio = entitatDescripcio;
+			return this;
+		}
+
+		public Builder expedientNumero(String expedientNumero) {
+			built.expedientNumero = expedientNumero;
+			return this;
+		}
+
 		public Builder exposa(String exposa) {
 			built.exposa = exposa;
 			return this;
 		}
+
+		public Builder extracte(String extracte) {
+			built.extracte = extracte;
+			return this;
+		}
+		public Builder procedimentCodi(String procedimentCodi) {
+			built.procedimentCodi = procedimentCodi;
+			return this;
+		}
+
+		public Builder idiomaDescripcio(String idiomaDescripcio) {
+			built.idiomaDescripcio = idiomaDescripcio;
+			return this;
+		}
+
+		public Builder llibreDescripcio(String llibreDescripcio) {
+			built.llibreDescripcio = llibreDescripcio;
+			return this;
+		}
+
+		public Builder observacions(String observacions) {
+			built.observacions = observacions;
+			return this;
+		}
+		
+		public Builder oficinaDescripcio(String oficinaDescripcio) {
+			built.oficinaDescripcio = oficinaDescripcio;
+			return this;
+		}
+
+		public Builder origenData(Date origenData) {
+			built.origenData = origenData;
+			return this;
+		}
+
+		public Builder origenRegistreNumero(String origenRegistreNumero) {
+			built.origenRegistreNumero = origenRegistreNumero;
+			return this;
+		}
+
+		public Builder refExterna(String refExterna) {
+			built.refExterna = refExterna;
+			return this;
+		}
+
 		public Builder solicita(String solicita) {
 			built.solicita = solicita;
 			return this;
 		}
-		public Builder motiuRebuig(String motiuRebuig) {
-			built.motiuRebuig = motiuRebuig;
+
+		public Builder transportNumero(String transportNumero) {
+			built.transportNumero = transportNumero;
 			return this;
 		}
-		public Builder procesData(Date procesData) {
-			built.procesData = procesData;
+
+		public Builder transportTipusCodi(String transportTipusCodi) {
+			built.transportTipusCodi = transportTipusCodi;
 			return this;
 		}
-		public Builder oficinaOrigen(Date dataOrigen,
-				String oficinaOrigenCodi,
-				String oficinaOrigenDescripcio) {
-			built.dataOrigen = dataOrigen;
-			built.oficinaOrigenCodi = oficinaOrigenCodi;
-			built.oficinaOrigenDescripcio = oficinaOrigenDescripcio;
+
+		public Builder transportTipusDescripcio(String transportTipusDescripcio) {
+			built.transportTipusDescripcio = transportTipusDescripcio;
 			return this;
 		}
-		public Builder llegida(Boolean llegida) {
-			built.llegida = llegida;
+
+		public Builder usuariCodi(String usuariCodi) {
+			built.usuariCodi = usuariCodi;
 			return this;
 		}
+
+		public Builder usuariNom(String usuariNom) {
+			built.usuariNom = usuariNom;
+			return this;
+		}
+
+		public Builder destiDescripcio(String destiDescripcio) {
+			built.destiDescripcio = destiDescripcio;
+			return this;
+		}
+
 		public RegistreEntity build() {
 			return built;
 		}
 	}
+	
+	
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((data == null) ? 0 : data.hashCode());
-		result = prime * result + ((entitatCodi == null) ? 0 : entitatCodi.hashCode());
-		result = prime * result + ((llibreCodi == null) ? 0 : llibreCodi.hashCode());
-		result = prime * result + numero.hashCode();
-		result = prime * result + ((registreTipus == null) ? 0 : registreTipus.hashCode());
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RegistreEntity other = (RegistreEntity) obj;
-		if (data == null) {
-			if (other.data != null)
-				return false;
-		} else if (!data.equals(other.data))
-			return false;
-		if (entitatCodi == null) {
-			if (other.entitatCodi != null)
-				return false;
-		} else if (!entitatCodi.equals(other.entitatCodi))
-			return false;
-		if (llibreCodi == null) {
-			if (other.llibreCodi != null)
-				return false;
-		} else if (!llibreCodi.equals(other.llibreCodi))
-			return false;
-		if (numero != other.numero)
-			return false;
-		if (registreTipus == null) {
-			if (other.registreTipus != null)
-				return false;
-		} else if (!registreTipus.equals(other.registreTipus))
-			return false;
-		return true;
+	public String getAplicacioCodi() {
+		return aplicacioCodi;
 	}
 
-	private static final long serialVersionUID = -2299453443943600172L;
+	public void updateAplicacioCodi(String aplicacioCodi) {
+		this.aplicacioCodi = aplicacioCodi;
+	}
+
+	public String getAplicacioVersio() {
+		return aplicacioVersio;
+	}
+
+	public void updateAplicacioVersio(String aplicacioVersio) {
+		this.aplicacioVersio = aplicacioVersio;
+	}
+
+	public String getAssumpteCodiCodi() {
+		return assumpteCodiCodi;
+	}
+
+	public void updateAssumpteCodiCodi(String assumpteCodiCodi) {
+		this.assumpteCodiCodi = assumpteCodiCodi;
+	}
+
+	public String getAssumpteCodiDescripcio() {
+		return assumpteCodiDescripcio;
+	}
+
+	public void updateAssumpteCodiDescripcio(String assumpteCodiDescripcio) {
+		this.assumpteCodiDescripcio = assumpteCodiDescripcio;
+	}
+
+	public String getAssumpteTipusCodi() {
+		return assumpteTipusCodi;
+	}
+
+	public void updateAssumpteTipusCodi(String assumpteTipusCodi) {
+		this.assumpteTipusCodi = assumpteTipusCodi;
+	}
+
+	public String getAssumpteTipusDescripcio() {
+		return assumpteTipusDescripcio;
+	}
+
+	public void updateAssumpteTipusDescripcio(String assumpteTipusDescripcio) {
+		this.assumpteTipusDescripcio = assumpteTipusDescripcio;
+	}
+
+	public Date getData() {
+		return data;
+	}
+
+	public void updateData(Date data) {
+		this.data = data;
+	}
+
+	public String getDocFisicaCodi() {
+		return docFisicaCodi;
+	}
+
+	public void updateDocFisicaCodi(String docFisicaCodi) {
+		this.docFisicaCodi = docFisicaCodi;
+	}
+
+	public String getDocFisicaDescripcio() {
+		return docFisicaDescripcio;
+	}
+
+	public void updateDocFisicaDescripcio(String docFisicaDescripcio) {
+		this.docFisicaDescripcio = docFisicaDescripcio;
+	}
+
+	public String getEntitatCodi() {
+		return entitatCodi;
+	}
+
+	public void updateEntitatCodi(String entitatCodi) {
+		this.entitatCodi = entitatCodi;
+	}
+
+	public String getEntitatDescripcio() {
+		return entitatDescripcio;
+	}
+
+	public void updateEntitatDescripcio(String entitatDescripcio) {
+		this.entitatDescripcio = entitatDescripcio;
+	}
+
+	public String getExpedientNumero() {
+		return expedientNumero;
+	}
+
+	public void updateExpedientNumero(String expedientNumero) {
+		this.expedientNumero = expedientNumero;
+	}
+
+	public String getExposa() {
+		return exposa;
+	}
+
+	public void updateExposa(String exposa) {
+		this.exposa = exposa;
+	}
+
+	public String getIdentificador() {
+		return identificador;
+	}
+
+	public void updateIdentificador(String identificador) {
+		this.identificador = identificador;
+	}
+
+	public String getIdiomaCodi() {
+		return idiomaCodi;
+	}
+
+	public void updateIdiomaCodi(String idiomaCodi) {
+		this.idiomaCodi = idiomaCodi;
+	}
+
+	public String getidiomaDescripcio() {
+		return idiomaDescripcio;
+	}
+
+	public String getExtracte() {
+		return extracte;
+	}
+
+	public String getProcedimentCodi() {
+		return procedimentCodi;
+	}
+
+	public EntitatEntity getEntitat() {
+		return entitat;
+	}
+
+	public void updateidiomaDescripcio(String idiomaDescripcio) {
+		this.idiomaDescripcio = idiomaDescripcio;
+	}
+
+	public String getLlibreCodi() {
+		return llibreCodi;
+	}
+
+	public void updateLlibreCodi(String llibreCodi) {
+		this.llibreCodi = llibreCodi;
+	}
+
+	public String getLlibreDescripcio() {
+		return llibreDescripcio;
+	}
+
+	public void updateLlibreDescripcio(String llibreDescripcio) {
+		this.llibreDescripcio = llibreDescripcio;
+	}
+
+	public String getObservacions() {
+		return observacions;
+	}
+
+	public void updateObservacions(String observacions) {
+		this.observacions = observacions;
+	}
+
+	public String getOficinaCodi() {
+		return oficinaCodi;
+	}
+
+	public void updateOficinaCodi(String oficinaCodi) {
+		this.oficinaCodi = oficinaCodi;
+	}
+
+	public String getOficinaDescripcio() {
+		return oficinaDescripcio;
+	}
+
+	public void updateOficinaDescripcio(String oficinaDescripcio) {
+		this.oficinaDescripcio = oficinaDescripcio;
+	}
+
+	public Date getOrigenData() {
+		return origenData;
+	}
+
+	public void updateOrigenData(Date origenData) {
+		this.origenData = origenData;
+	}
+
+	public String getOrigenRegistreNumero() {
+		return origenRegistreNumero;
+	}
+
+	public void updateOrigenRegistreNumero(String origenRegistreNumero) {
+		this.origenRegistreNumero = origenRegistreNumero;
+	}
+
+	public String getRefExterna() {
+		return refExterna;
+	}
+
+	public void updateRefExterna(String refExterna) {
+		this.refExterna = refExterna;
+	}
+
+	public String getSolicita() {
+		return solicita;
+	}
+
+	public void updateSolicita(String solicita) {
+		this.solicita = solicita;
+	}
+
+	public String getTransportNumero() {
+		return transportNumero;
+	}
+
+	public void updateTransportNumero(String transportNumero) {
+		this.transportNumero = transportNumero;
+	}
+
+	public String getTransportTipusCodi() {
+		return transportTipusCodi;
+	}
+
+	public void updateTransportTipusCodi(String transportTipusCodi) {
+		this.transportTipusCodi = transportTipusCodi;
+	}
+
+	public String getTransportTipusDescripcio() {
+		return transportTipusDescripcio;
+	}
+
+	public void updateTransportTipusDescripcio(String transportTipusDescripcio) {
+		this.transportTipusDescripcio = transportTipusDescripcio;
+	}
+
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+
+	public void updateUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
+	}
+
+	public String getUsuariNom() {
+		return usuariNom;
+	}
+
+	public void updateUsuariNom(String usuariNom) {
+		this.usuariNom = usuariNom;
+	}
+
+	public String getDestiCodi() {
+		return destiCodi;
+	}
+
+	public void updateDestiCodi(String destiCodi) {
+		this.destiCodi = destiCodi;
+	}
+
+	public String getDestiDescripcio() {
+		return destiDescripcio;
+	}
+
+	public void updateDestiDescripcio(String destiDescripcio) {
+		this.destiDescripcio = destiDescripcio;
+	}
+
+	public List<RegistreInteressatEntity> getInteressats() {
+		return interessats;
+	}
+
+	public void updateInteressats(List<RegistreInteressatEntity> interessats) {
+		this.interessats = interessats;
+	}
+
+	public List<RegistreAnnexEntity> getAnnexos() {
+		return annexos;
+	}
+
+	public void updateAnnexos(List<RegistreAnnexEntity> annexos) {
+		this.annexos = annexos;
+	}
+
+
+
+	private static final long serialVersionUID = 1815997738055924981L;
+
 }

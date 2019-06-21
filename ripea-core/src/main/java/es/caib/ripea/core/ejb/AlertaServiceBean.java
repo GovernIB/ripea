@@ -61,16 +61,6 @@ public class AlertaServiceBean implements AlertaService {
 		return delegate.findPaginat(paginacioParams);
 	}
 	
-	@Override
-	@RolesAllowed({"tothom"})
-	public PaginaDto<AlertaDto> findPaginatByLlegida(
-			boolean llegida,
-			Long contingutId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findPaginatByLlegida(
-				llegida,
-				contingutId,
-				paginacioParams);
-	}
+
 
 }

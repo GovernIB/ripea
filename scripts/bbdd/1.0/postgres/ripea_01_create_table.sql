@@ -379,147 +379,6 @@ CREATE TABLE IPA_EXPEDIENT_INTERESSAT
 );
 
 
-CREATE TABLE IPA_REGISTRE
-(
-  ID                   BIGINT                   NOT NULL,
-  TIPUS                character varying(1)     NOT NULL,
-  UNITAT_ADM           character varying(21)    NOT NULL,
-  UNITAT_ADM_DESC      character varying(100),
-  NUMERO               character varying(100)   NOT NULL,
-  DATA                 timestamp without time zone NOT NULL,
-  IDENTIFICADOR        character varying(100)   NOT NULL,
-  ENTITAT_CODI         character varying(21)    NOT NULL,
-  ENTITAT_DESC         character varying(100),
-  OFICINA_CODI         character varying(21)    NOT NULL,
-  OFICINA_DESC         character varying(100),
-  LLIBRE_CODI          character varying(4)     NOT NULL,
-  LLIBRE_DESC          character varying(100),
-  EXTRACTE             character varying(240),
-  ASSUMPTE_TIPUS_CODI  character varying(16)    NOT NULL,
-  ASSUMPTE_TIPUS_DESC  character varying(100),
-  ASSUMPTE_CODI        character varying(16),
-  ASSUMPTE_DESC        character varying(100),
-  REFERENCIA           character varying(16),
-  EXPEDIENT_NUM        character varying(80),
-  NUM_ORIG 			   character varying(80),
-  IDIOMA_CODI          character varying(2)     NOT NULL,
-  IDIOMA_DESC          character varying(100),
-  TRANSPORT_TIPUS_CODI character varying(2),
-  TRANSPORT_TIPUS_DESC character varying(100),
-  TRANSPORT_NUM        character varying(20),
-  USUARI_CODI          character varying(20),
-  USUARI_NOM           character varying(80),
-  USUARI_CONTACTE      character varying(160),
-  APLICACIO_CODI       character varying(20),
-  APLICACIO_VERSIO     character varying(15),
-  DOCFIS_CODI          character varying(1),
-  DOCFIS_DESC          character varying(100),
-  OBSERVACIONS         character varying(50),
-  EXPOSA               character varying(4000),
-  SOLICITA             character varying(4000),
-  MOTIU_REBUIG         character varying(4000),
-  PROCES_DATA          timestamp without time zone,
-  PROCES_ESTAT         character varying(16)    NOT NULL,
-  PROCES_INTENTS       integer,
-  PROCES_ERROR         character varying(1024),
-  REGLA_ID             bigint,
-  CREATEDDATE          timestamp without time zone,
-  CREATEDBY_CODI       character varying(256),
-  LASTMODIFIEDDATE     timestamp without time zone,
-  LASTMODIFIEDBY_CODI  character varying(256),
-  PROCES_ESTAT_SISTRA  character varying(16),
-  SISTRA_ID_TRAM       character varying(20),
-  SISTRA_ID_PROC       character varying(100),
-  DATA_ORIG            timestamp without time zone,
-  OFICINA_ORIG_CODI    character varying(21),
-  OFICINA_ORIG_DESC    character varying(100),
-  JUSTIFICANT_ARXIU_UUID character varying(100),
-  LLEGIDA              boolean,
-  EXPEDIENT_ARXIU_UUID  character varying(100)
-);
-
-
-CREATE TABLE IPA_REGISTRE_ANNEX
-(
-  ID                   BIGINT                   NOT NULL,
-  TITOL                character varying(200)   NOT NULL,
-  FITXER_NOM           character varying(80)    NOT NULL,
-  FITXER_TAMANY        integer                  NOT NULL,
-  FITXER_MIME          character varying(100),
-  FITXER_ARXIU_UUID     character varying(100)   NOT NULL,
-  DATA_CAPTURA         timestamp without time zone NOT NULL,
-  LOCALITZACIO         character varying(80),
-  ORIGEN_CIUADM        character varying(1)     NOT NULL,
-  NTI_TIPUS_DOC        character varying(4)     NOT NULL,
-  SICRES_TIPUS_DOC     character varying(2)     NOT NULL,
-  NTI_ELABORACIO_ESTAT character varying(4),
-  OBSERVACIONS         character varying(50),
-  FIRMA_MODE           integer,
-  FIRMA_FITXER_NOM     character varying(80),
-  FIRMA_FITXER_TAMANY  integer,
-  FIRMA_FITXER_MIME    character varying(30),
-  FIRMA_FITXER_ARXIU_UUID  character varying(100),
-  FIRMA_CSV            character varying(50),
-  TIMESTAMP            character varying(100),
-  VALIDACIO_OCSP       character varying(100),
-  REGISTRE_ID          bigint                   NOT NULL,
-  VERSION              bigint                   NOT NULL,
-  CREATEDDATE          timestamp without time zone,
-  CREATEDBY_CODI       character varying(256),
-  LASTMODIFIEDDATE     timestamp without time zone,
-  LASTMODIFIEDBY_CODI  character varying(256),
-  GESDOC_DOC_ID 	   character varying(50)
-);
-
-
-CREATE TABLE IPA_REGISTRE_ANNEX_FIRMA
-(
-  ID                   BIGINT                   	NOT NULL,
-  TIPUS		           character varying(30),
-  PERFIL    	       character varying(30),
-  FITXER_NOM           character varying(80),
-  TIPUS_MIME           character varying(30),
-  CSV_REGULACIO		   character varying(640),
-  ANNEX_ID             bigint                    	NOT NULL,
-  AUTOFIRMA            boolean,
-  CREATEDDATE          timestamp without time zone,
-  CREATEDBY_CODI       character varying(256),
-  LASTMODIFIEDDATE     timestamp without time zone,
-  LASTMODIFIEDBY_CODI  character varying(256),
-  GESDOC_FIR_ID 	   character varying(50)
-);
-
-
-CREATE TABLE IPA_REGISTRE_INTER
-(
-  ID                   BIGINT                   NOT NULL,
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDDATE     timestamp without time zone,
-  ADRESA               character varying(640),
-  CANAL_PREF           character varying(8),
-  CODI_POSTAL          character varying(20),
-  DOC_NUM              character varying(68),
-  DOC_TIPUS            character varying(4),
-  EMAIL                character varying(640),
-  EMAIL_HAB            character varying(640),
-  LLINATGE1            character varying(120),
-  LLINATGE2            character varying(120),
-  MUNICIPI             character varying(100),
-  NOM                  character varying(120),
-  OBSERVACIONS         character varying(640),
-  PAIS                 character varying(16),
-  PROVINCIA            character varying(100),
-  RAO_SOCIAL           character varying(320),
-  TELEFON              character varying(80),
-  TIPUS                character varying(4)     NOT NULL,
-  VERSION              bigint                   NOT NULL,
-  CREATEDBY_CODI       character varying(256),
-  LASTMODIFIEDBY_CODI  character varying(256),
-  REGISTRE_ID          bigint                   NOT NULL,
-  REPRESENTANT_ID      bigint,
-  REPRESENTAT_ID       bigint
-);
-
 
 CREATE TABLE IPA_EXECUCIO_MASSIVA
 (
@@ -623,3 +482,131 @@ CREATE TABLE IPA_EXPEDIENT_ESTAT
     CREATEDBY_CODI      character varying(256),
     LASTMODIFIEDBY_CODI character varying(256)
 );
+
+
+CREATE TABLE IPA_EXPEDIENT_PETICIO
+(
+  ID                   BIGINT               NOT NULL,
+  IDENTIFICADOR        character varying (80)             NOT NULL,
+  CLAU_ACCES           character varying (200)            NOT NULL,
+  DATA_ALTA            timestamp without time zone             NOT NULL,
+  ESTAT			       character varying (40)             NOT NULL,
+  META_EXPEDIENT_NOM   character varying (256),
+  EXP_PETICIO_ACCIO    character varying (20),
+  REGISTRE_ID 		   BIGINT,
+  CONSULTA_WS_ERROR    boolean,
+  CONSULTA_WS_ERROR_DESC  character varying (4000),
+  CONSULTA_WS_ERROR_DATE  timestamp without time zone,
+  NOTIFICA_DIST_ERROR character varying (4000),
+  EXPEDIENT_ID 				BIGINT,
+  
+  CREATEDDATE         timestamp without time zone,
+  LASTMODIFIEDDATE    timestamp without time zone,
+  CREATEDBY_CODI      character varying (256),
+  LASTMODIFIEDBY_CODI character varying (256)
+
+);
+
+
+
+CREATE TABLE IPA_REGISTRE (
+  ID 						BIGINT 		NOT NULL, 
+  APLICACIO_CODI 			character varying (20), 
+  APLICACIO_VERSIO 			character varying (15), 
+  ASSUMPTE_CODI_CODI 		character varying (16), 
+  ASSUMPTE_CODI_DESC 		character varying (100), 
+  ASSUMPTE_TIPUS_CODI		character varying (16) 	NOT NULL, 
+  ASSUMPTE_TIPUS_DESC 		character varying (100), 
+  DATA 						timestamp without time zone 	NOT NULL, 
+  DOC_FISICA_CODI 			character varying (1), 
+  DOC_FISICA_DESC 			character varying (100), 
+  ENTITAT_CODI 				character varying (21) 	NOT NULL, 
+  ENTITAT_DESC 				character varying (100), 
+  EXPEDIENT_NUMERO 			character varying (80), 
+  EXPOSA 					character varying (4000), 
+  EXTRACTE					character varying (240),
+  PROCEDIMENT_CODI			character varying (20),
+  IDENTIFICADOR 			character varying (100) 	NOT NULL, 
+  IDIOMA_CODI 				character varying (2) 	NOT NULL, 
+  IDIOMA_DESC 				character varying (100), 
+  LLIBRE_CODI 				character varying (4) 	NOT NULL, 
+  LLIBRE_DESC 				character varying (100), 
+  OBSERVACIONS 				character varying (50), 
+  OFICINA_CODI 				character varying (21) 	NOT NULL, 
+  OFICINA_DESC 				character varying (100), 
+  ORIGEN_DATA 				timestamp without time zone, 
+  ORIGEN_REGISTRE_NUM 		character varying (80), 
+  REF_EXTERNA 				character varying (16), 
+  SOLICITA 					character varying (4000), 
+  TRANSPORT_NUM 			character varying (20), 
+  TRANSPORT_TIPUS_CODI 		character varying (2), 
+  TRANSPORT_TIPUS_DESC 		character varying (100), 
+  USUARI_CODI 				character varying (20), 
+  USUARI_NOM 				character varying (80), 
+  DESTI_CODI 				character varying (21) 	NOT NULL, 
+  DESTI_DESCRIPCIO 			character varying (100),
+  ENTITAT_ID				BIGINT 		NOT NULL,
+
+  CREATEDDATE         timestamp without time zone,
+  LASTMODIFIEDDATE    timestamp without time zone,
+  CREATEDBY_CODI      character varying (256),
+  LASTMODIFIEDBY_CODI character varying (256)
+);
+
+
+CREATE TABLE IPA_REGISTRE_ANNEX (
+	ID 						BIGINT 		NOT NULL, 
+	CONTINGUT BLOB,
+	FIRMA_CONTINGUT BLOB,
+	FIRMA_PERFIL character varying (4),
+	FIRMA_TAMANY integer,
+	FIRMA_TIPUS character varying (4),
+	NOM character varying (80) NOT NULL,
+	NTI_FECHA_CAPTURA timestamp without time zone NOT NULL,
+	NTI_ORIGEN character varying (20) NOT NULL,
+	NTI_TIPO_DOC character varying (20) NOT NULL,
+	OBSERVACIONS character varying (50),
+	SICRES_TIPO_DOC character varying (20)  NOT NULL,
+	SICRES_VALIDEZ_DOC character varying (30),
+	TAMANY integer NOT NULL,
+	TIPUS_MIME character varying (30),
+	TITOL character varying (200) NOT NULL,
+	UUID character varying (100),
+	REGISTRE_ID BIGINT NOT NULL,
+	ESTAT character varying (20),
+	ERROR character varying (4000),
+	
+	CREATEDDATE         timestamp without time zone,
+  	LASTMODIFIEDDATE    timestamp without time zone,
+  	CREATEDBY_CODI      character varying (256),
+  	LASTMODIFIEDBY_CODI character varying (256)
+);
+
+
+CREATE TABLE IPA_REGISTRE_INTERESSAT (
+	ID 						BIGINT 		NOT NULL, 
+	ADRESA character varying (160),
+	CANAL character varying (30),
+	CP character varying (5),
+	DOC_NUMERO character varying (17),
+	DOC_TIPUS character varying (15),
+	EMAIL character varying (160),
+	LLINATGE1 character varying (30),
+	LLINATGE2 character varying (30),
+	MUNICIPI_CODI character varying (100),
+	NOM character varying (30),
+	OBSERVACIONS character varying (160),
+	PAIS_CODI character varying (4),
+	PROVINCIA_CODI character varying (100),
+	RAO_SOCIAL character varying (80),
+	TELEFON character varying (20),
+	TIPUS character varying (40) NOT NULL,
+	REPRESENTANT_ID BIGINT,
+	REGISTRE_ID BIGINT,
+	
+  CREATEDDATE         timestamp without time zone,
+  LASTMODIFIEDDATE    timestamp without time zone,
+  CREATEDBY_CODI      character varying (256),
+  LASTMODIFIEDBY_CODI character varying (256)
+);
+

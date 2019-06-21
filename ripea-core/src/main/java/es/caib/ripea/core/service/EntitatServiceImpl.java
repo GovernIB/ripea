@@ -194,6 +194,19 @@ public class EntitatServiceImpl implements EntitatService {
 			permisosEntitatHelper.omplirPermisosPerEntitat(entitat);
 		return entitat;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public EntitatDto findByUnitatArrel(String unitatArrel) {
+		logger.debug("Consulta de l'entitat amb unitatArrel (" +
+				"unitatArrel=" + unitatArrel + ")");
+		EntitatDto entitat = conversioTipusHelper.convertir(
+				entitatRepository.findByUnitatArrel(unitatArrel),
+				EntitatDto.class);
+		if (entitat != null)
+			permisosEntitatHelper.omplirPermisosPerEntitat(entitat);
+		return entitat;
+	}
 
 	@Transactional(readOnly = true)
 	@Override

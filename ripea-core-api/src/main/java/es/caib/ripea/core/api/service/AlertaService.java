@@ -73,18 +73,5 @@ public interface AlertaService {
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<AlertaDto> findPaginat(PaginacioParamsDto paginacioParams);
 
-	/**
-	 * Llistat amb les alertes llegides pertanyents a un contingut.
-	 * 
-	 * @param llegida Atribut de cerca en funció de si es volen trobar les alertes llegides.
-	 * @param contingutId Identificador del contingut del qual es volen trobar alertes.
-	 * 
-	 * @return El llistat d'alertes.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public PaginaDto<AlertaDto> findPaginatByLlegida(
-			boolean llegida,
-			Long contingutId,
-			PaginacioParamsDto paginacioParams);
 
 }

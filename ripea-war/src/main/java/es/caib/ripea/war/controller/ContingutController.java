@@ -356,20 +356,7 @@ public class ContingutController extends BaseUserController {
 						contingutId));
 		return "contingutErrors";
 	}
-	
-	@RequestMapping(value = "/contingut/{contingutId}/errors/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse errorsDatatable(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				alertaService.findPaginatByLlegida(
-						false,
-						contingutId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));
-	}
+
 	
 	@RequestMapping(value = "/contingut/{contingutId}/errors/{alertaId}/llegir", method = RequestMethod.GET)
 	@ResponseBody

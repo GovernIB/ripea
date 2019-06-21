@@ -252,6 +252,12 @@ body {
 										<c:param name="mantenirPaginacio" value="false" />
 									</c:url>"
 								class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
+								<a href="
+									<c:url value="/expedientPeticio">
+										<c:param name="mantenirPaginacio" value="false" />
+									</c:url>"
+								class="btn btn-primary"><spring:message code="decorator.menu.expedientPeticions"/></a>								
+								
 								<div class="btn-group">
 									<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>

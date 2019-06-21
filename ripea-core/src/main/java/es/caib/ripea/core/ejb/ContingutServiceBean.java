@@ -225,17 +225,7 @@ public class ContingutServiceBean implements ContingutService {
 				paginacioParams);
 	}
 
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<RegistreAnotacioDto> findAnotacionsRegistre(
-			Long entitatId,
-			AnotacioRegistreFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAnotacionsRegistre(
-				entitatId,
-				filtre,
-				paginacioParams);
-	}
+
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
