@@ -106,7 +106,7 @@ public class CarpetaHelper {
 			contingutHelper.comprovarNomValid(
 					pare,
 					nom,
-					"<creacio>",
+					null,
 					CarpetaEntity.class);
 			
 			carpetaEntity = CarpetaEntity.getBuilder(

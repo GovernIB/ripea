@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.DocumentTipus;
+import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracio;
 import es.caib.distribucio.ws.backofficeintegracio.NtiOrigen;
 import es.caib.distribucio.ws.backofficeintegracio.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.Carpeta;
@@ -158,7 +158,7 @@ public class ExpedientHelper {
 		contingutHelper.comprovarNomValid(
 				contingutPare,
 				nom,
-				"<creacio>",
+				null,
 				ExpedientEntity.class);
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
@@ -401,7 +401,7 @@ public class ExpedientHelper {
 		contingutHelper.comprovarNomValid(
 				carpetaEntity,
 				documentDto.getNom(),
-				"<creacio>",
+				null,
 				DocumentEntity.class);
 		
 		DocumentEntity docEntity = documentHelper.crearNouDocument(
@@ -565,9 +565,8 @@ public class ExpedientHelper {
 
 		document.setNtiOrigen(toNtiOrigenEnumDto(registreAnnexEntity.getNtiOrigen()));
 		document.setNtiTipoDocumental(toDocumentNtiTipoDocumentalEnumDto(registreAnnexEntity.getNtiTipoDocumental()));
-		
-		document.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
-		document.setFitxerContentType("application/pdf");
+		document.setNtiEstadoElaboracion(toDocumentNtiEstadoElaboracionEnumDto(registreAnnexEntity.getNtiEstadoElaboracio()));
+		document.setFitxerContentType(registreAnnexEntity.getTipusMime());
 		
 		document.setNtiVersion("1.0");
 		
@@ -576,6 +575,35 @@ public class ExpedientHelper {
 
 		return document;
 	}
+	
+	
+	
+	public DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(NtiEstadoElaboracio ntiEstadoElaboracio) {
+
+		DocumentNtiEstadoElaboracionEnumDto documentNtiEstadoElaboracionEnumDto = null;
+		
+		if (ntiEstadoElaboracio != null) {
+			switch (ntiEstadoElaboracio) {
+			case ORIGINAL:
+				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE01;
+				break;
+			case COPIA_ELECT_AUTENTICA_CANVI_FORMAT:
+				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE02;
+				break;
+			case COPIA_ELECT_AUTENTICA_PAPER:
+				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE03;
+				break;
+			case COPIA_ELECT_AUTENTICA_PARCIAL:
+				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE04;
+				break;
+			case ALTRES:
+				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE99;
+				break;				
+			}
+		}
+		return documentNtiEstadoElaboracionEnumDto;
+	}
+	
 	
 	
 	public DocumentNtiTipoDocumentalEnumDto toDocumentNtiTipoDocumentalEnumDto(NtiTipoDocumento ntiTipoDocumento) {

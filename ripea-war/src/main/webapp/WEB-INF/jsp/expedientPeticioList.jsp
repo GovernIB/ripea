@@ -45,13 +45,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		<div class="row">
 			<div class="col-md-9">
 				<div class="row">
-					<div class="col-md-3">
+					<div class="col-md-4">
 						<rip:inputText name="numero" inline="true" placeholderKey="expedientPeticio.list.placeholder.numero"/>
 					</div>	
-					<div class="col-md-3">
+					<div class="col-md-4">
 						<rip:inputText name="extracte" inline="true" placeholderKey="expedientPeticio.list.placeholder.extracte"/>
 					</div>	
-					<div class="col-md-3">							
+					<div class="col-md-4">							
 						<rip:inputText name="destinacio" inline="true" placeholderKey="expedientPeticio.list.placeholder.destinacio"/>
 					</div>	
 				</div>

@@ -575,6 +575,7 @@ CREATE TABLE IPA_REGISTRE_ANNEX (
 	REGISTRE_ID BIGINT NOT NULL,
 	ESTAT character varying (20),
 	ERROR character varying (4000),
+	NTI_ESTADO_ELABORACIO character varying(50) NOT NULL,
 	
 	CREATEDDATE         timestamp without time zone,
   	LASTMODIFIEDDATE    timestamp without time zone,

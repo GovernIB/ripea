@@ -114,7 +114,6 @@ public class ContingutExpedientController extends BaseUserController {
 					command.getAny(),
 					command.getNom(),
 					null,
-					false,
 					false);
 			return getModalControllerReturnValueSuccess(
 					request,

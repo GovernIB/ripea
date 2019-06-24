@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.distribucio.ws.backofficeintegracio.FirmaPerfil;
 import es.caib.distribucio.ws.backofficeintegracio.FirmaTipus;
+import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracio;
 import es.caib.distribucio.ws.backofficeintegracio.NtiOrigen;
 import es.caib.distribucio.ws.backofficeintegracio.NtiTipoDocumento;
 import es.caib.distribucio.ws.backofficeintegracio.SicresTipoDocumento;
@@ -79,6 +80,9 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "sicres_validez_doc", length = 30)
 	private SicresValidezDocumento sicresValidezDocumento;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "nti_estado_elaboracio", length = 50, nullable = false)
+	private NtiEstadoElaboracio ntiEstadoElaboracio;
 	@Column(name = "tamany", nullable = false)
 	private long tamany;
 	@Column(name = "tipus_mime", length = 30)
@@ -109,7 +113,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			 NtiTipoDocumento ntiTipoDocumental,
 			 SicresTipoDocumento sicresTipoDocumento,
 			 String titol,
-			 RegistreEntity registre) {
+			 RegistreEntity registre,
+			 NtiEstadoElaboracio ntiEstadoElaboracio) {
 		return new Builder(
 				 nom,
 				 ntiFechaCaptura,
@@ -117,7 +122,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 				 ntiTipoDocumental,
 				 sicresTipoDocumento,
 				 titol,
-				 registre);
+				 registre,
+				 ntiEstadoElaboracio);
 	}
 
 	/**
@@ -135,7 +141,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 				 NtiTipoDocumento ntiTipoDocumental,
 				 SicresTipoDocumento sicresTipoDocumento,
 				 String titol,
-				 RegistreEntity registre) {
+				 RegistreEntity registre,
+				 NtiEstadoElaboracio ntiEstadoElaboracio) {
 			built = new RegistreAnnexEntity();
 			built.nom = nom;
 			built.ntiFechaCaptura = ntiFechaCaptura;
@@ -145,6 +152,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.titol = titol;
 			built.registre = registre;
 			built.estat = RegistreAnnexEstatEnumDto.CREAT;
+			built.ntiEstadoElaboracio = ntiEstadoElaboracio;
 		}
 		
 		public Builder contingut(byte[] contingut) {
@@ -300,6 +308,10 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 		this.error = StringUtils.abbreviate(
 				error,
 				4000);
+	}
+	
+	public NtiEstadoElaboracio getNtiEstadoElaboracio() {
+		return ntiEstadoElaboracio;
 	}
 	
 	
