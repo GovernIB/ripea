@@ -51,12 +51,9 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -64,9 +61,6 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.NodeRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -81,19 +75,13 @@ public class ContingutHelper {
 	@Autowired
 	private ContingutRepository contingutRepository;
 	@Autowired
-	private NodeRepository nodeRepository;
-	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
 	@Autowired
-	private MetaNodeRepository metaNodeRepository;
-	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private ContingutMovimentRepository contenidorMovimentRepository;
-	@Autowired
-	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
@@ -118,8 +106,10 @@ public class ContingutHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
-
-
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
@@ -165,7 +155,7 @@ public class ContingutHelper {
 			dto.setSistraPublicat(expedient.isSistraPublicat());
 			dto.setSistraUnitatAdministrativa(expedient.getSistraUnitatAdministrativa());
 			dto.setSistraClau(expedient.getSistraClau());
-			dto.setNumero(expedient.getNumero());
+			dto.setNumero(expedientHelper.calcularNumero(expedient));
 			dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions().isEmpty() ? true : false);
 			dto.setAgafatPer(
 					conversioTipusHelper.convertir(
@@ -183,20 +173,17 @@ public class ContingutHelper {
 			dto.setConteDocumentsFirmats(conteDocumentsFirmats);
 			
 			dto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
-
 			// expedient estat
-			if(expedient.getExpedientEstat()!=null){
+			if (expedient.getExpedientEstat() != null) {
 				ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getExpedientEstat().getMetaExpedient(), expedient.getExpedientEstat().getOrdre()+1);
-				if(estat!=null){
+				if (estat != null) {
 					dto.setExpedientEstatNextInOrder(estat.getId());
 				} else {//if there is no estat with higher order, choose previous 
 					dto.setExpedientEstatNextInOrder(expedient.getExpedientEstat().getId());
 				}
-				
 				dto.setExpedientEstat(conversioTipusHelper.convertir(
 						expedient.getExpedientEstat(),
 						ExpedientEstatDto.class));
-				
 				//omplir permision for expedient estat
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				dto.setUsuariActualWrite(
@@ -207,7 +194,6 @@ public class ContingutHelper {
 								auth));
 			}
 			resposta = dto;
-			
 		// DOCUMENT
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
@@ -259,20 +245,18 @@ public class ContingutHelper {
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
-			
 		// CARPETA
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
 			resposta = dto;
 		} 
-		
 		// CONTINGUT
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setEsborrat(contingut.getEsborrat());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
-		if(!contingut.getFills().isEmpty()){
+		if (!contingut.getFills().isEmpty()) {
 			resposta.setHasFills(true);
 		} else {
 			resposta.setHasFills(false);
@@ -791,31 +775,6 @@ public class ContingutHelper {
 				auth);
 	}
 
-	public void calcularSequenciaExpedient(
-			ExpedientEntity expedient,
-			Integer any) {
-		int anyExpedient;
-		if (any != null)
-			anyExpedient = any.intValue();
-		else
-			anyExpedient = Calendar.getInstance().get(Calendar.YEAR);
-		MetaExpedientSequenciaEntity sequencia = metaExpedientSequenciaRepository.findByMetaExpedientAndAny(
-				expedient.getMetaExpedient(),
-				anyExpedient);
-		if (sequencia == null) {
-			sequencia = MetaExpedientSequenciaEntity.getBuilder(
-					anyExpedient,
-					expedient.getMetaExpedient()).build();
-			metaExpedientSequenciaRepository.save(sequencia);
-		}
-		long sequenciaExpedient = sequencia.getValor();
-		sequencia.incrementar();
-		expedient.updateAnySequenciaCodi(
-				anyExpedient,
-				sequenciaExpedient,
-				expedient.getMetaExpedient().getCodi());
-	}
-
 	public ExpedientEntity crearNouExpedient(
 			String nom,
 			MetaExpedientEntity metaExpedient,
@@ -825,6 +784,7 @@ public class ContingutHelper {
 			String ntiOrgano,
 			Date ntiFechaApertura,
 			Integer any,
+			Long sequencia,
 			boolean agafar) {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
@@ -843,9 +803,29 @@ public class ContingutHelper {
 				agafatPer(agafatPer).
 				build();
 		// Calcula en número del nou expedient
-		calcularSequenciaExpedient(
-				expedientCrear,
-				any);
+		long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(
+				metaExpedient,
+				any,
+				false);
+		if (sequencia == null) {
+			expedientCrear.updateAnySequenciaCodi(
+					any,
+					sequenciaMetaExpedient,
+					metaExpedient.getCodi());
+		} else {
+			if (sequencia.longValue() == sequenciaMetaExpedient) {
+				metaExpedientHelper.obtenirProximaSequenciaExpedient(
+						metaExpedient,
+						any,
+						true);
+				expedientCrear.updateAnySequenciaCodi(
+						any,
+						sequenciaMetaExpedient,
+						metaExpedient.getCodi());
+			} else {
+				throw new ValidationException("Ja existeix un altre expedient amb el número de seqüència " + sequenciaMetaExpedient);
+			}
+		}
 		ExpedientEntity expedientCreat = expedientRepository.save(expedientCrear);
 		// Calcula l'identificador del nou expedient
 		calcularIdentificadorExpedient(
@@ -1170,7 +1150,7 @@ public class ContingutHelper {
 		}
 	}
 
-	private Long getCountByContingut(
+	/*private Long getCountByContingut(
 			ContingutEntity contingut,
 			List<Object[]> counts) {
 		for (Object[] count: counts) {
@@ -1180,7 +1160,7 @@ public class ContingutHelper {
 			}
 		}
 		return new Long(0);
-	}
+	}*/
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 

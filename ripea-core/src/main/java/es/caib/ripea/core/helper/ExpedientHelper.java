@@ -1,10 +1,11 @@
 
 package es.caib.ripea.core.helper;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 
 import es.caib.distribucio.ws.backofficeintegracio.DocumentTipus;
 import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracion;
@@ -22,7 +27,6 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -72,6 +76,26 @@ public class ExpedientHelper {
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
+	private DocumentRepository documentRepository;
+	@Autowired
+	private CarpetaRepository carpetaRepository;
+	@Autowired
+	private ExpedientRepository expedientRepository;
+	@Autowired
+	private EntitatRepository entitatRepository;
+	@Autowired
+	private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired
+	private RegistreInteressatRepository registreInteressatRepository;
+	@Autowired
+	private CarpetaHelper carpetaHelper;
+	@Autowired
+	private DocumentHelper documentHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
+	@Autowired
 	private ContingutHelper contingutHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
@@ -82,27 +106,7 @@ public class ExpedientHelper {
 	@Autowired
 	private EmailHelper emailHelper;
 	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private CarpetaRepository carpetaRepository;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
-	@Resource
-	private CarpetaHelper carpetaHelper;
-	@Autowired
-	RegistreInteressatRepository registreInteressatRepository;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ExpedientDto create(
@@ -110,6 +114,7 @@ public class ExpedientHelper {
 			Long metaExpedientId,
 			Long pareId,
 			Integer any,
+			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats) {
@@ -155,9 +160,9 @@ public class ExpedientHelper {
 				metaExpedient.getEntitat().getUnitatArrel(),
 				new Date(),
 				any,
+				sequencia,
 				true);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
-		
 		//find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;
 		for (ExpedientEstatEntity expedientEstat : expedientEstats) {
@@ -177,15 +182,11 @@ public class ExpedientHelper {
 						estatInicial.getResponsableCodi());
 			}
 		}
-		
-		
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(
 					expedientPeticioId,
 					expedient.getId());
-			
-			
 			if (associarInteressats) {
 				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 
@@ -195,32 +196,24 @@ public class ExpedientHelper {
 
 					// if interessat is not representant
 					if (existsRepresentant != null) {
-
-						InteressatDto createdInteressat = expedientInteressatHelper.create(
+						expedientInteressatHelper.create(
 								entitatId,
 								expedient.getId(),
 								null,
 								toInteressatDto(registreInteressatEntity),
 								false);
-						
-						
-						if(registreInteressatEntity.getRepresentant()!=null){
+						if (registreInteressatEntity.getRepresentant()!=null){
 							expedientInteressatHelper.create(
 									entitatId,
 									expedient.getId(),
 									null,
 									toInteressatDto(registreInteressatEntity.getRepresentant()),
 									false);
-							
 						}
-						
-						
 					}
 				}
-
 			}
 		}
-
 		contingutLogHelper.logCreacio(
 				expedient,
 				false,
@@ -236,9 +229,7 @@ public class ExpedientHelper {
 				null);
 		return dto;
 	}
-	
-	
-	
+
 	public InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
 
 		InteressatDto interessatDto = null;
@@ -308,13 +299,9 @@ public class ExpedientHelper {
 
 		return interessatDto;
 	}
-	
-	
-	
-	public InteressatDocumentTipusEnumDto toInteressatDocumentTipusEnumDto(DocumentTipus documentTipus) {
 
+	public InteressatDocumentTipusEnumDto toInteressatDocumentTipusEnumDto(DocumentTipus documentTipus) {
 		InteressatDocumentTipusEnumDto interessatDocumentTipusEnumDto = null;
-		
 		if (documentTipus != null) {
 			switch (documentTipus) {
 			case NIF:
@@ -333,53 +320,39 @@ public class ExpedientHelper {
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.ALTRES_DE_PERSONA_FISICA;
 				break;					
 			}
-			
 		}
 		return interessatDocumentTipusEnumDto;
 	}
-	
-	
 
 	public void relateExpedientWithPeticioAndSetAnnexosPendent(
 			Long expedientPeticioId,
 			Long expedientId) {
-
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-
 		expedientPeticioEntity.updateExpedient(expedient);
 		expedient.addExpedientPeticio(expedientPeticioEntity);
-
-
 		// set annexos as pending to create in db and to move in arxiu
 		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			registreAnnex.updateEstat(RegistreAnnexEstatEnumDto.PENDENT);
 		}
 		
 	}
-	
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
 			Long expedientPeticioId,
 			Long expedientId) {
-
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
-
 	}
-	
-	
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateNotificarError(
 			Long expedientPeticioId,
 			String error) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateNotificaDistError(error);
-
 	}
-	
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateRegistreAnnexError(
 			Long registreAnnexId,
@@ -388,10 +361,7 @@ public class ExpedientHelper {
 		registreAnnexEntity.updateError(error);
 
 	}
-	
-	
-	
-	
+
 	/**
 	 * Creates document from registre annex
 	 * @param registreAnnexId
@@ -465,13 +435,12 @@ public class ExpedientHelper {
 		fitxer.setNom(documentDto.getFitxerNom());
 		fitxer.setContentType(documentDto.getFitxerContentType());
 		fitxer.setContingut(documentDto.getFitxerContingut());
-		List<ArxiuFirmaDto> firmes = null;
 		if (documentDto.getFitxerContingut() != null) {
 			documentHelper.actualitzarFitxerDocument(
 					docEntity,
 					fitxer);
 			if (documentDto.isAmbFirma()) {
-				firmes = documentHelper.validaFirmaDocument(
+				documentHelper.validaFirmaDocument(
 						docEntity, 
 						fitxer,
 						documentDto.getFirmaContingut());
@@ -720,12 +689,9 @@ public class ExpedientHelper {
 		}
 		return documentNtiTipoDocumentalEnumDto;
 	}
-	
-	
-	public NtiOrigenEnumDto toNtiOrigenEnumDto(NtiOrigen ntiOrigen) {
 
+	public NtiOrigenEnumDto toNtiOrigenEnumDto(NtiOrigen ntiOrigen) {
 		NtiOrigenEnumDto ntiOrigenEnumDto = null;
-		
 		if (ntiOrigen != null) {
 			switch (ntiOrigen) {
 			case CIUTADA:
@@ -738,9 +704,25 @@ public class ExpedientHelper {
 		}
 		return ntiOrigenEnumDto;
 	}
-	
-	
-	
+
+	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
+	public String calcularNumero(ExpedientEntity expedient) {
+		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
+		String expressioNumero = metaExpedient.getExpressioNumero();
+		if (expressioNumero != null && !expressioNumero.isEmpty()) {
+			Mustache mustache = mustacheFactory.compile(new StringReader(expressioNumero), "expressioNumero");
+			StringWriter writer = new StringWriter();
+			HashMap<String, Object> model = new HashMap<String, Object>();
+			model.put("codi", expedient.getCodi());
+			model.put("seq", expedient.getSequencia());
+			model.put("any", expedient.getAny());
+			mustache.execute(writer, model);
+		    writer.flush();
+		    return writer.toString();
+		} else {
+			return expedient.getCodi() + "/" + expedient.getSequencia() + "/" + expedient.getAny();
+		}
+	}
 
 	private void agafar(
 			Long entitatId,

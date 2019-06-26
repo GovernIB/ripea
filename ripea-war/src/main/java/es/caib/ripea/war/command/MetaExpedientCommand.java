@@ -35,6 +35,8 @@ public class MetaExpedientCommand {
 	private String classificacioSia;
 	@NotEmpty @Size(max = 30)
 	private String serieDocumental;
+	@Size(max = 100)
+	private String expressioNumero;
 	private boolean notificacioActiva;
 	@Size(max = 44)
 	private String notificacioSeuProcedimentCodi;
@@ -96,6 +98,12 @@ public class MetaExpedientCommand {
 	}
 	public void setSerieDocumental(String serieDocumental) {
 		this.serieDocumental = serieDocumental;
+	}
+	public String getExpressioNumero() {
+		return expressioNumero;
+	}
+	public void setExpressioNumero(String expressioNumero) {
+		this.expressioNumero = expressioNumero;
 	}
 	public boolean isNotificacioActiva() {
 		return notificacioActiva;

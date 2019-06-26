@@ -9,19 +9,15 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
-import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -45,13 +41,16 @@ public interface ExpedientService {
 	 * @param any
 	 *            Any de l'expedient que es vol crear. Si és null l'expedient es crearà
 	 *            a dins l'any actual.
+	 * @param sequencia
+	 *            Número de seqüència de l'expedient que es vol crear.
 	 * @param nom
 	 *            Nom de l'expedient que es vol crear.
 	 * @return L'expedient creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws NomInvalidException
-	 *             Si el nom del contenidor conté caràcters invàlids.
+	 * @throws ValidationException
+	 *             Si el nom del contenidor conté caràcters invàlids o si ja existeix un
+	 *             altre expedient amb el mateix tipus, sequencia i any.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public ExpedientDto create(
@@ -59,6 +58,7 @@ public interface ExpedientService {
 			Long metaExpedientId,
 			Long pareId,
 			Integer any,
+			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats) throws NotFoundException, ValidationException;

@@ -28,7 +28,6 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.api.Firma;
-import es.caib.ripea.core.api.dto.AnotacioRegistreFiltreDto;
 import es.caib.ripea.core.api.dto.ArxiuContingutDto;
 import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
@@ -54,7 +53,6 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.RegistreAnotacioDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.ConteDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -70,7 +68,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -88,7 +85,6 @@ import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
@@ -115,9 +111,6 @@ public class ContingutServiceImpl implements ContingutService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
-	@Autowired
-	private RegistreRepository registreRepository;
-
 	@Autowired
 	PaginacioHelper paginacioHelper;
 	@Autowired
@@ -1008,11 +1001,9 @@ public class ContingutServiceImpl implements ContingutService {
 		boolean tipusCarpeta = true;
 		boolean tipusDocument = true;
 		boolean tipusExpedient = true;
-		boolean tipusRegistre = true;
 		if (filtre.getTipus() != null) {
 			tipusCarpeta = false;
 			tipusDocument = false;
-			tipusRegistre = false;
 			switch (filtre.getTipus()) {
 			case CARPETA:
 				tipusCarpeta = true;
@@ -1024,7 +1015,6 @@ public class ContingutServiceImpl implements ContingutService {
 				tipusExpedient = true;
 				break;
 			case REGISTRE:
-				tipusRegistre = true;
 				break;
 			}
 		}

@@ -23,7 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,18 +37,18 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name = "ipa_expedient")
+@Table(name = "ipa_expedient", uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"metaexpedient_id", "anio", "sequencia"})
+})
 @EntityListeners(AuditingEntityListener.class)
 public class ExpedientEntity extends NodeEntity {
 
 	@Column(name = "estat", nullable = false)
 	protected ExpedientEstatEnumDto estat;
-	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "expedient_estat_id")
-	@ForeignKey(name = "ipa_expestat_expedient_fk")
-	private ExpedientEstatEntity expedientEstat;
-
+	@JoinColumn(name = "metaexpedient_id")
+	@ForeignKey(name = "ipa_metaexp_expedient_fk")
+	private MetaExpedientEntity metaExpedient;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "tancat_data")
 	protected Date tancatData;
@@ -124,15 +124,15 @@ public class ExpedientEntity extends NodeEntity {
 			name = "ipa_expedient_rel_rel_fk",
 			inverseName = "ipa_expedient_rel_exp_fk")
 	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
-	
-	
 	@OneToMany(
 			mappedBy = "expedient",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<ExpedientPeticioEntity> peticions = new ArrayList<ExpedientPeticioEntity>();
-
-
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "expedient_estat_id")
+	@ForeignKey(name = "ipa_expestat_expedient_fk")
+	private ExpedientEstatEntity expedientEstat;
 	
 	public List<ExpedientPeticioEntity> getPeticions() {
 		return peticions;
@@ -202,11 +202,6 @@ public class ExpedientEntity extends NodeEntity {
 	}
 	public MetaExpedientEntity getMetaExpedient() {
 		return (MetaExpedientEntity)getMetaNode();
-	}
-
-	@Transient
-	public String getNumero() {
-		return codi + "/" + sequencia + "/" + any;
 	}
 
 	public void update(
@@ -290,7 +285,7 @@ public class ExpedientEntity extends NodeEntity {
 
 	public static Builder getBuilder(
 			String nom,
-			MetaNodeEntity metaNode,
+			MetaExpedientEntity metaExpedient,
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			String ntiVersion,
@@ -299,7 +294,7 @@ public class ExpedientEntity extends NodeEntity {
 			String ntiClasificacionSia) {
 		return new Builder(
 				nom,
-				metaNode,
+				metaExpedient,
 				pare,
 				entitat,
 				ntiVersion,
@@ -312,7 +307,7 @@ public class ExpedientEntity extends NodeEntity {
 		ExpedientEntity built;
 		Builder(
 				String nom,
-				MetaNodeEntity metaNode,
+				MetaExpedientEntity metaExpedient,
 				ContingutEntity pare,
 				EntitatEntity entitat,
 				String ntiVersion,
@@ -321,7 +316,8 @@ public class ExpedientEntity extends NodeEntity {
 				String ntiClasificacionSia) {
 			built = new ExpedientEntity();
 			built.nom = nom;
-			built.metaNode = metaNode;
+			built.metaNode = metaExpedient;
+			built.metaExpedient = metaExpedient;
 			built.pare = pare;
 			built.entitat = entitat;
 			built.ntiVersion = ntiVersion;

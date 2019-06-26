@@ -17,6 +17,7 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 
 	private String classificacioSia;
 	private String serieDocumental;
+	private String expressioNumero;
 	private boolean notificacioActiva;
 	private String notificacioSeuProcedimentCodi;
 	private String notificacioSeuRegistreLlibre;
@@ -51,6 +52,12 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	}
 	public void setSerieDocumental(String serieDocumental) {
 		this.serieDocumental = serieDocumental;
+	}
+	public String getExpressioNumero() {
+		return expressioNumero;
+	}
+	public void setExpressioNumero(String expressioNumero) {
+		this.expressioNumero = expressioNumero;
 	}
 	public boolean isNotificacioActiva() {
 		return notificacioActiva;

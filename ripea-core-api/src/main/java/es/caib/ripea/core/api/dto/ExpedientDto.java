@@ -31,55 +31,12 @@ public class ExpedientDto extends NodeDto {
 	private String numero;
 	private boolean conteDocumentsFirmats;
 	private long numComentaris;
+	private ExpedientEstatDto expedientEstat;
 	private Long expedientEstatId;
 	private Long expedientEstatNextInOrder;
 	private boolean usuariActualWrite;
-	
 	private boolean peticions;
 
-
-	public boolean isPeticions() {
-		return peticions;
-	}
-
-	public void setPeticions(boolean peticions) {
-		this.peticions = peticions;
-	}
-
-	public boolean isUsuariActualWrite() {
-		return usuariActualWrite;
-	}
-
-	public void setUsuariActualWrite(boolean usuariActualWrite) {
-		this.usuariActualWrite = usuariActualWrite;
-	}
-	
-	private ExpedientEstatDto expedientEstat;
-
-	public ExpedientEstatDto getExpedientEstat() {
-		return expedientEstat;
-	}
-	public void setExpedientEstat(ExpedientEstatDto expedientEstat) {
-		this.expedientEstat = expedientEstat;
-	}
-	public Long getExpedientEstatNextInOrder() {
-		return expedientEstatNextInOrder;
-	}
-	public void setExpedientEstatNextInOrder(Long expedientEstatNextInOrder) {
-		this.expedientEstatNextInOrder = expedientEstatNextInOrder;
-	}
-	public Long getExpedientEstatId() {
-		return expedientEstatId;
-	}
-	public void setExpedientEstatId(Long expedientEstatId) {
-		this.expedientEstatId = expedientEstatId;
-	}
-	public long getNumComentaris() {
-		return numComentaris;
-	}
-	public void setNumComentaris(long numComentaris) {
-		this.numComentaris = numComentaris;
-	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -187,6 +144,42 @@ public class ExpedientDto extends NodeDto {
 	}
 	public void setConteDocumentsFirmats(boolean conteDocumentsFirmats) {
 		this.conteDocumentsFirmats = conteDocumentsFirmats;
+	}
+	public long getNumComentaris() {
+		return numComentaris;
+	}
+	public void setNumComentaris(long numComentaris) {
+		this.numComentaris = numComentaris;
+	}
+	public ExpedientEstatDto getExpedientEstat() {
+		return expedientEstat;
+	}
+	public void setExpedientEstat(ExpedientEstatDto expedientEstat) {
+		this.expedientEstat = expedientEstat;
+	}
+	public Long getExpedientEstatId() {
+		return expedientEstatId;
+	}
+	public void setExpedientEstatId(Long expedientEstatId) {
+		this.expedientEstatId = expedientEstatId;
+	}
+	public Long getExpedientEstatNextInOrder() {
+		return expedientEstatNextInOrder;
+	}
+	public void setExpedientEstatNextInOrder(Long expedientEstatNextInOrder) {
+		this.expedientEstatNextInOrder = expedientEstatNextInOrder;
+	}
+	public boolean isUsuariActualWrite() {
+		return usuariActualWrite;
+	}
+	public void setUsuariActualWrite(boolean usuariActualWrite) {
+		this.usuariActualWrite = usuariActualWrite;
+	}
+	public boolean isPeticions() {
+		return peticions;
+	}
+	public void setPeticions(boolean peticions) {
+		this.peticions = peticions;
 	}
 
 	public MetaExpedientDto getMetaExpedient() {

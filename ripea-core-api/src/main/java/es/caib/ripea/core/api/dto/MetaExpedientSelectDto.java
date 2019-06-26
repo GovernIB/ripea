@@ -3,11 +3,6 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 /**
  * Informació d'un MetaExpedient per desplegable.
  * 
@@ -30,7 +25,5 @@ public class MetaExpedientSelectDto {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-
-	private static final long serialVersionUID = -139254994389509932L;
 
 }

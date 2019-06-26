@@ -6,10 +6,9 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,13 +27,12 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -47,28 +45,24 @@ import es.caib.ripea.core.security.ExtendedPermission;
 @Service
 public class MetaExpedientServiceImpl implements MetaExpedientService {
 
-	@Resource
+	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
+	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
-
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private MetaNodeHelper metaNodeHelper;
-	@Resource
-	private PaginacioHelper paginacioHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
+	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
-
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private MetaNodeHelper metaNodeHelper;
+	@Autowired
+	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 
 	@Transactional
 	@Override
@@ -154,6 +148,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getDescripcio(),
 				metaExpedient.getClassificacioSia(),
 				metaExpedient.getSerieDocumental(),
+				metaExpedient.getExpressioNumero(),
 				metaExpedient.isNotificacioActiva(),
 				metaExpedient.getNotificacioSeuProcedimentCodi(),
 				metaExpedient.getNotificacioSeuRegistreLlibre(),
@@ -327,12 +322,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		return resposta;
 	}
-	
-	
-	
-	
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -401,6 +390,34 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				new Permission[] {ExtendedPermission.READ});
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public long getProximNumeroSequencia(
+			Long entitatId,
+			Long id,
+			int any) {
+		logger.debug("Consulta el pròxim número de seqüència (" +
+				"entitatId=" + entitatId +  ", " +
+				"id=" + id +  ", " +
+				"any=" + any +  ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				true);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		return metaExpedientHelper.obtenirProximaSequenciaExpedient(
+				metaExpedient,
+				any,
+				false);
+	}
+
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(
@@ -408,7 +425,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long id) {
 		logger.debug("Consulta dels permisos del meta-expedient ("
 				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ")"); 
+				+ "id=" + id +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,

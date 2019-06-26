@@ -30,13 +30,9 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @Entity
 @Table(	name = "ipa_registre_interessat")
 @EntityListeners(AuditingEntityListener.class)
+@SuppressWarnings("serial")
 public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	@Column(name = "adresa", length = 160)
 	private String adresa;
 	@Column(name = "canal", length = 30)

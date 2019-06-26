@@ -5,7 +5,6 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,8 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -62,8 +59,6 @@ public class ExpedientPeticioController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
 
-	
-
 	@Autowired
 	private ExpedientPeticioService expedientPeticioService;
 	@Autowired
@@ -72,20 +67,16 @@ public class ExpedientPeticioController extends BaseUserController {
 	private MetaExpedientService metaExpedientService;	
 	@Autowired
 	private ExpedientService expedientService;		
-	
-	
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-
-
 		model.addAttribute(
 				getFiltreCommand(request));
-		
 		return "expedientPeticioList";
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(
 			HttpServletRequest request,
@@ -108,20 +99,7 @@ public class ExpedientPeticioController extends BaseUserController {
 		}
 		return "redirect:expedientPeticio";
 	}
-	
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-	
-	
-	
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
@@ -136,8 +114,6 @@ public class ExpedientPeticioController extends BaseUserController {
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				"id");
 	}
-	
-	
 
 	@RequestMapping(value = "/{registreAnnexId}/{expedientPeticioId}/reintentar", method = RequestMethod.GET)
 	public String retryCreateDocFromAnnex(
@@ -145,14 +121,9 @@ public class ExpedientPeticioController extends BaseUserController {
 			@PathVariable Long registreAnnexId,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		
-		
-
 		boolean processatOk = expedientService.retryCreateDocFromAnnex(
 				registreAnnexId,
 				expedientPeticioId);
-
-
 		if (processatOk) {
 			MissatgesHelper.success(
 					request, 
@@ -170,19 +141,13 @@ public class ExpedientPeticioController extends BaseUserController {
 		}
 		return "redirect:/modal/expedientPeticio/" + expedientPeticioId;
 	}
-	
-	
+
 	@RequestMapping(value = "/{expedientPeticioId}/reintentarNotificar", method = RequestMethod.GET)
 	public String retryNotificarDistribucio(
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		
-
-		boolean processatOk = expedientService.retryNotificarDistribucio(
-				expedientPeticioId);
-
-
+		boolean processatOk = expedientService.retryNotificarDistribucio(expedientPeticioId);
 		if (processatOk) {
 			MissatgesHelper.success(
 					request, 
@@ -201,25 +166,18 @@ public class ExpedientPeticioController extends BaseUserController {
 		return "redirect:/modal/expedientPeticio/" + expedientPeticioId;
 	}
 
-
-	
-	
 	@RequestMapping(value = "/{expedientPeticioId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
-		
 		model.addAttribute(
 				"peticio",
 				expedientPeticioDto);
-		
 		return "expedientPetcioDetall";
 	}
-	
-	
+
 	@RequestMapping(value = "/{expedientId}/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse peticionsDatatable(
@@ -235,30 +193,22 @@ public class ExpedientPeticioController extends BaseUserController {
 						expedientId));		
 	}
 
-	
 	@RequestMapping(value = "/rebutjar/{expedientPeticioId}", method = RequestMethod.GET)
 	public String rebutjarGet(
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		
-		
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
-		
 		ExpedientPeticioRebutjarCommand command = new ExpedientPeticioRebutjarCommand();
 		command.setId(expedientPeticioId);
-		
 		model.addAttribute(
 				"expedientPeticioRebutjarCommand",
 				command);
-		
 		model.addAttribute(
 				"expedientPeticioId",
 				expedientPeticioDto.getId());
-		
 		return "expedientPeticioRebutjar";
 	}
-	
 
 	@RequestMapping(value = "/rebutjar", method = RequestMethod.POST)
 	public String rebutjarPost(
@@ -266,42 +216,32 @@ public class ExpedientPeticioController extends BaseUserController {
 			@Valid ExpedientPeticioRebutjarCommand command,
 			BindingResult bindingResult,
 			Model model) {
-
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"expedientPeticioRebutjarCommand",
 					command);
-			
 			model.addAttribute(
 					"expedientPeticioId",
 					command.getId());
-			
 			return "expedientPeticioRebutjar";
 		}
-
 		expedientPeticioService.rebutjar(
 				command.getId(),
 				command.getObservacions());
-		
-		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:expedientPeticio",
 				"expedientPeticio.controller.rebutjat.ok");
 	}
-	
-	
+
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.GET)
 	public String acceptar(
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
 		ExpedientDto expedient = null;
-
-
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		model.addAttribute(
 				"entitatId",
@@ -314,9 +254,7 @@ public class ExpedientPeticioController extends BaseUserController {
 		MetaExpedientDto metaExpedientDto = expedientPeticioService.findMetaExpedientByEntitatAndProcedimentCodi(
 				expedientPeticioDto.getRegistre().getEntitatCodi(),
 				expedientPeticioDto.getRegistre().getProcedimentCodi());
-		
 		List<ExpedientDto> expedients = null;
-		
 		// if exists metaExpedient with matching codi procediment
 		if (metaExpedientDto!=null) {
 			boolean hasPermissions = false;
@@ -328,11 +266,8 @@ public class ExpedientPeticioController extends BaseUserController {
 			// if current user has create permissions for this metaexpedient
 			if (hasPermissions) {
 				command.setMetaExpedientId(metaExpedientDto.getId());
-				
 				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId());
-				
 				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
-				
 				if (expedientNumero != null && !expedientNumero.isEmpty()) {
 					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(
 							entitat.getId(),
@@ -349,37 +284,28 @@ public class ExpedientPeticioController extends BaseUserController {
 				}
 			}
 		}
-		
 		command.setExpedientPeticioAccioEnumDto(expedient != null ? ExpedientPeticioAccioEnumDto.INCORPORAR : ExpedientPeticioAccioEnumDto.CREAR);
 		model.addAttribute(
 				"accio",
 				expedient != null ? ExpedientPeticioAccioEnumDto.INCORPORAR : ExpedientPeticioAccioEnumDto.CREAR);
 		command.setExpedientId(expedient != null ? expedient.getId() : null);
-
 		model.addAttribute(
 				"expedients",
 				expedients);
-		
 		model.addAttribute("accios",
 				EnumHelper.getOptionsForEnum(ExpedientPeticioAccioEnumDto.class,
 						"expedient.peticio.accio.enum."));
-
 		command.setId(expedientPeticioDto.getId());
 		command.setAssociarInteressats(true);
-		
 		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
-
 		command.setAny(Calendar.getInstance().get(Calendar.YEAR));
-
 		model.addAttribute(
 				"expedientPeticioAcceptarCommand",
 				command);
-
 		return "expedientPeticioAccept";
 
 	}
-	
-	
+
 	@RequestMapping(value = "/expedients/{entitatId}/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ExpedientDto> findExpedientEstatByMetaExpedient(
@@ -387,14 +313,9 @@ public class ExpedientPeticioController extends BaseUserController {
 			@PathVariable Long entitatId,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-
-
 		return (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitatId, metaExpedientId);
 	}
-	
-	
-	
-	
+
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
 	public String acceptarPost(
 			HttpServletRequest request,
@@ -402,23 +323,21 @@ public class ExpedientPeticioController extends BaseUserController {
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
-
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 			"expedientPeticioAcceptarCommand",
 			command);
 			return "expedientPeticioAcceptNoExp";
 		}
-		
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
-
 		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
 			expedientService.create(
 					entitat.getId(),
 					command.getMetaExpedientId(),
 					null,
 					command.getAny(),
+					null,
 					command.getNewExpedientTitol(),
 					expedientPeticioDto.getId(),
 					command.isAssociarInteressats());
@@ -429,17 +348,12 @@ public class ExpedientPeticioController extends BaseUserController {
 					expedientPeticioDto.getId(),
 					command.isAssociarInteressats());
 		}
-
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:expedientPeticio",
 				"expedientPeticio.controller.acceptat.ok");
 	}
-	
-	
-	
-	
-	
+
 	@RequestMapping(value = "/descarregarAnnex/{annexId}", method = RequestMethod.GET)
 	public String descarregarAnnex(
 			HttpServletRequest request,
@@ -460,9 +374,7 @@ public class ExpedientPeticioController extends BaseUserController {
 		}
 		return null;
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/firmaInfo/{annexId}", method = RequestMethod.GET)
 	public String firmaInfo(
 			HttpServletRequest request,
@@ -472,7 +384,6 @@ public class ExpedientPeticioController extends BaseUserController {
 		try {
 			RegistreAnnexDto registreAnnexDto = expedientPeticioService.findAnnexById(
 					annexId);
-
 			model.addAttribute(
 					"annexId",
 					registreAnnexDto.getId());
@@ -491,31 +402,31 @@ public class ExpedientPeticioController extends BaseUserController {
 					ex.getMessage());
 			return "ajaxErrorPage";
 		}
-
 		return "registreAnnexFirmes";
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/descarregarFirma/{annexId}", method = RequestMethod.GET)
 	public String descarregarFirma(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable Long annexId ) throws IOException {
 		FitxerDto fitxer = expedientPeticioService.getAnnexFirmaContingut(annexId);
-		
 		writeFileToResponse(
 				fitxer.getNom(),
 				fitxer.getContingut(),
 				response);
 		return null;
 	}
-	
 
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	}
 
-	
-
-	
 	/**
 	 * Gets filtreCommand from session, if it doesnt exist it creates new one in session
 	 * @param request
@@ -533,11 +444,9 @@ public class ExpedientPeticioController extends BaseUserController {
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
 		}
-
 		return filtreCommand;
 	}
-	
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioController.class);
 
 }

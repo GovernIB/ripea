@@ -32,6 +32,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	private String classificacioSia;
 	@Column(name = "serie_doc", length = 30, nullable = false)
 	private String serieDocumental;
+	@Column(name = "expressio_numero", length = 100)
+	private String expressioNumero;
 	@Column(name = "not_activa", nullable = false)
 	private boolean notificacioActiva;
 	@Column(name = "not_seu_proc_codi", length = 44)
@@ -60,8 +62,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@JoinColumn(name = "pare_id")
 	@ForeignKey(name = "ipa_pare_metaexp_fk")
 	private MetaExpedientEntity pare;
-	
-	
+
 	@OneToMany(mappedBy = "metaExpedient", cascade = {CascadeType.ALL})
 	protected Set<MetaExpedientSequenciaEntity> sequencies;
 		
@@ -77,6 +78,9 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	}
 	public String getSerieDocumental() {
 		return serieDocumental;
+	}
+	public String getExpressioNumero() {
+		return expressioNumero;
 	}
 	public boolean isNotificacioActiva() {
 		return notificacioActiva;
@@ -121,6 +125,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String descripcio,
 			String classificacioSia,
 			String serieDocumental,
+			String expressioNumero,
 			boolean notificacioActiva,
 			String notificacioSeuProcedimentCodi,
 			String notificacioSeuRegistreLlibre,
@@ -139,6 +144,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				descripcio);
 		this.classificacioSia = classificacioSia;
 		this.serieDocumental = serieDocumental;
+		this.expressioNumero = expressioNumero;
 		this.notificacioActiva = notificacioActiva;
 		this.notificacioSeuProcedimentCodi = notificacioSeuProcedimentCodi;
 		this.notificacioSeuRegistreLlibre = notificacioSeuRegistreLlibre;
@@ -194,6 +200,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			built.tipus = MetaNodeTipusEnum.EXPEDIENT;
 			built.pare = pare;
 			built.notificacioActiva = notificacioActiva;
+		}
+		public Builder expressioNumero(String expressioNumero) {
+			built.expressioNumero = expressioNumero;
+			return this;
 		}
 		public Builder notificacioSeuProcedimentCodi(String notificacioSeuProcedimentCodi) {
 			built.notificacioSeuProcedimentCodi = notificacioSeuProcedimentCodi;

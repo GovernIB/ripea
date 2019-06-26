@@ -151,7 +151,6 @@ public interface MetaExpedientService {
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
-
 	/**
 	 * Consulta els meta-expedients actius per una entitat pels usuaris admins.
 	 * 
@@ -206,6 +205,25 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
 			Long entitatId) throws NotFoundException;
+
+	/**
+	 * Retorna el pròxim número de seqüència per a un meta-expedient.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param id
+	 *            Atribut id del meta-expedient.
+	 * @param any
+	 *            L'any per a obtenir el número de seqüència.
+	 * @return El pròxim número de seqüència.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public long getProximNumeroSequencia(
+			Long entitatId,
+			Long id,
+			int any) throws NotFoundException;
 
 	/**
 	 * Consulta els permisos del meta-expedient.

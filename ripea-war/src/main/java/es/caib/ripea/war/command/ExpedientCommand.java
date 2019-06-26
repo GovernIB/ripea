@@ -21,9 +21,8 @@ public class ExpedientCommand extends ContenidorCommand {
 	protected Long metaNodeId;
 	private String tancatMotiu;
 	private int any;
-	private long sequencia;
+	private Long sequencia;
 	private Long expedientEstatId;
-
 
 	public Long getExpedientEstatId() {
 		return expedientEstatId;
@@ -49,10 +48,10 @@ public class ExpedientCommand extends ContenidorCommand {
 	public void setAny(int any) {
 		this.any = any;
 	}
-	public long getSequencia() {
+	public Long getSequencia() {
 		return sequencia;
 	}
-	public void setSequencia(long sequencia) {
+	public void setSequencia(Long sequencia) {
 		this.sequencia = sequencia;
 	}
 

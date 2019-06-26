@@ -3,8 +3,6 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -14,27 +12,18 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
-import es.caib.ripea.core.api.service.ExpedientService;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -47,9 +36,8 @@ import es.caib.ripea.core.api.service.ExpedientService;
 public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Autowired
-	ExpedientPeticioService delegate;
+	private ExpedientPeticioService delegate;
 
-	
 	@Override
 	@RolesAllowed("tothom")
 	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(

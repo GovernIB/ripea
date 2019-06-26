@@ -34,12 +34,9 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(	name = "ipa_metanode",
-		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {
-						"entitat_id",
-						"codi",
-						"tipus"})})
+@Table(name = "ipa_metanode", uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"entitat_id", "codi", "tipus"})
+})
 @Inheritance(strategy=InheritanceType.JOINED)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class MetaNodeEntity extends RipeaAuditable<Long> {

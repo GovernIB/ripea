@@ -28,7 +28,6 @@ import es.caib.ripea.core.entity.ContingutLogEntity.Builder;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.repository.ContingutLogRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;

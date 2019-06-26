@@ -103,7 +103,6 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.caib.ripea.plugin.signatura.SignaturaPlugin;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -130,7 +129,6 @@ public class PluginHelper {
 	private DadesExternesPlugin dadesExternesPlugin;
 	private IArxiuPlugin arxiuPlugin;
 	private IValidateSignaturePlugin validaSignaturaPlugin;
-	private SignaturaPlugin signaturaPlugin;
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 
@@ -405,7 +403,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		accioParams.put("número", expedient.getNumero());
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
@@ -523,7 +520,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		accioParams.put("número", expedient.getNumero());
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
@@ -560,7 +556,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		accioParams.put("número", expedient.getNumero());
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
@@ -627,7 +622,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		accioParams.put("número", expedient.getNumero());
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
@@ -665,7 +659,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		accioParams.put("número", expedient.getNumero());
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
@@ -2605,7 +2598,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
 		accioParams.put("expedientId", expedient.getId().toString());
-		accioParams.put("expedientNumero", expedient.getNumero());
 		accioParams.put("expedientTitol", expedient.getNom());
 		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
 		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
@@ -2776,7 +2768,6 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
 		accioParams.put("expedientId", expedient.getId().toString());
-		accioParams.put("expedientNumero", expedient.getNumero());
 		accioParams.put("expedientTitol", expedient.getNom());
 		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
 		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
@@ -3933,28 +3924,6 @@ public class PluginHelper {
 		}
 		return validaSignaturaPlugin;
 	}
-	
-	private SignaturaPlugin getSignaturaPlugin() {
-		if (signaturaPlugin == null) {
-			String pluginClass = getPropertyPluginSignatura();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					signaturaPlugin = (SignaturaPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_SIGNATURA,
-							"Error al crear la instància del plugin de signatura",
-							ex);
-				}
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_SIGNATURA,
-						"No està configurada la classe per al plugin de signatura");
-			}
-		}
-		return signaturaPlugin;
-	}
 	private NotificacioPlugin getNotificacioPlugin() {
 		if (notificacioPlugin == null) {
 			String pluginClass = getPropertyPluginNotificacio();
@@ -4008,10 +3977,6 @@ public class PluginHelper {
 	private String getPropertyPluginValidaSignatura() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.validatesignature.class");
-	}
-	private String getPropertyPluginSignatura() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.signatura.class");
 	}
 	private String getPropertyPluginNotificacio() {
 		return PropertiesHelper.getProperties().getProperty(
