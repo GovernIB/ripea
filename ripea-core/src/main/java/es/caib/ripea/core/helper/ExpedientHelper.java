@@ -191,10 +191,11 @@ public class ExpedientHelper {
 
 				for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
 
-					RegistreInteressatEntity existsRepresentant = registreInteressatRepository.findByRepresentant(registreInteressatEntity);
+					// checking if this interessat is representant of any other interessat
+					RegistreInteressatEntity isRepresentant = registreInteressatRepository.findByRepresentant(registreInteressatEntity);
 
 					// if interessat is not representant
-					if (existsRepresentant != null) {
+					if (isRepresentant == null) {
 
 						InteressatDto createdInteressat = expedientInteressatHelper.create(
 								entitatId,
@@ -208,7 +209,7 @@ public class ExpedientHelper {
 							expedientInteressatHelper.create(
 									entitatId,
 									expedient.getId(),
-									null,
+									createdInteressat.getId(),
 									toInteressatDto(registreInteressatEntity.getRepresentant()),
 									false);
 							
