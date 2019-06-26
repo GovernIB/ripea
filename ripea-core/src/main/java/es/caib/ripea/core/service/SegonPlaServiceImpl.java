@@ -115,9 +115,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										4000));
 						
 					} catch (IOException e1) {
-						throw new RuntimeException(e1);
+						logger.error(ExceptionUtils.getStackTrace(e1));
 					}
-					throw new RuntimeException(e);
 				}
 			}
 		}

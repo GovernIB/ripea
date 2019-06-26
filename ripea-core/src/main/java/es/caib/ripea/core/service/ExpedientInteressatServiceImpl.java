@@ -33,6 +33,7 @@ import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
@@ -63,9 +64,11 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private ExpedientInteressatHelper expedientInteressatHelper;
+	
 
 
-	@Transactional
 	@Override
 	public InteressatDto create(
 			Long entitatId,
@@ -74,7 +77,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		return create(entitatId, expedientId, null, interessat, true);
 	}
 
-	@Transactional
 	@Override
 	public InteressatDto create(
 			Long entitatId,
@@ -82,133 +84,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long interessatId,
 			InteressatDto interessat,
 			boolean propagarArxiu) {
-		if (interessatId != null) {
-			logger.debug("Creant nou representant ("
-					+ "entitatId=" + entitatId + ", "
-					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + interessatId + ", "
-					+ "interessat=" + interessat + ")");
-		} else {
-			logger.debug("Creant nou interessat ("
-					+ "entitatId=" + entitatId + ", "
-					+ "expedientId=" + expedientId + ", "
-					+ "interessat=" + interessat + ")");
-		}
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+
+		return expedientInteressatHelper.create(
 				entitatId,
 				expedientId,
-				true,
-				false,
-				true,
-				false,
-				false);
-		InteressatEntity pare = null;
-		if (interessatId != null) {
-			pare = interessatRepository.findOne(interessatId);
-			if (pare == null) {
-				throw new NotFoundException(
-						interessatId,
-						InteressatEntity.class);
-			}
-		}
-		InteressatEntity interessatEntity = null;
-		if (interessat.isPersonaFisica()) {
-			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
-			interessatEntity = InteressatPersonaFisicaEntity.getBuilder(
-					interessatPersonaFisicaDto.getNom(),
-					interessatPersonaFisicaDto.getLlinatge1(),
-					interessatPersonaFisicaDto.getLlinatge2(),
-					interessatPersonaFisicaDto.getDocumentTipus(),
-					interessatPersonaFisicaDto.getDocumentNum(),
-					interessatPersonaFisicaDto.getPais(),
-					interessatPersonaFisicaDto.getProvincia(),
-					interessatPersonaFisicaDto.getMunicipi(),
-					interessatPersonaFisicaDto.getAdresa(),
-					interessatPersonaFisicaDto.getCodiPostal(),
-					interessatPersonaFisicaDto.getEmail(),
-					interessatPersonaFisicaDto.getTelefon(),
-					interessatPersonaFisicaDto.getObservacions(),
-					interessatPersonaFisicaDto.getPreferenciaIdioma(),
-					interessatPersonaFisicaDto.getNotificacioAutoritzat(),
-					expedient,
-					null).build();
-		} else if (interessat.isPersonaJuridica()) {
-			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
-			interessatEntity = InteressatPersonaJuridicaEntity.getBuilder(
-					interessatPersonaJuridicaDto.getRaoSocial(),
-					interessatPersonaJuridicaDto.getDocumentTipus(),
-					interessatPersonaJuridicaDto.getDocumentNum(),
-					interessatPersonaJuridicaDto.getPais(),
-					interessatPersonaJuridicaDto.getProvincia(),
-					interessatPersonaJuridicaDto.getMunicipi(),
-					interessatPersonaJuridicaDto.getAdresa(),
-					interessatPersonaJuridicaDto.getCodiPostal(),
-					interessatPersonaJuridicaDto.getEmail(),
-					interessatPersonaJuridicaDto.getTelefon(),
-					interessatPersonaJuridicaDto.getObservacions(),
-					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-					interessatPersonaJuridicaDto.getNotificacioAutoritzat(),
-					expedient,
-					null).build();
-		} else {
-			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
-					interessatAdministracioDto.getOrganCodi());
-			interessatEntity = InteressatAdministracioEntity.getBuilder(
-					unitat.getCodi(),
-					unitat.getDenominacio(),
-					interessatAdministracioDto.getDocumentTipus(),
-					interessatAdministracioDto.getDocumentNum(),
-					interessatAdministracioDto.getPais(),
-					interessatAdministracioDto.getProvincia(),
-					interessatAdministracioDto.getMunicipi(),
-					interessatAdministracioDto.getAdresa(),
-					interessatAdministracioDto.getCodiPostal(),
-					interessatAdministracioDto.getEmail(),
-					interessatAdministracioDto.getTelefon(),
-					interessatAdministracioDto.getObservacions(),
-					interessatAdministracioDto.getPreferenciaIdioma(),
-					interessatAdministracioDto.getNotificacioAutoritzat(),
-					expedient,
-					null).build();
-		}
-		if (pare != null) {
-			interessatEntity.updateEsRepresentant(true);
-		}
-		interessatEntity = interessatRepository.save(interessatEntity);
-		if (pare != null) {
-			pare.updateRepresentant(interessatEntity);
-		}
-		expedient.addInteressat(interessatEntity);
-		
-		if (propagarArxiu) {
-			pluginHelper.arxiuExpedientActualitzar(expedient);
-		}
-		
-		// Registra al log la creació de l'interessat
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				interessatEntity,
-				LogObjecteTipusEnumDto.INTERESSAT,
-				LogTipusEnumDto.CREACIO,
-				interessatEntity.getIdentificador(),
-				null,
-				false,
-				false);
-		if (interessat instanceof InteressatPersonaFisicaDto) {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatPersonaFisicaDto.class);
-		} else if (interessat instanceof InteressatPersonaJuridicaDto) {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatPersonaJuridicaDto.class);
-		} else {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatAdministracioDto.class);
-		}
+				interessatId,
+				interessat,
+				propagarArxiu);
+
 	}
 
 	@Transactional

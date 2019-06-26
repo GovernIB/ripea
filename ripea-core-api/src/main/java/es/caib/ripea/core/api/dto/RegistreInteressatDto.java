@@ -25,10 +25,33 @@ public class RegistreInteressatDto {
 	private String observacions;
 	private String paisCodi;
 	private String provinciaCodi;
+	private String pais;
+	private String provincia;
+	private String municipi;
 	private String raoSocial;
 	private String telefon;
 	private String tipus;
 	private RegistreInteressatDto representant;
+	
+	
+	public String getPais() {
+		return pais;
+	}
+	public void setPais(String pais) {
+		this.pais = pais;
+	}
+	public String getProvincia() {
+		return provincia;
+	}
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
+	}
+	public String getMunicipi() {
+		return municipi;
+	}
+	public void setMunicipi(String municipi) {
+		this.municipi = municipi;
+	}
 	public String getAdresa() {
 		return adresa;
 	}

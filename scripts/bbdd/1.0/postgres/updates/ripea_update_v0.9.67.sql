@@ -95,6 +95,9 @@ CREATE TABLE IPA_REGISTRE_ANNEX (
 	ESTAT character varying (20),
 	ERROR character varying (4000),
 	NTI_ESTADO_ELABORACIO character varying(50) NOT NULL,
+	PAIS character varying(200),
+	PROVINCIA character varying(200),
+	MUNICIPI character varying(200),	
 	
 	CREATEDDATE         timestamp without time zone,
   	LASTMODIFIEDDATE    timestamp without time zone,

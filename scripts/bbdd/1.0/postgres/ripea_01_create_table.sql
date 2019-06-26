@@ -604,6 +604,9 @@ CREATE TABLE IPA_REGISTRE_INTERESSAT (
 	TIPUS character varying (40) NOT NULL,
 	REPRESENTANT_ID BIGINT,
 	REGISTRE_ID BIGINT,
+	PAIS character varying(200),
+	PROVINCIA character varying(200),
+	MUNICIPI character varying(200),	
 	
   CREATEDDATE         timestamp without time zone,
   LASTMODIFIEDDATE    timestamp without time zone,

@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package es.caib.ripea.core.helper;
 
 import java.util.Date;
@@ -16,7 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.DocumentTipus;
-import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracio;
+import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracion;
 import es.caib.distribucio.ws.backofficeintegracio.NtiOrigen;
 import es.caib.distribucio.ws.backofficeintegracio.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.Carpeta;
@@ -33,14 +31,16 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.CarpetaService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -50,16 +50,16 @@ import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
+import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.CarpetaRepository;
-import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
+import es.caib.ripea.core.repository.RegistreInteressatRepository;
 
 /**
  * Mètodes comuns per a la gestió d'expedients. 
@@ -78,33 +78,17 @@ public class ExpedientHelper {
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
-	private RegistreRepository registreRepository;
-	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EmailHelper emailHelper;
-	
 	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
 	private CarpetaRepository carpetaRepository;
 	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
-
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private CarpetaService carpetaService;
 	@Autowired
 	private ExpedientRepository expedientRepository;
 	@Autowired
@@ -114,9 +98,11 @@ public class ExpedientHelper {
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
-	private ExpedientInteressatService expedientInteressatService;
+	private ExpedientInteressatHelper expedientInteressatHelper;
 	@Resource
 	private CarpetaHelper carpetaHelper;
+	@Autowired
+	RegistreInteressatRepository registreInteressatRepository;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ExpedientDto create(
@@ -199,58 +185,42 @@ public class ExpedientHelper {
 					expedientPeticioId,
 					expedient.getId());
 			
-			//TODO
-//			if (associarInteressats) {
-//				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-//				
-//				for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
-//					
-//					InteressatDto interessatDto = null;
-//					switch (registreInteressatEntity.getTipus()) {
-//					case PERSONA_FISICA:
-//						InteressatPersonaFisicaDto interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
-//						interessatPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
-//						interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-//						interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-//						
-//						
-//						
-//						for (PaisDto paisDto : cacheHelper.findPaisos()) {
-//							System.out.println(paisDto.getCodi());
-//						}
-//						
-//						for (ProvinciaDto provinciaDto : cacheHelper.findProvincies()) {
-//							System.out.println(provinciaDto.getCodi());
-//						}
-//						
-//						
-////						cacheHelper.findMunicipisPerProvincia();
-//						
-//						
-//						
-//						
-//						interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
-//						
-//						interessatDto = interessatPersonaFisicaDto;
-//						break;
-//					case PERSONA_JURIDICA:
-//						
-//						InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
-//						interessatDto = interessatPersonaJuridicaDto;
-//						break;
-//					case ADMINISTRACIO:
-//						InteressatAdministracioDto interessatAdministracioDto = new InteressatAdministracioDto();
-//						interessatDto = interessatAdministracioDto;
-//						break;
-//					}
-//					
-//					expedientInteressatService.create(entitatId, expedient.getId(), null, interessatDto, false);
-//				}
-//				
-//
-//			}
+			
+			if (associarInteressats) {
+				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+
+				for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
+
+					RegistreInteressatEntity existsRepresentant = registreInteressatRepository.findByRepresentant(registreInteressatEntity);
+
+					// if interessat is not representant
+					if (existsRepresentant != null) {
+
+						InteressatDto createdInteressat = expedientInteressatHelper.create(
+								entitatId,
+								expedient.getId(),
+								null,
+								toInteressatDto(registreInteressatEntity),
+								false);
+						
+						
+						if(registreInteressatEntity.getRepresentant()!=null){
+							expedientInteressatHelper.create(
+									entitatId,
+									expedient.getId(),
+									null,
+									toInteressatDto(registreInteressatEntity.getRepresentant()),
+									false);
+							
+						}
+						
+						
+					}
+				}
+
+			}
 		}
-		
+
 		contingutLogHelper.logCreacio(
 				expedient,
 				false,
@@ -266,6 +236,80 @@ public class ExpedientHelper {
 				null);
 		return dto;
 	}
+	
+	
+	
+	public InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
+
+		InteressatDto interessatDto = null;
+		switch (registreInteressatEntity.getTipus()) {
+		case PERSONA_FISICA:
+			InteressatPersonaFisicaDto interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
+
+			interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+			interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
+			interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+			interessatPersonaFisicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatPersonaFisicaDto.setAdresa(registreInteressatEntity.getAdresa());
+			interessatPersonaFisicaDto.setCodiPostal(registreInteressatEntity.getCp());
+			interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
+			interessatPersonaFisicaDto.setTelefon(registreInteressatEntity.getTelefon());
+			interessatPersonaFisicaDto.setObservacions(registreInteressatEntity.getObservacions());
+			interessatPersonaFisicaDto.setNotificacioAutoritzat(false);
+
+			interessatPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
+			interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
+			interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
+			interessatPersonaFisicaDto.setLlinatge2(registreInteressatEntity.getLlinatge2());
+
+			interessatDto = interessatPersonaFisicaDto;
+			break;
+		case PERSONA_JURIDICA:
+			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
+
+			interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+			interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
+			interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+			interessatPersonaJuridicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatPersonaJuridicaDto.setAdresa(registreInteressatEntity.getAdresa());
+			interessatPersonaJuridicaDto.setCodiPostal(registreInteressatEntity.getCp());
+			interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
+			interessatPersonaJuridicaDto.setTelefon(registreInteressatEntity.getTelefon());
+			interessatPersonaJuridicaDto.setObservacions(registreInteressatEntity.getObservacions());
+			interessatPersonaJuridicaDto.setNotificacioAutoritzat(false);
+
+			interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
+			interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
+
+			interessatDto = interessatPersonaJuridicaDto;
+			break;
+		case ADMINISTRACIO:
+			InteressatAdministracioDto interessatAdministracioDto = new InteressatAdministracioDto();
+
+			interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+			interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
+			interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+			interessatAdministracioDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatAdministracioDto.setAdresa(registreInteressatEntity.getAdresa());
+			interessatAdministracioDto.setCodiPostal(registreInteressatEntity.getCp());
+			interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());
+			interessatAdministracioDto.setTelefon(registreInteressatEntity.getTelefon());
+			interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
+			interessatAdministracioDto.setNotificacioAutoritzat(false);
+
+			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+
+			interessatDto = interessatAdministracioDto;
+			break;
+		}
+
+		return interessatDto;
+	}
+	
+	
 	
 	public InteressatDocumentTipusEnumDto toInteressatDocumentTipusEnumDto(DocumentTipus documentTipus) {
 
@@ -363,9 +407,6 @@ public class ExpedientHelper {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
-		DocumentDto dto = null;
-		boolean processatOk = true;
-		
 
 		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
@@ -381,7 +422,7 @@ public class ExpedientHelper {
 		if(throwException)
 			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA!!!!!! ");
 		
-		// ############################## CREATE CARPETA ##########################################
+		// ############################## CREATE CARPETA IN DB AND IN ARXIU ##########################################
 		
 		// create carpeta ind db and arxiu if doesnt already exists
 		Long carpetaId = createCarpetaFromExpPeticio(
@@ -565,7 +606,7 @@ public class ExpedientHelper {
 
 		document.setNtiOrigen(toNtiOrigenEnumDto(registreAnnexEntity.getNtiOrigen()));
 		document.setNtiTipoDocumental(toDocumentNtiTipoDocumentalEnumDto(registreAnnexEntity.getNtiTipoDocumental()));
-		document.setNtiEstadoElaboracion(toDocumentNtiEstadoElaboracionEnumDto(registreAnnexEntity.getNtiEstadoElaboracio()));
+		document.setNtiEstadoElaboracion(toDocumentNtiEstadoElaboracionEnumDto(registreAnnexEntity.getNtiEstadoElaboracion()));
 		document.setFitxerContentType(registreAnnexEntity.getTipusMime());
 		
 		document.setNtiVersion("1.0");
@@ -578,12 +619,12 @@ public class ExpedientHelper {
 	
 	
 	
-	public DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(NtiEstadoElaboracio ntiEstadoElaboracio) {
+	public DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(NtiEstadoElaboracion ntiEstadoElaboracion) {
 
 		DocumentNtiEstadoElaboracionEnumDto documentNtiEstadoElaboracionEnumDto = null;
 		
-		if (ntiEstadoElaboracio != null) {
-			switch (ntiEstadoElaboracio) {
+		if (ntiEstadoElaboracion != null) {
+			switch (ntiEstadoElaboracion) {
 			case ORIGINAL:
 				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE01;
 				break;

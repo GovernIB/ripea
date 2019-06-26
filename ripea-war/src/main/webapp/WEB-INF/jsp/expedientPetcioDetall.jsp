@@ -218,9 +218,9 @@ tr.clicable {
 										<div class="row">
 											<div class="col-xs-6">
 												<dl class="dl-horizontal">
-													<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.paisCodi}</dd>
-													<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provinciaCodi}</dd>											
-													<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipiCodi}</dd>
+													<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.pais}</dd>
+													<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provincia}</dd>											
+													<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipi}</dd>
 													<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${interessat.adresa}</dd>
 													<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${interessat.cp}</dd>
 												</dl>
@@ -275,9 +275,9 @@ tr.clicable {
 																	<div class="row">
 																		<div class="col-xs-6">
 																			<dl class="dl-horizontal">
-																				<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${representant.paisCodi}</dd>
-																				<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${representant.provinciaCodi}</dd>											
-																				<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${representant.municipiCodi}</dd>
+																				<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${representant.pais}</dd>
+																				<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${representant.provincia}</dd>											
+																				<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${representant.municipi}</dd>
 																				<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${representant.adresa}</dd>
 																				<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${representant.cp}</dd>
 																			</dl>

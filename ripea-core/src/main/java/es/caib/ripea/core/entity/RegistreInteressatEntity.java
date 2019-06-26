@@ -33,6 +33,10 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Column(name = "adresa", length = 160)
 	private String adresa;
 	@Column(name = "canal", length = 30)
@@ -50,16 +54,22 @@ public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 	private String llinatge1;
 	@Column(name = "llinatge2", length = 30)
 	private String llinatge2;
-	@Column(name = "municipi_codi", length = 100)
-	private String municipiCodi;
 	@Column(name = "nom", length = 30)
 	private String nom;
 	@Column(name = "observacions", length = 160)
 	private String observacions;
+	@Column(name = "municipi_codi", length = 100)
+	private String municipiCodi;
 	@Column(name = "pais_codi", length = 4)
 	private String paisCodi;
 	@Column(name = "provincia_codi", length = 100)
 	private String provinciaCodi;
+	@Column(name = "municipi", length = 200)
+	private String municipi;
+	@Column(name = "pais", length = 200)
+	private String pais;
+	@Column(name = "provincia", length = 200)
+	private String provincia;
 	@Column(name = "rao_social", length = 80)
 	private String raoSocial;
 	@Column(name = "telefon", length = 20)
@@ -160,8 +170,18 @@ public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 			built.registre = registre;
 			return this;
 		}
-		
-
+		public Builder pais(String pais) {
+			built.pais = pais;
+			return this;
+		}
+		public Builder provincia(String provincia) {
+			built.provincia = provincia;
+			return this;
+		}
+		public Builder municipi(String municipi) {
+			built.municipi = municipi;
+			return this;
+		}		
 		public RegistreInteressatEntity build() {
 			return built;
 		}
@@ -238,7 +258,17 @@ public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 	public RegistreEntity getRegistre() {
 		return registre;
 	}
-	
+	public String getMunicipi() {
+		return municipi;
+	}
+
+	public String getPais() {
+		return pais;
+	}
+
+	public String getProvincia() {
+		return provincia;
+	}
 	
 
 }

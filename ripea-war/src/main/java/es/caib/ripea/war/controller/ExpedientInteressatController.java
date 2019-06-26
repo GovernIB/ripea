@@ -279,16 +279,16 @@ public class ExpedientInteressatController extends BaseUserController {
 			return "expedientInteressatForm";
 		}
 		
-		InteressatDto interessatDto = null;
+		InteressatDto representantDto = null;
 		switch (interessatCommand.getTipus()) {
 		case PERSONA_FISICA:
-			interessatDto = InteressatCommand.asPersonaFisicaDto(interessatCommand);
+			representantDto = InteressatCommand.asPersonaFisicaDto(interessatCommand);
 			break;
 		case PERSONA_JURIDICA:
-			interessatDto = InteressatCommand.asPersonaJuridicaDto(interessatCommand);
+			representantDto = InteressatCommand.asPersonaJuridicaDto(interessatCommand);
 			break;
 		case ADMINISTRACIO:
-			interessatDto = InteressatCommand.asAdministracioDto(interessatCommand);
+			representantDto = InteressatCommand.asAdministracioDto(interessatCommand);
 			break;
 		}
 		
@@ -298,14 +298,14 @@ public class ExpedientInteressatController extends BaseUserController {
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
-					interessatDto,
+					representantDto,
 					true);	
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
-					interessatDto);
+					representantDto);
 			msgKey = "interessat.controller.representant.modificat.ok";
 		}
 		return getModalControllerReturnValueSuccess(

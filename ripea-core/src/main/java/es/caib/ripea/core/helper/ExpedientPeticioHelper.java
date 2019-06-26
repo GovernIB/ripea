@@ -31,7 +31,6 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
@@ -53,15 +52,12 @@ public class ExpedientPeticioHelper {
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;  
 	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;  
-	@Autowired
 	private EntitatRepository entitatRepository; 
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
-	@Autowired
-	private MetaNodeRepository metaNodeRepository;
+
 	/*
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
@@ -267,6 +263,9 @@ public class ExpedientPeticioHelper {
 		 			provinciaCodi (interessat.getRepresentant().getProvinciaCodi()).
 		 			raoSocial (interessat.getRepresentant().getRaoSocial()).
 		 			telefon (interessat.getRepresentant().getTelefon()).
+		 			pais (interessat.getRepresentant().getPais()).
+		 			provincia (interessat.getRepresentant().getProvincia()).
+		 			municipi (interessat.getRepresentant().getMunicipi()).
 					build();
 			
 		}
@@ -286,6 +285,9 @@ public class ExpedientPeticioHelper {
 		 			observacions (interessat.getObservacions()).
 		 			paisCodi (interessat.getPaisCodi()).
 		 			provinciaCodi (interessat.getProvinciaCodi()).
+		 			pais (interessat.getPais()).
+		 			provincia (interessat.getProvincia()).
+		 			municipi (interessat.getMunicipi()).		 			
 		 			raoSocial (interessat.getRaoSocial()).
 		 			telefon (interessat.getTelefon()).
 		 			representant(representantEntity).
@@ -311,7 +313,7 @@ public class ExpedientPeticioHelper {
 				annex.getSicresTipoDocumento(),
 				annex.getTitol(),
 				registreEntity,
-				annex.getNtiEstadoElaboracio()).
+				annex.getNtiEstadoElaboracion()).
 				contingut(annex.getContingut()).
 				firmaContingut(annex.getFirmaContingut()).
 				ntiTipoDocumental(annex.getNtiTipoDocumental()).
