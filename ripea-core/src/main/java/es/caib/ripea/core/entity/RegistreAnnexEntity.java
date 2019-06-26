@@ -25,7 +25,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.distribucio.ws.backofficeintegracio.FirmaPerfil;
 import es.caib.distribucio.ws.backofficeintegracio.FirmaTipus;
-import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracio;
 import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracion;
 import es.caib.distribucio.ws.backofficeintegracio.NtiOrigen;
 import es.caib.distribucio.ws.backofficeintegracio.NtiTipoDocumento;
@@ -43,9 +42,9 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @Entity
 @Table(	name = "ipa_registre_annex")
 @EntityListeners(AuditingEntityListener.class)
+@SuppressWarnings("serial")
 public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 
-	
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "contingut")

@@ -14,19 +14,15 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
-import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientService;
 
@@ -50,6 +46,7 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long contenidorId,
 			Long metaExpedientId,
 			Integer any,
+			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats) {
@@ -58,6 +55,7 @@ public class ExpedientServiceBean implements ExpedientService {
 				contenidorId,
 				metaExpedientId,
 				any,
+				sequencia,
 				nom,
 				expedientPeticioId,
 				associarInteressats);

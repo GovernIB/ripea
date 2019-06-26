@@ -17,7 +17,6 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 

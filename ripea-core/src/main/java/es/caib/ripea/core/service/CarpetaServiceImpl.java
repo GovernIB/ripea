@@ -15,7 +15,6 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.CarpetaHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;

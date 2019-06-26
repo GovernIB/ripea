@@ -82,11 +82,8 @@ public class ContingutController extends BaseUserController {
 	private MetaDadaService metaDadaService;
 	@Autowired
 	private AlertaService alertaService;
-
 	@Autowired
 	private BeanGeneratorHelper beanGeneratorHelper;
-
-
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
@@ -357,7 +354,6 @@ public class ContingutController extends BaseUserController {
 		return "contingutErrors";
 	}
 
-	
 	@RequestMapping(value = "/contingut/{contingutId}/errors/{alertaId}/llegir", method = RequestMethod.GET)
 	@ResponseBody
 	public void llegirAlerta(

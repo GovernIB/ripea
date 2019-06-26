@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.caib.ripea.core.api.dto.IdiomaEnumDto;
-import es.caib.ripea.core.api.dto.ReglaTipusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.war.command.UsuariCommand;
@@ -33,8 +32,6 @@ public class UsuariController  extends BaseAdminController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-
-
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
 	public String getConfiguracio(

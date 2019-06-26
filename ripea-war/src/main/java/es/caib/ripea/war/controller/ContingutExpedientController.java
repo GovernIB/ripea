@@ -61,12 +61,13 @@ public class ContingutExpedientController extends BaseUserController {
 					entitatActual.getId(),
 					expedientId);
 		}
+		int any = Calendar.getInstance().get(Calendar.YEAR);
 		ExpedientCommand command = null;
 		if (expedient != null) {
 			command = ExpedientCommand.asCommand(expedient);
 		} else {
 			command = new ExpedientCommand();
-			command.setAny(Calendar.getInstance().get(Calendar.YEAR));
+			command.setAny(any);
 		}
 		command.setEntitatId(entitatActual.getId());
 		command.setPareId(contingutId);
@@ -112,6 +113,7 @@ public class ContingutExpedientController extends BaseUserController {
 					contingutId,
 					command.getMetaNodeId(),
 					command.getAny(),
+					command.getSequencia(),
 					command.getNom(),
 					null,
 					false);

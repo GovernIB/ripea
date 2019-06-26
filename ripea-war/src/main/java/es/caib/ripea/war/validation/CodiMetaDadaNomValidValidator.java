@@ -6,13 +6,6 @@ package es.caib.ripea.war.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 
 /**

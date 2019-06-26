@@ -47,8 +47,6 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.CarpetaService;
-import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
@@ -81,15 +79,11 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -109,15 +103,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
+	private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
 	@Autowired
 	private ContingutRepository contingutRepository;
-
-	@Autowired
-	private RegistreRepository registreRepository;
-	
 	@Autowired
 	private ExpedientHelper expedientHelper;
 	@Autowired
@@ -136,41 +128,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private CsvHelper csvHelper;
-
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-
 	@Autowired
 	private MessageHelper messageHelper;
-
-	@Autowired
-	private MetaNodeRepository metaNodeRepository;
-
-	@Autowired
-	private EntitatRepository entitatRepository;
-
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private CarpetaService carpetaService;
 	@Autowired
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	
-	@Autowired
 	private ContingutLogHelper contingutLogHelper;
-	
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	
-		
+
 	@Override
 	public ExpedientDto create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,
 			Integer any,
+			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats) {
@@ -179,15 +152,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"pareId=" + pareId + ", " +
 				"any=" + any + ", " +
+				"sequencia=" + sequencia + ", " +
 				"nom=" + nom + ", " +
 				"expedientPeticioId=" + expedientPeticioId +")");
-		
 		// if expedient comes from distribucio
 		ExpedientPeticioEntity expedientPeticioEntity = null;
-		Long registreId = null;
-		if(expedientPeticioId!= null) {
+		if (expedientPeticioId != null) {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			registreId = expedientPeticioEntity.getRegistre().getId();
 		}
 		ExpedientDto expedientDto = null;
 		// create expedient in db and in arxiu
@@ -196,21 +167,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 				metaExpedientId,
 				pareId,
 				any,
+				sequencia,
 				nom,
 				expedientPeticioId,
 				associarInteressats);
-		
-		
 		boolean processatOk = true;
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
-
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 				try {
 					expedientHelper.createDocFromAnnex(
 							registeAnnexEntity.getId(),
 							expedientPeticioEntity.getId());
-
 				} catch (Exception e) {
 					processatOk = false;
 					logger.error(ExceptionUtils.getStackTrace(e));
@@ -218,21 +186,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 					
 				}
 			}
-			
 			canviEstatToProcessatPendent(expedientPeticioEntity);
-			
 			if (processatOk) {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
 			}
-			
 		}
 		return expedientDto;
-		
-		
 	}
-	
-	
-	
+
 	@Override
 	public void incorporar(
 			Long entitatId,
@@ -1726,7 +1687,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		int dadesIndex = 0;
 		for (ExpedientEntity expedient: expedients) {
 			String[] fila = new String[numColumnes];
-			fila[0] = expedient.getNumero();
+			fila[0] = expedientHelper.calcularNumero(expedient);
 			fila[1] = expedient.getNom();
 			fila[2] = expedient.getEstat().name();
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());

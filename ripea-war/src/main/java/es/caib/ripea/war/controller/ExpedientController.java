@@ -67,14 +67,11 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
 @Controller
 @RequestMapping("/expedient")
 public class ExpedientController extends BaseUserController {
-	
-	
+
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
-
-	
 
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
 	@Autowired
@@ -89,8 +86,6 @@ public class ExpedientController extends BaseUserController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ExpedientPeticioService expedientPeticioService;
-	
-	
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -121,28 +116,17 @@ public class ExpedientController extends BaseUserController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
-
-
-		
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		Long metaExpedientId = (Long)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_METAEXP_ID);
-		
-		
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-
 		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
-		
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
-		
-		
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
-		
-		
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
@@ -154,8 +138,6 @@ public class ExpedientController extends BaseUserController {
 		}
 		return "expedientUserList";
 	}
-	
-	
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(
@@ -299,35 +281,6 @@ public class ExpedientController extends BaseUserController {
 		}
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
-
-	private ExpedientFiltreCommand getFiltreCommand(
-			HttpServletRequest request) {
-		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_FILTRE);
-		if (filtreCommand == null) {
-			filtreCommand = new ExpedientFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					filtreCommand);
-		}
-		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
-		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
-		return filtreCommand;
-	}
-	
-	
-
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -382,6 +335,7 @@ public class ExpedientController extends BaseUserController {
 					command.getMetaNodeId(),
 					null,
 					command.getAny(),
+					null,
 					command.getNom(),
 					null,
 					false);
@@ -453,7 +407,7 @@ public class ExpedientController extends BaseUserController {
 				url,
 				"expedient.controller.agafat.ok");
 	}
-	
+
 	@RequestMapping(value = "/{expedientId}/comentaris", method = RequestMethod.GET)
 	public String comentaris(
 			HttpServletRequest request,
@@ -480,9 +434,7 @@ public class ExpedientController extends BaseUserController {
 		
 		return "expedientComentaris";
 	}	
-	
-	
-	
+
 	@RequestMapping(value = "/{contingutId}/comentaris/publicar", method = RequestMethod.POST)
 	@ResponseBody
 	public List<ExpedientComentariDto> publicarComentari(
@@ -500,8 +452,6 @@ public class ExpedientController extends BaseUserController {
 				entitatActual.getId(), 
 				contingutId);
 	}
-
-
 
 	@RequestMapping(value = "/{expedientId}/alliberar", method = RequestMethod.GET)
 	public String alliberar(
@@ -566,7 +516,6 @@ public class ExpedientController extends BaseUserController {
 				"redirect:../../contingut/" + expedientId,
 				"expedient.controller.tancar.ok");
 	}
-	
 
 	@RequestMapping(value = "/estatValues/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -575,32 +524,22 @@ public class ExpedientController extends BaseUserController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		
 		List<ExpedientEstatDto> estatsFromDatabase = expedientService.findExpedientEstatByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
-		
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-
 		expedientEstatsOptions.addAll(estatsFromDatabase);
-		
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));		
-
 		return expedientEstatsOptions;
 	}
-	
 
-	
 	@RequestMapping(value = "/{expedientId}/canviarEstat", method = RequestMethod.GET)
 	public String canviarEstatGet(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
-		
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -608,15 +547,12 @@ public class ExpedientController extends BaseUserController {
 					entitatActual.getId(),
 					expedientId);
 		}
-		
 		List<ExpedientEstatDto> expedientEstats = expedientService.findExpedientEstats(
 				entitatActual.getId(),
 				expedientId);
 		ExpedientEstatDto expedientEstatObert = new ExpedientEstatDto();
 		expedientEstatObert.setNom("OBERT");
 		expedientEstats.add(0, expedientEstatObert);
-		
-		
 		ExpedientCommand command = null;
 		if (expedient != null) {
 			command = ExpedientCommand.asCommand(expedient);
@@ -636,20 +572,12 @@ public class ExpedientController extends BaseUserController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
-		
-		
-
-		
 		model.addAttribute(
 				"expedientEstats",
 				expedientEstats);
 		return "expedientChooseEstatForm";
-		
 	}
-	
-	
-	
-	
+
 	@RequestMapping(value = "/canviarEstat", method = RequestMethod.POST)
 	public String canviarEstatPost(
 			HttpServletRequest request,
@@ -657,7 +585,6 @@ public class ExpedientController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 //			model.addAttribute(
@@ -675,23 +602,7 @@ public class ExpedientController extends BaseUserController {
 				"redirect:../expedient",
 				"expedient.controller.estatModificat.ok");
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	@RequestMapping(value = "/{expedientId}/relacionarList", method = RequestMethod.GET)
 	public String expedientRelacionarGetList(
 			HttpServletRequest request,
@@ -718,43 +629,27 @@ public class ExpedientController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						ExpedientEstatEnumDto.class,
 						"expedient.estat.enum."));
-		
-	
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitatActual.getId());
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);
-
-		
 		ExpedientFiltreCommand expedientFiltreCommand = getRelacionarFiltreCommand(request);
-		
 //		Long metaExpedientId = null;
 //		if (expedientFiltreCommand != null) {
 //			metaExpedientId = expedientFiltreCommand.getMetaExpedientId();
 //		}
-		
 		model.addAttribute(
 				"expedientFiltreCommand",
 				expedientFiltreCommand);
-		
-		
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-
-		
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-
 		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
-		
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
-		
-		
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
-		
-		
 		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
 			MissatgesHelper.warning(
 					request, 
@@ -764,9 +659,7 @@ public class ExpedientController extends BaseUserController {
 		}
 		return "expedientRelacionarForm";
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/{expedientId}/relacionarList", method = RequestMethod.POST)
 	public String expedientRelacionarPostList(
 			HttpServletRequest request,
@@ -790,24 +683,7 @@ public class ExpedientController extends BaseUserController {
 		}
 		return "redirect:/modal/expedient/"+expedientId+"/relacionarList";
 	}
-	
-	
-	private ExpedientFiltreCommand getRelacionarFiltreCommand(
-			HttpServletRequest request) {
-		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_RELACIONAR_FILTRE);
-		if (filtreCommand == null) {
-			filtreCommand = new ExpedientFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_RELACIONAR_FILTRE,
-					filtreCommand);
-		}
-		return filtreCommand;
-	}
-	
-	
+
 	@RequestMapping(value = "/{expedientId}/relacionar/{relacionatId}", method = RequestMethod.GET)
 	public String expedientRelacionar(
 			HttpServletRequest request,
@@ -824,10 +700,6 @@ public class ExpedientController extends BaseUserController {
 				"redirect:/../../contingut/" + expedientId,
 				"expedient.controller.relacionat.ok");
 	}
-	
-
-	
-	
 
 	@RequestMapping(value = "/{expedientId}/relacio/datatable", method = RequestMethod.GET)
 	@ResponseBody
@@ -848,9 +720,6 @@ public class ExpedientController extends BaseUserController {
 						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
 	}
 
-
-
-	
 	@RequestMapping(value = "/{expedientId}/relacio/{relacionatId}/delete", method = RequestMethod.GET)
 	public String expedientRelacioDelete(
 			HttpServletRequest request,
@@ -893,9 +762,7 @@ public class ExpedientController extends BaseUserController {
 		
 		return "registreDetalls";
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/{expedientId}/enviament/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse enviamentDatatable(
@@ -910,7 +777,46 @@ public class ExpedientController extends BaseUserController {
 						entitatActual.getId(),
 						expedientId));		
 	}
-	
-	
+
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	}
+
+	private ExpedientFiltreCommand getFiltreCommand(
+			HttpServletRequest request) {
+		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new ExpedientFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE,
+					filtreCommand);
+		}
+		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
+		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
+		return filtreCommand;
+	}
+
+	private ExpedientFiltreCommand getRelacionarFiltreCommand(
+			HttpServletRequest request) {
+		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RELACIONAR_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new ExpedientFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_FILTRE,
+					filtreCommand);
+		}
+		return filtreCommand;
+	}
 
 }

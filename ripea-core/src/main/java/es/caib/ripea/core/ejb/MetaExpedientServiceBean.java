@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 
 /**
@@ -92,32 +93,6 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<PermisDto> permisFind(Long entitatId, Long id) {
-		return delegate.permisFind(
-				entitatId,
-				id);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void permisUpdate(Long entitatId, Long id, PermisDto permis) {
-		delegate.permisUpdate(
-				entitatId,
-				id,
-				permis);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public void permisDelete(Long entitatId, Long id, Long permisId) {
-		delegate.permisDelete(
-				entitatId,
-				id,
-				permisId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
@@ -149,6 +124,44 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
 			Long entitatId) {
 		return delegate.findActiusAmbEntitatPerLectura(entitatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public long getProximNumeroSequencia(
+			Long entitatId,
+			Long id,
+			int any) throws NotFoundException {
+		return delegate.getProximNumeroSequencia(
+				entitatId,
+				id,
+				any);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<PermisDto> permisFind(Long entitatId, Long id) {
+		return delegate.permisFind(
+				entitatId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void permisUpdate(Long entitatId, Long id, PermisDto permis) {
+		delegate.permisUpdate(
+				entitatId,
+				id,
+				permis);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void permisDelete(Long entitatId, Long id, Long permisId) {
+		delegate.permisDelete(
+				entitatId,
+				id,
+				permisId);
 	}
 
 }

@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,9 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,31 +34,23 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.service.CarpetaService;
-import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
@@ -89,20 +77,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired
 	private ExpedientRepository expedientRepository;
 	@Autowired
-	private MetaNodeRepository metaNodeRepository;
-	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
 	private EntitatRepository entitatRepository;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private CarpetaService carpetaService;
-	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	
 
 	@Transactional(readOnly = true)
 	@Override

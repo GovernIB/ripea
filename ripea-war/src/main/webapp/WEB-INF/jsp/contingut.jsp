@@ -21,7 +21,6 @@
 	</c:otherwise>
 </c:choose>
 
-
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -541,7 +540,7 @@ $(document).ready(function() {
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
 							<dt><spring:message code="contingut.info.numero"/></dt>
-							<dd>${contingut.codi}/${contingut.sequencia}/${contingut.any}</dd>
+							<dd>${contingut.numero}</dd>
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">

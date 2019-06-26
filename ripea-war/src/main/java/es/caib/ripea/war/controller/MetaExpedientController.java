@@ -44,7 +44,7 @@ public class MetaExpedientController extends BaseAdminController {
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		if(mantenirPaginacio) {
 			model.addAttribute("mantenirPaginacio", true);
-		}else {
+		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
 		return "metaExpedientList";
@@ -197,9 +197,6 @@ public class MetaExpedientController extends BaseAdminController {
 						exc.getMessage());
 			}
 		}
-
-		
-		
 	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
@@ -209,6 +206,19 @@ public class MetaExpedientController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaExpedientService.findByEntitat(entitatActual.getId());
+	}
+
+	@RequestMapping(value = "/{metaExpedientId}/proximNumeroSequencia/{any}", method = RequestMethod.GET)
+	@ResponseBody
+	public long proximNumeroSequencia(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable int any) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.getProximNumeroSequencia(
+				entitatActual.getId(),
+				metaExpedientId,
+				any);
 	}
 
 }

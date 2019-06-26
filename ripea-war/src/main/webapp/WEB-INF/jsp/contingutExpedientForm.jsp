@@ -17,6 +17,32 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+<script type="text/javascript">
+function refrescarSequencia() {
+	let metaExpedientId = $('select#metaNodeId').val();
+	let any = $('input#any').val();
+	if (metaExpedientId !== undefined && any !== undefined) {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
+			success: function(sequencia) {
+				$('input#sequencia').val(sequencia);
+			}
+		});
+	} else {
+		$('input#sequencia').val(undefined);
+	}
+}
+$(document).ready(function() {
+	$('select#metaNodeId').change(function(event) {
+		refrescarSequencia();
+	});
+	$('input#any').change(function(event) {
+		refrescarSequencia();
+	});
+	$('input#any').trigger('change');
+});
+</script>
 </head>
 <body>
 	<c:choose>
@@ -36,6 +62,7 @@
 				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true" labelSize="2"/>
 			</c:otherwise>
 		</c:choose>
+		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

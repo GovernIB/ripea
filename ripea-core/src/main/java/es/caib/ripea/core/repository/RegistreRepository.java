@@ -3,11 +3,8 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 
 /**

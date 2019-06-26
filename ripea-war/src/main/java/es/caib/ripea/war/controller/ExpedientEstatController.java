@@ -32,16 +32,10 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/expedientEstat")
 public class ExpedientEstatController extends BaseAdminController {
 
-
-
 	@Autowired
 	private ExpedientService expedientService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-	
-	
-	
-
 	
 	@RequestMapping(value = "/{metaExpedientId}", method = RequestMethod.GET)
 	public String getList(
@@ -58,6 +52,7 @@ public class ExpedientEstatController extends BaseAdminController {
 		return "expedientEstatList";
 		
 	}
+
 	@RequestMapping(value = "/{metaExpedientId}/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
@@ -74,8 +69,7 @@ public class ExpedientEstatController extends BaseAdminController {
 				"id");
 		return dtr;
 	}
-	
-	
+
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,
@@ -87,8 +81,7 @@ public class ExpedientEstatController extends BaseAdminController {
 				null,
 				model);
 	}
-	
-	
+
 	@RequestMapping(value = "/{metaExpedientId}/{estatId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -101,25 +94,18 @@ public class ExpedientEstatController extends BaseAdminController {
 			estat = expedientService.findExpedientEstatById(
 					entitatActual.getId(),
 					estatId);
-			
-		model.addAttribute(estat);	
+			model.addAttribute(estat);	
 		}
-		
 		ExpedientEstatCommand command = null;
 		if (estat != null)
 			command = ExpedientEstatCommand.asCommand(estat);
 		else
 			command = new ExpedientEstatCommand();
-		
-		
 		command.setMetaExpedientId(metaExpedientId);
-		
 		model.addAttribute(command);
-
 		return "expedientEstatForm";
 	}
-	
-	
+
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
@@ -151,9 +137,7 @@ public class ExpedientEstatController extends BaseAdminController {
 					"expedient.estat.controller.creat.ok");
 		}
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/{metaExpedientId}/{expedientEstatId}/move/{posicio}", method = RequestMethod.GET)
 	public String move(
 			HttpServletRequest request,
@@ -171,8 +155,7 @@ public class ExpedientEstatController extends BaseAdminController {
 				"redirect:expedientEstat/"+metaExpedientId,
 				null);
 	}
-	
-	
+
 	@RequestMapping(value = "/{expedientEstatId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
@@ -186,8 +169,5 @@ public class ExpedientEstatController extends BaseAdminController {
 				"redirect:expedientEstat",
 				"expedient.estat.controller.esborrat.ok");
 	}
-
-
-
 
 }
