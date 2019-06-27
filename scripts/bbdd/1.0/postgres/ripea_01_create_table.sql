@@ -562,6 +562,7 @@ CREATE TABLE IPA_REGISTRE_ANNEX (
 	FIRMA_TAMANY integer,
 	FIRMA_TIPUS character varying (4),
 	NOM character varying (80) NOT NULL,
+	FIRMA_NOM character varying(80),
 	NTI_FECHA_CAPTURA timestamp without time zone NOT NULL,
 	NTI_ORIGEN character varying (20) NOT NULL,
 	NTI_TIPO_DOC character varying (20) NOT NULL,

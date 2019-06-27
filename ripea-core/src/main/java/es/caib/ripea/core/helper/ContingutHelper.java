@@ -198,7 +198,6 @@ public class ContingutHelper {
 			resposta = dto;
 
 		// ##################### DOCUMENT ##################################
-
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
@@ -249,12 +248,14 @@ public class ContingutHelper {
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
-		// CARPETA
+			
+		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
 			resposta = dto;
 		} 
-		// CONTINGUT
+		
+		// ##################### CONTINGUT ##################################
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setEsborrat(contingut.getEsborrat());
@@ -810,7 +811,7 @@ public class ContingutHelper {
 		long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(
 				metaExpedient,
 				any,
-				false);
+				true);
 		if (sequencia == null) {
 			expedientCrear.updateAnySequenciaCodi(
 					any,

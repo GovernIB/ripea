@@ -43,6 +43,7 @@ import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -80,6 +81,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private EntitatRepository entitatRepository;
+	@Autowired
+	private ExpedientHelper  expedientHelper;
 
 	@Transactional(readOnly = true)
 	@Override
@@ -215,14 +218,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					false);
 		}
 
-		// set accion to be performed if peticion is accepted
 		ExpedientEntity expedientEntity = expedientRepository.findByEntitatAndMetaNodeAndNumero(
 				entitat,
 				metaExpedient,
 				expedientNumero);
+		
 
-		return conversioTipusHelper.convertir(expedientEntity,
-				ExpedientDto.class);
+		return expedientHelper.toExpedientDto(
+				expedientEntity,
+				false);
+
 	}
 	
 	
@@ -382,7 +387,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				Firma firma = firmes.get(0);
 
 				if (firma != null) {
-					arxiu.setNom(firma.getFitxerNom()); // TODO arxiu.setNom(annex.getFirmaNom()) need to add firmaNom to WS
+					arxiu.setNom(annex.getFirmaNom());
 					arxiu.setContentType(firma.getTipusMime());
 					arxiu.setContingut(firma.getContingut());
 					arxiu.setTamany(firma.getContingut().length);

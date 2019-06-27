@@ -687,10 +687,9 @@ $(document).ready(function() {
 			</ul>
 
 			<div class="tab-content">
+			
+				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
 				<div class="tab-pane active in" id="contingut">
-					<%--                   --%>
-					<%-- Pipella contingut --%>
-					<%--                   --%>
 					<c:choose>
 						<c:when test="${contingut.document}">
 							<table class="table table-bordered">
@@ -853,17 +852,11 @@ $(document).ready(function() {
 							
 						</c:otherwise>
 					</c:choose>
-					<%--                    --%>
-					<%-- /Pipella contingut --%>
-					<%--                    --%>
 				</div>
 				<c:if test="${contingut.node}">
+				
+					<!------------------------------ TABPANEL DADES ------------------------------------->
 					<div class="tab-pane" id="dades">
-						<%--               --%>
-						<%-- Pipella dades --%>
-						<%--               --%>
-					
-						
 						<c:choose>
 							<c:when test="${not empty metaDades}">
 								<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
@@ -943,9 +936,6 @@ $(document).ready(function() {
 							<c:otherwise>
 							</c:otherwise>
 						</c:choose>
-						<%--                --%>
-						<%-- /Pipella dades --%>
-						<%--                --%>
 					</div>
 				</c:if>
 				<c:if test="${contingut.expedient}">
@@ -995,10 +985,9 @@ $(document).ready(function() {
 							</c:if>
 						</script>
 					</div>
+					
+					<!------------------------------ TABPANEL ENVIAMENTS ------------------------------------->
 					<div class="tab-pane" id="enviaments">
-						<%--                    --%>
-						<%-- Pipella enviaments --%>
-						<%--                    --%>
 						<table
 							id="taulaEnviaments"
 							data-toggle="datatable"
@@ -1085,9 +1074,6 @@ $(document).ready(function() {
 								</tr>
 							</thead>
 						</table>
-						<%--                     --%>
-						<%-- /Pipella enviaments --%>
-						<%--                     --%>
 					</div>
 					
 					<!--  If expedient came form DISTRIBUCIO and was created from peticion -->
@@ -1120,11 +1106,11 @@ $(document).ready(function() {
 					</c:if>
 					
 				</c:if>
-				<c:if test="${contingut.document and contingut.versioCount gt 0}">
+				
+				<c:if test="${contingut.document and fn:length(contingut.versions) gt 0}">
+				
+					<!------------------------------ TABPANEL VERSIONS ------------------------------------->
 					<div class="tab-pane" id="versions">
-						<%--                  --%>
-						<%-- Pipella versions --%>
-						<%--                  --%>
 						<div class="tab-pane" id="contingut">
 							<div id="document-versions" class="panel-group" id="accordion">
 								<table class="table table-bordered table-striped">
@@ -1156,9 +1142,6 @@ $(document).ready(function() {
 								</table>
 							</div>
 						</div>
-						<%--                   --%>
-						<%-- /Pipella versions --%>
-						<%--                   --%>
 					</div>
 				</c:if>
 			</div>

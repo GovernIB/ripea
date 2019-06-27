@@ -62,7 +62,11 @@ tr.clicable {
 			<a href="#interessats" aria-controls="interessats" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.interessats"/>&nbsp;<span class="badge">${fn:length(registre.interessats)}</span></a>
 		</li>
 		<li role="presentation">
-			<a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.annexos"/>&nbsp;<span class="badge">${fn:length(registre.annexos)}</span></a>
+			<a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab">
+				<c:if test="${isErrorDocuments}"><span class="fa fa-warning text-danger"></span></c:if>
+				<spring:message code="registre.detalls.pipella.annexos"/>&nbsp;
+				<span class="badge">${fn:length(registre.annexos)}</span>
+			</a>
 		</li>
 		<c:if test="${not empty peticio.notificaDistError}">
 			<li role="presentation">

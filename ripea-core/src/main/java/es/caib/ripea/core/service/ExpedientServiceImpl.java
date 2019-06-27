@@ -138,7 +138,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ContingutLogHelper contingutLogHelper;
 
 	@Override
-	public ExpedientDto create(
+	public boolean create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,
@@ -181,21 +181,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 							expedientPeticioEntity.getId());
 				} catch (Exception e) {
 					processatOk = false;
-					logger.error(ExceptionUtils.getStackTrace(e));
+					logger.info(ExceptionUtils.getStackTrace(e));
 					expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
 					
 				}
 			}
 			canviEstatToProcessatPendent(expedientPeticioEntity);
 			if (processatOk) {
-				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
+				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
 		}
-		return expedientDto;
+		return processatOk;
 	}
 
 	@Override
-	public void incorporar(
+	public boolean incorporar(
 			Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
@@ -211,17 +211,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
 				expedientPeticioId,
 				expedientId);
+		
+		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId);
 
 		boolean processatOk = true;
 		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			try {
+				
+				boolean throwException1 = false;
+				if(throwException1)
+					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
+				
 				expedientHelper.createDocFromAnnex(
 						registeAnnexEntity.getId(),
 						expedientPeticioEntity.getId());
 
 			} catch (Exception e) {
 				processatOk = false;
-				logger.debug(ExceptionUtils.getStackTrace(e));
+				logger.error(ExceptionUtils.getStackTrace(e));
 				expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
 			}
 		}
@@ -229,8 +236,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		canviEstatToProcessatPendent(expedientPeticioEntity);
 		
 		if (processatOk) {
-			notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
-		}		
+			notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
+		}	
+		
+		return processatOk;
 	}	
 	
 	
@@ -243,8 +252,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	
-	public void notificarICanviEstatToProcessatNotificat(ExpedientPeticioEntity expedientPeticioEntity) {
+	public void notificarICanviEstatToProcessatNotificat(Long expedientPeticioId) {
 			
+		ExpedientPeticioEntity expedientPeticioEntity  = expedientPeticioRepository.findOne(expedientPeticioId);
 		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
@@ -286,6 +296,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			logger.debug(ExceptionUtils.getStackTrace(e));
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
 		}
+		
+		notificarICanviEstatToProcessatNotificat(expedientPeticioId);
 
 		return processatOk;
 	}

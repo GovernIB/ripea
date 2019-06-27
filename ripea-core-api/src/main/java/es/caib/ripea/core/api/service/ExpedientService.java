@@ -53,7 +53,7 @@ public interface ExpedientService {
 	 *             altre expedient amb el mateix tipus, sequencia i any.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public ExpedientDto create(
+	public boolean create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,
@@ -409,7 +409,7 @@ public interface ExpedientService {
 	boolean retryNotificarDistribucio(Long expedientPeticioId);
 
 	@PreAuthorize("hasRole('tothom')")
-	void incorporar(Long entitatId,
+	boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
 			boolean associarInteressats);

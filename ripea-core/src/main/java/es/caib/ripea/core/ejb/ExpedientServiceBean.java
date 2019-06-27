@@ -41,7 +41,7 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientDto create(
+	public boolean create(
 			Long entitatId,
 			Long contenidorId,
 			Long metaExpedientId,
@@ -332,11 +332,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public void incorporar(Long entitatId,
+	public boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
 			boolean associarInteressats) {
-		delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats);
+		return delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats);
 		
 	}
 

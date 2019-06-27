@@ -133,9 +133,7 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
 
 	}
-	
 
-	
 	@Transactional
 	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registre, ExpedientPeticioEntity expedientPeticioEntity) {
 		
@@ -146,8 +144,6 @@ public class ExpedientPeticioHelper {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
 
-		
-		
 		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registre.getAssumpteTipusCodi(),
@@ -322,6 +318,7 @@ public class ExpedientPeticioHelper {
 				sicresValidezDocumento(annex.getSicresValidezDocumento()).
 				tipusMime(annex.getTipusMime()).
 				uuid(annex.getUuid()).
+				firmaNom(annex.getFirmaNom()).
 				build();
 		
 		registreAnnexRepository.save(annexEntity);

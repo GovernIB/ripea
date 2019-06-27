@@ -35,6 +35,8 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -172,6 +174,26 @@ public class ExpedientPeticioController extends BaseUserController {
 			@PathVariable Long expedientPeticioId,
 			Model model) {
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		
+		boolean isErrorDocuments = false;
+		for (RegistreAnnexDto registreAnnexDto : expedientPeticioDto.getRegistre().getAnnexos()) {
+			if (registreAnnexDto.getEstat() == RegistreAnnexEstatEnumDto.PENDENT && registreAnnexDto.getError() != null && !registreAnnexDto.getError().isEmpty()) {
+				isErrorDocuments = true;
+			}
+		}
+		if (isErrorDocuments) {
+			
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"expedientPeticio.controller.acceptat.warning"));
+		}
+		
+		model.addAttribute(
+				"isErrorDocuments",
+				isErrorDocuments);
+		
 		model.addAttribute(
 				"peticio",
 				expedientPeticioDto);
@@ -297,7 +319,7 @@ public class ExpedientPeticioController extends BaseUserController {
 						"expedient.peticio.accio.enum."));
 		command.setId(expedientPeticioDto.getId());
 		command.setAssociarInteressats(true);
-		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
+//		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
 		command.setAny(Calendar.getInstance().get(Calendar.YEAR));
 		model.addAttribute(
 				"expedientPeticioAcceptarCommand",
@@ -329,10 +351,11 @@ public class ExpedientPeticioController extends BaseUserController {
 			command);
 			return "expedientPeticioAcceptNoExp";
 		}
+		boolean processatOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
-			expedientService.create(
+			processatOk = expedientService.create(
 					entitat.getId(),
 					command.getMetaExpedientId(),
 					null,
@@ -342,12 +365,24 @@ public class ExpedientPeticioController extends BaseUserController {
 					expedientPeticioDto.getId(),
 					command.isAssociarInteressats());
 		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
-			expedientService.incorporar(
+			processatOk = expedientService.incorporar(
 					entitat.getId(),
 					command.getExpedientId(),
 					expedientPeticioDto.getId(),
 					command.isAssociarInteressats());
 		}
+		
+		if (!processatOk) {
+			
+			
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"expedientPeticio.controller.acceptat.warning"));
+		}
+			
+		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:expedientPeticio",

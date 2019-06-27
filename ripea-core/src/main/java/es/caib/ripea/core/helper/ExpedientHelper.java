@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
@@ -187,32 +189,12 @@ public class ExpedientHelper {
 			relateExpedientWithPeticioAndSetAnnexosPendent(
 					expedientPeticioId,
 					expedient.getId());
+			
 			if (associarInteressats) {
-				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-
-				for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
-
-					// checking if this interessat is representant of any other interessat
-					RegistreInteressatEntity isRepresentant = registreInteressatRepository.findByRepresentant(registreInteressatEntity);
-
-					// if interessat is not representant
-					if (isRepresentant == null) {
-						InteressatDto createdInteressat = expedientInteressatHelper.create(
-								entitatId,
-								expedient.getId(),
-								null,
-								toInteressatDto(registreInteressatEntity),
-								false);
-						if (registreInteressatEntity.getRepresentant()!=null){
-							expedientInteressatHelper.create(
-									entitatId,
-									expedient.getId(),
-									createdInteressat.getId(),
-									toInteressatDto(registreInteressatEntity.getRepresentant()),
-									false);
-						}
-					}
-				}
+				associateInteressats(
+						expedient.getId(),
+						entitat.getId(),
+						expedientPeticioId);
 			}
 		}
 		contingutLogHelper.logCreacio(
@@ -229,6 +211,41 @@ public class ExpedientHelper {
 				false,
 				null);
 		return dto;
+	}
+	
+	@Transactional
+	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId) {
+		
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
+		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
+
+		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
+
+			boolean alreadyExists = false;
+			for (InteressatEntity existingInteressat : existingInteressats) {
+				if (existingInteressat.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero()))
+					alreadyExists = true;
+			}
+			
+			if (!alreadyExists) {
+				InteressatDto createdInteressat = expedientInteressatHelper.create(
+						entitatId,
+						expedientId,
+						null,
+						toInteressatDto(registreInteressatEntity),
+						true);
+				if (registreInteressatEntity.getRepresentant() != null) {
+					expedientInteressatHelper.create(
+							entitatId,
+							expedientId,
+							createdInteressat.getId(),
+							toInteressatDto(registreInteressatEntity.getRepresentant()),
+							true);
+				}
+			}
+		}
 	}
 
 	public InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
@@ -378,6 +395,7 @@ public class ExpedientHelper {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
+		CarpetaEntity carpetaEntity = null; 
 
 		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
@@ -394,12 +412,16 @@ public class ExpedientHelper {
 			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA!!!!!! ");
 		
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU ##########################################
+		boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
 		
-		// create carpeta ind db and arxiu if doesnt already exists
-		Long carpetaId = createCarpetaFromExpPeticio(
-				expedientEntity,
-				entitat.getId(),
-				expedientPeticioEntity.getRegistre().getIdentificador());
+		if (isCarpetaActive) {
+			// create carpeta ind db and arxiu if doesnt already exists
+			Long carpetaId = createCarpetaFromExpPeticio(
+					expedientEntity,
+					entitat.getId(),
+					expedientPeticioEntity.getRegistre().getIdentificador());
+			carpetaEntity = carpetaRepository.findOne(carpetaId);
+		}
 		
 		boolean throwException1 = false;
 		if(throwException1)
@@ -408,10 +430,9 @@ public class ExpedientHelper {
 		
 		// ############################## CREATE DOCUMENT IN DB ####################################
 		
-		CarpetaEntity carpetaEntity = carpetaRepository.findOne(carpetaId);
 		DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
 		contingutHelper.comprovarNomValid(
-				carpetaEntity,
+				isCarpetaActive ? carpetaEntity : expedientEntity,
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
@@ -426,8 +447,8 @@ public class ExpedientHelper {
 				documentDto.getNtiEstadoElaboracion(),
 				documentDto.getNtiTipoDocumental(),
 				null,
-				carpetaEntity,
-				carpetaEntity.getEntitat(),
+				isCarpetaActive ? carpetaEntity : expedientEntity,
+				expedientEntity.getEntitat(),
 				expedientEntity,
 				documentDto.getUbicacio(),
 				documentDto.getNtiIdDocumentoOrigen());
@@ -466,39 +487,67 @@ public class ExpedientHelper {
 		
 		// ############################## MOVE DOCUMENT IN ARXIU ##########################################
 		
-		// we put arxiu uuid of document in distribucio
+		// put arxiu uuid of annex 
 		docEntity.updateArxiu(
 				documentDto.getArxiuUuid());
 		documentRepository.saveAndFlush(docEntity);
 		
-		
-		// check if already exists in arxiu
-		Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
-		boolean documentExistsInArxiu = false;
-		String documentUuid = null;
+		if (isCarpetaActive) {
 
-		if (carpeta.getContinguts()!=null) {
-			for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
-				if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT && contingutArxiu.getNom().equals(docEntity.getNom())) {
-					documentExistsInArxiu = true;
-					documentUuid = contingutArxiu.getIdentificador();
+			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
+			boolean documentExistsInArxiu = false;
+			String documentUuid = null;
+			if (carpeta.getContinguts() != null) {
+				for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
+					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT && contingutArxiu.getNom().equals(docEntity.getNom())) {
+						documentExistsInArxiu = true;
+						documentUuid = contingutArxiu.getIdentificador();
+					}
+				}
+			}
+			if (documentExistsInArxiu &&
+					carpetaEntity.getArxiuUuid() == null) {
+				carpetaEntity.updateArxiu(documentUuid);
+			}
+			if (!documentExistsInArxiu) {
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(docEntity,
+						carpetaEntity,
+						expedientEntity.getArxiuUuid());
+
+				// if document was dispatched, update uuid to new document
+				if (uuidDesti != null) {
+					docEntity.updateArxiu(uuidDesti);
+				}
+			}
+		} else {
+			
+			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+			boolean documentExistsInArxiu = false;
+			String documentUuid = null;
+			if (expedient.getContinguts() != null) {
+				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT && contingutArxiu.getNom().equals(docEntity.getNom())) {
+						documentExistsInArxiu = true;
+						documentUuid = contingutArxiu.getIdentificador();
+					}
+				}
+			}
+			if (documentExistsInArxiu &&
+					carpetaEntity.getArxiuUuid() == null) {
+				expedientEntity.updateArxiu(documentUuid);
+			}
+			if (!documentExistsInArxiu) {
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(docEntity,
+						expedientEntity,
+						expedientEntity.getArxiuUuid());
+
+				// if document was dispatched, update uuid to new document
+				if (uuidDesti != null) {
+					docEntity.updateArxiu(uuidDesti);
 				}
 			}
 		}
-		if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
-			carpetaEntity.updateArxiu(documentUuid);
-		}
-		if (!documentExistsInArxiu) {
-			String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-					docEntity,
-					carpetaEntity,
-					expedientEntity.getArxiuUuid());
 
-			// if document was dispatched, update uuid to new document
-			if (uuidDesti != null) {
-				docEntity.updateArxiu(uuidDesti);
-			}
-		}
 		
 		// save ntiIdentitficador generated in arxiu in db
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
@@ -773,7 +822,7 @@ public class ExpedientHelper {
 				false);
 	}
 
-	private ExpedientDto toExpedientDto(
+	public ExpedientDto toExpedientDto(
 			ExpedientEntity expedient,
 			boolean ambPathIPermisos) {
 		return (ExpedientDto)contingutHelper.toContingutDto(

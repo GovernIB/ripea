@@ -61,6 +61,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "firma_tipus", length = 4)
 	private FirmaTipus firmaTipus;
+	@Column(name = "firma_nom", length = 80)
+	private String firmaNom;
 	@Column(name = "nom", length = 80, nullable = false)
 	private String nom;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -187,6 +189,10 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.uuid = uuid;
 			return this;
 		}
+		public Builder firmaNom(String firmaNom) {
+			built.firmaNom = firmaNom;
+			return this;
+		}
 		public RegistreAnnexEntity build() {
 			return built;
 		}
@@ -307,11 +313,14 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	public void updateError(String error) {
 		this.error = StringUtils.abbreviate(
 				error,
-				4000);
+				1000);
 	}
 	
 	public NtiEstadoElaboracion getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
+	}
+	public String getFirmaNom() {
+		return firmaNom;
 	}
 	
 	

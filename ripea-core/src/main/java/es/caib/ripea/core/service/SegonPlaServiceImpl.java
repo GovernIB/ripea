@@ -41,6 +41,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Resource
 	private EntitatRepository entitatRepository;
+	
 
 	/*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
