@@ -136,7 +136,9 @@ public class ContingutHelper {
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-		// EXPEDIENT
+		
+		
+		// ##################### EXPEDIENT ##################################
 		if (deproxied instanceof ExpedientEntity) {
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
 			ExpedientDto dto = new ExpedientDto();
@@ -194,7 +196,9 @@ public class ContingutHelper {
 								auth));
 			}
 			resposta = dto;
-		// DOCUMENT
+
+		// ##################### DOCUMENT ##################################
+
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
