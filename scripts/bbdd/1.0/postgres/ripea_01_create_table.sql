@@ -69,6 +69,7 @@ CREATE TABLE IPA_METAEXPEDIENT
   PARE_ID            bigint,
   CLASIF_SIA         character varying(30)       NOT NULL,
   SERIE_DOC          character varying(30)      NOT NULL,
+  EXPRESSIO_NUMERO   character varying(100),
   NOT_ACTIVA         boolean                    NOT NULL,
   NOT_SEU_PROC_CODI  character varying(44),
   NOT_SEU_REG_LIB    character varying(4),
@@ -112,9 +113,9 @@ CREATE TABLE IPA_METADOCUMENT
   PLANTILLA_CONTENT_TYPE  character varying(256),
   PLANTILLA_CONTINGUT     oid,
   META_EXPEDIENT_ID       bigint                   NOT NULL,
-  NTI_ORIGEN 			  character varying(2),
+  NTI_ORIGEN 			  character varying(2)     NOT NULL,
   NTI_ESTELA 			  character varying(4),
-  NTI_TIPDOC 			  character varying(4)
+  NTI_TIPDOC 			  character varying(4)     NOT NULL,
 );
 
 
@@ -273,6 +274,7 @@ CREATE TABLE IPA_EXPEDIENT
   SISTRA_UNITAT_ADM  character varying(9),
   SISTRA_CLAU        character varying(100),
   AGAFAT_PER_CODI    character varying(64),
+  METAEXPEDIENT_ID   bigint                     NOT NULL,
   EXPEDIENT_ESTAT_ID BIGINT
 );
 

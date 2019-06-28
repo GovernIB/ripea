@@ -104,29 +104,7 @@ public class MetaDocumentController extends BaseAdminController {
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
-		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
-		model.addAttribute(
-				"isPortafirmesDocumentTipusSuportat",
-				new Boolean(tipus != null));
-		model.addAttribute(
-				"portafirmesDocumentTipus",
-				tipus);
-		//Dades nti
-		model.addAttribute(
-				"ntiOrigenOptions",
-				EnumHelper.getOptionsForEnum(
-						NtiOrigenEnumDto.class,
-						"document.nti.origen.enum."));
-		model.addAttribute(
-				"ntiEstatElaboracioOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiEstadoElaboracionEnumDto.class,
-						"document.nti.estela.enum."));
-		model.addAttribute(
-				"ntiTipusDocumentalOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiTipoDocumentalEnumDto.class,
-						"document.nti.tipdoc.enum."));
+		emplenarModelForm(model);
 		return "metaDocumentForm";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.POST)
@@ -138,6 +116,7 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
+			emplenarModelForm(model);
 			return "metaDocumentForm";
 		}
 		if (command.getId() != null) {
@@ -215,7 +194,6 @@ public class MetaDocumentController extends BaseAdminController {
 					request,
 					"redirect:../../metaDocument",
 					"metadocument.controller.esborrat.ok");
-		
 		} catch (Exception exc) {
 			if (exc.getCause() != null && exc.getCause().getCause() != null) {
 				String excMsg = exc.getCause().getCause().getMessage();
@@ -246,6 +224,33 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaDocumentService.findByEntitat(entitatActual.getId());
+	}
+
+	public void emplenarModelForm(
+			Model model) {
+		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
+		model.addAttribute(
+				"isPortafirmesDocumentTipusSuportat",
+				new Boolean(tipus != null));
+		model.addAttribute(
+				"portafirmesDocumentTipus",
+				tipus);
+		//Dades nti
+		model.addAttribute(
+				"ntiOrigenOptions",
+				EnumHelper.getOptionsForEnum(
+						NtiOrigenEnumDto.class,
+						"document.nti.origen.enum."));
+		model.addAttribute(
+				"ntiTipusDocumentalOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentNtiTipoDocumentalEnumDto.class,
+						"document.nti.tipdoc.enum."));
+		model.addAttribute(
+				"ntiEstatElaboracioOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentNtiEstadoElaboracionEnumDto.class,
+						"document.nti.estela.enum."));
 	}
 
 }

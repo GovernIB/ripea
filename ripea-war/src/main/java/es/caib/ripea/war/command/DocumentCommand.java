@@ -14,11 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
@@ -55,17 +53,17 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotNull(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 	private DocumentTipusFirmaEnumDto tipusFirma = DocumentTipusFirmaEnumDto.ADJUNT;
 	private String escanejatTempId;
-	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	/*@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date dataCaptura;
 	@NotEmpty(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=9)
 	private String ntiOrgano;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
-	private NtiOrigenEnumDto ntiOrigen;
+	private NtiOrigenEnumDto ntiOrigen;*/
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
-	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	/*@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;*/
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=48)
 	private String ntiIdDocumentoOrigen;
 
@@ -125,7 +123,7 @@ public class DocumentCommand extends ContenidorCommand {
 	public void setEscanejatTempId(String escanejatTempId) {
 		this.escanejatTempId = escanejatTempId;
 	}
-	public Date getDataCaptura() {
+	/*public Date getDataCaptura() {
 		return dataCaptura;
 	}
 	public void setDataCaptura(Date dataCaptura) {
@@ -142,19 +140,19 @@ public class DocumentCommand extends ContenidorCommand {
 	}
 	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
 		this.ntiOrigen = ntiOrigen;
-	}
+	}*/
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
 	}
 	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 	}
-	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+	/*public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
 		return ntiTipoDocumental;
 	}
 	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
 		this.ntiTipoDocumental = ntiTipoDocumental;
-	}
+	}*/
 	public String getNtiIdDocumentoOrigen() {
 		return ntiIdDocumentoOrigen;
 	}

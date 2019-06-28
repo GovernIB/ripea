@@ -157,11 +157,11 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getDocumentTipus(),
 				document.getNom(),
 				document.getData(),
-				document.getDataCaptura(),
-				document.getNtiOrgano(),
-				document.getNtiOrigen(),
+				new Date(),
+				expedient.getNtiOrgano(),
+				metaDocument.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
-				document.getNtiTipoDocumental(),
+				metaDocument.getNtiTipoDocumental(),
 				metaDocument,
 				pare,
 				pare.getEntitat(),
@@ -197,14 +197,6 @@ public class DocumentServiceImpl implements DocumentService {
 		DocumentDto dto = toDocumentDto(entity);
 		return dto;
 	}
-	
-	
-
-	
-
-	
-
-	
 
 	@Transactional
 	@Override
@@ -249,11 +241,11 @@ public class DocumentServiceImpl implements DocumentService {
 				document.getNom(),
 				document.getData(),
 				document.getUbicacio(),
-				document.getDataCaptura(),
-				document.getNtiOrgano(),
-				document.getNtiOrigen(),
+				entity.getDataCaptura(),
+				entity.getNtiOrgano(),
+				entity.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
-				document.getNtiTipoDocumental(),
+				entity.getNtiTipoDocumental(),
 				document.getNtiIdDocumentoOrigen(),
 				document.getNtiTipoFirma(),
 				document.getNtiCsv(),
@@ -265,7 +257,6 @@ public class DocumentServiceImpl implements DocumentService {
 			fitxer.setContentType(document.getFitxerContentType());
 			fitxer.setContingut(document.getFitxerContingut());
 		}
-
 		if (document.getFitxerContingut() != null) {
 			documentHelper.actualitzarFitxerDocument(
 					entity,

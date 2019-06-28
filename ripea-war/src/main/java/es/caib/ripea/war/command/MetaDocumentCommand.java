@@ -63,10 +63,11 @@ public class MetaDocumentCommand {
 	protected MultipartFile plantilla;
 	private Long entitatId;
 	private Long metaExpedientId;
-	
-	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	@NotNull
 	private NtiOrigenEnumDto ntiOrigen;
+	@NotNull
+	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;	
 	
 	public Long getId() {
 		return id;
@@ -170,11 +171,11 @@ public class MetaDocumentCommand {
 	public void setMetaExpedientId(Long metaExpedientId) {
 		this.metaExpedientId = metaExpedientId;
 	}
-	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
-		return ntiEstadoElaboracion;
+	public NtiOrigenEnumDto getNtiOrigen() {
+		return ntiOrigen;
 	}
-	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
-		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
+		this.ntiOrigen = ntiOrigen;
 	}
 	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
 		return ntiTipoDocumental;
@@ -182,12 +183,13 @@ public class MetaDocumentCommand {
 	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
 		this.ntiTipoDocumental = ntiTipoDocumental;
 	}
-	public NtiOrigenEnumDto getNtiOrigen() {
-		return ntiOrigen;
+	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
+		return ntiEstadoElaboracion;
 	}
-	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
-		this.ntiOrigen = ntiOrigen;
+	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 	}
+
 	public static List<MetaDocumentCommand> toEntitatCommands(
 			List<MetaDocumentDto> dtos) {
 		List<MetaDocumentCommand> commands = new ArrayList<MetaDocumentCommand>();
