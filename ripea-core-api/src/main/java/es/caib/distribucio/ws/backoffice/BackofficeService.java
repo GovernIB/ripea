@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "BackofficeService", targetNamespace = "http://www.caib.es/distribucio/ws/backoffice", wsdlLocation = "file:/C:/Users/urszulal/git/ripeagesJBoss/ripea-core-api/src/main/resources/es/caib/ripea/core/api/wsdl/backoffice.wsdl")
+@WebServiceClient(name = "BackofficeService", targetNamespace = "http://www.caib.es/distribucio/ws/backoffice", wsdlLocation = "file:/home/LIMIT_CECOMASA.LOCAL/josepg/Feina/git/ripea/ripea-core-api/src/main/resources/es/caib/ripea/core/api/wsdl/backoffice.wsdl")
 public class BackofficeService
     extends Service
 {
@@ -30,7 +30,7 @@ public class BackofficeService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/C:/Users/urszulal/git/ripeagesJBoss/ripea-core-api/src/main/resources/es/caib/ripea/core/api/wsdl/backoffice.wsdl");
+            url = new URL("file:/home/LIMIT_CECOMASA.LOCAL/josepg/Feina/git/ripea/ripea-core-api/src/main/resources/es/caib/ripea/core/api/wsdl/backoffice.wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

@@ -47,13 +47,13 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -96,6 +96,8 @@ public class ContingutDocumentController extends BaseUserController {
 	@Autowired
 	private MetaDadaService metaDadaService;
 	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
 	private EscaneigHelper escaneigHelper;
 	@Autowired
 	private ArxiuTemporalHelper arxiuTemporalHelper;
@@ -136,33 +138,23 @@ public class ContingutDocumentController extends BaseUserController {
 			command = new DocumentCommand();
 			Date ara = new Date();
 			command.setData(ara);
-			command.setDataCaptura(ara);
+			//command.setDataCaptura(ara);
 			//command.setNtiOrigen(NtiOrigenEnumDto.O0);
 			//command.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
 			//command.setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
-			ContingutDto contingut = contingutService.findAmbIdUser(
-					entitatActual.getId(),
-					contingutId,
-					false,
-					false);
-			if (contingut.isExpedient()) {
-				command.setNtiOrgano(((ExpedientDto)contingut).getNtiOrgano());
-			} else if (contingut.getExpedientPare() != null) {
-				command.setNtiOrgano(contingut.getExpedientPare().getNtiOrgano());
-			}
 			omplirModelFormulari(
 					request,
 					command,
 					contingutId,
 					model);
 		}
-		model.addAttribute("contingutId", contingutId);
-		model.addAttribute("documentId", documentId);
 		command.setEntitatId(entitatActual.getId());
 		command.setPareId(contingutId);
 		command.setOrigen(DocumentFisicOrigenEnum.DISC);
 		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 		model.addAttribute(command);
+		model.addAttribute("contingutId", contingutId);
+		model.addAttribute("documentId", documentId);
 		return "contingutDocumentForm";
 	}
 	@RequestMapping(value = "/{contingutId}/document/digital/new", method = RequestMethod.POST)
@@ -598,7 +590,6 @@ public class ContingutDocumentController extends BaseUserController {
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
 					entitatActual.getId(), 
 					document.getId());
-			
 			for (MetaDadaDto metadada : metadades) {
 				DadaDto dada = new DadaDto();
 				dada.setMetaDada(metadada);
@@ -609,24 +600,20 @@ public class ContingutDocumentController extends BaseUserController {
 					entitatActual.getId(),
 					document.getId(),
 					dades);
-				
-			for (DadaDto dada : dades) {
+			for (DadaDto dada: dades) {
 				MetaDadaDto metaDada = metaDadaService.findById(
 						entitatActual.getId(), 
 						command.getMetaNodeId(),
 						dada.getMetaDada().getId());
-
 				Object valor = PropertyUtils.getSimpleProperty(dadesCommand, metaDada.getCodi());
-
 				if (valor != null && (!(valor instanceof String) || !((String) valor).isEmpty())) {
 					valors.put(metaDada.getCodi(), valor);
 				}
-			}	
+			}
 			contingutService.dadaSave(
 					entitatActual.getId(),
 					document.getId(),
 					valors);
-			
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + command.getPareId(),
@@ -707,6 +694,10 @@ public class ContingutDocumentController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiTipoDocumentalEnumDto.class,
 						"document.nti.tipdoc.enum."));
+		String propertyEscanejarActiu = aplicacioService.propertyFindByNom("es.caib.ripea.document.nou.escanejar.actiu");
+		model.addAttribute(
+				"escanejarActiu",
+				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
 	}
 
 

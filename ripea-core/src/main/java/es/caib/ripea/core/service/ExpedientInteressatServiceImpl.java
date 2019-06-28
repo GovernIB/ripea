@@ -35,13 +35,12 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 
 /**
- * Implementació dels mètodes per a gestionar la versió de l'aplicació.
+ * Implementació dels mètodes per a gestionar interessats.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -63,11 +62,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
-	
-
 
 	@Override
 	public InteressatDto create(
@@ -84,14 +79,12 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long interessatId,
 			InteressatDto interessat,
 			boolean propagarArxiu) {
-
 		return expedientInteressatHelper.create(
 				entitatId,
 				expedientId,
 				interessatId,
 				interessat,
 				propagarArxiu);
-
 	}
 
 	@Transactional
