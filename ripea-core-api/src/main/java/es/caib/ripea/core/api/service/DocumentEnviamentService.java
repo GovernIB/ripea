@@ -217,6 +217,9 @@ public interface DocumentEnviamentService {
 	 * 
 	 */
 	public void notificacioActualitzarEstat(String identificador, String referencia);
+
+	int enviamentsCount(Long entitatId,
+			Long expedientId);
 	
 //	/**
 //	 * Actualitza l'estat de les notificacions pendents de forma periòdica.

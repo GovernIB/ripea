@@ -573,6 +573,41 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		}
 		return resposta;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public int enviamentsCount(
+			Long entitatId,
+			Long expedientId) {
+		logger.debug("Obtenint enviaments count (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false);
+		
+		int count = 0;
+		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
+		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);
+		for (DocumentNotificacioEntity notificacio: notificacions) {
+			count++;
+		}
+		List<DocumentPublicacioEntity> publicacions = documentPublicacioRepository.findByExpedientOrderByEnviatDataAsc(
+				expedient);
+		for (DocumentPublicacioEntity publicacio: publicacions) {
+			count++;
+		}
+		return count;
+	}
+	
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override

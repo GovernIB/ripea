@@ -42,6 +42,7 @@ import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -76,6 +77,8 @@ public class ContingutController extends BaseUserController {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private ExpedientInteressatService interessatService;
+	@Autowired
+	private DocumentEnviamentService documentEnviamentService;	
 	@Autowired
 	private ExpedientService expedientService;
 	@Autowired
@@ -530,12 +533,17 @@ public class ContingutController extends BaseUserController {
 						entitatActual.getId(),
 						contingut.getId()));
 		if (contingut instanceof ExpedientDto) {
+
+			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
+					entitatActual.getId(),
+					contingut.getId()));
+			
 			model.addAttribute(
-					"interessats",
+					"interessatsCount",
 					interessatService.findByExpedient(
 							entitatActual.getId(),
-							contingut.getId()));
-			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
+							contingut.getId()).size());			
+			model.addAttribute("enviamentsCount", documentEnviamentService.enviamentsCount(
 					entitatActual.getId(),
 					contingut.getId()));
 		}

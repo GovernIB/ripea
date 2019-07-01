@@ -25,6 +25,7 @@
 <rip:blocIconaContingutNoms/>
 <html>
 <head>
+	<rip:modalHead/>
 	<title>
 		<c:choose>
 			<c:when test="${contingut.escriptori}">
@@ -115,6 +116,8 @@ span a {
 	cursor: pointer;
 }
 
+
+
 #contenidor-contingut .thumbnail h4 {
 	margin-top: 4px;
 }
@@ -202,6 +205,10 @@ ul.interessats {
 
 #colInfo {
 	padding-left: 0;
+}
+
+#colInfo #botons-accions-info {
+	float: right;
 }
 
 #colContent {
@@ -509,10 +516,9 @@ $(document).ready(function() {
 		<c:set var="contingutClass">col-md-12</c:set>
 		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
 			<c:set var="contingutClass">${isContingutDetail ? 'col-md-8' : 'col-md-9'} col-sm-8</c:set>
-			<div class="${isContingutDetail ? 'col-md-4' : 'col-md-3'} col-sm-4" id="colInfo">
-				<%--                    --%>
-				<%-- Columna informació --%>
-				<%--                    --%>
+			
+			<!------------------------------------------------------------------------- COLUMN INFO ------------------------------------------------------------------------>
+			<div class="${isContingutDetail ? 'col-md-4' : 'col-md-3'} col-sm-4" id="colInfo"> 				
 				<div id="contenidor-info" class="well">
 					<h3>
 						<spring:message code="contingut.info.informacio"/>
@@ -520,27 +526,36 @@ $(document).ready(function() {
 							<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs pull-right" data-toggle="modal">Arxiu</a>
 						</c:if>
 					</h3>
+					<c:if test="${!isContingutDetail}">
+				      	<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
+				    </c:if>	
 					<dl>
 						<dt>
 							<c:choose>
-								<c:when test="${contingut.expedient or contingut.document}">
+								<c:when test="${contingut.document}">
 									<spring:message code="contingut.info.titol"/>
+									<dd class="ellipsis">${contingut.nom}</dd>
 								</c:when>
-								<c:otherwise>
+								<c:when test="${contingut.carpeta}">
 									<spring:message code="contingut.info.nom"/>
-								</c:otherwise>
+									<dd class="ellipsis">${contingut.nom}</dd>
+								</c:when>
 							</c:choose>
 						</dt>
-						<dd class="ellipsis">${contingut.nom}</dd>
-						<dt><spring:message code="contingut.info.tipus"/></dt>
-						<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
+						
+						<c:if test="${!contingut.expedient}">
+							<dt><spring:message code="contingut.info.tipus"/></dt>
+							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
+						</c:if>
 						<c:if test="${contingut.expedient}">
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
+							
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.numero}</dd>
+							
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
@@ -551,32 +566,32 @@ $(document).ready(function() {
 								</c:otherwise>
 							</c:choose>								
 						</c:if>
+						
 						<c:if test="${contingut.document}">
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.document"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
+							
 							<dt><spring:message code="contingut.info.data"/></dt>
 							<dd><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></dd>
+							
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<dd><spring:message code="document.estat.enum.${contingut.estat}"/></dd>
+							
 							<c:if test="${contingut.versioCount gt 0}">
 								<dt><spring:message code="contingut.info.versio"/></dt>
 								<dd>${contingut.versioDarrera}</dd>
 							</c:if>
 						</c:if>
-					</dl>
+<!-- 					</dl> -->
 					<c:if test="${contingut.expedient or contingut.document}">
-						<a href="#informacioEni" class="btn btn-default btn-xs pull-right" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="informacioEni" style="margin-top:-3.5em">
-						<spring:message code="contingut.info.mes"/> ...
-						</a>
-						<div class="collapse" id="informacioEni">
-							<dl>
+<!-- 						<a href="#informacioEni" class="btn btn-default btn-xs pull-right" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="informacioEni" style="margin-top:-3.5em"> -->
+<%-- 						<spring:message code="contingut.info.mes"/> ... --%>
+<!-- 						</a> -->
+<!-- 						<div class="collapse" id="informacioEni"> -->
+<!-- 							<dl> -->
 								<c:if test="${contingut.expedient}">
-									<dt><spring:message code="contingut.info.nti.identificador"/></dt>
-									<dd style="overflow:hidden;text-overflow:ellipsis" title="${contingut.ntiIdentificador}">${contingut.ntiIdentificador}</dd>
-									<dt><spring:message code="contingut.info.nti.organ"/></dt>
-									<dd>${contingut.ntiOrganoDescripcio}</dd>
 									<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
 									<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 									<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
@@ -601,7 +616,7 @@ $(document).ready(function() {
 									</c:if>
 								</c:if>
 							</dl>
-						</div>
+<!-- 						</div> -->
 					</c:if>
 					<c:if test="${not empty relacionats}">
 						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
@@ -629,16 +644,15 @@ $(document).ready(function() {
 								</c:if>
 							</c:forEach>
 						</ul>
-					</c:if>
-				    <c:if test="${!isContingutDetail}">
-				      	<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
-				    </c:if>    
+					</c:if>   
 				</div>
 				<%--                     --%>
 				<%-- /Columna informació --%>
 				<%--                     --%>
 			</div>
 		</c:if>
+		
+		<!------------------------------------------------------------------------- COLUMN CONTENT ------------------------------------------------------------------------------->
 		<div class="${contingutClass}" id="colContent">
 			<c:if test="${contingut.node and (not contingut.valid or contingut.alerta)}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
@@ -670,10 +684,12 @@ $(document).ready(function() {
 					<li>
 						<a href="#interessats" data-toggle="tab"><spring:message code="contingut.tab.interessats"/>&nbsp;<span class="badge" id="interessats-count">${interessatsCount}</span></a>
 					</li>
-					<li>
-						<a href="#enviaments" data-toggle="tab"><spring:message code="contingut.tab.enviaments"/>&nbsp;<span class="badge" id="enviaments-count">${enviamentsCount}</span></a>
-					</li>
-					<c:if test="${contingut.peticions}">
+					<c:if test="${enviamentsCount> 0}">
+						<li>
+							<a href="#enviaments" data-toggle="tab" id="enviaments-tab"><spring:message code="contingut.tab.enviaments" />&nbsp;<span class="badge" id="enviaments-count">${enviamentsCount}</span></a>
+						</li>
+					</c:if>
+				<c:if test="${contingut.peticions}">
 						<li>
 							<a href="#anotacions" data-toggle="tab"><spring:message code="contingut.tab.anotacions"/>&nbsp;<span class="badge" id="anotacions-count"></span></a>
 						</li>
@@ -691,6 +707,8 @@ $(document).ready(function() {
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
 				<div class="tab-pane active in" id="contingut">
 					<c:choose>
+					
+						<%--------------- WHEN INSIDE DOCUMENT ---------------%>
 						<c:when test="${contingut.document}">
 							<table class="table table-bordered">
 								<tbody>
@@ -779,7 +797,10 @@ $(document).ready(function() {
 								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 							</c:if>
 						</c:when>
+						
+						<%--------------- WHEN INSIDE EXPEDIENT OR CARPETA ---------------%>
 						<c:otherwise>
+							<%---- ACCION BUTTONS ----%>
 							<div class="text-right" id="contingut-botons">
 								<div class="btn-group">
 									<c:choose>
@@ -840,6 +861,8 @@ $(document).ready(function() {
 									</div>
 								</c:if>
 							</div>
+							
+							<%--- TABLE OR GRID OF FOLDERS AND DOCUMENTS ---%>
 							<c:choose>
 							    <c:when test="${isContingutDetail}">
 							      	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/>
@@ -848,8 +871,6 @@ $(document).ready(function() {
 							    	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
 							    </c:otherwise>
 							</c:choose>								
-							
-							
 						</c:otherwise>
 					</c:choose>
 				</div>

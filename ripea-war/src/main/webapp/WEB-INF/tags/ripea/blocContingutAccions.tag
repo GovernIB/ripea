@@ -18,7 +18,15 @@
 	<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle<c:if test="${not modeLlistat}"> btn-xs</c:if>"><span class="fa fa-cog"></span><c:if test="${modeLlistat}">&nbsp;<spring:message code="comu.boto.accions"/></c:if>&nbsp;<span class="caret caret-white"></span></button>
 	<ul class="dropdown-menu">
 		<c:if test="${empty mostrarObrir or mostrarObrir}">
-			<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+			<c:choose>
+			<c:when test="${!contingut.carpeta}">
+				<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+				<li><a href="${contingut.id}" data-toggle="modal" data-maximized="true"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>			
+			</c:when>
+			<c:otherwise>
+				<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+			</c:otherwise>
+			</c:choose>
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
 		<c:if test="${potModificarExpedientPare || (contingut.expedient && contingut.usuariActualWrite) }">

@@ -391,33 +391,33 @@ public class ExpedientServiceTest extends BaseServiceTest {
 						autenticarUsuari("user");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(3);
-						ExpedientDto creat = expedientService.create(
-								entitatCreada.getId(),
-								metaExpedientCreat.getId(),
-								null,
-								expedientCreate.getAny(),
-								null,
-								expedientCreate.getNom(),
-								null,
-								false);
-						try {
-							elementsCreats.add(creat);
-							testAmbExpedientCreat.executar(
-									elementsCreats);
-						} catch (Exception ex) {
-							System.out.println("El test ha produït una excepció:");
-							ex.printStackTrace(System.out);
-						} finally {
-							for (Object element: elementsCreats) {
-								if (element instanceof ExpedientDto) {
-									autenticarUsuari("admin");
-									contingutService.deleteDefinitiu(
-											entitatCreada.getId(),
-											((ExpedientDto)element).getId());
-								}
-							}
-							elementsCreats.remove(creat);
-						}
+//						ExpedientDto creat = expedientService.create(
+//								entitatCreada.getId(),
+//								metaExpedientCreat.getId(),
+//								null,
+//								expedientCreate.getAny(),
+//								null,
+//								expedientCreate.getNom(),
+//								null,
+//								false);
+//						try {
+//							elementsCreats.add(creat);
+//							testAmbExpedientCreat.executar(
+//									elementsCreats);
+//						} catch (Exception ex) {
+//							System.out.println("El test ha produït una excepció:");
+//							ex.printStackTrace(System.out);
+//						} finally {
+//							for (Object element: elementsCreats) {
+//								if (element instanceof ExpedientDto) {
+//									autenticarUsuari("admin");
+//									contingutService.deleteDefinitiu(
+//											entitatCreada.getId(),
+//											((ExpedientDto)element).getId());
+//								}
+//							}
+//							elementsCreats.remove(creat);
+//						}
 					}
 				},
 				entitat,

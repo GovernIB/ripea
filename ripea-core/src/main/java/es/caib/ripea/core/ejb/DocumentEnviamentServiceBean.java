@@ -152,10 +152,18 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 //	}
 
 	@Override
+	@RolesAllowed("tothom")
 	public void notificacioActualitzarEstat(String identificador, String referencia) {
 		delegate.notificacioActualitzarEstat(
 				identificador,
 				referencia);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public int enviamentsCount(Long entitatId,
+			Long expedientId) {
+		return delegate.enviamentsCount(entitatId, expedientId);
 	}
 
 }
