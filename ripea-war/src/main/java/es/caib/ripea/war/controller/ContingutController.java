@@ -114,26 +114,26 @@ public class ContingutController extends BaseUserController {
 	}
 	
 	
-	@RequestMapping(value = "/contingutDetail/{contingutId}", method = RequestMethod.GET)
-	public String contingutDetailGet(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				true);
-		omplirModelPerMostrarContingut(
-				request,
-				entitatActual,
-				contingut,
-				SessioHelper.desmarcarLlegit(request),
-				model);
-		model.addAttribute("isContingutDetail", true);
-		return "contingut";
-	}
+//	@RequestMapping(value = "/contingutDetail/{contingutId}", method = RequestMethod.GET)
+//	public String contingutDetailGet(
+//			HttpServletRequest request,
+//			@PathVariable Long contingutId,
+//			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		ContingutDto contingut = contingutService.findAmbIdUser(
+//				entitatActual.getId(),
+//				contingutId,
+//				true,
+//				true);
+//		omplirModelPerMostrarContingut(
+//				request,
+//				entitatActual,
+//				contingut,
+//				SessioHelper.desmarcarLlegit(request),
+//				model);
+//		model.addAttribute("isContingutDetail", true);
+//		return "contingut";
+//	}
 	
 	
 

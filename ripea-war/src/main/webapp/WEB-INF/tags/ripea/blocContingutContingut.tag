@@ -14,9 +14,8 @@
 </c:choose>
 <c:choose>
 	<c:when test="${vistaIcones}">
-		<%--              --%>
-		<%-- Vista icones --%>
-		<%--              --%>
+	
+		<%--------------------- GRID -------------------%>
 		<ul id="contenidor-contingut" class="list-inline row">
 			<c:forEach var="fill" items="${fills}">
 				<c:if test="${fill.carpeta or fill.document or empty fill.metaNode or fill.metaNode.usuariActualRead}">
@@ -54,14 +53,10 @@
 				</c:if>
 			</c:forEach>
 		</ul>
-		<%--               --%>
-		<%-- /Vista icones --%>
-		<%--               --%>
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
-		<%--               --%>
-		<%-- Vista llistat --%>
-		<%--               --%>
+	
+		<%--------------------- TABLE -------------------%>
 		<table class="table table-striped table-bordered table-hover">
 			<thead>
 				<tr>
@@ -93,9 +88,6 @@
 				</c:forEach>
 			</tbody>
 		</table>
-		<%--                --%>
-		<%-- /Vista llistat --%>
-		<%--                --%>
 	</c:when>
 </c:choose>
 <c:if test="${empty fills}">

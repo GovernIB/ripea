@@ -156,7 +156,10 @@
 							$('.btn', modalBotons).each(function(index) {
 								var element = $(this);
 								var clon = element.clone();
-								if (element.data(settings.elementTancarData)) {
+								if (element.data('elementNoTancar')==true) {
+									clon.on('click', function () {
+									});
+								} else if (element.data(settings.elementTancarData)) {
 									clon.on('click', function () {
 										$(iframe).parent().parent().parent().parent().data(settings.elementTancarData, 'true');
 										$(iframe).parent().parent().parent().parent().modal('hide');
@@ -205,7 +208,7 @@
 				
 				modalobj.on('hidden.bs.modal', function () {
 					if (settings.refreshTancar) {
-						$('#' + settings.dataTableId).webutilDatatable('refresh');
+						window.location.reload(true);
 					}
 				});
 				

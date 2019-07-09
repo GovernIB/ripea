@@ -161,6 +161,11 @@ span a {
 	font-weight: normal;
 }
 
+#contenidor-info #botons-accions-info button{
+    padding: 1px 6px;
+	margin-bottom: 4px;    
+}
+
 #contenidor-info dd {
 	font-size: medium;
 	font-weight: bold;
@@ -477,11 +482,20 @@ $(document).ready(function() {
 		$('#pipella-contingut').removeClass( "active" );
 		$('#pipella-peticions').addClass( "active" );
 	}
-	<c:if test="${isContingutDetail}">
-		$( "#colInfo" ).insertAfter( "#colContent" );
-	</c:if >
+// 	<c:if test="${isContingutDetail}">
+// 		$( "#colInfo" ).insertAfter( "#colContent" );
+// 	</c:if >
 });
 </script>
+	<script>
+		$(document).ready(function() {
+			$(".modal-footer .btnDescareggar").on('click', function() {
+				alert("click");
+
+			});
+		});
+	</script>
+
 </head>
 <body>
 	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer}">
@@ -511,42 +525,30 @@ $(document).ready(function() {
 			<a href="<c:url value="../expedient/${expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
-	<rip:blocContenidorPath contingut="${contingut}"/>
+	<c:if test="${contingut.expedient or contingut.carpeta}">
+		<rip:blocContenidorPath contingut="${contingut}"/>
+	</c:if>
 	<div>
-		<c:set var="contingutClass">col-md-12</c:set>
-		<c:if test="${contingut.expedient or contingut.carpeta or contingut.document}">
-			<c:set var="contingutClass">${isContingutDetail ? 'col-md-8' : 'col-md-9'} col-sm-8</c:set>
-			
+		
+		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- COLUMN INFO ------------------------------------------------------------------------>
-			<div class="${isContingutDetail ? 'col-md-4' : 'col-md-3'} col-sm-4" id="colInfo"> 				
+			<div class="col-md-3 col-sm-4" id="colInfo">		
 				<div id="contenidor-info" class="well">
+				
 					<h3>
 						<spring:message code="contingut.info.informacio"/>
-						<c:if test="${pluginArxiuActiu}">
-							<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs pull-right" data-toggle="modal">Arxiu</a>
-						</c:if>
+						<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
 					</h3>
-					<c:if test="${!isContingutDetail}">
-				      	<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
-				    </c:if>	
+					
 					<dl>
-						<dt>
-							<c:choose>
-								<c:when test="${contingut.document}">
-									<spring:message code="contingut.info.titol"/>
-									<dd class="ellipsis">${contingut.nom}</dd>
-								</c:when>
-								<c:when test="${contingut.carpeta}">
-									<spring:message code="contingut.info.nom"/>
-									<dd class="ellipsis">${contingut.nom}</dd>
-								</c:when>
-							</c:choose>
-						</dt>
-						
-						<c:if test="${!contingut.expedient}">
+						<c:if test="${contingut.carpeta}">
+							<dt><spring:message code="contingut.info.nom" /></dt>
+							<dd class="ellipsis">${contingut.nom}</dd>
+							
 							<dt><spring:message code="contingut.info.tipus"/></dt>
 							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
 						</c:if>
+						
 						<c:if test="${contingut.expedient}">
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
@@ -567,57 +569,20 @@ $(document).ready(function() {
 							</c:choose>								
 						</c:if>
 						
-						<c:if test="${contingut.document}">
-							<c:if test="${not empty contingut.metaNode}">
-								<dt><spring:message code="contingut.info.meta.document"/></dt>
-								<dd>${contingut.metaNode.nom}</dd>
-							</c:if>
-							
-							<dt><spring:message code="contingut.info.data"/></dt>
-							<dd><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></dd>
-							
-							<dt><spring:message code="contingut.info.estat"/></dt>
-							<dd><spring:message code="document.estat.enum.${contingut.estat}"/></dd>
-							
-							<c:if test="${contingut.versioCount gt 0}">
-								<dt><spring:message code="contingut.info.versio"/></dt>
-								<dd>${contingut.versioDarrera}</dd>
-							</c:if>
-						</c:if>
-<!-- 					</dl> -->
+
+
 					<c:if test="${contingut.expedient or contingut.document}">
-<!-- 						<a href="#informacioEni" class="btn btn-default btn-xs pull-right" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="informacioEni" style="margin-top:-3.5em"> -->
-<%-- 						<spring:message code="contingut.info.mes"/> ... --%>
-<!-- 						</a> -->
-<!-- 						<div class="collapse" id="informacioEni"> -->
-<!-- 							<dl> -->
-								<c:if test="${contingut.expedient}">
-									<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
-									<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-									<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-									<dd>${contingut.ntiClasificacionSia}</dd>
-								</c:if>
-								<c:if test="${contingut.document}">
-									<dt><spring:message code="contingut.info.nti.identificador"/></dt>
-									<dd style="overflow:hidden;text-overflow:ellipsis" title="${contingut.ntiIdentificador}">${contingut.ntiIdentificador}</dd>
-									<dt><spring:message code="contingut.info.nti.organ"/></dt>
-									<dd>${contingut.ntiOrganoDescripcio}</dd>
-									<dt><spring:message code="contingut.info.nti.data.captura"/></dt>
-									<dd><fmt:formatDate value="${contingut.dataCaptura}" pattern="dd/MM/yyyy"/></dd>
-									<dt><spring:message code="contingut.info.nti.origen"/></dt>
-									<dd><spring:message code="document.nti.origen.enum.${contingut.ntiOrigen}"/></dd>
-									<dt><spring:message code="contingut.info.nti.estat.elab"/></dt>
-									<dd><spring:message code="document.nti.estela.enum.${contingut.ntiEstadoElaboracion}"/></dd>
-									<dt><spring:message code="contingut.info.nti.tipus.doc"/></dt>
-									<dd><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></dd>
-									<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
-										<dt><spring:message code="contingut.info.nti.doc.origen.id"/></dt>
-										<dd>${contingut.ntiIdDocumentoOrigen}</dd>
-									</c:if>
-								</c:if>
-							</dl>
-<!-- 						</div> -->
+
+						<c:if test="${contingut.expedient}">
+							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
+							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
+							<dd>${contingut.ntiClasificacionSia}</dd>
+						</c:if>
+
+
 					</c:if>
+					
 					<c:if test="${not empty relacionats}">
 						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
 							<spring:message code="contingut.info.relacionats"/>
@@ -646,14 +611,11 @@ $(document).ready(function() {
 						</ul>
 					</c:if>   
 				</div>
-				<%--                     --%>
-				<%-- /Columna informació --%>
-				<%--                     --%>
 			</div>
 		</c:if>
 		
 		<!------------------------------------------------------------------------- COLUMN CONTENT ------------------------------------------------------------------------------->
-		<div class="${contingutClass}" id="colContent">
+		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
 			<c:if test="${contingut.node and (not contingut.valid or contingut.alerta)}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
 					<span class="fa fa-exclamation-triangle"></span>
@@ -670,12 +632,12 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 			
-			<!------------------------------ TABLIST ------------------------------------->
+			<!---------------------------------------- TABLIST ------------------------------------------>
 			<ul class="nav nav-tabs">
 				<li class="active" id="pipella-contingut">
 					<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsNoRegistresCount}</span></a>
 				</li>
-				<c:if test="${contingut.document or contingut.expedient}">
+				<c:if test="${(contingut.document or contingut.expedient) and fn:length(contingut.metaNode.metaDades) gt 0}">
 					<li>
 						<a href="#dades" data-toggle="tab"><spring:message code="contingut.tab.dades"/>&nbsp;<span class="badge" id="dades-count">${contingut.dadesCount}</span></a>
 					</li>
@@ -700,6 +662,15 @@ $(document).ready(function() {
 						<a href="#versions" data-toggle="tab"><spring:message code="contingut.tab.versions"/>&nbsp;<span class="badge" id="versions-count">${fn:length(contingut.versions)}</span></a>
 					</li>
 				</c:if>
+				
+				
+				<c:if test="${contingut.document && pluginArxiuActiu}">
+					<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs pull-right" style="margin-right: 15px;margin-top: 7px;" data-toggle="modal">Arxiu</a>
+				</c:if>	
+				<c:if test="${contingut.expedient}">
+				
+					<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>			
+				</c:if>
 			</ul>
 
 			<div class="tab-content">
@@ -707,46 +678,28 @@ $(document).ready(function() {
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
 				<div class="tab-pane active in" id="contingut">
 					<c:choose>
-					
 						<%--------------- WHEN INSIDE DOCUMENT ---------------%>
 						<c:when test="${contingut.document}">
+						
 							<table class="table table-bordered">
 								<tbody>
-									<tr>
-										<td><strong><spring:message code="contingut.document.camp.tipus"/></strong></td>
-										<c:if test="${contingut.documentTipus == 'DIGITAL'}">
-											<td><span class="label label-default"><span class="fa fa-save"></span> <spring:message code="document.tipus.enum.DIGITAL"/></span></td>
-										</c:if>
-										<c:if test="${contingut.documentTipus == 'FISIC'}">
-											<td><span class="label label-default"><span class="fa fa-book"></span> <spring:message code="document.tipus.enum.FISIC"/></span></td>
-										</c:if>
-									</tr>
+<%-- 									<tr> --%>
+<%-- 										<td><strong><spring:message code="contingut.document.camp.tipus"/></strong></td> --%>
+<%-- 										<c:if test="${contingut.documentTipus == 'DIGITAL'}"> --%>
+<%-- 											<td><span class="label label-default"><span class="fa fa-save"></span> <spring:message code="document.tipus.enum.DIGITAL"/></span></td> --%>
+<%-- 										</c:if> --%>
+<%-- 										<c:if test="${contingut.documentTipus == 'FISIC'}"> --%>
+<%-- 											<td><span class="label label-default"><span class="fa fa-book"></span> <spring:message code="document.tipus.enum.FISIC"/></span></td> --%>
+<%-- 										</c:if> --%>
+<%-- 									</tr> --%>
 									<c:choose>
-										<c:when test="${contingut.documentTipus != 'FISIC'}">
+										<c:when test="${contingut.documentTipus == 'DIGITAL'}">
 											<tr>
-												<td>
-													<c:choose>
-														<c:when test="${not contingut.custodiat}">
-															<strong><spring:message code="contingut.document.camp.nom"/></strong>
-														</c:when>
-														<c:otherwise>
-															<strong><spring:message code="contingut.document.camp.nom.original"/></strong>
-														</c:otherwise>
-													</c:choose>
-												</td>
+												<td><strong><spring:message code="contingut.document.camp.arxiu"/></strong></td>
 												<td>${contingut.fitxerNom}</td>
 											</tr>
 											<tr>
-												<td>
-													<c:choose>
-														<c:when test="${not contingut.custodiat}">
-															<strong><spring:message code="contingut.document.camp.content.type"/></strong>
-														</c:when>
-														<c:otherwise>
-															<strong><spring:message code="contingut.document.camp.content.type.original"/></strong>
-														</c:otherwise>
-													</c:choose>
-												</td>
+												<td><strong><spring:message code="contingut.document.camp.content.type"/></strong></td>
 												<td>${contingut.fitxerContentType}</td>
 											</tr>
 										</c:when>
@@ -757,8 +710,47 @@ $(document).ready(function() {
 											</tr>
 										</c:otherwise>
 									</c:choose>
+
+									<c:if test="${not empty contingut.metaNode}">
+										<tr>
+											<td><strong><spring:message code="contingut.info.meta.document"/></strong></td>
+											<td>${contingut.metaNode.nom}</td>
+										</tr>
+									</c:if>
+									<tr>
+										<td><strong><spring:message code="contingut.info.data"/></strong></td>
+										<td><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></td>
+									</tr>
+									<tr>
+										<td><strong><spring:message code="contingut.info.estat"/></strong></td>
+										<td><spring:message code="document.estat.enum.${contingut.estat}"/></td>
+									</tr>									
+									<tr>
+										<td><strong><spring:message code="contingut.info.nti.data.captura"/></strong></td>
+										<td><fmt:formatDate value="${contingut.dataCaptura}" pattern="dd/MM/yyyy"/></td>
+									</tr>
+									<tr>
+										<td><strong><spring:message code="contingut.info.nti.origen"/></strong></td>
+										<td><spring:message code="document.nti.origen.enum.${contingut.ntiOrigen}"/></td>
+									</tr>
+									<tr>
+										<td><strong><spring:message code="contingut.info.nti.tipus.doc"/></strong></td>
+										<td><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></td>
+									</tr>																		
+									<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
+										<td><strong><spring:message code="contingut.info.nti.doc.origen.id"/></strong></td>
+										<td>${contingut.ntiIdDocumentoOrigen}</td>
+									</c:if>
+									<c:if test="${!empty contingut.ntiCsv}">		
+										<tr>
+											<td><strong><spring:message code="contingut.document.camp.firma.csv" /></strong></td>
+											<td>${contingut.ntiCsv}</td>
+										</tr>	
+									</c:if>										
+															
 								</tbody>
 							</table>
+							
 							<c:if test="${contingut.custodiat}">
 								<div class="panel panel-default">
 									<div class="panel-heading">
@@ -791,10 +783,6 @@ $(document).ready(function() {
 										</tbody>
 									</table>
 								</div>
-								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.imprimible"/></a>
-							</c:if>
-							<c:if test="${contingut.documentTipus != 'FISIC'}">
-								<a href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 							</c:if>
 						</c:when>
 						
@@ -803,25 +791,25 @@ $(document).ready(function() {
 							<%---- ACCION BUTTONS ----%>
 							<div class="text-right" id="contingut-botons">
 								<div class="btn-group">
-									<c:choose>
-									    <c:when test="${isContingutDetail}">
-									      	<c:set var="llistatVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/llistat"/></c:set>
-									    </c:when>    
-									    <c:otherwise>
+<%-- 									<c:choose> --%>
+<%-- 									    <c:when test="${isContingutDetail}"> --%>
+<%-- 									      	<c:set var="llistatVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/llistat"/></c:set> --%>
+<%-- 									    </c:when>     --%>
+<%-- 									    <c:otherwise> --%>
 									    	<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/llistat"/></c:set>
-									    </c:otherwise>
-									</c:choose>									
+<%-- 									    </c:otherwise> --%>
+<%-- 									</c:choose>									 --%>
 									<a href="${llistatVistaUrl}" class="btn btn-default<c:if test="${vistaLlistat}"> active</c:if>">
 										<span class="fa fa-th-list"></span>
 									</a>
-									<c:choose>
-									    <c:when test="${isContingutDetail}">
-									      	<c:set var="iconesVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/></c:set>
-									    </c:when>    
-									    <c:otherwise>
+<%-- 									<c:choose> --%>
+<%-- 									    <c:when test="${isContingutDetail}"> --%>
+<%-- 									      	<c:set var="iconesVistaUrl"><c:url value="/nodeco/contingutDetail/${contingut.id}/canviVista/icones"/></c:set> --%>
+<%-- 									    </c:when>     --%>
+<%-- 									    <c:otherwise> --%>
 									    	<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/icones"/></c:set>
-									    </c:otherwise>
-									</c:choose>						
+<%-- 									    </c:otherwise> --%>
+<%-- 									</c:choose>						 --%>
 									<a href="${iconesVistaUrl}" class="btn btn-default<c:if test="${vistaIcones}"> active</c:if>">
 										<span class="fa fa-th"></span>
 									</a>									
@@ -863,16 +851,16 @@ $(document).ready(function() {
 							</div>
 							
 							<%--- TABLE OR GRID OF FOLDERS AND DOCUMENTS ---%>
-							<c:choose>
-							    <c:when test="${isContingutDetail}">
-							      	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/>
-							    </c:when>    
-							    <c:otherwise>
+<%-- 							<c:choose> --%>
+<%-- 							    <c:when test="${isContingutDetail}"> --%>
+<%-- 							      	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/> --%>
+<%-- 							    </c:when>     --%>
+<%-- 							    <c:otherwise> --%>
 							    	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
-							    </c:otherwise>
-							</c:choose>								
-						</c:otherwise>
-					</c:choose>
+<%-- 							    </c:otherwise> --%>
+<%-- 							</c:choose>								 --%>
+ 						</c:otherwise> 
+ 					</c:choose> 
 				</div>
 				<c:if test="${contingut.node}">
 				
@@ -1168,5 +1156,18 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</div>
+	
+	
+	<c:if test="${contingut.document}">
+		<div id="modal-botons" class="well">
+			<c:if test="${contingut.custodiat}">
+				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.imprimible"/></a>
+			</c:if>
+			<c:if test="${contingut.documentTipus != 'FISIC'}">
+				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
+			</c:if>
+
+		</div>
+	</c:if>	
 </body>
 </html>

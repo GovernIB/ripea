@@ -46,6 +46,16 @@ public class DocumentDto extends NodeDto {
 	private List<DocumentVersioDto> versions;
 	private boolean firmaSeparada;
 	
+	
+	public String getFitxerExtension() {
+		return fitxerNom.substring(
+				fitxerNom.lastIndexOf('.')+1,
+				fitxerNom.length());
+	}
+	
+	public String getFitxerExtensionUpperCase() {
+		return getFitxerExtension().toUpperCase();
+	}
 
 	public boolean isFirmaSeparada() {
 		return firmaSeparada;
