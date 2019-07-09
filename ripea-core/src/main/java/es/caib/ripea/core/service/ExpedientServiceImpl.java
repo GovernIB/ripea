@@ -160,6 +160,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (expedientPeticioId != null) {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		}
+		@SuppressWarnings("unused")
 		ExpedientDto expedientDto = null;
 		// create expedient in db and in arxiu
 		expedientDto = expedientHelper.create(

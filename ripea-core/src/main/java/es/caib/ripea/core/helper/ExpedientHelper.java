@@ -1,4 +1,6 @@
-
+/**
+ * 
+ */
 package es.caib.ripea.core.helper;
 
 import java.io.StringReader;
@@ -65,7 +67,6 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.repository.RegistreInteressatRepository;
 
 /**
  * Mètodes comuns per a la gestió d'expedients. 
@@ -89,8 +90,6 @@ public class ExpedientHelper {
 	private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private RegistreInteressatRepository registreInteressatRepository;
 	@Autowired
 	private CarpetaHelper carpetaHelper;
 	@Autowired

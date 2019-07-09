@@ -575,6 +575,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	@Transactional(readOnly = true)
 	@Override
 	public int enviamentsCount(
@@ -593,7 +594,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false);
 		
 		int count = 0;
-		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);
 		for (DocumentNotificacioEntity notificacio: notificacions) {
 			count++;

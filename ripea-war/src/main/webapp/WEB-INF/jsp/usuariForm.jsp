@@ -27,8 +27,6 @@ $(document).ready(function() {
 		<rip:inputText name="nif" textKey="usuari.form.camp.nif" disabled="true"/>
 		<rip:inputText name="email" textKey="usuari.form.camp.email" disabled="true"/>
 		<rip:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
-		<rip:inputCheckbox name="rebreEmailsBustia" textKey="usuari.form.camp.rebre.emails.bustia"/>
-		<rip:inputCheckbox name="rebreEmailsAgrupats" textKey="usuari.form.camp.rebre.emails.agrupats"/>
 		<rip:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

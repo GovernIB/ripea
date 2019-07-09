@@ -42,7 +42,6 @@
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,7 +68,6 @@ body {
 	color:#666666;
 	padding-top: 120px;
 }
-
 <%-- If capsaleraColorFons is defined for entitat use it, if not look if there is capsaleraColorFons defined for application and use it, if not default color is used 	--%>
 <c:choose>
 	<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons}">
@@ -85,7 +83,6 @@ body {
 		</c:if>		
 	</c:otherwise>
 </c:choose>
-
 <%-- If capsaleraColorLletra is defined for entitat use it, if not look if there is capsaleraColorLletra defined for application and use it, if not default color is used 	--%>
 <c:choose>
 	<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra}">
@@ -101,15 +98,11 @@ body {
 		</c:if>		
 	</c:otherwise>
 </c:choose>
-
-
 </style>
-
 </head>
 <body>
-
 	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
-		<div class="container">
+		<div class="container container-caib">
 			<div class="navbar-header">
 				<%--button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="sr-only">Toggle navigation</span>
@@ -119,13 +112,6 @@ body {
 				</button--%>
 				<div class="navbar-brand">
 					<div id="govern-logo" class="pull-left">
-					
-					
-		
-			
-				
-					
-					
 						<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
 						<c:choose>
 							<c:when test="${sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0}">
@@ -285,7 +271,7 @@ body {
 			</div>
 		</div>
 	</div>
-	<div class="container container-main">
+	<div class="container container-main container-caib">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2>
@@ -301,7 +287,7 @@ body {
 			</div>
 		</div>
 	</div>
-    <div class="container container-foot">
+    <div class="container container-foot container-caib">
     	<div class="pull-left app-version"><p>RIPEA v<rip:versio/></p></div>
         <div class="pull-right govern-footer">
         	<p>
