@@ -747,21 +747,7 @@ public class ExpedientController extends BaseUserController {
 		return "redirect:/contingut/" + expedientId;
 	}
 
-	@RequestMapping(value = "/{registreId}", method = RequestMethod.GET)
-	public String registre(
-			HttpServletRequest request,
-			@PathVariable Long registreId,
-			Model model) {
 
-		RegistreDto registreDto = expedientPeticioService.findRegistreById(registreId);
-		
-		model.addAttribute(
-				"registre",
-				registreDto);
-		
-		
-		return "registreDetalls";
-	}
 
 	@RequestMapping(value = "/{expedientId}/enviament/datatable", method = RequestMethod.GET)
 	@ResponseBody
