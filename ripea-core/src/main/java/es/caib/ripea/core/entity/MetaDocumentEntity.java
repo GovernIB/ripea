@@ -76,6 +76,11 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
 	
+	@Column(name = "firma_biometrica")
+	private boolean firmaBiometricaActiva;
+	@Column(name = "biometrica_lectura")
+	private boolean biometricaLectura;
+	
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
@@ -117,7 +122,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public MetaExpedientEntity getMetaExpedient() {
 		return metaExpedient;
 	}
-
 	public NtiOrigenEnumDto getNtiOrigen() {
 		return ntiOrigen;
 	}
@@ -127,6 +131,13 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
 		return ntiTipoDocumental;
 	}
+	public boolean isFirmaBiometricaActiva() {
+		return firmaBiometricaActiva;
+	}
+	public boolean isBiometricaLectura() {
+		return biometricaLectura;
+	}
+	
 	public void update(
 			String codi,
 			String nom,
@@ -142,7 +153,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String firmaPassarelaCustodiaTipus,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+			boolean firmaBiometricaActiva,
+			boolean biometricaLectura) {
 		update(
 				codi,
 				nom,
@@ -159,6 +172,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.ntiOrigen = ntiOrigen;
 		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 		this.ntiTipoDocumental = ntiTipoDocumental;
+		this.firmaBiometricaActiva = firmaBiometricaActiva;
+		this.biometricaLectura = biometricaLectura;
 	}
 
 	public void updatePlantilla(
@@ -212,10 +227,22 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.ntiOrigen = ntiOrigen;
 			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
 			built.ntiTipoDocumental = ntiTipoDocumental;
+			built.firmaBiometricaActiva = false;
+			built.biometricaLectura = false;
+		}
+		
+		public Builder biometricaLectura(boolean biometricaLectura) {
+			built.biometricaLectura = biometricaLectura;
+			return this;
 		}
 		
 		public Builder firmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
 			built.firmaPortafirmesActiva = firmaPortafirmesActiva;
+			return this;
+		}
+		
+		public Builder firmaBiometricaActiva(boolean firmaBiometricaActiva) {
+			built.firmaBiometricaActiva = firmaBiometricaActiva;
 			return this;
 		}
 		

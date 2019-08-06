@@ -40,8 +40,14 @@ pageContext.setAttribute(
 	
 <script type="text/javascript">
 	$(document).ready(function() {
-
-
+		
+		$("#biometricaCallbackActiu").on('change', function(){
+			if($(this).prop("checked") == true){
+				$(".callback").removeClass("hidden");
+			} else if($(this).prop("checked") == false){ 
+				$(".callback").addClass("hidden");
+			}
+		});
         if($("#firmaPortafirmesActiva").prop("checked") == true){
         	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
@@ -69,6 +75,9 @@ pageContext.setAttribute(
 			<li role="presentation"><a href="#dades-nti" aria-controls="dades-nti" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dadesnti"/></a></li>
 			<li role="presentation"><a href="#firma-portafirmes" aria-controls="firma-portafirmes" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.portafirmes"/></a></li>
 			<li role="presentation"><a href="#firma-passarela" aria-controls="firma-passarela" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.passarela"/></a></li>
+			<c:if test="${isFirmaBiometrica}">
+				<li role="presentation"><a href="#firma-biometrica" aria-controls="firma-biometrica" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.biometrica"/></a></li>
+			</c:if>
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -106,6 +115,12 @@ pageContext.setAttribute(
 				<rip:inputCheckbox name="firmaPassarelaActiva" textKey="metadocument.form.camp.passarela.activa"/>
 				<rip:inputText name="firmaPassarelaCustodiaTipus" textKey="metadocument.form.camp.passarela.custodia"/>
 			</div>
+			<c:if test="${isFirmaBiometrica}">
+				<div role="tabpanel" class="tab-pane" id="firma-biometrica">
+					<rip:inputCheckbox name="firmaBiometricaActiva" textKey="metadocument.form.camp.firma.biometrica.activa"/>
+					<rip:inputCheckbox name="biometricaLectura" textKey="metadocument.form.camp.biometrica.lectura"/>
+				</div>
+			</c:if>
 		</div>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

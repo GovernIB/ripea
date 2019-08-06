@@ -17,7 +17,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
-
+	
 	public UsuariEntity findByCodi(String codi);
 
 	public UsuariEntity findByNif(String nif);

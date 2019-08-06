@@ -1,3 +1,4 @@
+
 /**
  * 
  */
@@ -6,7 +7,9 @@ package es.caib.ripea.war.controller;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,17 +32,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
+import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
@@ -163,6 +170,35 @@ public class DocumentController extends BaseUserController {
 		return "portafirmesInfo";
 	}
 
+	@RequestMapping(value = "/{documentId}/viafirma/info", method = RequestMethod.GET)
+	public String viaFirmaInfo(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"viafirma",
+				documentService.viaFirmaInfo(
+						entitatActual.getId(),
+						documentId));
+		return "viaFirmaInfo";
+	}
+
+	@RequestMapping(value = "/{documentId}/viafirma/reintentar", method = RequestMethod.GET)
+	public String viaFirmaReintentar(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		documentService.viaFirmaReintentar(
+				entitatActual.getId(),
+				documentId);
+		return this.getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../../contingut/" + documentId,
+				"document.controller.viafirma.reintentar.ok");
+	}
+	
 	@RequestMapping(value = "/{documentId}/custodia/reintentar", method = RequestMethod.GET)
 	public String custodiaReintentar(
 			HttpServletRequest request,
@@ -372,6 +408,95 @@ public class DocumentController extends BaseUserController {
 		}
 	}
 
+	@RequestMapping(value = "/{documentId}/viafirma/upload", method = RequestMethod.GET)
+	public String viaFirmaUploadGet(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentDto document = documentService.findById(
+				entitatActual.getId(),
+				documentId);
+		model.addAttribute("document", document);
+		
+		ViaFirmaEnviarCommand command = new ViaFirmaEnviarCommand();
+		command.setTitol(document.getPare().getNom());
+		command.setDescripcio(recuperarMotiu(
+				request,
+				document));
+		
+		model.addAttribute(command);
+		return "viaFirmaForm";
+	}
+	
+	@RequestMapping(value = "/{documentId}/viafirma/cancel", method = RequestMethod.GET)
+	public String viaFirmaCancel(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		documentService.viaFirmaCancelar(
+				entitatActual.getId(),
+				documentId);
+		return this.getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../../contingut/" + documentId,
+				"document.controller.viafirma.cancel.ok");
+	}
+
+	
+	@RequestMapping(value = "/{documentId}/viafirma/upload", method = RequestMethod.POST)
+	public String viaFirmaUploadPost(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			@Valid ViaFirmaEnviarCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			emplenarModelPortafirmes(
+					request,
+					documentId,
+					model);
+			return "viaFirmaForm";
+		}
+		documentService.viaFirmaEnviar(
+				entitatActual.getId(),
+				documentId,
+				ViaFirmaEnviarCommand.asDto(command),
+				usuariActual);
+		return this.getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../../contingut/" + documentId,
+				"document.controller.viafirma.upload.ok");
+	}
+
+	@RequestMapping(value = "/viafirma/usuaris", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ViaFirmaUsuariDto> getUsuarisViaFirma(
+			HttpServletRequest request,
+			Model model) {
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<ViaFirmaUsuariDto> viaFirmaUsuarisDto = documentService.viaFirmaUsuaris(usuariActual);
+		return viaFirmaUsuarisDto;
+	}
+	
+	@RequestMapping(value = "/viafirma/dispositius/{viaFirmaUsuari}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ViaFirmaDispositiuDto> getDispositiusViaFirma(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable String viaFirmaUsuari) {
+		List<ViaFirmaDispositiuDto> dispositius = new ArrayList<ViaFirmaDispositiuDto>();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		dispositius = documentService.viaFirmaDispositius(
+				viaFirmaUsuari,
+				usuariActual);
+		return dispositius;
+	}
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -404,4 +529,9 @@ public class DocumentController extends BaseUserController {
 				model);
 	}
 
+	private String recuperarMotiu(
+			HttpServletRequest request,
+			DocumentDto document) {
+		return getMessage(request, "document.controller.viafirma.motiu") + document.getNom() + " [" + document.getMetaNode().getNom() + "]";
+	}
 }

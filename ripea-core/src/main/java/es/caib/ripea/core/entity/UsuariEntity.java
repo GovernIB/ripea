@@ -4,10 +4,17 @@
 package es.caib.ripea.core.entity;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -35,6 +42,15 @@ public class UsuariEntity implements Serializable {
 	private String idioma;
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
+	@ManyToMany(
+			cascade = CascadeType.ALL,
+			fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "ipa_usuari_viafirma_ripea",
+			joinColumns = {@JoinColumn(name = "ripea_user_codi")},
+			inverseJoinColumns = {@JoinColumn(name = "viafirma_user_codi")})
+	private Set<ViaFirmaUsuariEntity> viaFirmaUsuaris = new HashSet<ViaFirmaUsuariEntity>();
+	
 	@Version
 	private long version = 0;
 
@@ -57,6 +73,9 @@ public class UsuariEntity implements Serializable {
 	}
 	public boolean isInicialitzat() {
 		return inicialitzat;
+	}
+	public Set<ViaFirmaUsuariEntity> getViaFirmaUsuaris() {
+		return viaFirmaUsuaris;
 	}
 	
 	public void update(

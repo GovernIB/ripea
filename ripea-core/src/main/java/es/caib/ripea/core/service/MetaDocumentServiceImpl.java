@@ -101,6 +101,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNtiOrigen(),
 				metaDocument.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental()).
+				biometricaLectura(metaDocument.isBiometricaLectura()).
+				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
 				descripcio(metaDocument.getDescripcio()).
 				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
@@ -162,7 +164,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getFirmaPassarelaCustodiaTipus(),
 				metaDocument.getNtiOrigen(),
 				metaDocument.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental());
+				metaDocument.getNtiTipoDocumental(),
+				metaDocument.isFirmaBiometricaActiva(),
+				metaDocument.isBiometricaLectura());
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
 					plantillaNom,

@@ -7,9 +7,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anotacioRegistreId complex type.
+ * <p>Clase Java para anotacioRegistreId complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
  * &lt;complexType name="anotacioRegistreId">
@@ -37,7 +37,7 @@ public class AnotacioRegistreId {
     protected String indetificador;
 
     /**
-     * Gets the value of the clauAcces property.
+     * Obtiene el valor de la propiedad clauAcces.
      * 
      * @return
      *     possible object is
@@ -49,7 +49,7 @@ public class AnotacioRegistreId {
     }
 
     /**
-     * Sets the value of the clauAcces property.
+     * Define el valor de la propiedad clauAcces.
      * 
      * @param value
      *     allowed object is
@@ -61,7 +61,7 @@ public class AnotacioRegistreId {
     }
 
     /**
-     * Gets the value of the indetificador property.
+     * Obtiene el valor de la propiedad indetificador.
      * 
      * @return
      *     possible object is
@@ -73,7 +73,7 @@ public class AnotacioRegistreId {
     }
 
     /**
-     * Sets the value of the indetificador property.
+     * Define el valor de la propiedad indetificador.
      * 
      * @param value
      *     allowed object is

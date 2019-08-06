@@ -50,7 +50,8 @@ public class IntegracioHelper {
 	public static final String INTCODI_VALIDASIG = "VALIDASIG";
 	public static final String INTCODI_NOTIFICACIO = "NOTIFICACIO";
 	public static final String INTCODI_GESDOC = "GESDOC";
-
+	public static final String INTCODI_VIAFIRMA = "VIAFIRMA";
+	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
 

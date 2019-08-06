@@ -11,10 +11,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -236,7 +242,86 @@ public interface DocumentService {
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) throws NotFoundException, IllegalStateException, SistemaExternException;
-
+	
+	/**
+	 * Recupera els dispositius disponibles per un usuari
+	 * 
+	 * @param viaFirmaUsuari
+	 *            Codi de l'usuari del que es volen recuperar els dispositius.
+	 * @param usuariActual
+	 *            Usuari actual autenticat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws IllegalStateException
+	 *             Si hi ha enviaments a portafirmes pendents per aquest document.
+	 * @throws SistemaExternException
+	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<ViaFirmaDispositiuDto> viaFirmaDispositius(
+			String viaFirmaUsuari,
+			UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException;
+	
+	/**
+	 * Recupera els usuaris de viaFirma relacionats amb el usuari de Ripea.
+	 * 
+	 * @param usuariActual
+	 *            Usuari actual autenticat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws IllegalStateException
+	 *             Si hi ha enviaments a portafirmes pendents per aquest document.
+	 * @throws SistemaExternException
+	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<ViaFirmaUsuariDto> viaFirmaUsuaris(UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException;
+	
+	
+	/**
+	 * Envia un document a firmar a ViaFirma.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document que es vol enviar a firmar.
+	 * @param viaFirmaEnviarDto
+	 *            Informació de l'usuari i dispositiu de viaFirma.
+	 * @param usuariActual
+	 *            Usuari actual autenticat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws IllegalStateException
+	 *             Si hi ha enviaments a portafirmes pendents per aquest document.
+	 * @throws SistemaExternException
+	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void viaFirmaEnviar(
+			Long entitatId,
+			Long documentId,
+			ViaFirmaEnviarDto viaFirmaEnviarDto,
+			UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException;
+	
+	/**
+	 * Cancela l'enviament d'un document a firmar a ViaFirma.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document que es vol enviar a firmar.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws IllegalStateException
+	 *             Si no s'ha trobat l'enviament al portafirmes pel document.
+	 * @throws SistemaExternException
+	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void viaFirmaCancelar(
+			Long entitatId,
+			Long documentId) throws NotFoundException, IllegalStateException, SistemaExternException;
+	
 	/**
 	 * Cancela l'enviament d'un document a firmar al portafirmes.
 	 * 
@@ -307,7 +392,72 @@ public interface DocumentService {
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
 			Long documentId) throws NotFoundException;
+	
+	/**
+	 * Reintenta la custòdia d'un document firmat amb ViaFirma que ha donat
+	 * error al custodiar.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document que es vol custodiar.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws SistemaExternException
+	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void viaFirmaReintentar(
+			Long entitatId,
+			Long documentId) throws NotFoundException, SistemaExternException;
+	
+	/**
+	 * Retorna la informació del darrer enviament a ViaFirma del document.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document que es vol convertir.
+	 * @return la informació de l'enviament a portafirmes.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public DocumentViaFirmaDto viaFirmaInfo(
+			Long entitatId,
+			Long documentId) throws NotFoundException;
+	
+	/**
+	 * Converteix el missatge retornat per el callback de viaFirma a Message 
+	 * i crida el callback per actualitzar estat
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document que es vol convertir.
+	 * @return la informació de l'enviament a portafirmes.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public Exception processarRespostaViaFirma(String messageJson);
 
+	/**
+	 * Processa una petició del callback de ViaFirma.
+	 * 
+	 * @param messageCode
+	 *            Codi del missatge del document dins ViaFirma.
+	 * @param estat
+	 *            Nou estat del document.
+	 * @return null si tot ha anat bé o una excepció si s'ha produit algun error
+	 *            al processar el document firmat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	public Exception viaFirmaCallback(
+			String messageCode,
+			ViaFirmaCallbackEstatEnumDto estat) throws NotFoundException;
+	
 	/**
 	 * Converteix el document a format PDF per a firmar-lo al navegador.
 	 * 

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.crypto.Cipher;
@@ -38,23 +39,34 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.core.api.dto.ViaFirmaRespostaDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -63,10 +75,14 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.ViaFirmaHelper;
+import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -81,6 +97,10 @@ public class DocumentServiceImpl implements DocumentService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired
+	private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired
+	private DispositiuEnviamentRepository dispositiuEnviamentRepository;
 	@Resource
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
@@ -100,6 +120,10 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
+	private UsuariRepository usuariRepository;
+	@Autowired
+	private ViaFirmaHelper viaFirmaHelper;
+	
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 
 	@Transactional
@@ -565,7 +589,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 	}
-
+	
 	@Transactional
 	@Override
 	public Exception portafirmesCallback(
@@ -664,7 +688,326 @@ public class DocumentServiceImpl implements DocumentService {
 				enviamentsPendents.get(0),
 				DocumentPortafirmesDto.class);
 	}
+	
+	@Transactional
+	@Override
+	public void viaFirmaReintentar(
+			Long entitatId,
+			Long id) {
+		logger.debug("Reintentant processament d'enviament a viaFirma amb error ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+				entitatId,
+				id,
+				false,
+				true,
+				false,
+				false);
+		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {
+						DocumentEnviamentEstatEnumDto.PENDENT,
+						DocumentEnviamentEstatEnumDto.ENVIAT
+				},
+				true);
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a portafirmes pendents de processar");
+		}
+		DocumentViaFirmaEntity documentPortafirmes = enviamentsPendents.get(0);
+		contingutLogHelper.log(
+				documentPortafirmes.getDocument(),
+				LogTipusEnumDto.VFIRMA_REINTENT,
+				documentPortafirmes.getMessageCode(),
+				documentPortafirmes.getEstat().name(),
+				false,
+				false);
+		if (DocumentEnviamentEstatEnumDto.PENDENT.equals(documentPortafirmes.getEstat())) {
+			documentHelper.viaFirmaEnviar(documentPortafirmes);
+		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
+			documentHelper.viaFirmaProcessar(documentPortafirmes);
+		}
+	}
 
+	@Transactional
+	@Override
+	public void viaFirmaEnviar(
+			Long entitatId, 
+			Long documentId, 
+			ViaFirmaEnviarDto viaFirmaEnviarDto,
+			UsuariDto usuariActual)
+			throws NotFoundException, IllegalStateException, SistemaExternException {
+		logger.debug("Enviant document a viaFirma (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + documentId + ")");
+		String contrasenyaUsuariViaFirma;
+		try {
+			UsuariEntity usuari = usuariRepository.findByCodi(usuariActual.getCodi());
+			
+			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+					entitatId,
+					documentId,
+					false,
+					true,
+					false,
+					false);
+			if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+				throw new ValidationException(
+						document.getId(),
+						DocumentEntity.class,
+						"El document a enviar a viaFirma no és del tipus " + DocumentTipusEnumDto.DIGITAL);
+			}
+			if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
+				throw new ValidationException(
+						document.getId(),
+						DocumentEntity.class,
+						"El document a enviar a viaFirma te alertes de validació");
+			}
+			if (DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) ||
+					DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+				throw new ValidationException(
+						document.getId(),
+						DocumentEntity.class,
+						"No es poden enviar a viaFirma documents firmats o custodiats");
+			}
+			//Recuperar contrasenya usuari
+			for (ViaFirmaUsuariEntity viaFirmaDispositiuDto : usuari.getViaFirmaUsuaris()) {
+				if (viaFirmaDispositiuDto.getCodi().equals(viaFirmaEnviarDto.getCodiUsuariViaFirma())) {
+					contrasenyaUsuariViaFirma = viaFirmaDispositiuDto.getContrasenya();
+					viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
+				}
+			}
+			//Guardar dispositiu associat a l'enviament
+			DispositiuEnviamentEntity dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
+			
+			dispositiuEnviamentRepository.save(dispositiuEnviament);
+			
+			//Guardar document a enviar
+			DocumentViaFirmaEntity documentViaFirma = DocumentViaFirmaEntity.getBuilder(
+					DocumentEnviamentEstatEnumDto.PENDENT,
+					viaFirmaEnviarDto.getCodiUsuariViaFirma(),
+					viaFirmaEnviarDto.getContrasenyaUsuariViaFirma(),
+					viaFirmaEnviarDto.getTitol(),
+					viaFirmaEnviarDto.getDescripcio(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(),
+					dispositiuEnviament,
+					document.getMetaDocument().isBiometricaLectura(),
+					document.getExpedient(),
+					document).build();
+			
+			documentHelper.viaFirmaEnviar(documentViaFirma);
+			
+			documentViaFirmaRepository.save(documentViaFirma);
+			document.updateEstat(
+					DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
+			contingutLogHelper.log(
+					document,
+					LogTipusEnumDto.VFIRMA_ENVIAMENT,
+					documentViaFirma.getMessageCode(),
+					documentViaFirma.getEstat().name(),
+					false,
+					false);
+		} catch (Exception ex) {
+			logger.error(
+					"Error a l'hora d'enviar el document a viaFirma (" +
+					"documentId=" + documentId + ")",
+					ex);
+			throw new RuntimeException(
+					"Error a l'hora d'enviar el document a viaFirma  (" +
+					"documentId=" + documentId + ")",
+					ex);
+		}
+	}
+	
+	@Transactional
+	@Override
+	public void viaFirmaCancelar(
+			Long entitatId,
+			Long id) {
+		logger.debug("Enviant document a viaFirma (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+				entitatId,
+				id,
+				false,
+				true,
+				false,
+				false);
+		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a viaFirma pendents");
+		}
+		DocumentViaFirmaEntity documentViaFirma = enviamentsPendents.get(0);
+		documentViaFirma.updateMessageCode(null);
+		documentViaFirma.updateCancelat(new Date());
+		document.updateEstat(
+				DocumentEstatEnumDto.REDACCIO);
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.VFIRMA_CANCELACIO,
+				documentViaFirma.getMessageCode(),
+				documentViaFirma.getEstat().name(),
+				false,
+				false);
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public DocumentViaFirmaDto viaFirmaInfo(
+			Long entitatId,
+			Long id) {
+		logger.debug("Obtenint informació del darrer enviament a viaFirma ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				id,
+				true,
+				false);
+		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {
+						DocumentEnviamentEstatEnumDto.PENDENT,
+						DocumentEnviamentEstatEnumDto.ENVIAT
+				});
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a viaFirma");
+		}
+		return conversioTipusHelper.convertir(
+				enviamentsPendents.get(0),
+				DocumentViaFirmaDto.class);
+	}
+	
+	@Transactional
+	@Override
+	public List<ViaFirmaDispositiuDto> viaFirmaDispositius(
+			String viaFirmaUsuari,
+			UsuariDto usuariActual)
+			throws NotFoundException, IllegalStateException, SistemaExternException {
+		logger.debug("Obtenint ( obtenint els dispositius de viaFirma de l'uusuari: " + usuariActual.getCodi() + ")");
+		List<ViaFirmaDispositiuDto> viaFirmaDispositiusDto = new ArrayList<ViaFirmaDispositiuDto>();
+		String contasenya = null;
+		try {
+			//Recuperar usuaris viaFirma usuari actual
+			UsuariEntity usuari = usuariRepository.findByCodi(usuariActual.getCodi());
+
+			for (ViaFirmaUsuariEntity viaFirmaDispositiuDto : usuari.getViaFirmaUsuaris()) {
+				if (viaFirmaDispositiuDto.getCodi().equals(viaFirmaUsuari)) {
+					contasenya = viaFirmaDispositiuDto.getContrasenya();
+				}
+			}
+			viaFirmaDispositiusDto = pluginHelper.getDeviceUser(
+					viaFirmaUsuari, 
+					contasenya);
+		} catch (Exception ex) {
+			logger.error(
+					"Error a l'hora de recuperar els usuaris de viaFirma (" +
+					"usuariCodi=" + usuariActual.getCodi() + ")",
+					ex);
+			throw new RuntimeException(
+					"Error a l'hora de recuperar els usuaris de viaFirma (" +
+					"usuariCodi=" + usuariActual.getCodi() + ")",
+					ex);
+		}
+		return viaFirmaDispositiusDto;
+	}
+	
+	@Transactional
+	@Override
+	public List<ViaFirmaUsuariDto> viaFirmaUsuaris(UsuariDto usuariActual)
+			throws NotFoundException, IllegalStateException, SistemaExternException {
+		logger.debug("Obtenint ( obtenint els usuaris de viaFirma de l'uusuari: " + usuariActual.getCodi() + ")");
+		List<ViaFirmaUsuariDto> viaFirmaUsuaris = new ArrayList<ViaFirmaUsuariDto>();
+		try {
+			//Recuperar usuaris viaFirma usuari actual
+			UsuariEntity usuari = usuariRepository.findByCodi(usuariActual.getCodi());
+			Set<ViaFirmaUsuariEntity> viaFirmaUsuarisEntity = usuari.getViaFirmaUsuaris();
+			
+			Set<ViaFirmaUsuariDto> viaFirmaUsuarisDto = conversioTipusHelper.convertirSet(
+					viaFirmaUsuarisEntity, 
+					ViaFirmaUsuariDto.class);
+			
+			viaFirmaUsuaris = new ArrayList<ViaFirmaUsuariDto>(viaFirmaUsuarisDto);
+		} catch (Exception ex) {
+			logger.error(
+					"Error a l'hora de recuperar els usuaris de viaFirma (" +
+					"usuariCodi=" + usuariActual.getCodi() + ")",
+					ex);
+			throw new RuntimeException(
+					"Error a l'hora de recuperar els usuaris de viaFirma (" +
+					"usuariCodi=" + usuariActual.getCodi() + ")",
+					ex);
+		}
+		return viaFirmaUsuaris;
+	}
+	
+	@Transactional
+	@Override
+	public Exception processarRespostaViaFirma(String messageJson) {
+		Exception exception = null;
+		try {
+			ViaFirmaRespostaDto response = viaFirmaHelper.processarRespostaViaFirma(messageJson);
+			
+			exception = viaFirmaCallback(
+					response.getMessageCode(), 
+					response.getStatus());
+		} catch (Exception ex) {
+			throw new RuntimeException(
+					"Error a l'hora de cridar el callback dins del servidor",
+					ex);
+		}
+		return exception;
+	}
+	
+	@Transactional
+	@Override
+	public Exception viaFirmaCallback(
+			String messageCode, 
+			ViaFirmaCallbackEstatEnumDto callbackEstat) throws NotFoundException {
+		logger.debug("Processant petició del callback ("
+				+ "messageCode=" + messageCode + ", "
+				+ "callbackEstat=" + callbackEstat + ")");
+		DocumentViaFirmaEntity documentViaFirma = documentViaFirmaRepository.findByMessageCode(messageCode);
+		if (documentViaFirma == null) {
+			return new NotFoundException(
+					"(messageCode=" + messageCode + ")",
+					DocumentViaFirmaEntity.class);
+		}
+		contingutLogHelper.log(
+				documentViaFirma.getDocument(),
+				LogTipusEnumDto.VFIRMA_CALLBACK,
+				documentViaFirma.getMessageCode(),
+				documentViaFirma.getEstat().name(),
+				false,
+				false);
+		documentViaFirma.updateCallbackEstat(callbackEstat);
+		return documentHelper.viaFirmaProcessar(documentViaFirma);
+	}
+
+	
 	@Transactional
 	@Override
 	public FitxerDto convertirPdfPerFirmaClient(
@@ -901,5 +1244,4 @@ public class DocumentServiceImpl implements DocumentService {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
-
 }

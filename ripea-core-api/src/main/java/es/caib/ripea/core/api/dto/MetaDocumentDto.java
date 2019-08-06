@@ -28,6 +28,8 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
 	private NtiOrigenEnumDto ntiOrigen;
+	private boolean firmaBiometricaActiva;
+	private boolean biometricaLectura;
 	
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
@@ -112,6 +114,18 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	}
 	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
 		this.ntiOrigen = ntiOrigen;
+	}
+	public boolean isFirmaBiometricaActiva() {
+		return firmaBiometricaActiva;
+	}
+	public void setFirmaBiometricaActiva(boolean firmaBiometricaActiva) {
+		this.firmaBiometricaActiva = firmaBiometricaActiva;
+	}
+	public boolean isBiometricaLectura() {
+		return biometricaLectura;
+	}
+	public void setBiometricaLectura(boolean biometricaLectura) {
+		this.biometricaLectura = biometricaLectura;
 	}
 	
 	@Override

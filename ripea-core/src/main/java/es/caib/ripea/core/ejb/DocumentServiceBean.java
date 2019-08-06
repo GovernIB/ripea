@@ -16,11 +16,18 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.DocumentService;
 
 /**
@@ -160,6 +167,71 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
+	public List<ViaFirmaUsuariDto> viaFirmaUsuaris(
+			UsuariDto usuariActual)
+			throws NotFoundException, IllegalStateException, SistemaExternException {
+		return delegate.viaFirmaUsuaris(usuariActual);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void viaFirmaEnviar(
+			Long entitatId, 
+			Long documentId, 
+			ViaFirmaEnviarDto viaFirmaEnviarDto,
+			UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException {
+		delegate.viaFirmaEnviar(
+				entitatId, 
+				documentId, 
+				viaFirmaEnviarDto, 
+				usuariActual);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public void viaFirmaCancelar(Long entitatId, Long documentId)
+			throws NotFoundException, IllegalStateException, SistemaExternException {
+		delegate.viaFirmaCancelar(entitatId, documentId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public void viaFirmaReintentar(Long entitatId, Long documentId) throws NotFoundException, SistemaExternException {
+		delegate.viaFirmaReintentar(entitatId, documentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public DocumentViaFirmaDto viaFirmaInfo(Long entitatId, Long documentId) throws NotFoundException {
+		return delegate.viaFirmaInfo(entitatId, documentId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<ViaFirmaDispositiuDto> viaFirmaDispositius(
+			String viaFirmaUsuari, 
+			UsuariDto usuariActual)
+			throws NotFoundException, IllegalStateException, SistemaExternException {
+		return delegate.viaFirmaDispositius(
+				viaFirmaUsuari,
+				usuariActual);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Exception processarRespostaViaFirma(String messageJson) {
+		return delegate.processarRespostaViaFirma(messageJson);
+	}
+	
+	@Override
+	public Exception viaFirmaCallback(
+			String messageCode,
+			ViaFirmaCallbackEstatEnumDto estat) {
+		return delegate.viaFirmaCallback(messageCode, estat);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) {
@@ -219,6 +291,5 @@ public class DocumentServiceBean implements DocumentService {
 			String referencia) {
 		delegate.notificacioActualitzarEstat(identificador, referencia);
 	}
-
 
 }

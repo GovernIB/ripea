@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.CertificateInfo;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -70,6 +72,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -80,6 +83,7 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
@@ -111,6 +115,11 @@ import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
+import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
+import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
+import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
+import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
+import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -135,7 +144,8 @@ public class PluginHelper {
 	private IValidateSignaturePlugin validaSignaturaPlugin;
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
-
+	private ViaFirmaPlugin viaFirmaPlugin;
+	
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -2848,6 +2858,134 @@ public class PluginHelper {
 		}
 	}
 	
+	public String viaFirmaUpload(
+			DocumentEntity document,
+			DocumentViaFirmaEntity documentViaFirmaEntity) {
+		ViaFirmaParams parametresViaFirma = new ViaFirmaParams();
+		ViaFirmaDispositiu viaFirmaDispositiu = new ViaFirmaDispositiu();
+		ViaFirmaResponse viaFirmaResponse;
+		String accioDescripcio = "Enviament de document a firmar";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put(
+				"documentId",
+				document.getId().toString());
+		accioParams.put(
+				"documentTitol",
+				document.getNom());
+
+		long t0 = System.currentTimeMillis();
+		FitxerDto fitxerOriginal = documentHelper.getFitxerAssociat(document, null);
+		FitxerDto fitxerConvertit = this.conversioConvertirPdf(
+				fitxerOriginal,
+				null);
+		try {
+			viaFirmaDispositiu.setCodi(documentViaFirmaEntity.getDispositiuEnviament().getCodi());
+			viaFirmaDispositiu.setCodiAplicacio(documentViaFirmaEntity.getDispositiuEnviament().getCodiAplicacio());
+			viaFirmaDispositiu.setCodiUsuari(documentViaFirmaEntity.getDispositiuEnviament().getCodiUsuari());
+			viaFirmaDispositiu.setDescripcio(documentViaFirmaEntity.getDispositiuEnviament().getDescripcio());
+			viaFirmaDispositiu.setEmailUsuari(documentViaFirmaEntity.getDispositiuEnviament().getEmailUsuari());
+			viaFirmaDispositiu.setEstat(documentViaFirmaEntity.getDispositiuEnviament().getEstat());
+			viaFirmaDispositiu.setIdentificador(documentViaFirmaEntity.getDispositiuEnviament().getIdentificador());
+			viaFirmaDispositiu.setIdentificadorNacional(documentViaFirmaEntity.getDispositiuEnviament().getIdentificadorNacional());
+			viaFirmaDispositiu.setLocal(documentViaFirmaEntity.getDispositiuEnviament().getLocal());
+			viaFirmaDispositiu.setTipus(documentViaFirmaEntity.getDispositiuEnviament().getTipus());
+			viaFirmaDispositiu.setToken(documentViaFirmaEntity.getDispositiuEnviament().getToken());
+			
+			String encodedBase64 = new String(Base64.encodeBase64(fitxerConvertit.getContingut()));
+			parametresViaFirma.setContingut(encodedBase64);
+			parametresViaFirma.setCodiUsuari(documentViaFirmaEntity.getCodiUsuari());
+			parametresViaFirma.setContrasenya(documentViaFirmaEntity.getContrasenyaUsuariViaFirma());
+			parametresViaFirma.setDescripcio(documentViaFirmaEntity.getDescripcio());
+			parametresViaFirma.setLecturaObligatoria(documentViaFirmaEntity.isLecturaObligatoria());
+			parametresViaFirma.setTitol(documentViaFirmaEntity.getTitol());
+			parametresViaFirma.setViaFirmaDispositiu(viaFirmaDispositiu);
+			
+			viaFirmaResponse = getViaFirmaPlugin().uploadDocument(parametresViaFirma);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de viaFirma";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return viaFirmaResponse.getCodiMissatge();
+	}
+	
+	public ViaFirmaDocument viaFirmaDownload(DocumentViaFirmaEntity documentViaFirma) {
+		String accioDescripcio = "Descarregar document firmat";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		DocumentEntity document = documentViaFirma.getDocument();
+		accioParams.put(
+				"documentVersioId",
+				document.getId().toString());
+		accioParams.put(
+				"documentPortafirmesId",
+				documentViaFirma.getId().toString());
+		accioParams.put(
+				"messageCode",
+				documentViaFirma.getMessageCode());
+		long t0 = System.currentTimeMillis();
+		ViaFirmaDocument viaFirmaDocument = null;
+		try {
+			viaFirmaDocument = getViaFirmaPlugin().downloadDocument(
+					documentViaFirma.getCodiUsuari(),
+					documentViaFirma.getContrasenyaUsuariViaFirma(),
+					documentViaFirma.getMessageCode());
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return viaFirmaDocument;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al descarregar el document firmat";
+			document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	public List<ViaFirmaDispositiuDto> getDeviceUser(
+			String codiUsuari,
+			String contasenya) {
+		List<ViaFirmaDispositiuDto> viaFirmaDispositiusDto = new ArrayList<ViaFirmaDispositiuDto>();
+		try {
+			
+			List<ViaFirmaDispositiu> viaFirmaDispositius = getViaFirmaPlugin().getDeviceUser(
+					codiUsuari,
+					contasenya);
+			viaFirmaDispositiusDto = conversioTipusHelper.convertirList(
+					viaFirmaDispositius, 
+					ViaFirmaDispositiuDto.class);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de viaFirma";
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return viaFirmaDispositiusDto;
+	}
+	
 	private boolean gestioDocumentalPluginConfiguracioProvada = false;
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
@@ -3991,6 +4129,29 @@ public class PluginHelper {
 		}
 		return notificacioPlugin;
 	}
+	private boolean viaFirmaPluginConfiguracioProvada = false;
+	private ViaFirmaPlugin getViaFirmaPlugin() {
+		if (viaFirmaPlugin == null && !viaFirmaPluginConfiguracioProvada) {
+			viaFirmaPluginConfiguracioProvada = true;
+			String pluginClass = getPropertyPluginViaFirma();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					viaFirmaPlugin = (ViaFirmaPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_VIAFIRMA, 
+							"Error al crear la instància del plugin de via firma",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_USUARIS,
+						"La classe del plugin de via firma no està configurada");
+			}
+		}
+		return viaFirmaPlugin;
+	}
 
 	private String getPropertyPluginDadesUsuari() {
 		return PropertiesHelper.getProperties().getProperty(
@@ -4031,7 +4192,9 @@ public class PluginHelper {
 	private String getPropertyPluginGestioDocumental() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.gesdoc.class");
 	}
-
+	private String getPropertyPluginViaFirma() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.viafirma.class");
+	}
 	private boolean getPropertyPluginRegistreSignarAnnexos() {
 		return PropertiesHelper.getProperties().getAsBoolean(
 				"es.caib.ripea.plugin.signatura.signarAnnexos");

@@ -112,6 +112,20 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
+				<c:if test="${contingut.estat == 'REDACCIO' && contingut.metaNode.firmaBiometricaActiva && contingut.documentTipus != 'FISIC'}">
+					<c:choose>
+						<c:when test="${contingut.valid}">
+							<li><a href="<c:url value="/document/${contingut.id}/viafirma/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>
+						</c:when>
+						<c:otherwise>
+							<li class="disabled"><a href="#"/><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>
+						</c:otherwise>
+						<%--c:otherwise>
+							<li><a href="<c:url value=" onclick="/>"alert('<spring:message code="contingut.document.firmar.error.no.valid"/>');return false;"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
+						</c:otherwise--%>
+					</c:choose>
+					<c:set var="mostrarSeparador" value="${true}"/>
+				</c:if>
 				<%--c:if test="${contingut.estat != 'REDACCIO' && contingut.documentTipus != 'FISIC'}">
 					<c:choose>
 						<c:when test="${contingut.estat != 'CUSTODIAT'}">
@@ -126,8 +140,12 @@
 					</c:when>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if--%>
-				<c:if test="${contingut.estat != 'REDACCIO' && contingut.documentTipus != 'FISIC' && contingut.estat != 'CUSTODIAT'}">
+				<c:if test="${contingut.estat != 'REDACCIO' && contingut.estat != 'CUSTODIAT' && contingut.estat != 'FIRMA_PENDENT_VIAFIRMA' && contingut.documentTipus != 'FISIC'}">
 					<li><a href="<c:url value="/document/${contingut.id}/portafirmes/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>
+					<c:set var="mostrarSeparador" value="${true}"/>
+				</c:if>
+				<c:if test="${contingut.estat != 'REDACCIO' && contingut.estat != 'CUSTODIAT' && contingut.estat == 'FIRMA_PENDENT_VIAFIRMA' && contingut.documentTipus != 'FISIC'}">
+					<li><a href="<c:url value="/document/${contingut.id}/viafirma/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.viafirma.info"/></a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 			</c:if>

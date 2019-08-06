@@ -89,6 +89,8 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SERIE);
 		metaDocumentUpdate.setPortafirmesCustodiaTipus("12343");
 		metaDocumentUpdate.setFirmaPassarelaCustodiaTipus("12344");
+		metaDocumentUpdate.setFirmaBiometricaActiva(true);
+		metaDocumentUpdate.setBiometricaLectura(false);
 		permisUserRead = new PermisDto();
 		permisUserRead.setRead(true);
 		permisUserRead.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);

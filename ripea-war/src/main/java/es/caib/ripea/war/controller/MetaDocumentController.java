@@ -24,6 +24,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
@@ -44,7 +45,9 @@ public class MetaDocumentController extends BaseAdminController {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -251,6 +254,9 @@ public class MetaDocumentController extends BaseAdminController {
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiEstadoElaboracionEnumDto.class,
 						"document.nti.estela.enum."));
+		model.addAttribute("isFirmaBiometrica", 
+				Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
+
 	}
 
 }

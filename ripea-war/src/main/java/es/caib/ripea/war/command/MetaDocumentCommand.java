@@ -68,6 +68,9 @@ public class MetaDocumentCommand {
 	@NotNull
 	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;	
+	private boolean firmaBiometricaActiva;
+	private boolean biometricaLectura;
+	
 	
 	public Long getId() {
 		return id;
@@ -189,7 +192,19 @@ public class MetaDocumentCommand {
 	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 	}
-
+	public boolean isFirmaBiometricaActiva() {
+		return firmaBiometricaActiva;
+	}
+	public void setFirmaBiometricaActiva(boolean firmaBiometricaActiva) {
+		this.firmaBiometricaActiva = firmaBiometricaActiva;
+	}
+	public boolean isBiometricaLectura() {
+		return biometricaLectura;
+	}
+	public void setBiometricaLectura(boolean biometricaLectura) {
+		this.biometricaLectura = biometricaLectura;
+	}
+	
 	public static List<MetaDocumentCommand> toEntitatCommands(
 			List<MetaDocumentDto> dtos) {
 		List<MetaDocumentCommand> commands = new ArrayList<MetaDocumentCommand>();

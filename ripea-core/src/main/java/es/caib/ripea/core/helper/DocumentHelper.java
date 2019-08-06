@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +35,13 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -45,6 +49,7 @@ import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -342,6 +347,161 @@ public class DocumentHelper {
 						false,
 						false);
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
+			} catch (Exception ex) {
+				Throwable rootCause = ExceptionUtils.getRootCause(ex);
+				if (rootCause == null) rootCause = ex;
+				return ex;
+			}
+		}
+		return null;
+	}
+	
+	public SistemaExternException viaFirmaEnviar(DocumentViaFirmaEntity documentViaFirma) {
+		DocumentEntity document = documentViaFirma.getDocument();
+		try {
+			String messageCode = pluginHelper.viaFirmaUpload(
+					document,
+					documentViaFirma);
+			documentViaFirma.updateEnviat(
+					new Date(),
+					messageCode);
+			return null;
+		} catch (SistemaExternException ex) {
+			Throwable rootCause = ExceptionUtils.getRootCause(ex);
+			if (rootCause == null) rootCause = ex;
+			documentViaFirma.updateEnviatError(
+					ExceptionUtils.getStackTrace(rootCause),
+					null);
+			return ex;
+		}
+	}
+	
+	public Exception viaFirmaProcessar(
+			DocumentViaFirmaEntity documentViaFirma) {
+		DocumentEntity document = documentViaFirma.getDocument();
+		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
+		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
+			document.updateEstat(
+					DocumentEstatEnumDto.FIRMAT);
+			ViaFirmaDocument viaFirmaDocument = null;
+			// Descarrega el document firmat del portafirmes
+			try {
+				viaFirmaDocument = pluginHelper.viaFirmaDownload(
+						documentViaFirma);
+			} catch (Exception ex) {
+				Throwable rootCause = ExceptionUtils.getRootCause(ex);
+				if (rootCause == null) rootCause = ex;
+				documentViaFirma.updateProcessatError(
+						ExceptionUtils.getStackTrace(rootCause),
+						null);
+				return null;
+			}
+			try {
+				// Actualitza la informació de firma a l'arxiu.
+				FitxerDto fitxer = new FitxerDto();
+				if (viaFirmaDocument != null) {
+					byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
+					
+					fitxer.setNom(viaFirmaDocument.getNomFitxer());
+					fitxer.setContingut(contingut);
+					fitxer.setContentType("application/pdf");
+					documentViaFirma.updateProcessat(
+								true,
+								new Date());
+					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+							document,
+							fitxer);
+					document.updateInformacioCustodia(
+							new Date(),
+							custodiaDocumentId,
+							document.getCustodiaCsv());
+					actualitzarVersionsDocument(document);
+					actualitzarInformacioFirma(document);
+					contingutLogHelper.log(
+							documentViaFirma.getDocument(),
+							LogTipusEnumDto.ARXIU_CUSTODIAT,
+							custodiaDocumentId,
+							null,
+							false,
+							false);
+				}
+			} catch (Exception ex) {
+				document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
+				Throwable rootCause = ExceptionUtils.getRootCause(ex);
+				if (rootCause == null) rootCause = ex;
+				documentViaFirma.updateProcessatError(
+						ExceptionUtils.getStackTrace(rootCause),
+						null);
+			}
+		} 
+		if (ViaFirmaCallbackEstatEnumDto.WAITING_CHECK.equals(callbackEstat)) {
+			try {
+				contingutLogHelper.log(
+						documentViaFirma.getDocument(),
+						LogTipusEnumDto.VFIRMA_WAITING_CHECK,
+						documentViaFirma.getMessageCode(),
+						null,
+						false,
+						false);
+			} catch (Exception ex) {
+				Throwable rootCause = ExceptionUtils.getRootCause(ex);
+				if (rootCause == null) rootCause = ex;
+				return ex;
+			}
+		}
+		
+		if (ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat)) {
+			try {
+				documentViaFirma.getDocument().updateEstat(
+						DocumentEstatEnumDto.REDACCIO);
+				documentViaFirma.updateProcessat(
+						false,
+						new Date());
+				contingutLogHelper.log(
+						documentViaFirma.getDocument(),
+						LogTipusEnumDto.VFIRMA_REBUIG,
+						documentViaFirma.getMessageCode(),
+						null,
+						false,
+						false);
+			} catch (Exception ex) {
+				Throwable rootCause = ExceptionUtils.getRootCause(ex);
+				if (rootCause == null) rootCause = ex;
+				return ex;
+			}
+		} else if (ViaFirmaCallbackEstatEnumDto.ERROR.equals(callbackEstat)) {
+			try {
+				documentViaFirma.getDocument().updateEstat(
+						DocumentEstatEnumDto.REDACCIO);
+				documentViaFirma.updateProcessat(
+						false,
+						new Date());
+				contingutLogHelper.log(
+						documentViaFirma.getDocument(),
+						LogTipusEnumDto.VFIRMA_ERROR,
+						documentViaFirma.getMessageCode(),
+						null,
+						false,
+						false);
+			} catch (Exception ex) {
+				Throwable rootCause = ExceptionUtils.getRootCause(ex);
+				if (rootCause == null) rootCause = ex;
+				return ex;
+			}
+		} else if (ViaFirmaCallbackEstatEnumDto.EXPIRED.equals(callbackEstat)) {
+			try {
+				documentViaFirma.getDocument().updateEstat(
+						DocumentEstatEnumDto.REDACCIO);
+				documentViaFirma.updateProcessat(
+						false,
+						new Date());
+				contingutLogHelper.log(
+						documentViaFirma.getDocument(),
+						LogTipusEnumDto.VFIRMA_EXPIRED,
+						documentViaFirma.getMessageCode(),
+						null,
+						false,
+						false);
 			} catch (Exception ex) {
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;

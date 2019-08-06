@@ -73,6 +73,9 @@
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							&nbsp;${fill.nom}
+							<c:if test="${fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat != 'FIRMA_PENDENT')}">
+								<span class="fa fa-clock-o" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
+							</c:if>
 						</td>
 						<td>
 							<c:if test="${not fill.carpeta}">${fill.metaNode.nom}</c:if>
