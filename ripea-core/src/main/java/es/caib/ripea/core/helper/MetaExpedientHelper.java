@@ -7,6 +7,8 @@ import java.util.Calendar;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
@@ -23,7 +25,8 @@ public class MetaExpedientHelper {
 	@Autowired
 	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
 
-	public long obtenirProximaSequenciaExpedient(
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public synchronized long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
 			boolean incrementar) {
