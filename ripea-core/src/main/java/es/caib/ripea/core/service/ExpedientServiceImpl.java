@@ -1806,6 +1806,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getTipusId() == null,
 						filtre.getTipusId(),
 						expedientRelacionats,
+						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
+						filtre.getInteressat(),
 						paginacioHelper.toSpringDataPageable(
 								paginacioParams,
 								ordenacioMap));
@@ -1838,6 +1840,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getSearch() == null ? "" : filtre.getSearch(),
 						filtre.getTipusId() == null,
 						filtre.getTipusId(),
+						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
+						filtre.getInteressat(),
 						paginacioHelper.toSpringDataPageable(
 								paginacioParams,
 								ordenacioMap));
@@ -1927,7 +1931,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getDataTancatFi() == null,
 					filtre.getDataTancatFi(),
 					filtre.getEstat() == null,
-					filtre.getEstat());
+					filtre.getEstat(),
+					filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
+					filtre.getInteressat());
 		} else {
 			return new ArrayList<Long>();
 		}

@@ -29,7 +29,15 @@ public class ExpedientFiltreDto implements Serializable {
 	private String search;
 	
 	private Long tipusId;
+	private String interessat;
 	
+
+	public String getInteressat() {
+		return interessat;
+	}
+	public void setInteressat(String interessat) {
+		this.interessat = interessat;
+	}
 
 	public Long getMetaExpedientId() {
 		return metaExpedientId;

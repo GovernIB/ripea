@@ -82,7 +82,13 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
-			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) ")
+			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " + 
+			"and (:esNullInteressat = true " +
+			"		or  e.id in (" +
+			"			select interessat.expedient.id " +
+			"			from InteressatEntity interessat " +	
+			"			where interessat.esRepresentant = false " +
+			"				and lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%'))) ")
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
@@ -110,6 +116,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("search") String search,
 			@Param("esNullTipusId") boolean esNullTipusId,
 			@Param("tipusId") Long tipusId,
+			@Param("esNullInteressat") boolean esNullInteressat,
+			@Param("interessat") String interessat,			
 			Pageable pageable);
 	
 	
@@ -133,7 +141,13 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
-			"and e not in :expedientRelacionats")
+			"and e not in :expedientRelacionats " +
+			"and (:esNullInteressat = true " +
+			"		or  e.id in (" +
+			"			select interessat.expedient.id " +
+			"			from InteressatEntity interessat " +	
+			"			where interessat.esRepresentant = false " +
+			"				and lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%'))) ")
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
@@ -162,6 +176,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullTipusId") boolean esNullTipusId,
 			@Param("tipusId") Long tipusId,
 			@Param("expedientRelacionats") List<ExpedientEntity> expedientRelacionats,
+			@Param("esNullInteressat") boolean esNullInteressat,
+			@Param("interessat") String interessat,
 			Pageable pageable);
 
 	@Query(	"select" +
@@ -179,7 +195,13 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstat = true or e.estat = :estat)")
+			"and (:esNullEstat = true or e.estat = :estat) " + 
+			"and (:esNullInteressat = true " +
+			"		or  e.id in (" +
+			"			select interessat.expedient.id " +
+			"			from InteressatEntity interessat " +	
+			"			where interessat.esRepresentant = false " +
+			"				and lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%'))) ")
 	List<Long> findIdByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
@@ -198,7 +220,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullTancatFi") boolean esNullTancatFi,
 			@Param("tancatFi") Date tancatFi,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEnumDto estat);
+			@Param("estat") ExpedientEstatEnumDto estat,
+			@Param("esNullInteressat") boolean esNullInteressat,
+			@Param("interessat") String interessat);
 
 	List<ExpedientEntity> findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
 			EntitatEntity entitat,

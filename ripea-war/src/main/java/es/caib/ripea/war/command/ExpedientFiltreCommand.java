@@ -29,7 +29,15 @@ public class ExpedientFiltreCommand {
 	private boolean meusExpedients;
 
 	private Long tipusId;
+	private String interessat;
+	
 
+	public String getInteressat() {
+		return interessat;
+	}
+	public void setInteressat(String interessat) {
+		this.interessat = interessat;
+	}
 	public Long getArxiuId() {
 		return arxiuId;
 	}
