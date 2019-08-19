@@ -112,10 +112,10 @@ public class ContingutDocumentController extends BaseUserController {
 			Model model) throws ClassNotFoundException, IOException {
 		return get(request, contingutId, null, model);
 	}
-	@RequestMapping(value = "/{contingutId}/document/{documentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/{documentId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
+			@PathVariable Long pareId,
 			@PathVariable Long documentId,
 			Model model) throws ClassNotFoundException, IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -138,6 +138,7 @@ public class ContingutDocumentController extends BaseUserController {
 			command = new DocumentCommand();
 			Date ara = new Date();
 			command.setData(ara);
+
 			//command.setDataCaptura(ara);
 			//command.setNtiOrigen(NtiOrigenEnumDto.O0);
 			//command.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
@@ -145,15 +146,15 @@ public class ContingutDocumentController extends BaseUserController {
 			omplirModelFormulari(
 					request,
 					command,
-					contingutId,
+					pareId,
 					model);
 		}
 		command.setEntitatId(entitatActual.getId());
-		command.setPareId(contingutId);
+		command.setPareId(pareId);
 		command.setOrigen(DocumentFisicOrigenEnum.DISC);
 		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 		model.addAttribute(command);
-		model.addAttribute("contingutId", contingutId);
+		model.addAttribute("contingutId", pareId);
 		model.addAttribute("documentId", documentId);
 		return "contingutDocumentForm";
 	}
@@ -689,6 +690,10 @@ public class ContingutDocumentController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiEstadoElaboracionEnumDto.class,
 						"document.nti.estela.enum."));
+		
+		
+
+		
 		model.addAttribute(
 				"ntiTipusDocumentalOptions",
 				EnumHelper.getOptionsForEnum(

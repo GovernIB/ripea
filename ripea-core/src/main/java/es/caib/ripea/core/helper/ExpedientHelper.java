@@ -212,7 +212,7 @@ public class ExpedientHelper {
 		return dto;
 	}
 	
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId) {
 		
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);

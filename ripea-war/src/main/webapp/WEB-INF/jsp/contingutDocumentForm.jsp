@@ -33,9 +33,20 @@ $(document).ready(function() {
 	}
 	
 	$('#documentTipus').val('DIGITAL');
-	if(${!empty documentCommand.id}){
-		$('#metaNodeId').on('change', function() {
-			if($('#id').val() == '') {
+	
+	$('#metaNodeId').on('change', function() {
+		if($('#id').val() == '') { // if creating new document
+			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+			.done(function(data) {			
+				$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+				$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
+				$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+				$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+				$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
+				$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
+			})
+		} else { // if modifying existing document 
+			if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
 				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
@@ -45,38 +56,28 @@ $(document).ready(function() {
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
-			} else {
-				if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
-					$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
-					.done(function(data) {			
-						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
-						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
-					})
+			}
+		}
+		
+		if ($(this).val()) {
+			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
+			.done(function(data) {
+				if (data.plantillaNom) {
+					$('#info-plantilla-si').removeClass('hidden');
+					$('#info-plantilla-si a').attr('href', '../metaDocument/' + data.id + '/plantilla');
+				} else {
+					$('#info-plantilla-si').addClass('hidden');
 				}
-			}
-			if ($(this).val()) {
-				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
-				.done(function(data) {
-					if (data.plantillaNom) {
-						$('#info-plantilla-si').removeClass('hidden');
-						$('#info-plantilla-si a').attr('href', '../metaDocument/' + data.id + '/plantilla');
-					} else {
-						$('#info-plantilla-si').addClass('hidden');
-					}
-					webutilModalAdjustHeight();
-				})
-				.fail(function() {
-					alert("<spring:message code="contingut.document.form.alert.plantilla"/>");
-				});
-			} else {
-				$('#info-plantilla-si').addClass('hidden');
-			}
-		});
-	}
+				webutilModalAdjustHeight();
+			})
+			.fail(function() {
+				alert("<spring:message code="contingut.document.form.alert.plantilla"/>");
+			});
+		} else {
+			$('#info-plantilla-si').addClass('hidden');
+		}
+	});
+	
 
 	$('input[type=radio][name=origen]').on('change', function() {
 		if ($(this).val() == 'DISC') {
@@ -131,7 +132,7 @@ $(document).ready(function() {
 	$('input[type=radio][name=origen][value=${documentCommand.origen}]').trigger('change');
 	$('input[type=checkbox][name=ambFirma').trigger('change');
 	$('input[type=radio][name=tipusFirma][value=${documentCommand.tipusFirma}]').trigger('change');
-	
+
 });
 </script>
 </head>

@@ -679,20 +679,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				paginaExpedientEstats,
 				ExpedientEstatDto.class);
 		
-		
-		for (ExpedientEstatDto expedientEstatDto : result.getContingut()) {
-
-			List<PermisDto> permisos = permisosHelper.findPermisos(expedientEstatDto.getId(),
-					ExpedientEstatEntity.class);
-			int permisosCount;
-			if (permisos == null)
-				permisosCount = 0;
-			else
-				permisosCount = permisos.size();
-			
-			expedientEstatDto.setPermisosCount(permisosCount);
-		}
-		
 		return result;
 
 	}
@@ -940,68 +926,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ExpedientEstatDto.class);
 	}
 
-	@Transactional
-	@Override
-	public List<PermisDto> estatPermisFind(
-			Long entitatId,
-			Long estatId) {
-		logger.debug("Consulta dels permisos de l'estat ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + estatId +  ")"); 
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
 
-		return permisosHelper.findPermisos(
-				estatId,
-				ExpedientEstatEntity.class);
-	}
 
-	@Transactional
-	@Override
-	public void estatPermisUpdate(
-			Long entitatId,
-			Long estatId,
-			PermisDto permis) {
-		logger.debug("Modificació del permis l'estat ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + estatId + ", "
-				+ "permis=" + permis + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
 
-		permisosHelper.updatePermis(
-				estatId,
-				ExpedientEstatEntity.class,
-				permis);
-	}
 
-	@Transactional
-	@Override
-	public void estatPermisDelete(
-			Long entitatId,
-			Long estatId,
-			Long permisId) {
-		logger.debug("Eliminació del permis del l'estat ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + estatId + ", "
-				+ "permisId=" + permisId + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-
-		permisosHelper.deletePermis(
-				estatId,
-				ExpedientEstatEntity.class,
-				permisId);
-	}
 
 	private void agafarByUserWithCodi(
 			Long entitatId,

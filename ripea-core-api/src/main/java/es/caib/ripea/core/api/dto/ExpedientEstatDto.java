@@ -15,16 +15,7 @@ public class ExpedientEstatDto  {
 	private Long id;
 	private boolean inicial;
 	private String responsableCodi;
-	private int permisosCount;
 
-
-	public int getPermisosCount() {
-		return permisosCount;
-	}
-
-	public void setPermisosCount(int permisosCount) {
-		this.permisosCount = permisosCount;
-	}
 
 	public String getResponsableCodi() {
 		return responsableCodi;

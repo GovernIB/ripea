@@ -390,15 +390,6 @@ public interface ExpedientService {
 	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId);
 
 	@PreAuthorize("hasRole('tothom')")
-	List<PermisDto> estatPermisFind(Long entitatId, Long estatId);
-
-	@PreAuthorize("hasRole('tothom')")
-	void estatPermisUpdate(Long entitatId, Long estatId, PermisDto permis);
-
-	@PreAuthorize("hasRole('tothom')")
-	void estatPermisDelete(Long entitatId, Long estatId, Long permisId);
-
-	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId);
 
 	@PreAuthorize("hasRole('tothom')")

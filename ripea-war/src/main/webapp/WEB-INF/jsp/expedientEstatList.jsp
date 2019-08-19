@@ -59,12 +59,6 @@ $(document).ready(function() {
 				</th>				
 				<th data-col-name="responsableCodi" data-orderable="false"><spring:message code="expedient.estat.form.camp.responsable"/></th>
 				
-				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
-					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
-					</script>
-				</th>				
-
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

@@ -301,21 +301,6 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public List<PermisDto> estatPermisFind(Long entitatId, Long estatId) {
-		return delegate.estatPermisFind(entitatId, estatId);
-	}
-
-	@Override
-	public void estatPermisUpdate(Long entitatId, Long estatId, PermisDto permis) {
-		delegate.estatPermisUpdate(entitatId, estatId, permis);
-	}
-
-	@Override
-	public void estatPermisDelete(Long entitatId, Long estatId, Long permisId) {
-		delegate.estatPermisDelete(entitatId, estatId, permisId);
-	}
-
-	@Override
 	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId) {
 		return delegate.findExpedientEstatByMetaExpedient(entitatId, metaExpedientId);
 	}
