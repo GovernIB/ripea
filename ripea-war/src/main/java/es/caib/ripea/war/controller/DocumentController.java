@@ -33,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -59,7 +61,8 @@ public class DocumentController extends BaseUserController {
 
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
-
+	@Autowired
+	private MetaDocumentService metaDocumentService;
 
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
@@ -81,6 +84,12 @@ public class DocumentController extends BaseUserController {
 						"contenidor.document.portafirmes.camp.motiu.default") +
 				" [" + document.getExpedientPare().getNom() + "]");
 		
+		MetaDocumentDto metaDocument = metaDocumentService.findById(
+				entitatActual.getId(),
+				document.getMetaDocument().getId());		
+		
+		command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		model.addAttribute(command);
 		return "portafirmesForm";
 	}
@@ -104,7 +113,9 @@ public class DocumentController extends BaseUserController {
 				documentId,
 				command.getMotiu(),
 				command.getPrioritat(),
-				command.getDataCaducitat());
+				command.getDataCaducitat(),
+				command.getPortafirmesResponsables(),
+				command.getPortafirmesFluxTipus());
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

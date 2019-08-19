@@ -191,4 +191,12 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				id);
 	}
 
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaDocumentDto findById(
+			Long entitatId,
+			Long metaDocumentId) {
+		return delegate.findById(entitatId, metaDocumentId);
+	}
+
 }

@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 
 /**
@@ -29,8 +30,26 @@ public class PortafirmesEnviarCommand {
 	private Date dataCaducitat;
 	private Date dataInici;
 	private boolean enviarCorreu;
-	
+	private String[] portafirmesResponsables;
+	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 
+
+	
+	public String[] getPortafirmesResponsables() {
+		return portafirmesResponsables;
+	}
+
+	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
+		this.portafirmesResponsables = portafirmesResponsables;
+	}
+
+	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
+		return portafirmesFluxTipus;
+	}
+
+	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	}
 
 	public PortafirmesEnviarCommand() {
 		Calendar cal = Calendar.getInstance();

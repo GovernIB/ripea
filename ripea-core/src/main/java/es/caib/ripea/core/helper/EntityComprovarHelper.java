@@ -195,17 +195,17 @@ public class EntityComprovarHelper {
 
 	public MetaExpedientEntity comprovarMetaExpedient(
 			EntitatEntity entitat,
-			Long id) {
+			Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(
-				id);
+				metaExpedientId);
 		if (metaExpedient == null) {
 			throw new NotFoundException(
-					id,
+					metaExpedientId,
 					MetaExpedientEntity.class);
 		}
 		if (!entitat.equals(metaExpedient.getEntitat())) {
 			throw new ValidationException(
-					id,
+					metaExpedientId,
 					MetaExpedientEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-expedient");
 		}
@@ -236,6 +236,29 @@ public class EntityComprovarHelper {
 				comprovarPermisDelete);
 		return metaExpedient;
 	}
+	
+	public MetaDocumentEntity comprovarMetaDocument(
+			EntitatEntity entitat,
+			Long metaDocumentId) {
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(
+				metaDocumentId);
+		if (metaDocument == null) {
+			throw new NotFoundException(
+					metaDocumentId,
+					MetaDocumentEntity.class);
+		}
+		if (!entitat.equals(metaDocument.getEntitat())) {
+			throw new ValidationException(
+					metaDocumentId,
+					MetaDocumentEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
+		}
+		comprovarMetaExpedient(
+				entitat,
+				metaDocument.getMetaExpedient().getId());
+		
+		return metaDocument;
+	}	
 
 	public MetaDocumentEntity comprovarMetaDocument(
 			EntitatEntity entitat,

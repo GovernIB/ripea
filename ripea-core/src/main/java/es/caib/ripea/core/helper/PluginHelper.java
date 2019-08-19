@@ -1685,46 +1685,19 @@ public class PluginHelper {
 			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
 			String fluxId,
 			List<DocumentEntity> annexos) {
-		String accioDescripcio = "Enviament de document a firmar";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"documentId",
-				document.getId().toString());
-		accioParams.put(
-				"documentTitol",
-				document.getNom());
-		accioParams.put("motiu", motiu);
-		accioParams.put("prioritat", prioritat.toString());
-		accioParams.put(
-				"dataCaducitat",
-				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
-		accioParams.put("documentTipus", documentTipus);
-		if (responsables != null) {
-			accioParams.put("responsables", Arrays.toString(responsables));
-		}
-		if (fluxTipus != null) {
-			accioParams.put("fluxTipus", fluxTipus.toString());
-		}
-		if (fluxId != null) {
-			accioParams.put("fluxId", fluxId);
-		}
+
 		long t0 = System.currentTimeMillis();
-		if (annexos != null) {
-			StringBuilder annexosIds = new StringBuilder();
-			StringBuilder annexosTitols = new StringBuilder();
-			boolean primer = true;
-			for (DocumentEntity annex: annexos) {
-				if (!primer) {
-					annexosIds.append(", ");
-					annexosTitols.append(", ");
-				}
-				annexosIds.append(annex.getId());
-				annexosTitols.append(annex.getNom());
-				primer = false;
-			}
-			accioParams.put("annexosIds", annexosIds.toString());
-			accioParams.put("annexosTitols", annexosTitols.toString());
-		}
+		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(
+				document,
+				motiu,
+				prioritat,
+				dataCaducitat,
+				documentTipus,
+				responsables,
+				fluxTipus,
+				fluxId,
+				annexos);
+		
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
 		portafirmesDocument.setTitol(document.getNom());
 		portafirmesDocument.setFirmat(
@@ -1788,7 +1761,7 @@ public class PluginHelper {
 					false);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PFIRMA,
-					accioDescripcio,
+					"Enviament de document a firmar",
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
@@ -1797,7 +1770,7 @@ public class PluginHelper {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_PFIRMA,
-					accioDescripcio,
+					"Enviament de document a firmar",
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
@@ -1809,6 +1782,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
 
 	public PortafirmesDocument portafirmesDownload(
 			DocumentPortafirmesEntity documentPortafirmes) {
@@ -3671,6 +3645,59 @@ public class PluginHelper {
 		}
 		return null;
 	}
+	
+	private Map<String, String> getAccioParamsPerPortaFirmesUpload(
+			DocumentEntity document,
+			String motiu,
+			PortafirmesPrioritatEnum prioritat,
+			Date dataCaducitat,
+			String documentTipus,
+			String[] responsables,
+			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+			String fluxId,
+			List<DocumentEntity> annexos) {
+		
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put(
+				"documentId",
+				document.getId().toString());
+		accioParams.put(
+				"documentTitol",
+				document.getNom());
+		accioParams.put("motiu", motiu);
+		accioParams.put("prioritat", prioritat.toString());
+		accioParams.put(
+				"dataCaducitat",
+				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
+		accioParams.put("documentTipus", documentTipus);
+		if (responsables != null) {
+			accioParams.put("responsables", Arrays.toString(responsables));
+		}
+		if (fluxTipus != null) {
+			accioParams.put("fluxTipus", fluxTipus.toString());
+		}
+		if (fluxId != null) {
+			accioParams.put("fluxId", fluxId);
+		}
+
+		if (annexos != null) {
+			StringBuilder annexosIds = new StringBuilder();
+			StringBuilder annexosTitols = new StringBuilder();
+			boolean primer = true;
+			for (DocumentEntity annex: annexos) {
+				if (!primer) {
+					annexosIds.append(", ");
+					annexosTitols.append(", ");
+				}
+				annexosIds.append(annex.getId());
+				annexosTitols.append(annex.getNom());
+				primer = false;
+			}
+			accioParams.put("annexosIds", annexosIds.toString());
+			accioParams.put("annexosTitols", annexosTitols.toString());
+		}
+		return accioParams;
+	}	
 
 
 	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {		

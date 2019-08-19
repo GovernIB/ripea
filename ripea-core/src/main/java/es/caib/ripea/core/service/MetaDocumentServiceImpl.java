@@ -262,6 +262,34 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		}
 		return resposta;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public MetaDocumentDto findById(
+			Long entitatId,
+			Long metaDocumentId) {
+		logger.debug("Consulta del meta-document (" +
+				"entitatId=" + entitatId + ", " +
+				"metaDocumentId=" + metaDocumentId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
+				entitat,
+				metaDocumentId);
+		
+		MetaDocumentDto resposta = conversioTipusHelper.convertir(
+				metaDocument,
+				MetaDocumentDto.class);
+		if (resposta != null) {
+			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+		}
+		return resposta;
+	}	
 
 	@Transactional(readOnly = true)
 	@Override

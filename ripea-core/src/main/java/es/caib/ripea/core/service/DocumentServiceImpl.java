@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -438,7 +439,9 @@ public class DocumentServiceImpl implements DocumentService {
 			Long id,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat) {
+			Date dataCaducitat,
+			String[] portafirmesResponsables,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
@@ -495,8 +498,8 @@ public class DocumentServiceImpl implements DocumentService {
 				prioritat,
 				dataCaducitat,
 				document.getMetaDocument().getPortafirmesDocumentTipus(),
-				document.getMetaDocument().getPortafirmesResponsables(),
-				document.getMetaDocument().getPortafirmesFluxTipus(),
+				portafirmesResponsables,
+				portafirmesFluxTipus,
 				document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
 				document).build();

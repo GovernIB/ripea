@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -107,13 +108,17 @@ public class DocumentServiceBean implements DocumentService {
 			Long id,
 			String motiu,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat) {
+			Date dataCaducitat,
+			String[] portafirmesResponsables,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		delegate.portafirmesEnviar(
 				entitatId,
 				id,
 				motiu,
 				prioritat,
-				dataCaducitat);
+				dataCaducitat,
+				portafirmesResponsables,
+				portafirmesFluxTipus);
 	}
 
 	@Override

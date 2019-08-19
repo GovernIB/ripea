@@ -271,4 +271,8 @@ public interface MetaDocumentService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId);
 
+	@PreAuthorize("hasRole('tothom')")
+	MetaDocumentDto findById(Long entitatId,
+			Long metaDocumentId);
+
 }

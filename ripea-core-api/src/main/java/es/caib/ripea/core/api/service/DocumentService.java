@@ -12,6 +12,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -232,7 +233,9 @@ public interface DocumentService {
 			Long documentId,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat) throws NotFoundException, IllegalStateException, SistemaExternException;
+			Date dataCaducitat,
+			String[] portafirmesResponsables,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) throws NotFoundException, IllegalStateException, SistemaExternException;
 
 	/**
 	 * Cancela l'enviament d'un document a firmar al portafirmes.
