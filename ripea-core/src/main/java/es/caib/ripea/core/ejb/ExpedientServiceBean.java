@@ -41,7 +41,7 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public boolean create(
+	public ExpedientDto create(
 			Long entitatId,
 			Long contenidorId,
 			Long metaExpedientId,

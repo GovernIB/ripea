@@ -12,6 +12,8 @@ import java.util.Date;
  */
 public class ExpedientDto extends NodeDto {
 
+
+	private Long id;
 	private ExpedientEstatEnumDto estat;
 	private Date tancatData;
 	private String tancatMotiu;
@@ -36,7 +38,14 @@ public class ExpedientDto extends NodeDto {
 	private Long expedientEstatNextInOrder;
 	private boolean usuariActualWrite;
 	private boolean peticions;
+	private boolean processatOk;
 
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public ExpedientEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -195,6 +204,12 @@ public class ExpedientDto extends NodeDto {
 		copia.setId(original.getId());
 		copia.setNom(original.getNom());
 		return copia;
+	}
+	public boolean isProcessatOk() {
+		return processatOk;
+	}
+	public void setProcessatOk(boolean processatOk) {
+		this.processatOk = processatOk;
 	}
 
 }

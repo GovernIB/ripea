@@ -330,7 +330,7 @@ public class ExpedientController extends BaseUserController {
 			return "contingutExpedientForm";
 		}
 		try {
-			expedientService.create(
+			ExpedientDto expedientDto = expedientService.create(
 					entitatActual.getId(),
 					command.getMetaNodeId(),
 					null,
@@ -339,10 +339,16 @@ public class ExpedientController extends BaseUserController {
 					command.getNom(),
 					null,
 					false);
-		return getModalControllerReturnValueSuccess(
+			
+		String result = getModalControllerReturnValueSuccess(
 				request,
-				"redirect:../expedient",
-				"expedient.controller.creat.ok");
+				"/contingut/"+expedientDto.getId(),
+				"expedient.controller.creat.ok",
+				null,
+				true);
+			
+		return result;
+		
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			model.addAttribute(

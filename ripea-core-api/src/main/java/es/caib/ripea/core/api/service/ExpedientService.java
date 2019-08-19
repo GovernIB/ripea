@@ -53,7 +53,7 @@ public interface ExpedientService {
 	 *             altre expedient amb el mateix tipus, sequencia i any.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public boolean create(
+	public ExpedientDto create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,

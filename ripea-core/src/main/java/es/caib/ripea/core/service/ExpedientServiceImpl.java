@@ -138,7 +138,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ContingutLogHelper contingutLogHelper;
 
 	@Override
-	public boolean create(
+	public ExpedientDto create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,
@@ -155,13 +155,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"sequencia=" + sequencia + ", " +
 				"nom=" + nom + ", " +
 				"expedientPeticioId=" + expedientPeticioId +")");
+		ExpedientDto expedientDto = new ExpedientDto();
 		// if expedient comes from distribucio
 		ExpedientPeticioEntity expedientPeticioEntity = null;
 		if (expedientPeticioId != null) {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		}
-		@SuppressWarnings("unused")
-		ExpedientDto expedientDto = null;
 		// create expedient in db and in arxiu
 		expedientDto = expedientHelper.create(
 				entitatId,
@@ -192,7 +191,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
 		}
-		return processatOk;
+		
+		expedientDto.setProcessatOk(processatOk);
+		return expedientDto;
 	}
 
 	@Override

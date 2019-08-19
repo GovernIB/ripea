@@ -355,7 +355,7 @@ public class ExpedientPeticioController extends BaseUserController {
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
-			processatOk = expedientService.create(
+			ExpedientDto expedientDto = expedientService.create(
 					entitat.getId(),
 					command.getMetaExpedientId(),
 					null,
@@ -364,6 +364,7 @@ public class ExpedientPeticioController extends BaseUserController {
 					command.getNewExpedientTitol(),
 					expedientPeticioDto.getId(),
 					command.isAssociarInteressats());
+			processatOk = expedientDto.isProcessatOk();
 		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 			processatOk = expedientService.incorporar(
 					entitat.getId(),
@@ -373,15 +374,12 @@ public class ExpedientPeticioController extends BaseUserController {
 		}
 		
 		if (!processatOk) {
-			
-			
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
 							request, 
 							"expedientPeticio.controller.acceptat.warning"));
 		}
-			
 		
 		return getModalControllerReturnValueSuccess(
 				request,

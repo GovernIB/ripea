@@ -35,10 +35,14 @@ table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
 table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
 	cursor: pointer;
 }
+.datepicker{
+	padding-left: 12px;
+	padding-right: 12px;
+}
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
-var columnaAgafatPer = 13;
+var columnaAgafatPer = 16;
 $(document).ready(function() {
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
@@ -174,7 +178,7 @@ function getCookie(cname) {
 					</div>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<div class="col-md-4">
-						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span></button>
+						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
 					</div>						
 				</div>
 				<rip:inputHidden name="meusExpedients"/>
@@ -215,7 +219,7 @@ function getCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="10" 
+		data-default-order="13" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -234,8 +238,7 @@ function getCookie(cname) {
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
+				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>				
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
@@ -253,7 +256,6 @@ function getCookie(cname) {
 						{{:nom}}
 					</script>
 				</th>
-				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%"><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -277,13 +279,15 @@ function getCookie(cname) {
 							<span class="stateColor-{{:expedientEstat.color}}"></span>
 						{{/if}}
 					</script>
-				</th>			
-				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				</th>				
+				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
+				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%"><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="5%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 					</script>
 				</th>					
+				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
