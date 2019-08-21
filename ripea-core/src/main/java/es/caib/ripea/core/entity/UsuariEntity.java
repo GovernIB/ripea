@@ -35,11 +35,6 @@ public class UsuariEntity implements Serializable {
 	private String idioma;
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
-	@Column(name = "rebre_emails")
-	private boolean rebreEmailsBustia = true;
-	@Column(name = "emails_agrupats")
-	private boolean rebreEmailsAgrupats = true;
-
 	@Version
 	private long version = 0;
 
@@ -63,12 +58,6 @@ public class UsuariEntity implements Serializable {
 	public boolean isInicialitzat() {
 		return inicialitzat;
 	}
-	public boolean isRebreEmailsBustia() {
-		return rebreEmailsBustia;
-	}
-	public boolean isRebreEmailsAgrupats() {
-		return rebreEmailsAgrupats;
-	}
 	
 	public void update(
 			String nom,
@@ -81,11 +70,7 @@ public class UsuariEntity implements Serializable {
 	}
 	
 	public void update(
-			boolean rebreEmailsBustia,
-			boolean rebreEmailsAgrupats,
 			String idioma) {
-		this.rebreEmailsBustia = rebreEmailsBustia;
-		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 		this.idioma = idioma;
 	}
 

@@ -406,7 +406,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					contingut.getId(),
 					em.getMotiu(),
 					em.getPrioritat(),
-					em.getDataCaducitat());
+					em.getDataCaducitat(),
+					null,
+					null);
 				
 			emc.updateFinalitzat(new Date());
 			execucioMassivaContingutRepository.save(emc);

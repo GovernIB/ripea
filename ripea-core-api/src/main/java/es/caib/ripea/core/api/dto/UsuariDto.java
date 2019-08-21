@@ -19,8 +19,6 @@ public class UsuariDto implements Serializable {
 	private String email;
 	private String idioma;
 	private String[] rols;
-	private Boolean rebreEmailsBustia;
-	private Boolean rebreEmailsAgrupats;
 
 	public String getCodi() {
 		return codi;
@@ -57,18 +55,6 @@ public class UsuariDto implements Serializable {
 	}
 	public void setRols(String[] rols) {
 		this.rols = rols;
-	}
-	public Boolean getRebreEmailsBustia() {
-		return rebreEmailsBustia;
-	}
-	public void setRebreEmailsBustia(Boolean rebreEmailsBustia) {
-		this.rebreEmailsBustia = rebreEmailsBustia;
-	}
-	public Boolean getRebreEmailsAgrupats() {
-		return rebreEmailsAgrupats;
-	}
-	public void setRebreEmailsAgrupats(Boolean rebreEmailsAgrupats) {
-		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

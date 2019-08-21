@@ -20,8 +20,6 @@ CREATE TABLE IPA_USUARI
   NOM           		character varying(200),
   EMAIL         		character varying(200),
   IDIOMA 				character varying(2) 	 	NOT NULL,
-  REBRE_EMAILS  		boolean,
-  EMAILS_AGRUPATS		boolean,
   VERSION       		bigint                      NOT NULL
 );
 

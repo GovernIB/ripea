@@ -191,7 +191,7 @@ body {
 									</a>
 								</li>
 								<li>
-									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true">
+									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
 										<spring:message code="decorator.menu.configuracio.user"/>
 									</a>
 								</li>

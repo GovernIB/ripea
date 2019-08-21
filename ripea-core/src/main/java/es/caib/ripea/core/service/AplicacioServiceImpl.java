@@ -128,8 +128,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Actualitzant configuració de usuari actual");
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
 		usuari.update(
-				dto.getRebreEmailsBustia(), 
-				dto.getRebreEmailsAgrupats(),
 				dto.getIdioma());
 		
 		return toUsuariDtoAmbRols(usuari);
