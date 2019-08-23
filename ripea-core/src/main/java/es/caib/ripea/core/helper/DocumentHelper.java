@@ -494,7 +494,7 @@ public class DocumentHelper {
 		}
 		return (DocumentEntity)node;
 	}
-	
+
 	public List<ArxiuFirmaDto> validaFirmaDocument(
 			DocumentEntity document,
 			FitxerDto fitxer,
@@ -515,9 +515,6 @@ public class DocumentHelper {
 				false);
 		return firmes;
 	}
-	
-	
-	
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 

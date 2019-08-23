@@ -20,7 +20,6 @@
 		<c:if test="${contingut.expedientPare.estat == 'TANCAT'}"><c:set var="expedientTancat" value="${true}"/></c:if>
 	</c:otherwise>
 </c:choose>
-
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -56,6 +55,7 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
 	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
 	<c:if test="${isContingutDetail}">
 		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
@@ -231,6 +231,11 @@ ul.interessats {
 #contenidor-info h3 {
 	padding-bottom: 6px;
 }
+
+.drag_activated {
+	border: 4px dashed #ffd351;
+}
+
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
@@ -476,26 +481,39 @@ $(document).ready(function() {
 	$('form#nodeDades td .form-group').on('clone.multifield', function(event, clon) {
 		$('input', clon).change(nodeDadesInputChange);
 	});
-	if(${pipellaAnotacionsRegistre}) {
+	if (${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
 		$('#peticions').addClass( "active in" );
 		$('#pipella-contingut').removeClass( "active" );
 		$('#pipella-peticions').addClass( "active" );
 	}
-// 	<c:if test="${isContingutDetail}">
-// 		$( "#colInfo" ).insertAfter( "#colContent" );
-// 	</c:if >
+	$('#contingut').filedrop({
+		maxfiles: 1,
+		error: function(err, file) {
+			alert('Filedrop error: ' + err);
+		},
+		dragOver: function() {
+			$('#contingut').addClass('drag_activated');
+		},
+		dragLeave: function() {
+			$('#contingut').removeClass('drag_activated');
+		},
+		drop: function(e) {
+			let files = e.originalEvent.dataTransfer.files;
+			$('#contingut').removeClass('drag_activated');
+			document.querySelector('#dropped-files').files = files;
+			$('#document-new').trigger('click');d
+		}
+	});
 });
 </script>
-	<script>
-		$(document).ready(function() {
-			$(".modal-footer .btnDescareggar").on('click', function() {
-				alert("click");
-
-			});
+<%--script>
+	$(document).ready(function() {
+		$(".modal-footer .btnDescareggar").on('click', function() {
+			alert("click");
 		});
-	</script>
-
+	});
+</script--%>
 </head>
 <body>
 	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer}">
@@ -529,17 +547,14 @@ $(document).ready(function() {
 		<rip:blocContenidorPath contingut="${contingut}"/>
 	</c:if>
 	<div>
-		
 		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- COLUMN INFO ------------------------------------------------------------------------>
 			<div class="col-md-3 col-sm-4" id="colInfo">		
 				<div id="contenidor-info" class="well">
-				
 					<h3>
 						<spring:message code="contingut.info.informacio"/>
 						<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
 					</h3>
-					
 					<dl>
 						<c:if test="${contingut.carpeta}">
 							<dt><spring:message code="contingut.info.nom" /></dt>
@@ -548,16 +563,13 @@ $(document).ready(function() {
 							<dt><spring:message code="contingut.info.tipus"/></dt>
 							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
 						</c:if>
-						
 						<c:if test="${contingut.expedient}">
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
-							
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.numero}</dd>
-							
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
@@ -568,21 +580,14 @@ $(document).ready(function() {
 								</c:otherwise>
 							</c:choose>								
 						</c:if>
-						
-
-
 					<c:if test="${contingut.expedient or contingut.document}">
-
 						<c:if test="${contingut.expedient}">
 							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
 							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
 							<dd>${contingut.ntiClasificacionSia}</dd>
 						</c:if>
-
-
 					</c:if>
-					
 					<c:if test="${not empty relacionats}">
 						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
 							<spring:message code="contingut.info.relacionats"/>
@@ -613,7 +618,6 @@ $(document).ready(function() {
 				</div>
 			</div>
 		</c:if>
-		
 		<!------------------------------------------------------------------------- COLUMN CONTENT ------------------------------------------------------------------------------->
 		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
 			<c:if test="${contingut.node and (not contingut.valid or contingut.alerta)}">
@@ -631,7 +635,6 @@ $(document).ready(function() {
 					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.mesinfo"/></a>
 				</div>
 			</c:if>
-			
 			<!---------------------------------------- TABLIST ------------------------------------------>
 			<ul class="nav nav-tabs">
 				<li class="active" id="pipella-contingut">
@@ -662,8 +665,6 @@ $(document).ready(function() {
 						<a href="#versions" data-toggle="tab"><spring:message code="contingut.tab.versions"/>&nbsp;<span class="badge" id="versions-count">${fn:length(contingut.versions)}</span></a>
 					</li>
 				</c:if>
-				
-				
 				<c:if test="${contingut.document && pluginArxiuActiu}">
 					<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs pull-right" style="margin-right: 15px;margin-top: 7px;" data-toggle="modal">Arxiu</a>
 				</c:if>	
@@ -672,15 +673,12 @@ $(document).ready(function() {
 					<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>			
 				</c:if>
 			</ul>
-
 			<div class="tab-content">
-			
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
 				<div class="tab-pane active in" id="contingut">
 					<c:choose>
 						<%--------------- WHEN INSIDE DOCUMENT ---------------%>
 						<c:when test="${contingut.document}">
-						
 							<table class="table table-bordered">
 								<tbody>
 <%-- 									<tr> --%>
@@ -710,7 +708,6 @@ $(document).ready(function() {
 											</tr>
 										</c:otherwise>
 									</c:choose>
-
 									<c:if test="${not empty contingut.metaNode}">
 										<tr>
 											<td><strong><spring:message code="contingut.info.meta.document"/></strong></td>
@@ -747,10 +744,8 @@ $(document).ready(function() {
 											<td>${contingut.ntiCsv}</td>
 										</tr>	
 									</c:if>										
-															
 								</tbody>
 							</table>
-							
 							<c:if test="${contingut.custodiat}">
 								<div class="panel panel-default">
 									<div class="panel-heading">
@@ -785,7 +780,6 @@ $(document).ready(function() {
 								</div>
 							</c:if>
 						</c:when>
-						
 						<%--------------- WHEN INSIDE EXPEDIENT OR CARPETA ---------------%>
 						<c:otherwise>
 							<%---- ACCION BUTTONS ----%>
@@ -838,7 +832,7 @@ $(document).ready(function() {
 											<c:if test="${contingut.crearExpedients and not empty metaExpedients}">
 												<li><a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...</a></li>
 											</c:if>
-											<li><a href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
+											<li><a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
 											<c:if test="${isMostrarCarpeta}">
 												<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>
 											</c:if>
@@ -849,21 +843,21 @@ $(document).ready(function() {
 									</div>
 								</c:if>
 							</div>
-							
+							<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							<input class="hidden" id="dropped-files" type="file"/>
 							<%--- TABLE OR GRID OF FOLDERS AND DOCUMENTS ---%>
 <%-- 							<c:choose> --%>
 <%-- 							    <c:when test="${isContingutDetail}"> --%>
 <%-- 							      	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}" nodeco="true"/> --%>
 <%-- 							    </c:when>     --%>
 <%-- 							    <c:otherwise> --%>
-							    	<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							    	<%--rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/--%>
 <%-- 							    </c:otherwise> --%>
 <%-- 							</c:choose>								 --%>
  						</c:otherwise> 
  					</c:choose> 
 				</div>
 				<c:if test="${contingut.node}">
-				
 					<!------------------------------ TABPANEL DADES ------------------------------------->
 					<div class="tab-pane" id="dades">
 						<c:choose>
@@ -948,7 +942,6 @@ $(document).ready(function() {
 					</div>
 				</c:if>
 				<c:if test="${contingut.expedient}">
-				
 					<!------------------------------ TABPANEL INTERESSATS ------------------------------------->	
 					<div class="tab-pane" id="interessats">
 						<table id="taulaInteressats" data-toggle="datatable" data-url="<c:url value="/contingut/${contingut.id}/interessat/datatable"/>" data-paging-enabled="false" data-botons-template="#taulaInteressatsBotonsTemplate" class="table table-striped table-bordered" style="width:100%">
@@ -994,7 +987,6 @@ $(document).ready(function() {
 							</c:if>
 						</script>
 					</div>
-					
 					<!------------------------------ TABPANEL ENVIAMENTS ------------------------------------->
 					<div class="tab-pane" id="enviaments">
 						<table
@@ -1084,7 +1076,6 @@ $(document).ready(function() {
 							</thead>
 						</table>
 					</div>
-					
 					<!--  If expedient came form DISTRIBUCIO and was created from peticion -->
 					<c:if test="${contingut.peticions}">
 					<!------------------------------ TABPANEL ANOTACIONS ------------------------------------->				
@@ -1113,11 +1104,8 @@ $(document).ready(function() {
 							</table>
 						</div>						
 					</c:if>
-					
 				</c:if>
-				
 				<c:if test="${contingut.document and fn:length(contingut.versions) gt 0}">
-				
 					<!------------------------------ TABPANEL VERSIONS ------------------------------------->
 					<div class="tab-pane" id="versions">
 						<div class="tab-pane" id="contingut">
@@ -1156,8 +1144,6 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</div>
-	
-	
 	<c:if test="${contingut.document}">
 		<div id="modal-botons" class="well">
 			<c:if test="${contingut.custodiat}">
@@ -1166,7 +1152,6 @@ $(document).ready(function() {
 			<c:if test="${contingut.documentTipus != 'FISIC'}">
 				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 			</c:if>
-
 		</div>
 	</c:if>	
 </body>
