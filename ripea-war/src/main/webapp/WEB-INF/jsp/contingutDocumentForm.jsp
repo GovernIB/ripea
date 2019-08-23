@@ -25,15 +25,18 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 <script>
+function mostrarDocument(fileName) {
+	$fileinput = $('#arxiu').closest('.fileinput');
+	$fileinput.removeClass('fileinput-new');
+	$fileinput.addClass('fileinput-exists');
+	$('.fileinput-filename', $fileinput).append(fileName);
+}
 $(document).ready(function() {
-	if("${nomDocument}" != ""){
-		$(".fileinput").removeClass("fileinput-new");
-		$(".fileinput").addClass("fileinput-exists");
-		$(".fileinput-filename").append("${nomDocument}");
+	let fileName = "${nomDocument}";
+	if (fileName !== '') {
+		mostrarDocument(fileName);
 	}
-	
 	$('#documentTipus').val('DIGITAL');
-	
 	$('#metaNodeId').on('change', function() {
 		if($('#id').val() == '') { // if creating new document
 			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
@@ -132,6 +135,15 @@ $(document).ready(function() {
 	$('input[type=radio][name=origen][value=${documentCommand.origen}]').trigger('change');
 	$('input[type=checkbox][name=ambFirma').trigger('change');
 	$('input[type=radio][name=tipusFirma][value=${documentCommand.tipusFirma}]').trigger('change');
+	let droppedFiles = window.parent.document.getElementById('dropped-files');
+	if (droppedFiles) {
+		let droppedFilesFiles = droppedFiles.files;
+		if (droppedFilesFiles && droppedFilesFiles.length == 1) {
+			document.querySelector('#arxiu').files = droppedFilesFiles;
+			mostrarDocument(droppedFilesFiles[0].name);
+			document.querySelector('#arxiu').value = '';
+		}
+	}
 
 });
 </script>

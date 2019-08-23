@@ -14,7 +14,6 @@
 </c:choose>
 <c:choose>
 	<c:when test="${vistaIcones}">
-	
 		<%--------------------- GRID -------------------%>
 		<ul id="contenidor-contingut" class="list-inline row">
 			<c:forEach var="fill" items="${fills}">
@@ -55,7 +54,6 @@
 		</ul>
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
-	
 		<%--------------------- TABLE -------------------%>
 		<table class="table table-striped table-bordered table-hover">
 			<thead>
