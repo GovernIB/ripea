@@ -3,22 +3,30 @@
  */
 package es.caib.ripea.core.helper;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -31,29 +39,23 @@ public class EmailHelper {
 
 	private static final String PREFIX_RIPEA = "[RIPEA]";
 
-	@Resource
-	private UsuariRepository usuariRepository;
-	
-	@Resource
+	@Autowired
+	private CacheHelper cacheHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	@Autowired
 	private JavaMailSender mailSender;
 
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-	@Resource
-	private ContingutHelper contenidorHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-
-
-
-	public void emailUsuariContingutAgafatSensePermis(
+	public void contingutAgafatSensePermis(
 			ContingutEntity contingut,
 			UsuariEntity usuariOriginal,
 			UsuariEntity usuariNou) {
-		logger.debug("Enviament emails contingut agafat sense permis (" +
-				"contingutId=" + contingut.getId() + ")");
+		logger.debug("Enviant correu electrònic per a contingut agafat sense permis (" +
+			"contingutId=" + contingut.getId() + ")");
 		SimpleMailMessage missatge = new SimpleMailMessage();
 		missatge.setFrom(getRemitent());
 		String tipus = "desconegut";
@@ -75,12 +77,12 @@ public class EmailHelper {
 		mailSender.send(missatge);
 	}
 
-	public void emailExecucioMassivaFinalitzada(
+	public void execucioMassivaFinalitzada(
 			ExecucioMassivaEntity em) {
-		logger.debug("Enviament emails execució massiva finalitzada amb id: " + em.getId());
+		logger.debug("Enviant correu electrònic per a execució massiva finalitzada (" + 
+			"execucioMassivaId=" + em.getId() + ")");
 		SimpleMailMessage missatge = new SimpleMailMessage();
-		
-		if (emplenarDestinatari(
+		if (emplenarDestinatariAmbUsuari(
 				missatge,
 				em.getCreatedBy().getCodi())) {
 			missatge.setFrom(getRemitent());
@@ -96,52 +98,38 @@ public class EmailHelper {
 		}
 	}
 
-	/*public List<UsuariDto> obtenirCodiDestinatarisPerEmail(BustiaEntity bustia) {
-		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
-		Set<String> usuaris = contenidorHelper.findUsuarisAmbPermisReadPerContenidor(bustia);
-		for (String usuari: usuaris) {
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
-				UsuariEntity user = usuariRepository.findOne(usuari);
-				if (user == null || user.isRebreEmailsBustia()) {
-					UsuariDto u = new UsuariDto();
-					u.setCodi(usuari);
-					u.setEmail(dadesUsuari.getEmail());
-					u.setRebreEmailsAgrupats(user == null ? true : user.isRebreEmailsAgrupats());
-					destinataris.add(u);
-				}
-			}
-		}
-		return destinataris;
-	}
-	
-	private boolean emplenarDestinataris(
-			MailMessage mailMessage,
-			BustiaEntity bustia) {
+	public void canviEstatDocumentPortafirmes(
+			DocumentPortafirmesEntity documentPortafirmes) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de document al portafirmes (" +
+			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
+		DocumentEntity document = documentPortafirmes.getDocument();
+		ExpedientEntity expedient = document.getExpedient();
+		Set<DadesUsuari> responsables = getResponsables(expedient);
 		List<String> destinataris = new ArrayList<String>();
-		Set<String> usuaris = contenidorHelper.findUsuarisAmbPermisReadPerContenidor(bustia);
-		for (String usuari: usuaris) {
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-			if (dadesUsuari != null && dadesUsuari.getEmail() != null)
-				destinataris.add(dadesUsuari.getEmail());
+		for (DadesUsuari responsable: responsables) {
+			destinataris.add(responsable.getEmail());
 		}
-		if (!destinataris.isEmpty()) {
-			mailMessage.setTo(destinataris.get(0));
-			destinataris.remove(0);
-			if (!destinataris.isEmpty()) {
-				mailMessage.setCc(destinataris.toArray(new String[destinataris.size()]));
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}*/
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setFrom(getRemitent());
+		missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
+		missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes");
+		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
+		missatge.setText(
+				"Informació del document:\n" +
+				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+				"\tExpedient nom: " + expedient.getNom() + "\n" +
+				"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+				"\tDocument nom: " + document.getNom() + "\n" +
+				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+				"Estat del document:" + estat + "\n");
+		mailSender.send(missatge);
+	}
 
-	private boolean emplenarDestinatari(
+	private boolean emplenarDestinatariAmbUsuari(
 			MailMessage mailMessage,
 			String usuariCodi) {
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(
-				usuariCodi);
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
 		if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
 			mailMessage.setTo(dadesUsuari.getEmail());
 			return true;
@@ -150,21 +138,28 @@ public class EmailHelper {
 		}
 	}
 
-	/*private String getUnitatOrganitzativaNom(
-			EntitatEntity entitat,
-			String unitatOrganitzativaCodi) {
-		ArbreDto<UnitatOrganitzativaDto> arbreUnitats = cacheHelper.findUnitatsOrganitzativesPerEntitat(
-				entitat.getCodi());
-		for (ArbreNodeDto<UnitatOrganitzativaDto> node: arbreUnitats.toList()) {
-			UnitatOrganitzativaDto unitat = node.getDades();
-			if (unitat.getCodi().equals(unitatOrganitzativaCodi)) {
-				return unitat.getDenominacio();
-			}
-		}
-		return null;
-	}*/
 	private String getRemitent() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.email.remitent");
+	}
+
+	public Set<DadesUsuari> getResponsables(ExpedientEntity expedient) {
+		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
+		List<PermisDto> permisos = permisosHelper.findPermisos(
+				expedient.getMetaNode().getId(),
+				MetaNodeEntity.class);
+		for (PermisDto permis: permisos) {
+			if (permis.isWrite()) {
+				if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
+					responsables.add(
+							pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
+				}
+				if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
+					responsables.addAll(
+							pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
+				}
+			}
+		}
+		return responsables;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);

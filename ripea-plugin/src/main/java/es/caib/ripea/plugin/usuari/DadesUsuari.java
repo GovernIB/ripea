@@ -66,6 +66,29 @@ public class DadesUsuari implements Serializable {
 		this.email = email;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DadesUsuari other = (DadesUsuari) obj;
+		if (codi == null) {
+			if (other.codi != null)
+				return false;
+		} else if (!codi.equals(other.codi))
+			return false;
+		return true;
+	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 

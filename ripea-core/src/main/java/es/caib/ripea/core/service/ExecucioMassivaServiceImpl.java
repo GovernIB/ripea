@@ -222,7 +222,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			}
 			try {
 				if (emc.getExecucioMassiva().getEnviarCorreu()) {
-					mailHelper.emailExecucioMassivaFinalitzada(emc.getExecucioMassiva());
+					mailHelper.execucioMassivaFinalitzada(emc.getExecucioMassiva());
 				}
 			} catch (Exception ex) {
 				logger.error("EXPEDIENTMASSIU: No s'ha pogut enviar el correu de finalització", ex);

@@ -95,7 +95,6 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 
-
 	@Transactional
 	@Override
 	public DocumentDto create(

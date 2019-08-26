@@ -969,7 +969,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
-			emailHelper.emailUsuariContingutAgafatSensePermis(
+			emailHelper.contingutAgafatSensePermis(
 					expedient,
 					usuariOriginal,
 					usuariNou);
@@ -1255,7 +1255,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
-			emailHelper.emailUsuariContingutAgafatSensePermis(
+			emailHelper.contingutAgafatSensePermis(
 					expedient,
 					usuariOriginal,
 					usuariNou);
@@ -1308,7 +1308,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'altre l'usuari que li han pres
-			emailHelper.emailUsuariContingutAgafatSensePermis(
+			emailHelper.contingutAgafatSensePermis(
 					expedient,
 					usuariOriginal,
 					usuariNou);

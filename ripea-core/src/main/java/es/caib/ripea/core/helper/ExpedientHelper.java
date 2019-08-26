@@ -211,23 +211,18 @@ public class ExpedientHelper {
 				null);
 		return dto;
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId) {
-		
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
-
 		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
-
 			boolean alreadyExists = false;
 			for (InteressatEntity existingInteressat : existingInteressats) {
 				if (existingInteressat.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero()))
 					alreadyExists = true;
 			}
-			
 			if (!alreadyExists) {
 				InteressatDto createdInteressat = expedientInteressatHelper.create(
 						entitatId,
@@ -245,114 +240,6 @@ public class ExpedientHelper {
 				}
 			}
 		}
-	}
-
-	public InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
-
-		InteressatDto interessatDto = null;
-		switch (registreInteressatEntity.getTipus()) {
-		case PERSONA_FISICA:
-			InteressatPersonaFisicaDto interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
-
-			interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-			interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-			interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
-			interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
-			interessatPersonaFisicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
-			interessatPersonaFisicaDto.setAdresa(registreInteressatEntity.getAdresa());
-			interessatPersonaFisicaDto.setCodiPostal(registreInteressatEntity.getCp());
-			interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
-			interessatPersonaFisicaDto.setTelefon(registreInteressatEntity.getTelefon());
-			interessatPersonaFisicaDto.setObservacions(registreInteressatEntity.getObservacions());
-			interessatPersonaFisicaDto.setNotificacioAutoritzat(false);
-
-			interessatPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
-			interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
-			interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
-			interessatPersonaFisicaDto.setLlinatge2(registreInteressatEntity.getLlinatge2());
-
-			interessatDto = interessatPersonaFisicaDto;
-			break;
-		case PERSONA_JURIDICA:
-			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
-
-			interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-			interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-			interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
-			interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
-			interessatPersonaJuridicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
-			interessatPersonaJuridicaDto.setAdresa(registreInteressatEntity.getAdresa());
-			interessatPersonaJuridicaDto.setCodiPostal(registreInteressatEntity.getCp());
-			interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
-			interessatPersonaJuridicaDto.setTelefon(registreInteressatEntity.getTelefon());
-			interessatPersonaJuridicaDto.setObservacions(registreInteressatEntity.getObservacions());
-			interessatPersonaJuridicaDto.setNotificacioAutoritzat(false);
-
-			interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
-			interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
-
-			interessatDto = interessatPersonaJuridicaDto;
-			break;
-		case ADMINISTRACIO:
-			InteressatAdministracioDto interessatAdministracioDto = new InteressatAdministracioDto();
-
-			interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-			interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-			interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
-			interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
-			interessatAdministracioDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
-			interessatAdministracioDto.setAdresa(registreInteressatEntity.getAdresa());
-			interessatAdministracioDto.setCodiPostal(registreInteressatEntity.getCp());
-			interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());
-			interessatAdministracioDto.setTelefon(registreInteressatEntity.getTelefon());
-			interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
-			interessatAdministracioDto.setNotificacioAutoritzat(false);
-
-			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-
-			interessatDto = interessatAdministracioDto;
-			break;
-		}
-
-		return interessatDto;
-	}
-
-	public InteressatDocumentTipusEnumDto toInteressatDocumentTipusEnumDto(DocumentTipus documentTipus) {
-		InteressatDocumentTipusEnumDto interessatDocumentTipusEnumDto = null;
-		if (documentTipus != null) {
-			switch (documentTipus) {
-			case NIF:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.NIF;
-				break;
-			case CIF:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.CIF;
-				break;
-			case PASSAPORT:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.PASSAPORT;
-				break;				
-			case NIE:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS;
-				break;
-			case ALTRES:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.ALTRES_DE_PERSONA_FISICA;
-				break;					
-			}
-		}
-		return interessatDocumentTipusEnumDto;
-	}
-
-	public void relateExpedientWithPeticioAndSetAnnexosPendent(
-			Long expedientPeticioId,
-			Long expedientId) {
-		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		expedientPeticioEntity.updateExpedient(expedient);
-		expedient.addExpedientPeticio(expedientPeticioEntity);
-		// set annexos as pending to create in db and to move in arxiu
-		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
-			registreAnnex.updateEstat(RegistreAnnexEstatEnumDto.PENDENT);
-		}
-		
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -389,30 +276,24 @@ public class ExpedientHelper {
 	public void createDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId) {
-		
 		ExpedientPeticioEntity expedientPeticioEntity;
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null; 
-
 		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
-
 		logger.debug("Creant carpeta i documents de expedient peticio (" +
 				"expedientId=" + expedientPeticioEntity.getExpedient().getId() + ", " +
 				"registreAnnexId=" + registreAnnexId + ", " +
 				"expedientPeticioId=" + expedientPeticioId + ")");
-		
 		boolean throwException = false;
-		if(throwException)
+		if (throwException)
 			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA!!!!!! ");
-		
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU ##########################################
 		boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
-		
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaFromExpPeticio(
@@ -421,21 +302,16 @@ public class ExpedientHelper {
 					expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
-		
 		boolean throwException1 = false;
-		if(throwException1)
+		if (throwException1)
 			throw new RuntimeException("EXCEPION BEFORE CREATING DOCUMENT IN DB!!!!!! ");
-		
-		
 		// ############################## CREATE DOCUMENT IN DB ####################################
-		
 		DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
 		contingutHelper.comprovarNomValid(
 				isCarpetaActive ? carpetaEntity : expedientEntity,
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
-		
 		DocumentEntity docEntity = documentHelper.crearNouDocument(
 				documentDto.getDocumentTipus(),
 				documentDto.getNom(),
@@ -451,7 +327,6 @@ public class ExpedientHelper {
 				expedientEntity,
 				documentDto.getUbicacio(),
 				documentDto.getNtiIdDocumentoOrigen());
-		
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(documentDto.getFitxerNom());
 		fitxer.setContentType(documentDto.getFitxerContentType());
@@ -477,22 +352,15 @@ public class ExpedientHelper {
 				docEntity,
 				true,
 				true);
-		
-		
-		
 		boolean throwException2 = false;
 		if(throwException2)
 			throw new RuntimeException("EXCEPION BEFORE MOVING DOCUMENT IN DB!!!!!! ");
-		
 		// ############################## MOVE DOCUMENT IN ARXIU ##########################################
-		
 		// put arxiu uuid of annex 
 		docEntity.updateArxiu(
 				documentDto.getArxiuUuid());
 		documentRepository.saveAndFlush(docEntity);
-		
 		if (isCarpetaActive) {
-
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
@@ -512,14 +380,12 @@ public class ExpedientHelper {
 				String uuidDesti = contingutHelper.arxiuPropagarMoviment(docEntity,
 						carpetaEntity,
 						expedientEntity.getArxiuUuid());
-
 				// if document was dispatched, update uuid to new document
 				if (uuidDesti != null) {
 					docEntity.updateArxiu(uuidDesti);
 				}
 			}
 		} else {
-			
 			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
@@ -539,15 +405,12 @@ public class ExpedientHelper {
 				String uuidDesti = contingutHelper.arxiuPropagarMoviment(docEntity,
 						expedientEntity,
 						expedientEntity.getArxiuUuid());
-
 				// if document was dispatched, update uuid to new document
 				if (uuidDesti != null) {
 					docEntity.updateArxiu(uuidDesti);
 				}
 			}
 		}
-
-		
 		// save ntiIdentitficador generated in arxiu in db
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 				docEntity,
@@ -558,61 +421,104 @@ public class ExpedientHelper {
 		documentDetalls.getMetadades().getIdentificadorOrigen();
 		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
 		documentRepository.save(docEntity);
-		
+	}
+
+	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
+	public String calcularNumero(ExpedientEntity expedient) {
+		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
+		String expressioNumero = metaExpedient.getExpressioNumero();
+		if (expressioNumero != null && !expressioNumero.isEmpty()) {
+			Mustache mustache = mustacheFactory.compile(new StringReader(expressioNumero), "expressioNumero");
+			StringWriter writer = new StringWriter();
+			HashMap<String, Object> model = new HashMap<String, Object>();
+			model.put("codi", expedient.getCodi());
+			model.put("seq", expedient.getSequencia());
+			model.put("any", expedient.getAny());
+			mustache.execute(writer, model);
+		    writer.flush();
+		    return writer.toString();
+		} else {
+			return expedient.getCodi() + "/" + expedient.getSequencia() + "/" + expedient.getAny();
+		}
+	}
+
+	public ExpedientDto toExpedientDto(
+			ExpedientEntity expedient,
+			boolean ambPathIPermisos) {
+		return (ExpedientDto)contingutHelper.toContingutDto(
+				expedient,
+				ambPathIPermisos,
+				false,
+				false,
+				false,
+				ambPathIPermisos,
+				false,
+				false);
+	}
+
+	private void agafar(
+			Long entitatId,
+			Long expedientId,
+			String usuariCodi) {
+		logger.debug("Agafant l'expedient com a usuari ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientId=" + expedientId + ", "
+				+ "usuariCodi=" + usuariCodi + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
+				expedient,
+				false,
+				false,
+				false);
+		if (expedientSuperior != null) {
+			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
+			throw new ValidationException(
+					expedientId,
+					ExpedientEntity.class,
+					"No es pot agafar un expedient no arrel");
+		}
+		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
+		UsuariEntity usuariOriginal = expedient.getAgafatPer();
+		UsuariEntity usuariNou = usuariHelper.getUsuariByCodi(usuariCodi);
+		expedient.updateAgafatPer(usuariNou);
+		if (usuariOriginal != null) {
+			// Avisa a l'usuari que li han pres
+			emailHelper.contingutAgafatSensePermis(
+					expedient,
+					usuariOriginal,
+					usuariNou);
+		}
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.AGAFAR,
+				null,
+				null,
+				false,
+				false);
+	}
+
+	private void relateExpedientWithPeticioAndSetAnnexosPendent(
+			Long expedientPeticioId,
+			Long expedientId) {
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		expedientPeticioEntity.updateExpedient(expedient);
+		expedient.addExpedientPeticio(expedientPeticioEntity);
+		// set annexos as pending to create in db and to move in arxiu
+		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
+			registreAnnex.updateEstat(RegistreAnnexEstatEnumDto.PENDENT);
+		}
 		
 	}
-	
-	
-	
-	private Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {
-		
-		// check if already exists in db
-		boolean carpetaExistsInDB = false;
-		Long carpetaId = null;
-		CarpetaEntity carpetaEntity = null;
-		for (ContingutEntity contingut : expedientEntity.getFills()) {
-			if (contingut instanceof CarpetaEntity && contingut.getNom().equals(nom)) {
-				carpetaExistsInDB = true;
-				carpetaId = contingut.getId();
-				carpetaEntity = (CarpetaEntity) contingut;
-			}
-		}
-		// check if already exists in arxiu
-		Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
-		boolean carpetaExistsInArxiu = false;
-		String carpetaUuid = null;
 
-		if (expedient.getContinguts()!=null) {
-			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-				String replacedNom = nom.replace("/", "_");
-				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA && contingutArxiu.getNom().equals(replacedNom)) {
-					carpetaExistsInArxiu = true;
-					carpetaUuid = contingutArxiu.getIdentificador();
-				}
-			}
-		}
-		
-		if (carpetaExistsInDB && carpetaExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
-			carpetaEntity.updateArxiu(carpetaUuid);
-		}
-
-		if (!carpetaExistsInDB || !carpetaExistsInArxiu) {
-			CarpetaDto carpetaDto = carpetaHelper.create(
-					entitatId,
-					expedientEntity.getId(),
-					nom,
-					carpetaExistsInDB,
-					carpetaId,
-					carpetaExistsInArxiu,
-					carpetaUuid);
-			carpetaId = carpetaDto.getId();
-		} 
-		
-		return carpetaId;
-	}
-	
 	private DocumentDto toDocumentDto(RegistreAnnexEntity registreAnnexEntity) {
-
 		DocumentDto document = new DocumentDto();
 		document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
@@ -621,26 +527,116 @@ public class ExpedientHelper {
 		document.setFitxerNom(registreAnnexEntity.getNom());
 		document.setArxiuUuid(registreAnnexEntity.getUuid());
 		document.setDataCaptura(registreAnnexEntity.getNtiFechaCaptura());
-
 		document.setNtiOrigen(toNtiOrigenEnumDto(registreAnnexEntity.getNtiOrigen()));
 		document.setNtiTipoDocumental(toDocumentNtiTipoDocumentalEnumDto(registreAnnexEntity.getNtiTipoDocumental()));
 		document.setNtiEstadoElaboracion(toDocumentNtiEstadoElaboracionEnumDto(registreAnnexEntity.getNtiEstadoElaboracion()));
 		document.setFitxerContentType(registreAnnexEntity.getTipusMime());
-		
 		document.setNtiVersion("1.0");
-		
 		String codiDir3 = entitatRepository.findByUnitatArrel(registreAnnexEntity.getRegistre().getEntitatCodi()).getUnitatArrel();
 		document.setNtiOrgano(codiDir3);
-
 		return document;
 	}
-	
-	
-	
-	public DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(NtiEstadoElaboracion ntiEstadoElaboracion) {
 
+	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
+		InteressatDto interessatDto = null;
+		switch (registreInteressatEntity.getTipus()) {
+		case PERSONA_FISICA:
+			InteressatPersonaFisicaDto interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
+			interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+			interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
+			interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+			interessatPersonaFisicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatPersonaFisicaDto.setAdresa(registreInteressatEntity.getAdresa());
+			interessatPersonaFisicaDto.setCodiPostal(registreInteressatEntity.getCp());
+			interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
+			interessatPersonaFisicaDto.setTelefon(registreInteressatEntity.getTelefon());
+			interessatPersonaFisicaDto.setObservacions(registreInteressatEntity.getObservacions());
+			interessatPersonaFisicaDto.setNotificacioAutoritzat(false);
+			interessatPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
+			interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
+			interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
+			interessatPersonaFisicaDto.setLlinatge2(registreInteressatEntity.getLlinatge2());
+			interessatDto = interessatPersonaFisicaDto;
+			break;
+		case PERSONA_JURIDICA:
+			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
+			interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+			interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
+			interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+			interessatPersonaJuridicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatPersonaJuridicaDto.setAdresa(registreInteressatEntity.getAdresa());
+			interessatPersonaJuridicaDto.setCodiPostal(registreInteressatEntity.getCp());
+			interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
+			interessatPersonaJuridicaDto.setTelefon(registreInteressatEntity.getTelefon());
+			interessatPersonaJuridicaDto.setObservacions(registreInteressatEntity.getObservacions());
+			interessatPersonaJuridicaDto.setNotificacioAutoritzat(false);
+			interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
+			interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
+			interessatDto = interessatPersonaJuridicaDto;
+			break;
+		case ADMINISTRACIO:
+			InteressatAdministracioDto interessatAdministracioDto = new InteressatAdministracioDto();
+			interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+			interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
+			interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+			interessatAdministracioDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatAdministracioDto.setAdresa(registreInteressatEntity.getAdresa());
+			interessatAdministracioDto.setCodiPostal(registreInteressatEntity.getCp());
+			interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());
+			interessatAdministracioDto.setTelefon(registreInteressatEntity.getTelefon());
+			interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
+			interessatAdministracioDto.setNotificacioAutoritzat(false);
+			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			interessatDto = interessatAdministracioDto;
+			break;
+		}
+		return interessatDto;
+	}
+
+	private InteressatDocumentTipusEnumDto toInteressatDocumentTipusEnumDto(DocumentTipus documentTipus) {
+		InteressatDocumentTipusEnumDto interessatDocumentTipusEnumDto = null;
+		if (documentTipus != null) {
+			switch (documentTipus) {
+			case NIF:
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.NIF;
+				break;
+			case CIF:
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.CIF;
+				break;
+			case PASSAPORT:
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.PASSAPORT;
+				break;				
+			case NIE:
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS;
+				break;
+			case ALTRES:
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.ALTRES_DE_PERSONA_FISICA;
+				break;					
+			}
+		}
+		return interessatDocumentTipusEnumDto;
+	}
+
+	private NtiOrigenEnumDto toNtiOrigenEnumDto(NtiOrigen ntiOrigen) {
+		NtiOrigenEnumDto ntiOrigenEnumDto = null;
+		if (ntiOrigen != null) {
+			switch (ntiOrigen) {
+			case CIUTADA:
+				ntiOrigenEnumDto = NtiOrigenEnumDto.O0;
+				break;
+			case ADMINISTRACIO:
+				ntiOrigenEnumDto = NtiOrigenEnumDto.O1;
+				break;
+			}
+		}
+		return ntiOrigenEnumDto;
+	}
+
+	private DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(NtiEstadoElaboracion ntiEstadoElaboracion) {
 		DocumentNtiEstadoElaboracionEnumDto documentNtiEstadoElaboracionEnumDto = null;
-		
 		if (ntiEstadoElaboracion != null) {
 			switch (ntiEstadoElaboracion) {
 			case ORIGINAL:
@@ -662,13 +658,9 @@ public class ExpedientHelper {
 		}
 		return documentNtiEstadoElaboracionEnumDto;
 	}
-	
-	
-	
-	public DocumentNtiTipoDocumentalEnumDto toDocumentNtiTipoDocumentalEnumDto(NtiTipoDocumento ntiTipoDocumento) {
 
+	private DocumentNtiTipoDocumentalEnumDto toDocumentNtiTipoDocumentalEnumDto(NtiTipoDocumento ntiTipoDocumento) {
 		DocumentNtiTipoDocumentalEnumDto documentNtiTipoDocumentalEnumDto = null;
-
 		if (ntiTipoDocumento != null) {
 			switch (ntiTipoDocumento) {
 			case RESOLUCIO:
@@ -739,100 +731,46 @@ public class ExpedientHelper {
 		return documentNtiTipoDocumentalEnumDto;
 	}
 
-	public NtiOrigenEnumDto toNtiOrigenEnumDto(NtiOrigen ntiOrigen) {
-		NtiOrigenEnumDto ntiOrigenEnumDto = null;
-		if (ntiOrigen != null) {
-			switch (ntiOrigen) {
-			case CIUTADA:
-				ntiOrigenEnumDto = NtiOrigenEnumDto.O0;
-				break;
-			case ADMINISTRACIO:
-				ntiOrigenEnumDto = NtiOrigenEnumDto.O1;
-				break;
+	private Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {
+		// check if already exists in db
+		boolean carpetaExistsInDB = false;
+		Long carpetaId = null;
+		CarpetaEntity carpetaEntity = null;
+		for (ContingutEntity contingut : expedientEntity.getFills()) {
+			if (contingut instanceof CarpetaEntity && contingut.getNom().equals(nom)) {
+				carpetaExistsInDB = true;
+				carpetaId = contingut.getId();
+				carpetaEntity = (CarpetaEntity) contingut;
 			}
 		}
-		return ntiOrigenEnumDto;
-	}
-
-	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
-	public String calcularNumero(ExpedientEntity expedient) {
-		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
-		String expressioNumero = metaExpedient.getExpressioNumero();
-		if (expressioNumero != null && !expressioNumero.isEmpty()) {
-			Mustache mustache = mustacheFactory.compile(new StringReader(expressioNumero), "expressioNumero");
-			StringWriter writer = new StringWriter();
-			HashMap<String, Object> model = new HashMap<String, Object>();
-			model.put("codi", expedient.getCodi());
-			model.put("seq", expedient.getSequencia());
-			model.put("any", expedient.getAny());
-			mustache.execute(writer, model);
-		    writer.flush();
-		    return writer.toString();
-		} else {
-			return expedient.getCodi() + "/" + expedient.getSequencia() + "/" + expedient.getAny();
+		// check if already exists in arxiu
+		Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+		boolean carpetaExistsInArxiu = false;
+		String carpetaUuid = null;
+		if (expedient.getContinguts()!=null) {
+			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+				String replacedNom = nom.replace("/", "_");
+				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA && contingutArxiu.getNom().equals(replacedNom)) {
+					carpetaExistsInArxiu = true;
+					carpetaUuid = contingutArxiu.getIdentificador();
+				}
+			}
 		}
-	}
-
-	private void agafar(
-			Long entitatId,
-			Long expedientId,
-			String usuariCodi) {
-		logger.debug("Agafant l'expedient com a usuari ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "usuariCodi=" + usuariCodi + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				expedientId,
-				false,
-				false,
-				true,
-				false,
-				false);
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				expedient,
-				false,
-				false,
-				false);
-		if (expedientSuperior != null) {
-			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
-			throw new ValidationException(
-					expedientId,
-					ExpedientEntity.class,
-					"No es pot agafar un expedient no arrel");
+		if (carpetaExistsInDB && carpetaExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
+			carpetaEntity.updateArxiu(carpetaUuid);
 		}
-		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
-		UsuariEntity usuariOriginal = expedient.getAgafatPer();
-		UsuariEntity usuariNou = usuariHelper.getUsuariByCodi(usuariCodi);
-		expedient.updateAgafatPer(usuariNou);
-		if (usuariOriginal != null) {
-			// Avisa a l'usuari que li han pres
-			emailHelper.emailUsuariContingutAgafatSensePermis(
-					expedient,
-					usuariOriginal,
-					usuariNou);
-		}
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.AGAFAR,
-				null,
-				null,
-				false,
-				false);
-	}
-
-	public ExpedientDto toExpedientDto(
-			ExpedientEntity expedient,
-			boolean ambPathIPermisos) {
-		return (ExpedientDto)contingutHelper.toContingutDto(
-				expedient,
-				ambPathIPermisos,
-				false,
-				false,
-				false,
-				ambPathIPermisos,
-				false,
-				false);
+		if (!carpetaExistsInDB || !carpetaExistsInArxiu) {
+			CarpetaDto carpetaDto = carpetaHelper.create(
+					entitatId,
+					expedientEntity.getId(),
+					nom,
+					carpetaExistsInDB,
+					carpetaId,
+					carpetaExistsInArxiu,
+					carpetaUuid);
+			carpetaId = carpetaDto.getId();
+		} 
+		return carpetaId;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);

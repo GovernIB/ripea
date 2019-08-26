@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sun.jersey.core.util.Base64;
@@ -57,19 +56,18 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 @Component
 public class DocumentHelper {
 
-	@Resource
+	@Autowired
 	private DocumentRepository documentRepository;
-
-	@Resource
+	@Autowired
 	private ContingutHelper contingutHelper;
-	@Resource
+	@Autowired
 	private ContingutLogHelper contingutLogHelper;
-	@Resource
+	@Autowired
 	private PluginHelper pluginHelper;
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-
-
+	@Autowired
+	private EmailHelper emailHelper;
 
 	public DocumentEntity crearNouDocument(
 			DocumentTipusEnumDto documentTipus,
@@ -320,6 +318,7 @@ public class DocumentHelper {
 							false,
 							false);
 				}
+				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
 			} catch (Exception ex) {
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
@@ -342,6 +341,7 @@ public class DocumentHelper {
 						null,
 						false,
 						false);
+				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
 			} catch (Exception ex) {
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;

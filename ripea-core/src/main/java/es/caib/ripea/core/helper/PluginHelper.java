@@ -115,7 +115,7 @@ import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
  */
 @Component
 public class PluginHelper {
-	
+
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_DOC_TMP = "anotacions_registre_doc_tmp";
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
