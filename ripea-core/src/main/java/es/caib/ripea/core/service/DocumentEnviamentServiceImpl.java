@@ -35,6 +35,7 @@ import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -66,11 +67,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
+	private EmailHelper emailHelper;
+	@Autowired
 	private AlertaHelper alertaHelper;
 	@Autowired
 	private MessageHelper messageHelper;
-
-
 
 	@Transactional
 	@Override
@@ -655,7 +656,12 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					DocumentNotificacioEntity.class);
 		}
 		try {
+			DocumentEnviamentEstatEnumDto estatAbans = notificacio.getEstat();
 			pluginHelper.notificacioActualitzarEstat(notificacio);
+			DocumentEnviamentEstatEnumDto estatDespres = notificacio.getEstat();
+			if (estatAbans != estatDespres) {
+				emailHelper.canviEstatNotificacio(notificacio, estatAbans);
+			}
 		} catch (Exception ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;

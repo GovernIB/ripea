@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -123,6 +124,36 @@ public class EmailHelper {
 				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat del document:" + estat + "\n");
+		mailSender.send(missatge);
+	}
+
+	public void canviEstatNotificacio(
+			DocumentNotificacioEntity documentNotificacio,
+			DocumentEnviamentEstatEnumDto estatAnterior) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (" +
+			"documentNotificacioId=" + documentNotificacio.getId() + ")");
+		DocumentEntity document = documentNotificacio.getDocument();
+		ExpedientEntity expedient = document.getExpedient();
+		Set<DadesUsuari> responsables = getResponsables(expedient);
+		List<String> destinataris = new ArrayList<String>();
+		for (DadesUsuari responsable: responsables) {
+			destinataris.add(responsable.getEmail());
+		}
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setFrom(getRemitent());
+		missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
+		missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de notificació");
+		String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
+		missatge.setText(
+				"Informació del document:\n" +
+				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+				"\tExpedient nom: " + expedient.getNom() + "\n" +
+				"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+				"\tDocument nom: " + document.getNom() + "\n" +
+				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+				"Estat anterior:" + estatAnterior + "\n" +
+				"Estat actual:" + estat + "\n");
 		mailSender.send(missatge);
 	}
 

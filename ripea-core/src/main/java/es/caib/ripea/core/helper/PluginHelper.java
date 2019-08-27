@@ -2770,7 +2770,6 @@ public class PluginHelper {
 							new ByteArrayInputStream(certificacio));
 				}
 			}
-			
 			notificacio.updateEnviamentEstat(
 					resposta.getEstat(),
 					resposta.getEstatData(),
