@@ -13,20 +13,17 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 
+import es.caib.notib.client.NotificacioRestClient;
 import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.ws.notificacio.Certificacio;
-import es.caib.notib.ws.notificacio.Document;
+import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
-import es.caib.notib.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.ws.notificacio.NotificacioService;
-import es.caib.notib.ws.notificacio.PagadorCie;
-import es.caib.notib.ws.notificacio.PagadorPostal;
-import es.caib.notib.ws.notificacio.ParametresSeu;
+import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
+import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -49,58 +46,33 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
  */
 public class NotificacioPluginNotib implements NotificacioPlugin {
 
-	private NotificacioService notificacioService;
+	
+	private NotificacioRestClient clientV2;
+
 
 	@Override
 	public RespostaEnviar enviar(
 			Notificacio notificacio) throws SistemaExternException {
 		try {
-			es.caib.notib.ws.notificacio.Notificacio notificacioNotib = new es.caib.notib.ws.notificacio.Notificacio();
+			es.caib.notib.ws.notificacio.NotificacioV2 notificacioNotib = new es.caib.notib.ws.notificacio.NotificacioV2();
+
+			
 			notificacioNotib.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());
-			if (notificacio.getEnviamentTipus() != null) {
-				switch (notificacio.getEnviamentTipus()) {
-				case COMUNICACIO:
-					notificacioNotib.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-					break;
-				case NOTIFICACIO:
-					notificacioNotib.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
-					break;
-				}
-			}
+			notificacioNotib.setEnviamentTipus(notificacio.getEnviamentTipus() != null ? EnviamentTipusEnum.valueOf(notificacio.getEnviamentTipus().toString()) : null);
 			notificacioNotib.setConcepte(notificacio.getConcepte());
 			notificacioNotib.setDescripcio(notificacio.getDescripcio());
 			notificacioNotib.setEnviamentDataProgramada(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 			notificacioNotib.setRetard(notificacio.getRetard());
 			notificacioNotib.setCaducitat(toXmlGregorianCalendar(notificacio.getCaducitat()));
-			Document document = new Document();
+			DocumentV2 document = new DocumentV2();
 			document.setArxiuNom(notificacio.getDocumentArxiuNom());
-			document.setContingutBase64(
-					new String(Base64.encodeBase64(notificacio.getDocumentArxiuContingut())));
-			document.setHash(
-					new String(Base64.encodeBase64(
-							DigestUtils.sha256Hex(notificacio.getDocumentArxiuContingut()).getBytes())));
+			document.setContingutBase64(new String(Base64.encodeBase64(notificacio.getDocumentArxiuContingut())));
 			notificacioNotib.setDocument(document);
 			notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
-			if (notificacio.getPagadorPostalDir3Codi() != null) {
-				PagadorPostal pagadorPostal = new PagadorPostal();
-				pagadorPostal.setDir3Codi(
-						notificacio.getPagadorPostalDir3Codi());
-				pagadorPostal.setContracteNum(
-						notificacio.getPagadorPostalContracteNum());
-				pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(notificacio.getPagadorPostalContracteDataVigencia()));
-				pagadorPostal.setFacturacioClientCodi(
-						notificacio.getPagadorPostalFacturacioClientCodi());
-				notificacioNotib.setPagadorPostal(pagadorPostal);
-			}
-			if (notificacio.getPagadorCieDir3Codi() != null) {
-				PagadorCie pagadorCie = new PagadorCie();
-				pagadorCie.setDir3Codi(
-						notificacio.getPagadorCieDir3Codi());
-				pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(notificacio.getPagadorCieContracteDataVigencia()));
-				notificacioNotib.setPagadorCie(pagadorCie);
-			}
+			notificacioNotib.setUsuariCodi(notificacio.getUsuariCodi());
+			
 			if (notificacio.getEnviaments() != null) {
-				for (Enviament enviament: notificacio.getEnviaments()) {
+				for (Enviament enviament : notificacio.getEnviaments()) {
 					es.caib.notib.ws.notificacio.Enviament enviamentNotib = new es.caib.notib.ws.notificacio.Enviament();
 					enviamentNotib.setTitular(
 							toPersonaNotib(enviament.getTitular()));
@@ -112,192 +84,30 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 					}
 					if (enviament.getEntregaPostalTipus() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
-						switch (enviament.getEntregaPostalTipus()) {
-						case NACIONAL:
-							entregaPostal.setTipus(EntregaPostalTipusEnum.NACIONAL);
-							break;
-						case ESTRANGER:
-							entregaPostal.setTipus(EntregaPostalTipusEnum.ESTRANGER);
-							break;
-						case APARTAT_CORREUS:
-							entregaPostal.setTipus(EntregaPostalTipusEnum.APARTAT_CORREUS);
-							break;
-						case SENSE_NORMALITZAR:
-							entregaPostal.setTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
-							break;
-						}
-						if (enviament.getEntregaPostalViaTipus() != null) {
-							switch (enviament.getEntregaPostalViaTipus()) {
-							case ALAMEDA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.ALAMEDA);
-								break;
-							case AVENIDA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.AVENIDA);
-								break;
-							case AVINGUDA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.AVINGUDA);
-								break;
-							case BARRIO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.BARRIO);
-								break;
-							case BULEVAR:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.BULEVAR);
-								break;
-							case CALLE:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
-								break;
-							case CALLEJA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLEJA);
-								break;
-							case CAMI:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CAMI);
-								break;
-							case CAMINO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CAMINO);
-								break;
-							case CAMPO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CAMPO);
-								break;
-							case CARRER:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CARRER);
-								break;
-							case CARRERA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CARRERA);
-								break;
-							case CARRETERA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CARRETERA);
-								break;
-							case CUESTA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CUESTA);
-								break;
-							case EDIFICIO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.EDIFICIO);
-								break;
-							case ENPARANTZA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.ENPARANTZA);
-								break;
-							case ESTRADA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.ESTRADA);
-								break;
-							case GLORIETA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.GLORIETA);
-								break;
-							case JARDINES:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.JARDINES);
-								break;
-							case JARDINS:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.JARDINS);
-								break;
-							case KALEA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.KALEA);
-								break;
-							case OTROS:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.OTROS);
-								break;
-							case PARQUE:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PARQUE);
-								break;
-							case PASAJE:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PASAJE);
-								break;
-							case PASEO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PASEO);
-								break;
-							case PASSATGE:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PASSATGE);
-								break;
-							case PASSEIG:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PASSEIG);
-								break;
-							case PLACETA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PLACETA);
-								break;
-							case PLAZA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PLAZA);
-								break;
-							case PLAZUELA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PLAZUELA);
-								break;
-							case PLAÇA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PLAÇA);
-								break;
-							case POBLADO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.POBLADO);
-								break;
-							case POLIGONO:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.POLIGONO);
-								break;
-							case PRAZA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.PRAZA);
-								break;
-							case RAMBLA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.RAMBLA);
-								break;
-							case RONDA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.RONDA);
-								break;
-							case RUA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.RUA);
-								break;
-							case SECTOR:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.SECTOR);
-								break;
-							case TRAVESIA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.TRAVESIA);
-								break;
-							case TRAVESSERA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.TRAVESSERA);
-								break;
-							case URBANIZACION:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.URBANIZACION);
-								break;
-							case VIA:
-								entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.VIA);
-								break;
-							}
-						}
-						entregaPostal.setViaNom(
-								enviament.getEntregaPostalViaNom());
-						entregaPostal.setNumeroCasa(
-								enviament.getEntregaPostalNumeroCasa());
-						entregaPostal.setNumeroQualificador(
-								enviament.getEntregaPostalNumeroQualificador());
-						entregaPostal.setPuntKm(
-								enviament.getEntregaPostalPuntKm());
-						entregaPostal.setApartatCorreus(
-								enviament.getEntregaPostalApartatCorreus());
-						entregaPostal.setPortal(
-								enviament.getEntregaPostalPortal());
-						entregaPostal.setEscala(
-								enviament.getEntregaPostalEscala());
-						entregaPostal.setPlanta(
-								enviament.getEntregaPostalPlanta());
-						entregaPostal.setPorta(
-								enviament.getEntregaPostalPorta());
-						entregaPostal.setBloc(
-								enviament.getEntregaPostalBloc());
-						entregaPostal.setComplement(
-								enviament.getEntregaPostalComplement());
-						entregaPostal.setCodiPostal(
-								enviament.getEntregaPostalCodiPostal());
-						entregaPostal.setPoblacio(
-								enviament.getEntregaPostalPoblacio());
-						entregaPostal.setMunicipiCodi(
-								enviament.getEntregaPostalMunicipiCodi());
-						entregaPostal.setProvinciaCodi(
-								enviament.getEntregaPostalProvinciaCodi());
-						entregaPostal.setPaisCodi(
-								enviament.getEntregaPostalPaisCodi());
-						entregaPostal.setLinea1(
-								enviament.getEntregaPostalLinea1());
-						entregaPostal.setLinea2(
-								enviament.getEntregaPostalLinea2());
-						entregaPostal.setCie(
-								enviament.getEntregaPostalCie());
-						entregaPostal.setFormatSobre(
-								enviament.getEntregaPostalFormatSobre());
-						entregaPostal.setFormatFulla(
-								enviament.getEntregaPostalFormatFulla());
+						entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.valueOf(enviament.getEntregaPostalTipus().toString()));
+						entregaPostal.setViaTipus(enviament.getEntregaPostalViaTipus() != null
+								? EntregaPostalViaTipusEnum.valueOf(enviament.getEntregaPostalViaTipus().toString()) : null);
+						entregaPostal.setViaNom(enviament.getEntregaPostalViaNom());
+						entregaPostal.setNumeroCasa(enviament.getEntregaPostalNumeroCasa());
+						entregaPostal.setNumeroQualificador(enviament.getEntregaPostalNumeroQualificador());
+						entregaPostal.setPuntKm(enviament.getEntregaPostalPuntKm());
+						entregaPostal.setApartatCorreus(enviament.getEntregaPostalApartatCorreus());
+						entregaPostal.setPortal(enviament.getEntregaPostalPortal());
+						entregaPostal.setEscala(enviament.getEntregaPostalEscala());
+						entregaPostal.setPlanta(enviament.getEntregaPostalPlanta());
+						entregaPostal.setPorta(enviament.getEntregaPostalPorta());
+						entregaPostal.setBloc(enviament.getEntregaPostalBloc());
+						entregaPostal.setComplement(enviament.getEntregaPostalComplement());
+						entregaPostal.setCodiPostal(enviament.getEntregaPostalCodiPostal());
+						entregaPostal.setPoblacio(enviament.getEntregaPostalPoblacio());
+						entregaPostal.setMunicipiCodi(enviament.getEntregaPostalMunicipiCodi());
+						entregaPostal.setProvincia(enviament.getEntregaPostalProvinciaCodi());
+						entregaPostal.setPaisCodi(enviament.getEntregaPostalPaisCodi());
+						entregaPostal.setLinea1(enviament.getEntregaPostalLinea1());
+						entregaPostal.setLinea2(enviament.getEntregaPostalLinea2());
+						entregaPostal.setCie(enviament.getEntregaPostalCie());
+						entregaPostal.setFormatSobre(enviament.getEntregaPostalFormatSobre());
+						entregaPostal.setFormatFulla(enviament.getEntregaPostalFormatFulla());
 						enviamentNotib.setEntregaPostal(entregaPostal);
 					}
 					if (enviament.getEntregaDehProcedimentCodi() != null) {
@@ -306,59 +116,20 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 						entregaDeh.setProcedimentCodi(enviament.getEntregaDehProcedimentCodi());
 						enviamentNotib.setEntregaDeh(entregaDeh);
 					}
+					
+					enviamentNotib.setServeiTipus(es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto.valueOf(notificacio.getServeiTipusEnum().toString()));
 					notificacioNotib.getEnviaments().add(enviamentNotib);
 				}
 			}
-			ParametresSeu parametresSeu = new ParametresSeu();
-			parametresSeu.setExpedientSerieDocumental(
-					notificacio.getSeuExpedientSerieDocumental());
-			parametresSeu.setProcedimentCodi(
-					notificacio.getSeuProcedimentCodi());
-			parametresSeu.setExpedientUnitatOrganitzativa(
-					notificacio.getSeuExpedientUnitatOrganitzativa());
-			parametresSeu.setExpedientIdentificadorEni(
-					notificacio.getSeuExpedientIdentificadorEni());
-			parametresSeu.setExpedientSerieDocumental(
-					notificacio.getSeuExpedientSerieDocumental());
-			parametresSeu.setExpedientTitol(
-					notificacio.getSeuExpedientTitol());
-			parametresSeu.setRegistreOficina(
-					notificacio.getSeuRegistreOficina());
-			parametresSeu.setRegistreLlibre(
-					notificacio.getSeuRegistreLlibre());
-			parametresSeu.setRegistreOrgan(
-					notificacio.getSeuRegistreOrgan());
-			parametresSeu.setIdioma(
-					notificacio.getSeuIdioma());
-			parametresSeu.setAvisTitol(
-					notificacio.getSeuAvisTitol());
-			parametresSeu.setAvisText(
-					notificacio.getSeuAvisText());
-			parametresSeu.setAvisTextMobil(
-					notificacio.getSeuAvisTextMobil());
-			parametresSeu.setOficiTitol(
-					notificacio.getSeuOficiTitol());
-			parametresSeu.setOficiText(
-					notificacio.getSeuOficiText());
-			notificacioNotib.setParametresSeu(parametresSeu);
+
+			//####### send notificacio ####################
 			RespostaAlta respostaAlta = getNotificacioService().alta(notificacioNotib);
+			
 			if (respostaAlta.isError()) {
 				throw new SistemaExternException(respostaAlta.getErrorDescripcio());
 			} else {
 				RespostaEnviar resposta = new RespostaEnviar();
-				if (respostaAlta.getEstat() != null) {
-					switch (respostaAlta.getEstat()) {
-					case PENDENT:
-						resposta.setEstat(NotificacioEstat.PENDENT);
-						break;
-					case ENVIADA:
-						resposta.setEstat(NotificacioEstat.ENVIADA);
-						break;
-					case FINALITZADA:
-						resposta.setEstat(NotificacioEstat.FINALITZADA);
-						break;
-					}
-				}
+				resposta.setEstat(respostaAlta.getEstat() != null ? NotificacioEstat.valueOf(respostaAlta.getEstat().toString()) : null);
 				resposta.setIdentificador(respostaAlta.getIdentificador());
 				if (respostaAlta.getReferencies() != null) {
 					List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
@@ -372,6 +143,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 				}
 				return resposta;
 			}
+			
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut enviar la notificació (" +
@@ -544,19 +316,45 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			p.setLlinatge2(persona.getLlinatge2());
 			p.setTelefon(persona.getTelefon());
 			p.setEmail(persona.getEmail());
+			p.setInteressatTipus(toInteressatTipusEnumDto(persona.getInteressatTipus()));
 		}
 		return p;
 	}
+	
+	
+	
+	private InteressatTipusEnumDto toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
+		es.caib.notib.ws.notificacio.InteressatTipusEnumDto interessatTipusEnumDtoWS = null;
+		if (interessatTipusEnumDto != null) {
+			switch (interessatTipusEnumDto) {
+			case PERSONA_FISICA:
+				interessatTipusEnumDtoWS = InteressatTipusEnumDto.FISICA;
+				break;
+			case PERSONA_JURIDICA:
+				interessatTipusEnumDtoWS = InteressatTipusEnumDto.JURIDICA;
+				break;
+			case ADMINISTRACIO:
+				interessatTipusEnumDtoWS = InteressatTipusEnumDto.ADMINISTRACIO;
+				break;				
+			}
+		}
+		return interessatTipusEnumDtoWS;
+	}	
+	
+	
 
-	private NotificacioService getNotificacioService() {
-		if (notificacioService == null) {
-			notificacioService = NotificacioRestClientFactory.getRestClient(
+
+	private NotificacioRestClient getNotificacioService() {
+		if (clientV2 == null) {
+			clientV2 = NotificacioRestClientFactory.getRestClientV2(
 					getUrl(),
 					getUsername(),
 					getPassword());
 		}
-		return notificacioService;
+		return clientV2;
 	}
+	
+	
 
 	private String getUrl() {
 		return PropertiesHelper.getProperties().getProperty(

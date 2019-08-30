@@ -15,9 +15,6 @@
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.dades"/></a>
 		</li>
 		<li role="presentation">
-			<a href="#avisofici" aria-controls="avisofici" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.avisofici"/></a>
-		</li>
-		<li role="presentation">
 			<a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.annexos"/> <span class="badge">${fn:length(notificacio.annexos)}</span></a>
 		</li>
 		<c:if test="${notificacio.error}">
@@ -60,20 +57,6 @@
 					<dt><spring:message code="notificacio.info.camp.observacions"/></dt>
 					<dd>${notificacio.observacions}</dd>
 				</c:if>
-			</dl>
-		</div>
-		<div class="tab-pane" id="avisofici" role="tabpanel">
-			<dl class="dl-horizontal">
-				<dt><spring:message code="notificacio.info.camp.avis.titol"/></dt>
-				<dd>${notificacio.seuAvisTitol}</dd>
-				<dt><spring:message code="notificacio.info.camp.avis.text"/></dt>
-				<dd>${notificacio.seuAvisText}</dd>
-				<dt><spring:message code="notificacio.info.camp.avis.text.sms"/></dt>
-				<dd>${notificacio.seuAvisTextMobil}</dd>
-				<dt><spring:message code="notificacio.info.camp.ofici.titol"/></dt>
-				<dd>${notificacio.seuOficiTitol}</dd>
-				<dt><spring:message code="notificacio.info.camp.ofici.text"/></dt>
-				<dd>${notificacio.seuOficiText}</dd>
 			</dl>
 		</div>
 		<div class="tab-pane" id="annexos" role="tabpanel">

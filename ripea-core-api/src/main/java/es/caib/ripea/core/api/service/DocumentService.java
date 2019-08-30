@@ -366,6 +366,10 @@ public interface DocumentService {
 			byte[] arxiuContingut) throws NotFoundException, SistemaExternException;
 
 	FitxerDto descarregarImprimible(Long entitatId, Long id, String versio);
+	
+	@PreAuthorize("hasRole('tothom')")
+	void notificacioActualitzarEstat(String identificador,
+			String referencia);
 
 
 }

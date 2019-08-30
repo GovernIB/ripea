@@ -214,5 +214,12 @@ public class DocumentServiceBean implements DocumentService {
 				versio);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void notificacioActualitzarEstat(String identificador,
+			String referencia) {
+		delegate.notificacioActualitzarEstat(identificador, referencia);
+	}
+
 
 }

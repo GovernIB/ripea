@@ -39,16 +39,6 @@
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa"/>
-				<rip:inputText name="notificacioSeuProcedimentCodi" textKey="metaexpedient.form.camp.notificacio.seu.proc.codi"/>
-				<rip:inputText name="notificacioSeuRegistreLlibre" textKey="metaexpedient.form.camp.notificacio.seu.reg.lib"/>
-				<rip:inputText name="notificacioSeuRegistreOficina" textKey="metaexpedient.form.camp.notificacio.seu.reg.ofi"/>
-				<rip:inputText name="notificacioSeuRegistreOrgan" textKey="metaexpedient.form.camp.notificacio.seu.reg.org"/>
-				<rip:inputText name="notificacioSeuExpedientUnitatOrganitzativa" textKey="metaexpedient.form.camp.notificacio.seu.exp.uo"/>
-				<rip:inputText name="notificacioAvisTitol" textKey="metaexpedient.form.camp.notificacio.avis.titol"/>
-				<rip:inputTextarea name="notificacioAvisText" textKey="metaexpedient.form.camp.notificacio.avis.text"/>
-				<rip:inputTextarea name="notificacioAvisTextMobil" textKey="metaexpedient.form.camp.notificacio.avis.text.mobil"/>
-				<rip:inputText name="notificacioOficiTitol" textKey="metaexpedient.form.camp.notificacio.ofici.titol"/>
-				<rip:inputTextarea name="notificacioOficiText" textKey="metaexpedient.form.camp.notificacio.ofici.text"/>
 			</div>
 		</div>
 		<div id="modal-botons">

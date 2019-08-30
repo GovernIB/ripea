@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -38,8 +39,8 @@ import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -49,6 +50,7 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -61,6 +63,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -77,7 +80,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
-
+	@Resource
+	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -776,6 +780,28 @@ public class DocumentServiceImpl implements DocumentService {
 					"identificador=" + identificador + ")");
 		}
 	}
+	
+	
+	@Transactional
+	@Override
+	public void notificacioActualitzarEstat(
+			String identificador, 
+			String referencia) {
+		
+		DocumentNotificacioEntity notificacio = documentNotificacioRepository.findByEnviamentIdentificadorAndEnviamentReferencia(
+				identificador,
+				referencia);
+		if (notificacio == null) {
+			throw new NotFoundException(notificacio, DocumentNotificacioEntity.class);
+		}
+		try {
+			pluginHelper.notificacioActualitzarEstat(notificacio);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de notificacions";
+			logger.error(errorDescripcio, ex);
+			throw new RuntimeException(ex);
+		}
+	}	
 
 
 

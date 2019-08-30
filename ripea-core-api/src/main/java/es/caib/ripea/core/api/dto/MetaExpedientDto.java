@@ -19,16 +19,6 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String serieDocumental;
 	private String expressioNumero;
 	private boolean notificacioActiva;
-	private String notificacioSeuProcedimentCodi;
-	private String notificacioSeuRegistreLlibre;
-	private String notificacioSeuRegistreOficina;
-	private String notificacioSeuRegistreOrgan;
-	private String notificacioSeuExpedientUnitatOrganitzativa;
-	private String notificacioAvisTitol;
-	private String notificacioAvisText;
-	private String notificacioAvisTextMobil;
-	private String notificacioOficiTitol;
-	private String notificacioOficiText;
 	private Long pareId;
 	private List<MetaDocumentDto> metaDocuments;
 	
@@ -64,66 +54,6 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	}
 	public void setNotificacioActiva(boolean notificacioActiva) {
 		this.notificacioActiva = notificacioActiva;
-	}
-	public String getNotificacioSeuProcedimentCodi() {
-		return notificacioSeuProcedimentCodi;
-	}
-	public void setNotificacioSeuProcedimentCodi(String notificacioSeuProcedimentCodi) {
-		this.notificacioSeuProcedimentCodi = notificacioSeuProcedimentCodi;
-	}
-	public String getNotificacioSeuRegistreLlibre() {
-		return notificacioSeuRegistreLlibre;
-	}
-	public void setNotificacioSeuRegistreLlibre(String notificacioSeuRegistreLlibre) {
-		this.notificacioSeuRegistreLlibre = notificacioSeuRegistreLlibre;
-	}
-	public String getNotificacioSeuRegistreOficina() {
-		return notificacioSeuRegistreOficina;
-	}
-	public void setNotificacioSeuRegistreOficina(String notificacioSeuRegistreOficina) {
-		this.notificacioSeuRegistreOficina = notificacioSeuRegistreOficina;
-	}
-	public String getNotificacioSeuRegistreOrgan() {
-		return notificacioSeuRegistreOrgan;
-	}
-	public void setNotificacioSeuRegistreOrgan(String notificacioSeuRegistreOrgan) {
-		this.notificacioSeuRegistreOrgan = notificacioSeuRegistreOrgan;
-	}
-	public String getNotificacioSeuExpedientUnitatOrganitzativa() {
-		return notificacioSeuExpedientUnitatOrganitzativa;
-	}
-	public void setNotificacioSeuExpedientUnitatOrganitzativa(String notificacioSeuExpedientUnitatOrganitzativa) {
-		this.notificacioSeuExpedientUnitatOrganitzativa = notificacioSeuExpedientUnitatOrganitzativa;
-	}
-	public String getNotificacioAvisTitol() {
-		return notificacioAvisTitol;
-	}
-	public void setNotificacioAvisTitol(String notificacioAvisTitol) {
-		this.notificacioAvisTitol = notificacioAvisTitol;
-	}
-	public String getNotificacioAvisText() {
-		return notificacioAvisText;
-	}
-	public void setNotificacioAvisText(String notificacioAvisText) {
-		this.notificacioAvisText = notificacioAvisText;
-	}
-	public String getNotificacioAvisTextMobil() {
-		return notificacioAvisTextMobil;
-	}
-	public void setNotificacioAvisTextMobil(String notificacioAvisTextMobil) {
-		this.notificacioAvisTextMobil = notificacioAvisTextMobil;
-	}
-	public String getNotificacioOficiTitol() {
-		return notificacioOficiTitol;
-	}
-	public void setNotificacioOficiTitol(String notificacioOficiTitol) {
-		this.notificacioOficiTitol = notificacioOficiTitol;
-	}
-	public String getNotificacioOficiText() {
-		return notificacioOficiText;
-	}
-	public void setNotificacioOficiText(String notificacioOficiText) {
-		this.notificacioOficiText = notificacioOficiText;
 	}
 	public Long getPareId() {
 		return pareId;

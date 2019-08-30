@@ -18,15 +18,12 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private Date dataCaducitat;
 	private Long interessatId;
 	private InteressatDto interessat;
-	private InteressatIdiomaEnumDto seuIdioma;
-	private String seuAvisTitol;
-	private String seuAvisText;
-	private String seuAvisTextMobil;
-	private String seuOficiTitol;
-	private String seuOficiText;
+
 	private String enviamentIdentificador;
 	private String enviamentReferencia;
-
+	
+	private ServeiTipusEnumDto serveiTipusEnum;
+	
 	public DocumentNotificacioTipusEnumDto getTipus() {
 		return tipus;
 	}
@@ -63,42 +60,7 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	public void setInteressat(InteressatDto interessat) {
 		this.interessat = interessat;
 	}
-	public InteressatIdiomaEnumDto getSeuIdioma() {
-		return seuIdioma;
-	}
-	public void setSeuIdioma(InteressatIdiomaEnumDto seuIdioma) {
-		this.seuIdioma = seuIdioma;
-	}
-	public String getSeuAvisTitol() {
-		return seuAvisTitol;
-	}
-	public void setSeuAvisTitol(String seuAvisTitol) {
-		this.seuAvisTitol = seuAvisTitol;
-	}
-	public String getSeuAvisText() {
-		return seuAvisText;
-	}
-	public void setSeuAvisText(String seuAvisText) {
-		this.seuAvisText = seuAvisText;
-	}
-	public String getSeuAvisTextMobil() {
-		return seuAvisTextMobil;
-	}
-	public void setSeuAvisTextMobil(String seuAvisTextMobil) {
-		this.seuAvisTextMobil = seuAvisTextMobil;
-	}
-	public String getSeuOficiTitol() {
-		return seuOficiTitol;
-	}
-	public void setSeuOficiTitol(String seuOficiTitol) {
-		this.seuOficiTitol = seuOficiTitol;
-	}
-	public String getSeuOficiText() {
-		return seuOficiText;
-	}
-	public void setSeuOficiText(String seuOficiText) {
-		this.seuOficiText = seuOficiText;
-	}
+
 	public String getEnviamentIdentificador() {
 		return enviamentIdentificador;
 	}
@@ -111,6 +73,12 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	public void setEnviamentReferencia(String enviamentReferencia) {
 		this.enviamentReferencia = enviamentReferencia;
 	}
+	public ServeiTipusEnumDto getServeiTipusEnum() {
+		return serveiTipusEnum;
+	}
+	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
+		this.serveiTipusEnum = serveiTipusEnum;
+	}	
 
 	@Override
 	public String getDestinatari() {

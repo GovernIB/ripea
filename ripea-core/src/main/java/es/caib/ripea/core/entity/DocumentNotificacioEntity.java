@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 
 /**
@@ -49,19 +50,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@JoinColumn(name = "not_interessat_id")
 	@ForeignKey(name = "ipa_interessat_docenv_fk")
 	private InteressatEntity interessat;
-	@Column(name = "not_seu_idioma", length = 2)
-	@Enumerated(EnumType.STRING)
-	private InteressatIdiomaEnumDto seuIdioma;
-	@Column(name = "not_seu_avis_titol", length = 256)
-	private String seuAvisTitol;
-	@Column(name = "not_seu_avis_text", length = 1024)
-	private String seuAvisText;
-	@Column(name = "not_seu_avis_textm", length = 200)
-	private String seuAvisTextMobil;
-	@Column(name = "not_seu_ofici_titol", length = 256)
-	private String seuOficiTitol;
-	@Column(name = "not_seu_ofici_text", length = 1024)
-	private String seuOficiText;
 	@Column(name = "not_env_id", length = 100)
 	private String enviamentIdentificador;
 	@Column(name = "not_env_ref", length = 100)
@@ -79,10 +67,10 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	private String enviamentCertificacioOrigen;
 	@Column(name = "not_env_cert_arxiuid", length = 50)
 	private String enviamentCertificacioArxiuId;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "servei_tipus", length = 10)
+	private ServeiTipusEnumDto serveiTipusEnum;
 
-	public DocumentNotificacioTipusEnumDto getTipus() {
-		return tipus;
-	}
 	public Date getDataProgramada() {
 		return dataProgramada;
 	}
@@ -94,24 +82,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	}
 	public InteressatEntity getInteressat() {
 		return interessat;
-	}
-	public InteressatIdiomaEnumDto getSeuIdioma() {
-		return seuIdioma;
-	}
-	public String getSeuAvisTitol() {
-		return seuAvisTitol;
-	}
-	public String getSeuAvisText() {
-		return seuAvisText;
-	}
-	public String getSeuAvisTextMobil() {
-		return seuAvisTextMobil;
-	}
-	public String getSeuOficiTitol() {
-		return seuOficiTitol;
-	}
-	public String getSeuOficiText() {
-		return seuOficiText;
 	}
 	public String getEnviamentIdentificador() {
 		return enviamentIdentificador;
@@ -137,6 +107,15 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public String getEnviamentCertificacioArxiuId() {
 		return enviamentCertificacioArxiuId;
 	}
+	public ServeiTipusEnumDto getServeiTipusEnum() {
+		return serveiTipusEnum;
+	}
+	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
+		this.serveiTipusEnum = serveiTipusEnum;
+	}
+	public DocumentNotificacioTipusEnumDto getTipus() {
+		return tipus;
+	}	
 	
 	public void update(
 			DocumentEnviamentEstatEnumDto estat,
@@ -202,12 +181,9 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			Date dataCaducitat,
 			InteressatEntity interessat,
 			InteressatIdiomaEnumDto seuIdioma,
-			String seuAvisTitol,
-			String seuAvisText,
-			String seuOficiTitol,
-			String seuOficiText,
 			ExpedientEntity expedient,
-			DocumentEntity document) {
+			DocumentEntity document,
+			ServeiTipusEnumDto serveiTipusEnum) {
 		return new Builder(
 				estat,
 				assumpte,
@@ -217,12 +193,9 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				dataCaducitat,
 				interessat,
 				seuIdioma,
-				seuAvisTitol,
-				seuAvisText,
-				seuOficiTitol,
-				seuOficiText,
 				expedient,
-				document);
+				document,
+				serveiTipusEnum);
 	}
 
 	public static class Builder {
@@ -236,12 +209,9 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				Date dataCaducitat,
 				InteressatEntity interessat,
 				InteressatIdiomaEnumDto seuIdioma,
-				String seuAvisTitol,
-				String seuAvisText,
-				String seuOficiTitol,
-				String seuOficiText,
 				ExpedientEntity expedient,
-				DocumentEntity document) {
+				DocumentEntity document,
+				ServeiTipusEnumDto serveiTipusEnum) {
 			built = new DocumentNotificacioEntity();
 			built.inicialitzar();
 			built.estat = estat;
@@ -251,13 +221,9 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			built.retard = retard;
 			built.dataCaducitat = dataCaducitat;
 			built.interessat = interessat;
-			built.seuIdioma = seuIdioma;
-			built.seuAvisTitol = seuAvisTitol;
-			built.seuAvisText = seuAvisText;
-			built.seuOficiTitol = seuOficiTitol;
-			built.seuOficiText = seuOficiText;
 			built.expedient = expedient;
 			built.document = document;
+			built.serveiTipusEnum = serveiTipusEnum;
 		}
 		public Builder annexos(List<DocumentEntity> annexos) {
 			built.annexos = annexos;
@@ -265,10 +231,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;
-			return this;
-		}
-		public Builder seuAvisTextMobil(String seuAvisTextMobil) {
-			built.seuAvisTextMobil = seuAvisTextMobil;
 			return this;
 		}
 		public DocumentNotificacioEntity build() {

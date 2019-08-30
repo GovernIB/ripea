@@ -69,16 +69,6 @@ CREATE TABLE IPA_METAEXPEDIENT
   SERIE_DOC          character varying(30)      NOT NULL,
   EXPRESSIO_NUMERO   character varying(100),
   NOT_ACTIVA         boolean                    NOT NULL,
-  NOT_SEU_PROC_CODI  character varying(44),
-  NOT_SEU_REG_LIB    character varying(4),
-  NOT_SEU_REG_OFI    character varying(9),
-  NOT_SEU_REG_ORG    character varying(9),
-  NOT_SEU_EXP_UNI    character varying(9),
-  NOT_AVIS_TITOL     character varying(256),
-  NOT_AVIS_TEXT      character varying(1024),
-  NOT_AVIS_TEXTM     character varying(200),
-  NOT_OFICI_TITOL    character varying(256),
-  NOT_OFICI_TEXT     character varying(1024)
 );
 
 
@@ -333,12 +323,6 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT
   NOT_RETARD           integer,
   NOT_DATA_CADUCITAT   timestamp without time zone,
   NOT_INTERESSAT_ID    BIGINT,
-  NOT_SEU_IDIOMA       character varying(2),
-  NOT_SEU_AVIS_TITOL   character varying(256), 
-  NOT_SEU_AVIS_TEXT    character varying(1024),
-  NOT_SEU_AVIS_TEXTM   character varying(200),
-  NOT_SEU_OFICI_TITOL  character varying(256),
-  NOT_SEU_OFICI_TEXT   character varying(1024),
   NOT_ENV_ID           character varying(100),
   NOT_ENV_REF          character varying(100),
   NOT_ENV_DAT_ESTAT    character varying(20),
@@ -362,7 +346,8 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT
   LASTMODIFIEDDATE     timestamp without time zone,
   CREATEDBY_CODI       character varying(256),
   LASTMODIFIEDBY_CODI  character varying(256),
-  VERSION              BIGINT                      NOT NULL
+  VERSION              BIGINT                      NOT NULL,
+  SERVEI_TIPUS 		   CHARACTER VARYING(10)
 );
 
 

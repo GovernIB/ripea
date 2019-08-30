@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -71,11 +73,14 @@ public class DocumentEnviamentController extends BaseUserController {
 		DocumentNotificacioCommand command = new DocumentNotificacioCommand();
 		MetaExpedientDto metaExpedient = expedient.getMetaExpedient();
 		command.setDocumentId(documentId);
-		command.setSeuAvisTitol(metaExpedient.getNotificacioAvisTitol());
-		command.setSeuAvisText(metaExpedient.getNotificacioAvisText());
-		command.setSeuAvisTextMobil(metaExpedient.getNotificacioAvisTextMobil());
-		command.setSeuOficiTitol(metaExpedient.getNotificacioOficiTitol());
-		command.setSeuOficiText(metaExpedient.getNotificacioOficiText());
+		
+		
+		model.addAttribute(
+				"serveiTipusEstats",
+				EnumHelper.getOptionsForEnum(
+						ServeiTipusEnumDto.class,
+						"notificacio.servei.tipus.enum."));
+		
 		model.addAttribute(command);
 		return "notificacioForm";
 	}

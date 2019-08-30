@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.plugin.notificacio;
 
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+
 /**
  * Informació d'una persona per a un enviament.
  * 
@@ -16,6 +18,8 @@ public class Persona {
 	private String nif;
 	private String telefon;
 	private String email;
+	private InteressatTipusEnumDto interessatTipus;
+	
 
 	public String getNom() {
 		return nom;
@@ -52,6 +56,12 @@ public class Persona {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public InteressatTipusEnumDto getInteressatTipus() {
+		return interessatTipus;
+	}
+	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
+		this.interessatTipus = interessatTipus;
 	}
 
 }

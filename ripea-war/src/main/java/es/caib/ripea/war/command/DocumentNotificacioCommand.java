@@ -17,7 +17,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 /**
@@ -43,17 +43,11 @@ public class DocumentNotificacioCommand {
 	private Date dataCaducitat;
 	@NotNull(groups = {Create.class, Update.class})
 	private Long interessatId;
-	private InteressatIdiomaEnumDto seuIdioma;
-	@NotEmpty(groups = {Electronica.class}) @Size(max = 256)
-	private String seuAvisTitol;
-	@NotEmpty(groups = {Electronica.class}) @Size(max = 1024)
-	private String seuAvisText;
-	@Size(max = 200)
-	private String seuAvisTextMobil;
-	@NotEmpty(groups = {Electronica.class}) @Size(max = 256)
-	private String seuOficiTitol;
-	@NotEmpty(groups = {Electronica.class}) @Size(max = 1024)
-	private String seuOficiText;
+	
+	@NotNull
+	private ServeiTipusEnumDto serveiTipusEnum;
+	
+
 	private List<Long> annexos;
 
 
@@ -118,42 +112,7 @@ public class DocumentNotificacioCommand {
 	public void setInteressatId(Long interessatId) {
 		this.interessatId = interessatId;
 	}
-	public InteressatIdiomaEnumDto getSeuIdioma() {
-		return seuIdioma;
-	}
-	public void setSeuIdioma(InteressatIdiomaEnumDto seuIdioma) {
-		this.seuIdioma = seuIdioma;
-	}
-	public String getSeuAvisTitol() {
-		return seuAvisTitol;
-	}
-	public void setSeuAvisTitol(String seuAvisTitol) {
-		this.seuAvisTitol = seuAvisTitol;
-	}
-	public String getSeuAvisText() {
-		return seuAvisText;
-	}
-	public void setSeuAvisText(String seuAvisText) {
-		this.seuAvisText = seuAvisText;
-	}
-	public String getSeuAvisTextMobil() {
-		return seuAvisTextMobil;
-	}
-	public void setSeuAvisTextMobil(String seuAvisTextMobil) {
-		this.seuAvisTextMobil = seuAvisTextMobil;
-	}
-	public String getSeuOficiTitol() {
-		return seuOficiTitol;
-	}
-	public void setSeuOficiTitol(String seuOficiTitol) {
-		this.seuOficiTitol = seuOficiTitol;
-	}
-	public String getSeuOficiText() {
-		return seuOficiText;
-	}
-	public void setSeuOficiText(String seuOficiText) {
-		this.seuOficiText = seuOficiText;
-	}
+
 	public List<Long> getAnnexos() {
 		return annexos;
 	}
@@ -185,6 +144,13 @@ public class DocumentNotificacioCommand {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public ServeiTipusEnumDto getServeiTipusEnum() {
+		return serveiTipusEnum;
+	}
+	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
+		this.serveiTipusEnum = serveiTipusEnum;
 	}
 
 	public interface Electronica {}

@@ -72,42 +72,36 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private AlertaHelper alertaHelper;
 	@Autowired
 	private MessageHelper messageHelper;
-
-	@Transactional
-	@Override
-	public DocumentNotificacioDto notificacioCreate(
-			Long entitatId,
-			Long documentId,
-			DocumentNotificacioDto notificacio) {
-		logger.debug("Creant una notificació del document (" +
-				"entitatId=" + entitatId + ", " +
-				"documentId=" + documentId + ", " +
-				"notificacio=" + notificacio + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-				entitatId,
-				documentId,
-				false,
-				true);
+	
+	
+	
+	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
+		
 		if (!DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
 			throw new ValidationException(
-					documentId,
+					document.getId(),
 					DocumentEntity.class,
 					"El document no està custodiat");
 		}
 		ExpedientEntity expedient = document.getExpedient();
 		if (expedient == null) {
 			throw new ValidationException(
-					documentId,
+					document.getId(),
 					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + documentId + ")");
+					"El document no te cap expedient associat (documentId=" + document.getId() + ")");
 		}
-		if (	!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacio.getTipus()) &&
+		if (	!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioTipus) &&
 				!expedient.getMetaExpedient().isNotificacioActiva()) {
 			throw new ValidationException(
-					documentId,
+					document.getId(),
 					DocumentEntity.class,
 					"El document pertany a un expedient que no te activades les notificacions electròniques");
 		}
+		return expedient;
+	}
+	
+	private InteressatEntity validateInteressatPerNotificacio(DocumentNotificacioDto notificacio, ExpedientEntity expedient) {
+		
 		InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
 				expedient,
 				notificacio.getInteressatId());
@@ -136,10 +130,33 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					"interessatId=" + notificacio.getInteressatId() + ", " +
 					"interessatClass=" + interessat.getClass().getName() + ")");
 		}
-		InteressatIdiomaEnumDto notificacioIdioma = interessat.getPreferenciaIdioma();
-		if (notificacioIdioma == null) {
-			notificacioIdioma = InteressatIdiomaEnumDto.CA;
-		}
+		
+		return interessat;
+	}
+	
+
+	@Transactional
+	@Override
+	public DocumentNotificacioDto notificacioCreate(
+			Long entitatId,
+			Long documentId,
+			DocumentNotificacioDto notificacio) {
+		
+		logger.debug("Creant una notificació del document (" +
+				"entitatId=" + entitatId + ", " +
+				"documentId=" + documentId + ", " +
+				"notificacio=" + notificacio + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				true);
+		ExpedientEntity expedient = validateExpedientPerNotificacio(document, notificacio.getTipus());
+		InteressatEntity interessat = validateInteressatPerNotificacio(notificacio, expedient);
+		
+		
+		InteressatIdiomaEnumDto notificacioIdioma = interessat.getPreferenciaIdioma() != null ? interessat.getPreferenciaIdioma(): InteressatIdiomaEnumDto.CA;
+
 		DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
 				(notificacio.getEstat() != null) ? notificacio.getEstat() : DocumentEnviamentEstatEnumDto.PENDENT,
 				notificacio.getAssumpte(),
@@ -149,18 +166,21 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				null, // dataCaducitat
 				interessat,
 				notificacioIdioma,
-				notificacio.getSeuAvisTitol(),
-				notificacio.getSeuAvisText(),
-				notificacio.getSeuOficiTitol(),
-				notificacio.getSeuOficiText(),
 				expedient,
-				document).
+				document,
+				notificacio.getServeiTipusEnum()).
 				observacions(notificacio.getObservacions()).
-				seuAvisTextMobil(notificacio.getSeuAvisTextMobil()).
 				build();
 		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacio.getTipus())) {
 			pluginHelper.notificacioEnviar(notificacioEntity);
 		}
+		
+		
+		
+		
+		
+		
+		
 		DocumentNotificacioDto dto = conversioTipusHelper.convertir(
 				documentNotificacioRepository.save(notificacioEntity),
 				DocumentNotificacioDto.class);

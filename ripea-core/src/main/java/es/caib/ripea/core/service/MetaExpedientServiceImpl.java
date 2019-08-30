@@ -96,16 +96,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.isNotificacioActiva(),
 				entitat,
 				metaExpedientPare).
-				notificacioSeuProcedimentCodi(metaExpedient.getNotificacioSeuProcedimentCodi()).
-				notificacioSeuRegistreLlibre(metaExpedient.getNotificacioSeuRegistreLlibre()).
-				notificacioSeuRegistreOficina(metaExpedient.getNotificacioSeuRegistreOficina()).
-				notificacioSeuRegistreOrgan(metaExpedient.getNotificacioSeuRegistreOrgan()).
-				notificacioSeuExpedientUnitatOrganitzativa(metaExpedient.getNotificacioSeuExpedientUnitatOrganitzativa()).
-				notificacioAvisTitol(metaExpedient.getNotificacioAvisTitol()).
-				notificacioAvisText(metaExpedient.getNotificacioAvisText()).
-				notificacioAvisTextMobil(metaExpedient.getNotificacioAvisTextMobil()).
-				notificacioOficiTitol(metaExpedient.getNotificacioOficiTitol()).
-				notificacioOficiText(metaExpedient.getNotificacioOficiText()).
 				build();
 		return conversioTipusHelper.convertir(
 				metaExpedientRepository.save(entity),
@@ -150,16 +140,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getSerieDocumental(),
 				metaExpedient.getExpressioNumero(),
 				metaExpedient.isNotificacioActiva(),
-				metaExpedient.getNotificacioSeuProcedimentCodi(),
-				metaExpedient.getNotificacioSeuRegistreLlibre(),
-				metaExpedient.getNotificacioSeuRegistreOficina(),
-				metaExpedient.getNotificacioSeuRegistreOrgan(),
-				metaExpedient.getNotificacioSeuExpedientUnitatOrganitzativa(),
-				metaExpedient.getNotificacioAvisTitol(),
-				metaExpedient.getNotificacioAvisText(),
-				metaExpedient.getNotificacioAvisTextMobil(),
-				metaExpedient.getNotificacioOficiTitol(),
-				metaExpedient.getNotificacioOficiText(),
 				metaExpedientPare);
 		return conversioTipusHelper.convertir(
 				metaExpedientEntity,
