@@ -136,6 +136,8 @@ public class ConversioTipusHelper {
 						target.setNotificacioAutoritzat(source.isNotificacioAutoritzat());
 						target.setRepresentantId(source.getRepresentantId());
 						target.setRepresentantIdentificador(source.getRepresentantIdentificador());
+						target.setEntregaDeh(source.getEntregaDeh());
+						target.setEntregaDehObligat(source.getEntregaDehObligat());
 						return target;
 					}
 				});

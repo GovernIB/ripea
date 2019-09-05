@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -13,6 +16,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -108,7 +112,25 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	private Long representantIdentificador;
 	@Version
 	private long version = 0;
+	
+	@Column(name = "entrega_deh")
+	protected Boolean entregaDeh;
 
+	@Column(name = "entrega_deh_obligat")
+	protected Boolean entregaDehObligat;
+	
+
+	@OneToMany(
+			mappedBy = "interessat",
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
+	
+	
+
+	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
+		return documentEnviamentInteressats;
+	}
 	public InteressatDocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
 	}
@@ -168,6 +190,18 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		}
 		return representantIdentificador;
 	}
+	public Boolean getEntregaDeh() {
+		return entregaDeh;
+	}
+	public void updateEntregaDeh(Boolean entregaDeh) {
+		this.entregaDeh = entregaDeh;
+	}
+	public Boolean getEntregaDehObligat() {
+		return entregaDehObligat;
+	}
+	public void updateEntregaDehObligat(Boolean entregaDehObligat) {
+		this.entregaDehObligat = entregaDehObligat;
+	}
 
 	public void updateEsRepresentant(boolean esRepresentant) {
 		this.esRepresentant = esRepresentant;
@@ -177,6 +211,8 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	}
 
 	public abstract String getIdentificador();
+
+
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

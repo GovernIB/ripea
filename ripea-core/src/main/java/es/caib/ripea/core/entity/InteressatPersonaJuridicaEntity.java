@@ -54,7 +54,9 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			String telefon,
 			String observacions,
 			InteressatIdiomaEnumDto preferenciaIdioma,
-			Boolean notificacioAutoritzat) {
+			Boolean notificacioAutoritzat,
+			Boolean entregaDeh,
+			Boolean entregaDehObligat) {
 		this.raoSocial = raoSocial;
 		this.documentTipus = documentTipus;
 		this.documentNum = documentNum;
@@ -68,6 +70,8 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 		this.observacions =  observacions;
 		this.preferenciaIdioma =  preferenciaIdioma;
 		this.notificacioAutoritzat =  notificacioAutoritzat;
+		this.entregaDeh = entregaDeh;
+		this.entregaDehObligat = entregaDehObligat;
 	}
 
 	/**
@@ -105,7 +109,9 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			InteressatIdiomaEnumDto preferenciaIdioma,
 			Boolean notificacioAutoritzat,
 			ExpedientEntity expedient,
-			InteressatEntity representant) {
+			InteressatEntity representant,
+			Boolean entregaDeh,
+			Boolean entregaDehObligat) {
 		return new Builder(
 				raoSocial,
 				documentTipus,
@@ -121,7 +127,9 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 				preferenciaIdioma,
 				notificacioAutoritzat,
 				expedient,
-				representant);
+				representant,
+				entregaDeh,
+				entregaDehObligat);
 	}
 
 	/**
@@ -146,7 +154,9 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 				InteressatIdiomaEnumDto preferenciaIdioma,
 				Boolean notificacioAutoritzat,
 				ExpedientEntity expedient,
-				InteressatEntity representant) {
+				InteressatEntity representant,
+				Boolean entregaDeh,
+				Boolean entregaDehObligat) {
 			built = new InteressatPersonaJuridicaEntity();
 			built.raoSocial = raoSocial;
 			built.documentTipus = documentTipus;
@@ -164,6 +174,8 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			built.expedient =  expedient;
 			built.representant =  representant;
 			built.esRepresentant = false;
+			built.entregaDeh = entregaDeh;
+			built.entregaDehObligat = entregaDehObligat;
 		}
 		public InteressatPersonaJuridicaEntity build() {
 			return built;

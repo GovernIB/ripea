@@ -12,17 +12,16 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * Constraint de validació que controla que no es doni d'alta dues
- * vegades el mateix interesat.
+ * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=InteressatPaisValidator.class)
-public @interface InteressatPais {
+@Constraint(validatedBy=InteressatEmailValidator.class)
+public @interface InteressatEmail {
 
-	String message() default "Ha d'informar de la provincia i el municipi quan el país és Espanya";
+	String message() default "Ha d''informar de la email si la opció Entrega a la Direcció Electrònica Hablitada (DEH) està habilitada";
 
 	Class<?>[] groups() default {};
 

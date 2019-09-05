@@ -37,9 +37,24 @@ public class Enviament {
 	private Integer entregaPostalCie;
 	private String entregaPostalFormatSobre;
 	private String entregaPostalFormatFulla;
-	private boolean entregaDehObligat;
+	private Boolean entregaDehObligat;
 	private String entregaDehProcedimentCodi;
+	private boolean entregaPostalActiva;
+	private boolean entregaDehActiva;
+	private String entregaNif;
 
+	public boolean isEntregaPostalActiva() {
+		return entregaPostalActiva;
+	}
+	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
+		this.entregaPostalActiva = entregaPostalActiva;
+	}
+	public boolean isEntregaDehActiva() {
+		return entregaDehActiva;
+	}
+	public void setEntregaDehActiva(boolean entregaDehActiva) {
+		this.entregaDehActiva = entregaDehActiva;
+	}
 	public Persona getTitular() {
 		return titular;
 	}
@@ -190,10 +205,10 @@ public class Enviament {
 	public void setEntregaPostalFormatFulla(String entregaPostalFormatFulla) {
 		this.entregaPostalFormatFulla = entregaPostalFormatFulla;
 	}
-	public boolean isEntregaDehObligat() {
+	public Boolean getEntregaDehObligat() {
 		return entregaDehObligat;
 	}
-	public void setEntregaDehObligat(boolean entregaDehObligat) {
+	public void setEntregaDehObligat(Boolean entregaDehObligat) {
 		this.entregaDehObligat = entregaDehObligat;
 	}
 	public String getEntregaDehProcedimentCodi() {
@@ -202,5 +217,12 @@ public class Enviament {
 	public void setEntregaDehProcedimentCodi(String entregaDehProcedimentCodi) {
 		this.entregaDehProcedimentCodi = entregaDehProcedimentCodi;
 	}
+	public String getEntregaNif() {
+		return entregaNif;
+	}
+	public void setEntregaNif(String entregaNif) {
+		this.entregaNif = entregaNif;
+	}
+
 
 }

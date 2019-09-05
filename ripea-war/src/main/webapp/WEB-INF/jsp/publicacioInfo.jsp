@@ -14,7 +14,7 @@
 		<dt><spring:message code="publicacio.info.camp.document"/></dt>
 		<dd>${publicacio.document.nom}</dd>
 		<dt><spring:message code="publicacio.info.camp.data.enviament"/></dt>
-		<dd><fmt:formatDate value="${publicacio.dataEnviament}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+		<dd><fmt:formatDate value="${publicacio.enviatData}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 		<dt><spring:message code="publicacio.info.camp.estat"/></dt>
 		<dd><spring:message code="publicacio.estat.enum.${publicacio.estat}"/></dd>
 		<dt><spring:message code="publicacio.info.camp.tipus"/></dt>

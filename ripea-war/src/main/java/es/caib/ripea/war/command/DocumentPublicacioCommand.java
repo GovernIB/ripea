@@ -36,6 +36,8 @@ public class DocumentPublicacioCommand {
 	private Date dataPublicacio;
 	@Size(groups = {Create.class, Update.class}, max = 256)
 	private String observacions;
+	@NotNull(groups = {Create.class})
+	private Date enviatData;
 
 
 
@@ -98,6 +100,15 @@ public class DocumentPublicacioCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
+
+	public Date getEnviatData() {
+		return enviatData;
+	}
+	public void setEnviatData(Date enviatData) {
+		this.enviatData = enviatData;
+	}
+
 
 	public interface Create {}
 	public interface Update {}

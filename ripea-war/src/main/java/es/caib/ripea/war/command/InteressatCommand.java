@@ -9,10 +9,10 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
@@ -21,6 +21,7 @@ import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.InteressatDocument;
+import es.caib.ripea.war.validation.InteressatEmail;
 import es.caib.ripea.war.validation.InteressatNoRepetit;
 import es.caib.ripea.war.validation.InteressatPais;
 
@@ -29,6 +30,7 @@ import es.caib.ripea.war.validation.InteressatPais;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@InteressatEmail(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 @InteressatNoRepetit(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 @InteressatPais(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 @InteressatDocument(groups = {PersonaFisica.class, PersonaJuridica.class})
@@ -84,9 +86,14 @@ public class InteressatCommand  {
 	protected InteressatIdiomaEnumDto preferenciaIdioma;
 	protected Boolean notificacioAutoritzat;
 
+	private Boolean entregaDeh;
+	private Boolean entregaDehObligat;
+	
+	
 	@NotNull
 	protected InteressatTipusEnumDto tipus;
 	protected boolean comprovat = false;
+	
 	
 	// Camps de filtre (No s'utilitzen al fer submit)
 	protected String filtreCodiDir3;
@@ -312,6 +319,20 @@ public class InteressatCommand  {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public Boolean getEntregaDeh() {
+		return entregaDeh;
+	}
+	public void setEntregaDeh(Boolean entregaDeh) {
+		this.entregaDeh = entregaDeh;
+	}
+
+	public Boolean getEntregaDehObligat() {
+		return entregaDehObligat;
+	}
+	public void setEntregaDehObligat(Boolean entregaDehObligat) {
+		this.entregaDehObligat = entregaDehObligat;
 	}
 
 	public interface PersonaFisica {}

@@ -215,7 +215,6 @@ public class DocumentServiceBean implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public void notificacioActualitzarEstat(String identificador,
 			String referencia) {
 		delegate.notificacioActualitzarEstat(identificador, referencia);

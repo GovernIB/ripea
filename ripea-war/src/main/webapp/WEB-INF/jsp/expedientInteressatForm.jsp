@@ -401,6 +401,33 @@ $(document).ready(function() {
 		$('#interessatform').submit();
 	});
 	$('select#tipus').change();
+
+
+	<c:if test="${!esRepresentant}">
+		$('input[type=checkbox][name=entregaDeh]').on('change', function() {
+			if($(this).prop("checked") == true){
+				$('#entregaDehObligatDiv').removeClass('hidden');
+				
+				$("label[for='email']").append(" *");
+			} else {
+				$('#entregaDehObligatDiv').addClass('hidden');
+				$("label[for='email']").text($("label[for='email']").text().replace(/ \*/g, ""));				
+			}
+			webutilModalAdjustHeight();
+		});			
+		$('input[type=checkbox][name=entregaDeh').trigger('change');
+		
+		$('input[type=checkbox][name=entregaDehObligat]').on('change', function() {
+			if($(this).prop("checked") == true){
+				$('#entregaDeh').attr('disabled', 'disabled');
+			} else {
+				$('#entregaDeh').removeAttr('disabled');
+			}
+			webutilModalAdjustHeight();
+		});			
+		$('input[type=checkbox][name=entregaDehObligat').trigger('change');	
+	</c:if>
+	
 });
 
 function canviVisibilitat(tipus) {
@@ -527,6 +554,16 @@ function canviVisibilitat(tipus) {
 			<div class="col-xs-6"><rip:inputSelect name="preferenciaIdioma" textKey="interessat.form.camp.idioma" optionItems="${idiomaEnumOptions}" optionTextKeyAttribute="text" optionValueAttribute="value" /></div>
 			<div class="col-xs-6"><rip:inputCheckbox name="notificacioAutoritzat" textKey="interessat.form.camp.autoritzat" labelSize="10"/></div>
 		</div>
+		<c:if test="${!esRepresentant}">
+			<div class="row">
+				<div class="col-xs-6" style="float: right;"><rip:inputCheckbox name="entregaDeh" textKey="interessat.form.camp.entregaDeh" labelSize="10"/></div>
+			</div>		
+			<div class="row" class="hidden">		
+				<div class="col-xs-6" style="float: right;" id="entregaDehObligatDiv"><rip:inputCheckbox name="entregaDehObligat" textKey="interessat.form.camp.entregaDehObligat" labelSize="10"/></div>
+			</div>		
+		</c:if>
+		
+		
 		
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="button" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

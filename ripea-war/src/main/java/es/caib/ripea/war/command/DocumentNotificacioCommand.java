@@ -41,12 +41,15 @@ public class DocumentNotificacioCommand {
 	private Date dataProgramada;
 	private Integer retard;
 	private Date dataCaducitat;
-	@NotNull(groups = {Create.class, Update.class})
-	private Long interessatId;
+	@NotEmpty(groups = {Create.class, Update.class})
+	private List<Long> interessatsIds;
 	
 	@NotNull
 	private ServeiTipusEnumDto serveiTipusEnum;
 	
+	private Boolean entregaPostal;
+	
+
 
 	private List<Long> annexos;
 
@@ -106,12 +109,6 @@ public class DocumentNotificacioCommand {
 	public void setDataCaducitat(Date dataCaducitat) {
 		this.dataCaducitat = dataCaducitat;
 	}
-	public Long getInteressatId() {
-		return interessatId;
-	}
-	public void setInteressatId(Long interessatId) {
-		this.interessatId = interessatId;
-	}
 
 	public List<Long> getAnnexos() {
 		return annexos;
@@ -152,6 +149,22 @@ public class DocumentNotificacioCommand {
 	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
 		this.serveiTipusEnum = serveiTipusEnum;
 	}
+
+	public List<Long> getInteressatsIds() {
+		return interessatsIds;
+	}
+	public void setInteressatsIds(List<Long> interessatsIds) {
+		this.interessatsIds = interessatsIds;
+	}
+
+
+	public Boolean getEntregaPostal() {
+		return entregaPostal;
+	}
+	public void setEntregaPostal(Boolean entregaPostal) {
+		this.entregaPostal = entregaPostal;
+	}
+
 
 	public interface Electronica {}
 	public interface Create {}

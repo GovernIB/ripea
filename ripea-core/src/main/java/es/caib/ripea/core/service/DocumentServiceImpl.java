@@ -50,7 +50,7 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -63,6 +63,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -98,6 +99,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 
 	@Transactional
 	@Override
@@ -788,14 +791,13 @@ public class DocumentServiceImpl implements DocumentService {
 			String identificador, 
 			String referencia) {
 		
-		DocumentNotificacioEntity notificacio = documentNotificacioRepository.findByEnviamentIdentificadorAndEnviamentReferencia(
-				identificador,
-				referencia);
-		if (notificacio == null) {
-			throw new NotFoundException(notificacio, DocumentNotificacioEntity.class);
+		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findByIdentificadorIReferencia(
+				identificador, referencia);
+		if (documentEnviamentInteressatEntity == null) {
+			throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
 		}
 		try {
-			pluginHelper.notificacioActualitzarEstat(notificacio);
+			pluginHelper.notificacioActualitzarEstat(documentEnviamentInteressatEntity);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de notificacions";
 			logger.error(errorDescripcio, ex);

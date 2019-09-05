@@ -4,7 +4,9 @@
 package es.caib.ripea.core.entity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,17 +14,14 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 
@@ -46,14 +45,8 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@Column(name = "not_data_caducitat")
 	@Temporal(TemporalType.DATE)
 	private Date dataCaducitat;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "not_interessat_id")
-	@ForeignKey(name = "ipa_interessat_docenv_fk")
-	private InteressatEntity interessat;
 	@Column(name = "not_env_id", length = 100)
 	private String enviamentIdentificador;
-	@Column(name = "not_env_ref", length = 100)
-	private String enviamentReferencia;
 	@Column(name = "not_env_dat_estat", length = 20)
 	private String enviamentDatatEstat;
 	@Column(name = "not_env_dat_data")
@@ -70,7 +63,21 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "servei_tipus", length = 10)
 	private ServeiTipusEnumDto serveiTipusEnum;
+	
+	@Column(name="entrega_postal")
+	private Boolean entregaPostal;
+	
+	
+	@OneToMany(
+			mappedBy = "notificacio",
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
+	
 
+	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
+		return documentEnviamentInteressats;
+	}
 	public Date getDataProgramada() {
 		return dataProgramada;
 	}
@@ -80,14 +87,8 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public Date getDataCaducitat() {
 		return dataCaducitat;
 	}
-	public InteressatEntity getInteressat() {
-		return interessat;
-	}
 	public String getEnviamentIdentificador() {
 		return enviamentIdentificador;
-	}
-	public String getEnviamentReferencia() {
-		return enviamentReferencia;
 	}
 	public String getEnviamentDatatEstat() {
 		return enviamentDatatEstat;
@@ -120,12 +121,10 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public void update(
 			DocumentEnviamentEstatEnumDto estat,
 			String assumpte,
-			String observacions,
-			InteressatEntity interessat) {
+			String observacions) {
 		this.estat = estat;
 		this.assumpte = assumpte;
 		this.observacions = observacions;
-		this.interessat = interessat;
 	}
 
 	public void updateEnviat(
@@ -135,9 +134,8 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			String enviamentReferencia) {
 		super.updateEnviat(enviatData);
 		this.enviamentIdentificador = enviamentIdentificador;
-		this.enviamentReferencia = enviamentReferencia;
+		this.enviatData = enviatData;
 		if (!enviat) {
-			this.enviatData = null;
 			this.estat = DocumentEnviamentEstatEnumDto.PENDENT;
 		}
 	}
@@ -179,11 +177,11 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			Date dataProgramada,
 			Integer retard,
 			Date dataCaducitat,
-			InteressatEntity interessat,
-			InteressatIdiomaEnumDto seuIdioma,
+			List<InteressatEntity> interessats,
 			ExpedientEntity expedient,
 			DocumentEntity document,
-			ServeiTipusEnumDto serveiTipusEnum) {
+			ServeiTipusEnumDto serveiTipusEnum,
+			Boolean entregaPostal) {
 		return new Builder(
 				estat,
 				assumpte,
@@ -191,11 +189,11 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				dataProgramada,
 				retard,
 				dataCaducitat,
-				interessat,
-				seuIdioma,
+				interessats,
 				expedient,
 				document,
-				serveiTipusEnum);
+				serveiTipusEnum,
+				entregaPostal);
 	}
 
 	public static class Builder {
@@ -207,11 +205,11 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				Date dataProgramada,
 				Integer retard,
 				Date dataCaducitat,
-				InteressatEntity interessat,
-				InteressatIdiomaEnumDto seuIdioma,
+				List<InteressatEntity> interessats,
 				ExpedientEntity expedient,
 				DocumentEntity document,
-				ServeiTipusEnumDto serveiTipusEnum) {
+				ServeiTipusEnumDto serveiTipusEnum,
+				Boolean entregaPostal) {
 			built = new DocumentNotificacioEntity();
 			built.inicialitzar();
 			built.estat = estat;
@@ -220,11 +218,13 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			built.dataProgramada = dataProgramada;
 			built.retard = retard;
 			built.dataCaducitat = dataCaducitat;
-			built.interessat = interessat;
 			built.expedient = expedient;
 			built.document = document;
 			built.serveiTipusEnum = serveiTipusEnum;
+			built.entregaPostal = entregaPostal;
+			
 		}
+
 		public Builder annexos(List<DocumentEntity> annexos) {
 			built.annexos = annexos;
 			return this;
@@ -247,7 +247,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		result = prime * result + ((enviatData == null) ? 0 : enviatData.hashCode());
 		result = prime * result + ((processatData == null) ? 0 : processatData.hashCode());
 		result = prime * result + ((tipus == null) ? 0 : tipus.hashCode());
-		result = prime * result + ((interessat == null) ? 0 : interessat.hashCode());
 		return result;
 	}
 	@Override
@@ -284,13 +283,15 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				return false;
 		} else if (!tipus.equals(other.tipus))
 			return false;
-		if (interessat == null) {
-			if (other.interessat != null)
-				return false;
-		} else if (!interessat.equals(other.interessat))
-			return false;
 		return true;
 	}
+
+	public Boolean getEntregaPostal() {
+		return entregaPostal;
+	}
+
+
+
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

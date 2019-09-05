@@ -3,7 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+
 
 /**
  * Informació d'una notificació d'un document a un ciutadà.
@@ -16,13 +20,16 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private Date dataProgramada;
 	private Integer retard;
 	private Date dataCaducitat;
-	private Long interessatId;
-	private InteressatDto interessat;
+
 
 	private String enviamentIdentificador;
 	private String enviamentReferencia;
+	private List<Long> interessatsIds = new ArrayList<Long>();
 	
 	private ServeiTipusEnumDto serveiTipusEnum;
+	
+	private Boolean entregaPostal;
+	private List<InteressatDto> interessats = new ArrayList<InteressatDto>();
 	
 	public DocumentNotificacioTipusEnumDto getTipus() {
 		return tipus;
@@ -48,19 +55,6 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	public void setDataCaducitat(Date dataCaducitat) {
 		this.dataCaducitat = dataCaducitat;
 	}
-	public Long getInteressatId() {
-		return interessatId;
-	}
-	public void setInteressatId(Long interessatId) {
-		this.interessatId = interessatId;
-	}
-	public InteressatDto getInteressat() {
-		return interessat;
-	}
-	public void setInteressat(InteressatDto interessat) {
-		this.interessat = interessat;
-	}
-
 	public String getEnviamentIdentificador() {
 		return enviamentIdentificador;
 	}
@@ -82,11 +76,29 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 
 	@Override
 	public String getDestinatari() {
-		return interessat.getNomComplet();
+		return null;
 	}
 	@Override
 	public String getDestinatariAmbDocument() {
-		return interessat.getNomCompletAmbDocument();
+		return null;
+	}
+	public Boolean getEntregaPostal() {
+		return entregaPostal;
+	}
+	public void setEntregaPostal(Boolean entregaPostal) {
+		this.entregaPostal = entregaPostal;
+	}
+	public List<Long> getInteressatsIds() {
+		return interessatsIds;
+	}
+	public void setInteressatsIds(List<Long> interessatsIds) {
+		this.interessatsIds = interessatsIds;
+	}
+	public List<InteressatDto> getInteressats() {
+		return interessats;
+	}
+	public void setInteressats(List<InteressatDto> interessats) {
+		this.interessats = interessats;
 	}
 
 }

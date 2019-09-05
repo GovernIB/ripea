@@ -82,7 +82,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 									toPersonaNotib(destinatari));
 						}
 					}
-					if (enviament.getEntregaPostalTipus() != null) {
+					if (enviament.isEntregaPostalActiva()) {
 						EntregaPostal entregaPostal = new EntregaPostal();
 						entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.valueOf(enviament.getEntregaPostalTipus().toString()));
 						entregaPostal.setViaTipus(enviament.getEntregaPostalViaTipus() != null
@@ -109,12 +109,17 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 						entregaPostal.setFormatSobre(enviament.getEntregaPostalFormatSobre());
 						entregaPostal.setFormatFulla(enviament.getEntregaPostalFormatFulla());
 						enviamentNotib.setEntregaPostal(entregaPostal);
+						enviamentNotib.setEntregaPostalActiva(true);
 					}
-					if (enviament.getEntregaDehProcedimentCodi() != null) {
+					if (enviament.isEntregaDehActiva()) {
 						EntregaDeh entregaDeh = new EntregaDeh();
-						entregaDeh.setObligat(enviament.isEntregaDehObligat());
+						entregaDeh.setObligat(enviament.getEntregaDehObligat());
 						entregaDeh.setProcedimentCodi(enviament.getEntregaDehProcedimentCodi());
+						entregaDeh.setEmisorNif(enviament.getEntregaNif());
 						enviamentNotib.setEntregaDeh(entregaDeh);
+						enviamentNotib.setEntregaDehActiva(true);
+					} else {
+						enviamentNotib.setEntregaDehActiva(false);
 					}
 					
 					enviamentNotib.setServeiTipus(es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto.valueOf(notificacio.getServeiTipusEnum().toString()));
@@ -122,7 +127,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 				}
 			}
 
-			//####### send notificacio ####################
+			//####### ALTA NOTIFICACIO ####################
 			RespostaAlta respostaAlta = getNotificacioService().alta(notificacioNotib);
 			
 			if (respostaAlta.isError()) {

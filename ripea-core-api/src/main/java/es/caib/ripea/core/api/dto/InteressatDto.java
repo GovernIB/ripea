@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+
 /**
  * Informació d'un interessat.
  * 
@@ -31,6 +32,11 @@ public abstract class InteressatDto implements Serializable {
 	protected Long representantId;
 	protected String representantIdentificador;
 	protected String identificador;
+	
+	private InteressatDto representant;
+	
+	protected Boolean entregaDeh;
+	private Boolean entregaDehObligat;
 	
 	public Long getId() {
 		return id;
@@ -162,6 +168,33 @@ public abstract class InteressatDto implements Serializable {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
+	public Boolean getEntregaDeh() {
+		return entregaDeh;
+	}
+	public void setEntregaDeh(Boolean entregaDeh) {
+		this.entregaDeh = entregaDeh;
+	}
+
+
+
+	public Boolean getEntregaDehObligat() {
+		return entregaDehObligat;
+	}
+	public void setEntregaDehObligat(Boolean entregaDehObligat) {
+		this.entregaDehObligat = entregaDehObligat;
+	}
+
+
+
+	public InteressatDto getRepresentant() {
+		return representant;
+	}
+	public void setRepresentant(InteressatDto representant) {
+		this.representant = representant;
+	}
+
+
 
 	private static final long serialVersionUID = -139254994389509932L;
 

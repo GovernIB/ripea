@@ -157,7 +157,9 @@ CREATE TABLE IPA_INTERESSAT
   LASTMODIFIEDDATE     timestamp without time zone,
   CREATEDBY_CODI       character varying(64),
   LASTMODIFIEDBY_CODI  character varying(64),
-  VERSION              bigint               NOT NULL
+  VERSION              bigint               NOT NULL,
+  ENTREGA_DEH 		   BOOLEAN,
+  ENTREGA_DEH_OBLIGAT BOOLEAN
 );
 
 
@@ -322,7 +324,6 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT
   NOT_DATA_PROG        timestamp without time zone,
   NOT_RETARD           integer,
   NOT_DATA_CADUCITAT   timestamp without time zone,
-  NOT_INTERESSAT_ID    BIGINT,
   NOT_ENV_ID           character varying(100),
   NOT_ENV_REF          character varying(100),
   NOT_ENV_DAT_ESTAT    character varying(20),
@@ -347,7 +348,8 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT
   CREATEDBY_CODI       character varying(256),
   LASTMODIFIEDBY_CODI  character varying(256),
   VERSION              BIGINT                      NOT NULL,
-  SERVEI_TIPUS 		   CHARACTER VARYING(10)
+  SERVEI_TIPUS 		   CHARACTER VARYING(10),
+  ENTREGA_POSTAL       BOOLEAN
 );
 
 
@@ -600,3 +602,16 @@ CREATE TABLE IPA_REGISTRE_INTERESSAT (
   LASTMODIFIEDBY_CODI character varying (256)
 );
 
+
+
+CREATE TABLE IPA_DOCUMENT_ENVIAMENT_INTER
+(
+  ID                   	BIGINT NOT NULL,
+  DOCUMENT_ENVIAMENT_ID BIGINT NOT NULL,
+  INTERESSAT_ID 		BIGINT NOT NULL,
+  NOT_ENV_REF   		CHARACTER VARYING (100),
+  CREATEDDATE         timestamp without time zone,
+  LASTMODIFIEDDATE    timestamp without time zone,
+  CREATEDBY_CODI      character varying (256),
+  LASTMODIFIEDBY_CODI character varying (256)  
+);

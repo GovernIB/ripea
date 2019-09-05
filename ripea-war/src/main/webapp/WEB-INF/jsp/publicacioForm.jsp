@@ -32,7 +32,8 @@
 		<rip:inputSelect name="tipus" textKey="publicacio.form.camp.tipus" optionItems="${publicacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
 		<rip:inputSelect name="estat" textKey="publicacio.form.camp.estat" optionItems="${publicacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
 		<rip:inputText name="assumpte" textKey="publicacio.form.camp.assumpte" required="true"/>
-		<rip:inputDate name="dataPublicacio" textKey="publicacio.form.camp.data.pub"/>
+		<rip:inputDate name="dataPublicacio" textKey="publicacio.form.camp.data.pub" />
+		<rip:inputDate name="enviatData" textKey="notificacio.info.camp.data.enviament" required="true"/>
 		<rip:inputTextarea name="observacions" textKey="publicacio.form.camp.observacions"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> <spring:message code="comu.boto.guardar"/></button>

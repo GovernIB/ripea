@@ -62,7 +62,9 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			String telefon,
 			String observacions,
 			InteressatIdiomaEnumDto preferenciaIdioma,
-			Boolean notificacioAutoritzat) {
+			Boolean notificacioAutoritzat,
+			Boolean entregaDeh,
+			Boolean entregaDehObligat) {
 		this.organCodi = organCodi;
 		this.organNom = organNom;
 		this.documentTipus = documentTipus;
@@ -77,6 +79,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		this.observacions =  observacions;
 		this.preferenciaIdioma =  preferenciaIdioma;
 		this.notificacioAutoritzat =  notificacioAutoritzat;
+		this.entregaDeh = entregaDeh;
+		this.entregaDehObligat = entregaDehObligat;
 	}
 
 	/**
@@ -115,7 +119,9 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			InteressatIdiomaEnumDto preferenciaIdioma,
 			Boolean notificacioAutoritzat,
 			ExpedientEntity expedient,
-			InteressatEntity representant) {
+			InteressatEntity representant,
+			Boolean entregaDeh,
+			Boolean entregaDehObligat) {
 		return new Builder(
 				organCodi,
 				organNom,
@@ -132,7 +138,9 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				preferenciaIdioma,
 				notificacioAutoritzat,
 				expedient,
-				representant);
+				representant,
+				entregaDeh,
+				entregaDehObligat);
 	}
 
 	/**
@@ -158,7 +166,9 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				InteressatIdiomaEnumDto preferenciaIdioma,
 				Boolean notificacioAutoritzat,
 				ExpedientEntity expedient,
-				InteressatEntity representant) {
+				InteressatEntity representant,
+				Boolean entregaDeh,
+				Boolean entregaDehObligat) {
 			built = new InteressatAdministracioEntity();
 			built.organCodi = organCodi;
 			built.organNom = organNom;
@@ -177,6 +187,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			built.expedient =  expedient;
 			built.representant =  representant;
 			built.esRepresentant = false;
+			built.entregaDeh = entregaDeh;
+			built.entregaDehObligat = entregaDehObligat;
 		}
 		public InteressatAdministracioEntity build() {
 			return built;

@@ -100,6 +100,9 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 			name = "ipa_docenv_docenvdoc_fk",
 			inverseName = "ipa_document_docenvdoc_fk")
 	protected List<DocumentEntity> annexos = new ArrayList<DocumentEntity>();
+	
+	
+	
 	@Version
 	private long version = 0;
 

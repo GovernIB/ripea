@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.CertificateInfo;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -53,6 +52,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
@@ -77,6 +77,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -97,7 +98,6 @@ import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentTipus;
 import es.caib.ripea.plugin.notificacio.Notificacio;
-import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
@@ -2571,15 +2571,17 @@ public class PluginHelper {
 
 
 
-	public void notificacioEnviar(
-			DocumentNotificacioEntity notificacioEntity) {
+	public RespostaEnviar notificacioEnviar(
+			DocumentNotificacioDto notificacioDto,
+			ExpedientEntity expedientEntity, 
+			DocumentEntity documentEntity,
+			List<InteressatEntity> interessats) {
 		
-		ExpedientEntity expedient = notificacioEntity.getExpedient();
-		DocumentEntity document = notificacioEntity.getDocument();
-		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
+
+		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
 		String accioDescripcio = "Enviament d'una notificació electrònica";
 		
-		Map<String, String> accioParams = getNotificacioAccioParams(notificacioEntity);
+		Map<String, String> accioParams = getNotificacioAccioParams(notificacioDto, expedientEntity, documentEntity, interessats);
 		
 		long t0 = System.currentTimeMillis();
 		try {
@@ -2589,22 +2591,22 @@ public class PluginHelper {
 			if (forsarEntitat != null) {
 				notificacio.setEmisorDir3Codi(forsarEntitat);
 			} else {
-				notificacio.setEmisorDir3Codi(expedient.getEntitat().getUnitatArrel());
+				notificacio.setEmisorDir3Codi(expedientEntity.getEntitat().getUnitatArrel());
 			}
 			
-			notificacio.setEnviamentTipus(notificacioEntity.getTipus() != null ? EnviamentTipus.valueOf(notificacioEntity.getTipus().toString()) : null);
-			notificacio.setConcepte(notificacioEntity.getAssumpte());
-			notificacio.setDescripcio(notificacioEntity.getObservacions());
-			notificacio.setEnviamentDataProgramada(notificacioEntity.getDataProgramada());
+			notificacio.setEnviamentTipus(notificacioDto.getTipus() != null ? EnviamentTipus.valueOf(notificacioDto.getTipus().toString()) : null);
+			notificacio.setConcepte(notificacioDto.getAssumpte());
+			notificacio.setDescripcio(notificacioDto.getObservacions());
+			notificacio.setEnviamentDataProgramada(notificacioDto.getDataProgramada());
 			notificacio.setRetard(
-					(notificacioEntity.getRetard() != null) ? notificacioEntity.getRetard() : getPropertyNotificacioRetardNumDies());
+					(notificacioDto.getRetard() != null) ? notificacioDto.getRetard() : getPropertyNotificacioRetardNumDies());
 			
-			if (notificacioEntity.getDataCaducitat() != null) {
-				notificacio.setCaducitat(notificacioEntity.getDataCaducitat());
+			if (notificacioDto.getDataCaducitat() != null) {
+				notificacio.setCaducitat(notificacioDto.getDataCaducitat());
 			} else {
 				Integer numDies = getPropertyNotificacioCaducitatNumDies();
 				if (numDies != null) {
-					Date dataInicial = (notificacioEntity.getDataProgramada() != null) ? notificacioEntity.getDataProgramada() : new Date();
+					Date dataInicial = (notificacioDto.getDataProgramada() != null) ? notificacioDto.getDataProgramada() : new Date();
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataInicial);
 					cal.add(Calendar.DAY_OF_MONTH, numDies);
@@ -2612,81 +2614,88 @@ public class PluginHelper {
 				}
 			}
 			
-			FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
 			notificacio.setDocumentArxiuNom(fitxer.getNom());
 			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
 			
-			Enviament enviament = new Enviament();
-			Persona titular = convertirAmbPersona(notificacioEntity.getInteressat());
-			enviament.setTitular(titular);
-			Persona destinatari = null;
-			if (notificacioEntity.getInteressat().getRepresentant() != null) {
-				destinatari = convertirAmbPersona(notificacioEntity.getInteressat().getRepresentant());
-				enviament.setDestinataris(Arrays.asList(destinatari));
-			}
-			if (getPropertyNotificacioEnviamentPostalActiu()) {
-				enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
-				InteressatEntity interessatPerAdresa = notificacioEntity.getInteressat();
-				if (notificacioEntity.getInteressat().getRepresentant() != null) {
-					interessatPerAdresa = notificacioEntity.getInteressat().getRepresentant();
-				}
-				PaisDto pais = dadesExternesHelper.getPaisAmbCodi(
-						interessatPerAdresa.getPais());
-				if (pais == null) {
-					throw new NotFoundException(
-							interessatPerAdresa.getPais(),
-							PaisDto.class);
-				}
-				ProvinciaDto provincia = dadesExternesHelper.getProvinciaAmbCodi(
-						interessatPerAdresa.getProvincia());
-				if (provincia == null) {
-					throw new NotFoundException(
-							interessatPerAdresa.getProvincia(),
-							ProvinciaDto.class);
-				}
-				MunicipiDto municipi = dadesExternesHelper.getMunicipiAmbCodi(
-						interessatPerAdresa.getProvincia(),
-						interessatPerAdresa.getMunicipi());
-				if (municipi == null) {
-					throw new NotFoundException(
-							interessatPerAdresa.getMunicipi(),
-							MunicipiDto.class);
-				}
-				enviament.setEntregaPostalLinea1(
-						interessatPerAdresa.getAdresa() + ", " +
-						interessatPerAdresa.getCodiPostal() + ", " +
-						municipi.getNom());
-				enviament.setEntregaPostalLinea2(
-						provincia.getNom() + ", " +
-						pais.getNom());
-			}
-			if (getPropertyNotificacioEnviamentDehActiva()) {
-				enviament.setEntregaDehObligat(false);
-				enviament.setEntregaDehProcedimentCodi(
-						metaExpedient.getClassificacioSia());
-			}
-			notificacio.setEnviaments(Arrays.asList(enviament));
-			
 			UsuariDto usuari = aplicacioService.getUsuariActual();
-			notificacio.setUsuariCodi(usuari.getCodi());			
-			notificacio.setServeiTipusEnum(notificacioEntity.getServeiTipusEnum());
+			List<Enviament> enviaments = new ArrayList<>();
+			for(InteressatEntity interessatEntity: interessats) {
+				
+				Enviament enviament = new Enviament();
+				Persona persona = convertirAmbPersona(interessatEntity);
+				enviament.setTitular(persona);
+				enviament.setDestinataris(Arrays.asList(persona));
 
-			// ############## enviar #######################
-			RespostaEnviar resposta = getNotificacioPlugin().enviar(notificacio);
+				// ########## ENTREGA POSTAL  ###############
+				if (notificacioDto.getEntregaPostal()) {
+					enviament.setEntregaPostalActiva(true);
+					enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
+					InteressatEntity interessatPerAdresa = interessatEntity;
+					if (interessatEntity.getRepresentant() != null) {
+						interessatPerAdresa = interessatEntity.getRepresentant();
+					}
+					PaisDto pais = dadesExternesHelper.getPaisAmbCodi(
+							interessatPerAdresa.getPais());
+					if (pais == null) {
+						throw new NotFoundException(
+								interessatPerAdresa.getPais(),
+								PaisDto.class);
+					}
+					
+					ProvinciaDto provincia = dadesExternesHelper.getProvinciaAmbCodi(
+							interessatPerAdresa.getProvincia());
+					if (provincia == null) {
+						throw new NotFoundException(
+								interessatPerAdresa.getProvincia(),
+								ProvinciaDto.class);
+					}
+					MunicipiDto municipi = dadesExternesHelper.getMunicipiAmbCodi(
+							interessatPerAdresa.getProvincia(),
+							interessatPerAdresa.getMunicipi());
+					if (municipi == null) {
+						throw new NotFoundException(
+								interessatPerAdresa.getMunicipi(),
+								MunicipiDto.class);
+					}
+					enviament.setEntregaPostalLinea1(
+							interessatPerAdresa.getAdresa() + ", " +
+									interessatPerAdresa.getCodiPostal() + ", " +
+									municipi.getNom());
+					enviament.setEntregaPostalLinea2(
+							provincia.getNom() + ", " +
+									pais.getNom());
+					enviament.setEntregaPostalCodiPostal("00000");
+				}
+				// ########## ENVIAMENT DEH  ###############
+				if (interessatEntity.getEntregaDeh()) {
+					enviament.setEntregaDehActiva(true);
+					enviament.setEntregaDehObligat(interessatEntity.getEntregaDehObligat());
+					enviament.setEntregaDehProcedimentCodi(
+							metaExpedient.getClassificacioSia());
+					enviament.setEntregaNif(usuari.getNif());
+				}
+				enviaments.add(enviament);
+			}
 			
+			notificacio.setEnviaments(enviaments);
 			
-			notificacioEntity.updateEnviat(
-					new Date(),
-					resposta.getEstat().equals(NotificacioEstat.ENVIADA),
-					resposta.getIdentificador(), 
-					resposta.getReferencies().get(0).getReferencia());
+			notificacio.setUsuariCodi(usuari.getCodi());			
+			notificacio.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());
+
+			// ############## ALTA NOTIFICACIO #######################
+			RespostaEnviar respostaEnviar = getNotificacioPlugin().enviar(notificacio);
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			
+			return respostaEnviar;
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de notificacions";
 			integracioHelper.addAccioError(
@@ -2697,9 +2706,6 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			notificacioEntity.updateEnviatError(
-					ExceptionUtils.getStackTrace(ex), 
-					null);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					errorDescripcio,
@@ -2708,7 +2714,8 @@ public class PluginHelper {
 	}
 
 	public void notificacioActualitzarEstat(
-			DocumentNotificacioEntity notificacio) {
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		ExpedientEntity expedient = notificacio.getExpedient();
 		DocumentEntity document = notificacio.getDocument();
 		
@@ -2720,17 +2727,16 @@ public class PluginHelper {
 		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
 		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
 		accioParams.put("documentNom", document.getNom());
-		accioParams.put("interessat", notificacio.getInteressat().getIdentificador());
 		if (notificacio.getTipus() != null) {
 			accioParams.put("enviamentTipus", notificacio.getTipus().name());
 		}
 		accioParams.put("concepte", notificacio.getAssumpte());
-		accioParams.put("referencia", notificacio.getEnviamentReferencia());
+		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
 		
 		long t0 = System.currentTimeMillis();
 		try {
 			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(
-					notificacio.getEnviamentReferencia());
+					documentEnviamentInteressatEntity.getEnviamentReferencia());
 			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
 			if (resposta.getCertificacioData() != null) {
 				byte[] certificacio = resposta.getCertificacioContingut();
@@ -3881,17 +3887,21 @@ public class PluginHelper {
 	}*/
 	
 	
-	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioEntity notificacio) {
+	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {
 		
 		Map<String, String> accioParams = new HashMap<String, String>();
 		
-		accioParams.put("setEmisorDir3Codi", notificacio.getExpedient().getEntitat().getUnitatArrel());
-		accioParams.put("expedientId", notificacio.getExpedient().getId().toString());
-		accioParams.put("expedientTitol", notificacio.getExpedient().getNom());
-		accioParams.put("expedientTipusId", notificacio.getExpedient().getMetaNode().getId().toString());
-		accioParams.put("expedientTipusNom", notificacio.getExpedient().getMetaNode().getNom());
-		accioParams.put("documentNom", notificacio.getDocument().getNom());
-		accioParams.put("interessat", notificacio.getInteressat().getIdentificador());
+		accioParams.put("setEmisorDir3Codi", expedientEntity.getEntitat().getUnitatArrel());
+		accioParams.put("expedientId", expedientEntity.getId().toString());
+		accioParams.put("expedientTitol", expedientEntity.getNom());
+		accioParams.put("expedientTipusId", expedientEntity.getMetaNode().getId().toString());
+		accioParams.put("expedientTipusNom", expedientEntity.getMetaNode().getNom());
+		accioParams.put("documentNom", documentEntity.getNom());
+		String intressatsString = "";
+		for (InteressatEntity interessatEntity : interessats) {
+			intressatsString += interessatEntity.getIdentificador();
+		}
+		accioParams.put("interessats", intressatsString);
 		if (notificacio.getTipus() != null) {
 			accioParams.put("enviamentTipus", notificacio.getTipus().name());
 		}
@@ -3909,6 +3919,7 @@ public class PluginHelper {
 		
 		return accioParams;
 	}	
+	
 	private DadesExternesPlugin getDadesExternesPlugin() {
 		if (dadesExternesPlugin == null) {
 			String pluginClass = getPropertyPluginDadesExternes();

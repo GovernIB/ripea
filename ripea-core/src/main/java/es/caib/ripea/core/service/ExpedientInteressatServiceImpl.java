@@ -153,7 +153,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatPersonaFisicaDto.getTelefon(),
 					interessatPersonaFisicaDto.getObservacions(),
 					interessatPersonaFisicaDto.getPreferenciaIdioma(),
-					interessatPersonaFisicaDto.getNotificacioAutoritzat());
+					interessatPersonaFisicaDto.getNotificacioAutoritzat(),
+					interessatPersonaFisicaDto.getEntregaDeh(),
+					interessatPersonaFisicaDto.getEntregaDehObligat());
 		} else if (interessat.isPersonaJuridica()) {
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
 			interessatEntity = interessatRepository.findPersonaJuridicaById(interessat.getId());
@@ -170,7 +172,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatPersonaJuridicaDto.getTelefon(),
 					interessatPersonaJuridicaDto.getObservacions(),
 					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-					interessatPersonaJuridicaDto.getNotificacioAutoritzat());
+					interessatPersonaJuridicaDto.getNotificacioAutoritzat(),
+					interessatPersonaJuridicaDto.getEntregaDeh(),
+					interessatPersonaJuridicaDto.getEntregaDehObligat());
 		} else {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
 			interessatEntity = interessatRepository.findAdministracioById(interessat.getId());
@@ -190,7 +194,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatAdministracioDto.getTelefon(),
 					interessatAdministracioDto.getObservacions(),
 					interessatAdministracioDto.getPreferenciaIdioma(),
-					interessatAdministracioDto.getNotificacioAutoritzat());
+					interessatAdministracioDto.getNotificacioAutoritzat(),
+					interessatAdministracioDto.getEntregaDeh(),
+					interessatAdministracioDto.getEntregaDehObligat());
 		}
 		interessatEntity = interessatRepository.save(interessatEntity);
 		// Registra al log la modificació de l'interessat

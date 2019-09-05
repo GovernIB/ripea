@@ -16,7 +16,7 @@
 		<ehcache.version>2.10.1</ehcache.version>
 		<orika.version>1.1.7</orika.version>
 		<groovy.version>2.1.6</groovy.version>
-		<jackson.version>2.7.0</jackson.version>
+		<jackson.version>2.6.3</jackson.version>
 		<xdocreport.version>1.0.3</xdocreport.version>
 		<bouncycastle.version>1.46</bouncycastle.version>
 		<cxf.version>2.2.12</cxf.version>
