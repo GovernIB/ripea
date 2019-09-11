@@ -590,6 +590,7 @@ public class ExpedientHelper {
 			interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
 			interessatAdministracioDto.setNotificacioAutoritzat(false);
 			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());			
 			interessatDto = interessatAdministracioDto;
 			break;
 		}

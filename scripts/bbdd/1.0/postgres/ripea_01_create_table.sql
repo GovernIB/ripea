@@ -595,11 +595,12 @@ CREATE TABLE IPA_REGISTRE_INTERESSAT (
 	PAIS character varying(200),
 	PROVINCIA character varying(200),
 	MUNICIPI character varying(200),	
+	ORGAN_CODI CHARACTER VARYING(9),
 	
-  CREATEDDATE         timestamp without time zone,
-  LASTMODIFIEDDATE    timestamp without time zone,
-  CREATEDBY_CODI      character varying (256),
-  LASTMODIFIEDBY_CODI character varying (256)
+    CREATEDDATE         timestamp without time zone,
+    LASTMODIFIEDDATE    timestamp without time zone,
+    CREATEDBY_CODI      character varying (256),
+    LASTMODIFIEDBY_CODI character varying (256)
 );
 
 

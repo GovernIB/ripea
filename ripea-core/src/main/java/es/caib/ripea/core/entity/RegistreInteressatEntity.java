@@ -81,8 +81,15 @@ public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "registre_id")
 	@ForeignKey(name = "dis_interessat_registre_fk")
 	private RegistreEntity registre;
+	@Column(name = "organ_codi", length = 9)
+	private String organCodi;
 	
 	
+	
+	public String getOrganCodi() {
+		return organCodi;
+	}
+
 	public static Builder getBuilder(
 			InteressatTipus tipus) {
 		return new Builder(
@@ -178,6 +185,10 @@ public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 			built.municipi = municipi;
 			return this;
 		}		
+		public Builder organCodi(String organCodi) {
+			built.organCodi = organCodi;
+			return this;
+		}			
 		public RegistreInteressatEntity build() {
 			return built;
 		}

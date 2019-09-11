@@ -135,52 +135,52 @@ public class ExpedientPeticioHelper {
 	}
 
 	@Transactional
-	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registre, ExpedientPeticioEntity expedientPeticioEntity) {
+	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
 		
 		
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
-				registre.getEntitatCodi());
+				registreEntrada.getEntitatCodi());
 		if (entitat == null) {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
 
 		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
-				registre.getAssumpteTipusCodi(),
-				registre.getData().toGregorianCalendar().getTime(),
-				registre.getEntitatCodi(),
-				registre.getIdentificador(),
-				registre.getIdiomaCodi(),
-				registre.getLlibreCodi(),
-				registre.getOficinaCodi(),
-				registre.getDestiCodi(),
+				registreEntrada.getAssumpteTipusCodi(),
+				registreEntrada.getData().toGregorianCalendar().getTime(),
+				registreEntrada.getEntitatCodi(),
+				registreEntrada.getIdentificador(),
+				registreEntrada.getIdiomaCodi(),
+				registreEntrada.getLlibreCodi(),
+				registreEntrada.getOficinaCodi(),
+				registreEntrada.getDestiCodi(),
 				entitat).
-				aplicacioCodi(registre.getAplicacioCodi()).
-				aplicacioVersio(registre.getAplicacioVersio()).
-				assumpteCodiCodi(registre.getAssumpteCodiCodi()).
-				assumpteCodiDescripcio(registre.getAssumpteCodiDescripcio()).
-				assumpteTipusDescripcio(registre.getAssumpteTipusDescripcio()).
-				docFisicaCodi(registre.getDocFisicaCodi()).
-				docFisicaDescripcio(registre.getDocFisicaDescripcio()).
-				entitatDescripcio(registre.getEntitatDescripcio()).
-				expedientNumero(registre.getExpedientNumero()).
-				exposa(registre.getExposa()).
-	 			extracte(registre.getExtracte()).
-	 			procedimentCodi(registre.getProcedimentCodi()).
-				idiomaDescripcio(registre.getIdomaDescripcio()).
-				llibreDescripcio(registre.getLlibreDescripcio()).
-				observacions(registre.getObservacions()).
-				oficinaDescripcio(registre.getOficinaDescripcio()).
-				origenData(registre.getOrigenData() != null ? registre.getOrigenData().toGregorianCalendar().getTime() : null).
-				origenRegistreNumero(registre.getOrigenRegistreNumero()).
-				refExterna(registre.getRefExterna()).
-				solicita(registre.getSolicita()).
-				transportNumero(registre.getTransportNumero()).
-				transportTipusCodi(registre.getTransportTipusCodi()).
-				transportTipusDescripcio(registre.getTransportTipusDescripcio()).
-				usuariCodi(registre.getUsuariCodi()).
-				usuariNom(registre.getUsuariNom()).
-				destiDescripcio(registre.getDestiDescripcio()).
+				aplicacioCodi(registreEntrada.getAplicacioCodi()).
+				aplicacioVersio(registreEntrada.getAplicacioVersio()).
+				assumpteCodiCodi(registreEntrada.getAssumpteCodiCodi()).
+				assumpteCodiDescripcio(registreEntrada.getAssumpteCodiDescripcio()).
+				assumpteTipusDescripcio(registreEntrada.getAssumpteTipusDescripcio()).
+				docFisicaCodi(registreEntrada.getDocFisicaCodi()).
+				docFisicaDescripcio(registreEntrada.getDocFisicaDescripcio()).
+				entitatDescripcio(registreEntrada.getEntitatDescripcio()).
+				expedientNumero(registreEntrada.getExpedientNumero()).
+				exposa(registreEntrada.getExposa()).
+	 			extracte(registreEntrada.getExtracte()).
+	 			procedimentCodi(registreEntrada.getProcedimentCodi()).
+				idiomaDescripcio(registreEntrada.getIdomaDescripcio()).
+				llibreDescripcio(registreEntrada.getLlibreDescripcio()).
+				observacions(registreEntrada.getObservacions()).
+				oficinaDescripcio(registreEntrada.getOficinaDescripcio()).
+				origenData(registreEntrada.getOrigenData() != null ? registreEntrada.getOrigenData().toGregorianCalendar().getTime() : null).
+				origenRegistreNumero(registreEntrada.getOrigenRegistreNumero()).
+				refExterna(registreEntrada.getRefExterna()).
+				solicita(registreEntrada.getSolicita()).
+				transportNumero(registreEntrada.getTransportNumero()).
+				transportTipusCodi(registreEntrada.getTransportTipusCodi()).
+				transportTipusDescripcio(registreEntrada.getTransportTipusDescripcio()).
+				usuariCodi(registreEntrada.getUsuariCodi()).
+				usuariNom(registreEntrada.getUsuariNom()).
+				destiDescripcio(registreEntrada.getDestiDescripcio()).
 				build();
 
 		
@@ -220,14 +220,14 @@ public class ExpedientPeticioHelper {
 		
 		expedientPeticioRepository.save(expedientPeticioEntity);
 		
-		for (Interessat interessat: registre.getInteressats()) {
+		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
 					crearInteressatEntity(
 							interessat,
 							registreEntity));
 		}
 		
-		for (Annex annex: registre.getAnnexos()) {
+		for (Annex annex: registreEntrada.getAnnexos()) {
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
 							annex,
@@ -262,6 +262,7 @@ public class ExpedientPeticioHelper {
 		 			pais (interessat.getRepresentant().getPais()).
 		 			provincia (interessat.getRepresentant().getProvincia()).
 		 			municipi (interessat.getRepresentant().getMunicipi()).
+		 			organCodi(interessat.getRepresentant().getOrganCodi()).
 					build();
 			
 		}
@@ -286,6 +287,7 @@ public class ExpedientPeticioHelper {
 		 			municipi (interessat.getMunicipi()).		 			
 		 			raoSocial (interessat.getRaoSocial()).
 		 			telefon (interessat.getTelefon()).
+		 			organCodi(interessat.getOrganCodi()).
 		 			representant(representantEntity).
 		 			registre(registreEntity).
 					build();
