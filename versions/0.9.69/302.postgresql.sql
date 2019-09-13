@@ -69,8 +69,8 @@ ALTER TABLE ONLY IPA_DOCUMENT_ENVIAMENT ADD (
   CONSTRAINT IPA_DOCUMENT_ENVIAMENT_DIS_FK FOREIGN KEY (VF_VIAFIRMA_DISPOSITIU) 
     REFERENCES IPA_DOCUMENT_ENVIAMENT_DIS (ID));
     
--- Relacionar usuaris ViaFirma amb un usuari de Ripea  
--- Usuaris viaFirma
-INSERT INTO IPA_VIAFIRMA_USUARI VALUES ('usuari','contrasenya','Usuari recursos humans');
--- Relacionar usuaris viaFirma amb usuari Ripea
-INSERT INTO IPA_USUARI_VIAFIRMA_RIPEA VALUES (0,'usuariViaFirma', 'usuariRipea');
+---- Relacionar usuaris ViaFirma amb un usuari de Ripea  
+---- Usuaris viaFirma
+--INSERT INTO IPA_VIAFIRMA_USUARI VALUES ('usuari','contrasenya','Usuari recursos humans');
+---- Relacionar usuaris viaFirma amb usuari Ripea
+--INSERT INTO IPA_USUARI_VIAFIRMA_RIPEA VALUES (0,'usuariViaFirma', 'usuariRipea');

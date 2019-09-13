@@ -12,7 +12,7 @@ package es.caib.ripea.core.api.dto;
 public enum DocumentEstatEnumDto {
 	REDACCIO,
 	FIRMA_PENDENT,
-	FIRMA_PENDENT_VIAFIRMA,
 	FIRMAT,
-	CUSTODIAT
+	CUSTODIAT,
+	FIRMA_PENDENT_VIAFIRMA
 }

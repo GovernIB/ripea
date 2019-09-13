@@ -1,4 +1,3 @@
-
 CREATE TABLE IPA_ALERTA
 (
   ID                   BIGINT                          NOT NULL,
@@ -104,6 +103,8 @@ CREATE TABLE IPA_METADOCUMENT
   NTI_ORIGEN 			  character varying(2)     NOT NULL,
   NTI_ESTELA 			  character varying(4),
   NTI_TIPDOC 			  character varying(4)     NOT NULL,
+  FIRMA_BIOMETRICA 		  BOOLEAN,
+  BIOMETRICA_LECTURA 	  BOOLEAN
 );
 
 
@@ -307,49 +308,58 @@ CREATE TABLE IPA_DOCUMENT
 
 CREATE TABLE IPA_DOCUMENT_ENVIAMENT
 (
-  ID                   BIGINT                      NOT NULL,
-  DTYPE                character varying(32)       NOT NULL,
-  ESTAT                character varying(255)      NOT NULL,
-  ASSUMPTE             character varying(256)      NOT NULL,
-  OBSERVACIONS         character varying(256),
-  ENVIAT_DATA          timestamp without time zone NOT NULL,
-  PROCESSAT_DATA       timestamp without time zone,
-  CANCELAT_DATA        timestamp without time zone,
-  ERROR                boolean,
-  ERROR_DESC           character varying(255),
-  INTENT_NUM           integer,
-  INTENT_DATA          timestamp without time zone,
-  INTENT_PROXIM_DATA   timestamp without time zone,
-  NOT_TIPUS            integer,
-  NOT_DATA_PROG        timestamp without time zone,
-  NOT_RETARD           integer,
-  NOT_DATA_CADUCITAT   timestamp without time zone,
-  NOT_ENV_ID           character varying(100),
-  NOT_ENV_REF          character varying(100),
-  NOT_ENV_DAT_ESTAT    character varying(20),
-  NOT_ENV_DAT_DATA     timestamp without time zone,
-  NOT_ENV_DAT_ORIG     character varying(20),
-  NOT_ENV_CERT_DATA    timestamp without time zone,
-  NOT_ENV_CERT_ORIG    character varying(20),
-  NOT_ENV_CERT_ARXIUID character varying(50),
-  PF_PRIORITAT         integer,
-  PF_CAD_DATA          timestamp without time zone,
-  PF_DOC_TIPUS         character varying(64),
-  PF_RESPONSABLES      character varying(1024),
-  PF_FLUX_TIPUS        integer,
-  PF_FLUX_ID           character varying(64),
-  PF_PORTAFIRMES_ID    character varying(64),
-  PF_CALLBACK_ESTAT    integer,
-  PUB_TIPUS            integer,
-  DOCUMENT_ID          BIGINT                      NOT NULL,
-  EXPEDIENT_ID         BIGINT                      NOT NULL,
-  CREATEDDATE          timestamp without time zone,
-  LASTMODIFIEDDATE     timestamp without time zone,
-  CREATEDBY_CODI       character varying(256),
-  LASTMODIFIEDBY_CODI  character varying(256),
-  VERSION              BIGINT                      NOT NULL,
-  SERVEI_TIPUS 		   CHARACTER VARYING(10),
-  ENTREGA_POSTAL       BOOLEAN
+  ID                   		BIGINT                      NOT NULL,
+  DTYPE                		character varying(32)       NOT NULL,
+  ESTAT                		character varying(255)      NOT NULL,
+  ASSUMPTE             		character varying(256)      NOT NULL,
+  OBSERVACIONS         		character varying(256),
+  ENVIAT_DATA          		timestamp without time zone NOT NULL,
+  PROCESSAT_DATA       		timestamp without time zone,
+  CANCELAT_DATA        		timestamp without time zone,
+  ERROR                		boolean,
+  ERROR_DESC           		character varying(255),
+  INTENT_NUM           		integer,
+  INTENT_DATA          		timestamp without time zone,
+  INTENT_PROXIM_DATA   		timestamp without time zone,
+  NOT_TIPUS            		integer,
+  NOT_DATA_PROG        		timestamp without time zone,
+  NOT_RETARD           		integer,
+  NOT_DATA_CADUCITAT   		timestamp without time zone,
+  NOT_ENV_ID           		character varying(100),
+  NOT_ENV_REF          		character varying(100),
+  NOT_ENV_DAT_ESTAT    		character varying(20),
+  NOT_ENV_DAT_DATA     		timestamp without time zone,
+  NOT_ENV_DAT_ORIG     		character varying(20),
+  NOT_ENV_CERT_DATA    		timestamp without time zone,
+  NOT_ENV_CERT_ORIG    		character varying(20),
+  NOT_ENV_CERT_ARXIUID 		character varying(50),
+  PF_PRIORITAT         		integer,
+  PF_CAD_DATA          		timestamp without time zone,
+  PF_DOC_TIPUS         		character varying(64),
+  PF_RESPONSABLES      		character varying(1024),
+  PF_FLUX_TIPUS        		integer,
+  PF_FLUX_ID          		character varying(64),
+  PF_PORTAFIRMES_ID    		character varying(64),
+  PF_CALLBACK_ESTAT    		integer,
+  VF_CODI_USUARI 	   		CHARACTER VARYING(64),
+  VF_TITOL 					CHARACTER VARYING(256),
+  VF_DESCRIPCIO 			CHARACTER VARYING(256),
+  VF_CODI_DISPOSITIU 		CHARACTER VARYING(64),
+  VF_MESSAGE_CODE 			CHARACTER VARYING(64),
+  VF_CALLBACK_ESTAT 		NUMBER(10,0),
+  VF_CONTRASENYA_USUARI 	CHARACTER VARYING(64),
+  VF_LECTURA_OBLIGATORIA 	BOOLEAN,
+  VF_VIAFIRMA_DISPOSITIU 	BIGINT,
+  PUB_TIPUS            		integer,
+  DOCUMENT_ID          		BIGINT                      NOT NULL,
+  EXPEDIENT_ID         		BIGINT                      NOT NULL,
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDDATE     		timestamp without time zone,
+  CREATEDBY_CODI       		character varying(256),
+  LASTMODIFIEDBY_CODI  		character varying(256),
+  VERSION             		BIGINT                      NOT NULL,
+  SERVEI_TIPUS 		   		CHARACTER VARYING(10),
+  ENTREGA_POSTAL       		BOOLEAN
 );
 
 
@@ -616,3 +626,35 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT_INTER
   CREATEDBY_CODI      character varying (256),
   LASTMODIFIEDBY_CODI character varying (256)  
 );
+
+CREATE TABLE IPA_VIAFIRMA_USUARI (
+	CODI			CHARACTER VARYING(64)			NOT NULL,
+	CONTRASENYA		CHARACTER VARYING(64)			NOT NULL,
+	DESCRIPCIO		CHARACTER VARYING(64)			NOT NULL
+);
+
+CREATE TABLE IPA_USUARI_VIAFIRMA_RIPEA (
+    ID                    BIGINT            			NOT NULL,
+    VIAFIRMA_USER_CODI    CHARACTER VARYING(64)         NOT NULL,
+    RIPEA_USER_CODI       CHARACTER VARYING(64)         NOT NULL
+);
+
+CREATE TABLE IPA_DOCUMENT_ENVIAMENT_DIS (
+    ID                      BIGINT               NOT NULL,
+    CODI                    CHARACTER VARYING(64),
+    CODI_APLICACIO          CHARACTER VARYING(64),
+    CODI_USUARI             CHARACTER VARYING(64),
+    DESCRIPCIO              CHARACTER VARYING(255),
+    LOCALE                  CHARACTER VARYING(10),
+    ESTAT                   CHARACTER VARYING(64),
+    TOKEN                   CHARACTER VARYING(255),
+    IDENTIFICADOR           CHARACTER VARYING(64),
+    TIPUS                   CHARACTER VARYING(64),
+    EMAIL_USUARI            CHARACTER VARYING(64),
+    IDENTIFICADOR_NAC       CHARACTER VARYING(64),
+    CREATEDDATE             timestamp without time zone,
+    LASTMODIFIEDDATE        timestamp without time zone,
+    CREATEDBY_CODI          CHARACTER VARYING(256),
+    LASTMODIFIEDBY_CODI     CHARACTER VARYING(256)
+);
+
