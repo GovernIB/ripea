@@ -490,6 +490,7 @@ $(document).ready(function() {
 	$('#contingut').filedrop({
 		maxfiles: 1,
 		error: function(err, file) {
+			console.log('>>> filedrop error', err, file)
 			alert('Filedrop error: ' + err);
 		},
 		dragOver: function() {

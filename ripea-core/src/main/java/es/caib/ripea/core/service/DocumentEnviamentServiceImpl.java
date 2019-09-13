@@ -182,7 +182,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				null, // dataProgramada
 				null, // retard
 				null, // dataCaducitat
-				interessats,
 				expedientEntity,
 				documentEntity,
 				notificacioDto.getServeiTipusEnum(),
@@ -406,13 +405,20 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					DocumentEntity.class,
 					"El document no te cap expedient associat (documentId=" + documentId + ")");
 		}
-		DocumentNotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+		DocumentNotificacioEntity documentNotificacioEntity = entityComprovarHelper.comprovarNotificacio(
 				expedient,
 				null,
 				notificacioId);
-		return conversioTipusHelper.convertir(
-				notificacio,
+		
+		DocumentNotificacioDto documentNotificacioDto = conversioTipusHelper.convertir(
+				documentNotificacioEntity,
 				DocumentNotificacioDto.class);
+		
+		for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacioEntity.getDocumentEnviamentInteressats()) {
+			documentNotificacioDto.getInteressats().add(conversioTipusHelper.convertir(documentEnviamentInteressatEntity.getInteressat(), InteressatDto.class));
+		}
+		
+		return documentNotificacioDto;
 	}
 
 	@Transactional

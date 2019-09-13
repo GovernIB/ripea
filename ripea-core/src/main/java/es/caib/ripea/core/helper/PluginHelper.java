@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.fundaciobit.plugins.validatesignature.api.CertificateInfo;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -72,8 +71,8 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
