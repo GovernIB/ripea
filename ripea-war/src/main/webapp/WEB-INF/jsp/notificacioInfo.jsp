@@ -10,6 +10,7 @@
 	<rip:modalHead/>
 </head>
 <body>
+	<!---------------------------------------- TABLIST ------------------------------------------>
 	<ul class="nav nav-tabs" role="tablist">
 		<li class="active" role="presentation">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.dades"/></a>
@@ -25,6 +26,7 @@
 	</ul>
 	<br/>
 	<div class="tab-content">
+		<!------------------------------ TABPANEL DADES ------------------------------------->
 		<div class="tab-pane active in" id="dades" role="tabpanel">
 			<dl class="dl-horizontal">
 
@@ -175,7 +177,6 @@
 													</table>
 												</div>
 											</c:if>
-											<!-- ------------------------ -->
 										</div>
 									</td>						
 								</tr>
@@ -186,11 +187,14 @@
 
 			</dl>
 		</div>
+		<!------------------------------ TABPANEL ANNEXOS ------------------------------------->		
 		<div class="tab-pane" id="annexos" role="tabpanel">
 			<c:forEach var="annex" items="${notificacio.annexos}">
 				<p>${annex.nom}</p>
 			</c:forEach>
 		</div>
+		
+		<!------------------------------ TABPANEL ERRORS ------------------------------------->
 		<div class="tab-pane" id="errors" role="tabpanel">
 			<c:if test="${notificacio.error}">
 				<div class="alert well-sm alert-danger alert-dismissable">
