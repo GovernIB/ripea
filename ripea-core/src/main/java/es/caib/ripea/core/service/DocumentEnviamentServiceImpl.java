@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,10 +190,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				observacions(notificacioDto.getObservacions()).
 				build();
 		
-		
-		DocumentNotificacioDto dto = conversioTipusHelper.convertir(
-				documentNotificacioRepository.save(notificacioEntity),
-				DocumentNotificacioDto.class);
+		documentNotificacioRepository.save(notificacioEntity);
 		
 		for (InteressatEntity interessatEntity : interessats) {
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessatEntity, notificacioEntity).build();
@@ -200,13 +198,18 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		}
 		
 		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
-			notificacioEntity.updateEnviat(
-					new Date(),
-					respostaEnviar.getEstat().equals(NotificacioEstat.ENVIADA),
-					respostaEnviar.getIdentificador(), 
-					respostaEnviar.getReferencies().get(0).getReferencia());
 			
-			
+			if (respostaEnviar.isError()) {
+				notificacioEntity.updateEnviatError(
+						respostaEnviar.getErrorDescripcio(),
+						null);
+			} else {
+				notificacioEntity.updateEnviat(
+						new Date(),
+						respostaEnviar.getEstat().equals(NotificacioEstat.ENVIADA),
+						respostaEnviar.getIdentificador());
+			}
+
 			for (EnviamentReferencia enviamentReferencia : respostaEnviar.getReferencies()) {
 				for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : notificacioEntity.getDocumentEnviamentInteressats()) {
 					if(documentEnviamentInteressatEntity.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
@@ -215,6 +218,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				}
 			}
 		}
+		
+		DocumentNotificacioDto dto = conversioTipusHelper.convertir(
+				notificacioEntity,
+				DocumentNotificacioDto.class);
 		
 		String destinitariAmbDocument = "";
 		for (InteressatDto interessatDto : dto.getInteressats()) {
@@ -704,7 +711,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		try {
 			DocumentEnviamentEstatEnumDto estatAbans = notificacio.getEstat();
-			pluginHelper.notificacioActualitzarEstat(documentEnviamentInteressatEntity);
+			pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
 			DocumentEnviamentEstatEnumDto estatDespres = notificacio.getEstat();
 			if (estatAbans != estatDespres) {
 				emailHelper.canviEstatNotificacio(notificacio, estatAbans);

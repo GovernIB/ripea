@@ -1140,7 +1140,7 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
 		}
 		try {
-			pluginHelper.notificacioActualitzarEstat(documentEnviamentInteressatEntity);
+			pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de notificacions";
 			logger.error(errorDescripcio, ex);

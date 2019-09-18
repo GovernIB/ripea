@@ -25,7 +25,22 @@ public class RespostaConsultaEstatEnviament {
 	private String certificacioMetadades;
 	private String certificacioCsv;
 	private String certificacioTipusMime;
+	private boolean error;
+	private String errorDescripcio;
+	
 
+	public boolean isError() {
+		return error;
+	}
+	public void setError(boolean error) {
+		this.error = error;
+	}
+	public String getErrorDescripcio() {
+		return errorDescripcio;
+	}
+	public void setErrorDescripcio(String errorDescripcio) {
+		this.errorDescripcio = errorDescripcio;
+	}
 	public EnviamentEstat getEstat() {
 		return estat;
 	}

@@ -2753,31 +2753,22 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	
 
-	public void notificacioActualitzarEstat(
+	public void notificacioConsultarIActualitzarEstat(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+		
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		ExpedientEntity expedient = notificacio.getExpedient();
-		DocumentEntity document = notificacio.getDocument();
 		
 		String accioDescripcio = "Consulta d'estat d'una notificació electrònica";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
-		accioParams.put("expedientId", expedient.getId().toString());
-		accioParams.put("expedientTitol", expedient.getNom());
-		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
-		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-		accioParams.put("documentNom", document.getNom());
-		if (notificacio.getTipus() != null) {
-			accioParams.put("enviamentTipus", notificacio.getTipus().name());
-		}
-		accioParams.put("concepte", notificacio.getAssumpte());
-		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
-		
+		Map<String, String> accioParams = getAccioParams(documentEnviamentInteressatEntity);
 		long t0 = System.currentTimeMillis();
 		try {
+			
 			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(
 					documentEnviamentInteressatEntity.getEnviamentReferencia());
+			
 			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
 			if (resposta.getCertificacioData() != null) {
 				byte[] certificacio = resposta.getCertificacioContingut();
@@ -2792,13 +2783,17 @@ public class PluginHelper {
 							new ByteArrayInputStream(certificacio));
 				}
 			}
+			
 			notificacio.updateEnviamentEstat(
 					resposta.getEstat(),
 					resposta.getEstatData(),
 					resposta.getEstatOrigen(),
 					resposta.getCertificacioData(),
 					resposta.getCertificacioOrigen(),
-					gestioDocumentalId);
+					gestioDocumentalId,
+					resposta.isError(),
+					resposta.getErrorDescripcio());
+			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,
@@ -3854,6 +3849,28 @@ public class PluginHelper {
 		}
 		return accioParams;
 	}	
+	
+	private Map<String, String> getAccioParams(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+		
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		ExpedientEntity expedient = notificacio.getExpedient();
+		DocumentEntity document = notificacio.getDocument();
+		
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
+		accioParams.put("expedientId", expedient.getId().toString());
+		accioParams.put("expedientTitol", expedient.getNom());
+		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
+		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
+		accioParams.put("documentNom", document.getNom());
+		if (notificacio.getTipus() != null) {
+			accioParams.put("enviamentTipus", notificacio.getTipus().name());
+		}
+		accioParams.put("concepte", notificacio.getAssumpte());
+		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
+		return accioParams;
+	}
+	
 
 
 	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {		

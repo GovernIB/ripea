@@ -200,23 +200,23 @@
 				<div class="alert well-sm alert-danger alert-dismissable">
 					<span class="fa fa-exclamation-triangle"></span>
 					<spring:message code="notificacio.info.errors.enviament"/>
-					<a href="reintentar" class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span> <spring:message code="notificacio.info.errors.enviament.reintentar"/></a>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h4 class="panel-title"><spring:message code="notificacio.info.error.enviament"/></h4>
-					</div>
-					<div class="panel-body">
-						<br/>
-						<dl class="dl-horizontal">
-							<dt><spring:message code="notificacio.info.camp.error.data.darrer"/></dt>
-							<dd><fmt:formatDate value="${notificacio.enviamentData}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-							<dt><spring:message code="notificacio.info.camp.error.intents"/></dt>
-							<dd>${notificacio.enviamentCount}</dd>
-						</dl>
-						<pre style="height:300px; margin: 12px">${notificacio.enviamentErrorDescripcio}</pre>
-					</div>
-				</div>
+<%-- 					<a href="reintentar" class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span> <spring:message code="notificacio.info.errors.enviament.reintentar"/></a> --%>
+ 				</div> 
+<!-- 				<div class="panel panel-default"> -->
+<!-- 					<div class="panel-heading"> -->
+<%-- 						<h4 class="panel-title"><spring:message code="notificacio.info.error.enviament"/></h4> --%>
+<!-- 					</div> -->
+<!-- 					<div class="panel-body"> -->
+<!-- 						<br/> -->
+<!-- 						<dl class="dl-horizontal"> -->
+<%-- 							<dt><spring:message code="notificacio.info.camp.error.data.darrer"/></dt> --%>
+<%-- 							<dd><fmt:formatDate value="${notificacio.enviatData}" pattern="dd/MM/yyyy HH:mm:ss"/></dd> --%>
+<%-- 							<dt><spring:message code="notificacio.info.camp.error.intents"/></dt> --%>
+<%-- 							<dd>${notificacio.intentNum}</dd> --%>
+<!-- 						</dl> -->
+						<pre style="height:300px; margin: 12px">${notificacio.errorDescripcio}</pre>
+<!-- 					</div> -->
+<!-- 				</div> -->
 			</c:if>
 <%--
 			<c:if test="${notificacio.processamentError}">

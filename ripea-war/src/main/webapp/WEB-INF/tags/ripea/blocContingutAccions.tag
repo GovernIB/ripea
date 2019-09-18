@@ -163,7 +163,9 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 				<c:if test="${contingut.estat == 'CUSTODIAT'}">
-					<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
+						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+					</c:if>
 					<li><a href="<c:url value="/document/${contingut.id}/publicar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-clipboard"></span>&nbsp;<spring:message code="comu.boto.publicar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
