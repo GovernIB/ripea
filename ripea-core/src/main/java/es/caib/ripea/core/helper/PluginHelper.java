@@ -754,13 +754,12 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		try {
 			
-			String documentNomInArxiu = documentNomInArxiu(document.getNom(), contingutPare.getArxiuUuid());
-			
 			if (document.getArxiuUuid() == null) {
 				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
 						toArxiuDocument(
 								null,
-								documentNomInArxiu,
+								contingutPare.getArxiuUuid(),
+								document.getNom(),
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -790,7 +789,8 @@ public class PluginHelper {
 				getArxiuPlugin().documentModificar(
 						toArxiuDocument(
 								document.getArxiuUuid(),
-								documentNomInArxiu,
+								contingutPare.getArxiuUuid(),
+								document.getNom(),
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -1158,9 +1158,13 @@ public class PluginHelper {
 				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 				firmes = Arrays.asList(firma);
 			}
+			
+			
+			
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
+							document.getPare().getArxiuUuid(),
 							document.getNom(),
 							fitxerAmbFirma,
 							true,
@@ -3163,7 +3167,8 @@ public class PluginHelper {
 	}
 
 	private Document toArxiuDocument(
-			String identificador,
+			String documentUuid,
+			String expedientUuid,
 			String nom,
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
@@ -3179,8 +3184,10 @@ public class PluginHelper {
 			boolean enPaper,
 			String serieDocumental) {
 		Document document = new Document();
-		document.setNom(nom);
-		document.setIdentificador(identificador);
+		
+		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
+		document.setNom(documentNomInArxiu);
+		document.setIdentificador(documentUuid);
 		DocumentMetadades metadades = new DocumentMetadades();
 		setMetadades(
 				ntiOrigen,
