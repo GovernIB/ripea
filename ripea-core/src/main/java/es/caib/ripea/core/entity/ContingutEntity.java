@@ -72,6 +72,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	 */
 	@Column(name = "esborrat")
 	protected int esborrat = 0;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "esborrat_data")
+	protected Date esborratData;
 	@Column(name = "arxiu_uuid", length = 36)
 	protected String arxiuUuid;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -98,6 +101,12 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@Version
 	private long version = 0;
 
+	public Date getEsborratData() {
+		return esborratData;
+	}
+	public void updateEsborratData(Date esborratData) {
+		this.esborratData = esborratData;
+	}
 	public String getNom() {
 		return nom;
 	}

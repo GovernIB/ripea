@@ -753,11 +753,14 @@ public class PluginHelper {
 		accioParams.put("serieDocumental", serieDocumental);
 		long t0 = System.currentTimeMillis();
 		try {
+			
+			String documentNomInArxiu = documentNomInArxiu(document.getNom(), contingutPare.getArxiuUuid());
+			
 			if (document.getArxiuUuid() == null) {
 				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
 						toArxiuDocument(
 								null,
-								document.getNom(),
+								documentNomInArxiu,
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -787,7 +790,7 @@ public class PluginHelper {
 				getArxiuPlugin().documentModificar(
 						toArxiuDocument(
 								document.getArxiuUuid(),
-								document.getNom(),
+								documentNomInArxiu,
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -826,6 +829,31 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+
+	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid){
+
+		List<ContingutArxiu> continguts = arxiuExpedientConsultarPerUuid(expedientUuid).getContinguts();
+		int ocurrences = 0;
+		if(continguts != null) {
+			List<String> noms = new ArrayList<String>();
+			for(ContingutArxiu contingut : continguts) {
+				noms.add(contingut.getNom());
+			}
+			String newName = new String(nomPerComprovar);
+			
+			while(noms.indexOf(newName) >= 0) {
+				ocurrences ++;
+				newName = nomPerComprovar + " (" + ocurrences + ")";
+			}
+
+			return newName;
+		
+	}
+	return nomPerComprovar;
+}
+	
+
 	
 	/*public void arxiuFirmaActualitzar(
 			DocumentEntity document,

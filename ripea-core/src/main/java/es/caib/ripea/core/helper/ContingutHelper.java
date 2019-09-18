@@ -259,6 +259,7 @@ public class ContingutHelper {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setEsborrat(contingut.getEsborrat());
+		resposta.setEsborratData(contingut.getEsborratData());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
 		if (!contingut.getFills().isEmpty()) {

@@ -86,14 +86,24 @@
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
 			
+<%-- 			<c:choose> --%>
+<%-- 				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats || contingut.document && contingut.estat != 'REDACCIO'}"> --%>
+<%-- 					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li> --%>
+<%-- 				</c:when> --%>
+<%-- 				<c:otherwise> --%>
+
 			<c:choose>
-				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats || contingut.document && contingut.estat != 'REDACCIO'}">
-					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+				<c:when test="${contingut.document && contingut.estat != 'REDACCIO'}">
+					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat"/> </c:set>
 				</c:when>
 				<c:otherwise>
-					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.node"/></c:set>
 				</c:otherwise>
-			</c:choose>			
+			</c:choose>
+
+			<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+<%-- 				</c:otherwise> --%>
+<%-- 			</c:choose>			 --%>
 			
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>

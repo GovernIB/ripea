@@ -180,7 +180,8 @@ CREATE TABLE IPA_CONTINGUT
   LASTMODIFIEDDATE     timestamp without time zone,
   CREATEDBY_CODI       character varying(64),
   LASTMODIFIEDBY_CODI  character varying(64),
-  VERSION              bigint                   NOT NULL
+  VERSION              bigint                   NOT NULL,
+  ESBORRAT_DATA 	   TIMESTAMP WITHOUT TIMEZONE
 );
 
 

@@ -233,25 +233,26 @@ public class ContingutServiceImpl implements ContingutService {
 					ContingutEntity.class,
 					"Aquest contingut ja està esborrat");
 		}
-		// Valida si conté documents definitius
-		if (conteDocumentsDefinitius(contingut)) {
-			throw new ConteDocumentsDefinitiusException(
-					contingutId,
-					ContingutEntity.class);
-		}
+
 		// Marca el contingut i tots els seus fills com a esborrats
 		//  de forma recursiva
 		marcarEsborrat(contingut);
-		// Si el contingut és un document guarda una còpia del fitxer esborrat
-		// per a poder recuperar-lo posteriorment
-		if (contingut instanceof DocumentEntity) {
-			DocumentEntity document = (DocumentEntity)contingut;
-			if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-				fitxerDocumentEsborratGuardar((DocumentEntity)contingut);
+		
+		// Valida si conté documents definitius
+		if (!conteDocumentsDefinitius(contingut)) {
+			
+			// Si el contingut és un document guarda una còpia del fitxer esborrat
+			// per a poder recuperar-lo posteriorment
+			if (contingut instanceof DocumentEntity) {
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
+				}
 			}
+			// Elimina contingut a l'arxiu
+			contingutHelper.arxiuPropagarEliminacio(contingut);
 		}
-		// Propaga l'acció a l'arxiu
-		contingutHelper.arxiuPropagarEliminacio(contingut);
+
 		return dto;
 	}
 
@@ -359,23 +360,28 @@ public class ContingutServiceImpl implements ContingutService {
 				null,
 				true,
 				true);
-		// Propaga l'acció a l'arxiu
-		FitxerDto fitxer = null;
-		if (contingut instanceof DocumentEntity) {
-			DocumentEntity document = (DocumentEntity)contingut;
-			if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-				fitxer = fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
+		
+		if (!conteDocumentsDefinitius(contingut)) {
+			
+			// Propaga l'acció a l'arxiu
+			FitxerDto fitxer = null;
+			if (contingut instanceof DocumentEntity) {
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+					fitxer = fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
+				}
+			}
+			contingutHelper.arxiuPropagarModificacio(
+					contingut,
+					null,
+					false,
+					false,
+					null);
+			if (fitxer != null) {
+				fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
 		}
-		contingutHelper.arxiuPropagarModificacio(
-				contingut,
-				null,
-				false,
-				false,
-				null);
-		if (fitxer != null) {
-			fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
-		}
+		
 		return dto;
 	}
 
@@ -1864,6 +1870,7 @@ public class ContingutServiceImpl implements ContingutService {
 			}
 		}
 		contingut.updateEsborrat(continguts.size() + 1);
+		contingut.updateEsborratData(new Date());
 		contingutLogHelper.log(
 				contingut,
 				LogTipusEnumDto.ELIMINACIO,
@@ -1873,7 +1880,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true);
 	}
 
-	private void fitxerDocumentEsborratGuardar(
+	private void fitxerDocumentEsborratGuardarEnTmp(
 			DocumentEntity document) throws IOException {
 		File fContent = new File(getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
