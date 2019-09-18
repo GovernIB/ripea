@@ -223,11 +223,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				metaExpedient,
 				expedientNumero);
 		
-
-		return expedientHelper.toExpedientDto(
-				expedientEntity,
-				false);
-
+		if (expedientEntity == null) {
+			return null;
+		} else {
+			return expedientHelper.toExpedientDto(expedientEntity,
+					false);
+		}
 	}
 	
 	
