@@ -615,7 +615,10 @@ public class ExpedientHelper {
 				break;
 			case ALTRES:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.ALTRES_DE_PERSONA_FISICA;
-				break;					
+				break;		
+			case CODI_ORIGEN:
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.CODI_ORIGEN;
+				break;
 			}
 		}
 		return interessatDocumentTipusEnumDto;
