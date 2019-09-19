@@ -753,10 +753,12 @@ public class PluginHelper {
 		accioParams.put("serieDocumental", serieDocumental);
 		long t0 = System.currentTimeMillis();
 		try {
+			
 			if (document.getArxiuUuid() == null) {
 				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
 						toArxiuDocument(
 								null,
+								contingutPare.getArxiuUuid(),
 								document.getNom(),
 								fitxer,
 								documentAmbFirma,
@@ -787,6 +789,7 @@ public class PluginHelper {
 				getArxiuPlugin().documentModificar(
 						toArxiuDocument(
 								document.getArxiuUuid(),
+								contingutPare.getArxiuUuid(),
 								document.getNom(),
 								fitxer,
 								documentAmbFirma,
@@ -826,6 +829,31 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+
+	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid){
+
+		List<ContingutArxiu> continguts = arxiuExpedientConsultarPerUuid(expedientUuid).getContinguts();
+		int ocurrences = 0;
+		if(continguts != null) {
+			List<String> noms = new ArrayList<String>();
+			for(ContingutArxiu contingut : continguts) {
+				noms.add(contingut.getNom());
+			}
+			String newName = new String(nomPerComprovar);
+			
+			while(noms.indexOf(newName) >= 0) {
+				ocurrences ++;
+				newName = nomPerComprovar + " (" + ocurrences + ")";
+			}
+
+			return newName;
+		
+	}
+	return nomPerComprovar;
+}
+	
+
 	
 	/*public void arxiuFirmaActualitzar(
 			DocumentEntity document,
@@ -1130,9 +1158,13 @@ public class PluginHelper {
 				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 				firmes = Arrays.asList(firma);
 			}
+			
+			
+			
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
+							document.getPare().getArxiuUuid(),
 							document.getNom(),
 							fitxerAmbFirma,
 							true,
@@ -2721,31 +2753,22 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	
 
-	public void notificacioActualitzarEstat(
+	public void notificacioConsultarIActualitzarEstat(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+		
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		ExpedientEntity expedient = notificacio.getExpedient();
-		DocumentEntity document = notificacio.getDocument();
 		
 		String accioDescripcio = "Consulta d'estat d'una notificació electrònica";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
-		accioParams.put("expedientId", expedient.getId().toString());
-		accioParams.put("expedientTitol", expedient.getNom());
-		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
-		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-		accioParams.put("documentNom", document.getNom());
-		if (notificacio.getTipus() != null) {
-			accioParams.put("enviamentTipus", notificacio.getTipus().name());
-		}
-		accioParams.put("concepte", notificacio.getAssumpte());
-		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
-		
+		Map<String, String> accioParams = getAccioParams(documentEnviamentInteressatEntity);
 		long t0 = System.currentTimeMillis();
 		try {
+			
 			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(
 					documentEnviamentInteressatEntity.getEnviamentReferencia());
+			
 			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
 			if (resposta.getCertificacioData() != null) {
 				byte[] certificacio = resposta.getCertificacioContingut();
@@ -2760,13 +2783,17 @@ public class PluginHelper {
 							new ByteArrayInputStream(certificacio));
 				}
 			}
+			
 			notificacio.updateEnviamentEstat(
 					resposta.getEstat(),
 					resposta.getEstatData(),
 					resposta.getEstatOrigen(),
 					resposta.getCertificacioData(),
 					resposta.getCertificacioOrigen(),
-					gestioDocumentalId);
+					gestioDocumentalId,
+					resposta.isError(),
+					resposta.getErrorDescripcio());
+			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,
@@ -3135,7 +3162,8 @@ public class PluginHelper {
 	}
 
 	private Document toArxiuDocument(
-			String identificador,
+			String documentUuid,
+			String expedientUuid,
 			String nom,
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
@@ -3151,8 +3179,10 @@ public class PluginHelper {
 			boolean enPaper,
 			String serieDocumental) {
 		Document document = new Document();
-		document.setNom(nom);
-		document.setIdentificador(identificador);
+		
+		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
+		document.setNom(documentNomInArxiu);
+		document.setIdentificador(documentUuid);
 		DocumentMetadades metadades = new DocumentMetadades();
 		setMetadades(
 				ntiOrigen,
@@ -3819,6 +3849,28 @@ public class PluginHelper {
 		}
 		return accioParams;
 	}	
+	
+	private Map<String, String> getAccioParams(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+		
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		ExpedientEntity expedient = notificacio.getExpedient();
+		DocumentEntity document = notificacio.getDocument();
+		
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
+		accioParams.put("expedientId", expedient.getId().toString());
+		accioParams.put("expedientTitol", expedient.getNom());
+		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
+		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
+		accioParams.put("documentNom", document.getNom());
+		if (notificacio.getTipus() != null) {
+			accioParams.put("enviamentTipus", notificacio.getTipus().name());
+		}
+		accioParams.put("concepte", notificacio.getAssumpte());
+		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
+		return accioParams;
+	}
+	
 
 
 	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {		

@@ -259,6 +259,7 @@ public class ContingutHelper {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setEsborrat(contingut.getEsborrat());
+		resposta.setEsborratData(contingut.getEsborratData());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
 		if (!contingut.getFills().isEmpty()) {
@@ -946,16 +947,16 @@ public class ContingutHelper {
 					objectClass,
 					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
-		if (contingutPare != null) {
-			for (ContingutEntity fill: contingutPare.getFills()) {
-				if ((!fill.getId().equals(id) && fill.getNom().equals(nom))  ) {
-					throw new ValidationException(
-							id,
-							objectClass,
-							"Ja existeix un altre contingut amb el mateix nom");
-				}
-			}
-		}
+//		if (contingutPare != null) {
+//			for (ContingutEntity fill: contingutPare.getFills()) {
+//				if ((!fill.getId().equals(id) && fill.getNom().equals(nom))  ) {
+//					throw new ValidationException(
+//							id,
+//							objectClass,
+//							"Ja existeix un altre contingut amb el mateix nom");
+//				}
+//			}
+//		}
 	}
 	
 	

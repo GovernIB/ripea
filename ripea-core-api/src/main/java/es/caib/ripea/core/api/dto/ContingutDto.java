@@ -31,7 +31,16 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected String darrerMovimentComentari;
 	private boolean alerta;
 	private boolean hasFills;
+	protected Date esborratData;
 	
+	
+
+	public Date getEsborratData() {
+		return esborratData;
+	}
+	public void setEsborratData(Date esborratData) {
+		this.esborratData = esborratData;
+	}
 	public boolean isHasFills() {
 		return hasFills;
 	}

@@ -86,14 +86,24 @@
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
 			
+<%-- 			<c:choose> --%>
+<%-- 				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats || contingut.document && contingut.estat != 'REDACCIO'}"> --%>
+<%-- 					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li> --%>
+<%-- 				</c:when> --%>
+<%-- 				<c:otherwise> --%>
+
 			<c:choose>
-				<c:when test="${contingut.expedient && contingut.conteDocumentsFirmats || contingut.document && contingut.estat != 'REDACCIO'}">
-					<li class="disabled"><a><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+				<c:when test="${contingut.document && contingut.estat != 'REDACCIO'}">
+					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat"/> </c:set>
 				</c:when>
 				<c:otherwise>
-					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.node"/></c:set>
 				</c:otherwise>
-			</c:choose>			
+			</c:choose>
+
+			<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+<%-- 				</c:otherwise> --%>
+<%-- 			</c:choose>			 --%>
 			
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
@@ -153,7 +163,9 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 				<c:if test="${contingut.estat == 'CUSTODIAT'}">
-					<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
+						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+					</c:if>
 					<li><a href="<c:url value="/document/${contingut.id}/publicar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-clipboard"></span>&nbsp;<spring:message code="comu.boto.publicar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>

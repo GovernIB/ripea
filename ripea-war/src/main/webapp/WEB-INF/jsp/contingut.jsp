@@ -1000,6 +1000,7 @@ $(document).ready(function() {
 							style="width:100%">
 							<thead>
 								<tr>
+									<th data-col-name="error" data-visible="false"></th>
 									<th data-col-name="notificacio" data-visible="false"></th>
 									<th data-col-name="publicacio" data-visible="false"></th>
 									<th data-col-name="tipus" data-orderable="false" data-template="#cellEnviamentTipusTemplate" width="15%">
@@ -1043,6 +1044,7 @@ $(document).ready(function() {
 												{{else estat == 'REBUTJAT'}}
 													<span class="label label-default"><span class="fa fa-times"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
 												{{/if}}
+												{{if error}} <span class="fa fa-warning text-danger" title="<spring:message code="contingut.enviament.error"/>"></span> {{/if}}
 											{{else publicacio}}
 												{{if estat == 'PENDENT'}}
 													<span class="label label-warning"><span class="fa fa-clock-o"></span> {{:~eval('publicacioEstatText["' + estat + '"]')}}</span>

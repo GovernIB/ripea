@@ -130,8 +130,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public void updateEnviat(
 			Date enviatData,
 			boolean enviat,
-			String enviamentIdentificador,
-			String enviamentReferencia) {
+			String enviamentIdentificador) {
 		super.updateEnviat(enviatData);
 		this.enviamentIdentificador = enviamentIdentificador;
 		this.enviatData = enviatData;
@@ -139,6 +138,12 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			this.estat = DocumentEnviamentEstatEnumDto.PENDENT;
 		}
 	}
+	
+	
+	
+	
+	
+	
 
 	public void updateEnviamentEstat(
 			EnviamentEstat enviamentDatatEstat,
@@ -146,13 +151,17 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			String enviamentDatatOrigen,
 			Date enviamentCertificacioData,
 			String enviamentCertificacioOrigen,
-			String enviamentCertificacioArxiuId) {
+			String enviamentCertificacioArxiuId,
+			boolean error,
+			String errorDescripcio) {
 		this.enviamentDatatEstat = enviamentDatatEstat.name();
 		this.enviamentDatatData = enviamentDatatData;
 		this.enviamentDatatOrigen = enviamentDatatOrigen;
 		this.enviamentCertificacioData = enviamentCertificacioData;
 		this.enviamentCertificacioOrigen = enviamentCertificacioOrigen;
 		this.enviamentCertificacioArxiuId = enviamentCertificacioArxiuId;
+		this.error = error;
+		this.errorDescripcio = errorDescripcio;
 		switch (enviamentDatatEstat) {
 		case LLEGIDA:
 		case NOTIFICADA:
