@@ -199,33 +199,31 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			String referencia) throws SistemaExternException {
 		try {
 			es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament respostaConsultaEstat = getNotificacioService().consultaEstatEnviament(referencia);
-			if (respostaConsultaEstat.isError()) {
-				throw new SistemaExternException(respostaConsultaEstat.getErrorDescripcio());
-			} else {
-				RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
-				
-				resposta.setEstat(toEnviamentEstat(respostaConsultaEstat.getEstat()));
-				resposta.setEstatData(toDate(respostaConsultaEstat.getEstatData()));
-				resposta.setEstatDescripcio(respostaConsultaEstat.getEstatDescripcio());
-				resposta.setEstatOrigen(respostaConsultaEstat.getEstatOrigen());
-				resposta.setReceptorNif(respostaConsultaEstat.getReceptorNif());
-				resposta.setReceptorNom(respostaConsultaEstat.getReceptorNom());
-				if (respostaConsultaEstat.getCertificacio() != null) {
-					Certificacio certificacio = respostaConsultaEstat.getCertificacio();
-					resposta.setCertificacioData(toDate(certificacio.getData()));
-					resposta.setCertificacioOrigen(certificacio.getOrigen());
-					resposta.setCertificacioContingut(
-							Base64.decodeBase64(certificacio.getContingutBase64().getBytes()));
-					resposta.setCertificacioHash(certificacio.getHash());
-					resposta.setCertificacioMetadades(certificacio.getMetadades());
-					resposta.setCertificacioCsv(certificacio.getCsv());
-					resposta.setCertificacioTipusMime(certificacio.getTipusMime());
-				}
-				resposta.setError(respostaConsultaEstat.isError());
-				resposta.setErrorDescripcio(respostaConsultaEstat.getErrorDescripcio());
-				
-				return resposta;
+
+			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
+			
+			resposta.setEstat(toEnviamentEstat(respostaConsultaEstat.getEstat()));
+			resposta.setEstatData(toDate(respostaConsultaEstat.getEstatData()));
+			resposta.setEstatDescripcio(respostaConsultaEstat.getEstatDescripcio());
+			resposta.setEstatOrigen(respostaConsultaEstat.getEstatOrigen());
+			resposta.setReceptorNif(respostaConsultaEstat.getReceptorNif());
+			resposta.setReceptorNom(respostaConsultaEstat.getReceptorNom());
+			if (respostaConsultaEstat.getCertificacio() != null) {
+				Certificacio certificacio = respostaConsultaEstat.getCertificacio();
+				resposta.setCertificacioData(toDate(certificacio.getData()));
+				resposta.setCertificacioOrigen(certificacio.getOrigen());
+				resposta.setCertificacioContingut(
+						Base64.decodeBase64(certificacio.getContingutBase64().getBytes()));
+				resposta.setCertificacioHash(certificacio.getHash());
+				resposta.setCertificacioMetadades(certificacio.getMetadades());
+				resposta.setCertificacioCsv(certificacio.getCsv());
+				resposta.setCertificacioTipusMime(certificacio.getTipusMime());
 			}
+			resposta.setError(respostaConsultaEstat.isError());
+			resposta.setErrorDescripcio(respostaConsultaEstat.getErrorDescripcio());
+			
+				return resposta;
+			
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut consultar l'estat de l'enviament (" +

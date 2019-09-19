@@ -123,7 +123,7 @@ public class DocumentServiceImpl implements DocumentService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private ViaFirmaHelper viaFirmaHelper;
-	
+	@Autowired
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 
 	@Transactional
