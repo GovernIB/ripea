@@ -42,7 +42,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
-var columnaAgafatPer = 16;
+var columnaAgafatPer = 15;
 $(document).ready(function() {
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
@@ -76,14 +76,12 @@ $(document).ready(function() {
 			return false;
 		});
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
-
 		$("span[class^='stateColor-']").each(function( index ) {
 
 		    var fullClassNameString = this.className;
 		    var colorString = fullClassNameString.substring(11);
 		    $(this).parent().css( "background-color", colorString );	
 		});
-		
 	});
 	if (mostrarMeusExpedients) {
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
@@ -122,9 +120,6 @@ $(document).ready(function() {
 			});
 		}
 	});
-
-
-			
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -147,8 +142,6 @@ function getCookie(cname) {
     }
     return "";
 }
-
-
 </script>
 </head>
 <body>
@@ -187,8 +180,6 @@ function getCookie(cname) {
 				</div>
 				<rip:inputHidden name="meusExpedients"/>
 			</div>
-		
-			
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					
@@ -224,7 +215,7 @@ function getCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="13" 
+		data-default-order="12" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -261,6 +252,8 @@ function getCookie(cname) {
 						{{:nom}}
 					</script>
 				</th>
+				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
+				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -284,16 +277,14 @@ function getCookie(cname) {
 							<span class="stateColor-{{:expedientEstat.color}}"></span>
 						{{/if}}
 					</script>
-				</th>				
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
-				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%"><spring:message code="expedient.list.user.columna.createl"/></th>
-				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="5%">
+				</th>
+				<th data-col-name="agafatPer.nom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 					</script>
 				</th>					
-				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>

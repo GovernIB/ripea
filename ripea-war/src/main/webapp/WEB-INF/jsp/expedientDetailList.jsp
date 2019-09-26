@@ -32,21 +32,16 @@ table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
 table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
 	cursor: pointer;
 }
-
 .container{width: 98%}
-
 .buttons {
     position: absolute;
     top: 138px;
     right: 2%;
 }
-
 .buttons a {
 	float: right;
 	margin-left: 10px;
 }
-
-
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
@@ -83,23 +78,17 @@ $(document).ready(function() {
 			);
 			return false;
 		});
-
 		$("#taulaDades_wrapper .col-md-3").addClass('col-md-4');
 		$("#taulaDades_wrapper .col-md-3").removeClass('col-md-3');
 		$("#taulaDades_wrapper .col-md-9").addClass('col-md-8');
 		$("#taulaDades_wrapper .col-md-9").removeClass('col-md-9');
-
-
 		$( "tbody td:nth-child(2)" ).css({ 
 		    "max-width": "20px",
 		    "overflow": "hidden",
 		    "text-overflow": "ellipsis",
 		    "white-space": "nowrap"
 		})
-
-
 	});
-
 	$('#meusExpedientsBtn').click(function() {
 		mostrarMeusExpedients = !$(this).hasClass('active');
 		// Modifica el formulari
@@ -110,24 +99,14 @@ $(document).ready(function() {
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
 	})
-
-
-
 	$("#taulaDades").on("click", "tr", function(e){
-		
 		if (e.target.id!="dropdownButton" && e.target.id!="deleteFromDropdown" && e.target.id!="exportarFromDropdown" && $(e.target).attr('class')!="fa fa-cog" && $(e.target).attr('class')!="caret"){
 			var idRow = $(this).closest('tr').attr('id');
 			var id = idRow.substring(4); 
 			$("#frame").append("<div style='text-align: center; margin-bottom: 60px; margin-top: 60px;''><span class='fa fa-circle-o-notch fa-spin fa-3x'/></div>");
 			$("#frame").attr("src", "<c:url value="/nodeco/contingutDetail/"/>" + id);
 		}
-
 	});
-
-
-
-
-	
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -153,8 +132,6 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
-
-
 	<div class="buttons">
 		<div class="btn-group">
 			<a href="<c:url value="/expedient"/>" class="btn btn-default"><span class="fa fa-list-alt"></span></a>
@@ -213,8 +190,6 @@ function getCookie(cname) {
 			</c:if>
 		</div>
 	</script>
-	
-	
 	<div class="row">
 		<div class="col-md-4">
 			<table id="taulaDades" 
@@ -229,108 +204,94 @@ function getCookie(cname) {
 					style="width:100%">
 				<thead>
 					<tr>
-
-
-
-				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
-				<th data-col-name="agafat" data-visible="false"></th>
-				<th data-col-name="agafatPer.codi" data-visible="false"></th>
-				<th data-col-name="alerta" data-visible="false"></th>
-				<th data-col-name="valid" data-visible="false"></th>
-				<th data-col-name="metaNode.nom" width="15%" data-visible="false"><spring:message code="expedient.list.user.columna.tipus"/></th>
-				<th data-col-name="numero" width="30%"><spring:message code="expedient.list.user.columna.numero"/></th>
-				<th data-col-name="nom" data-template="#cellNomTemplate" width="70%">
-					<spring:message code="expedient.list.user.columna.titol"/>
-					<script id="cellNomTemplate" type="text/x-jsrender">
-						{{if !valid}}
-							{{if alerta}}
-								<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.dual"/>"></span>
-							{{else}}
-								<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient"/>"></span>
-							{{/if}}
-						{{else}}
-							{{if alerta}}
-								<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.segonpla"/>"></span>
-							{{/if}}
-						{{/if}}
-						{{:nom}}
-					</script>
-				</th>
-				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%" data-visible="false"><spring:message code="expedient.list.user.columna.createl"/></th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%" data-visible="false">
-					<spring:message code="expedient.list.user.columna.estat"/>
-					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'OBERT'}}
-							<span class="label label-default"><span class="fa fa-folder-open"></span> <spring:message code="expedient.estat.enum.OBERT"/></span>
-						{{else}}
-							<span class="label label-success"><span class="fa fa-folder"></span> <spring:message code="expedient.estat.enum.TANCAT"/></span>
-						{{/if}}
-						{{if ambRegistresSenseLlegir}}
-							<span class="fa-stack" aria-hidden="true">
-          						<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
-          						<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
-        					</span>
-						{{/if}}
-					</script>
-				</th>
-				<th data-col-name="agafatPer.nom" data-orderable="false" width="20%" data-visible="false"><spring:message code="expedient.list.user.columna.agafatper"/></th>
-				
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown" >
-							<button id="dropdownButton" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualWrite}}
-									<li><a href="expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
-								{{/if}}
-								{{if metaNode.usuariActualDelete}}
-									<li><a id="deleteFromDropdown" href="contingut/{{:id}}/delete?isExpedientDetail=true" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-								{{/if}}
-								<li role="separator" class="divider"></li>
-								{{if metaNode.usuariActualWrite}}
-									{{if !agafat}}
-										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+						<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
+						<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
+						<th data-col-name="agafat" data-visible="false"></th>
+						<th data-col-name="agafatPer.codi" data-visible="false"></th>
+						<th data-col-name="alerta" data-visible="false"></th>
+						<th data-col-name="valid" data-visible="false"></th>
+						<th data-col-name="metaNode.nom" width="15%" data-visible="false"><spring:message code="expedient.list.user.columna.tipus"/></th>
+						<th data-col-name="numero" width="30%"><spring:message code="expedient.list.user.columna.numero"/></th>
+						<th data-col-name="nom" data-template="#cellNomTemplate" width="70%">
+							<spring:message code="expedient.list.user.columna.titol"/>
+							<script id="cellNomTemplate" type="text/x-jsrender">
+								{{if !valid}}
+									{{if alerta}}
+										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.dual"/>"></span>
 									{{else}}
-										{{if agafatPer.codi != '${pageContext.request.userPrincipal.name}'}}
-											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
-										{{else}}
-											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
-										{{/if}}
+										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient"/>"></span>
 									{{/if}}
-									<li><a href="expedient/{{:id}}/relacionarList" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-									{{if estat == 'OBERT'}}
-										{{if valid && estat == 'OBERT'}}
-											<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
-										{{/if}}
-									{{else}}
-										<li><a href="expedient/{{:id}}/reobrir" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
+								{{else}}
+									{{if alerta}}
+										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.segonpla"/>"></span>
 									{{/if}}
 								{{/if}}
-								<li role="separator" class="divider"></li>
-								<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
-								<li><a id="exportarFromDropdown" href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>				
-						
-						
-		
+								{{:nom}}
+							</script>
+						</th>
+						<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" width="14%" data-visible="false"><spring:message code="expedient.list.user.columna.createl"/></th>
+						<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%" data-visible="false">
+							<spring:message code="expedient.list.user.columna.estat"/>
+							<script id="cellEstatTemplate" type="text/x-jsrender">
+								{{if estat == 'OBERT'}}
+									<span class="label label-default"><span class="fa fa-folder-open"></span> <spring:message code="expedient.estat.enum.OBERT"/></span>
+								{{else}}
+									<span class="label label-success"><span class="fa fa-folder"></span> <spring:message code="expedient.estat.enum.TANCAT"/></span>
+								{{/if}}
+								{{if ambRegistresSenseLlegir}}
+									<span class="fa-stack" aria-hidden="true">
+          								<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
+          								<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
+        							</span>
+								{{/if}}
+							</script>
+						</th>
+						<th data-col-name="agafatPer.nom" data-orderable="false" width="20%" data-visible="false"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+						<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+							<script id="cellAccionsTemplate" type="text/x-jsrender">
+								<div class="dropdown" >
+									<button id="dropdownButton" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
+									<ul class="dropdown-menu">
+										<li><a><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
+										{{if metaNode.usuariActualWrite}}
+											<li><a href="expedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+										{{/if}}
+										{{if metaNode.usuariActualDelete}}
+											<li><a id="deleteFromDropdown" href="contingut/{{:id}}/delete?isExpedientDetail=true" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+										{{/if}}
+										<li role="separator" class="divider"></li>
+										{{if metaNode.usuariActualWrite}}
+											{{if !agafat}}
+												<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+											{{else}}
+												{{if agafatPer.codi != '${pageContext.request.userPrincipal.name}'}}
+													<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+												{{else}}
+													<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
+												{{/if}}
+											{{/if}}
+											<li><a href="expedient/{{:id}}/relacionarList" data-toggle="modal"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+											{{if estat == 'OBERT'}}
+												{{if valid && estat == 'OBERT'}}
+													<li><a href="expedient/{{:id}}/tancar" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+												{{/if}}
+											{{else}}
+												<li><a href="expedient/{{:id}}/reobrir" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
+											{{/if}}
+										{{/if}}
+										<li role="separator" class="divider"></li>
+										<li><a href="contingut/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
+										<li><a id="exportarFromDropdown" href="contingut/{{:id}}/exportar"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+									</ul>
+								</div>
+							</script>
+						</th>
 					</tr>
 				</thead>
 			</table>
 		</div>				
 		<div class="col-md-8">
-		
 		     <iframe id="frame" src="" width="100%" height="600px" style="border: none;" ></iframe>
-
-		
-		
-		
 		</div>
-			
-			
 	</div>			
 </body>

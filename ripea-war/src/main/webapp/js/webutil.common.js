@@ -467,6 +467,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			weekStart: 1,
 			autoclose: true,
 			orientation: 'bottom',
+			todayHighlight: true,
 			language: $(this).data('idioma')
 		}).on('show', function() {
 			webutilModalAdjustHeight();
