@@ -199,11 +199,11 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			if (flux.size() > 0) {
 				numNifs = flux.get(0).getDestinataris().length;
 			}
-			String[][] nifs = new String[numNifs][flux.size()];
+			String[][] nifs = new String[flux.size()][numNifs];
 			for (int i = 0; i < flux.size(); i++) {
 				PortafirmesFluxBloc fluxBloc = flux.get(i);
 				for (int j = 0; j < fluxBloc.getDestinataris().length; j++) {
-					nifs[j][i] = fluxBloc.getDestinataris()[j];
+					nifs[i][j] = fluxBloc.getDestinataris()[j];
 				}
 			}
 			fluxWs = PeticioDeFirmaUtils.constructFluxDeFirmesWsUsingBlocDeFirmes(
