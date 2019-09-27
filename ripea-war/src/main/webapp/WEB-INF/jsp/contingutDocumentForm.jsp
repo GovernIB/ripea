@@ -38,18 +38,8 @@ $(document).ready(function() {
 	}
 	$('#documentTipus').val('DIGITAL');
 	$('#metaNodeId').on('change', function() {
-		if($('#id').val() == '') { // if creating new document
-			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
-			.done(function(data) {			
-				$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-				$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-				$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-				$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
-				$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
-				$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
-			})
-		} else { // if modifying existing document 
-			if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
+		if ($(this).val()) {
+			if ($('#id').val() == '') { // if creating new document
 				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
@@ -59,10 +49,19 @@ $(document).ready(function() {
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
+			} else { // if modifying existing document 
+				if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
+					$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+					.done(function(data) {			
+						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
+						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					})
+				}
 			}
-		}
-		
-		if ($(this).val()) {
 			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
 			.done(function(data) {
 				if (data.plantillaNom) {
@@ -80,8 +79,6 @@ $(document).ready(function() {
 			$('#info-plantilla-si').addClass('hidden');
 		}
 	});
-	
-
 	$('input[type=radio][name=origen]').on('change', function() {
 		if ($(this).val() == 'DISC') {
 			$('#input-origen-arxiu').removeClass('hidden');
@@ -111,7 +108,6 @@ $(document).ready(function() {
 		}
 		webutilModalAdjustHeight();
 	});
-	
 	$(document).on('submit','form#documentCommand', function() {
 		var action = $(this).attr('action');
 		var lastSlashIndex = action.lastIndexOf('/');
@@ -144,7 +140,6 @@ $(document).ready(function() {
 			document.querySelector('#arxiu').value = '';
 		}
 	}
-
 });
 </script>
 </head>

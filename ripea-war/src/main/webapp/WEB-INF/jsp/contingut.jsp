@@ -69,7 +69,6 @@
 	    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	</c:if>
 <style>
-
 span {
 	display: inline-block;
 }
@@ -87,12 +86,10 @@ span a {
 .tab-content {
 	margin-top: .8em;
 }
-
 #contenidor-contingut {
 	margin-left: 0;
 	margin-right: -11px;
 }
-
 #contenidor-contingut li.element-contingut {
 	margin: 0 0 0px 0;
 	padding: 0 10px 0 0;
@@ -104,138 +101,108 @@ span a {
 	*display: inline;
 	_height: 140px;
 }
-
 #contenidor-contingut .thumbnail {
 	margin-bottom: 0 !important;
 	border: 2px solid #f9f9f9;
 }
-
 #contenidor-contingut .thumbnail:hover {
 	border: 2px solid #ddd;
 	background-color: #f5f5f5;
 	cursor: pointer;
 }
-
-
-
 #contenidor-contingut .thumbnail h4 {
 	margin-top: 4px;
 }
-
 #contenidor-contingut .thumbnail a {
 	text-decoration: none;
 }
-
 #contenidor-contingut .caption p {
 	
 }
-
 #contenidor-contingut .caption .dropdown-menu {
 	text-align: left;
 }
-
 #contenidor-contingut .caption .dropdown-menu li {
 	width: 100%;
 	margin: 0;
 	padding: 0;
 }
-
 #contenidor-info h3 {
 	font-weight: bold;
 	margin-top: 0;
 	border-bottom: 1px solid #e3e3e3;
 	padding-bottom: .6em;
 }
-
 #contenidor-info h4 {
 	font-weight: bold;
 	margin-top: 0;
 	border-bottom: 1px solid #f5f5f5;
 	padding-bottom: .6em;
 }
-
 #contenidor-info dt {
 	color: #999;
 	font-size: small;
 	font-style: italic;
 	font-weight: normal;
 }
-
 #contenidor-info #botons-accions-info button{
     padding: 1px 6px;
 	margin-bottom: 4px;    
 }
-
 #contenidor-info dd {
 	font-size: medium;
 	font-weight: bold;
 	margin-bottom: 0.4em;
 }
-
 #contingut-botons {
 	margin-bottom: .8em;
 }
-
 h4.interessats {
 	padding-bottom: 0 !important;
 	margin-bottom: 4px !important;
 }
-
 ul.interessats {
 	padding-left: 1em !important;
 }
-
 .element-hover .thumbnail {
 	border: 2px solid #ddd !important;
 	background-color: #f5f5f5;
 }
-
 .right {
 	float: right;
 }
-
 #nodeDades .form-group {
 	margin-bottom: 6px;
 }
-
 #nodeDades input.form-control {
 	width: 322px;
 }
-
 #nodeDades input.multiple {
 	width: 280px;
 	!
 	important
 }
-
 #colInfo {
 	padding-left: 0;
 }
-
 #colInfo #botons-accions-info {
 	float: right;
 }
-
 #colContent {
 	padding-right: 0;
 }
-
 #alerta-no-agafat {
 	margin-bottom: 15px;
 }
-
 #contenidor-info {
 	margin-bottom: 0;
 }
-
 #contenidor-info h3 {
 	padding-bottom: 6px;
 }
-
 .drag_activated {
 	border: 4px dashed #ffd351;
 }
-
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
@@ -392,7 +359,7 @@ $(document).ready(function() {
 	$('#taulaAnotacions').on('draw.dt', function (e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		$('#anotacions-count').html(api.page.info().recordsTotal);
-	});	
+	});
 	$('.element-draggable').draggable({
 		containment: 'parent',
 		helper: 'clone',
@@ -491,7 +458,7 @@ $(document).ready(function() {
 		maxfiles: 1,
 		error: function(err, file) {
 			console.log('>>> filedrop error', err, file)
-			alert('Filedrop error: ' + err);
+			//alert('Filedrop error: ' + err);
 		},
 		dragOver: function() {
 			$('#contingut').addClass('drag_activated');
