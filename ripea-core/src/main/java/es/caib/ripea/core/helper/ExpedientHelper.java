@@ -348,6 +348,10 @@ public class ExpedientHelper {
 					fitxer.getContingut());
 			
 		}
+		
+		docEntity.updateEstat(
+				DocumentEstatEnumDto.CUSTODIAT);
+		
 		contingutLogHelper.logCreacio(
 				docEntity,
 				true,
