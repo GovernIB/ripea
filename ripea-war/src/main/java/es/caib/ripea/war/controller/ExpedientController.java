@@ -40,12 +40,10 @@ import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
@@ -84,8 +82,6 @@ public class ExpedientController extends BaseUserController {
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private ExpedientPeticioService expedientPeticioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -339,16 +335,11 @@ public class ExpedientController extends BaseUserController {
 					command.getNom(),
 					null,
 					false);
-			
-		String result = getModalControllerReturnValueSuccess(
-				request,
-				"/contingut/"+expedientDto.getId(),
-				"expedient.controller.creat.ok",
-				null,
-				true);
-			
-		return result;
-		
+			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../expedient",
+					"expedient.controller.creat.ok");
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			model.addAttribute(
