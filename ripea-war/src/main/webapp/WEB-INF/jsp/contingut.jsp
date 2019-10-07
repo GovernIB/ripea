@@ -456,6 +456,7 @@ $(document).ready(function() {
 	}
 	$('#contingut').filedrop({
 		maxfiles: 1,
+		fallback_dropzoneClick : false,
 		error: function(err, file) {
 			switch(err) {
 			case 'BrowserNotSupported':

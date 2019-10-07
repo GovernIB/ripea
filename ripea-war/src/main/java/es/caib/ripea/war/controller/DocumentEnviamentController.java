@@ -57,13 +57,15 @@ public class DocumentEnviamentController extends BaseUserController {
 	@Autowired
 	private Validator validator;
 
-
-
 	@RequestMapping(value = "/{documentId}/notificar", method = RequestMethod.GET)
 	public String notificarGet(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) {
+		emplenarModelNotificacio(
+				request,
+				documentId,
+				model);
 		DocumentNotificacioCommand command = new DocumentNotificacioCommand();
 		command.setDocumentId(documentId);
 		model.addAttribute(
@@ -71,7 +73,6 @@ public class DocumentEnviamentController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						ServeiTipusEnumDto.class,
 						"notificacio.servei.tipus.enum."));
-		
 		model.addAttribute(command);
 		return "notificacioForm";
 	}
@@ -356,7 +357,8 @@ public class DocumentEnviamentController extends BaseUserController {
 				"notificacioTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						DocumentNotificacioTipusEnumDto.class,
-						"notificacio.tipus.enum."));
+						"notificacio.tipus.enum.",
+						new Enum<?>[] {DocumentNotificacioTipusEnumDto.MANUAL}));
 		model.addAttribute(
 				"notificacioEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(
