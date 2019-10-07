@@ -66,16 +66,16 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		metaExpedientCreate.setSerieDocumental("1234");
 		metaExpedientCreate.setClassificacioSia("1234");
 		metaExpedientCreate.setNotificacioActiva(false);
-		metaExpedientCreate.setNotificacioSeuProcedimentCodi("1234");
-		metaExpedientCreate.setNotificacioSeuRegistreLlibre("1234");
-		metaExpedientCreate.setNotificacioSeuRegistreOficina("1234");
-		metaExpedientCreate.setNotificacioSeuRegistreOrgan("1234");
-		metaExpedientCreate.setNotificacioSeuExpedientUnitatOrganitzativa("1234");
-		metaExpedientCreate.setNotificacioAvisTitol("1234");
-		metaExpedientCreate.setNotificacioAvisText("1234");
-		metaExpedientCreate.setNotificacioAvisTextMobil("1234");
-		metaExpedientCreate.setNotificacioOficiTitol("1234");
-		metaExpedientCreate.setNotificacioOficiText("1234");
+//		metaExpedientCreate.setNotificacioSeuProcedimentCodi("1234");
+//		metaExpedientCreate.setNotificacioSeuRegistreLlibre("1234");
+//		metaExpedientCreate.setNotificacioSeuRegistreOficina("1234");
+//		metaExpedientCreate.setNotificacioSeuRegistreOrgan("1234");
+//		metaExpedientCreate.setNotificacioSeuExpedientUnitatOrganitzativa("1234");
+//		metaExpedientCreate.setNotificacioAvisTitol("1234");
+//		metaExpedientCreate.setNotificacioAvisText("1234");
+//		metaExpedientCreate.setNotificacioAvisTextMobil("1234");
+//		metaExpedientCreate.setNotificacioOficiTitol("1234");
+//		metaExpedientCreate.setNotificacioOficiText("1234");
 		metaExpedientCreate.setPareId(null);
 		metaExpedientUpdate = new MetaExpedientDto();
 		metaExpedientUpdate.setCodi("TEST2");
@@ -84,16 +84,16 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		metaExpedientUpdate.setSerieDocumental("12341");
 		metaExpedientUpdate.setClassificacioSia("12342");
 		metaExpedientUpdate.setNotificacioActiva(true);
-		metaExpedientUpdate.setNotificacioSeuProcedimentCodi("1234");
-		metaExpedientUpdate.setNotificacioSeuRegistreLlibre("1234");
-		metaExpedientUpdate.setNotificacioSeuRegistreOficina("1234");
-		metaExpedientUpdate.setNotificacioSeuRegistreOrgan("1234");
-		metaExpedientUpdate.setNotificacioSeuExpedientUnitatOrganitzativa("1234");
-		metaExpedientUpdate.setNotificacioAvisTitol("12346");
-		metaExpedientUpdate.setNotificacioAvisText("12347");
-		metaExpedientUpdate.setNotificacioAvisTextMobil("12348");
-		metaExpedientUpdate.setNotificacioOficiTitol("12349");
-		metaExpedientUpdate.setNotificacioOficiText("12340");
+//		metaExpedientUpdate.setNotificacioSeuProcedimentCodi("1234");
+//		metaExpedientUpdate.setNotificacioSeuRegistreLlibre("1234");
+//		metaExpedientUpdate.setNotificacioSeuRegistreOficina("1234");
+//		metaExpedientUpdate.setNotificacioSeuRegistreOrgan("1234");
+//		metaExpedientUpdate.setNotificacioSeuExpedientUnitatOrganitzativa("1234");
+//		metaExpedientUpdate.setNotificacioAvisTitol("12346");
+//		metaExpedientUpdate.setNotificacioAvisText("12347");
+//		metaExpedientUpdate.setNotificacioAvisTextMobil("12348");
+//		metaExpedientUpdate.setNotificacioOficiTitol("12349");
+//		metaExpedientUpdate.setNotificacioOficiText("12340");
 		metaExpedientUpdate.setPareId(null);
 		permisUserRead = new PermisDto();
 		permisUserRead.setRead(true);
@@ -252,36 +252,36 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		assertEquals(
 				original.isNotificacioActiva(),
 				perComprovar.isNotificacioActiva());
-		assertEquals(
-				original.getNotificacioSeuProcedimentCodi(),
-				perComprovar.getNotificacioSeuProcedimentCodi());
-		assertEquals(
-				original.getNotificacioSeuRegistreLlibre(),
-				perComprovar.getNotificacioSeuRegistreLlibre());
-		assertEquals(
-				original.getNotificacioSeuRegistreOficina(),
-				perComprovar.getNotificacioSeuRegistreOficina());
-		assertEquals(
-				original.getNotificacioSeuRegistreOrgan(),
-				perComprovar.getNotificacioSeuRegistreOrgan());
-		assertEquals(
-				original.getNotificacioSeuExpedientUnitatOrganitzativa(),
-				perComprovar.getNotificacioSeuExpedientUnitatOrganitzativa());
-		assertEquals(
-				original.getNotificacioAvisTitol(),
-				perComprovar.getNotificacioAvisTitol());
-		assertEquals(
-				original.getNotificacioAvisText(),
-				perComprovar.getNotificacioAvisText());
-		assertEquals(
-				original.getNotificacioAvisTextMobil(),
-				perComprovar.getNotificacioAvisTextMobil());
-		assertEquals(
-				original.getNotificacioOficiTitol(),
-				perComprovar.getNotificacioOficiTitol());
-		assertEquals(
-				original.getNotificacioOficiText(),
-				perComprovar.getNotificacioOficiText());
+//		assertEquals(
+//				original.getNotificacioSeuProcedimentCodi(),
+//				perComprovar.getNotificacioSeuProcedimentCodi());
+//		assertEquals(
+//				original.getNotificacioSeuRegistreLlibre(),
+//				perComprovar.getNotificacioSeuRegistreLlibre());
+//		assertEquals(
+//				original.getNotificacioSeuRegistreOficina(),
+//				perComprovar.getNotificacioSeuRegistreOficina());
+//		assertEquals(
+//				original.getNotificacioSeuRegistreOrgan(),
+//				perComprovar.getNotificacioSeuRegistreOrgan());
+//		assertEquals(
+//				original.getNotificacioSeuExpedientUnitatOrganitzativa(),
+//				perComprovar.getNotificacioSeuExpedientUnitatOrganitzativa());
+//		assertEquals(
+//				original.getNotificacioAvisTitol(),
+//				perComprovar.getNotificacioAvisTitol());
+//		assertEquals(
+//				original.getNotificacioAvisText(),
+//				perComprovar.getNotificacioAvisText());
+//		assertEquals(
+//				original.getNotificacioAvisTextMobil(),
+//				perComprovar.getNotificacioAvisTextMobil());
+//		assertEquals(
+//				original.getNotificacioOficiTitol(),
+//				perComprovar.getNotificacioOficiTitol());
+//		assertEquals(
+//				original.getNotificacioOficiText(),
+//				perComprovar.getNotificacioOficiText());
 		assertEquals(
 				original.getPareId(),
 				perComprovar.getPareId());

@@ -111,7 +111,7 @@ public class ExpedientServiceTest extends BaseServiceTest {
 		metaExpedient.setSerieDocumental("1234");
 		metaExpedient.setClassificacioSia("1234");
 		metaExpedient.setNotificacioActiva(false);
-		metaExpedient.setNotificacioSeuProcedimentCodi("1234");
+		/*metaExpedient.setNotificacioSeuProcedimentCodi("1234");
 		metaExpedient.setNotificacioSeuRegistreLlibre("1234");
 		metaExpedient.setNotificacioSeuRegistreOficina("1234");
 		metaExpedient.setNotificacioSeuRegistreOrgan("1234");
@@ -120,7 +120,7 @@ public class ExpedientServiceTest extends BaseServiceTest {
 		metaExpedient.setNotificacioAvisText("1234");
 		metaExpedient.setNotificacioAvisTextMobil("1234");
 		metaExpedient.setNotificacioOficiTitol("1234");
-		metaExpedient.setNotificacioOficiText("1234");
+		metaExpedient.setNotificacioOficiText("1234");*/
 		metaExpedient.setPareId(null);
 		List<PermisDto> permisosExpedient = new ArrayList<PermisDto>();
 		PermisDto permisUser = new PermisDto();
@@ -389,8 +389,8 @@ public class ExpedientServiceTest extends BaseServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("user");
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(3);
+//						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(3);
 //						ExpedientDto creat = expedientService.create(
 //								entitatCreada.getId(),
 //								metaExpedientCreat.getId(),

@@ -111,7 +111,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private AlertaRepository alertaRepository;
 	@Autowired
-	PaginacioHelper paginacioHelper;
+	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
