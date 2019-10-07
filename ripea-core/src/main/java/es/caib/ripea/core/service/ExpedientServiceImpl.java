@@ -154,14 +154,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"sequencia=" + sequencia + ", " +
 				"nom=" + nom + ", " +
 				"expedientPeticioId=" + expedientPeticioId +")");
-		ExpedientDto expedientDto = new ExpedientDto();
 		// if expedient comes from distribucio
 		ExpedientPeticioEntity expedientPeticioEntity = null;
 		if (expedientPeticioId != null) {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		}
 		// create expedient in db and in arxiu
-		expedientDto = expedientHelper.create(
+		ExpedientDto expedientDto = expedientHelper.create(
 				entitatId,
 				metaExpedientId,
 				pareId,
@@ -190,7 +189,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
 		}
-		
 		expedientDto.setProcessatOk(processatOk);
 		return expedientDto;
 	}

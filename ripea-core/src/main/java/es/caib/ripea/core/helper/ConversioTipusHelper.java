@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
@@ -24,8 +23,6 @@ import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;

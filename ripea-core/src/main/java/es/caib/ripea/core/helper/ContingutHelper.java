@@ -85,9 +85,9 @@ public class ContingutHelper {
 	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
-	ExpedientComentariRepository expedientComentariRepository;
+	private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
-	ExpedientEstatRepository expedientEstatRepository;
+	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
@@ -958,11 +958,6 @@ public class ContingutHelper {
 //			}
 //		}
 	}
-	
-	
-
-	
-	
 
 	public void arxiuPropagarModificacio(
 			ContingutEntity contingut,

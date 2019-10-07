@@ -4266,14 +4266,6 @@ public class PluginHelper {
 				"es.caib.ripea.notificacio.caducitat.num.dies");
 		return (valor != null) ? new Integer(valor) : 15;
 	}
-	private boolean getPropertyNotificacioEnviamentPostalActiu() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.notificacio.enviament.postal.actiu");
-	}
-	private boolean getPropertyNotificacioEnviamentDehActiva() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.notificacio.enviament.deh.activa");
-	}
 	private String getPropertyNotificacioForsarEntitat() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.notificacio.forsar.entitat");
