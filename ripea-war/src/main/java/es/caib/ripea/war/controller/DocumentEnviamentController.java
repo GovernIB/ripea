@@ -28,7 +28,6 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
@@ -65,15 +64,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) {
-		ExpedientDto expedient = emplenarModelNotificacio(
-				request,
-				documentId,
-				model);
 		DocumentNotificacioCommand command = new DocumentNotificacioCommand();
-		MetaExpedientDto metaExpedient = expedient.getMetaExpedient();
 		command.setDocumentId(documentId);
-		
-		
 		model.addAttribute(
 				"serveiTipusEstats",
 				EnumHelper.getOptionsForEnum(

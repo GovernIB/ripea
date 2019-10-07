@@ -218,22 +218,21 @@
 					if (this.contentDocument) {
 						pathname = this.contentDocument.location.pathname;
 					}
-					
 					if (pathname && pathname.startsWith(webutilModalTancarPath())) {
-						$('button.close', $(this).closest('.modal-dialog')).trigger('click');
-						if (settings.refreshMissatges && !settings.refreshPagina) {
-							webutilRefreshMissatges();
-						}
-						if (settings.refreshDatatable) {
-							$('#' + settings.dataTableId).webutilDatatable('refresh');
-						}
-						if (settings.refreshPagina) {
-							window.location.reload(true);
-						}
-						//if you want to besides closing dialog, redirect to another page, you need to add redirection path string after webutilModalTancarPath() string
-						var redirectionPath = pathname.replace(webutilModalTancarPath(), "");
-						if(redirectionPath){
-							window.location.href = window.location.origin + webutilContextPath() + redirectionPath;
+						let redirectUrlAfterClosingModal = new URL(this.contentDocument.location.href).searchParams.get('redirectUrlAfterClosingModal');
+						if (redirectUrlAfterClosingModal) {
+							window.location.href = redirectUrlAfterClosingModal;
+						} else {
+							$('button.close', $(this).closest('.modal-dialog')).trigger('click');
+							if (settings.refreshMissatges && !settings.refreshPagina) {
+								webutilRefreshMissatges();
+							}
+							if (settings.refreshDatatable) {
+								$('#' + settings.dataTableId).webutilDatatable('refresh');
+							}
+							if (settings.refreshPagina) {
+								window.location.reload(true);
+							}
 						}
 					}
 				});

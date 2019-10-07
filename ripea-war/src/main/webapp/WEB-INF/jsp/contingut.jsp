@@ -457,8 +457,21 @@ $(document).ready(function() {
 	$('#contingut').filedrop({
 		maxfiles: 1,
 		error: function(err, file) {
-			console.log('>>> filedrop error', err, file)
-			//alert('Filedrop error: ' + err);
+			switch(err) {
+			case 'BrowserNotSupported':
+				alert('browser does not support HTML5 drag and drop')
+				break;
+			case 'TooManyFiles':
+				break;
+			case 'FileTooLarge':
+				break;
+			case 'FileTypeNotAllowed':
+				break;
+			case 'FileExtensionNotAllowed':
+				break;
+			default:
+				break;
+			}
 		},
 		dragOver: function() {
 			$('#contingut').addClass('drag_activated');

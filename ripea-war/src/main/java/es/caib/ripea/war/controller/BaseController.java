@@ -121,15 +121,13 @@ public class BaseController implements MessageSourceAware {
 				request,
 				url,
 				messageKey,
-				null,
-				false);
+				null);
 	}
 	protected String getModalControllerReturnValueSuccess(
 			HttpServletRequest request,
 			String url,
 			String messageKey,
-			Object[] messageArgs,
-			boolean redirectFromModal) {
+			Object[] messageArgs) {
 		if (messageKey != null) {
 			MissatgesHelper.success(
 					request, 
@@ -139,8 +137,8 @@ public class BaseController implements MessageSourceAware {
 							messageArgs));
 		}
 		if (ModalHelper.isModal(request)) {
-			String redirectionPath = redirectFromModal ? url : "";
-			return modalUrlTancar() + redirectionPath;
+			//String redirectionPath = redirectFromModal ? url : "";
+			return modalUrlTancar();
 		} else {
 			return url;
 		}

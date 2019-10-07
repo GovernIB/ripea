@@ -23,6 +23,7 @@ import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentCommand.UpdateFirmaSeparada;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.ArxiuNoBuit;
 import es.caib.ripea.war.validation.DocumentDigitalExistent;
 import es.caib.ripea.war.validation.NomDocumentNoRepetit;
 import es.caib.ripea.war.validation.ValidIfSeparada;
@@ -46,6 +47,7 @@ public class DocumentCommand extends ContenidorCommand {
 	private Long metaNodeId;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date data;
+	@ArxiuNoBuit(groups = {CreateDigital.class, CreateFirmaSeparada.class})
 	private MultipartFile arxiu;
 	private DocumentFisicOrigenEnum origen;
 	private boolean ambFirma;
