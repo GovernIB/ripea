@@ -513,7 +513,7 @@ CREATE TABLE IPA_REGISTRE (
   APLICACIO_VERSIO 			character varying (15), 
   ASSUMPTE_CODI_CODI 		character varying (16), 
   ASSUMPTE_CODI_DESC 		character varying (100), 
-  ASSUMPTE_TIPUS_CODI		character varying (16) 	NOT NULL, 
+  ASSUMPTE_TIPUS_CODI		character varying (16), 
   ASSUMPTE_TIPUS_DESC 		character varying (100), 
   DATA 						timestamp without time zone 	NOT NULL, 
   DOC_FISICA_CODI 			character varying (1), 

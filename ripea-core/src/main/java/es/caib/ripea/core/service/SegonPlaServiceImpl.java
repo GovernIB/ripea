@@ -94,12 +94,21 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							"");
 					
 
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					logger.error(
 							"Error consultar i guardar anotació per petició: " +
-									expedientPeticioEntity.getIdentificador());
+									expedientPeticioEntity.getIdentificador() + 
+									" RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
 					try {
-						
+						boolean isRollbackException = true;
+						while (isRollbackException) {
+							if (e.getClass().toString().contains("RollbackException")) {
+								e = e.getCause();
+							} else {
+								isRollbackException = false;
+							}
+						}
+
 						// add error to peticio, so it will not be processed anymore until it will be resent from DISTRIBUCIO 
 						expedientPeticioHelper.addExpedientPeticioConsultaError(
 								expedientPeticioEntity.getId(),
