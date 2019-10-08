@@ -41,7 +41,7 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	private String assumpteCodiCodi;
 	@Column(name = "assumpte_codi_desc", length = 100)
 	private String assumpteCodiDescripcio;
-	@Column(name = "assumpte_tipus_codi", length = 16, nullable = false)
+	@Column(name = "assumpte_tipus_codi", length = 16)
 	private String assumpteTipusCodi;
 	@Column(name = "assumpte_tipus_desc", length = 100)
 	private String assumpteTipusDescripcio;
