@@ -10,6 +10,7 @@ import java.util.Set;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
@@ -17,13 +18,18 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
@@ -44,6 +50,9 @@ public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
 
+	@Autowired
+	private ContingutHelper contingutHelper;
+	
 	public ConversioTipusHelper() {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory.getConverterFactory().registerConverter(
@@ -52,28 +61,6 @@ public class ConversioTipusHelper {
 						return source.toDate();
 					}
 				});
-		/*mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<ArxiuEntity, ArxiuDto>() {
-					public ArxiuDto convert(ArxiuEntity source, Type<? extends ArxiuDto> destinationClass) {
-						ArxiuDto target = new ArxiuDto();
-						target.setId(source.getId());
-						target.setNom(source.getNom());
-						target.setUnitatCodi(source.getUnitatCodi());
-						target.setActiu(source.isActiu());
-						return target;
-					}
-				});
-		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<ArxiuEntity, ArxiuDto>() {
-					public ArxiuDto convert(ArxiuEntity source, Type<? extends ArxiuDto> destinationClass) {
-						ArxiuDto target = new ArxiuDto();
-						target.setId(source.getId());
-						target.setNom(source.getNom());
-						target.setUnitatCodi(source.getUnitatCodi());
-						target.setActiu(source.isActiu());
-						return target;
-					}
-				});*/
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaContingutEntity, ExecucioMassivaContingutDto>() {
 					public ExecucioMassivaContingutDto convert(ExecucioMassivaContingutEntity source, Type<? extends ExecucioMassivaContingutDto> destinationClass) {
@@ -98,6 +85,22 @@ public class ConversioTipusHelper {
 						target.setError(source.getError());
 						target.setLlegida(source.getLlegida().booleanValue());
 						target.setContingutId(source.getContingut().getId());
+						return target;
+					}
+				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientTascaEntity, ExpedientTascaDto>() {
+					public ExpedientTascaDto convert(ExpedientTascaEntity source, Type<? extends ExpedientTascaDto> destinationClass) {
+						ExpedientTascaDto target = new ExpedientTascaDto();
+						target.setId(source.getId());
+						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient()));
+						target.setMetaExpedientTasca(convertir(source.getMetaExpedientTasca(), MetaExpedientTascaDto.class));
+						target.setResponsable(convertir(source.getResponsable(), UsuariDto.class));
+						target.setDataInici(source.getDataInici());
+						target.setDataFi(source.getDataFi());
+						target.setEstat(source.getEstat());
+						target.setMotiuRebuig(source.getMotiuRebuig());
 						return target;
 					}
 				});

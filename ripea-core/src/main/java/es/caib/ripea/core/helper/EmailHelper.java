@@ -14,11 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -26,8 +29,11 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -50,6 +56,10 @@ public class EmailHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private JavaMailSender mailSender;
+	@Autowired
+	private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired
+	private UsuariRepository usuariRepository;
 
 	public void contingutAgafatSensePermis(
 			ContingutEntity contingut,
@@ -105,7 +115,7 @@ public class EmailHelper {
 			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
 		DocumentEntity document = documentPortafirmes.getDocument();
 		ExpedientEntity expedient = document.getExpedient();
-		Set<DadesUsuari> responsables = getResponsables(expedient);
+		Set<DadesUsuari> responsables = getGestors(expedient);
 		List<String> destinataris = new ArrayList<String>();
 		for (DadesUsuari responsable: responsables) {
 			destinataris.add(responsable.getEmail());
@@ -134,7 +144,7 @@ public class EmailHelper {
 			"documentNotificacioId=" + documentNotificacio.getId() + ")");
 		DocumentEntity document = documentNotificacio.getDocument();
 		ExpedientEntity expedient = document.getExpedient();
-		Set<DadesUsuari> responsables = getResponsables(expedient);
+		Set<DadesUsuari> responsables = getGestors(expedient);
 		List<String> destinataris = new ArrayList<String>();
 		for (DadesUsuari responsable: responsables) {
 			destinataris.add(responsable.getEmail());
@@ -156,6 +166,58 @@ public class EmailHelper {
 				"Estat actual:" + estat + "\n");
 		mailSender.send(missatge);
 	}
+	
+	
+	
+	public void enviarEmailCanviarEstatTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			TascaEstatEnumDto estatAnterior) {
+		logger.debug("Enviant correu electrònic per a canvis de tasca (" +
+			"tascaId=" + expedientTascaEntity.getId() + ")");
+
+		Set<DadesUsuari> responsables = getGestors(expedientTascaEntity.getExpedient());
+		List<String> destinataris = new ArrayList<String>();
+		for (DadesUsuari responsable: responsables) {
+			destinataris.add(responsable.getEmail());
+		}
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuariAuthenticated = usuariRepository.findByCodi(auth.getName());
+		
+		destinataris.add(usuariAuthenticated.getEmail());
+		
+		
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setFrom(getRemitent());
+		missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
+		
+		String estat = expedientTascaEntity.getEstat().toString();
+		if (estatAnterior == null) {
+			missatge.setSubject(PREFIX_RIPEA + " Nova tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom());
+			missatge.setText(					
+					"S'ha creat una nova tasca a RIPEA:\n" +
+					"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
+					"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
+					"\tEstat: " + expedientTascaEntity.getEstat() + "\n" +
+					"Pot accedir a la tasca utilizant el següent enllaç: " + PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n");
+		} else {
+			String enllacTramitar = "";
+			if (expedientTascaEntity.getEstat() == TascaEstatEnumDto.INICIADA || expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT) {
+				enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n";
+			}
+			missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom());
+			missatge.setText(					
+					"S'ha modificat l'estat de la tasca a RIPEA:\n" +
+							"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
+							"\tEstat anterior:" + estatAnterior + "\n" +
+							"\tEstat actual:" + estat + "\n" + 
+							enllacTramitar);
+		
+		
+		}
+		
+		mailSender.send(missatge);
+	}
 
 	private boolean emplenarDestinatariAmbUsuari(
 			MailMessage mailMessage,
@@ -173,7 +235,7 @@ public class EmailHelper {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.email.remitent");
 	}
 
-	public Set<DadesUsuari> getResponsables(ExpedientEntity expedient) {
+	public Set<DadesUsuari> getGestors(ExpedientEntity expedient) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
 		List<PermisDto> permisos = permisosHelper.findPermisos(
 				expedient.getMetaNode().getId(),

@@ -10,6 +10,8 @@
 	<c:otherwise><c:set var="titol"><spring:message code="contingut.document.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
+<c:set var="isTasca" value="${not empty tascaId}"/>
+<c:set var="isCreate" value="${empty documentCommand.id}"/>
 
 <html>
 <head>
@@ -31,12 +33,14 @@ function mostrarDocument(fileName) {
 	$fileinput.addClass('fileinput-exists');
 	$('.fileinput-filename', $fileinput).append(fileName);
 }
+
 $(document).ready(function() {
 	let fileName = "${nomDocument}";
 	if (fileName !== '') {
 		mostrarDocument(fileName);
 	}
-	$('#documentTipus').val('DIGITAL');
+
+	// METADOCUMENT CHANGE
 	$('#metaNodeId').on('change', function() {
 		if ($(this).val()) {
 			if ($('#id').val() == '') { // if creating new document
@@ -79,16 +83,6 @@ $(document).ready(function() {
 			$('#info-plantilla-si').addClass('hidden');
 		}
 	});
-	$('input[type=radio][name=origen]').on('change', function() {
-		if ($(this).val() == 'DISC') {
-			$('#input-origen-arxiu').removeClass('hidden');
-			$('#input-origen-escaner').addClass('hidden');
-		} else {
-			$('#input-origen-escaner').removeClass('hidden');
-			$('#input-origen-arxiu').addClass('hidden');
-		}
-		webutilModalAdjustHeight();
-	});
 	$('input[type=checkbox][name=ambFirma]').on('change', function() {
 		if($(this).prop("checked") == true){
 			$('#input-firma').removeClass('hidden');
@@ -108,23 +102,8 @@ $(document).ready(function() {
 		}
 		webutilModalAdjustHeight();
 	});
-	$(document).on('submit','form#documentCommand', function() {
-		var action = $(this).attr('action');
-		var lastSlashIndex = action.lastIndexOf('/');
-		var actionProcessed = action.substring(0, lastSlashIndex);
-		var $btn = $(this).find("button[type=submit]:focus");
-		if ($btn.length == 0) {
-			if (action.endsWith("new")) {
-				actionProcessed += '/digital/new';
-			} else {
-				actionProcessed += '/digital/update';
-			}
-		} else {
-			actionProcessed += '/escaneig/inici';
-		}
-		$(this).attr('action', actionProcessed);
-		return true;
-	});
+
+	
 	if($('#id').val() == '') {
 		$('#metaNodeId').trigger('change');
 	}
@@ -144,10 +123,18 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
+
+
+
 	<c:choose>
-		<c:when test="${empty documentCommand.id}"><c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document/new"/></c:set></c:when>
-		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document/update"/></c:set></c:otherwise>
+		<c:when test="${isTasca}">
+			<c:set var="formAction"><rip:modalUrl value="/usuariTasca/${tascaId}/pare/${documentCommand.pareId}/document${isCreate ? '/docNew' : '/docUpdate'}"/></c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document${isCreate ? '/docNew' : '/docUpdate'}"/></c:set>
+		</c:otherwise>
 	</c:choose>
+	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentCommand" enctype="multipart/form-data">
 		<div id="info-plantilla-si" class="alert well-sm alert-info hidden">
 			<span class="fa fa-info-circle"></span>
@@ -158,55 +145,22 @@ $(document).ready(function() {
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
-		<%-- ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="active"><a href="#dades_doc" aria-controls="dades_doc" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.tab.dades.doc"/></a></li>
-			<li role="presentation"><a href="#dades_nti" aria-controls="dades_nti" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.tab.dades.nti"/></a></li>
-		</ul>
-		<br/>
-		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane active" id="dades_doc"--%>
-				<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true"/>
-				<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
-				<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
-				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<c:choose>
-					<c:when test="${escanejarActiu}">
-						<rip:inputRadio name="origen" textKey="contingut.document.form.camp.origen" botons="true" optionItems="${digitalOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-						<div id="input-origen-arxiu" class="hidden">
-							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
-						</div>
-						<div id="input-origen-escaner" class="hidden">
-							<rip:inputFixed name="escanejatTempId" padding="false" textKey="contingut.document.form.camp.escaneig">
-								<rip:inputHidden name="escanejatTempId"/>
-								<div class="input-group">
-									<input type="text" class="form-control" disabled="disabled" value="${escanejat.nom}"/>
-									<span class="input-group-btn">
-										<button class="btn btn-default" name="hola" type="submit"><span class="fa fa-print"></span> <spring:message code="contingut.document.form.boto.escaneig"/></button>
-									</span>
-				    			</div>
-							</rip:inputFixed>
-						</div>
-					</c:when>
-					<c:otherwise>
-						<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
-					</c:otherwise>
-				</c:choose>
-				<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-				<div id="input-firma" class="hidden">
-					<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-					<div id="input-firma-arxiu" class="hidden">
-						<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
-					</div>
-				</div>
-			<%--/div>
-			<div role="tabpanel" class="tab-pane" id="dades_nti">
-				<rip:inputDate name="dataCaptura" textKey="contingut.document.form.camp.nti.datacap" required="true"/>
-				<rip:inputText name="ntiOrgano" textKey="contingut.document.form.camp.nti.organo" required="true"/>
-				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" required="true" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" required="true" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+
+		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true"/>
+		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
+		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
+		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+
+		<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
+
+		<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+		<div id="input-firma" class="hidden">
+			<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+			<div id="input-firma-arxiu" class="hidden">
+				<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
 			</div>
-		</div--%>
+		</div>
+
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

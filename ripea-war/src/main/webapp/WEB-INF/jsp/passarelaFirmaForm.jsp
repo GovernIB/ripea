@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<c:set var="isTasca" value="${not empty tascaId}"/>
 <html>
 <head>
 	<title><spring:message code="passarelafirma.form.titol"/></title>
@@ -37,7 +38,16 @@ $(document).ready(function() {
 			</a>
 		</div>
 	</c:if>
-	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/firmaPassarela"/></c:set>
+	
+	<c:choose>
+		<c:when test="${isTasca}">
+			<c:set var="formAction"><rip:modalUrl value="/usuariTasca/${tascaId}/document/${document.id}/firmaPassarela"/></c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/firmaPassarela"/></c:set>
+		</c:otherwise>
+	</c:choose>
+	
 	<form:form id="passarela-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="passarelaFirmaEnviarCommand" role="form" enctype="multipart/form-data">
 		<rip:inputTextarea name="motiu" textKey="passarelafirma.form.camp.motiu" required="true"/>
 		<%--rip:inputText name="lloc" textKey="passarelafirma.form.camp.lloc" required="true"/--%>

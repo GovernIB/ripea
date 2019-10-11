@@ -98,19 +98,17 @@ public class ContingutDocumentController extends BaseUserController {
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
-	private EscaneigHelper escaneigHelper;
-	@Autowired
 	private ArxiuTemporalHelper arxiuTemporalHelper;
 	@Autowired
 	private BeanGeneratorHelper beanGeneratorHelper;
 
 
-	@RequestMapping(value = "/{contingutId}/document/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
+			@PathVariable Long pareId,
 			Model model) throws ClassNotFoundException, IOException {
-		return get(request, contingutId, null, model);
+		return get(request, pareId, null, model);
 	}
 	@RequestMapping(value = "/{pareId}/document/{documentId}", method = RequestMethod.GET)
 	public String get(
@@ -139,10 +137,6 @@ public class ContingutDocumentController extends BaseUserController {
 			Date ara = new Date();
 			command.setData(ara);
 
-			//command.setDataCaptura(ara);
-			//command.setNtiOrigen(NtiOrigenEnumDto.O0);
-			//command.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
-			//command.setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
 			omplirModelFormulari(
 					request,
 					command,
@@ -158,10 +152,10 @@ public class ContingutDocumentController extends BaseUserController {
 		model.addAttribute("documentId", documentId);
 		return "contingutDocumentForm";
 	}
-	@RequestMapping(value = "/{contingutId}/document/digital/new", method = RequestMethod.POST)
-	public String postDigitalNew(
+	@RequestMapping(value = "/{pareId}/document/docNew", method = RequestMethod.POST)
+	public String postNew(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
+			@PathVariable Long pareId,
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -169,7 +163,7 @@ public class ContingutDocumentController extends BaseUserController {
 			omplirModelFormulari(
 					request,
 					command,
-					contingutId,
+					pareId,
 					model);
 			return "contingutDocumentForm";
 		}
@@ -184,15 +178,15 @@ public class ContingutDocumentController extends BaseUserController {
 			omplirModelFormulari(
 					request,
 					command,
-					contingutId,
+					pareId,
 					model);
 			return "contingutDocumentForm";
 		}
 		
 		
 	}
-	@RequestMapping(value = "/{contingutId}/document/digital/update", method = RequestMethod.POST)
-	public String postDigitalUpdate(
+	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
+	public String postUpdate(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@Validated({UpdateDigital.class}) DocumentCommand command,
@@ -222,170 +216,9 @@ public class ContingutDocumentController extends BaseUserController {
 			return "contingutDocumentForm";
 		}
 	}
-	@RequestMapping(value = "/{contingutId}/document/fisic/new", method = RequestMethod.POST)
-	public String postFisicNew(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			@Validated({CreateFisic.class}) DocumentCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					command,
-					contingutId,
-					model);
-			return "contingutDocumentForm";
-		}
-		return createUpdateDocument(
-				request,
-				command,
-				bindingResult,
-				model);
-	}
-	@RequestMapping(value = "/{contingutId}/document/fisic/update", method = RequestMethod.POST)
-	public String postFisicUpdate(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			@Validated({UpdateFisic.class}) DocumentCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					command,
-					contingutId,
-					model);
-			return "contingutDocumentForm";
-		}
-		return createUpdateDocument(
-				request,
-				command,
-				bindingResult,
-				model);
-	}
 
-	@RequestMapping(value = "/{contingutId}/document/escaneig/inici", method = RequestMethod.POST)
-	public String escaneigInici(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			DocumentCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
-		String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-		/* ScanTypes:
-		 *   IScanWebPlugin.SCANTYPE_PDF
-		 *   IScanWebPlugin.SCANTYPE_JPG
-		 *   IScanWebPlugin.SCANTYPE_PNG
-		 *   IScanWebPlugin.SCANTYPE_GIF
-		 *   IScanWebPlugin.SCANTYPE_TIFF
-		 */
-		String scanType = IScanWebPlugin.SCANTYPE_PDF;
-		/* Flags:
-		 *   IScanWebPlugin.FLAG_NON_SIGNED
-		 *   IScanWebPlugin.FLAG_SIGNED
-		 *   IScanWebPlugin.FLAG_TIMESTAMP
-		 *   IScanWebPlugin.FLAG_CSV
-		 */
-		Set<String> flags = new HashSet<String>();
-		flags.add(IScanWebPlugin.FLAG_NON_SIGNED);
-		/* ScanWebMode:
-		 *   ScanWebMode.SYNCHRONOUS
-		 *   ScanWebMode.ASYNCHRONOUS
-		 */
-		ScanWebMode mode = ScanWebMode.SYNCHRONOUS;
-		List<Metadata> metadades = new ArrayList<Metadata>();
-		String procesEscaneigUrl = modalStr + escaneigHelper.iniciarEscaneig(
-				request,
-				scanType,
-				flags,
-				metadades,
-				mode,
-				LocaleContextHolder.getLocale().getLanguage(),
-				command,
-				modalStr + "/contingut/" + contingutId + "/document/escaneig/final");
-		return "redirect:" + procesEscaneigUrl;
-	}
 
-	@RequestMapping(value = "/{contingutId}/document/escaneig/final")
-	public String escaneigFinal(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			@RequestParam("scanWebId") long scanWebId,
-			Model model) throws IOException, ClassNotFoundException {
-		EscaneigConfig swc = escaneigHelper.getScanWebConfig(
-				request,
-				scanWebId);
-		DocumentCommand command = swc.getCommand();
-		ScanWebStatus status = swc.getStatus();
-		switch (status.getStatus()) {
-		//case ScanWebStatus.STATUS_IN_PROGRESS:
-		case ScanWebStatus.STATUS_FINAL_OK:
-			List<ScannedDocument> listDocs = swc.getScannedFiles();
-			if (listDocs.size() == 0) {
-				MissatgesHelper.warning(
-						request,
-						getMessage(
-								request, 
-								"document.controller.escaneig.no.document"));
-			} else {
-				ScannedDocument escanejat = listDocs.get(0);
-				if (escanejat.getScannedPlainFile() == null) {
-					MissatgesHelper.warning(
-							request,
-							getMessage(
-									request, 
-									"document.controller.escaneig.no.doc.plain"));
-				} else {
-					FitxerDto fitxer = new FitxerDto();
-					fitxer.setNom(
-							escanejat.getScannedPlainFile().getName());
-					fitxer.setContentType(
-							escanejat.getScannedPlainFile().getMime());
-					fitxer.setContingut(
-							escanejat.getScannedPlainFile().getData());
-					String escanejatTempId = arxiuTemporalHelper.crearFitxer(
-							servletContext,
-							fitxer);
-					command.setEscanejatTempId(escanejatTempId);
-				}
-			}
-			break;
-		case ScanWebStatus.STATUS_FINAL_ERROR:
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request, 
-							"document.controller.escaneig.final.error",
-							new Object[] {status.getErrorMsg()}));
-			break;
-		case ScanWebStatus.STATUS_CANCELLED:
-			MissatgesHelper.warning(
-					request,
-					getMessage(
-							request, 
-							"document.controller.escaneig.final.cancel"));
-			break;
-		default:
-			MissatgesHelper.warning(
-					request,
-					getMessage(
-							request, 
-							"document.controller.escaneig.final.desconegut"));
-		
-		}
-		escaneigHelper.closeScanWebProcess(
-				request,
-				swc);
-		model.addAttribute(command);
-		omplirModelFormulari(
-				request,
-				command,
-				contingutId,
-				model);
-		return "contingutDocumentForm";
-	}
-
+	
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
 	@ResponseBody
 	public AjaxFormResponse mostraDetallSignants(
@@ -401,11 +234,11 @@ public class ContingutDocumentController extends BaseUserController {
 		return AjaxHelper.generarAjaxFormOk(detallSignants);
 	}
 
-	@RequestMapping(value = "/{contingutId}/document/{documentId}/descarregar", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/{documentId}/descarregar", method = RequestMethod.GET)
 	public String descarregar(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable Long contingutId,
+			@PathVariable Long pareId,
 			@PathVariable Long documentId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutDto contingut = contingutService.findAmbIdUser(
@@ -430,7 +263,7 @@ public class ContingutDocumentController extends BaseUserController {
 						request, 
 						"document.controller.descarregar.error"));
 		if (contingut.getPare() != null)
-			return "redirect:../../contingut/" + contingutId;
+			return "redirect:../../contingut/" + pareId;
 		else
 			return "redirect:../../expedient";
 	}
@@ -560,28 +393,7 @@ public class ContingutDocumentController extends BaseUserController {
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
 		Map<String, Object> valors = new HashMap<String, Object>();
-		/*switch (command.getOrigen()) {
-		case DISC:
-			if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
-				fitxer = new FitxerDto();
-				fitxer.setNom(command.getArxiu().getOriginalFilename());
-				fitxer.setContentType(command.getArxiu().getContentType());
-				fitxer.setContingut(command.getArxiu().getBytes());
-			}
-			break;
-		case ESCANER:
-			if (command.getEscanejatTempId() != null && !command.getEscanejatTempId().isEmpty()) {
-				fitxer = arxiuTemporalHelper.llegirFitxerAmbContingut(
-						servletContext,
-						command.getEscanejatTempId());
-			}
-			break;
-		}
-		if (command.isAmbFirma()) {
-			fitxer.setFirmaNom(command.getFirma().getOriginalFilename());
-			fitxer.setContentType(command.getFirma().getContentType());
-			fitxer.setContingutFirma(command.getFirma().getBytes());
-		}*/
+
 		if (command.getId() == null) {
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
@@ -622,7 +434,6 @@ public class ContingutDocumentController extends BaseUserController {
 		} else {
 			documentService.update(
 					entitatActual.getId(),
-					command.getId(),
 					DocumentCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,

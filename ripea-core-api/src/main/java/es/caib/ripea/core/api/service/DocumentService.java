@@ -59,8 +59,6 @@ public interface DocumentService {
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
-	 * @param id
-	 *            Atribut id del document que es vol modificar.
 	 * @param document
 	 *            Informació del document que es vol crear.
 	 * @return El document modificat.
@@ -72,7 +70,6 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto update(
 			Long entitatId,
-			Long id,
 			DocumentDto document) throws NotFoundException, ValidationException;
 
 	/**

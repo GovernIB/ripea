@@ -46,33 +46,38 @@
 			<tr>
 				<th data-col-name="codi"><spring:message code="metaexpedient.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="metaexpedient.list.columna.nom"/></th>
-				<th data-col-name="actiu" data-template="#cellActiuTemplate">
+				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="7%">
 					<spring:message code="metaexpedient.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="metaDocumentsCount" data-template="#cellMetaDocumentsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="metaDocumentsCount" data-template="#cellMetaDocumentsTemplate" data-orderable="false" width="1%">
 					<script id="cellMetaDocumentsTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/metaDocument" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.documents"/>&nbsp;<span class="badge">{{:metaDocumentsCount}}</span></a>
 					</script>
 				</th>
-				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="10%">
+				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="1%">
 					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/metaDada" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
 					</script>
 				</th>
-				<th data-col-name="expedientEstatsCount" data-template="#cellArxiusTemplate" data-orderable="false" width="10%">
-					<script id="cellArxiusTemplate" type="text/x-jsrender">
+				<th data-col-name="expedientEstatsCount" data-template="#cellEstatsTemplate" data-orderable="false" width="1%">
+					<script id="cellEstatsTemplate" type="text/x-jsrender">
 						<a href="expedientEstat/{{:id}}" class="btn btn-default"><spring:message code="metaexpedient.list.boto.estats"/>&nbsp;<span class="badge">{{:expedientEstatsCount}}</span></a>
 					</script>
 				</th>
-				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
+				<th data-col-name="expedientTasquesCount" data-template="#cellTasquesTemplate" data-orderable="false" width="1%">
+					<script id="cellTasquesTemplate" type="text/x-jsrender">
+						<a href="metaExpedient/{{:id}}/tasca" class="btn btn-default"><spring:message code="metaexpedient.list.boto.tasques"/>&nbsp;<span class="badge">{{:expedientTasquesCount}}</span></a>
+					</script>
+				</th>
+				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
@@ -91,7 +96,4 @@
 			</tr>
 		</thead>
 	</table>
-	<script id="tableButtonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="metaExpedient/new" data-rdt-link-modal="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a></p>
-	</script>
 </body>

@@ -3,7 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+
 
 /**
  * Informació d'un expedient.
@@ -39,7 +43,14 @@ public class ExpedientDto extends NodeDto {
 	private boolean usuariActualWrite;
 	private boolean peticions;
 	private boolean processatOk;
+	private boolean tasques;
 
+	public boolean isTasques() {
+		return tasques;
+	}
+	public void setTasques(boolean tasques) {
+		this.tasques = tasques;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -210,6 +221,10 @@ public class ExpedientDto extends NodeDto {
 	}
 	public void setProcessatOk(boolean processatOk) {
 		this.processatOk = processatOk;
+	}
+	
+	public String getNomINumero() {
+		return this.nom + " (" + this.numero + ")";
 	}
 
 }

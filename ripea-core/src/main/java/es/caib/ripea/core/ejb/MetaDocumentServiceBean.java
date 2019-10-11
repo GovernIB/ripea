@@ -96,7 +96,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto findById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -192,7 +192,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto findById(
 			Long entitatId,
 			Long metaDocumentId) {

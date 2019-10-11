@@ -492,4 +492,10 @@ public interface ContingutService {
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
+	ContingutDto findAmbIdUser(Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermis);
+
 }

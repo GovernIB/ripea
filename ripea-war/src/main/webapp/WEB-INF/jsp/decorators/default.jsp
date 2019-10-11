@@ -39,6 +39,9 @@
 	pageContext.setAttribute(
 			"teAccesExpedients",
 			es.caib.ripea.war.helper.ExpedientHelper.teAccesExpedients(request));
+	pageContext.setAttribute(
+			"countTasquesPendent",
+			es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -199,9 +202,13 @@ body {
 						</li>
 					</ul>
 					<div class="clearfix"></div>
+					
+					<%------------------------ MENU BUTTONS ------------------------%>
 					<div class="btn-group navbar-btn navbar-right">
 						<c:choose>
 							<c:when test="${isRolActualSuperusuari}">
+								
+								<%---- Entitats ----%>
 								<a href="<c:url value="/entitat"/>" class="btn btn-primary"><spring:message code="decorator.menu.entitats"/></a>
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
@@ -233,17 +240,23 @@ body {
 								</div>
 							</c:when>
 							<c:when test="${isRolActualUsuari}">
-								<a href="
-									<c:url value="/expedient">
-										<c:param name="mantenirPaginacio" value="false" />
-									</c:url>"
-								class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
-								<a href="
-									<c:url value="/expedientPeticio">
-										<c:param name="mantenirPaginacio" value="false" />
-									</c:url>"
-								class="btn btn-primary"><spring:message code="decorator.menu.expedientPeticions"/></a>								
+							
+								<%---- Expedients ----%>
+								<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="false" /></c:url>"class="btn btn-primary">
+										<spring:message code="decorator.menu.expedients"/>
+								</a>
 								
+								<%---- Expedients pendents ----%>
+								<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+									<spring:message code="decorator.menu.expedientPeticions"/>
+								</a>
+								
+								<%---- Tasques ----%>								
+								<a href="<c:url value="/usuariTasca"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+									<spring:message code="decorator.menu.tasques"/>
+									<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
+								</a>						
+										
 								<div class="btn-group">
 									<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>
@@ -278,7 +291,7 @@ body {
 					<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>
 					<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>
 					<decorator:title />
-					<small><decorator:getProperty property="meta.subtitle"/></small>
+<%-- 					<small><decorator:getProperty property="meta.subtitle"/></small> --%>
 				</h2>
 			</div>
 			<div class="panel-body">

@@ -114,35 +114,10 @@ public class ContingutController extends BaseUserController {
 		return "contingut";
 	}
 	
-	
-//	@RequestMapping(value = "/contingutDetail/{contingutId}", method = RequestMethod.GET)
-//	public String contingutDetailGet(
-//			HttpServletRequest request,
-//			@PathVariable Long contingutId,
-//			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-//		ContingutDto contingut = contingutService.findAmbIdUser(
-//				entitatActual.getId(),
-//				contingutId,
-//				true,
-//				true);
-//		omplirModelPerMostrarContingut(
-//				request,
-//				entitatActual,
-//				contingut,
-//				SessioHelper.desmarcarLlegit(request),
-//				model);
-//		model.addAttribute("isContingutDetail", true);
-//		return "contingut";
-//	}
-	
-	
-
 	@RequestMapping(value = "/contingut/{contingutId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			@RequestParam(required = false, defaultValue = "false") Boolean isExpedientDetail,
 			Model model) throws IOException {
 	
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -154,20 +129,18 @@ public class ContingutController extends BaseUserController {
 		contingutService.deleteReversible(
 				entitatActual.getId(),
 				contingutId);
-
-		if(isExpedientDetail){
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../expedientDetail",
-					"contingut.controller.element.esborrat.ok");
+		
+		boolean isExpedient = contingut.getPare() == null;
+		String url = "";
+		if (isExpedient) {
+			url = "redirect:../../expedient";
 		} else {
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					(contingut.getPare() != null) ? "redirect:../../contingut/" + contingut.getPare().getId() : "redirect:../../expedient",
-					"contingut.controller.element.esborrat.ok");
+			url = "redirect:../../contingut/" + contingut.getPare().getId();
 		}
-
-
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				url,
+				"contingut.controller.element.esborrat.ok");
 	}
 
 	@RequestMapping(value = "/contingut/{contingutId}/canviVista/icones", method = RequestMethod.GET)
@@ -518,7 +491,7 @@ public class ContingutController extends BaseUserController {
 
 
 
-	private void omplirModelPerMostrarContingut(
+	public void omplirModelPerMostrarContingut(
 			HttpServletRequest request,
 			EntitatDto entitatActual,
 			ContingutDto contingut,
@@ -548,13 +521,6 @@ public class ContingutController extends BaseUserController {
 					entitatActual.getId(),
 					contingut.getId()));
 		}
-		/*if (contingut instanceof DocumentDto) {
-			model.addAttribute(
-					"documentVersions",
-					documentService.findVersionsByDocument(
-							entitatActual.getId(),
-							contingut.getId()));
-		}*/
 		if (contingut instanceof NodeDto) {
 			model.addAttribute(
 					"metaDades",
@@ -621,5 +587,6 @@ public class ContingutController extends BaseUserController {
 				"contingutOrigen",
 				contingutOrigen);
 	}
+
 
 }

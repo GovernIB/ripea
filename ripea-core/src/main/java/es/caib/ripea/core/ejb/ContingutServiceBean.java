@@ -301,4 +301,20 @@ public class ContingutServiceBean implements ContingutService {
 				recursiu);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermis) {
+		return delegate.findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				ambPermis);
+	}
+
 }

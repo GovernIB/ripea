@@ -318,7 +318,7 @@ public class ExpedientHelper {
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
-		DocumentEntity docEntity = documentHelper.crearNouDocument(
+		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),
 				documentDto.getNom(),
 				documentDto.getData(),

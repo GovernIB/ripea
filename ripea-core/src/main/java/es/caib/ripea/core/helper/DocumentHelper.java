@@ -3,13 +3,23 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -17,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
@@ -26,15 +37,21 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -46,6 +63,8 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
+import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
@@ -73,8 +92,335 @@ public class DocumentHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+	
+	public void portafirmesEnviar(
+			Long entitatId,
+			DocumentEntity document,
+			String assumpte,
+			PortafirmesPrioritatEnumDto prioritat,
+			Date dataCaducitat,
+			String[] portafirmesResponsables,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+		logger.debug("Enviant document a portafirmes (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + document.getId() + ", " +
+				"assumpte=" + assumpte + ", " +
+				"prioritat=" + prioritat + ", " +
+				"dataCaducitat=" + dataCaducitat + ")");
+//		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+//				entitatId,
+//				id,
+//				false,
+//				true,
+//				false,
+//				false);
+		
+		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"El document a enviar al portafirmes no és del tipus " + DocumentTipusEnumDto.DIGITAL);
+		}
+		if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"El document a enviar al portafirmes te alertes de validació");
+		}
+		if (	DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) ||
+				DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"No es poden enviar al portafirmes documents firmates o custodiats");
+		}
+		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {
+						DocumentEnviamentEstatEnumDto.PENDENT,
+						DocumentEnviamentEstatEnumDto.ENVIAT
+				});
+		if (enviamentsPendents.size() > 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document te enviaments al portafirmes pendents");
+		}
+		if (!document.getMetaDocument().isFirmaPortafirmesActiva()) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"El document no te activada la firma amb portafirmes");
+		}
+		DocumentPortafirmesEntity documentPortafirmes = DocumentPortafirmesEntity.getBuilder(
+				DocumentEnviamentEstatEnumDto.PENDENT,
+				assumpte,
+				prioritat,
+				dataCaducitat,
+				document.getMetaDocument().getPortafirmesDocumentTipus(),
+				portafirmesResponsables,
+				portafirmesFluxTipus,
+				document.getMetaDocument().getPortafirmesFluxId(),
+				document.getExpedient(),
+				document).build();
+		// Si l'enviament produeix excepcions la retorna
+		SistemaExternException sex = portafirmesEnviar(documentPortafirmes);
+		if (sex != null) {
+			throw sex;
+		}
+		documentPortafirmesRepository.save(documentPortafirmes);
+		document.updateEstat(
+				DocumentEstatEnumDto.FIRMA_PENDENT);
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.PFIRMA_ENVIAMENT,
+				documentPortafirmes.getPortafirmesId(),
+				documentPortafirmes.getEstat().name(),
+				false,
+				false);
+	}
+	
+	
+	
 
-	public DocumentEntity crearNouDocument(
+	public DocumentPortafirmesDto portafirmesInfo(
+			Long entitatId,
+			DocumentEntity document) {
+		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + document.getId() + ")");
+
+		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {
+						DocumentEnviamentEstatEnumDto.PENDENT,
+						DocumentEnviamentEstatEnumDto.ENVIAT
+				});
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a portafirmes");
+		}
+		return conversioTipusHelper.convertir(
+				enviamentsPendents.get(0),
+				DocumentPortafirmesDto.class);
+	}	
+	
+	
+	public DocumentDto updateDocument(
+			Long entitatId,
+			DocumentEntity documentEntity,
+			DocumentDto document) {
+
+		MetaDocumentEntity metaDocument = null;
+		List<ArxiuFirmaDto> firmes = null;
+		if (document.getMetaDocument() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					documentEntity.getEntitat(),
+					documentEntity.getMetaDocument().getMetaExpedient(),
+					document.getMetaDocument().getId(),
+					false);
+		} else {
+			throw new ValidationException(
+					documentEntity.getId(),
+					DocumentEntity.class,
+					"No es pot actualitzar un document sense un meta-document associat");
+		}
+		contingutHelper.comprovarNomValid(
+				documentEntity.getPare(),
+				document.getNom(),
+				documentEntity.getId(),
+				DocumentEntity.class);
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
+		String nomOriginal = documentEntity.getNom();
+		documentEntity.update(
+				metaDocument,
+				document.getNom(),
+				document.getData(),
+				document.getUbicacio(),
+				documentEntity.getDataCaptura(),
+				documentEntity.getNtiOrgano(),
+				documentEntity.getNtiOrigen(),
+				document.getNtiEstadoElaboracion(),
+				documentEntity.getNtiTipoDocumental(),
+				document.getNtiIdDocumentoOrigen(),
+				document.getNtiTipoFirma(),
+				document.getNtiCsv(),
+				document.getNtiCsvRegulacion());
+		FitxerDto fitxer = null;
+		if (document.getFitxerContingut() != null) {
+			fitxer = new FitxerDto();
+			fitxer.setNom(document.getFitxerNom());
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setContingut(document.getFitxerContingut());
+		}
+		if (document.getFitxerContingut() != null) {
+			actualitzarFitxerDocument(
+					documentEntity,
+					fitxer);
+			if (document.isAmbFirma()) {
+				firmes = validaFirmaDocument(
+						documentEntity, 
+						fitxer,
+						document.getFirmaContingut());
+			}
+		}
+		// Registra al log la modificació del document
+		contingutLogHelper.log(
+				documentEntity,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(document.getNom())) ? document.getNom() : null,
+				(document.getFitxerContingut() != null) ? "VERSIO_NOVA" : null,
+				false,
+				false);
+		DocumentDto dto = toDocumentDto(documentEntity);
+		contingutHelper.arxiuPropagarModificacio(
+				documentEntity,
+				fitxer,
+				document.isAmbFirma(),
+				document.isFirmaSeparada(),
+				firmes);
+		return dto;
+	}
+	
+
+	public void portafirmesReintentar(
+			Long entitatId,
+			DocumentEntity document) {
+		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + document.getId() + ")");
+
+		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {
+						DocumentEnviamentEstatEnumDto.PENDENT,
+						DocumentEnviamentEstatEnumDto.ENVIAT
+				},
+				true);
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a portafirmes pendents de processar");
+		}
+		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
+		contingutLogHelper.log(
+				documentPortafirmes.getDocument(),
+				LogTipusEnumDto.PFIRMA_REINTENT,
+				documentPortafirmes.getPortafirmesId(),
+				documentPortafirmes.getEstat().name(),
+				false,
+				false);
+		if (DocumentEnviamentEstatEnumDto.PENDENT.equals(documentPortafirmes.getEstat())) {
+			portafirmesEnviar(documentPortafirmes);
+		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
+			portafirmesProcessar(documentPortafirmes);
+		}
+	}
+	
+	
+	public DocumentDto crearDocument(
+			DocumentDto document,
+			ContingutEntity pare,
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument) {
+		
+
+		
+		if (expedient != null) {
+			cacheHelper.evictErrorsValidacioPerNode(expedient);
+		}
+		
+		contingutHelper.comprovarNomValid(
+				pare,
+				document.getNom(),
+				null,
+				DocumentEntity.class);
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+				expedient,
+				metaDocument,
+				0);
+		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
+					"metaExpedientId=" + expedient.getMetaExpedient().getId() + ", " +
+					"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
+					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
+					"expedientId=" + expedient.getId() + ")");
+		}
+		
+		DocumentEntity entity = crearDocumentDB(
+				document.getDocumentTipus(),
+				document.getNom(),
+				document.getData(),
+				new Date(),
+				expedient.getNtiOrgano(),
+				metaDocument.getNtiOrigen(),
+				document.getNtiEstadoElaboracion(),
+				metaDocument.getNtiTipoDocumental(),
+				metaDocument,
+				pare,
+				pare.getEntitat(),
+				expedient,
+				document.getUbicacio(),
+				document.getNtiIdDocumentoOrigen());
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(document.getFitxerNom());
+		fitxer.setContentType(document.getFitxerContentType());
+		fitxer.setContingut(document.getFitxerContingut());
+		List<ArxiuFirmaDto> firmes = null;
+		if (document.getFitxerContingut() != null) {
+			actualitzarFitxerDocument(
+					entity,
+					fitxer);
+			if (document.isAmbFirma()) {
+				firmes = validaFirmaDocument(
+						entity, 
+						fitxer,
+						document.getFirmaContingut());
+			}
+		}
+		contingutLogHelper.logCreacio(
+				entity,
+				true,
+				true);
+		contingutHelper.arxiuPropagarModificacio(
+				entity,
+				fitxer,
+				document.isAmbFirma(),
+				document.isFirmaSeparada(),
+				firmes);
+		DocumentDto dto = toDocumentDto(entity);
+		
+		return dto;
+		
+	}
+	
+	private DocumentDto toDocumentDto(
+			DocumentEntity document) {
+		return (DocumentDto)contingutHelper.toContingutDto(
+				document,
+				false,
+				false,
+				false,
+				false,
+				true,
+				true,
+				false);
+	}
+	
+
+	public DocumentEntity crearDocumentDB(
 			DocumentTipusEnumDto documentTipus,
 			String nom,
 			Date data,
@@ -612,6 +958,40 @@ public class DocumentHelper {
 			}
 		}
 	}
+	
+
+	public void portafirmesCancelar(
+			Long entitatId,
+			DocumentEntity document) {
+		logger.debug("Enviant document a portafirmes (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + document.getId() + ")");
+
+		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a portafirmes pendents");
+		}
+		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
+		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
+			pluginHelper.portafirmesDelete(documentPortafirmes);
+		}
+		documentPortafirmes.updateCancelat(new Date());
+		document.updateEstat(
+				DocumentEstatEnumDto.REDACCIO);
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.PFIRMA_CANCELACIO,
+				documentPortafirmes.getPortafirmesId(),
+				documentPortafirmes.getEstat().name(),
+				false,
+				false);
+	}
+	
 
 	public DocumentEntity comprovarDocumentDinsExpedientModificable(
 			Long entitatId,
@@ -675,6 +1055,141 @@ public class DocumentHelper {
 				false);
 		return firmes;
 	}
+
+	
+	public void processarFirmaClient(
+			String identificador,
+			String arxiuNom,
+			byte[] arxiuContingut,
+			DocumentEntity document) {
+		logger.debug("Custodiar identificador firma applet ("
+				+ "identificador=" + identificador + ")");
+		ObjecteFirmaApplet objecte = null;
+
+		// Registra al log la firma del document
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.FIRMA_CLIENT,
+				null,
+				null,
+				false,
+				false);
+		// Custodia el document firmat
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(arxiuNom);
+		fitxer.setContingut(arxiuContingut);
+		fitxer.setContentType("application/pdf");
+		document.updateEstat(
+				DocumentEstatEnumDto.CUSTODIAT);
+		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+				document,
+				fitxer);
+		document.updateInformacioCustodia(
+				new Date(),
+				custodiaDocumentId,
+				document.getCustodiaCsv());
+		actualitzarVersionsDocument(document);
+		// Registra al log la custòdia de la firma del document
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.ARXIU_CUSTODIAT,
+				custodiaDocumentId,
+				null,
+				false,
+				false);
+		
+	}
+	
+	public String firmaClientXifrar(
+			ObjecteFirmaApplet objecte) throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream os = new ObjectOutputStream(baos);
+		Long[] array = new Long[] {
+				objecte.getSysdate(),
+				objecte.getEntitatId(),
+				objecte.getDocumentId()};
+		os.writeObject(array);
+		os.close();
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(
+				Cipher.ENCRYPT_MODE,
+				buildKey(CLAU_SECRETA));
+		byte[] xifrat = cipher.doFinal(baos.toByteArray());
+		return new String(Base64.encode(xifrat));
+	}
+
+	public static final String CLAU_SECRETA = "R1p3AR1p3AR1p3AR";
+
+	public SecretKeySpec buildKey(String message) throws Exception {
+		MessageDigest sha = MessageDigest.getInstance("SHA-1");
+		byte[] key = sha.digest(message.getBytes());
+		key = Arrays.copyOf(key, 16);
+		return new SecretKeySpec(key, "AES");
+	}
+	
+	public ObjecteFirmaApplet obtainInstanceObjecteFirmaApplet(
+			Long sysdate,
+			Long entitatId,
+			Long documentId) {
+		return new ObjecteFirmaApplet(
+				sysdate,
+				entitatId,
+				documentId);
+	}
+	
+	public class ObjecteFirmaApplet implements Serializable {
+		private Long sysdate;
+		private Long entitatId;
+		private Long documentId;
+		public ObjecteFirmaApplet(
+				Long sysdate,
+				Long entitatId,
+				Long documentId) {
+			this.sysdate = sysdate;
+			this.entitatId = entitatId;
+			this.documentId = documentId;
+		}
+		public Long getSysdate() {
+			return sysdate;
+		}
+		public void setSysdate(Long sysdate) {
+			this.sysdate = sysdate;
+		}
+		public Long getEntitatId() {
+			return entitatId;
+		}
+		public void setEntitatId(Long entitatId) {
+			this.entitatId = entitatId;
+		}
+		public Long getDocumentId() {
+			return documentId;
+		}
+		public void setDocumentId(Long documentId) {
+			this.documentId = documentId;
+		}
+		private static final long serialVersionUID = -6929597339153341365L;
+	}
+	
+	public ObjecteFirmaApplet firmaAppletDesxifrar(
+			String missatge,
+			String key) throws Exception {
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(
+				Cipher.DECRYPT_MODE,
+				buildKey(key));
+		ByteArrayInputStream bais = new ByteArrayInputStream(
+				cipher.doFinal(
+						Base64.decode(missatge.getBytes())));
+		ObjectInputStream is = new ObjectInputStream(bais);
+		Long[] array = (Long[])is.readObject();
+		ObjecteFirmaApplet objecte = obtainInstanceObjecteFirmaApplet(
+				array[0],
+				array[1],
+				array[2]);
+		is.close();
+		return objecte;
+	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 

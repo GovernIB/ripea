@@ -34,15 +34,19 @@ import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -80,7 +84,22 @@ public class CacheHelper {
 	private PluginHelper pluginHelper;
 	@Resource
 	private UsuariHelper usuariHelper;
+	@Resource
+	private UsuariRepository usuariRepository;
+	@Resource
+	private ExpedientTascaRepository expedientTascaRepository;
 
+	
+	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
+	public long countTasquesPendents(String usuariCodi) {
+		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
+		UsuariEntity usuariEntity = usuariRepository.findByCodi(usuariCodi);
+		return expedientTascaRepository.countTasquesPendents(usuariEntity);
+	}
+	@CacheEvict(value = "tasquesUsuari", key="#usuariCodi")
+	public void evictCountTasquesPendents(String usuariCodi) {
+	}
+	
 
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -140,7 +141,83 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<PermisDto> permisFind(Long entitatId, Long id) {
+	public MetaExpedientTascaDto tascaCreate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException {
+		return delegate.tascaCreate(
+				entitatId,
+				metaExpedientId,
+				metaExpedientTasca);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientTascaDto tascaUpdate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException {
+		return delegate.tascaUpdate(
+				entitatId,
+				metaExpedientId,
+				metaExpedientTasca);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientTascaDto tascaUpdateActiu(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id,
+			boolean activa) throws NotFoundException {
+		return delegate.tascaUpdateActiu(
+				entitatId,
+				metaExpedientId,
+				id,
+				activa);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientTascaDto tascaDelete(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) throws NotFoundException {
+		return delegate.tascaDelete(
+				entitatId,
+				metaExpedientId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientTascaDto tascaFindById(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) throws NotFoundException {
+		return delegate.tascaFindById(
+				entitatId,
+				metaExpedientId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		return delegate.tascaFindPaginatByMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<PermisDto> permisFind(
+			Long entitatId,
+			Long id) {
 		return delegate.permisFind(
 				entitatId,
 				id);
@@ -148,7 +225,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public void permisUpdate(Long entitatId, Long id, PermisDto permis) {
+	public void permisUpdate(
+			Long entitatId,
+			Long id,
+			PermisDto permis) {
 		delegate.permisUpdate(
 				entitatId,
 				id,

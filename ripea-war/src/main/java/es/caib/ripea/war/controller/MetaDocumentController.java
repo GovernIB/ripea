@@ -54,7 +54,6 @@ public class MetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(

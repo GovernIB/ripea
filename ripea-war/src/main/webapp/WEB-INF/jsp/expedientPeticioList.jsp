@@ -86,20 +86,18 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedientPeticio/datatable"/>"  <%-- URL which will load rows of datatable  --%>
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="3" <%-- default column number to be sorted  --%>
+		data-default-order="1" <%-- default column number to be sorted  --%>
 		data-default-dir="desc" <%-- default ordering direction  --%>
 		data-save-state="true" 
 		data-mantenir-paginacio="true"
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="estat" data-visible="false"></th>
-				<th data-col-name="metaExpedientNom"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
-				<th data-col-name="expedientPeticioAccioEnumDto"><spring:message code="expedientPeticio.list.columna.accio"/></th>
 				<th data-col-name="registre.identificador"><spring:message code="expedientPeticio.list.columna.numero"/></th>
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedientPeticio.list.columna.data"/></th>
 				<th data-col-name="registre.extracte"><spring:message code="expedientPeticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiDescripcio"><spring:message code="expedientPeticio.list.columna.destiNom"/></th>
+				<th data-col-name="metaExpedientNom"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
 				<th data-col-name="estat"><spring:message code="expedientPeticio.list.columna.estat"/></th>
 
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

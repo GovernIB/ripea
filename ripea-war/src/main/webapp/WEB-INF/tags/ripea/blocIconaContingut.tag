@@ -5,12 +5,14 @@
 <%@ attribute name="tamanyEnorme" required="false" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ attribute name="nomesIconaNom" required="false" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
+<c:set var="isTasca" value="${not empty tascaId}"/>
 <rip:blocIconaContingutNoms/>
 <c:if test="${tamanyDoble}"><c:set var="iconaTamany" value="fa-2x"/></c:if>
 <c:if test="${tamanyEnorme}"><c:set var="iconaTamany" value="fa-5x"/></c:if>
 <c:choose>
 	<c:when test="${nomesIconaNom}">
 		<c:choose>
+			<c:when test="${isTasca}">${iconaTask}</c:when>
 			<c:when test="${contingut.expedient and contingut.estat == 'OBERT'}">${iconaExpedientObert} ${iconaTamany}</c:when>
 			<c:when test="${contingut.expedient and contingut.estat != 'OBERT'}">${iconaExpedientTancat} ${iconaTamany}</c:when>
 			<c:when test="${contingut.document}">${iconaDocument} ${iconaTamany}</c:when>

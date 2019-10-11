@@ -71,7 +71,7 @@ $(document).ready(function(){
 		commandName="expedientPeticioAcceptarCommand">
 		<form:hidden path="id" />
 
-		<rip:inputRadio name="expedientPeticioAccioEnumDto" textKey="contingut.document.form.camp.origen" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<rip:inputRadio name="expedientPeticioAccioEnumDto" textKey="expedientPeticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
 		<rip:inputSelect name="metaExpedientId" textKey="expedientPeticio.form.acceptar.camp.metaExpedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true"

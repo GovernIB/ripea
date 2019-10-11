@@ -134,6 +134,13 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	public ExpedientEntity getExpedient() {
 		return expedient;
 	}
+	public ExpedientEntity getExpedientPare() {
+		if (this instanceof ExpedientEntity) {
+			return (ExpedientEntity) this;
+		} else {
+			return this.getExpedient();
+		}
+	}
 	public ContingutMovimentEntity getDarrerMoviment() {
 		return darrerMoviment;
 	}
