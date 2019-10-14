@@ -80,5 +80,9 @@
 			id="expedientPeticioService"
 			jndi-name="ripea/ExpedientPeticioServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.ExpedientPeticioService"/>	
+	<jee:local-slsb
+			id="expedientTascaService"
+			jndi-name="ripea/ExpedientTascaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ExpedientTascaService"/>			
 		
 </beans>
