@@ -181,4 +181,8 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	String propertyFindByNom(String nom);
 
+	List<UsuariDto> findUsuariAmbTextDades(String text);
+
+	UsuariDto findUsuariAmbCodiDades(String codi);
+
 }

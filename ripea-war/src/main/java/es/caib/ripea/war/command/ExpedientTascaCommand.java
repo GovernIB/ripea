@@ -2,17 +2,24 @@ package es.caib.ripea.war.command;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 
 public class ExpedientTascaCommand {
 	
+	@NotNull
 	private Long metaExpedientTascaId;
+	@NotEmpty
 	private String responsableCodi;
 	private String metaExpedientTascaDescripcio;
 	private Date dataInici;
 	private Date dataFi;
+	
 	
 	
 	public String getMetaExpedientTascaDescripcio() {

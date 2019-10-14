@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +164,7 @@ public class ExpedientTascaController extends BaseUserController {
 	public String postTasca(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
-			@ModelAttribute ExpedientTascaCommand expedientTascaCommand,
+			@Valid ExpedientTascaCommand expedientTascaCommand,
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);

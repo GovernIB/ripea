@@ -222,6 +222,41 @@ public class PluginHelper {
 		}
 	}
 	
+	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException {
+		String accioDescripcio = "Consulta d'usuaris d'un filtre";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("filtre",
+				filtre);
+		long t0 = System.currentTimeMillis();
+		try {
+			List<DadesUsuari> dadesUsuari = getDadesUsuariPlugin().findAmbFiltre(filtre);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_USUARIS,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return dadesUsuari;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_USUARIS,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_USUARIS,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	
+	
+	
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
 			String pareCodi) {
 		String accioDescripcio = "Consulta llista d'unitats donat un pare";

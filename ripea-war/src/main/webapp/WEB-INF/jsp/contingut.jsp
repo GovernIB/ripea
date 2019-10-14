@@ -265,9 +265,9 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 $(document).ready(function() {
 
 
-	console.log('before!');
+
 	$("#tascaBtn").appendTo(".panel-heading h2");
-	console.log('HO!');
+
 	
 	$("#mostraDetallSignants").click(function(){
 		$('#detallSignants').html("");

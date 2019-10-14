@@ -49,6 +49,15 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 				grupCodi);
 	}
 
+	@Override
+	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException {
+		LOGGER.debug("Consulta de les dades de l'usuari (filtre=" + filtre + ")");
+		return consultaDadesUsuari(
+				getJdbcQueryUsuariFiltre(),
+				"filtre",
+				filtre);
+	}
+
 
 
 	private DadesUsuari consultaDadesUsuariUnic(
@@ -123,6 +132,9 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	}
 	private String getJdbcQueryUsuariGrup() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.grup");
+	}
+	private String getJdbcQueryUsuariFiltre() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre");
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);

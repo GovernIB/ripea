@@ -38,15 +38,15 @@ public interface DadesUsuariPlugin {
 	public List<DadesUsuari> findAmbGrup(String grupCodi) throws SistemaExternException;
 	
 	
-//	/**
-//	* Retorna la llista d'usuaris que coincideixen amb el filtre especificat.
-//	*
-//	* @param filtre
-//	*            Filtre per a fer la consulta.
-//	* @return La llista d'usuaris que coincideixen amb el filtre.
-//	* @throws SistemaExternException
-//	*            Si es produeix un error al consultar les dades de l'usuari.
-//	*/
-//	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException;
+	/**
+	* Retorna la llista d'usuaris que coincideixen amb el filtre especificat.
+	*
+	* @param filtre
+	*            Filtre per a fer la consulta.
+	* @return La llista d'usuaris que coincideixen amb el filtre.
+	* @throws SistemaExternException
+	*            Si es produeix un error al consultar les dades de l'usuari.
+	*/
+	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException;
 
 }

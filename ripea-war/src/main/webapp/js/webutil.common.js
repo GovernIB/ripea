@@ -410,6 +410,8 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 								}));
 				}
 			});
+		} else {
+			$(this).empty();
 		}
 		
 		$(this).select2({

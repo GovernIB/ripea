@@ -29,7 +29,9 @@ $(document).ready(function(){
 			.done(function(data){
 
 				$('#metaExpedientTascaDescripcio').val(data.descripcio);
-				$('#responsableCodi').val(data.responsable);
+				
+				$('#responsableCodi').data('currentValue', data.responsable);
+				$('#responsableCodi').webutilInputSuggest();
 			})
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
@@ -61,10 +63,16 @@ $(document).ready(function(){
 			disabled="true"
 			required="true"/> 
 			
-		<rip:inputText 
+		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+		<rip:inputSuggest 
 			name="responsableCodi" 
-			textKey="expedient.tasca.form.camp.responsableCodi" 
-			required="true"/> 
+			urlConsultaInicial="${urlConsultaInicial}" 
+			urlConsultaLlistat="${urlConsultaLlistat}" 
+			textKey="expedient.tasca.form.camp.responsable"
+			suggestValue="codi"
+			suggestText="nom"
+			required="true" />			
 
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

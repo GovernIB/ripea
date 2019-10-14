@@ -31,6 +31,7 @@ import es.caib.ripea.core.helper.ExcepcioLogHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -61,6 +62,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Resource
 	private AplicacioHelper aplicacioHelper;
+	@Resource
+	private UsuariHelper usuariHelper;
 
 
 
@@ -150,6 +153,25 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consultant usuaris amb text (text=" + text + ")");
 		return conversioTipusHelper.convertirList(
 				usuariRepository.findByText(text),
+				UsuariDto.class);
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto findUsuariAmbCodiDades(String codi) {
+		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+		return conversioTipusHelper.convertir(
+				usuariHelper.getUsuariByCodiDades(codi),
+				UsuariDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<UsuariDto> findUsuariAmbTextDades(String text) {
+		logger.debug("Consultant usuaris amb text (text=" + text + ")");
+		return conversioTipusHelper.convertirList(
+				pluginHelper.findAmbFiltre(text),
 				UsuariDto.class);
 	}
 

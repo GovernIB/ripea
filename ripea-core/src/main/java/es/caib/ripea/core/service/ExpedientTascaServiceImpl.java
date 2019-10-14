@@ -26,7 +26,6 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -47,12 +46,12 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
  * 
@@ -87,6 +86,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private UsuariHelper usuariHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -307,45 +308,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				"CA");
 	}
 
-	private UsuariEntity findUserInDatabaseOrWithDadesUsuariPlugin(String usuariCodi) {
 
-		logger.debug("Cercant d’usuari a la base de dades (usuariCodi=" + usuariCodi + ")");
-		UsuariEntity usuari = usuariRepository.findOne(usuariCodi);
-		if (usuari == null) {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + usuariCodi + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
-			if (dadesUsuari != null) {
-				usuari = usuariRepository.save(
-						UsuariEntity.getBuilder(
-								dadesUsuari.getCodi(),
-								dadesUsuari.getNom(),
-								dadesUsuari.getNif(),
-								dadesUsuari.getEmail(),
-								getIdiomaPerDefecte()).build());
-			} else {
-				throw new NotFoundException(
-						usuariCodi,
-						DadesUsuari.class);
-			}
-		} else {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + usuariCodi + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
-			if (dadesUsuari != null) {
-				usuari.update(
-						dadesUsuari.getNom(),
-						dadesUsuari.getNif(),
-						dadesUsuari.getEmail());
-			} else {
-				throw new NotFoundException(
-						usuariCodi,
-						DadesUsuari.class);
-			}
-		}
-		
-		return usuari;
-	}
+	
+	
 	
 	@Override
 	@Transactional
@@ -370,7 +335,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
 		
-		UsuariEntity responsable = findUserInDatabaseOrWithDadesUsuariPlugin(expedientTasca.getResponsableCodi());
+		UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(expedientTasca.getResponsableCodi());
 
 		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(expedient, metaExpedientTascaEntity, responsable).build();
 		
