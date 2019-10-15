@@ -56,12 +56,6 @@ $(document).ready(function(){
 			optionValueAttribute="id"  
 			optionTextAttribute="nom"
 			required="true" /> 
-		
-		<rip:inputTextarea 
-			name="metaExpedientTascaDescripcio" 
-			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
-			disabled="true"
-			required="true"/> 
 			
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
@@ -72,7 +66,13 @@ $(document).ready(function(){
 			textKey="expedient.tasca.form.camp.responsable"
 			suggestValue="codi"
 			suggestText="nom"
-			required="true" />			
+			required="true"/>				
+		
+		<rip:inputTextarea 
+			name="metaExpedientTascaDescripcio" 
+			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
+			disabled="true"
+			required="true"/> 
 
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

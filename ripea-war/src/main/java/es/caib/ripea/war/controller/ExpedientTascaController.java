@@ -149,7 +149,7 @@ public class ExpedientTascaController extends BaseUserController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.CANCELLADA);
+		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.CANCELLADA, null);
 		
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(

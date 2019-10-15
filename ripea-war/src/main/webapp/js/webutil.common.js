@@ -417,7 +417,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
-		    allowClear: true,
+		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumInputLength: $(this).data('minimumInputLength'),
 		    ajax: {
 		    	delay: 500,

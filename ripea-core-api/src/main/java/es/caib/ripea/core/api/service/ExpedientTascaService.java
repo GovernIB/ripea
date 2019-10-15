@@ -43,10 +43,6 @@ public interface ExpedientTascaService {
 	public long countTasquesPendents();
 
 
-	public ExpedientTascaDto canviarEstat(
-			Long expedientTascaId,
-			TascaEstatEnumDto tascaEstatEnumDto);
-
 	public ContingutDto findTascaExpedient(
 			Long entitatId,
 			Long contingutId,
@@ -122,11 +118,11 @@ public interface ExpedientTascaService {
 			Long id, 
 			Long tascaId);
 
-	public ExpedientTascaDto rebutjar(
-			Long expedientTascaId,
-			String motiu);
-
 	public void enviarEmailCrearTasca(
 			Long expedientTascaId);
+
+	public ExpedientTascaDto canviarEstat(Long expedientTascaId,
+			TascaEstatEnumDto tascaEstatEnumDto,
+			String motiu);
 
 }

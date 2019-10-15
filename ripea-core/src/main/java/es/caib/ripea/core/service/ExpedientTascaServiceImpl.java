@@ -244,10 +244,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	}
 	
-	
 	@Transactional
 	@Override
-	public ExpedientTascaDto canviarEstat(Long expedientTascaId, TascaEstatEnumDto tascaEstatEnumDto) {
+	public ExpedientTascaDto canviarEstat(Long expedientTascaId, TascaEstatEnumDto tascaEstatEnumDto, String motiu) {
 		logger.debug("Canviant estat del tasca " +
 				"expedientTascaId=" + expedientTascaId +", "+
 				"tascaEstatEnumDto=" + tascaEstatEnumDto +
@@ -255,35 +254,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
 		TascaEstatEnumDto estatAnterior = expedientTascaEntity.getEstat();
-		expedientTascaEntity.updateEstat(tascaEstatEnumDto);
+				
+		if (tascaEstatEnumDto == TascaEstatEnumDto.REBUTJADA) {
+			expedientTascaEntity.updateRebutjar(motiu);
+		} else {
+			expedientTascaEntity.updateEstat(tascaEstatEnumDto);
+		}
 		
 		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior);
-		
 		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
 		
 		return conversioTipusHelper.convertir(expedientTascaEntity,
 				ExpedientTascaDto.class);
 	}
-	
-	
-	@Transactional
-	@Override
-	public ExpedientTascaDto rebutjar(Long expedientTascaId, String motiu) {
-		logger.debug("Canviant estat del tasca " +
-				"expedientTascaId=" + expedientTascaId +", "+
-				"motiu=" + motiu +
-				")");
-		
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
-		TascaEstatEnumDto estatAnterior = expedientTascaEntity.getEstat();
-		expedientTascaEntity.updateRebutjar(motiu);
-		
-		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior);
-		
-		return conversioTipusHelper.convertir(expedientTascaEntity,
-				ExpedientTascaDto.class);
-	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override

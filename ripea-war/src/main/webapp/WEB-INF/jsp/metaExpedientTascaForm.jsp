@@ -24,8 +24,18 @@
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="metaexpedient.tasca.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="metaexpedient.tasca.form.camp.nom" required="true"/>
+		
+		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+		<rip:inputSuggest 
+			name="responsable" 
+			urlConsultaInicial="${urlConsultaInicial}" 
+			urlConsultaLlistat="${urlConsultaLlistat}" 
+			textKey="metaexpedient.tasca.form.camp.responsable"
+			suggestValue="codi"
+			suggestText="nom"
+			placeholderKey="metaexpedient.tasca.form.camp.responsable"/>	
 		<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true"/>
-		<rip:inputText name="responsable" textKey="metaexpedient.tasca.form.camp.responsable"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/tasca"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

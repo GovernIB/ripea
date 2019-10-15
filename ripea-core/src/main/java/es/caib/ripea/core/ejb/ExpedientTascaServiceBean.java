@@ -96,13 +96,6 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 		return delegate.countTasquesPendents();
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public ExpedientTascaDto canviarEstat(Long expedientTascaId,
-			TascaEstatEnumDto tascaEstatEnumDto) {
-		return delegate.canviarEstat(expedientTascaId,
-				tascaEstatEnumDto);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
@@ -273,19 +266,21 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	}
 
 	@Override
-	public ExpedientTascaDto rebutjar(
-			Long expedientTascaId,
-			String motiu) {
-		return delegate.rebutjar(
-				expedientTascaId, 
-				motiu);
-	}
-
-	@Override
 	public void enviarEmailCrearTasca(
 			Long expedientTascaId) {
 		delegate.enviarEmailCrearTasca(
 				expedientTascaId);
+	}
+
+	@Override
+	public ExpedientTascaDto canviarEstat(
+			Long expedientTascaId,
+			TascaEstatEnumDto tascaEstatEnumDto,
+			String motiu) {
+		return delegate.canviarEstat(
+				expedientTascaId,
+				tascaEstatEnumDto,
+				motiu);
 	}
 
 }

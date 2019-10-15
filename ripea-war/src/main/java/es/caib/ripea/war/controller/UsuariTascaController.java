@@ -190,7 +190,7 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.INICIADA);
+		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.INICIADA, null);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
@@ -230,8 +230,9 @@ public class UsuariTascaController extends BaseUserController {
 			return "usuariTascaRebuigForm";
 		}
 		
-		expedientTascaService.rebutjar(
+		expedientTascaService.canviarEstat(
 				command.getId(),
+				TascaEstatEnumDto.REBUTJADA,
 				command.getMotiu());
 		return getModalControllerReturnValueSuccess(
 				request,
@@ -248,7 +249,7 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.FINALITZADA);
+		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.FINALITZADA, null);
 		
 		expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(

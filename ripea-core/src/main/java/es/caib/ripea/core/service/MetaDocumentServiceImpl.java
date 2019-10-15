@@ -279,8 +279,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false);
+				false,
+				true);
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				metaDocumentId);
