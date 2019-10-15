@@ -369,7 +369,8 @@ public class DocumentEnviamentController extends BaseUserController {
 				"interessats",
 				expedientInteressatService.findByExpedient(
 						entitatActual.getId(),
-						document.getExpedientPare().getId()));
+						document.getExpedientPare().getId(),
+						true));
 		model.addAttribute(
 				"expedientId",
 				document.getExpedientPare().getId());

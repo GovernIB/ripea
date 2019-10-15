@@ -185,7 +185,8 @@ public interface ExpedientInteressatService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<InteressatDto> findByExpedient(
 			Long entitatId,
-			Long expedientId) throws NotFoundException;
+			Long expedientId,
+			boolean nomesAmbNotificacioActiva) throws NotFoundException;
 
 	/**
 	 * Consulta el nombre d'interessats associats a un expedient.

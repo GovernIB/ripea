@@ -47,6 +47,20 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	List<InteressatEntity> findByExpedientAndNotRepresentant(
 			@Param("expedient") ExpedientEntity expedient);
 	
+	
+	@Query(	  "select "
+			+ "    inter "
+			+ "from "
+			+ "    InteressatEntity inter "
+			+ "where "
+			+ "    inter.expedient = :expedient "
+			+ "and inter.esRepresentant = false "
+			+ "and inter.notificacioAutoritzat = true "
+			+ "order by "
+			+ "    inter.id asc")
+	List<InteressatEntity> findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+			@Param("expedient") ExpedientEntity expedient);
+	
 	@Query(	  "select "
 			+ "    count(inter) "
 			+ "from "

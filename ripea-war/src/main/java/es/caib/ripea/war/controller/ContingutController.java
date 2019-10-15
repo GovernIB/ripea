@@ -359,7 +359,8 @@ public class ContingutController extends BaseUserController {
 		if (contingut instanceof ExpedientDto) {
 			interessats = interessatService.findByExpedient(
 					entitatActual.getId(),
-					contingutId);
+					contingutId,
+					false);
 		}
 		return DatatablesHelper.getDatatableResponse(
 				request,
@@ -516,7 +517,8 @@ public class ContingutController extends BaseUserController {
 					"interessatsCount",
 					interessatService.findByExpedient(
 							entitatActual.getId(),
-							contingut.getId()).size());			
+							contingut.getId(),
+							false).size());			
 			model.addAttribute("enviamentsCount", documentEnviamentService.enviamentsCount(
 					entitatActual.getId(),
 					contingut.getId()));
