@@ -117,7 +117,7 @@ $(document).ready(function() {
 		if (droppedFilesFiles && droppedFilesFiles.length == 1) {
 			document.querySelector('#arxiu').files = droppedFilesFiles;
 			mostrarDocument(droppedFilesFiles[0].name);
-			document.querySelector('#arxiu').value = '';
+			
 		}
 	}
 });

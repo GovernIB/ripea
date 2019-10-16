@@ -2745,7 +2745,7 @@ public class PluginHelper {
 					enviament.setEntregaPostalCodiPostal("00000");
 				}
 				// ########## ENVIAMENT DEH  ###############
-				if (interessatEntity.getEntregaDeh()) {
+				if (interessatEntity.getEntregaDeh() != null && interessatEntity.getEntregaDeh()) {
 					enviament.setEntregaDehActiva(true);
 					enviament.setEntregaDehObligat(interessatEntity.getEntregaDehObligat());
 					enviament.setEntregaDehProcedimentCodi(

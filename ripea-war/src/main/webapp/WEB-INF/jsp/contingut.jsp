@@ -497,6 +497,7 @@ $(document).ready(function() {
 		}
 	});
 
+
 });
 </script>
 
@@ -788,7 +789,7 @@ $(document).ready(function() {
 											<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/llistat"/></c:set>
 										</c:otherwise>
 									</c:choose>	
-									<a href="${llistatVistaUrl}" class="btn btn-default ${vistaLlistat ? 'active' : ''}">
+									<a href="${llistatVistaUrl}" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
 										<span class="fa fa-th-list"></span>
 									</a>
 									<%---- Button icones ----%>
@@ -800,7 +801,7 @@ $(document).ready(function() {
 											<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/icones"/></c:set>
 										</c:otherwise>
 									</c:choose>										
-									<a href="${iconesVistaUrl}" class="btn btn-default ${vistaIcones ? 'active' : ''}">
+									<a href="${iconesVistaUrl}" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
 										<span class="fa fa-th"></span>
 									</a>									
 								</div>
