@@ -26,6 +26,7 @@ import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
@@ -132,7 +133,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			RespostaAlta respostaAlta = getNotificacioService().alta(notificacioNotib);
 
 			if (respostaAlta.isError() && (respostaAlta.getReferencies() == null || respostaAlta.getReferencies().isEmpty())) {
-				throw new SistemaExternException(respostaAlta.getErrorDescripcio());
+				throw new NotibRepostaException(respostaAlta.getErrorDescripcio());
 			} else {
 				RespostaEnviar resposta = new RespostaEnviar();
 				resposta.setEstat(respostaAlta.getEstat() != null ? NotificacioEstat.valueOf(respostaAlta.getEstat().toString()) : null);
@@ -258,7 +259,11 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 		es.caib.notib.ws.notificacio.Persona p = null;
 		if (persona != null) {
 			p = new es.caib.notib.ws.notificacio.Persona();
-			p.setNif(persona.getNif());
+			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
+				p.setDir3Codi(persona.getNif());
+			} else {
+				p.setNif(persona.getNif());
+			}
 			p.setNom(persona.getNom());
 			p.setLlinatge1(persona.getLlinatge1());
 			p.setLlinatge2(persona.getLlinatge2());

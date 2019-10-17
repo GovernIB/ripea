@@ -132,15 +132,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 						"L'interessat no ha donat el consentiment per a les notificacions electròniques (" +
 						"expedientId=" + expedient.getId() + ", " +
 						"interessatId=" + interessatId + ")");
-			}
-			if (interessat instanceof InteressatAdministracioEntity) {
-				throw new ValidationException(
-						interessatId,
-						InteressatEntity.class,
-						"L'interessat ha de ser una persona física o jurídica(" +
-						"interessatId=" + interessatId + ", " +
-						"interessatClass=" + interessat.getClass().getName() + ")");
-			}		
+			}	
 			interessats.add(interessat);		
 		}
 		return interessats;

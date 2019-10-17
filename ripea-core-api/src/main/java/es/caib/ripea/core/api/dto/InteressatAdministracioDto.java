@@ -14,6 +14,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class InteressatAdministracioDto extends InteressatDto {
 
 	protected String organCodi;
+	protected String organNom;
+
+	public String getOrganNom() {
+		return organNom;
+	}
+
+	public void setOrganNom(String organNom) {
+		this.organNom = organNom;
+	}
 
 	@Override
 	public InteressatTipusEnumDto getTipus() {

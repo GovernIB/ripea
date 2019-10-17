@@ -3586,7 +3586,9 @@ public class PluginHelper {
 			persona.setNom(interessatPj.getRaoSocial());
 			persona.setInteressatTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
 		} else if (interessat instanceof InteressatAdministracioEntity) {
+			InteressatAdministracioEntity interessatA = (InteressatAdministracioEntity)interessat;
 			persona.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			persona.setNom(interessatA.getOrganNom());
 		}
 		persona.setTelefon(interessat.getTelefon());
 		persona.setEmail(interessat.getEmail());

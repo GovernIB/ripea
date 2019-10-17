@@ -10,6 +10,9 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -29,9 +32,11 @@ import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.war.command.DocumentNotificacioCommand;
 import es.caib.ripea.war.command.DocumentNotificacioCommand.Electronica;
 import es.caib.ripea.war.command.DocumentPublicacioCommand;
@@ -98,14 +103,33 @@ public class DocumentEnviamentController extends BaseUserController {
 			return "notificacioForm";
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentEnviamentService.notificacioCreate(
-				entitatActual.getId(),
-				documentId,
-				DocumentNotificacioCommand.asDto(command));
-		return this.getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../../contingut/" + documentId,
-				"document.controller.notificacio.ok");
+		
+		try {
+			documentEnviamentService.notificacioCreate(
+					entitatActual.getId(),
+					documentId,
+					DocumentNotificacioCommand.asDto(command));
+			
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + documentId,
+					"document.controller.notificacio.ok");
+
+		} catch (Exception ex) {
+			logger.error(ExceptionUtils.getRootCauseMessage(ex), ex);
+			String msg = "";
+			Throwable rootCause = ExceptionUtils.getRootCause(ex);
+			if (rootCause instanceof NotibRepostaException) {
+				msg = getMessage(request, "contingut.enviament.errorReposta.notib") + " " + rootCause.getMessage();
+			} else {
+				msg = ex.getMessage();
+			}
+			
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../../../contingut/" + documentId,
+					msg);
+		}
 	}
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/info")
@@ -420,5 +444,7 @@ public class DocumentEnviamentController extends BaseUserController {
 							DocumentEnviamentEstatEnumDto.CANCELAT}));
 		
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(DocumentEnviamentController.class);
 
 }
