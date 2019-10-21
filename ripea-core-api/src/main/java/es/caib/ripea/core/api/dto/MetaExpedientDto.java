@@ -20,17 +20,10 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String expressioNumero;
 	private boolean notificacioActiva;
 	private Long pareId;
-	private List<MetaDocumentDto> metaDocuments;
-	
 	private int expedientEstatsCount;
-	
+	private int expedientTasquesCount;
+	private List<MetaDocumentDto> metaDocuments;
 
-	public int getExpedientEstatsCount() {
-		return expedientEstatsCount;
-	}
-	public void setExpedientEstatsCount(int expedientEstatsCount) {
-		this.expedientEstatsCount = expedientEstatsCount;
-	}
 	public String getClassificacioSia() {
 		return classificacioSia;
 	}
@@ -60,6 +53,18 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	}
 	public void setPareId(Long pareId) {
 		this.pareId = pareId;
+	}
+	public int getExpedientEstatsCount() {
+		return expedientEstatsCount;
+	}
+	public void setExpedientEstatsCount(int expedientEstatsCount) {
+		this.expedientEstatsCount = expedientEstatsCount;
+	}
+	public int getExpedientTasquesCount() {
+		return expedientTasquesCount;
+	}
+	public void setExpedientTasquesCount(int expedientTasquesCount) {
+		this.expedientTasquesCount = expedientTasquesCount;
 	}
 	public List<MetaDocumentDto> getMetaDocuments() {
 		return metaDocuments;

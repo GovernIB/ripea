@@ -102,7 +102,6 @@ $(document).ready(function() {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
-				<th data-col-name="escriptori" data-visible="false">#</th>
 				<th data-col-name="expedient" data-visible="false">#</th>
 				<th data-col-name="carpeta" data-visible="false">#</th>
 				<th data-col-name="hasFills" data-visible="false">#</th>

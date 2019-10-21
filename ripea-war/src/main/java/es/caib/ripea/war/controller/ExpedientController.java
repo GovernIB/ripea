@@ -381,6 +381,20 @@ public class ExpedientController extends BaseUserController {
 			return "contingutExpedientForm";
 		}		
 	}
+	
+	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/proximNumeroSequencia/{any}", method = RequestMethod.GET)
+	@ResponseBody
+	public long proximNumeroSequencia(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable int any) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.getProximNumeroSequencia(
+				entitatActual.getId(),
+				metaExpedientId,
+				any);
+	}
 
 	@RequestMapping(value = "/{expedientId}/agafar", method = RequestMethod.GET)
 	public String agafar(

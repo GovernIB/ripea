@@ -85,7 +85,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setContentType(document.getContingut().getTipusMime());
 			fitxer.setContingut(document.getContingut().getContingut());
 			
-			DocumentEntity entity = documentHelper.crearNouDocument(
+			DocumentEntity entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.DIGITAL,
 					document.getNom(),
 					document.getMetadades().getDataCaptura(),

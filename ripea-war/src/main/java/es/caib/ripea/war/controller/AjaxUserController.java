@@ -52,6 +52,25 @@ public class AjaxUserController extends BaseUserController {
 			Model model) {
 		return aplicacioService.findUsuariAmbText(text);
 	}
+	
+	
+	@RequestMapping(value = "/usuariDades/{codi}", method = RequestMethod.GET)
+	@ResponseBody
+	public UsuariDto getByCodiPluginDadesUsuari(
+			HttpServletRequest request,
+			@PathVariable String codi,
+			Model model) {
+		return aplicacioService.findUsuariAmbCodiDades(codi);
+	}
+
+	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<UsuariDto> getPluginDadesUsuari(
+			HttpServletRequest request,
+			@PathVariable String text,
+			Model model) {
+		return aplicacioService.findUsuariAmbTextDades(text);
+	}
 
 	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)
 	@ResponseBody

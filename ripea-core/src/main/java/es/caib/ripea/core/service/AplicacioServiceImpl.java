@@ -24,12 +24,14 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.AplicacioHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.ExcepcioLogHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -48,7 +50,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private UsuariRepository usuariRepository;
 	@Resource
 	private AclSidRepository aclSidRepository;
-
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
@@ -59,6 +60,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private IntegracioHelper integracioHelper;
 	@Resource
 	private ExcepcioLogHelper excepcioLogHelper;
+	@Resource
+	private AplicacioHelper aplicacioHelper;
+	@Resource
+	private UsuariHelper usuariHelper;
 
 
 
@@ -150,6 +155,25 @@ public class AplicacioServiceImpl implements AplicacioService {
 				usuariRepository.findByText(text),
 				UsuariDto.class);
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto findUsuariAmbCodiDades(String codi) {
+		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+		return conversioTipusHelper.convertir(
+				usuariHelper.getUsuariByCodiDades(codi),
+				UsuariDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<UsuariDto> findUsuariAmbTextDades(String text) {
+		logger.debug("Consultant usuaris amb text (text=" + text + ")");
+		return conversioTipusHelper.convertirList(
+				pluginHelper.findAmbFiltre(text),
+				UsuariDto.class);
+	}
 
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
@@ -198,7 +222,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyBaseUrl() {
 		logger.debug("Consulta de la propietat base URL");
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url");
+		return aplicacioHelper.propertyBaseUrl();
 	}
 
 	@Override

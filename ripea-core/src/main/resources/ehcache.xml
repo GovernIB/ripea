@@ -6,6 +6,7 @@
 	<defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false" />
 
 	<cache name="aclCache" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="600" overflowToDisk="false" />
+	<cache name="tasquesUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="entitatsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="errorsValidacioNode" maxElementsInMemory="1000" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="unitatsOrganitzatives" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />

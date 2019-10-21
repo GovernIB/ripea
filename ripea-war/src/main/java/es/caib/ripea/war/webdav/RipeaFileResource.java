@@ -179,7 +179,6 @@ public class RipeaFileResource implements ReplaceableResource, FileResource {
 			fitxer.setContingut(IOUtils.toByteArray(in));
 			getDocumentService().update(
 					document.getEntitat().getId(),
-					document.getId(),
 					document);
 		} catch (IOException ex) {
 			throw new BadRequestException("Error al llegir les dades de l'arxiu", ex);

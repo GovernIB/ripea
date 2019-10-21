@@ -24,7 +24,7 @@ function refrescarSequencia() {
 	if (metaExpedientId !== undefined && any !== undefined) {
 		$.ajax({
 			type: 'GET',
-			url: '<c:url value="/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
 			success: function(sequencia) {
 				$('input#sequencia').val(sequencia);
 			}
@@ -62,7 +62,7 @@ $(document).ready(function() {
 				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true" labelSize="2"/>
 			</c:otherwise>
 		</c:choose>
-		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2"/>
+		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -14,11 +17,13 @@ import java.util.ListIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
@@ -28,6 +33,7 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -50,6 +56,7 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
@@ -61,6 +68,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -110,6 +118,8 @@ public class ContingutHelper {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Autowired
+	private ExpedientTascaRepository expedientTascaRepository;
 
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
@@ -158,7 +168,7 @@ public class ContingutHelper {
 			dto.setSistraUnitatAdministrativa(expedient.getSistraUnitatAdministrativa());
 			dto.setSistraClau(expedient.getSistraClau());
 			dto.setNumero(expedientHelper.calcularNumero(expedient));
-			dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions().isEmpty() ? true : false);
+			dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions( ).isEmpty() ? true : false);
 			dto.setAgafatPer(
 					conversioTipusHelper.convertir(
 							expedient.getAgafatPer(),
@@ -537,6 +547,118 @@ public class ContingutHelper {
 		}
 		return contingut;
 	}
+	
+	
+	public ContingutEntity comprovarContingutPertanyTascaAccesible(
+			Long entitatId,
+			Long tascaId,
+			Long contingutId) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(tascaId);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		
+		if (!expedientTascaEntity.getExpedient().getId().equals(contingut.getExpedientPare().getId())) {
+			throw new SecurityException("Contingut no pertany a la tasca accesible("
+					+ "tascaId=" + expedientTascaEntity.getId() + ", "
+					+ "contingutId=" + contingutId + ", "
+					+ "usuari=" + auth.getName() + ")");
+		}
+		
+		if (!expedientTascaEntity.getResponsable().getCodi().equals(auth.getName())) {
+			throw new SecurityException("Sense permisos per accedir la tasca ("
+					+ "tascaId=" + expedientTascaEntity.getId() + ", "
+					+ "usuari=" + auth.getName() + ")");
+		}
+		
+		return contingut;
+	}
+	
+	
+
+	public ContingutDto deleteReversible(
+			Long entitatId,
+			ContingutEntity contingut) throws IOException {
+		logger.debug("Esborrant el contingut ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingut.getId() + ")");
+
+		ContingutDto dto = toContingutDto(
+				contingut,
+				true,
+				false,
+				false,
+				false,
+				false,
+				false,
+				false);
+		// Comprova que el contingut no estigui esborrat
+		if (contingut.getEsborrat() > 0) {
+			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					"Aquest contingut ja està esborrat");
+		}
+
+		// Marca el contingut i tots els seus fills com a esborrats
+		//  de forma recursiva
+		marcarEsborrat(contingut);
+		
+		// Valida si conté documents definitius
+		if (!conteDocumentsDefinitius(contingut)) {
+			
+			// Si el contingut és un document guarda una còpia del fitxer esborrat
+			// per a poder recuperar-lo posteriorment
+			if (contingut instanceof DocumentEntity) {
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
+				}
+			}
+			// Elimina contingut a l'arxiu
+			arxiuPropagarEliminacio(contingut);
+		}
+
+		return dto;
+	}
+	
+	private boolean conteDocumentsDefinitius(ContingutEntity contingut) {
+		boolean conteDefinitius = false;
+		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
+			for (ContingutEntity contingutFill: contingut.getFills()) {
+				conteDefinitius = conteDocumentsDefinitius(contingutFill);
+				if (conteDefinitius)
+					break;
+			}
+		} else if (deproxied instanceof DocumentEntity) {
+			DocumentEntity document = (DocumentEntity)deproxied;
+			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat());
+		}
+		return conteDefinitius;
+	}
+	
+	private void fitxerDocumentEsborratGuardarEnTmp(
+			DocumentEntity document) throws IOException {
+		File fContent = new File(getBaseDir() + "/" + document.getId());
+		fContent.getParentFile().mkdirs();
+		FileOutputStream outContent = new FileOutputStream(fContent);
+		FitxerDto fitxer = documentHelper.getFitxerAssociat(
+				document,
+				null);
+		outContent.write(fitxer.getContingut());
+		outContent.close();
+	}
+
 
 	public void comprovarPermisosNode(
 			NodeEntity node,
@@ -613,94 +735,7 @@ public class ContingutHelper {
 					"El node no te meta-node associat (nodeId=" + node.getId() + ")");
 		}
 	}
-	/*public void comprovarPermisosPathContingut(
-			ContingutEntity contingut,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisDelete,
-			boolean incloureActual) {
-		List<ContingutEntity> path = getPathContingut(contingut);
-		if (path != null) {
-			// Dels contenidors del path només comprova el permis read
-			for (ContingutEntity contingutPath: path) {
-				// Si el contingut està agafat per un altre usuari no es
-				// comproven els permisos de l'escriptori perquè òbviament
-				// els altres usuaris no hi tendran accés.
-				if (!(contingutPath instanceof EscriptoriEntity)) {
-					comprovarPermisosContingut(
-							contingutPath,
-							true,
-							false,
-							false);
-				}
-			}
-		}
-		if (incloureActual) {
-			// Del contenidor en qüestió comprova tots els permisos
-			comprovarPermisosContingut(
-					contingut,
-					comprovarPermisRead,
-					comprovarPermisWrite,
-					comprovarPermisDelete);
-		}
-	}
-	public void comprovarPermisosFinsExpedientArrel(
-			ContingutEntity contingut,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisDelete,
-			boolean incloureActual) {
-		List<ContingutEntity> path = getPathContingut(contingut);
-		if (incloureActual || path != null) {
-			if (incloureActual) {
-				if (path == null)
-					path = new ArrayList<ContingutEntity>();
-				path.add(contingut);
-			}
-			boolean expedientArrelTrobat = false;
-			for (ContingutEntity contingutPath: path) {
-				if (!expedientArrelTrobat && contingutPath instanceof ExpedientEntity) {
-					expedientArrelTrobat = true;
-				}
-				if (expedientArrelTrobat) {
-					comprovarPermisosContingut(
-							contingutPath,
-							comprovarPermisRead,
-							comprovarPermisWrite,
-							comprovarPermisDelete);
-				}
-			}
-		}
-	}
 
-	public void comprovarContingutArrelEsEscriptoriUsuariActual(
-			EntitatEntity entitat,
-			ContingutEntity contingut) {
-		// Comprova que el contenidor arrel és un escriptori
-		// i que pertany a l'usuari actual.
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		EscriptoriEntity escriptori = null;
-		Object deproxied = HibernateHelper.deproxy(contingut);
-		if (deproxied instanceof EscriptoriEntity) {
-			escriptori = (EscriptoriEntity)deproxied;
-		} else {
-			List<ContingutEntity> path = getPathContingut(contingut);
-			if (path != null) {
-				deproxied = HibernateHelper.deproxy(path.get(0));
-				if (deproxied instanceof EscriptoriEntity)
-					escriptori = (EscriptoriEntity)deproxied;
-			}
-		}
-		if (	escriptori == null ||
-				escriptori.getUsuari() == null ||
-				!escriptori.getUsuari().getCodi().equals(auth.getName()) ||
-				!escriptori.getEntitat().equals(entitat)) {
-			throw new SecurityException("El contingut no està situat a l'escriptori de l'usuari actual ("
-						+ "id=" + contingut.getId() + ", "
-						+ "entitatId=" + entitat.getId() + ", "
-						+ "usuari=" + auth.getName() + ")");
-		}
-	}*/
 
 	public ExpedientEntity getExpedientSuperior(
 			ContingutEntity contingut,
@@ -1150,6 +1185,37 @@ public class ContingutHelper {
 		    }
 		}
 	}
+	
+	
+	public void marcarEsborrat(ContingutEntity contingut) {
+		for (ContingutEntity contingutFill: contingut.getFills()) {
+			marcarEsborrat(contingutFill);
+		}
+		List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
+				contingut.getPare(),
+				contingut.getNom());
+		// Per evitar errors de restricció única violada hem de
+		// posar al camp esborrat un nombre != 0 i que sigui diferent
+		// dels altres fills esborrats amb el mateix nom.
+		int index = 1;
+		for (ContingutEntity c: continguts) {
+			if (c.getEsborrat() > 0) {
+				if (index < c.getEsborrat()) {
+					break;
+				}
+				index++;
+			}
+		}
+		contingut.updateEsborrat(continguts.size() + 1);
+		contingut.updateEsborratData(new Date());
+		contingutLogHelper.log(
+				contingut,
+				LogTipusEnumDto.ELIMINACIO,
+				null,
+				null,
+				true,
+				true);
+	}
 
 	/*private Long getCountByContingut(
 			ContingutEntity contingut,
@@ -1162,6 +1228,10 @@ public class ContingutHelper {
 		}
 		return new Long(0);
 	}*/
+	
+	public String getBaseDir() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 

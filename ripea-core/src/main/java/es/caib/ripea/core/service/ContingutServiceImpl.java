@@ -215,44 +215,11 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true);
-		ContingutDto dto = contingutHelper.toContingutDto(
-				contingut,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false);
-		// Comprova que el contingut no estigui esborrat
-		if (contingut.getEsborrat() > 0) {
-			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingutId + ")");
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"Aquest contingut ja està esborrat");
-		}
+	
 
-		// Marca el contingut i tots els seus fills com a esborrats
-		//  de forma recursiva
-		marcarEsborrat(contingut);
-		
-		// Valida si conté documents definitius
-		if (!conteDocumentsDefinitius(contingut)) {
-			
-			// Si el contingut és un document guarda una còpia del fitxer esborrat
-			// per a poder recuperar-lo posteriorment
-			if (contingut instanceof DocumentEntity) {
-				DocumentEntity document = (DocumentEntity)contingut;
-				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
-				}
-			}
-			// Elimina contingut a l'arxiu
-			contingutHelper.arxiuPropagarEliminacio(contingut);
-		}
-
-		return dto;
+		return contingutHelper.deleteReversible(
+				entitatId,
+				contingut);
 	}
 
 	@Transactional
@@ -717,6 +684,7 @@ public class ContingutServiceImpl implements ContingutService {
 		return dto;
 	}
 	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -724,19 +692,45 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions) {
+
+		return findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				true);
+	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos) {
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
 				+ "ambFills=" + ambFills + ", "
 				+ "ambVersions=" + ambVersions + ")");
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
-				entitatId,
-				contingutId,
-				true,
-				false);
+		
+		ContingutEntity contingut;
+		if (ambPermisos) {
+			contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
+					entitatId,
+					contingutId,
+					true,
+					false);
+		} else {
+			contingut = contingutRepository.findOne(contingutId);
+		}
+
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
-				true,
+				ambPermisos,
 				ambFills,
 				ambFills,
 				true,
@@ -749,6 +743,8 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return dto;
 	}
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -789,62 +785,6 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "entitatId=" + entitatId + ", "
 				+ "path=" + path + ", "
 				+ "usuariCodi=" + auth.getName() + ")");
-		// TODO
-		/*EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		EscriptoriEntity escriptori = escriptoriRepository.findByEntitatAndUsuari(
-				entitat,
-				usuariHelper.getUsuariAutenticat());
-		ContingutEntity contingutActual = escriptori;
-		if (!path.isEmpty() && !path.equals("/")) {
-			String[] pathParts;
-			if (path.startsWith("/")) {
-				pathParts = path.substring(1).split("/");
-			} else {
-				pathParts = path.split("/");
-			}
-			for (String pathPart: pathParts) {
-				Long idActual = contingutActual.getId();
-				contingutActual = contingutRepository.findByPareAndNomAndEsborrat(
-						contingutActual,
-						pathPart,
-						0);
-				if (contingutActual == null) {
-					logger.error("No s'ha trobat el contingut (pareId=" + idActual + ", nom=" + pathPart + ")");
-					throw new NotFoundException(
-							"(pareId=" + idActual + ", nom=" + pathPart + ")",
-							ContingutEntity.class);
-				}
-				// Si el contingut actual és un document ens aturam
-				// perquè el següent element del path serà la darrera
-				// versió i no la trobaría com a contingut.
-				if (contingutActual instanceof DocumentEntity)
-					break;
-			}
-		}
-		// Comprova que el contingut arrel és l'escriptori de l'usuari actual
-		contingutHelper.comprovarContingutArrelEsEscriptoriUsuariActual(
-				entitat,
-				contingutActual);
-		// Comprova l'accés al path del contingut
-		contingutHelper.comprovarPermisosPathContingut(
-				contingutActual,
-				true,
-				false,
-				false,
-				true);
-		return contingutHelper.toContingutDto(
-				contingutActual,
-				true,
-				true,
-				true,
-				true,
-				true,
-				false,
-				true);*/
 		return null;
 	}
 
@@ -1658,7 +1598,7 @@ public class ContingutServiceImpl implements ContingutService {
 			creat = contingutRepository.save(carpetaNova);
 		} else if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			creat = documentHelper.crearNouDocument(
+			creat = documentHelper.crearDocumentDB(
 					documentOrigen.getDocumentTipus(),
 					documentOrigen.getNom(),
 					documentOrigen.getData(),
@@ -1711,7 +1651,7 @@ public class ContingutServiceImpl implements ContingutService {
 		ContingutEntity creat = null;
 		if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			creat = documentHelper.crearNouDocument(
+			creat = documentHelper.crearDocumentDB(
 					documentOrigen.getDocumentTipus(),
 					documentOrigen.getNom(),
 					documentOrigen.getData(),
@@ -1849,39 +1789,11 @@ public class ContingutServiceImpl implements ContingutService {
 		return conteDefinitius;
 	}
 
-	private void marcarEsborrat(ContingutEntity contingut) {
-		for (ContingutEntity contingutFill: contingut.getFills()) {
-			marcarEsborrat(contingutFill);
-		}
-		List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
-				contingut.getPare(),
-				contingut.getNom());
-		// Per evitar errors de restricció única violada hem de
-		// posar al camp esborrat un nombre != 0 i que sigui diferent
-		// dels altres fills esborrats amb el mateix nom.
-		int index = 1;
-		for (ContingutEntity c: continguts) {
-			if (c.getEsborrat() > 0) {
-				if (index < c.getEsborrat()) {
-					break;
-				}
-				index++;
-			}
-		}
-		contingut.updateEsborrat(continguts.size() + 1);
-		contingut.updateEsborratData(new Date());
-		contingutLogHelper.log(
-				contingut,
-				LogTipusEnumDto.ELIMINACIO,
-				null,
-				null,
-				true,
-				true);
-	}
+
 
 	private void fitxerDocumentEsborratGuardarEnTmp(
 			DocumentEntity document) throws IOException {
-		File fContent = new File(getBaseDir() + "/" + document.getId());
+		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
 		FileOutputStream outContent = new FileOutputStream(fContent);
 		FitxerDto fitxer = documentHelper.getFitxerAssociat(
@@ -1893,7 +1805,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 	private FitxerDto fitxerDocumentEsborratLlegir(
 			DocumentEntity document) throws IOException {
-		File fContent = new File(getBaseDir() + "/" + document.getId());
+		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
 		if (fContent.exists()) {
 			FileInputStream inContent = new FileInputStream(fContent);
@@ -1918,7 +1830,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 	private void fitxerDocumentEsborratEsborrar(
 			DocumentEntity document) {
-		File fContent = new File(getBaseDir() + "/" + document.getId());
+		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
 		fContent.delete();
 	}
@@ -1948,9 +1860,7 @@ public class ContingutServiceImpl implements ContingutService {
 		return cal.getTime();
 	}
 
-	private String getBaseDir() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
-	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 

@@ -147,6 +147,46 @@ public class UsuariHelper {
 		return usuari;
 	}
 	
+	public UsuariEntity getUsuariByCodiDades(String usuariCodi) {
+
+		logger.debug("Cercant d’usuari a la base de dades (usuariCodi=" + usuariCodi + ")");
+		UsuariEntity usuari = usuariRepository.findOne(usuariCodi);
+		if (usuari == null) {
+			logger.debug("Consultant plugin de dades d'usuari (" +
+					"usuariCodi=" + usuariCodi + ")");
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
+			if (dadesUsuari != null) {
+				usuari = usuariRepository.save(
+						UsuariEntity.getBuilder(
+								dadesUsuari.getCodi(),
+								dadesUsuari.getNom(),
+								dadesUsuari.getNif(),
+								dadesUsuari.getEmail(),
+								getIdiomaPerDefecte()).build());
+			} else {
+				throw new NotFoundException(
+						usuariCodi,
+						DadesUsuari.class);
+			}
+		} else {
+			logger.debug("Consultant plugin de dades d'usuari (" +
+					"usuariCodi=" + usuariCodi + ")");
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
+			if (dadesUsuari != null) {
+				usuari.update(
+						dadesUsuari.getNom(),
+						dadesUsuari.getNif(),
+						dadesUsuari.getEmail());
+			} else {
+				throw new NotFoundException(
+						usuariCodi,
+						DadesUsuari.class);
+			}
+		}
+		
+		return usuari;
+	}
+	
 
 	private String getIdiomaPerDefecte() {
 		return PropertiesHelper.getProperties().getProperty(

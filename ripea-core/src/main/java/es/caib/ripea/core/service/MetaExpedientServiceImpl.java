@@ -17,13 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -35,6 +38,7 @@ import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -51,6 +55,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private MetaDocumentRepository metaDocumentRepository;
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired
+	private MetaExpedientTascaRepository metaExpedientTascaRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -297,9 +303,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		for(MetaExpedientDto metaExpedient:  resposta.getContingut()){
 			metaExpedient.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
+			metaExpedient.setExpedientTasquesCount(metaExpedientTascaRepository.countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
 		}
-		
-		
 		return resposta;
 	}
 
@@ -396,6 +401,156 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient,
 				any,
 				false);
+	}
+
+	@Transactional
+	@Override
+	public MetaExpedientTascaDto tascaCreate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException {
+		logger.debug("Creant una nova tasca del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"metaExpedientTasca=" + metaExpedientTasca + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId,
+				false,
+				false,
+				false,
+				false);
+		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
+				metaExpedientTasca.getCodi(),
+				metaExpedientTasca.getNom(),
+				metaExpedientTasca.getDescripcio(),
+				metaExpedientTasca.getResponsable(),
+				metaExpedient).
+				build();
+		return conversioTipusHelper.convertir(
+				metaExpedientTascaRepository.save(entity),
+				MetaExpedientTascaDto.class);
+	}
+
+	@Transactional
+	@Override
+	public MetaExpedientTascaDto tascaUpdate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException {
+		logger.debug("Actualitzant la tasca del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"metaExpedientTasca=" + metaExpedientTasca + ")");
+		MetaExpedientTascaEntity entity = getMetaExpedientTasca(
+				entitatId,
+				metaExpedientId,
+				metaExpedientTasca.getId());
+		entity.update(
+				metaExpedientTasca.getCodi(),
+				metaExpedientTasca.getNom(),
+				metaExpedientTasca.getDescripcio(),
+				metaExpedientTasca.getResponsable());
+		return conversioTipusHelper.convertir(
+				entity,
+				MetaExpedientTascaDto.class);
+	}
+
+	@Transactional
+	@Override
+	public MetaExpedientTascaDto tascaUpdateActiu(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id,
+			boolean activa) throws NotFoundException {
+		logger.debug("Actualitzant l'atribut activa de la tasca del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"id=" + id + ")");
+		MetaExpedientTascaEntity entity = getMetaExpedientTasca(
+				entitatId,
+				metaExpedientId,
+				id);
+		entity.updateActiva(activa);
+		return conversioTipusHelper.convertir(
+				entity,
+				MetaExpedientTascaDto.class);
+	}
+
+	@Transactional
+	@Override
+	public MetaExpedientTascaDto tascaDelete(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) throws NotFoundException {
+		logger.debug("Esborrant la tasca del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"id=" + id + ")");
+		MetaExpedientTascaEntity entity = getMetaExpedientTasca(
+				entitatId,
+				metaExpedientId,
+				id);
+		metaExpedientTascaRepository.delete(entity);
+		return conversioTipusHelper.convertir(
+				entity,
+				MetaExpedientTascaDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public MetaExpedientTascaDto tascaFindById(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) throws NotFoundException {
+		logger.debug("Consultant la tasca del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"id=" + id + ")");
+		MetaExpedientTascaEntity entity = getMetaExpedientTasca(
+				entitatId,
+				metaExpedientId,
+				id);
+		return conversioTipusHelper.convertir(
+				entity,
+				MetaExpedientTascaDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		logger.debug("Consulta paginada de les tasques del meta-expedient(" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"paginacioParams=" + paginacioParams + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId,
+				false,
+				false,
+				false,
+				false);
+		return paginacioHelper.toPaginaDto(
+				metaExpedientTascaRepository.findByEntitatAndMetaExpedientAndFiltre(
+						entitat,
+						metaExpedient,
+						paginacioParams.getFiltre() == null,
+						paginacioParams.getFiltre(),
+						paginacioHelper.toSpringDataPageable(paginacioParams)),
+				MetaExpedientTascaDto.class);
 	}
 
 	@Transactional
@@ -543,6 +698,31 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return conversioTipusHelper.convertirList(
 				metaExpedients,
 				MetaExpedientDto.class);		
+	}
+
+	private MetaExpedientTascaEntity getMetaExpedientTasca(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId,
+				false,
+				false,
+				false,
+				false);
+		MetaExpedientTascaEntity entity = metaExpedientTascaRepository.findOne(id);
+		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
+			throw new NotFoundException(
+					id,
+					MetaExpedientTascaEntity.class);
+		}
+		return entity;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);

@@ -59,11 +59,9 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public DocumentDto update(
 			Long entitatId,
-			Long id,
 			DocumentDto document) {
 		return delegate.update(
 				entitatId,
-				id,
 				document);
 	}
 

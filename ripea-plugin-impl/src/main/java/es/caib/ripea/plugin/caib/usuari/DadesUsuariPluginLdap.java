@@ -151,6 +151,12 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 		}
 		return usuaris;
 	}
+	
+	@Override
+	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException{
+		
+		return null;
+	}
 
 	private String obtenirAtributComString(
 			Attributes atributs,

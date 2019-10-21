@@ -132,15 +132,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 						"L'interessat no ha donat el consentiment per a les notificacions electròniques (" +
 						"expedientId=" + expedient.getId() + ", " +
 						"interessatId=" + interessatId + ")");
-			}
-			if (interessat instanceof InteressatAdministracioEntity) {
-				throw new ValidationException(
-						interessatId,
-						InteressatEntity.class,
-						"L'interessat ha de ser una persona física o jurídica(" +
-						"interessatId=" + interessatId + ", " +
-						"interessatClass=" + interessat.getClass().getName() + ")");
-			}		
+			}	
 			interessats.add(interessat);		
 		}
 		return interessats;
@@ -178,10 +170,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
 				(notificacioDto.getEstat() != null) ? notificacioDto.getEstat() : DocumentEnviamentEstatEnumDto.PENDENT,
 				notificacioDto.getAssumpte(),
-				DocumentNotificacioTipusEnumDto.NOTIFICACIO,
-				null, // dataProgramada
-				null, // retard
-				null, // dataCaducitat
+				notificacioDto.getTipus(),
+				notificacioDto.getDataProgramada(),
+				notificacioDto.getRetard(),
+				notificacioDto.getDataCaducitat(), 
 				expedientEntity,
 				documentEntity,
 				notificacioDto.getServeiTipusEnum(),
@@ -201,10 +193,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 			if (respostaEnviar.isError()) {
 				notificacioEntity.updateEnviatError(
 						respostaEnviar.getErrorDescripcio(),
-						null);
+						respostaEnviar.getIdentificador());
 			} else {
 				notificacioEntity.updateEnviat(
-						new Date(),
+						null,
 						respostaEnviar.getEstat().equals(NotificacioEstat.ENVIADA),
 						respostaEnviar.getIdentificador());
 			}

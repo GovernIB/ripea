@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -224,6 +225,124 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long id,
 			int any) throws NotFoundException;
+
+	/**
+	 * Crea una tasca del meta-expedient.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param metaExpedientTasca
+	 *            Informació de la tasca del meta-expedient a crear.
+	 * @return El meta-expedient creat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaExpedientTascaDto tascaCreate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException;
+
+	/**
+	 * Actualitza la informació de la tasca del meta-expedient que tengui el mateix
+	 * id que l'especificat per paràmetre.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param metaExpedientTasca
+	 *            Informació de la tasca del meta-expedient a modificar.
+	 * @return La tasca del meta-expedient modificada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaExpedientTascaDto tascaUpdate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException;
+
+	/**
+	 * Marca la tasca del meta-expedient com a activa/inactiva .
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param id
+	 *            Id de la tasca del meta-expedient a modificar.
+	 * @param activa
+	 *            true si el meta-expedient es vol activar o false en cas contrari.
+	 * @return El meta-expedient modificada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaExpedientTascaDto tascaUpdateActiu(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id,
+			boolean activa) throws NotFoundException;
+
+	/**
+	 * Esborra la tasca del meta-expedient amb el mateix id que l'especificat.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param id
+	 *            Id de la tasca del meta-expedient a esborrar.
+	 * @return La tasca del meta-expedient esborrada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaExpedientTascaDto tascaDelete(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) throws NotFoundException;
+
+	/**
+	 * Consulta una tasca del meta-expedient donat el seu id.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param id
+	 *            Id de la tasca del meta-expedient a trobar.
+	 * @return La tasca del meta-expedient amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaExpedientTascaDto tascaFindById(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) throws NotFoundException;
+
+	/**
+	 * Consulta les tasques d'un meta-expedient de forma paginada.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina de tasques del meta-expedient.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
 	 * Consulta els permisos del meta-expedient.

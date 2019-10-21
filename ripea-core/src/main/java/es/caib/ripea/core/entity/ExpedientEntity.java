@@ -124,16 +124,32 @@ public class ExpedientEntity extends NodeEntity {
 			name = "ipa_expedient_rel_rel_fk",
 			inverseName = "ipa_expedient_rel_exp_fk")
 	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
+	
 	@OneToMany(
 			mappedBy = "expedient",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<ExpedientPeticioEntity> peticions = new ArrayList<ExpedientPeticioEntity>();
+	
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientTascaEntity> tasques = new ArrayList<ExpedientTascaEntity>();
+	
+	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_estat_id")
 	@ForeignKey(name = "ipa_expestat_expedient_fk")
 	private ExpedientEstatEntity expedientEstat;
 	
+	
+	public List<ExpedientTascaEntity> getTasques() {
+		return tasques;
+	}
+	public void updateTasques(List<ExpedientTascaEntity> tasques) {
+		this.tasques = tasques;
+	}
 	public List<ExpedientPeticioEntity> getPeticions() {
 		return peticions;
 	}

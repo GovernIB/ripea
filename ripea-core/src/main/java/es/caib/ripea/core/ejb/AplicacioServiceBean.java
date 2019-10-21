@@ -144,4 +144,14 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.propertyFindByNom(nom);
 	}
 
+	@Override
+	public List<UsuariDto> findUsuariAmbTextDades(String text) {
+		return delegate.findUsuariAmbTextDades(text);
+	}
+
+	@Override
+	public UsuariDto findUsuariAmbCodiDades(String codi) {
+		return delegate.findUsuariAmbCodiDades(codi);
+	}
+
 }

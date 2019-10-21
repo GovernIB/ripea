@@ -6,6 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:set var="titol"><spring:message code="contenidor.document.portafirmes.titol"/></c:set>
+<c:set var="isTasca" value="${not empty tascaId}"/>
 <html>
 <head>
 	<title>${titol}</title>
@@ -29,7 +30,14 @@
 			</a>
 		</div>
 	</c:if>
-	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/portafirmes/upload"/></c:set>
+	<c:choose>
+		<c:when test="${isTasca}">
+			<c:set var="formAction"><rip:modalUrl value="/usuariTasca/${tascaId}/document/${document.id}/portafirmes/upload"/></c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/portafirmes/upload"/></c:set>
+		</c:otherwise>
+	</c:choose>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="portafirmesEnviarCommand" role="form">
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>

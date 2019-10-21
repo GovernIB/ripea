@@ -138,7 +138,7 @@ public class DocumentController extends BaseUserController {
 		documentService.portafirmesReintentar(
 				entitatActual.getId(),
 				documentId);
-		return "redirect:../firma/info";
+		return "redirect:./info";
 	}
 
 	@RequestMapping(value = "/{documentId}/portafirmes/cancel", method = RequestMethod.GET)

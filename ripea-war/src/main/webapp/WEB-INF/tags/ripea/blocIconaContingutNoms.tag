@@ -3,6 +3,7 @@
 <c:set var="iconaExpedient" value="fa-folder-open" scope="request"/>
 <c:set var="iconaExpedientObert" value="fa-folder-open" scope="request"/>
 <c:set var="iconaExpedientTancat" value="fa-folder" scope="request"/>
+<c:set var="iconaTask" value="fa-tasks" scope="request"/>
 <c:set var="iconaDocument" value="fa-file-text-o" scope="request"/>
 <c:set var="iconaImportacio" value="fa-file-o" scope="request"/>
 <c:set var="iconaCarpeta" value="fa-folder-o" scope="request"/>

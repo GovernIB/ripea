@@ -368,7 +368,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	@Override
 	public List<InteressatDto> findByExpedient(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId,
+			boolean nomesAmbNotificacioActiva) {
 		logger.debug("Consulta interessats de l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
@@ -380,11 +381,16 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				false,
 				false);
-		List<InteressatEntity> interessats = interessatRepository.findByExpedientAndNotRepresentant(
-				expedient);
-//		List<InteressatDto> resposta = conversioTipusHelper.convertirList(
-//				interessats, 
-//				InteressatDto.class);
+		
+		List<InteressatEntity> interessats = new ArrayList<>();
+		if (nomesAmbNotificacioActiva) {
+			interessats = interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+					expedient);
+		} else {
+			interessats = interessatRepository.findByExpedientAndNotRepresentant(
+					expedient);
+		}
+
 		List<InteressatDto> resposta = new ArrayList<InteressatDto>();
 		for (InteressatEntity interessat: interessats) {
 			if (interessat instanceof InteressatPersonaFisicaEntity)

@@ -50,8 +50,6 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect name="principalTipus" textKey="metadocument.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
-		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
-		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 		<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
 		
 		<rip:inputCheckbox name="selectAll" textKey="metaexpedient.permis.form.camp.all"/>
