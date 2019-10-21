@@ -462,11 +462,16 @@ public class DocumentController extends BaseUserController {
 					model);
 			return "viaFirmaForm";
 		}
-		documentService.viaFirmaEnviar(
-				entitatActual.getId(),
-				documentId,
-				ViaFirmaEnviarCommand.asDto(command),
-				usuariActual);
+		try {
+			documentService.viaFirmaEnviar(
+					entitatActual.getId(),
+					documentId,
+					ViaFirmaEnviarCommand.asDto(command),
+					usuariActual);
+		} catch (Exception ex) {
+			MissatgesHelper.error(request, ex.getMessage());
+			return "viaFirmaForm";
+		}
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

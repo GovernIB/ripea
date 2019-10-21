@@ -827,8 +827,7 @@ public class DocumentServiceImpl implements DocumentService {
 					"documentId=" + documentId + ")",
 					ex);
 			throw new RuntimeException(
-					"Error a l'hora d'enviar el document a viaFirma  (" +
-					"documentId=" + documentId + ")",
+					"Error a l'hora d'enviar el document a viaFirma: " + ex.getMessage(),
 					ex);
 		}
 	}

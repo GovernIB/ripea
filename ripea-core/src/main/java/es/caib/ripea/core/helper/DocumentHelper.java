@@ -356,7 +356,7 @@ public class DocumentHelper {
 		return null;
 	}
 	
-	public SistemaExternException viaFirmaEnviar(DocumentViaFirmaEntity documentViaFirma) {
+	public void viaFirmaEnviar(DocumentViaFirmaEntity documentViaFirma) throws SistemaExternException {
 		DocumentEntity document = documentViaFirma.getDocument();
 		try {
 			String messageCode = pluginHelper.viaFirmaUpload(
@@ -365,14 +365,12 @@ public class DocumentHelper {
 			documentViaFirma.updateEnviat(
 					new Date(),
 					messageCode);
-			return null;
-		} catch (SistemaExternException ex) {
+		} catch (Exception ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;
-			documentViaFirma.updateEnviatError(
-					ExceptionUtils.getStackTrace(rootCause),
-					null);
-			return ex;
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					rootCause.getMessage());
 		}
 	}
 	
