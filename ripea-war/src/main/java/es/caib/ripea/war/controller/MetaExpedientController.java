@@ -208,17 +208,5 @@ public class MetaExpedientController extends BaseAdminController {
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/proximNumeroSequencia/{any}", method = RequestMethod.GET)
-	@ResponseBody
-	public long proximNumeroSequencia(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			@PathVariable int any) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return metaExpedientService.getProximNumeroSequencia(
-				entitatActual.getId(),
-				metaExpedientId,
-				any);
-	}
 
 }

@@ -15,9 +15,6 @@
 		<li class="active" role="presentation">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.dades"/></a>
 		</li>
-		<li role="presentation">
-			<a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.annexos"/> <span class="badge">${fn:length(notificacio.annexos)}</span></a>
-		</li>
 		<c:if test="${notificacio.error}">
 			<li role="presentation">
 				<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="notificacio.info.pipella.errors"/></a>
@@ -37,9 +34,17 @@
 						<td>${notificacio.document.nom}</td>
 					</tr>
 					<tr>				
-						<td><strong><spring:message code="notificacio.info.camp.data.enviament"/></strong></td>
+						<td><strong><spring:message code="notificacio.info.camp.createdData"/></strong></td>
+						<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</tr>
+					<tr>				
+						<td><strong><spring:message code="notificacio.info.camp.data"/></strong></td>
 						<td><fmt:formatDate value="${notificacio.enviatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 					</tr>
+					<tr>				
+						<td><strong><spring:message code="notificacio.info.camp.dataFinalitzada"/></strong></td>
+						<td><fmt:formatDate value="${notificacio.processatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</tr>										
 					<tr>						
 						<td><strong><spring:message code="notificacio.info.camp.tipus"/></strong></td>
 						<td><spring:message code="notificacio.tipus.enum.${notificacio.tipus}"/></td>
@@ -85,9 +90,12 @@
 										<c:when test="${interessat.tipus == 'PERSONA_FISICA'}">
 											<td>${interessat.nom} ${interessat.llinatge1} ${interessat.llinatge2}</td>
 										</c:when>
-										<c:otherwise>
+										<c:when test="${interessat.tipus == 'PERSONA_JURIDICA'}">
 											<td>${interessat.raoSocial}</td>
-										</c:otherwise>
+										</c:when>										
+										<c:when test="${interessat.tipus == 'ADMINISTRACIO'}">
+											<td>${interessat.organNom}</td>
+										</c:when>
 									</c:choose>
 									<td>
 										<c:if test="${interessat.tipus != 'ADMINISTRACIO'}">
@@ -187,13 +195,6 @@
 
 			</dl>
 		</div>
-		<!------------------------------ TABPANEL ANNEXOS ------------------------------------->		
-		<div class="tab-pane" id="annexos" role="tabpanel">
-			<c:forEach var="annex" items="${notificacio.annexos}">
-				<p>${annex.nom}</p>
-			</c:forEach>
-		</div>
-		
 		<!------------------------------ TABPANEL ERRORS ------------------------------------->
 		<div class="tab-pane" id="errors" role="tabpanel">
 			<c:if test="${notificacio.error}">

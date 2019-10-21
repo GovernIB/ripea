@@ -170,10 +170,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
 				(notificacioDto.getEstat() != null) ? notificacioDto.getEstat() : DocumentEnviamentEstatEnumDto.PENDENT,
 				notificacioDto.getAssumpte(),
-				DocumentNotificacioTipusEnumDto.NOTIFICACIO,
-				null, // dataProgramada
-				null, // retard
-				null, // dataCaducitat
+				notificacioDto.getTipus(),
+				notificacioDto.getDataProgramada(),
+				notificacioDto.getRetard(),
+				notificacioDto.getDataCaducitat(), 
 				expedientEntity,
 				documentEntity,
 				notificacioDto.getServeiTipusEnum(),
@@ -193,10 +193,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 			if (respostaEnviar.isError()) {
 				notificacioEntity.updateEnviatError(
 						respostaEnviar.getErrorDescripcio(),
-						null);
+						respostaEnviar.getIdentificador());
 			} else {
 				notificacioEntity.updateEnviat(
-						new Date(),
+						null,
 						respostaEnviar.getEstat().equals(NotificacioEstat.ENVIADA),
 						respostaEnviar.getIdentificador());
 			}

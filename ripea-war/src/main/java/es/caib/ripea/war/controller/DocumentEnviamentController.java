@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 
@@ -122,7 +123,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			if (rootCause instanceof NotibRepostaException) {
 				msg = getMessage(request, "contingut.enviament.errorReposta.notib") + " " + rootCause.getMessage();
 			} else {
-				msg = ex.getMessage();
+				throw new RuntimeException(ex);
 			}
 			
 			return getModalControllerReturnValueErrorMessageText(

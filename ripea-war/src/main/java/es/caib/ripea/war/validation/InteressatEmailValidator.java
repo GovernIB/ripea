@@ -31,7 +31,7 @@ public class InteressatEmailValidator implements ConstraintValidator<InteressatE
 			InteressatCommand interessat = (InteressatCommand)value;
 			boolean valid = true;
 			
-			if (interessat.getEntregaDeh() && (interessat.getEmail() == null || interessat.getEmail().isEmpty())) {
+			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && (interessat.getEmail() == null || interessat.getEmail().isEmpty())) {
 				context
 					.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("interessat.form.valid.email"))
@@ -42,7 +42,7 @@ public class InteressatEmailValidator implements ConstraintValidator<InteressatE
 
 			return valid;
 		} catch (final Exception ex) {
-        	LOGGER.error("Ha d'informar de la provincia i el municipi quan el país és Espanya", ex);
+        	LOGGER.error("Error al validar interessat email", ex);
         	return false;
         }
 	}

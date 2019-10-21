@@ -139,7 +139,14 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		}
 	}
 	
-	
+	public void updateEnviatError(
+			String errorDescripcio,
+			String enviamentIdentificador) {
+		this.enviamentIdentificador = enviamentIdentificador;
+		super.updateEnviatError(
+				errorDescripcio,
+				null);
+	}
 	
 	
 	

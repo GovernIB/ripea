@@ -13,6 +13,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import es.caib.notib.client.NotificacioRestClient;
 import es.caib.notib.client.NotificacioRestClientFactory;
@@ -78,12 +81,12 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 					es.caib.notib.ws.notificacio.Enviament enviamentNotib = new es.caib.notib.ws.notificacio.Enviament();
 					enviamentNotib.setTitular(
 							toPersonaNotib(enviament.getTitular()));
-					if (enviament.getDestinataris() != null) {
-						for (Persona destinatari: enviament.getDestinataris()) {
-							enviamentNotib.getDestinataris().add(
-									toPersonaNotib(destinatari));
-						}
-					}
+//					if (enviament.getDestinataris() != null) {
+//						for (Persona destinatari: enviament.getDestinataris()) {
+//							enviamentNotib.getDestinataris().add(
+//									toPersonaNotib(destinatari));
+//						}
+//					}
 					if (enviament.isEntregaPostalActiva()) {
 						EntregaPostal entregaPostal = new EntregaPostal();
 						entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.valueOf(enviament.getEntregaPostalTipus().toString()));
@@ -131,6 +134,20 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 
 			//####### ALTA NOTIFICACIO ####################
 			RespostaAlta respostaAlta = getNotificacioService().alta(notificacioNotib);
+			
+			String referenciesString ="";
+			if(respostaAlta.getReferencies()!=null){
+				for (es.caib.notib.ws.notificacio.EnviamentReferencia enviamentReferencia : respostaAlta.getReferencies()) {
+					referenciesString += "[referencia="+enviamentReferencia.getReferencia()+ ",titular="+enviamentReferencia.getTitularNif()+"]";
+				}
+			}
+			
+			logger.debug("Es va enviar una notificació [concepte=" + notificacioNotib.getConcepte() + "] RespostaAlta: " + 
+			"error="+respostaAlta.isError() +
+			",errorDescripcio="+respostaAlta.getErrorDescripcio() +
+			",estat="+respostaAlta.getEstat() +
+			",identificador="+respostaAlta.getIdentificador() +
+			",referencies="+referenciesString);
 
 			if (respostaAlta.isError() && (respostaAlta.getReferencies() == null || respostaAlta.getReferencies().isEmpty())) {
 				throw new NotibRepostaException(respostaAlta.getErrorDescripcio());
@@ -154,6 +171,12 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			}
 			
 		} catch (Exception ex) {
+			logger.error(
+					"No s'ha pogut enviar la notificació (" +
+					"emisorDir3Codi=" + notificacio.getEmisorDir3Codi() + ", " +
+					"enviamentTipus=" + notificacio.getEnviamentTipus() + ", " +
+					"concepte=" + notificacio.getConcepte() + ")",
+					ex);
 			throw new SistemaExternException(
 					"No s'ha pogut enviar la notificació (" +
 					"emisorDir3Codi=" + notificacio.getEmisorDir3Codi() + ", " +
@@ -392,4 +415,6 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 				"es.caib.ripea.plugin.notificacio.password");
 	}
 
+	
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioPluginNotib.class);
 }

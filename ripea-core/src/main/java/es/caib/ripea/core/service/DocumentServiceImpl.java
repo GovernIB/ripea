@@ -875,11 +875,14 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findByIdentificadorIReferencia(
 				identificador, referencia);
-		if (documentEnviamentInteressatEntity == null) {
-			throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
-		}
 		try {
-			pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
+			if (documentEnviamentInteressatEntity == null) {
+				logger.error("Callback de notib envia notificació que no existeix a la base de dades: identificador=" + identificador + ", referencia=" + referencia);
+				// throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
+			} else {
+				pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
+			}
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de notificacions";
 			logger.error(errorDescripcio, ex);
