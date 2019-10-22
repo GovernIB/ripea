@@ -850,8 +850,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false);
+				false,
+				true);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
