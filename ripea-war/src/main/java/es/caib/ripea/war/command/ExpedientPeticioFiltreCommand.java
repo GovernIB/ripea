@@ -8,7 +8,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatFiltreEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
@@ -26,7 +26,7 @@ public class ExpedientPeticioFiltreCommand {
 	private ExpedientPeticioAccioEnumDto accioEnum;
 	private Date dataInicial;
 	private Date dataFinal;
-	private ExpedientPeticioEstatFiltreEnumDto estat;
+	private ExpedientPeticioEstatViewEnumDto estat;
 
 
 
@@ -38,11 +38,11 @@ public class ExpedientPeticioFiltreCommand {
 		this.accioEnum = accioEnum;
 	}
 
-	public ExpedientPeticioEstatFiltreEnumDto getEstat() {
+	public ExpedientPeticioEstatViewEnumDto getEstat() {
 		return estat;
 	}
 
-	public void setEstat(ExpedientPeticioEstatFiltreEnumDto estat) {
+	public void setEstat(ExpedientPeticioEstatViewEnumDto estat) {
 		this.estat = estat;
 	}
 

@@ -23,8 +23,24 @@ public class ExpedientPeticioDto {
 	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
 	private String notificaDistError;
 	
-	
-
+	public ExpedientPeticioEstatViewEnumDto getEstatView() {
+		ExpedientPeticioEstatViewEnumDto estatView = null;
+		if (estat != null) {
+			switch (estat) {
+			case PENDENT:
+				estatView = ExpedientPeticioEstatViewEnumDto.PENDENT;
+				break;
+			case PROCESSAT_PENDENT:
+			case PROCESSAT_NOTIFICAT:
+				estatView = ExpedientPeticioEstatViewEnumDto.ACCEPTAT;
+				break;
+			case REBUTJAT:
+				estatView = ExpedientPeticioEstatViewEnumDto.REBUTJAT;
+				break;
+			}
+		}
+		return estatView;
+	}
 	public String getNotificaDistError() {
 		return notificaDistError;
 	}
@@ -87,7 +103,6 @@ public class ExpedientPeticioDto {
 			ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
 		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
 	}
-	
-	
+
 
 }

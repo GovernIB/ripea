@@ -154,8 +154,17 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	
 	@Override
 	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException{
-		
-		return null;
+		LOGGER.debug("Consulta de les dades de l'usuari (filtre=" + filtre + ")");
+		try {
+			return consultaUsuaris(
+					getLdapFiltreNom(), 
+					filtre);
+		} catch (NamingException e) {
+			throw new SistemaExternException(
+					"La consulta dels usuaris no ha pogut recuperar cap resultat(" +
+					"filtre=" + getLdapFiltreCodi() + ", " +
+					"valor=" + filtre + ")");
+		}
 	}
 
 	private String obtenirAtributComString(
@@ -184,6 +193,10 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	private String getLdapFiltreCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.codi");
+	}
+	private String getLdapFiltreNom() {
+		// Exemple: (&(displayName=inetOrgPersonCAIB)(cn=XXX))
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.nom");
 	}
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))

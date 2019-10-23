@@ -9,9 +9,8 @@ package es.caib.ripea.core.api.dto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum ExpedientPeticioEstatFiltreEnumDto {
+public enum ExpedientPeticioEstatViewEnumDto {
 	PENDENT,
-	PROCESSAT_PENDENT,
-	PROCESSAT_NOTIFICAT,
+	ACCEPTAT,
 	REBUTJAT
 }

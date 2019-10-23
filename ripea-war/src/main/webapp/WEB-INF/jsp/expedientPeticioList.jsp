@@ -66,7 +66,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 						<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataFinal"/>
 					</div>	
 					<div class="col-md-3">							
-						<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatFiltreEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.estat"/>
+						<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.estat"/>
 					</div>					
 				</div>
 			</div>
@@ -98,7 +98,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<th data-col-name="registre.extracte"><spring:message code="expedientPeticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiDescripcio"><spring:message code="expedientPeticio.list.columna.destiNom"/></th>
 				<th data-col-name="metaExpedientNom"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
-				<th data-col-name="estat"><spring:message code="expedientPeticio.list.columna.estat"/></th>
+				<th data-col-name="estatView"><spring:message code="expedientPeticio.list.columna.estat"/></th>
 
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
@@ -106,7 +106,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/expedientPeticio/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-								{{if estat == 'PENDENT'}}
+								{{if estatView == 'PENDENT'}}
 									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
 									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
 								{{/if}}
