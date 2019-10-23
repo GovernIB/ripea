@@ -40,7 +40,10 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:esNullDestinacio = true or lower(e.registre.destiDescripcio) like lower('%'||:destinacio||'%')) " + 
 			"and (:esNullDataInicial = true or e.registre.data >= :dataInicial) " +
 			"and (:esNullDataFinal = true or e.registre.data <= :dataFinal) " +
-			"and (:esNullEstat = true or e.estat = :estat) " +
+			"and (:esNullEstat = true or " +
+			"							(:estat = 'PENDENT' and e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
+			"							(:estat = 'ACCEPTAT' and (e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
+			" 							(:estat = 'REBUTJAT' and e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " +
 			"and (:esNullAccio = true or e.expedientPeticioAccioEnumDto = :accio) "
 			)
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
@@ -58,7 +61,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullDataFinal") boolean esNullDataFinal,
 			@Param("dataFinal") Date dataFinal,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientPeticioEstatEnumDto estat,
+			@Param("estat") String estat,
 			@Param("esNullAccio") boolean esNullAccio,
 			@Param("accio") ExpedientPeticioAccioEnumDto accio,
 			Pageable pageable);

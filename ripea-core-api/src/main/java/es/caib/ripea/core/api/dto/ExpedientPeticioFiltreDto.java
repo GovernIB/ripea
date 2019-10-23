@@ -22,7 +22,7 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	private ExpedientPeticioAccioEnumDto accioEnum;
 	private Date dataInicial;
 	private Date dataFinal;
-	private ExpedientPeticioEstatFiltreEnumDto estat;
+	private ExpedientPeticioEstatViewEnumDto estat;
 
 
 
@@ -34,11 +34,11 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 		this.accioEnum = accioEnum;
 	}
 
-	public ExpedientPeticioEstatFiltreEnumDto getEstat() {
+	public ExpedientPeticioEstatViewEnumDto getEstat() {
 		return estat;
 	}
 
-	public void setEstat(ExpedientPeticioEstatFiltreEnumDto estat) {
+	public void setEstat(ExpedientPeticioEstatViewEnumDto estat) {
 		this.estat = estat;
 	}
 

@@ -25,7 +25,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatFiltreEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -109,29 +109,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios;
 
 		// enum with states accesibles from filter in the view (without creat state)
-		ExpedientPeticioEstatFiltreEnumDto estatFiltre = filtre.getEstat();
+		ExpedientPeticioEstatViewEnumDto estatView = filtre.getEstat();
 
-		// enum with all states exisiting in db (with creat state)
-		ExpedientPeticioEstatEnumDto estat = null;
-
-		if (estatFiltre != null) {
-			switch (estatFiltre) {
-			case PENDENT:
-				estat = ExpedientPeticioEstatEnumDto.PENDENT;
-				break;
-			case PROCESSAT_PENDENT:
-				estat = ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT;
-				break;
-			case PROCESSAT_NOTIFICAT:
-				estat = ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT;
-				break;				
-			case REBUTJAT:
-				estat = ExpedientPeticioEstatEnumDto.REBUTJAT;
-				break;
-			}
-		}
-
-		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(entitat,
+		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
+				entitat,
 				filtre.getProcediment() == null ||
 						filtre.getProcediment().isEmpty(),
 				filtre.getProcediment(),
@@ -148,11 +129,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
 				filtre.getDataFinal(),
-				estat == null,
-				estat,
+				estatView == null,
+				estatView != null ? estatView.toString() : null,
 				filtre.getAccioEnum() == null,
 				filtre.getAccioEnum(),
-				paginacioHelper.toSpringDataPageable(paginacioParams,
+				paginacioHelper.toSpringDataPageable(
+						paginacioParams,
 						ordenacioMap));
 
 		PaginaDto<ExpedientPeticioDto> result = paginacioHelper.toPaginaDto(paginaExpedientPeticios,
