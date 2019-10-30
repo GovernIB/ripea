@@ -89,12 +89,12 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</form:form>
-	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/log/{{:id}}</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">contingutAdmin/{{:id}}/info</script>
 	<table
 		id="taulaDades"
 		data-toggle="datatable"
 		data-url="<c:url value="/contingutAdmin/datatable"/>"
-		data-default-order="11"
+		data-default-order="10"
 		data-default-dir="desc"
 		class="table table-bordered table-striped"
 		data-rowhref-template="#rowhrefTemplate"

@@ -944,6 +944,7 @@ $(document).ready(function() {
 										<th data-col-name="documentNum" data-orderable="false" width="15%"><spring:message code="contingut.interessat.columna.document"/></th>
 										<th data-col-name="identificador" data-orderable="false" width="35%"><spring:message code="contingut.interessat.columna.identificador"/></th>
 										<th data-col-name="representantIdentificador" data-orderable="false" width="25%"><spring:message code="contingut.interessat.columna.representant"/>
+										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 										<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
 											<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
 											<div class="dropdown">
@@ -964,6 +965,7 @@ $(document).ready(function() {
 											</div>
 										</script>
 										</th>
+										</c:if>
 									</tr>
 								</thead>
 							</table>

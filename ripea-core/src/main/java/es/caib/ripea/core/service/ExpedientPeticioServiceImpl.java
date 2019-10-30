@@ -41,6 +41,7 @@ import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
@@ -128,7 +129,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
-				filtre.getDataFinal(),
+				DateHelper.toDateFinalDia(filtre.getDataFinal()),
 				estatView == null,
 				estatView != null ? estatView.toString() : null,
 				filtre.getAccioEnum() == null,

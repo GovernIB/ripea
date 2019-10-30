@@ -21,7 +21,7 @@
 function refrescarSequencia() {
 	let metaExpedientId = $('select#metaNodeId').val();
 	let any = $('input#any').val();
-	if (metaExpedientId !== undefined && any !== undefined) {
+	if (metaExpedientId != undefined && any != undefined && any != "") {
 		$.ajax({
 			type: 'GET',
 			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,

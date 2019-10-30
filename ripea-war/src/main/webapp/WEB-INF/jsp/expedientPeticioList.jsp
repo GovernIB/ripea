@@ -56,16 +56,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 					</div>	
 				</div>
 				<div class="row">
-					<div class="col-md-3">							
-						<rip:inputSelect name="accioEnum" inline="true" optionEnum="ExpedientPeticioAccioEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.accio"/>
-					</div>	
-					<div class="col-md-3">							
+					<div class="col-md-4">							
 						<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataInicial"/>
 					</div>	
-					<div class="col-md-3">							
+					<div class="col-md-4">							
 						<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataFinal"/>
 					</div>	
-					<div class="col-md-3">							
+					<div class="col-md-4">							
 						<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.estat"/>
 					</div>					
 				</div>
@@ -79,7 +76,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 			</div>
 		</div>
 	</form:form>
-
+	
 	<script id="rowhrefTemplate" type="text/x-jsrender">expedientPeticio/{{:id}}</script> 
 	<table
 		id="taulaDades"
@@ -98,7 +95,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<th data-col-name="registre.extracte"><spring:message code="expedientPeticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiDescripcio"><spring:message code="expedientPeticio.list.columna.destiNom"/></th>
 				<th data-col-name="metaExpedientNom"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
-				<th data-col-name="estatView"><spring:message code="expedientPeticio.list.columna.estat"/></th>
+				<th data-col-name="estatView" data-orderable="false"><spring:message code="expedientPeticio.list.columna.estat"/></th>
 
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

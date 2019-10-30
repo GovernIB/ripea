@@ -63,8 +63,8 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"and (:tipusExpedient = true or type(c) <> es.caib.ripea.core.entity.ExpedientEntity) " +
 			"and (:esNullMetaNode = true or ((type(c) = es.caib.ripea.core.entity.ExpedientEntity or type(c) = es.caib.ripea.core.entity.DocumentEntity) and c.metaNode = :metaNode)) " +
 			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullDataInici = true or c.lastModifiedDate >= :dataInici) " +
-			"and (:esNullDataFi = true or c.lastModifiedDate <= :dataFi) " +
+			"and (:esNullDataInici = true or c.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or c.createdDate <= :dataFi) " +
 			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) ")
 	public Page<ContingutEntity> findByFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,

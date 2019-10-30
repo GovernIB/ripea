@@ -71,6 +71,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
@@ -963,8 +964,8 @@ public class ContingutServiceImpl implements ContingutService {
 				break;
 			}
 		}
-		Date dataCreacioInici = toDateInicialDia(filtre.getDataCreacioInici());
-		Date dataCreacioFi = toDateFinalDia(filtre.getDataCreacioFi());
+		Date dataCreacioInici = DateHelper.toDateInicialDia(filtre.getDataCreacioInici());
+		Date dataCreacioFi = DateHelper.toDateFinalDia(filtre.getDataCreacioFi());
 		return paginacioHelper.toPaginaDto(
 				contingutRepository.findByFiltrePaginat(
 						entitat,
@@ -1039,9 +1040,9 @@ public class ContingutServiceImpl implements ContingutService {
 						(usuari == null),
 						usuari,
 						(dataInici == null),
-						toDateInicialDia(dataInici),
+						DateHelper.toDateInicialDia(dataInici),
 						(dataFi == null),
-						toDateFinalDia(dataFi),
+						DateHelper.toDateFinalDia(dataFi),
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 				ContingutDto.class,
 				new Converter<ContingutEntity, ContingutDto>() {
@@ -1404,8 +1405,8 @@ public class ContingutServiceImpl implements ContingutService {
 						MetaNodeEntity.class);
 			}
 		}
-		Date dataInici = toDateInicialDia(filtre.getDataInici());
-		Date dataFi = toDateFinalDia(filtre.getDataFi());
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 		List<DocumentEntity> preDocuments = documentRepository.findDocumentMassiuByFiltre(
 				entitat,
 				(filtre.getTipusExpedient() == null),
@@ -1562,8 +1563,8 @@ public class ContingutServiceImpl implements ContingutService {
 						MetaNodeEntity.class);
 			}
 		}
-		Date dataInici = toDateInicialDia(filtre.getDataInici());
-		Date dataFi = toDateFinalDia(filtre.getDataFi());
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 		return documentRepository.findIdMassiuByEntitatAndFiltre(
 				entitat,
 				(filtre.getTipusExpedient() == null),
@@ -1835,30 +1836,7 @@ public class ContingutServiceImpl implements ContingutService {
 		fContent.delete();
 	}
 
-	private Date toDateInicialDia(Date data) {
-		if (data == null) {
-			return null;
-		}
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(data);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime();
-	}
-	private Date toDateFinalDia(Date data) {
-		if (data == null) {
-			return null;
-		}
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(data);
-		cal.set(Calendar.HOUR_OF_DAY, 23);
-		cal.set(Calendar.MINUTE, 59);
-		cal.set(Calendar.SECOND, 59);
-		cal.set(Calendar.MILLISECOND, 999);
-		return cal.getTime();
-	}
+
 
 
 

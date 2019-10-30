@@ -48,7 +48,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 				getEntitatActualComprovantPermisos(request));
 		return "adminPermis";
 	}
-	@RequestMapping(value = "datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
@@ -61,13 +61,13 @@ public class EntitatPermisAdminController extends BaseAdminController {
 		return dtr;
 	}
 
-	@RequestMapping(value = "new", method = RequestMethod.GET)
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,
 			Model model) {
 		return get(request, null, model);
 	}
-	@RequestMapping(value = "{permisId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{permisId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long permisId,
@@ -110,7 +110,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 				"entitat.controller.permis.modificat.ok");
 	}
 
-	@RequestMapping(value = "{permisId}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/{permisId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long permisId,

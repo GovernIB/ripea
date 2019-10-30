@@ -63,6 +63,7 @@ import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.CsvHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -1787,7 +1788,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getDataCreacioInici() == null,
 						filtre.getDataCreacioInici(),
 						filtre.getDataCreacioFi() == null,
-						filtre.getDataCreacioFi(),
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						filtre.getDataTancatInici() == null,
 						filtre.getDataTancatInici(),
 						filtre.getDataTancatFi() == null,
@@ -1822,7 +1823,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getDataCreacioInici() == null,
 						filtre.getDataCreacioInici(),
 						filtre.getDataCreacioFi() == null,
-						filtre.getDataCreacioFi(),
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						filtre.getDataTancatInici() == null,
 						filtre.getDataTancatInici(),
 						filtre.getDataTancatFi() == null,

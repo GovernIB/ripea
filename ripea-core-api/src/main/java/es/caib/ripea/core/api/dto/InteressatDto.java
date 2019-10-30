@@ -32,6 +32,8 @@ public abstract class InteressatDto implements Serializable {
 	protected Long representantId;
 	protected String representantIdentificador;
 	protected String identificador;
+	private boolean esRepresentant;
+	
 	
 	private InteressatDto representant;
 	
@@ -192,6 +194,15 @@ public abstract class InteressatDto implements Serializable {
 	}
 	public void setRepresentant(InteressatDto representant) {
 		this.representant = representant;
+	}
+
+
+
+	public boolean isEsRepresentant() {
+		return esRepresentant;
+	}
+	public void setEsRepresentant(boolean esRepresentant) {
+		this.esRepresentant = esRepresentant;
 	}
 
 

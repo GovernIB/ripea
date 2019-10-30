@@ -96,7 +96,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			select interessat.expedient.id " +
 			"			from InteressatEntity interessat " +	
 			"			where interessat.esRepresentant = false " +
-			"				and lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%'))) ")
+			"				and (lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) ")
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
@@ -155,7 +157,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			select interessat.expedient.id " +
 			"			from InteressatEntity interessat " +	
 			"			where interessat.esRepresentant = false " +
-			"				and lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%'))) ")
+			"				and (lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) ")
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,

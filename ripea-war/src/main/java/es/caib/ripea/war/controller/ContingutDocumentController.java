@@ -165,6 +165,7 @@ public class ContingutDocumentController extends BaseUserController {
 					command,
 					pareId,
 					model);
+			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
 		try {

@@ -3,9 +3,8 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 
 
@@ -44,6 +43,35 @@ public class ExpedientDto extends NodeDto {
 	private boolean peticions;
 	private boolean processatOk;
 	private boolean tasques;
+	
+	private Set<InteressatDto> interessats;
+	
+//	public String getInteressatsResum() {
+//		String interessatsResum = "";
+//		if (this.getInteressats() != null)
+//			for (InteressatDto interessat : this.getInteressats()) {
+//				if (!interessat.isEsRepresentant()) {
+//					
+//					switch (interessat.getTipus()) {
+//					case PERSONA_FISICA:
+//						InteressatPersonaFisicaDto personaFisicaDto = (InteressatPersonaFisicaDto) interessat;
+//						interessatsResum += personaFisicaDto.getNom() == null ? "" : personaFisicaDto.getNom() + " ";
+//						interessatsResum += personaFisicaDto.getLlinatge1() == null ? "" : personaFisicaDto.getLlinatge1() + " ";
+//						interessatsResum += personaFisicaDto.getLlinatge2() == null ? "" : personaFisicaDto.getLlinatge2() + "<br>";
+//						break;
+//					case PERSONA_JURIDICA:
+//						InteressatPersonaJuridicaDto personaJuridicaDto = (InteressatPersonaJuridicaDto) interessat;
+//						interessatsResum += personaJuridicaDto.getRaoSocial() + "<br>";
+//						break;
+//					case ADMINISTRACIO:
+//						InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) interessat;
+//						interessatsResum += interessatAdministracioDto.getOrganNom() + "<br>";
+//						break;						
+//					}
+//				}
+//			}
+//		return interessatsResum;
+//	}
 
 	public boolean isTasques() {
 		return tasques;
@@ -225,6 +253,14 @@ public class ExpedientDto extends NodeDto {
 	
 	public String getNomINumero() {
 		return this.nom + " (" + this.numero + ")";
+	}
+
+	public Set<InteressatDto> getInteressats() {
+		return interessats;
+	}
+
+	public void setInteressats(Set<InteressatDto> interessats) {
+		this.interessats = interessats;
 	}
 
 }

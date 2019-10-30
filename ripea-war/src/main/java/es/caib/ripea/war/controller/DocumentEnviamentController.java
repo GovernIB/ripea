@@ -123,7 +123,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			if (rootCause instanceof NotibRepostaException) {
 				msg = getMessage(request, "contingut.enviament.errorReposta.notib") + " " + rootCause.getMessage();
 			} else {
-				throw new RuntimeException(ex);
+				msg = rootCause.getMessage();
 			}
 			
 			return getModalControllerReturnValueErrorMessageText(

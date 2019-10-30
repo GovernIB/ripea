@@ -119,6 +119,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@Column(name = "entrega_deh_obligat")
 	protected Boolean entregaDehObligat;
 	
+	
 
 	@OneToMany(
 			mappedBy = "interessat",
