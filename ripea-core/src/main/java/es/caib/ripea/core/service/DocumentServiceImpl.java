@@ -849,10 +849,10 @@ public class DocumentServiceImpl implements DocumentService {
 					true,
 					false,
 					false);
-		
+			
 			documentHelper.processarFirmaClient(
 					identificador,
-					arxiuNom,
+					changeExtensioToPdf(arxiuNom),
 					arxiuContingut,
 					document);
 		} else {
@@ -862,6 +862,15 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(
 					"No s'han trobat les dades del document amb identificador applet (" +
 					"identificador=" + identificador + ")");
+		}
+	}
+	
+	private String changeExtensioToPdf(String nom) {
+		int indexPunt = nom.lastIndexOf(".");
+		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
+			return nom.substring(0,indexPunt)+ ".pdf";
+		} else {
+			return nom;
 		}
 	}
 	

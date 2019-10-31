@@ -335,6 +335,7 @@ public class UsuariTascaController extends BaseUserController {
 					command,
 					pareId,
 					model);
+			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
 		try {
@@ -369,6 +370,7 @@ public class UsuariTascaController extends BaseUserController {
 					command,
 					pareId,
 					model);
+			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
 		try {
