@@ -18,6 +18,7 @@ Actualment encara es troba en procés però es pot dir que les principals caract
 * User Interface: Web-based
 ## <a name="docs"></a> Documentació
 * [Manual d'instal·lació](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/odt/00_ripea_instalar.odt)
+* [Manual d'usuari](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf)
 ## <a name="v_estable"></a> Versió estable
 ### [v0.9.71.pre](https://github.com/GovernIB/ripea/releases/tag/v0.9.71.pre)
 ## <a name="b_activa"></a> Branca activa
