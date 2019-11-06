@@ -56,7 +56,8 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			InteressatIdiomaEnumDto preferenciaIdioma,
 			Boolean notificacioAutoritzat,
 			Boolean entregaDeh,
-			Boolean entregaDehObligat) {
+			Boolean entregaDehObligat,
+			Boolean incapacitat) {
 		this.raoSocial = raoSocial;
 		this.documentTipus = documentTipus;
 		this.documentNum = documentNum;
@@ -72,6 +73,7 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 		this.notificacioAutoritzat =  notificacioAutoritzat;
 		this.entregaDeh = entregaDeh;
 		this.entregaDehObligat = entregaDehObligat;
+		this.incapacitat = incapacitat;
 	}
 
 	/**
@@ -111,7 +113,8 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			ExpedientEntity expedient,
 			InteressatEntity representant,
 			Boolean entregaDeh,
-			Boolean entregaDehObligat) {
+			Boolean entregaDehObligat,
+			Boolean incapacitat) {
 		return new Builder(
 				raoSocial,
 				documentTipus,
@@ -129,7 +132,8 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 				expedient,
 				representant,
 				entregaDeh,
-				entregaDehObligat);
+				entregaDehObligat,
+				incapacitat);
 	}
 
 	/**
@@ -156,7 +160,8 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 				ExpedientEntity expedient,
 				InteressatEntity representant,
 				Boolean entregaDeh,
-				Boolean entregaDehObligat) {
+				Boolean entregaDehObligat,
+				Boolean incapacitat) {
 			built = new InteressatPersonaJuridicaEntity();
 			built.raoSocial = raoSocial;
 			built.documentTipus = documentTipus;
@@ -176,6 +181,7 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			built.esRepresentant = false;
 			built.entregaDeh = entregaDeh;
 			built.entregaDehObligat = entregaDehObligat;
+			built.incapacitat = incapacitat;
 		}
 		public InteressatPersonaJuridicaEntity build() {
 			return built;

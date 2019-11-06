@@ -163,7 +163,7 @@ CREATE TABLE IPA_INTERESSAT
   TELEFON              character varying(20),
   OBSERVACIONS         character varying(160),
   ORGAN_CODI           character varying(9),
-  ORGAN_NOM	       character varying(80),
+  ORGAN_NOM	           character varying(80),
   RAO_SOCIAL           character varying(80),
   NOT_IDIOMA           character varying(2),
   NOT_AUTORITZAT       boolean                  NOT NULL,
@@ -176,7 +176,8 @@ CREATE TABLE IPA_INTERESSAT
   LASTMODIFIEDBY_CODI  character varying(64),
   VERSION              bigint               NOT NULL,
   ENTREGA_DEH 		   BOOLEAN,
-  ENTREGA_DEH_OBLIGAT BOOLEAN
+  ENTREGA_DEH_OBLIGAT  BOOLEAN,
+  INCAPACITAT 		   BOOLEAN
 );
 
 
@@ -376,7 +377,8 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT
   LASTMODIFIEDBY_CODI  		character varying(256),
   VERSION             		BIGINT                      NOT NULL,
   SERVEI_TIPUS 		   		CHARACTER VARYING(10),
-  ENTREGA_POSTAL       		BOOLEAN
+  ENTREGA_POSTAL       		BOOLEAN,
+  NOTIFICACIO_ESTAT         CHARACTER VARYING(255)
 );
 
 
@@ -641,7 +643,13 @@ CREATE TABLE IPA_DOCUMENT_ENVIAMENT_INTER
   CREATEDDATE         timestamp without time zone,
   LASTMODIFIEDDATE    timestamp without time zone,
   CREATEDBY_CODI      character varying (256),
-  LASTMODIFIEDBY_CODI character varying (256)  
+  LASTMODIFIEDBY_CODI character varying (256),
+  NOT_ENV_DAT_DATA     		TIMESTAMP WITHOUT TIMEZONE,
+  NOT_ENV_DAT_ORIG     		CHARACTER VARYING(20),
+  NOT_ENV_CERT_DATA    		TIMESTAMP WITHOUT TIMEZONE,
+  NOT_ENV_CERT_ORIG    		CHARACTER VARYING(20),
+  ERROR                		BOOLEAN,
+  ERROR_DESC           		CHARACTER VARYING(2048)
 );
 
 CREATE TABLE IPA_VIAFIRMA_USUARI (

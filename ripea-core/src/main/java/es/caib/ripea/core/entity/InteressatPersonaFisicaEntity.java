@@ -78,7 +78,8 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 			InteressatIdiomaEnumDto preferenciaIdioma,
 			Boolean notificacioAutoritzat,
 			Boolean entregaDeh,
-			Boolean entregaDehObligat) {
+			Boolean entregaDehObligat,
+			Boolean incapacitat) {
 		this.nom = nom;
 		this.llinatge1 = llinatge1;
 		this.llinatge2 = llinatge2;
@@ -96,6 +97,7 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 		this.notificacioAutoritzat =  notificacioAutoritzat;
 		this.entregaDeh = entregaDeh;
 		this.entregaDehObligat = entregaDehObligat;
+		this.incapacitat = incapacitat;
 	}
 
 	/**
@@ -139,7 +141,8 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 			ExpedientEntity expedient,
 			InteressatEntity representant,
 			Boolean entregaDeh,
-			Boolean entregaDehObligat) {
+			Boolean entregaDehObligat,
+			Boolean incapacitat) {
 		return new Builder(
 				nom,
 				llinatge1,
@@ -159,7 +162,8 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 				expedient,
 				representant,
 				entregaDeh,
-				entregaDehObligat);
+				entregaDehObligat,
+				incapacitat);
 	}
 
 	/**
@@ -188,7 +192,8 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 				ExpedientEntity expedient,
 				InteressatEntity representant,
 				Boolean entregaDeh,
-				Boolean entregaDehObligat) {
+				Boolean entregaDehObligat,
+				Boolean incapacitat) {
 			built = new InteressatPersonaFisicaEntity();
 			built.nom = nom;
 			built.llinatge1 = llinatge1;
@@ -210,7 +215,7 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 			built.esRepresentant = false;
 			built.entregaDeh = entregaDeh;
 			built.entregaDehObligat = entregaDehObligat;
-			
+			built.incapacitat = incapacitat;
 		}
 		public InteressatPersonaFisicaEntity build() {
 			return built;

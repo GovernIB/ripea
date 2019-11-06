@@ -104,6 +104,7 @@ import es.caib.ripea.plugin.notificacio.Notificacio;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
@@ -2700,9 +2701,13 @@ public class PluginHelper {
 			for(InteressatEntity interessatEntity: interessats) {
 				
 				Enviament enviament = new Enviament();
-				Persona persona = convertirAmbPersona(interessatEntity);
-				enviament.setTitular(persona);
-				enviament.setDestinataris(Arrays.asList(persona));
+				enviament.setTitular(convertirAmbPersona(interessatEntity));
+				
+				if (interessatEntity.getIncapacitat() != null && interessatEntity.getIncapacitat() == true) {
+					if (interessatEntity.getRepresentant() != null) {
+						enviament.setDestinataris(Arrays.asList(convertirAmbPersona(interessatEntity.getRepresentant())));
+					}
+				}
 
 				// ########## ENTREGA POSTAL  ###############
 				if (notificacioDto.getEntregaPostal()) {
@@ -2807,27 +2812,40 @@ public class PluginHelper {
 			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
 			if (resposta.getCertificacioData() != null) {
 				byte[] certificacio = resposta.getCertificacioContingut();
-				if (gestioDocumentalId != null && notificacio.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+				if (gestioDocumentalId != null && documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
 					gestioDocumentalDelete(
 							notificacio.getEnviamentCertificacioArxiuId(),
 							GESDOC_AGRUPACIO_CERTIFICACIONS);
 				}
-				if (gestioDocumentalId == null || notificacio.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+				if (gestioDocumentalId == null || documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
 					gestioDocumentalId = gestioDocumentalCreate(
 							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 							new ByteArrayInputStream(certificacio));
 				}
 			}
 			
-			notificacio.updateEnviamentEstat(
+			documentEnviamentInteressatEntity.updateEnviamentEstat(
 					resposta.getEstat(),
 					resposta.getEstatData(),
 					resposta.getEstatOrigen(),
 					resposta.getCertificacioData(),
 					resposta.getCertificacioOrigen(),
-					gestioDocumentalId,
 					resposta.isError(),
 					resposta.getErrorDescripcio());
+			
+			
+
+			
+			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(
+					documentEnviamentInteressatEntity.getNotificacio().getEnviamentIdentificador());
+			
+			
+			notificacio.updateNotificacioEstat(
+					respostaNotificioEstat.isFinalitzada(),
+					resposta.getEstatData(),
+					respostaNotificioEstat.isError(),
+					respostaNotificioEstat.getErrorDescripcio(),
+					gestioDocumentalId);
 			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
@@ -3573,6 +3591,8 @@ public class PluginHelper {
 	}
 
 	private Persona convertirAmbPersona(InteressatEntity interessat) {
+		interessat = HibernateHelper.deproxy(interessat);
+		
 		Persona persona = new Persona();
 		persona.setNif(interessat.getDocumentNum());
 		if (interessat instanceof InteressatPersonaFisicaEntity) {
@@ -3592,6 +3612,7 @@ public class PluginHelper {
 		}
 		persona.setTelefon(interessat.getTelefon());
 		persona.setEmail(interessat.getEmail());
+		persona.setIncapacitat(interessat.getIncapacitat());
 		return persona;
 	}
 

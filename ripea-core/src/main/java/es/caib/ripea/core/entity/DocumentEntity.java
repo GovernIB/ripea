@@ -93,6 +93,10 @@ public class DocumentEntity extends NodeEntity {
 	private String ntiCsv;
 	@Column(name = "nti_csvreg", length = 512)
 	private String ntiCsvRegulacion;
+	
+	public Long getPareId() {
+		return pare.getId();
+	}
 
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;

@@ -155,7 +155,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatPersonaFisicaDto.getPreferenciaIdioma(),
 					interessatPersonaFisicaDto.getNotificacioAutoritzat(),
 					interessatPersonaFisicaDto.getEntregaDeh(),
-					interessatPersonaFisicaDto.getEntregaDehObligat());
+					interessatPersonaFisicaDto.getEntregaDehObligat(),
+					interessatPersonaFisicaDto.getIncapacitat());
 		} else if (interessat.isPersonaJuridica()) {
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
 			interessatEntity = interessatRepository.findPersonaJuridicaById(interessat.getId());
@@ -174,7 +175,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
 					interessatPersonaJuridicaDto.getNotificacioAutoritzat(),
 					interessatPersonaJuridicaDto.getEntregaDeh(),
-					interessatPersonaJuridicaDto.getEntregaDehObligat());
+					interessatPersonaJuridicaDto.getEntregaDehObligat(),
+					interessatPersonaJuridicaDto.getIncapacitat());
 		} else {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
 			interessatEntity = interessatRepository.findAdministracioById(interessat.getId());
@@ -196,7 +198,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatAdministracioDto.getPreferenciaIdioma(),
 					interessatAdministracioDto.getNotificacioAutoritzat(),
 					interessatAdministracioDto.getEntregaDeh(),
-					interessatAdministracioDto.getEntregaDehObligat());
+					interessatAdministracioDto.getEntregaDehObligat(),
+					interessatAdministracioDto.getIncapacitat());
 		}
 		interessatEntity = interessatRepository.save(interessatEntity);
 		// Registra al log la modificació de l'interessat

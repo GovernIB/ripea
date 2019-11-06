@@ -97,7 +97,8 @@ public class ExpedientInteressatHelper {
 					expedient,
 					null,
 					interessatPersonaFisicaDto.getEntregaDeh(),
-					interessatPersonaFisicaDto.getEntregaDehObligat()).build();
+					interessatPersonaFisicaDto.getEntregaDehObligat(),
+					interessatPersonaFisicaDto.getIncapacitat()).build();
 		} else if (interessat.isPersonaJuridica()) {
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
 			interessatEntity = InteressatPersonaJuridicaEntity.getBuilder(
@@ -117,7 +118,8 @@ public class ExpedientInteressatHelper {
 					expedient,
 					null,
 					interessatPersonaJuridicaDto.getEntregaDeh(),
-					interessatPersonaJuridicaDto.getEntregaDehObligat()).build();
+					interessatPersonaJuridicaDto.getEntregaDehObligat(),
+					interessatPersonaJuridicaDto.getIncapacitat()).build();
 		} else {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
 			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
@@ -140,7 +142,8 @@ public class ExpedientInteressatHelper {
 					expedient,
 					null,
 					interessatAdministracioDto.getEntregaDeh(),
-					interessatAdministracioDto.getEntregaDehObligat()).build();
+					interessatAdministracioDto.getEntregaDehObligat(),
+					interessatAdministracioDto.getIncapacitat()).build();
 		}
 		if (pare != null) {
 			interessatEntity.updateEsRepresentant(true);

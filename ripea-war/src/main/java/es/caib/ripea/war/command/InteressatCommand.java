@@ -89,6 +89,7 @@ public class InteressatCommand  {
 	private Boolean entregaDeh;
 	private Boolean entregaDehObligat;
 	
+	private Boolean incapacitat;
 	
 	@NotNull
 	protected InteressatTipusEnumDto tipus;
@@ -159,6 +160,12 @@ public class InteressatCommand  {
 	}
 	public void setDocumentTipus(InteressatDocumentTipusEnumDto documentTipus) {
 		this.documentTipus = documentTipus;
+	}
+	public Boolean getIncapacitat() {
+		return incapacitat;
+	}
+	public void setIncapacitat(Boolean incapacitat) {
+		this.incapacitat = incapacitat;
 	}
 	public String getDocumentNum() {
 		return documentNum;

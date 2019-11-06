@@ -81,12 +81,12 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 					es.caib.notib.ws.notificacio.Enviament enviamentNotib = new es.caib.notib.ws.notificacio.Enviament();
 					enviamentNotib.setTitular(
 							toPersonaNotib(enviament.getTitular()));
-//					if (enviament.getDestinataris() != null) {
-//						for (Persona destinatari: enviament.getDestinataris()) {
-//							enviamentNotib.getDestinataris().add(
-//									toPersonaNotib(destinatari));
-//						}
-//					}
+					if (enviament.getDestinataris() != null) {
+						for (Persona destinatari: enviament.getDestinataris()) {
+							enviamentNotib.getDestinataris().add(
+									toPersonaNotib(destinatari));
+						}
+					}
 					if (enviament.isEntregaPostalActiva()) {
 						EntregaPostal entregaPostal = new EntregaPostal();
 						entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.valueOf(enviament.getEntregaPostalTipus().toString()));
@@ -191,25 +191,14 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			String identificador) throws SistemaExternException {
 		try {
 			es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio respostaConsultaEstat = getNotificacioService().consultaEstatNotificacio(identificador);
-			if (respostaConsultaEstat.isError()) {
-				throw new SistemaExternException(respostaConsultaEstat.getErrorDescripcio());
-			} else {
-				RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
-				if (respostaConsultaEstat.getEstat() != null) {
-					switch (respostaConsultaEstat.getEstat()) {
-					case PENDENT:
-						resposta.setEstat(NotificacioEstat.PENDENT);
-						break;
-					case ENVIADA:
-						resposta.setEstat(NotificacioEstat.ENVIADA);
-						break;
-					case FINALITZADA:
-						resposta.setEstat(NotificacioEstat.FINALITZADA);
-						break;
-					}
-				}
-				return resposta;
-			}
+
+			RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
+			resposta.setEstat(respostaConsultaEstat.getEstat() != null ? NotificacioEstat.valueOf(respostaConsultaEstat.getEstat().toString()) : null);
+			resposta.setError(respostaConsultaEstat.isError());
+			resposta.setErrorDescripcio(respostaConsultaEstat.getErrorDescripcio());
+			resposta.setErrorData(respostaConsultaEstat.getErrorData() != null ? respostaConsultaEstat.getErrorData().toGregorianCalendar().getTime() : null);
+			return resposta;
+
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut consultar l'estat de la notificació (" +
@@ -226,7 +215,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 
 			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
 			
-			resposta.setEstat(toEnviamentEstat(respostaConsultaEstat.getEstat()));
+			resposta.setEstat(respostaConsultaEstat.getEstat() != null ? EnviamentEstat.valueOf(respostaConsultaEstat.getEstat().toString()) : null);
 			resposta.setEstatData(toDate(respostaConsultaEstat.getEstatData()));
 			resposta.setEstatDescripcio(respostaConsultaEstat.getEstatDescripcio());
 			resposta.setEstatOrigen(respostaConsultaEstat.getEstatOrigen());
@@ -293,80 +282,11 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			p.setTelefon(persona.getTelefon());
 			p.setEmail(persona.getEmail());
 			p.setInteressatTipus(toInteressatTipusEnumDto(persona.getInteressatTipus()));
+			p.setIncapacitat(persona.isIncapacitat());
 		}
 		return p;
 	}
-	private EnviamentEstat toEnviamentEstat(EnviamentEstatEnum enviamentEstatEnum) {
-		EnviamentEstat enviamentEstat = null;
-		if (enviamentEstatEnum != null) {
-			switch (enviamentEstatEnum) {
-			case NOTIB_ENVIADA:
-				enviamentEstat = EnviamentEstat.NOTIB_ENVIADA;
-				break;
-			case NOTIB_PENDENT:
-				enviamentEstat = EnviamentEstat.NOTIB_PENDENT;
-				break;
-			case ABSENT:
-				enviamentEstat = EnviamentEstat.ABSENT;
-				break;
-			case ADRESA_INCORRECTA:
-				enviamentEstat = EnviamentEstat.ADRESA_INCORRECTA;
-				break;
-			case DESCONEGUT:
-				enviamentEstat = EnviamentEstat.DESCONEGUT;
-				break;
-			case ENTREGADA_OP:
-				enviamentEstat = EnviamentEstat.ENTREGADA_OP;
-				break;
-			case ENVIADA_CI:
-				enviamentEstat = EnviamentEstat.ENVIADA_CI;
-				break;
-			case ENVIADA_DEH:
-				enviamentEstat = EnviamentEstat.ENVIADA_DEH;
-				break;
-			case ENVIAMENT_PROGRAMAT:
-				enviamentEstat = EnviamentEstat.ENVIAMENT_PROGRAMAT;
-				break;
-			case ERROR_ENTREGA:
-				enviamentEstat = EnviamentEstat.ERROR_ENTREGA;
-				break;
-			case EXPIRADA:
-				enviamentEstat = EnviamentEstat.EXPIRADA;
-				break;
-			case EXTRAVIADA:
-				enviamentEstat = EnviamentEstat.EXTRAVIADA;
-				break;
-			case LLEGIDA:
-				enviamentEstat = EnviamentEstat.LLEGIDA;
-				break;
-			case MORT:
-				enviamentEstat = EnviamentEstat.MORT;
-				break;
-			case NOTIFICADA:
-				enviamentEstat = EnviamentEstat.NOTIFICADA;
-				break;
-			case PENDENT_CIE:
-				enviamentEstat = EnviamentEstat.PENDENT_CIE;
-				break;
-			case PENDENT_DEH:
-				enviamentEstat = EnviamentEstat.PENDENT_DEH;
-				break;
-			case PENDENT_ENVIAMENT:
-				enviamentEstat = EnviamentEstat.PENDENT_ENVIAMENT;
-				break;
-			case PENDENT_SEU:
-				enviamentEstat = EnviamentEstat.PENDENT_SEU;
-				break;
-			case REBUTJADA:
-				enviamentEstat = EnviamentEstat.REBUTJADA;
-				break;
-			case SENSE_INFORMACIO:
-				enviamentEstat = EnviamentEstat.SENSE_INFORMACIO;
-				break;
-			}
-		}
-		return enviamentEstat;
-	}
+
 	
 	
 	private InteressatTipusEnumDto toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {

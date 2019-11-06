@@ -5,7 +5,10 @@ package es.caib.ripea.core.api.dto;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 
 
 
@@ -25,6 +28,9 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private String enviamentIdentificador;
 	private String enviamentReferencia;
 	private List<Long> interessatsIds = new ArrayList<Long>();
+	
+	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();
+	
 	
 	private ServeiTipusEnumDto serveiTipusEnum;
 	
@@ -100,5 +106,13 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	public void setInteressats(List<InteressatDto> interessats) {
 		this.interessats = interessats;
 	}
+	public Set<DocumentEnviamentInteressatDto> getDocumentEnviamentInteressats() {
+		return documentEnviamentInteressats;
+	}
+	public void setDocumentEnviamentInteressats(Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats) {
+		this.documentEnviamentInteressats = documentEnviamentInteressats;
+	}
+	
+	
 
 }

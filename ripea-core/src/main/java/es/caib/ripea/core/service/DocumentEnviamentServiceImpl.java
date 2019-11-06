@@ -4,7 +4,6 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -18,11 +17,13 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
@@ -31,7 +32,6 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -168,7 +168,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		}
 		
 		DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
-				(notificacioDto.getEstat() != null) ? notificacioDto.getEstat() : DocumentEnviamentEstatEnumDto.PENDENT,
+				DocumentNotificacioEstatEnumDto.PENDENT,
 				notificacioDto.getAssumpte(),
 				notificacioDto.getTipus(),
 				notificacioDto.getDataProgramada(),
@@ -275,16 +275,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					DocumentNotificacioEntity.class,
 					"No es pot modificar una notificació amb el tipus " + documentNotificacioEntity.getTipus());
 		}
-		DocumentNotificacioDto documentNotificacioDto= conversioTipusHelper.convertir(documentNotificacioEntity, DocumentNotificacioDto.class);
+		DocumentNotificacioDto documentNotificacioDto = conversioTipusHelper.convertir(documentNotificacioEntity, DocumentNotificacioDto.class);
 		
 		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(
 				documentNotificacioDto,
 				expedient);
 		
-		DocumentEnviamentEstatEnumDto estat = documentNotificacioEntity.getEstat();
-		if (DocumentNotificacioTipusEnumDto.MANUAL.equals(documentNotificacioEntity.getTipus())) {
-			estat = notificacio.getEstat();
-		}
+		DocumentNotificacioEstatEnumDto estat = documentNotificacioEntity.getNotificacioEstat();
 		documentNotificacioEntity.update(
 				estat,
 				notificacio.getAssumpte(),

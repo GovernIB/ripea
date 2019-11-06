@@ -40,6 +40,14 @@ public abstract class InteressatDto implements Serializable {
 	protected Boolean entregaDeh;
 	private Boolean entregaDehObligat;
 	
+	private Boolean incapacitat;
+	
+	public Boolean getIncapacitat() {
+		return incapacitat;
+	}
+	public void setIncapacitat(Boolean incapacitat) {
+		this.incapacitat = incapacitat;
+	}
 	public Long getId() {
 		return id;
 	}

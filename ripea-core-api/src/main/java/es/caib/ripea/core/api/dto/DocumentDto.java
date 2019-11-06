@@ -46,7 +46,17 @@ public class DocumentDto extends NodeDto {
 	private List<DocumentVersioDto> versions;
 	private boolean firmaSeparada;
 	
+	private Long pareId;
 	
+	
+	public Long getPareId() {
+		return pareId;
+	}
+
+	public void setPareId(Long pareId) {
+		this.pareId = pareId;
+	}
+
 	public String getFitxerExtension() {
 		return fitxerNom.substring(
 				fitxerNom.lastIndexOf('.')+1,

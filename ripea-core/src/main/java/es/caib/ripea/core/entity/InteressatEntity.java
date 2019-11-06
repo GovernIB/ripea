@@ -119,6 +119,9 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@Column(name = "entrega_deh_obligat")
 	protected Boolean entregaDehObligat;
 	
+	@Column(name = "incapacitat")
+	protected Boolean incapacitat;
+	
 	
 
 	@OneToMany(
@@ -210,7 +213,9 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	public void updateRepresentant(InteressatEntity representant) {
 		this.representant = representant;
 	}
-
+	public Boolean getIncapacitat() {
+		return incapacitat != null ? incapacitat : false;
+	}
 	public abstract String getIdentificador();
 
 

@@ -21,6 +21,7 @@ import javax.persistence.TemporalType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
@@ -47,17 +48,17 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	private Date dataCaducitat;
 	@Column(name = "not_env_id", length = 100)
 	private String enviamentIdentificador;
-	@Column(name = "not_env_dat_estat", length = 20)
-	private String enviamentDatatEstat;
-	@Column(name = "not_env_dat_data")
-	private Date enviamentDatatData;
-	@Column(name = "not_env_dat_orig", length = 20)
-	private String enviamentDatatOrigen;
-	@Column(name = "not_env_cert_data")
-	@Temporal(TemporalType.DATE)
-	private Date enviamentCertificacioData;
-	@Column(name = "not_env_cert_orig", length = 20)
-	private String enviamentCertificacioOrigen;
+//	@Column(name = "not_env_dat_estat", length = 20)
+//	private String enviamentDatatEstat;
+//	@Column(name = "not_env_dat_data")
+//	private Date enviamentDatatData;
+//	@Column(name = "not_env_dat_orig", length = 20)
+//	private String enviamentDatatOrigen;
+//	@Column(name = "not_env_cert_data")
+//	@Temporal(TemporalType.DATE)
+//	private Date enviamentCertificacioData;
+//	@Column(name = "not_env_cert_orig", length = 20)
+//	private String enviamentCertificacioOrigen;
 	@Column(name = "not_env_cert_arxiuid", length = 50)
 	private String enviamentCertificacioArxiuId;
 	@Enumerated(EnumType.STRING)
@@ -66,6 +67,10 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	
 	@Column(name="entrega_postal")
 	private Boolean entregaPostal;
+	
+	@Column(name = "notificacio_estat", nullable = false)
+	@Enumerated(EnumType.STRING)
+	protected DocumentNotificacioEstatEnumDto notificacioEstat;
 	
 	
 	@OneToMany(
@@ -90,21 +95,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public String getEnviamentIdentificador() {
 		return enviamentIdentificador;
 	}
-	public String getEnviamentDatatEstat() {
-		return enviamentDatatEstat;
-	}
-	public Date getEnviamentDatatData() {
-		return enviamentDatatData;
-	}
-	public String getEnviamentDatatOrigen() {
-		return enviamentDatatOrigen;
-	}
-	public Date getEnviamentCertificacioData() {
-		return enviamentCertificacioData;
-	}
-	public String getEnviamentCertificacioOrigen() {
-		return enviamentCertificacioOrigen;
-	}
 	public String getEnviamentCertificacioArxiuId() {
 		return enviamentCertificacioArxiuId;
 	}
@@ -118,11 +108,14 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		return tipus;
 	}	
 	
+	public DocumentNotificacioEstatEnumDto getNotificacioEstat() {
+		return notificacioEstat;
+	}
 	public void update(
-			DocumentEnviamentEstatEnumDto estat,
+			DocumentNotificacioEstatEnumDto notificacioEstat,
 			String assumpte,
 			String observacions) {
-		this.estat = estat;
+		this.notificacioEstat = notificacioEstat;
 		this.assumpte = assumpte;
 		this.observacions = observacions;
 	}
@@ -135,7 +128,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		this.enviamentIdentificador = enviamentIdentificador;
 		this.enviatData = enviatData;
 		if (!enviat) {
-			this.estat = DocumentEnviamentEstatEnumDto.PENDENT;
+			this.notificacioEstat = DocumentNotificacioEstatEnumDto.PENDENT;
 		}
 	}
 	
@@ -147,47 +140,22 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				errorDescripcio,
 				null);
 	}
-	
-	
-	
-	
 
-	public void updateEnviamentEstat(
-			EnviamentEstat enviamentDatatEstat,
-			Date enviamentDatatData,
-			String enviamentDatatOrigen,
-			Date enviamentCertificacioData,
-			String enviamentCertificacioOrigen,
-			String enviamentCertificacioArxiuId,
+	public void updateNotificacioEstat(
+			boolean notificacioFinalitzada,
+			Date estatData,
 			boolean error,
-			String errorDescripcio) {
-		this.enviamentDatatEstat = enviamentDatatEstat.name();
-		this.enviamentDatatData = enviamentDatatData;
-		this.enviamentDatatOrigen = enviamentDatatOrigen;
-		this.enviamentCertificacioData = enviamentCertificacioData;
-		this.enviamentCertificacioOrigen = enviamentCertificacioOrigen;
+			String errorDescripcio,
+			String enviamentCertificacioArxiuId) {
 		this.enviamentCertificacioArxiuId = enviamentCertificacioArxiuId;
 		this.error = error;
 		this.errorDescripcio = errorDescripcio;
-		switch (enviamentDatatEstat) {
-		case LLEGIDA:
-		case NOTIFICADA:
-			updateProcessat(true, enviamentDatatData);
-			break;
-		case EXPIRADA:
-		case REBUTJADA:
-			updateProcessat(false, enviamentDatatData);
-			break;
-		case NOTIB_ENVIADA:
-			updateEnviat(enviamentDatatData);
-			break;
-		default:
-			break;
-		}
+		this.notificacioEstat = notificacioFinalitzada ? DocumentNotificacioEstatEnumDto.FINALITZADA : DocumentNotificacioEstatEnumDto.PENDENT;
+		this.processatData = notificacioFinalitzada ? estatData : null;
 	}
 
 	public static Builder getBuilder(
-			DocumentEnviamentEstatEnumDto estat,
+			DocumentNotificacioEstatEnumDto notificacioEstat,
 			String assumpte,
 			DocumentNotificacioTipusEnumDto tipus,
 			Date dataProgramada,
@@ -198,7 +166,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			ServeiTipusEnumDto serveiTipusEnum,
 			Boolean entregaPostal) {
 		return new Builder(
-				estat,
+				notificacioEstat,
 				assumpte,
 				tipus,
 				dataProgramada,
@@ -213,7 +181,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public static class Builder {
 		DocumentNotificacioEntity built;
 		Builder(
-				DocumentEnviamentEstatEnumDto estat,
+				DocumentNotificacioEstatEnumDto notificacioEstat,
 				String assumpte,
 				DocumentNotificacioTipusEnumDto tipus,
 				Date dataProgramada,
@@ -225,7 +193,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 				Boolean entregaPostal) {
 			built = new DocumentNotificacioEntity();
 			built.inicialitzar();
-			built.estat = estat;
+			built.notificacioEstat = notificacioEstat;
 			built.assumpte = assumpte;
 			built.tipus = tipus;
 			built.dataProgramada = dataProgramada;

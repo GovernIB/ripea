@@ -1004,14 +1004,14 @@ $(document).ready(function() {
 											{{/if}}
 										</script>
 										</th>
-										<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.createdData"/></th>
-										<th data-col-name="enviatData" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.data"/></th>
+										<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.data"/></th>
 										<th data-col-name="processatData" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.dataFinalitzada"/></th>
 										<th data-col-name="assumpte" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.assumpte"/></th>
 										<th data-col-name="destinatari" data-orderable="false" data-visible="false" width="20%">
 											<spring:message code="contingut.enviament.columna.destinatari"/>
 										</th>
 										<th data-col-name="documentId" data-visible="false"/>
+										<th data-col-name="documentNom" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.document"/></th>
 										<th data-col-name="estat" data-template="#cellEnviamentEstatTemplate" data-orderable="false" width="10%">
 											<spring:message code="contingut.enviament.columna.estat"/>
 											<script id="cellEnviamentEstatTemplate" type="text/x-jsrender">

@@ -109,6 +109,9 @@ public abstract class DocumentEnviamentDto extends AuditoriaDto {
 	public Long getDocumentId() {
 		return document != null ? document.id : null;
 	}
+	public String getDocumentNom() {
+		return document != null ? document.nom : null;
+	}
 	public List<DocumentDto> getAnnexos() {
 		return annexos;
 	}

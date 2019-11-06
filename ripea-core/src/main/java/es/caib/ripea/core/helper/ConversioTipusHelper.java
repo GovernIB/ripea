@@ -145,6 +145,8 @@ public class ConversioTipusHelper {
 						target.setRepresentantIdentificador(source.getRepresentantIdentificador());
 						target.setEntregaDeh(source.getEntregaDeh());
 						target.setEntregaDehObligat(source.getEntregaDehObligat());
+						target.setIncapacitat(source.getIncapacitat());
+						target.setRepresentant(source.getRepresentant() != null ? convertir(source.getRepresentant(),InteressatDto.class) : null);
 						return target;
 					}
 				});

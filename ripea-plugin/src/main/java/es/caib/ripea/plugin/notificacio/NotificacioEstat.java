@@ -11,9 +11,9 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEstat implements Serializable {
-	PENDENT,
-	ENVIADA,
-	FINALITZADA,
-	REGISTRADA,
+	PENDENT, 
+	ENVIADA, 
+	REGISTRADA, 
+	FINALITZADA, 
 	PROCESSADA
 }

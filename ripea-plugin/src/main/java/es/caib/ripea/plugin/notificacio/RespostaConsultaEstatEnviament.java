@@ -28,6 +28,22 @@ public class RespostaConsultaEstatEnviament {
 	private boolean error;
 	private String errorDescripcio;
 	
+	public boolean isFinalitzat() {
+		if (estat != null && 
+				(estat == EnviamentEstat.ABSENT || 
+				estat == EnviamentEstat.ADRESA_INCORRECTA || 
+				estat == EnviamentEstat.ERROR_ENTREGA || 
+				estat == EnviamentEstat.EXPIRADA || 
+				estat == EnviamentEstat.EXTRAVIADA || 
+				estat == EnviamentEstat.MORT || 
+				estat == EnviamentEstat.LLEGIDA || 
+				estat == EnviamentEstat.NOTIFICADA || 
+				estat == EnviamentEstat.REBUTJADA)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	public boolean isError() {
 		return error;

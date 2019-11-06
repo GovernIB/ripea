@@ -19,8 +19,14 @@ public class Persona {
 	private String telefon;
 	private String email;
 	private InteressatTipusEnumDto interessatTipus;
+	private boolean incapacitat;
 	
-
+	public boolean isIncapacitat() {
+		return incapacitat;
+	}
+	public void setIncapacitat(boolean incapacitat) {
+		this.incapacitat = incapacitat;
+	}
 	public String getNom() {
 		return nom;
 	}
