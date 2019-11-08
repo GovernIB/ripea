@@ -880,7 +880,7 @@ public class DocumentServiceImpl implements DocumentService {
 	public void notificacioActualitzarEstat(
 			String identificador, 
 			String referencia) {
-		
+		logger.debug("Rebre callback de notib: identificador=" + identificador + ", referencia=" + referencia);
 		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findByIdentificadorIReferencia(
 				identificador, referencia);
 		try {
