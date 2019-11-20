@@ -260,6 +260,17 @@ public class DocumentHelper {
 			fitxer.setNom(document.getFitxerNom());
 			fitxer.setContentType(document.getFitxerContentType());
 			fitxer.setContingut(document.getFitxerContingut());
+		} else if (documentEntity.getArxiuUuid() != null) {
+			fitxer = new FitxerDto();
+			fitxer.setContentType(documentEntity.getFitxerContentType());
+			fitxer.setNom(documentEntity.getFitxerNom());
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					documentEntity,
+					null,
+					null,
+					true,
+					false);
+			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 		}
 		if (document.getFitxerContingut() != null) {
 			actualitzarFitxerDocument(

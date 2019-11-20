@@ -556,7 +556,10 @@ $(document).ready(function() {
 			if (checkItAll.checked) {
 				inputs.forEach(function(input) {
 					input.checked = true;
-					docsIdx.push(parseInt(input.id));
+					var index = docsIdx.indexOf(parseInt(input.id));
+					if (index < 0) {
+						docsIdx.push(parseInt(input.id));
+					}
 			    });  
 				enableDisableButton();
 				selectAll();
@@ -567,8 +570,9 @@ $(document).ready(function() {
 					if (index > -1) {
 						docsIdx.splice(index, 1);
 					}
-					deselectAll();
 			    });  
+				enableDisableButton();
+				deselectAll();
 			}
 		});
 	} else {
@@ -579,25 +583,25 @@ $(document).ready(function() {
 			$(checkItAll).toggleClass('active');
 	
 			if ($(checkItAll).hasClass('active') && $(listDocuments).hasClass('multiple')) {
-				console.log("true");
-				console.log(docsIdx);
 				elements.forEach(function(input) {
 					$(input).addClass('selectd');
-					docsIdx.push(parseInt(input.id));
+					var index = docsIdx.indexOf(parseInt(input.id));
+					if (index < 0) {
+						docsIdx.push(parseInt(input.id));
+					}
 				});  
-				console.log(docsIdx);
 				enableDisableButton();
 				selectAll();
 			} else if ($(listDocuments).hasClass('multiple')) {
-				console.log("false");
 				elements.forEach(function(input) {
 					$(input).removeClass('selectd');
 					var index = docsIdx.indexOf(parseInt(input.id));
 					if (index > -1) {
 						docsIdx.splice(index, 1);
 					}
-					deselectAll();
 			    });  
+				enableDisableButton();
+				deselectAll();
 			}
 		});
 	}
