@@ -202,6 +202,21 @@ ul.interessats {
 .drag_activated {
 	border: 4px dashed #ffd351;
 }
+.disabled {
+	pointer-events: none;
+    opacity: 0.4; 
+}
+#loading {
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	z-index: 100;
+	width: 100%;
+	margin-top: 10%;
+}
+.selectd {
+	background-color: #c6c6c6
+}
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
@@ -335,8 +350,8 @@ $(document).ready(function() {
 			useNativeClamp: true
 		});
 	});
-	$('.table-hover > tbody > tr > td:not(:last-child)').css('cursor','pointer');
-	$('.table-hover > tbody > tr > td:not(:last-child)').click(function(event) {
+	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child)').css('cursor','pointer');
+	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child)').click(function(event) {
 		event.stopPropagation();
 		window.location.href = $('a:first', $(this).parent()).attr('href');
 	});
@@ -497,8 +512,149 @@ $(document).ready(function() {
 		}
 	});
 
-
+	var tableDocuments = document.getElementById('table-documents');
+	var checkItAll = document.getElementById('checkItAll');
+	
+	$('.checkItAll').addClass('disabled');
+	
+	$('#habilitar-mult').on('click', function() {
+		var contenidorContingut = document.getElementById('contenidor-contingut');
+		var inputs = contenidorContingut.querySelectorAll('li>div');
+		
+		if ($(contenidorContingut).hasClass('multiple')) {
+			$('.checkItAll').addClass('disabled');
+			$(contenidorContingut).removeClass('multiple');
+			$(this).removeClass('active');
+			//Inicialitzar contador i array
+			docsIdx = [];
+			var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
+			$.get(
+					multipleUrl,
+					function(data) {
+						$(".seleccioCount").html(data);
+					}
+			);
+			enableDisableButton();
+			inputs.forEach(function(element) {
+				if ($(element).hasClass('selectd')) {
+					$(element).removeClass('selectd');
+				}
+			}); 
+		} else {
+			$('.checkItAll').removeClass('disabled');
+			$(contenidorContingut).addClass('multiple');
+			$(this).addClass('active');
+		}
+	});
+	
+	enableDisableButton();
+	if (tableDocuments != null) {
+		//Vista llista
+		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+		
+		checkItAll.addEventListener('change', function() {
+			if (checkItAll.checked) {
+				inputs.forEach(function(input) {
+					input.checked = true;
+					docsIdx.push(parseInt(input.id));
+			    });  
+				enableDisableButton();
+				selectAll();
+			} else {
+				inputs.forEach(function(input) {
+					input.checked = false;
+					var index = docsIdx.indexOf(parseInt(input.id));
+					if (index > -1) {
+						docsIdx.splice(index, 1);
+					}
+					deselectAll();
+			    });  
+			}
+		});
+	} else {
+		//Vista icones
+		$(checkItAll).on('click', function(){
+			var listDocuments = document.getElementById('contenidor-contingut');
+			var elements = listDocuments.querySelectorAll('li>div');
+			$(checkItAll).toggleClass('active');
+	
+			if ($(checkItAll).hasClass('active') && $(listDocuments).hasClass('multiple')) {
+				console.log("true");
+				console.log(docsIdx);
+				elements.forEach(function(input) {
+					$(input).addClass('selectd');
+					docsIdx.push(parseInt(input.id));
+				});  
+				console.log(docsIdx);
+				enableDisableButton();
+				selectAll();
+			} else if ($(listDocuments).hasClass('multiple')) {
+				console.log("false");
+				elements.forEach(function(input) {
+					$(input).removeClass('selectd');
+					var index = docsIdx.indexOf(parseInt(input.id));
+					if (index > -1) {
+						docsIdx.splice(index, 1);
+					}
+					deselectAll();
+			    });  
+			}
+		});
+	}
 });
+
+function enableDisableButton() {
+	var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut"/>';
+	$('#contenidor-contingut ').addClass("disabled");
+	$('#table-documents').addClass("disabled");
+	$('#loading').removeClass('hidden');
+	$.ajax({
+        type: "GET",
+        url: comprovacioUrl,
+        dataType: "json",
+        data: {docsIdx: docsIdx},
+        success: function (totPdf) {
+        	if (totPdf == true && docsIdx.length > 0) {
+				$('.des-mult').removeClass("disabled");
+				$('.zip-mult').addClass("disabled");
+				$('.con-mult').removeClass("disabled");
+			} else if (docsIdx.length > 0) {
+				$('.zip-mult').removeClass("disabled");
+				$('.des-mult').addClass("disabled");
+				$('.con-mult').removeClass("disabled");
+			} else {
+				$('.con-mult').addClass("disabled");
+				$('.zip-mult').addClass("disabled");
+				$('.des-mult').addClass("disabled");
+			}
+        	$('#contenidor-contingut ').removeClass("disabled");
+        	$('#table-documents').removeClass("disabled");
+        	$('#loading').addClass('hidden');
+		}
+   });
+}
+
+function selectAll() {
+	var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+	$.get(
+			multipleUrl, 
+			{docsIdx: docsIdx},
+			function(data) {
+				$(".seleccioCount").html(data);
+			}
+	);
+}
+
+function deselectAll() {
+	var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+	$.get(
+			multipleUrl, 
+			{docsIdx: docsIdx},
+			function(data) {
+				$(".seleccioCount").html(data);
+			}
+	);
+}
 </script>
 
 </head>
@@ -779,6 +935,47 @@ $(document).ready(function() {
 							</c:if>							
 							<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
 							<div class="text-right" id="contingut-botons">
+								<c:if test="${vistaIcones}">
+									<div class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.habilitar"/>" id="habilitar-mult" class="btn-group btn btn-default">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
+									<div class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.seleccio"/>" id="checkItAll" class="btn-group btn btn-default checkItAll">
+											<span class="fa fa-check"></span>
+										</div>
+									</div>
+								</c:if>
+								<%---- Button descarregar mult ----%>
+								<div class="btn-group">
+									<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
+										<a href="<c:url value="/contingut/${contingut.id}/descarregarMultiples"/>" class="btn btn-default con-mult">
+											<span class="fa fa-download"></span>
+											
+											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+										</a>
+									</div>
+								</div>
+								<%---- Button concatenar mult ----%>
+								<div class="btn-group">
+									<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
+										<a href="<c:url value="/contingut/${contingut.id}/concatenar"/>" class="btn btn-default des-mult" data-toggle="modal" data-maximized="true">
+											<span class="fa fa-paperclip"></span>
+											
+											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+										</a>
+									</div>
+								</div>
+								<%---- Button descarregar zip mult ----%>
+								<div class="btn-group">
+									<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
+										<a href="<c:url value="/contingut/${contingut.id}/concatenarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
+											<span class="glyphicon glyphicon-compressed"></span>
+											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+										</a>
+									</div>
+								</div>
 								<div class="btn-group">
 									<%---- Button llistat ----%>
 									<c:choose>
@@ -803,7 +1000,10 @@ $(document).ready(function() {
 									</c:choose>										
 									<a href="${iconesVistaUrl}" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
 										<span class="fa fa-th"></span>
-									</a>									
+									</a>	
+									<script>
+										var docsIdx = new Array();
+									</script>							
 								</div>
 								<c:if test="${isTasca or (expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
 									<div id="botons-crear-contingut" class="btn-group">
@@ -836,6 +1036,9 @@ $(document).ready(function() {
 								</c:if>
 							</div>
 							<%---- TABLE/GRID OF CONTINGUTS ----%>
+							<div id="loading">
+								<img src="../img/loading.gif"/>
+							</div>
 							<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
 							<input class="hidden" id="dropped-files" type="file"/>
 						</c:otherwise> 

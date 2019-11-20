@@ -13,6 +13,7 @@ import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentCommand.UpdateFisic;
+import es.caib.ripea.war.command.DocumentConcatenatCommand.ConcatenarDigital;
 
 /**
  * Command per al manteniment de contenidors.
@@ -25,8 +26,8 @@ public class ContenidorCommand {
 	@NotNull(groups = {Create.class, Update.class})
 	protected Long entitatId;
 	protected Long pareId;
-	@NotEmpty(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
-	@Size(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=256)
+	@NotEmpty(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, ConcatenarDigital.class})
+	@Size(groups = {Create.class, Update.class, CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, ConcatenarDigital.class}, max=256)
 	protected String nom;
 
 

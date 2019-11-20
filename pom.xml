@@ -25,12 +25,13 @@
 		<regweb.version>3.0.5</regweb.version>
 		<dir3caib.version>1.0.7</dir3caib.version>
 		<notib.version>1.0.2</notib.version>
+		<pdfbox.version>2.0.12</pdfbox.version>
 		<maven.test.skip>true</maven.test.skip>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
-		<version.revision>71.PRE</version.revision>
+		<version.revision>72.PRE</version.revision>
 		<version.full>${project.version}.${version.revision}</version.full>
 	</properties>
 	<modules>
@@ -95,7 +96,6 @@
 				<configuration>
 					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
 				</configuration>
-				<version>3.0.1</version>
 			</plugin>
 		</plugins>
 	</build>

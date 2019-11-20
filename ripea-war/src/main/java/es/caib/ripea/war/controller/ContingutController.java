@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +25,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
@@ -53,6 +54,7 @@ import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
 /**
@@ -66,7 +68,8 @@ public class ContingutController extends BaseUserController {
 
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
-
+	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
+	
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
@@ -149,6 +152,11 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
+		Set<Long> seleccio = new HashSet<Long>();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO,
+				seleccio);
 		SessioHelper.updateContenidorVista(
 				request,
 				CONTENIDOR_VISTA_ICONES);
@@ -161,6 +169,11 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
+		Set<Long> seleccio = new HashSet<Long>();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO,
+				seleccio);
 		SessioHelper.updateContenidorVista(
 				request,
 				CONTENIDOR_VISTA_LLISTAT);

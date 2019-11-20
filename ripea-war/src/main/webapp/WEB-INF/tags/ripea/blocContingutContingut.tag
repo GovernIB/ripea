@@ -19,7 +19,7 @@
 			<c:forEach var="fill" items="${fills}">
 				<c:if test="${fill.carpeta or fill.document or empty fill.metaNode or fill.metaNode.usuariActualRead}">
 					<li class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if>" data-contenidor-id="${fill.id}">
-						<div id="info-fill-${fill.id}" class="thumbnail element-noclick">
+						<div id="${fill.id}" class="thumbnail element-noclick">
 							<div class="text-center">
 								<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true"/> 
 							</div>
@@ -34,17 +34,49 @@
 							</div>
 						</div>
 						<script>
-							$('#info-fill-${fill.id}').click(function(e) {
+							$('#${fill.id}').click(function(e) {
+								var contenidorContingut = document.getElementById('contenidor-contingut');
+								
 								if ($(this).hasClass('noclick')) {
 									$(this).removeClass('noclick');
 								} else {
 									if ($('#accions-fill-${fill.id}').has(e.target).length == 0) {
-										$('#info-fill-${fill.id}').tooltip('destroy');
-										window.location = $('#info-fill-${fill.id} a:first').attr('href');
+										$('#${fill.id}').tooltip('destroy');
+										if ($(contenidorContingut).hasClass('multiple')) {
+											var index = docsIdx.indexOf(${fill.id});
+											var multipleUrl;
+											
+											if (index > -1) {
+												docsIdx.splice(index, 1);
+												$(this).removeClass('selectd');
+												var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+												$.get(
+														multipleUrl, 
+														{docsIdx: docsIdx},
+														function(data) {
+															$(".seleccioCount").html(data);
+														}
+												);
+											} else {
+												var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+												$(this).addClass('selectd');
+												docsIdx.push(${fill.id});
+												$.get(
+														multipleUrl, 
+														{docsIdx: docsIdx},
+														function(data) {
+															$(".seleccioCount").html(data);
+														}
+												);
+											}
+											enableDisableButton();
+										} else {
+											window.location = $('#${fill.id} a:first').attr('href');
+										}
 									}
 								}
 							});
-							$('#info-fill-${fill.id} li a').click(function(e) {
+							$('#${fill.id} li a').click(function(e) {
 								e.stopPropagation();
 							});
 						</script>
@@ -55,9 +87,10 @@
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
 		<%--------------------- TABLE -------------------%>
-		<table class="table table-striped table-bordered table-hover">
+		<table class="table table-striped table-bordered table-hover" id="table-documents">
 			<thead>
 				<tr>
+					<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
 					<th><spring:message code="contingut.info.nom"/></th>
 					<th><spring:message code="contingut.info.tipus"/></th>
 					<th><spring:message code="contingut.info.createl"/></th>
@@ -68,6 +101,7 @@
 			<tbody>
 				<c:forEach var="fill" items="${fills}">
 					<tr id="info-fill-${fill.id}" class="element-drag-drop">
+						<td><input type="checkbox" class="info-fill-${fill.id}" id="${fill.id}" autocomplete="off"/></td>
 						<td>
 							<rip:blocIconaContingut contingut="${fill}"/>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
@@ -86,6 +120,46 @@
 							<rip:blocContingutAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}"  nodeco="${nodeco}"/>
 						</td>
 					</tr>
+					<script>
+					$('.info-fill-${fill.id}').change(function() {
+						//Remove if duplicate
+						var index = docsIdx.indexOf(${fill.id});
+						var multipleUrl;
+						
+						if (index > -1) {
+							docsIdx.splice(index, 1);
+							var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+							$.get(
+									multipleUrl, 
+									{docsIdx: docsIdx},
+									function(data) {
+										$(".seleccioCount").html(data);
+									}
+							);
+						}
+						if(this.checked) {
+							var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+							docsIdx.push(${fill.id});
+							$.get(
+									multipleUrl, 
+									{docsIdx: docsIdx},
+									function(data) {
+										$(".seleccioCount").html(data);
+									}
+							);
+						} else {
+							var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+							$.get(
+									multipleUrl, 
+									{docsIdx: docsIdx},
+									function(data) {
+										$(".seleccioCount").html(data);
+									}
+							);
+						}
+						enableDisableButton();
+					});
+					</script>
 				</c:forEach>
 			</tbody>
 		</table>

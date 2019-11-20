@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.war.command.DocumentCommand;
+import es.caib.ripea.war.command.DocumentConcatenatCommand;
 import es.caib.ripea.war.helper.MessageHelper;
 
 /**
@@ -21,7 +22,7 @@ import es.caib.ripea.war.helper.MessageHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDocumentNoRepetit, DocumentCommand> {
+public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDocumentNoRepetit, Object> {
 
 	@Autowired
 	private ContingutService contingutService;
@@ -33,21 +34,26 @@ public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDoc
 
 	@Override
 	public boolean isValid(
-			final DocumentCommand cmd, 
+			final Object obj, 
 			final ConstraintValidatorContext context) {
 		try {
+			Long entitatId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getEntitatId() : ((DocumentConcatenatCommand) obj).getEntitatId();
+			Long pareId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getPareId() : ((DocumentConcatenatCommand) obj).getPareId();
+			Long id = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getId() : ((DocumentConcatenatCommand) obj).getId();
+			String nom = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getNom() : ((DocumentConcatenatCommand) obj).getNom();
+			
 			boolean valid = true;
 			ContingutDto contingutPare = contingutService.findAmbIdUser(
-					cmd.getEntitatId(), 
-					cmd.getPareId(), 
+					entitatId, 
+					pareId, 
 					true, 
 					false,
 					false);
 			
 			for (ContingutDto contingut: contingutPare.getFills()) {
 				if (contingut.isDocument()) {
-					if (contingut.getNom().equals(cmd.getNom())) {
-						if (cmd.getId() == null || cmd.getId() != contingut.getId()) {
+					if (contingut.getNom().equals(nom)) {
+						if (id == null || id != contingut.getId()) {
 							context.disableDefaultConstraintViolation();
 							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NomDocumentNoRepetit"))
 								.addNode("nom")

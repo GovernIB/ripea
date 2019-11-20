@@ -37,6 +37,9 @@
 					</c:when>	
 					<c:when test="${contingut.fitxerExtension=='xls' or contingut.fitxerExtension=='xlsx' or contingut.fitxerExtension=='ods'}">
 						<span class="fa fa-file-excel-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
+					</c:when>	
+					<c:when test="${contingut.fitxerExtension=='zip'}">
+						<span class="fa fa-file-zip-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
 					</c:when>		
 <%-- 					<c:when test="${contingut.fitxerExtension=='odt'}"> --%>
 <%-- 						<span class="fa fa-file-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}" style="position: relative;left: 10px;"></span> --%>

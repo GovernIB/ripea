@@ -201,6 +201,11 @@
 			<artifactId>notib-client</artifactId>
 			<version>${notib.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.pdfbox</groupId>
+		    <artifactId>pdfbox</artifactId>
+		    <version>${pdfbox.version}</version>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
