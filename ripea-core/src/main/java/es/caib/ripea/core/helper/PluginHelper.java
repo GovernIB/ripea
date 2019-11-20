@@ -2691,7 +2691,8 @@ public class PluginHelper {
 				}
 			}
 			
-			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+			FitxerDto fitxer =  arxiuDocumentVersioImprimible(documentEntity);
+//			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
 			notificacio.setDocumentArxiuNom(fitxer.getNom());
 			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
@@ -2747,7 +2748,10 @@ public class PluginHelper {
 					enviament.setEntregaPostalLinea2(
 							provincia.getNom() + ", " +
 									pais.getNom());
-					enviament.setEntregaPostalCodiPostal("00000");
+
+					enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
+					enviament.setEntregaPostalPaisCodi(interessatPerAdresa.getPais());
+					
 				}
 				// ########## ENVIAMENT DEH  ###############
 				if (interessatEntity.getEntregaDeh() != null && interessatEntity.getEntregaDeh()) {
