@@ -16,8 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +42,6 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
@@ -65,8 +62,8 @@ import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
-import es.caib.ripea.war.command.DocumentConcatenatCommand.ConcatenarDigital;
 import es.caib.ripea.war.command.DocumentConcatenatCommand;
+import es.caib.ripea.war.command.DocumentConcatenatCommand.ConcatenarDigital;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.ArxiuTemporalHelper;
@@ -463,12 +460,6 @@ public class ContingutDocumentController extends BaseUserController {
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
-		
-//		DocumentHelper.concatenarDocuments(
-//				documentService, 
-//				entitatActual, 
-//				commandConc,
-//				ordre);
 		
 		DocumentHelper.generarFitxerZip(
 				documentService, 

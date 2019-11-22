@@ -2,7 +2,6 @@ package es.caib.ripea.war.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -11,7 +10,6 @@ import java.util.zip.ZipOutputStream;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
-import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -118,7 +116,7 @@ public class DocumentHelper {
 			if (command != null) {
 				reportContent = baos.toByteArray();
 				command.setFitxerNom(((ExpedientDto)contingut).getNom().replaceAll(" ", "_") + ".zip");
-				command.setFitxerContentType("application/octet-stream");
+				command.setFitxerContentType("application/zip");
 				command.setFitxerContingut(reportContent);
 			}			
 		} catch (IOException e) {

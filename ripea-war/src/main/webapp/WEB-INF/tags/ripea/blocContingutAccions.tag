@@ -152,7 +152,7 @@
 			<c:if test="${isTasca || potModificarExpedientPare}">
 			
 				<%---- Enviar a portafirmes ----%>
-				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL'}">
+				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<c:choose>
@@ -172,7 +172,7 @@
 				</c:if>
 				
 				<%---- Firmar al navegador ----%>
-				<c:if test="${contingut.metaNode.firmaPassarelaActiva && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL'}">
+				<c:if test="${contingut.metaNode.firmaPassarelaActiva && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<c:choose>
@@ -192,7 +192,7 @@
 				</c:if>
 				
 				<%---- Enviar a viaFirma ----%>
-				<c:if test="${!isTasca and (contingut.estat == 'REDACCIO' && contingut.metaNode.firmaBiometricaActiva && contingut.documentTipus == 'DIGITAL' && isFirmaBiometrica)}">
+				<c:if test="${!isTasca and (contingut.estat == 'REDACCIO' && contingut.metaNode.firmaBiometricaActiva && contingut.documentTipus == 'DIGITAL' && isFirmaBiometrica) && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<li><a href="<c:url value="/document/${contingut.id}/viafirma/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-square"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>
@@ -203,7 +203,7 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				<c:if test="${contingut.estat == 'CUSTODIAT' and !isTasca}">
+				<c:if test="${contingut.estat == 'CUSTODIAT' and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
 					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
@@ -257,14 +257,16 @@
 			<c:if test="${contingut.expedient && pluginArxiuActiu}"> 
 				<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 			</c:if>
-			<c:choose>
-				<c:when test="${contingut.document && contingut.estat != 'CUSTODIAT' || contingut.expedient && !contingut.conteDocumentsFirmats}">
-					<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-				</c:when>
-				<c:otherwise>
-					<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
-				</c:otherwise>
-			</c:choose>				
+			<c:if test="${contingut.document && contingut.fitxerExtension!='zip'}">
+				<c:choose>
+					<c:when test="${contingut.document && contingut.estat != 'CUSTODIAT' || contingut.expedient && !contingut.conteDocumentsFirmats}">
+						<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+					</c:when>
+					<c:otherwise>
+						<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+					</c:otherwise>
+				</c:choose>		
+			</c:if>		
 		</c:if>
 	</ul>
 </div>
