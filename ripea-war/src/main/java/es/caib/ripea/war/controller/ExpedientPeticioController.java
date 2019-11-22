@@ -359,6 +359,7 @@ public class ExpedientPeticioController extends BaseUserController {
 					entitat.getId(),
 					command.getMetaExpedientId(),
 					null,
+					null,
 					command.getAny(),
 					null,
 					command.getNewExpedientTitol(),

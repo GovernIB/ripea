@@ -18,6 +18,7 @@ public class ExpedientDto extends NodeDto {
 
 	private Long id;
 	private ExpedientEstatEnumDto estat;
+	private MetaExpedientDominiDto metaExpedientDomini;
 	private Date tancatData;
 	private String tancatMotiu;
 	private int any;
@@ -75,6 +76,12 @@ public class ExpedientDto extends NodeDto {
 
 	public boolean isTasques() {
 		return tasques;
+	}
+	public MetaExpedientDominiDto getMetaExpedientDomini() {
+		return metaExpedientDomini;
+	}
+	public void setMetaExpedientDomini(MetaExpedientDominiDto metaExpedientDomini) {
+		this.metaExpedientDomini = metaExpedientDomini;
 	}
 	public void setTasques(boolean tasques) {
 		this.tasques = tasques;

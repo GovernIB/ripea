@@ -18,6 +18,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -82,6 +83,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
+			"and (:esNullMetaNodeDomini = true or e.metaExpedientDomini = :metaNodeDomini) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
@@ -103,7 +105,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
-			@Param("metaNode") MetaNodeEntity metaNode,			
+			@Param("metaNode") MetaNodeEntity metaNode,	
+			@Param("esNullMetaNodeDomini") boolean esNullMetaNodeDomini,
+			@Param("metaNodeDomini") MetaExpedientDominiEntity metaNodeDomini,	
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullNom") boolean esNullNom,
@@ -142,6 +146,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
+			"and (:esNullMetaNodeDomini = true or e.metaExpedientDomini = :metaNodeDomini) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
@@ -164,7 +169,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
-			@Param("metaNode") MetaNodeEntity metaNode,			
+			@Param("metaNode") MetaNodeEntity metaNode,	
+			@Param("esNullMetaNodeDomini") boolean esNullMetaNodeDomini,
+			@Param("metaNodeDomini") MetaExpedientDominiEntity metaNodeDomini,	
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullNom") boolean esNullNom,

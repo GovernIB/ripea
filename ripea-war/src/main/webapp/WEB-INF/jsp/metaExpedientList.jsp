@@ -1,4 +1,3 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -75,6 +74,11 @@
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+					</script>
+				</th>
+				<th data-col-name="expedientDominisCount" data-template="#cellDominisTemplate" data-orderable="false" width="1%">
+					<script id="cellDominisTemplate" type="text/x-jsrender">
+						<a href="metaExpedient/{{:id}}/domini" class="btn btn-default"><spring:message code="metaexpedient.list.boto.dominis"/>&nbsp;<span class="badge">{{:expedientDominisCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">

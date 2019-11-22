@@ -44,6 +44,7 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			Long contenidorId,
 			Long metaExpedientId,
+			Long metaExpedientDominiId,
 			Integer any,
 			Long sequencia,
 			String nom,
@@ -53,6 +54,7 @@ public class ExpedientServiceBean implements ExpedientService {
 				entitatId,
 				contenidorId,
 				metaExpedientId,
+				metaExpedientDominiId,
 				any,
 				sequencia,
 				nom,
@@ -253,8 +255,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any) {
-		return delegate.update(entitatId, id, nom, any);
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId) {
+		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId);
 	}
 
 	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,

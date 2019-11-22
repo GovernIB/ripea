@@ -56,6 +56,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
@@ -66,6 +67,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientDominiRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
@@ -88,6 +90,8 @@ public class ExpedientHelper {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired
+	private MetaExpedientDominiRepository metaExpedientDominiRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
@@ -113,12 +117,14 @@ public class ExpedientHelper {
 	public ExpedientDto create(
 			Long entitatId,
 			Long metaExpedientId,
+			Long metaExpedientDominiId,
 			Long pareId,
 			Integer any,
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats) {
+		MetaExpedientDominiEntity metaExpedientDomini = null;
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
@@ -137,6 +143,11 @@ public class ExpedientHelper {
 				false,
 				true,
 				false);
+		
+		if (metaExpedientDominiId != null) {
+			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
+		}
+			
 		ContingutEntity contingutPare = null;
 		if (pareId != null) {
 			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -161,6 +172,7 @@ public class ExpedientHelper {
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
 				metaExpedient,
+				metaExpedientDomini,
 				contingutPare,
 				metaExpedient.getEntitat(),
 				"1.0",

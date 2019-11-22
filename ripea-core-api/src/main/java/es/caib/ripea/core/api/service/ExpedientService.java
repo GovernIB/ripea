@@ -55,6 +55,7 @@ public interface ExpedientService {
 	public ExpedientDto create(
 			Long entitatId,
 			Long metaExpedientId,
+			Long metaExpedientDominiId,
 			Long pareId,
 			Integer any,
 			Long sequencia,
@@ -361,7 +362,7 @@ public interface ExpedientService {
 	boolean hasWritePermission(Long expedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto update(Long entitatId, Long id, String nom, int any);
+	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId);
 
 	PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
 			PaginacioParamsDto paginacioParams);

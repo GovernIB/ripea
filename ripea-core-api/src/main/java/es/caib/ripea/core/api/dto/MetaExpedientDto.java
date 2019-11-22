@@ -22,6 +22,7 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private Long pareId;
 	private int expedientEstatsCount;
 	private int expedientTasquesCount;
+	private int expedientDominisCount;
 	private List<MetaDocumentDto> metaDocuments;
 
 	public String getClassificacioSia() {
@@ -65,6 +66,12 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	}
 	public void setExpedientTasquesCount(int expedientTasquesCount) {
 		this.expedientTasquesCount = expedientTasquesCount;
+	}
+	public int getExpedientDominisCount() {
+		return expedientDominisCount;
+	}
+	public void setExpedientDominisCount(int expedientDominisCount) {
+		this.expedientDominisCount = expedientDominisCount;
 	}
 	public List<MetaDocumentDto> getMetaDocuments() {
 		return metaDocuments;

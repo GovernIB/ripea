@@ -120,6 +120,8 @@ $(document).ready(function() {
 			});
 		}
 	});
+	
+	
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -171,12 +173,11 @@ function getCookie(cname) {
 					</div>	
 					<div class="col-md-3">
 						<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
-					</div>			
-						
+					</div>	
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<div class="col-md-1">
 						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-					</div>						
+					</div>					
 				</div>
 				<rip:inputHidden name="meusExpedients"/>
 			</div>
@@ -187,6 +188,11 @@ function getCookie(cname) {
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/>
+			</div>	
 		</div>
 	</form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">

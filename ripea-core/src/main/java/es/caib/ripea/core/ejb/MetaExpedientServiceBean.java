@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.MetaExpedientDominiDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -242,6 +243,76 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				entitatId,
 				id,
 				permisId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientDominiDto dominiCreate(
+			Long entitatId, 
+			Long metaExpedientId,
+			MetaExpedientDominiDto metaExpedientTasca) throws NotFoundException {
+		return delegate.dominiCreate(
+				entitatId, 
+				metaExpedientId, 
+				metaExpedientTasca);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientDominiDto dominiUpdate(
+			Long entitatId, 
+			Long metaExpedientId,
+			MetaExpedientDominiDto metaExpedientTasca) throws NotFoundException {
+		return delegate.dominiUpdate(
+				entitatId,
+				metaExpedientId, 
+				metaExpedientTasca);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientDominiDto dominiDelete(
+			Long entitatId, 
+			Long metaExpedientId, 
+			Long id) throws NotFoundException {
+		return delegate.dominiDelete(
+				entitatId, 
+				metaExpedientId, 
+				id);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaExpedientDominiDto dominiFindById(
+			Long entitatId, 
+			Long metaExpedientId, 
+			Long id)
+			throws NotFoundException {
+		return delegate.dominiFindById(
+				entitatId, 
+				metaExpedientId, 
+				id);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaExpedientDominiDto> dominiFindPaginatByMetaExpedient(Long entitatId, Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		return delegate.dominiFindPaginatByMetaExpedient(
+				entitatId,
+				metaExpedientId, 
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientDominiDto> dominiFindByMetaExpedient(
+			Long entitatId, 
+			Long metaExpedientId)
+			throws NotFoundException {
+		return delegate.dominiFindByMetaExpedient(
+				entitatId, 
+				metaExpedientId);
 	}
 
 }

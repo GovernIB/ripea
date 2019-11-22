@@ -33,10 +33,49 @@ function refrescarSequencia() {
 		$('input#sequencia').val(undefined);
 	}
 }
+
+function recuperarDominisMetaExpedient() {
+	let metaExpedientId = $('select#metaNodeId').val();
+	if (metaExpedientId != undefined) {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/findMetaExpedientDominis',
+			success: function(dominis) {
+				var selDominis = $('select#metaNodeDominiId');
+				var selDominisOriginal = ${expedientCommand.metaNodeDominiId}
+				selDominis.empty();
+				selDominis.append("<option value=\"\"><spring:message code='contingut.expedient.form.camp.domini.cap'/></option>");
+				if (dominis && dominis.length > 0) {
+					$.each(dominis, function(i, domini) {
+						if (domini.id == selDominisOriginal) {
+
+							console.log(selDominisOriginal);
+							console.log(domini.id);
+							
+							selDominis.append("<option value=\"" + domini.id + "\" selected>" + domini.nom + "</option>");
+						} else {
+							selDominis.append("<option value=\"" + domini.id + "\">" + domini.nom + "</option>");
+						}
+					});
+				}
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				selDominis.select2(select2Options);
+			},
+			error: function(e) {
+				console.log("error recuperant els dominis..." + e);
+			}
+		});
+	}
+}
 $(document).ready(function() {
 	$('select#metaNodeId').change(function(event) {
 		refrescarSequencia();
+		recuperarDominisMetaExpedient();
 	});
+	$('select#metaNodeId').trigger('change');
+	
 	$('input#any').change(function(event) {
 		refrescarSequencia();
 	});
@@ -49,6 +88,7 @@ $(document).ready(function() {
 		<c:when test="${empty expedientCommand.id}"><c:set var="formAction"><rip:modalUrl value="/expedient/new"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientCommand.id}/update"/></c:set></c:otherwise>
 	</c:choose>
+	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -62,6 +102,7 @@ $(document).ready(function() {
 				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true" labelSize="2"/>
 			</c:otherwise>
 		</c:choose>
+		<rip:inputSelect name="metaNodeDominiId" textKey="contingut.expedient.form.camp.metanodedomini" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<div id="modal-botons" class="well">

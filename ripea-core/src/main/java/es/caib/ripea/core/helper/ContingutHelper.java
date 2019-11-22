@@ -17,13 +17,11 @@ import java.util.ListIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
@@ -39,9 +37,9 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDominiDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
 import es.caib.ripea.core.api.dto.NodeDto;
@@ -58,6 +56,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
@@ -158,6 +157,10 @@ public class ContingutHelper {
 			dto.setTancatMotiu(expedient.getTancatMotiu());
 			dto.setAny(expedient.getAny());
 			dto.setSequencia(expedient.getSequencia());
+			dto.setMetaExpedientDomini(
+					conversioTipusHelper.convertir(
+							expedient.getMetaExpedientDomini(), 
+							MetaExpedientDominiDto.class));
 			dto.setCodi(expedient.getCodi());
 			dto.setNtiVersion(expedient.getNtiVersion());
 			dto.setNtiIdentificador(expedient.getNtiIdentificador());
@@ -822,6 +825,7 @@ public class ContingutHelper {
 	public ExpedientEntity crearNouExpedient(
 			String nom,
 			MetaExpedientEntity metaExpedient,
+			MetaExpedientDominiEntity metaExpedientDomini,
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			String ntiVersion,
@@ -838,6 +842,7 @@ public class ContingutHelper {
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
+				metaExpedientDomini,
 				pare,
 				entitat,
 				"1.0",

@@ -23,7 +23,14 @@ public class ExpedientCommand extends ContenidorCommand {
 	private int any;
 	private Long sequencia;
 	private Long expedientEstatId;
-
+	protected Long metaNodeDominiId;
+	
+	public Long getMetaNodeDominiId() {
+		return metaNodeDominiId;
+	}
+	public void setMetaNodeDominiId(Long metaNodeDominiId) {
+		this.metaNodeDominiId = metaNodeDominiId;
+	}
 	public Long getExpedientEstatId() {
 		return expedientEstatId;
 	}
@@ -63,6 +70,8 @@ public class ExpedientCommand extends ContenidorCommand {
 			command.setPareId(dto.getPare().getId());
 		if (dto.getMetaNode() != null)
 			command.setMetaNodeId(dto.getMetaNode().getId());
+		if (dto.getMetaExpedientDomini() != null)
+			command.setMetaNodeDominiId(dto.getMetaExpedientDomini().getId());
 		return command;
 	}
 	public static ExpedientDto asDto(ExpedientCommand command) {

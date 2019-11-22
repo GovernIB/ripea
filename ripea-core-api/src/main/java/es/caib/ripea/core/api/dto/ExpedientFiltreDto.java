@@ -17,6 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ExpedientFiltreDto implements Serializable {
 
 	private Long metaExpedientId;
+	private Long metaExpedientDominiId;
 	private String nom;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
@@ -24,6 +25,7 @@ public class ExpedientFiltreDto implements Serializable {
 	private Long expedientEstatId;
 	private ExpedientEstatEnumDto estat;
 	private Date dataTancatInici;
+	
 	private Date dataTancatFi;
 	private boolean meusExpedients;
 	private String search;
@@ -31,6 +33,14 @@ public class ExpedientFiltreDto implements Serializable {
 	private Long tipusId;
 	private String interessat;
 	
+
+	
+	public Long getMetaExpedientDominiId() {
+		return metaExpedientDominiId;
+	}
+	public void setMetaExpedientDominiId(Long metaExpedientDominiId) {
+		this.metaExpedientDominiId = metaExpedientDominiId;
+	}
 
 	public String getInteressat() {
 		return interessat;

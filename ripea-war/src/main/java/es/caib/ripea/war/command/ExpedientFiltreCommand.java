@@ -19,6 +19,7 @@ public class ExpedientFiltreCommand {
 
 	private Long arxiuId;
 	private Long metaExpedientId;
+	private Long metaExpedientDominiId;
 	private String nom;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
@@ -32,6 +33,12 @@ public class ExpedientFiltreCommand {
 	private String interessat;
 	
 
+	public Long getMetaExpedientDominiId() {
+		return metaExpedientDominiId;
+	}
+	public void setMetaExpedientDominiId(Long metaExpedientDominiId) {
+		this.metaExpedientDominiId = metaExpedientDominiId;
+	}
 	public String getInteressat() {
 		return interessat;
 	}
