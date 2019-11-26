@@ -42,7 +42,7 @@
 								} else {
 									if ($('#accions-fill-${fill.id}').has(e.target).length == 0) {
 										$('#${fill.id}').tooltip('destroy');
-										if ($(contenidorContingut).hasClass('multiple')) {
+										if ($(contenidorContingut).hasClass('multiple') && ${fill.document}) {
 											var index = docsIdx.indexOf(${fill.id});
 											var multipleUrl;
 											
@@ -101,13 +101,18 @@
 			<tbody>
 				<c:forEach var="fill" items="${fills}">
 					<tr id="info-fill-${fill.id}" class="element-drag-drop">
-						<td><input type="checkbox" class="info-fill-${fill.id}" id="${fill.id}" autocomplete="off"/></td>
+						
+						<td>
+						<c:if test="${fill.document}">
+						<input type="checkbox" class="info-fill-${fill.id}" id="${fill.id}" autocomplete="off"/>
+						</c:if>
+						</td>
 						<td>
 							<rip:blocIconaContingut contingut="${fill}"/>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							&nbsp;${fill.nom}
-							<c:if test="${fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
+							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
 								<span class="fa fa-clock-o" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 							</c:if>
 						</td>

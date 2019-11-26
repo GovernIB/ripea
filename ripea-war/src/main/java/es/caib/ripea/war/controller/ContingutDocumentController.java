@@ -610,6 +610,28 @@ public class ContingutDocumentController extends BaseUserController {
 		return totPdf;
 	}
 	
+	@RequestMapping(value = "/{pareId}/comprovarContingut/{contingutId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean comprovarContingut(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long contingutId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		boolean isDocument = true;
+		
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutId,
+				true,
+				false);
+		if (!contingut.isCarpeta())
+			isDocument = true;
+		else
+			isDocument = false;
+		
+		return isDocument;
+	}
+	
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/descarregarImprimible", method = RequestMethod.GET)
 	public String descarregarImprimible(
 			HttpServletRequest request,

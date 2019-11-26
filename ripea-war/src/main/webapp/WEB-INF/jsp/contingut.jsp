@@ -555,14 +555,24 @@ $(document).ready(function() {
 		checkItAll.addEventListener('change', function() {
 			if (checkItAll.checked) {
 				inputs.forEach(function(input) {
-					input.checked = true;
-					var index = docsIdx.indexOf(parseInt(input.id));
-					if (index < 0) {
-						docsIdx.push(parseInt(input.id));
-					}
+					var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+					$.ajax({
+				        type: "GET",
+				        url: comprovacioUrl,
+				        success: function (isDocument) {
+				        	if (isDocument) {
+				        		input.checked = true;
+								var index = docsIdx.indexOf(parseInt(input.id));
+								if (index < 0) {
+									docsIdx.push(parseInt(input.id));
+								}
+				        	}
+
+							enableDisableButton();
+							selectAll();
+				        }
+					});
 			    });  
-				enableDisableButton();
-				selectAll();
 			} else {
 				inputs.forEach(function(input) {
 					input.checked = false;
@@ -581,17 +591,28 @@ $(document).ready(function() {
 			var listDocuments = document.getElementById('contenidor-contingut');
 			var elements = listDocuments.querySelectorAll('li>div');
 			$(checkItAll).toggleClass('active');
-	
+
 			if ($(checkItAll).hasClass('active') && $(listDocuments).hasClass('multiple')) {
 				elements.forEach(function(input) {
-					$(input).addClass('selectd');
-					var index = docsIdx.indexOf(parseInt(input.id));
-					if (index < 0) {
-						docsIdx.push(parseInt(input.id));
-					}
+					var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+					$.ajax({
+				        type: "GET",
+				        url: comprovacioUrl,
+				        success: function (isDocument) {
+				        	if (isDocument) {
+				        		$(input).addClass('selectd');
+								var index = docsIdx.indexOf(parseInt(input.id));
+								if (index < 0) {
+									docsIdx.push(parseInt(input.id));
+								}
+				        	}
+
+							enableDisableButton();
+							selectAll();
+				        }
+					});
+					
 				});  
-				enableDisableButton();
-				selectAll();
 			} else if ($(listDocuments).hasClass('multiple')) {
 				elements.forEach(function(input) {
 					$(input).removeClass('selectd');
@@ -961,25 +982,27 @@ function deselectAll() {
 										</a>
 									</div>
 								</div>
-								<%---- Button concatenar mult ----%>
-								<div class="btn-group">
-									<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
-										<a href="<c:url value="/contingut/${contingut.id}/concatenar"/>" class="btn btn-default des-mult" data-toggle="modal" data-maximized="true">
-											<span class="fa fa-paperclip"></span>
-											
-											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-										</a>
+								<c:if test="${expedientAgafatPerUsuariActual and contingut.estat != 'TANCAT'}">
+									<%---- Button concatenar mult ----%>
+									<div class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
+											<a href="<c:url value="/contingut/${contingut.id}/concatenar"/>" class="btn btn-default des-mult" data-toggle="modal" data-maximized="true">
+												<span class="fa fa-paperclip"></span>
+												
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</a>
+										</div>
 									</div>
-								</div>
-								<%---- Button descarregar zip mult ----%>
-								<div class="btn-group">
-									<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
-										<a href="<c:url value="/contingut/${contingut.id}/concatenarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
-											<span class="glyphicon glyphicon-compressed"></span>
-											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-										</a>
+									<%---- Button descarregar zip mult ----%>
+									<div class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
+											<a href="<c:url value="/contingut/${contingut.id}/concatenarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
+												<span class="glyphicon glyphicon-compressed"></span>
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</a>
+										</div>
 									</div>
-								</div>
+								</c:if>
 								<div class="btn-group">
 									<%---- Button llistat ----%>
 									<c:choose>
