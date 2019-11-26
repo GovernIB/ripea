@@ -12,8 +12,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -79,46 +81,48 @@ public class DocumentHelper {
 		
 		ZipOutputStream zos = new ZipOutputStream(baos);
 		try {
-			for (Long docId: docsIdx) {
-				DocumentDto document = null;
-				FitxerDto fitxer;
-				ContingutDto contingutDoc = contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						docId,
-						true,
-						false);
-				if (contingutDoc instanceof DocumentDto)
-					document = (DocumentDto) contingutDoc;
-				
-				if (document.getEstat().equals(DocumentEstatEnumDto.FIRMAT) || document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-					fitxer = documentService.descarregarImprimible(
+			if (docsIdx != null) {
+				for (Long docId: docsIdx) {
+					DocumentDto document = null;
+					FitxerDto fitxer = null;
+					ContingutDto contingutDoc = contingutService.findAmbIdUser(
 							entitatActual.getId(),
 							docId,
-							null);
-				} else {
-					fitxer = documentService.descarregar(
-							entitatActual.getId(),
-							docId,
-							null);
+							true,
+							false);
+					if (contingutDoc instanceof DocumentDto)
+						document = (DocumentDto) contingutDoc;
+					
+					if (document.getEstat().equals(DocumentEstatEnumDto.FIRMAT) || document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+						fitxer = documentService.descarregarImprimible(
+								entitatActual.getId(),
+								docId,
+								null);
+					} else {
+						fitxer = documentService.descarregar(
+								entitatActual.getId(),
+								docId,
+								null);
+					} 
+					try {
+						ZipEntry entry = new ZipEntry(fitxer.getNom());
+						entry.setSize(fitxer.getContingut().length);
+						zos.putNextEntry(entry);
+						zos.write(fitxer.getContingut());
+						zos.closeEntry();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-				try {
-					ZipEntry entry = new ZipEntry(fitxer.getNom());
-					entry.setSize(fitxer.getContingut().length);
-					zos.putNextEntry(entry);
-					zos.write(fitxer.getContingut());
-					zos.closeEntry();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			zos.close();
-
-			if (command != null) {
-				reportContent = baos.toByteArray();
-				command.setFitxerNom(((ExpedientDto)contingut).getNom().replaceAll(" ", "_") + ".zip");
-				command.setFitxerContentType("application/zip");
-				command.setFitxerContingut(reportContent);
-			}			
+				zos.close();
+	
+				if (command != null) {
+					reportContent = baos.toByteArray();
+					command.setFitxerNom(((ExpedientDto)contingut).getNom().replaceAll(" ", "_") + ".zip");
+					command.setFitxerContentType("application/zip");
+					command.setFitxerContingut(reportContent);
+				}	
+			}		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
