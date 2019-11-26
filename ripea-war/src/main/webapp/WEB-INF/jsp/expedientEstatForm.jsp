@@ -27,8 +27,18 @@
 		<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true"/>
 		<rip:inputText name="color" textKey="expedient.estat.form.camp.color" />
 		<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial"/>
-		<rip:inputText name="responsableCodi" textKey="expedient.estat.form.camp.responsable" />
 		
+		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+		<rip:inputSuggest 
+			name="responsableCodi" 
+			urlConsultaInicial="${urlConsultaInicial}" 
+			urlConsultaLlistat="${urlConsultaLlistat}" 
+			textKey="expedient.estat.form.camp.responsable"
+			suggestValue="codi"
+			suggestText="nom"
+			required="true"/>
+			
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

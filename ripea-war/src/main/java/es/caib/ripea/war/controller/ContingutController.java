@@ -587,6 +587,12 @@ public class ContingutController extends BaseUserController {
 				"pluginArxiuActiu",
 				aplicacioService.isPluginArxiuActiu());
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
+		
+		Set<Long> seleccio = new HashSet<Long>();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO,
+				seleccio);
 	}
 
 	private void omplirModelPerMoureOCopiarVincular(
