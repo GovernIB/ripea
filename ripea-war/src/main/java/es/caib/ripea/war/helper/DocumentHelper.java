@@ -9,13 +9,10 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -32,6 +29,7 @@ public class DocumentHelper {
 
 	public static void concatenarDocuments(
 			DocumentService documentService,
+			ContingutService contingutService,
 			EntitatDto entitatActual,
 			DocumentConcatenatCommand command,
 			Map<String, Long> ordre) {
@@ -41,19 +39,28 @@ public class DocumentHelper {
 		PDFMergerUtility PDFmerger = new PDFMergerUtility(); 
 		try {
 			for (Map.Entry<String, Long> entry : ordre.entrySet()) {
-				fitxer = documentService.descarregar(
+				
+				ContingutDto contingut = contingutService.findAmbIdUser(
 						entitatActual.getId(),
 						entry.getValue(),
-						null);
-	
-				PDDocument document = PDDocument.load(fitxer.getContingut());
-				
+						true,
+						false);
+				if (contingut.isDocument() && (((DocumentDto)contingut).isFirmat() || ((DocumentDto)contingut).isCustodiat())) {
+					fitxer = documentService.descarregarImprimible(
+							entitatActual.getId(),
+							entry.getValue(),
+							null);
+					
+
+					PDDocument document = PDDocument.load(fitxer.getContingut());
+					PDFmerger.appendDocument(resultat, document);
+				} else {
+					//zip
+				}
 				//remove signature
-				PDDocumentCatalog catalog = document.getDocumentCatalog();
-				catalog.setAcroForm(null);
+				//PDDocumentCatalog catalog = document.getDocumentCatalog();
+				//catalog.setAcroForm(null);
 				
-				
-				PDFmerger.appendDocument(resultat, document);
 			}
 			resultat.save(resultatOutputStream);
 			resultat.close();
@@ -61,7 +68,6 @@ public class DocumentHelper {
 			command.setFitxerContentType("application/pdf");
 			command.setFitxerContingut(resultatOutputStream.toByteArray());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

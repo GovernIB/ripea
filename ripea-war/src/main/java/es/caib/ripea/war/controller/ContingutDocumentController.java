@@ -322,7 +322,7 @@ public class ContingutDocumentController extends BaseUserController {
 		return getConcatenacioForm(request, pareId, null, model, false);
 	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarDocuments", method = RequestMethod.POST)
+	@RequestMapping(value = "/{pareId}/notificar", method = RequestMethod.POST)
 	public String concatenarDocuments(
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -349,6 +349,7 @@ public class ContingutDocumentController extends BaseUserController {
 		
 		DocumentHelper.concatenarDocuments(
 				documentService, 
+				contingutService,
 				entitatActual, 
 				commandConc,
 				ordre);
@@ -372,13 +373,15 @@ public class ContingutDocumentController extends BaseUserController {
 		}
 	}
 
-	@RequestMapping(value = "/{contingutId}/concatenar", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contingutId}/notificar", method = RequestMethod.GET)
 	public String concatenar(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
+		boolean totsFirmats = true; 
+		boolean totsDocuments = true;
 		
 		ContingutDto contingut = contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -402,7 +405,13 @@ public class ContingutDocumentController extends BaseUserController {
 			
 			if (contingutDoc instanceof DocumentDto) {
 				document = (DocumentDto) contingutDoc;
-				documents.add(document);
+				if (document.isFirmat() || document.isCustodiat())
+					documents.add(document);
+				else
+					totsFirmats = false;
+			} else {
+				totsDocuments = false;
+				break;
 			}
 		}
 		
@@ -417,12 +426,16 @@ public class ContingutDocumentController extends BaseUserController {
 				SESSION_ATTRIBUTE_ORDRE,
 				ordre);
 		
-		model.addAttribute("documents", documents);
-		model.addAttribute("contingut", contingut);
-		return "concatenacioForm";
+		if (totsDocuments && totsFirmats) {
+			model.addAttribute("documents", documents);
+			model.addAttribute("contingut", contingut);
+			return "concatenacioForm";
+		} else {
+			return "contingutDocumentConcatenatForm";
+		}
 	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarZip/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/generarZip/new", method = RequestMethod.GET)
 	public String concatenarZipGet(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
@@ -430,7 +443,7 @@ public class ContingutDocumentController extends BaseUserController {
 		return getConcatenacioForm(request, pareId, null, model, true);
 	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarZip", method = RequestMethod.POST)
+	@RequestMapping(value = "/{pareId}/generarZip", method = RequestMethod.POST)
 	public String concatenarZip(
 			HttpServletRequest request,
 			HttpServletResponse response,

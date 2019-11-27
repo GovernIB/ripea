@@ -986,8 +986,8 @@ function deselectAll() {
 									<%---- Button concatenar mult ----%>
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
-											<a href="<c:url value="/contingut/${contingut.id}/concatenar"/>" class="btn btn-default des-mult" data-toggle="modal" data-maximized="true">
-												<span class="fa fa-paperclip"></span>
+											<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default des-mult" data-toggle="modal" data-maximized="true">
+												<span class="fa fa-envelope-o"></span>
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
@@ -996,7 +996,7 @@ function deselectAll() {
 									<%---- Button descarregar zip mult ----%>
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
-											<a href="<c:url value="/contingut/${contingut.id}/concatenarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
+											<a href="<c:url value="/contingut/${contingut.id}/generarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
 												<span class="glyphicon glyphicon-compressed"></span>
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>

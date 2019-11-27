@@ -123,6 +123,9 @@ $(document).ready(function() {
 </head>
 <body>
 <div class="container">
+	<div class="alert alert-warning" role="alert">
+	  El envío de los documentos se realizará como una concatenación de versiones imprimibles en el orden elegido.
+	</div>
 	<div class="container col-md-12">
 		<div><spring:message code="contingut.document.form.titol.concatenacio.ordre"/></div>
 	</div>
