@@ -290,4 +290,9 @@ public class DocumentServiceBean implements DocumentService {
 		delegate.notificacioActualitzarEstat(identificador, referencia);
 	}
 
+	@Override
+	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
+		return delegate.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatId);
+	}
+
 }

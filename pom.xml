@@ -24,7 +24,7 @@
 		<portafib.version>1.1</portafib.version>
 		<regweb.version>3.0.5</regweb.version>
 		<dir3caib.version>1.0.7</dir3caib.version>
-		<notib.version>1.0.2</notib.version>
+		<notib.version>1.1</notib.version>
 		<maven.test.skip>true</maven.test.skip>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>

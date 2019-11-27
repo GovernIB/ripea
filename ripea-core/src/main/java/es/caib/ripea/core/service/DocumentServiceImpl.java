@@ -897,6 +897,15 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(ex);
 		}
 	}	
+	
+	@Transactional
+	@Override
+	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId){
+		
+		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findOne(
+				documentEnviamentInteressatId);
+		return pluginHelper.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatEntity);
+	}
 
 
 

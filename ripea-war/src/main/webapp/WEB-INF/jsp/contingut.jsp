@@ -1012,28 +1012,41 @@ $(document).ready(function() {
 										</th>
 										<th data-col-name="documentId" data-visible="false"/>
 										<th data-col-name="documentNom" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.document"/></th>
+										
+										<th data-col-name="notificacioEstat" data-visible="false"></th>
 										<th data-col-name="estat" data-template="#cellEnviamentEstatTemplate" data-orderable="false" width="10%">
 											<spring:message code="contingut.enviament.columna.estat"/>
 											<script id="cellEnviamentEstatTemplate" type="text/x-jsrender">
+
 											{{if notificacio}}
-												{{if estat == 'PENDENT'}}
-													<span class="label label-warning"><span class="fa fa-clock-o"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
-												{{else estat == 'ENVIAT'}}
+												{{if notificacioEstat == 'PENDENT'}}
+													<span class="label label-warning"><span class="fa fa-clock-o"></span> <spring:message code="notificacio.notificacioEstat.enum.PENDENT"/></span>
+													{{if error}} <span class="fa fa-warning text-danger" title="<spring:message code="contingut.enviament.error"/>"></span> {{/if}}
+												{{else notificacioEstat == 'ENVIADA'}}
 													{{if error}}
-														<span class="label label-danger"><span class="fa fa-warning"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
+														<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA"/></span>
 													{{else}}
-														<span class="label label-info"><span class="fa fa-envelope-o"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
+														<span class="label label-info"><span class="fa fa-envelope-o"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA"/></span>
 													{{/if}}
-												{{else estat == 'PROCESSAT'}}
+												{{else notificacioEstat == 'REGISTRADA'}}
 													{{if error}}
-														<span class="label label-danger"><span class="fa fa-warning"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
+														<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.REGISTRADA"/></span>
 													{{else}}
-														<span class="label label-success"><span class="fa fa-check"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
+														<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.REGISTRADA"/></span>
 													{{/if}}
-												{{else estat == 'REBUTJAT'}}
-													<span class="label label-default"><span class="fa fa-times"></span> {{:~eval('notificacioEstatText["' + estat + '"]')}}</span>
+												{{else notificacioEstat == 'FINALITZADA'}}
+													{{if error}}
+															<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA"/></span>
+														{{else}}
+															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA"/></span>
+													{{/if}}
+												{{else notificacioEstat == 'PROCESSADA'}}
+													{{if error}}
+															<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
+														{{else}}
+															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
+													{{/if}}
 												{{/if}}
-												{{if error}} <span class="fa fa-warning text-danger" title="<spring:message code="contingut.enviament.error"/>"></span> {{/if}}
 											{{else publicacio}}
 												{{if estat == 'PENDENT'}}
 													<span class="label label-warning"><span class="fa fa-clock-o"></span> {{:~eval('publicacioEstatText["' + estat + '"]')}}</span>

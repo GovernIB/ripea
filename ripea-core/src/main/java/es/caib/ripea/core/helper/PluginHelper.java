@@ -27,6 +27,8 @@ import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
+
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
@@ -2798,6 +2800,20 @@ public class PluginHelper {
 		}
 	}
 	
+	public byte[] notificacioConsultarIDescarregarCertificacio(
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+
+		RespostaConsultaEstatEnviament resposta;
+		try {
+			resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		byte[] certificacio = resposta.getCertificacioContingut();
+		return certificacio;
+	}
+	
+	
 	
 
 	public void notificacioConsultarIActualitzarEstat(
@@ -2845,7 +2861,7 @@ public class PluginHelper {
 			
 			
 			notificacio.updateNotificacioEstat(
-					respostaNotificioEstat.isFinalitzada(),
+					respostaNotificioEstat.getEstat(),
 					resposta.getEstatData(),
 					respostaNotificioEstat.isError(),
 					respostaNotificioEstat.getErrorDescripcio(),

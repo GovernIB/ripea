@@ -17,13 +17,6 @@ public class RespostaConsultaEstatNotificacio {
 	private Date errorData;
 	private String errorDescripcio;
 	
-	public boolean isFinalitzada() {
-		if (estat == NotificacioEstat.PENDENT || estat == NotificacioEstat.ENVIADA) {
-			return false;
-		} else {
-			return true;
-		}
-	}
 	public boolean isError() {
 		return error;
 	}
