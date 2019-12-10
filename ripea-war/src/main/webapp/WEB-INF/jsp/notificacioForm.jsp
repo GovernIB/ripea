@@ -48,7 +48,7 @@ $(document).ready(function() {
 		<c:when test="${empty documentNotificacioCommand.id}"><c:set var="formAction"><rip:modalUrl value="/document/${documentNotificacioCommand.documentId}/notificar"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/notificacio/${documentNotificacioCommand.id}"/></c:set></c:otherwise>
 	</c:choose>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacioCommand" role="form">
+	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacioCommand" role="form">
 		<c:if test="${empty documentNotificacioCommand.id || documentNotificacioCommand.tipus == 'ELECTRONICA'}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.form.camp.tab.dades"/></a></li>

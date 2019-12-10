@@ -17,7 +17,8 @@
 		<%--------------------- GRID -------------------%>
 		<ul id="contenidor-contingut" class="list-inline row">
 			<c:forEach var="fill" items="${fills}">
-				<c:if test="${fill.carpeta or fill.document or empty fill.metaNode or fill.metaNode.usuariActualRead}">
+			<%-- && fill.documentTipus != 'VIRTUAL' --%>
+				<c:if test="${fill.carpeta or (fill.document) or empty fill.metaNode or fill.metaNode.usuariActualRead}">
 					<li class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if>" data-contenidor-id="${fill.id}">
 						<div id="${fill.id}" class="thumbnail element-noclick">
 							<div class="text-center">
@@ -100,6 +101,7 @@
 			</thead>
 			<tbody>
 				<c:forEach var="fill" items="${fills}">
+				<c:if test="${fill.carpeta or (fill.document) or empty fill.metaNode or fill.metaNode.usuariActualRead}">
 					<tr id="info-fill-${fill.id}" class="element-drag-drop">
 						
 						<td>
@@ -165,6 +167,7 @@
 						enableDisableButton();
 					});
 					</script>
+					</c:if>
 				</c:forEach>
 			</tbody>
 		</table>

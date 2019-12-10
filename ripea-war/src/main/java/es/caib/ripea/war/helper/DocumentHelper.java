@@ -2,19 +2,21 @@ package es.caib.ripea.war.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -32,6 +34,7 @@ public class DocumentHelper {
 
 	public static void concatenarDocuments(
 			DocumentService documentService,
+			ContingutService contingutService,
 			EntitatDto entitatActual,
 			DocumentConcatenatCommand command,
 			Map<String, Long> ordre) {
@@ -41,28 +44,36 @@ public class DocumentHelper {
 		PDFMergerUtility PDFmerger = new PDFMergerUtility(); 
 		try {
 			for (Map.Entry<String, Long> entry : ordre.entrySet()) {
-				fitxer = documentService.descarregar(
+				
+				ContingutDto contingut = contingutService.findAmbIdUser(
 						entitatActual.getId(),
 						entry.getValue(),
-						null);
-	
-				PDDocument document = PDDocument.load(fitxer.getContingut());
-				
-				//remove signature
-				PDDocumentCatalog catalog = document.getDocumentCatalog();
-				catalog.setAcroForm(null);
-				
-				
-				PDFmerger.appendDocument(resultat, document);
+						true,
+						false);
+				if (contingut.isDocument() && (((DocumentDto)contingut).isFirmat() || ((DocumentDto)contingut).isCustodiat())) {
+					fitxer = documentService.descarregarImprimible(
+							entitatActual.getId(),
+							entry.getValue(),
+							null);
+					
+
+					PDDocument document = PDDocument.load(fitxer.getContingut());
+					PDFmerger.appendDocument(resultat, document);
+				} 
 			}
 			resultat.save(resultatOutputStream);
 			resultat.close();
+			//command.setNom("notificacio_" + new Date().getTime());
+			//command.setData(new Date());
+			
+			command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
 			command.setFitxerNom(command.getNom() + ".pdf");
 			command.setFitxerContentType("application/pdf");
 			command.setFitxerContingut(resultatOutputStream.toByteArray());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException ex) {
+			LOGGER.error(
+					"No s'ha pogut crear el document concatenat a partir del contingut seleccionat",
+					ex);
 		}
 	}
 	
@@ -83,7 +94,6 @@ public class DocumentHelper {
 		try {
 			if (docsIdx != null) {
 				for (Long docId: docsIdx) {
-					DocumentDto document = null;
 					FitxerDto fitxer = null;
 					ContingutDto contingutDoc = contingutService.findAmbIdUser(
 							entitatActual.getId(),
@@ -91,41 +101,45 @@ public class DocumentHelper {
 							true,
 							false);
 					if (contingutDoc instanceof DocumentDto)
-						document = (DocumentDto) contingutDoc;
-					
-					if (document.getEstat().equals(DocumentEstatEnumDto.FIRMAT) || document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-						fitxer = documentService.descarregarImprimible(
-								entitatActual.getId(),
-								docId,
-								null);
-					} else {
 						fitxer = documentService.descarregar(
 								entitatActual.getId(),
 								docId,
 								null);
-					} 
 					try {
-						ZipEntry entry = new ZipEntry(fitxer.getNom());
+						ZipEntry entry = new ZipEntry(revisarContingutNom(contingutDoc.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));
 						entry.setSize(fitxer.getContingut().length);
 						zos.putNextEntry(entry);
 						zos.write(fitxer.getContingut());
 						zos.closeEntry();
-					} catch (Exception e) {
-						e.printStackTrace();
+					} catch (Exception ex) {
+						LOGGER.error(
+								"No s'ha generar el document a partir del contingut seleccionat",
+								ex);
 					}
 				}
 				zos.close();
 	
 				if (command != null) {
 					reportContent = baos.toByteArray();
-					command.setFitxerNom(((ExpedientDto)contingut).getNom().replaceAll(" ", "_") + ".zip");
+					command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
+					command.setFitxerNom(revisarContingutNom(((ExpedientDto)contingut).getNom()) + ".zip");
 					command.setFitxerContentType("application/zip");
 					command.setFitxerContingut(reportContent);
 				}	
 			}		
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException ex) {
+			LOGGER.error(
+					"No s'ha generar el fitxer zip a partir del contingut seleccionat",
+					ex);
 		}
 	}
+	
+	private static String revisarContingutNom(String nom) {
+		if (nom == null) {
+			return null;
+		}
+		return nom.replace("&", "&amp;").replaceAll("[\\\\/:*?\"<>|]", "_");
+	}
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PaginacioHelper.class);
 }

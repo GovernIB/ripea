@@ -29,11 +29,11 @@
 	text-align: center;
 }
 #contenidor-contingut {
-	margin-right: -11px;
 	background-color: #fdfdfd;
-	border: 6px solid #eaeaea;
+	border: 5px solid #fbfbfb;
 	display: inline-block;
 	padding: 1%;
+	width: 100%;
 }
 #contenidor-contingut li.element-contingut {
 	display: -moz-inline-stack;
@@ -41,7 +41,7 @@
 	vertical-align: top;
 	zoom: 1;
 	margin-bottom: 1%;
-	width: auto;
+	width: 20%;
 }
 #contenidor-contingut .thumbnail {
 	margin-bottom: 0 !important;
@@ -123,6 +123,9 @@ $(document).ready(function() {
 </head>
 <body>
 <div class="container">
+	<div class="alert alert-warning" role="alert">
+	  <div><spring:message code="contingut.document.form.titol.concatenacio.info"/></div>
+	</div>
 	<div class="container col-md-12">
 		<div><spring:message code="contingut.document.form.titol.concatenacio.ordre"/></div>
 	</div>
@@ -145,9 +148,6 @@ $(document).ready(function() {
 							</p>
 						</div>
 					</div>
-					 <script>
-					 
-					</script>
 				</li>
 			</c:forEach>
 		</ul>
@@ -155,7 +155,7 @@ $(document).ready(function() {
 	<div class="contenidor-botons col-md-12 text-center">
 		<div class="btn-group">
 			<div id="descarregar-mult" class="btn-group">
-				<a href="<c:url value="/contingut/${contingut.id}/concatenarDocuments/new"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default">
+				<a href="<c:url value="/contingut/${contingut.id}/concatenarDocuments/new"/>" data-toggle="modal" data-refresh-pagina="true" data-segona-modal="true" class="btn btn-default">
 					<span class="fa fa-paperclip"></span>
 					<spring:message code="concatenacio.form.boto.concatenar"/>
 				</a>

@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<c:set var="titol"><spring:message code="contingut.document.form.titol.concatenacio.crear"/></c:set>
+<c:set var="titol"><spring:message code="contingut.document.form.titol.compresio.crear"/></c:set>
 
 <html>
 <head>
@@ -82,15 +82,10 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:choose>
-		<c:when test="${isZip}">
-			<c:set var="formAction"><rip:modalUrl value="/contingut/${documentConcatenatCommand.pareId}/concatenarZip"/></c:set>
-		</c:when>
-		<c:otherwise>
-			<c:set var="formAction"><rip:modalUrl value="/contingut/${documentConcatenatCommand.pareId}/concatenarDocuments"/></c:set>
-		</c:otherwise>
-	</c:choose>
-	
+	<div class="alert alert-warning" role="alert">
+	  <div><spring:message code="contingut.document.form.titol.compresio.info"/></div>
+	</div>
+	<c:set var="formAction"><rip:modalUrl value="/contingut/${documentConcatenatCommand.pareId}/generarZip"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentConcatenatCommand" enctype="multipart/form-data">
 		<div id="info-plantilla-si" class="alert well-sm alert-info hidden">
 			<span class="fa fa-info-circle"></span>
@@ -108,7 +103,7 @@ $(document).ready(function() {
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardarnotificar"/></button>
 			<a href="<c:url value="/contingut/${documentConcatenatCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
