@@ -178,7 +178,8 @@ public class ContingutDocumentController extends BaseUserController {
 					command,
 					null,
 					bindingResult,
-					model);
+					model,
+					false);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
@@ -214,7 +215,8 @@ public class ContingutDocumentController extends BaseUserController {
 					command,
 					null,
 					bindingResult,
-					model);
+					model,
+					false);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
@@ -322,63 +324,15 @@ public class ContingutDocumentController extends BaseUserController {
 		return getConcatenacioForm(request, pareId, null, model, false);
 	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarDocuments", method = RequestMethod.POST)
-	public String concatenarDocuments(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long pareId,
-			@Validated({ConcatenarDigital.class}) DocumentConcatenatCommand commandConc,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					null,
-					commandConc,
-					pareId,
-					model);
-			model.addAttribute("contingutId", pareId);
-			model.addAttribute("isZip", false);
-			return "contingutDocumentConcatenatForm";
-		}
-		@SuppressWarnings("unchecked")
-		Map<String, Long> ordre = (Map<String, Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_ORDRE);
-		
-		DocumentHelper.concatenarDocuments(
-				documentService, 
-				entitatActual, 
-				commandConc,
-				ordre);
-		
-		try {
-			return createUpdateDocument(
-					request,
-					null,
-					commandConc,
-					bindingResult,
-					model);
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
-			omplirModelFormulari(
-					request,
-					null,
-					commandConc,
-					pareId,
-					model);
-			return "contingutDocumentForm";
-		}
-	}
-
-	@RequestMapping(value = "/{contingutId}/concatenar", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contingutId}/notificar", method = RequestMethod.GET)
 	public String concatenar(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			Model model) {
+			Model model) throws ClassNotFoundException, IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
+		boolean totsFirmats = true; 
+		boolean totsDocuments = true;
 		
 		ContingutDto contingut = contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -402,7 +356,13 @@ public class ContingutDocumentController extends BaseUserController {
 			
 			if (contingutDoc instanceof DocumentDto) {
 				document = (DocumentDto) contingutDoc;
-				documents.add(document);
+				if (document.isFirmat() || document.isCustodiat())
+					documents.add(document);
+				else
+					totsFirmats = false;
+			} else {
+				totsDocuments = false;
+				break;
 			}
 		}
 		
@@ -417,20 +377,80 @@ public class ContingutDocumentController extends BaseUserController {
 				SESSION_ATTRIBUTE_ORDRE,
 				ordre);
 		
-		model.addAttribute("documents", documents);
-		model.addAttribute("contingut", contingut);
-		return "concatenacioForm";
+		if (totsDocuments && totsFirmats) {
+			model.addAttribute("documents", documents);
+			model.addAttribute("contingut", contingut);
+			return "contingutConcatenacioForm";
+		} else {
+			return getConcatenacioForm(
+					request, 
+					contingutId, 
+					null, 
+					model, 
+					true);
+		}
 	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarZip/new", method = RequestMethod.GET)
-	public String concatenarZipGet(
+	@RequestMapping(value = "/{pareId}/notificar", method = RequestMethod.POST)
+	public String concatenarDocuments(
 			HttpServletRequest request,
+			HttpServletResponse response,
 			@PathVariable Long pareId,
+			@Validated({ConcatenarDigital.class}) DocumentConcatenatCommand commandConc,
+			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException {
-		return getConcatenacioForm(request, pareId, null, model, true);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			omplirModelFormulari(
+					request,
+					null,
+					commandConc,
+					pareId,
+					model);
+			model.addAttribute("contingutId", pareId);
+			return "contingutConcatenatForm";
+		}
+		@SuppressWarnings("unchecked")
+		Map<String, Long> ordre = (Map<String, Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_ORDRE);
+		
+		DocumentHelper.concatenarDocuments(
+				documentService, 
+				contingutService,
+				entitatActual, 
+				commandConc,
+				ordre);
+		
+		try {
+			return createUpdateDocument(
+					request,
+					null,
+					commandConc,
+					bindingResult,
+					model,
+					true);
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			omplirModelFormulari(
+					request,
+					null,
+					commandConc,
+					pareId,
+					model);
+			return "contingutDocumentForm";
+		}
 	}
+
+//	@RequestMapping(value = "/{pareId}/generarZip/new", method = RequestMethod.GET)
+//	public String concatenarZipGet(
+//			HttpServletRequest request,
+//			@PathVariable Long pareId,
+//			Model model) throws IOException, ClassNotFoundException {
+//		return getConcatenacioForm(request, pareId, null, model, true);
+//	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarZip", method = RequestMethod.POST)
+	@RequestMapping(value = "/{pareId}/generarZip", method = RequestMethod.POST)
 	public String concatenarZip(
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -453,8 +473,7 @@ public class ContingutDocumentController extends BaseUserController {
 					pareId,
 					model);
 			model.addAttribute("contingutId", pareId);
-			model.addAttribute("isZip", true);
-			return "contingutDocumentConcatenatForm";
+			return "contingutComprimitForm";
 		}
 		@SuppressWarnings("unchecked")
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -476,7 +495,8 @@ public class ContingutDocumentController extends BaseUserController {
 					null,
 					commandConc,
 					bindingResult,
-					model);
+					model,
+					true);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
@@ -593,21 +613,26 @@ public class ContingutDocumentController extends BaseUserController {
 			@PathVariable Long pareId,
 			@RequestParam(value="docsIdx[]", required = false) Long[] docsIdx) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		boolean totPdf = true;
+		boolean totPdfFirmat = true;
 		
 		if (docsIdx != null) {
 			for (Long docId: docsIdx) {
-				FitxerDto fitxer = documentService.descarregar(
+				ContingutDto contingut = contingutService.findAmbIdUser(
 						entitatActual.getId(),
 						docId,
-						null);
-				if (!fitxer.getContentType().equals("application/pdf")) {
-					totPdf = false;
-					break;
+						true,
+						false);
+				if (contingut instanceof DocumentDto) {
+					DocumentDto document = (DocumentDto) contingut;
+					if ((!document.isFirmat() || document.isCustodiat()) 
+							&& (document.isFirmat() || !document.isCustodiat())) {
+						totPdfFirmat = false;
+						break;
+					}
 				}
 			}
 		}
-		return totPdf;
+		return totPdfFirmat;
 	}
 	
 	@RequestMapping(value = "/{pareId}/comprovarContingut/{contingutId}", method = RequestMethod.GET)
@@ -756,7 +781,8 @@ public class ContingutDocumentController extends BaseUserController {
 			DocumentCommand command,
 			DocumentConcatenatCommand commandConc,
 			BindingResult bindingResult,
-			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model,
+			boolean notificar) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -796,10 +822,16 @@ public class ContingutDocumentController extends BaseUserController {
 					entitatActual.getId(),
 					document.getId(),
 					valors);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../contingut/" + pareId,
-					"document.controller.creat.ok");
+			
+			if (!notificar) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:../../contingut/" + pareId,
+						"document.controller.creat.ok");
+			} else {
+				modalUrlTancar();
+				return "redirect:../../document/" + document.getId() + "/notificar";
+			}
 		} else {
 			documentService.update(
 					entitatActual.getId(),
@@ -907,7 +939,9 @@ public class ContingutDocumentController extends BaseUserController {
 		model.addAttribute(command);
 		model.addAttribute("contingutId", pareId);
 		model.addAttribute("documentId", documentId);
-		model.addAttribute("isZip", isZip);
-		return "contingutDocumentConcatenatForm";
+		if (isZip)
+			return "contingutComprimitForm";
+		else
+			return "contingutConcatenatForm";
 	}
 }

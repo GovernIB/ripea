@@ -1051,8 +1051,8 @@ public class ContingutHelper {
 
 			//##################### CARPETA #####################
 			} else if (contingut instanceof CarpetaEntity) {
-				pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
-						contingut.getPare());
+				//pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
+				//		contingut.getPare());
 
 			} else {
 				throw new ValidationException(

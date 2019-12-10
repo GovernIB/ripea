@@ -638,19 +638,22 @@ function enableDisableButton() {
         url: comprovacioUrl,
         dataType: "json",
         data: {docsIdx: docsIdx},
-        success: function (totPdf) {
-        	if (totPdf == true && docsIdx.length > 0) {
-				$('.des-mult').removeClass("disabled");
-				$('.zip-mult').addClass("disabled");
+        success: function (totPdfFirmat) {
+        	if (totPdfFirmat) {
+        		$('.nomaximized').addClass('hidden');
+        		$('.maximized').removeClass('hidden');
+        	} else {
+        		$('.maximized').addClass('hidden');
+        		$('.nomaximized').removeClass('hidden');
+        	}
+        	if (docsIdx.length > 0) {
 				$('.con-mult').removeClass("disabled");
-			} else if (docsIdx.length > 0) {
-				$('.zip-mult').removeClass("disabled");
-				$('.des-mult').addClass("disabled");
-				$('.con-mult').removeClass("disabled");
+				//$('.des-mult').removeClass("disabled");
+				//$('.zip-mult').addClass("disabled");
 			} else {
 				$('.con-mult').addClass("disabled");
-				$('.zip-mult').addClass("disabled");
-				$('.des-mult').addClass("disabled");
+				//$('.zip-mult').addClass("disabled");
+				//$('.des-mult').addClass("disabled");
 			}
         	$('#contenidor-contingut ').removeClass("disabled");
         	$('#table-documents').removeClass("disabled");
@@ -982,26 +985,32 @@ function deselectAll() {
 										</a>
 									</div>
 								</div>
-								<c:if test="${expedientAgafatPerUsuariActual and contingut.estat != 'TANCAT'}">
-									<%---- Button concatenar mult ----%>
+								<c:if test="${expedientAgafatPerUsuariActual and expedientPare.estat != 'TANCAT'}">
+									<%---- Button notificar mult ----%>
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
-											<a href="<c:url value="/contingut/${contingut.id}/concatenar"/>" class="btn btn-default des-mult" data-toggle="modal" data-maximized="true">
-												<span class="fa fa-paperclip"></span>
+											<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult maximized hidden" data-toggle="modal" data-maximized="true">
+												<span class="fa fa-envelope-o"></span>
+												
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</a> 
+											<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult nomaximized" data-toggle="modal">
+												<span class="fa fa-envelope-o"></span>
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
 									</div>
-									<%---- Button descarregar zip mult ----%>
+									<%---- Button descarregar zip mult 
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
-											<a href="<c:url value="/contingut/${contingut.id}/concatenarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
+											<a href="<c:url value="/contingut/${contingut.id}/generarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
 												<span class="glyphicon glyphicon-compressed"></span>
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
 									</div>
+									----%>
 								</c:if>
 								<div class="btn-group">
 									<%---- Button llistat ----%>

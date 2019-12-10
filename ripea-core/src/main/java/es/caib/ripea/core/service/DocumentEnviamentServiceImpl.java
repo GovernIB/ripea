@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ArxiuFormatDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -21,6 +20,7 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -81,11 +81,9 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Autowired
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	
-	
-	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
-		
-		if (!document.getFitxerContentType().equals(ArxiuFormatDto.ZIP.getText()) && !DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
+		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

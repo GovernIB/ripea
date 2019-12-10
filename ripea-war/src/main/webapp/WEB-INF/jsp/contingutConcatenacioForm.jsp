@@ -29,11 +29,11 @@
 	text-align: center;
 }
 #contenidor-contingut {
-	margin-right: -11px;
 	background-color: #fdfdfd;
-	border: 6px solid #eaeaea;
+	border: 5px solid #fbfbfb;
 	display: inline-block;
 	padding: 1%;
+	width: 100%;
 }
 #contenidor-contingut li.element-contingut {
 	display: -moz-inline-stack;
@@ -123,6 +123,9 @@ $(document).ready(function() {
 </head>
 <body>
 <div class="container">
+	<div class="alert alert-warning" role="alert">
+	  <div><spring:message code="contingut.document.form.titol.concatenacio.info"/></div>
+	</div>
 	<div class="container col-md-12">
 		<div><spring:message code="contingut.document.form.titol.concatenacio.ordre"/></div>
 	</div>
