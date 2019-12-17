@@ -63,7 +63,6 @@ import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentConcatenatCommand;
-import es.caib.ripea.war.command.DocumentConcatenatCommand.ConcatenarDigital;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.ArxiuTemporalHelper;
@@ -102,7 +101,8 @@ public class ContingutDocumentController extends BaseUserController {
 	private ArxiuTemporalHelper arxiuTemporalHelper;
 	@Autowired
 	private BeanGeneratorHelper beanGeneratorHelper;
-
+	@Autowired 
+	private DocumentHelper documentHelper;
 
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
@@ -177,9 +177,9 @@ public class ContingutDocumentController extends BaseUserController {
 					request,
 					command,
 					null,
-					bindingResult,
 					model,
-					false);
+					false,
+					true);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
@@ -214,9 +214,9 @@ public class ContingutDocumentController extends BaseUserController {
 					request,
 					command,
 					null,
-					bindingResult,
 					model,
-					false);
+					false,
+					true);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
@@ -301,7 +301,8 @@ public class ContingutDocumentController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
 		
-		DocumentHelper.generarFitxerZip(
+		documentHelper.generarFitxerZip(
+				entitatActual.getId(),
 				documentService, 
 				contingutService,
 				entitatActual, 
@@ -316,19 +317,11 @@ public class ContingutDocumentController extends BaseUserController {
 		response.getOutputStream().flush();
 	}
 	
-	@RequestMapping(value = "/{pareId}/concatenarDocuments/new", method = RequestMethod.GET)
-	public String concatenarDocumentsGet(
-			HttpServletRequest request,
-			@PathVariable Long pareId,
-			Model model) throws IOException, ClassNotFoundException {
-		return getConcatenacioForm(request, pareId, null, model, false);
-	}
-	
 	@RequestMapping(value = "/{contingutId}/notificar", method = RequestMethod.GET)
 	public String concatenar(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			Model model) throws ClassNotFoundException, IOException {
+			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 		boolean totsFirmats = true; 
@@ -382,130 +375,66 @@ public class ContingutDocumentController extends BaseUserController {
 			model.addAttribute("contingut", contingut);
 			return "contingutConcatenacioForm";
 		} else {
-			return getConcatenacioForm(
-					request, 
-					contingutId, 
-					null, 
-					model, 
-					true);
+			DocumentConcatenatCommand command = new DocumentConcatenatCommand();
+			command.setPareId(contingutId);
+			
+			documentHelper.generarFitxerZip(
+					entitatActual.getId(),
+					documentService, 
+					contingutService,
+					entitatActual, 
+					command,
+					docsIdx,
+					contingut,
+					null);
+			
+			return createUpdateDocument(
+					request,
+					null,
+					command,
+					model,
+					true,
+					false);
 		}
 	}
 	
-	@RequestMapping(value = "/{pareId}/notificar", method = RequestMethod.POST)
+	
+	@RequestMapping(value = "/{pareId}/notificarForm", method = RequestMethod.GET)
 	public String concatenarDocuments(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable Long pareId,
-			@Validated({ConcatenarDigital.class}) DocumentConcatenatCommand commandConc,
-			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					null,
-					commandConc,
-					pareId,
-					model);
-			model.addAttribute("contingutId", pareId);
-			return "contingutConcatenatForm";
-		}
+		
 		@SuppressWarnings("unchecked")
 		Map<String, Long> ordre = (Map<String, Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_ORDRE);
+		DocumentConcatenatCommand command = new DocumentConcatenatCommand();
+		command.setPareId(pareId);
 		
-		DocumentHelper.concatenarDocuments(
+		documentHelper.concatenarDocuments(
+				entitatActual.getId(),
 				documentService, 
 				contingutService,
 				entitatActual, 
-				commandConc,
+				command,
 				ordre);
 		
 		try {
 			return createUpdateDocument(
 					request,
 					null,
-					commandConc,
-					bindingResult,
+					command,
 					model,
-					true);
+					true,
+					false);
 		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
-			omplirModelFormulari(
-					request,
-					null,
-					commandConc,
-					pareId,
-					model);
-			return "contingutDocumentForm";
-		}
-	}
-
-//	@RequestMapping(value = "/{pareId}/generarZip/new", method = RequestMethod.GET)
-//	public String concatenarZipGet(
-//			HttpServletRequest request,
-//			@PathVariable Long pareId,
-//			Model model) throws IOException, ClassNotFoundException {
-//		return getConcatenacioForm(request, pareId, null, model, true);
-//	}
-	
-	@RequestMapping(value = "/{pareId}/generarZip", method = RequestMethod.POST)
-	public String concatenarZip(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long pareId,
-			@Validated({ConcatenarDigital.class}) DocumentConcatenatCommand commandConc,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				pareId,
-				true,
-				false);
-		
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					null,
-					commandConc,
-					pareId,
-					model);
-			model.addAttribute("contingutId", pareId);
-			return "contingutComprimitForm";
-		}
-		@SuppressWarnings("unchecked")
-		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		
-		DocumentHelper.generarFitxerZip(
-				documentService, 
-				contingutService,
-				entitatActual, 
-				commandConc,
-				docsIdx,
-				contingut,
-				null);
-		
-		try {
-			return createUpdateDocument(
-					request,
-					null,
-					commandConc,
-					bindingResult,
-					model,
-					true);
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
-			omplirModelFormulari(
-					request,
-					null,
-					commandConc,
-					pareId,
-					model);
-			return "contingutDocumentForm";
+			return getModalControllerReturnValueErrorMessageText(
+					request, 
+					null, 
+					exception.getMessage());
 		}
 	}
 
@@ -780,9 +709,9 @@ public class ContingutDocumentController extends BaseUserController {
 			HttpServletRequest request,
 			DocumentCommand command,
 			DocumentConcatenatCommand commandConc,
-			BindingResult bindingResult,
 			Model model,
-			boolean notificar) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			boolean notificar,
+			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -793,7 +722,8 @@ public class ContingutDocumentController extends BaseUserController {
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,
-					commandConc == null ? DocumentCommand.asDto(command) : DocumentConcatenatCommand.asDto(commandConc));
+					commandConc == null ? DocumentCommand.asDto(command) : DocumentConcatenatCommand.asDto(commandConc),
+					comprovarMetaExpedient);
 			//Valor per defecte d'algunes metadades
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
 					entitatActual.getId(), 
@@ -835,7 +765,9 @@ public class ContingutDocumentController extends BaseUserController {
 		} else {
 			documentService.update(
 					entitatActual.getId(),
-					commandConc == null ? DocumentCommand.asDto(command) : DocumentConcatenatCommand.asDto(commandConc));
+					commandConc == null ? DocumentCommand.asDto(command) : DocumentConcatenatCommand.asDto(commandConc),
+					comprovarMetaExpedient);
+			
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../contingut/" + pareId,
@@ -914,34 +846,5 @@ public class ContingutDocumentController extends BaseUserController {
 		model.addAttribute(
 				"escanejarActiu",
 				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
-	}
-	
-	private String getConcatenacioForm(
-			HttpServletRequest request,
-			@PathVariable Long pareId,
-			@PathVariable Long documentId,
-			Model model,
-			boolean isZip) throws ClassNotFoundException, IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentConcatenatCommand command = new DocumentConcatenatCommand();
-			Date ara = new Date();
-			command.setData(ara);
-
-			omplirModelFormulari(
-					request,
-					null,
-					command,
-					pareId,
-					model);
-		
-		command.setEntitatId(entitatActual.getId());
-		command.setPareId(pareId);
-		model.addAttribute(command);
-		model.addAttribute("contingutId", pareId);
-		model.addAttribute("documentId", documentId);
-		if (isZip)
-			return "contingutComprimitForm";
-		else
-			return "contingutConcatenatForm";
 	}
 }

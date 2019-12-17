@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -62,4 +63,12 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 	List<MetaDocumentEntity> findByEntitat(
 			EntitatEntity entitat);
 
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.entitat = :entitat " +
+			"and md.metaDocumentTipusGeneric = :metaDocumentTipusGeneric")
+	MetaDocumentEntity findByEntitatAndTipusGeneric(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaDocumentTipusGeneric") MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric);
 }

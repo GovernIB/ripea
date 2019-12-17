@@ -469,7 +469,8 @@ public class UsuariTascaController extends BaseUserController {
 					entitatActual.getId(),
 					command.getPareId(),
 					tascaId,
-					DocumentCommand.asDto(command));
+					DocumentCommand.asDto(command),
+					true);
 			
 //			//Valor per defecte d'algunes metadades
 //			List<MetaDadaDto> metadades = metaDadaService.findByNode(
@@ -508,7 +509,8 @@ public class UsuariTascaController extends BaseUserController {
 			expedientTascaService.updateDocument(
 					entitatActual.getId(),
 					tascaId,
-					DocumentCommand.asDto(command));
+					DocumentCommand.asDto(command),
+					true);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../contingut/" + command.getPareId(),

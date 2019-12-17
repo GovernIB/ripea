@@ -347,7 +347,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			Long entitatId,
 			Long pareId,
 			Long tascaId,
-			DocumentDto document) {
+			DocumentDto document,
+			boolean comprovarMetaExpedient) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
@@ -365,7 +366,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					pare.getEntitat(),
 					expedient.getMetaExpedient(),
 					document.getMetaDocument().getId(),
-					true);
+					true,
+					comprovarMetaExpedient);
 		} else {
 			throw new ValidationException(
 					"<creacio>",
@@ -391,7 +393,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	public DocumentDto updateDocument(
 			Long entitatId,
 			Long tascaId,
-			DocumentDto documentDto) {
+			DocumentDto documentDto,
+			boolean comprovarMetaExpedient) {
 		logger.debug("Actualitzant el document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentDto.getId() + ", " +
@@ -404,7 +407,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		return documentHelper.updateDocument(
 				entitatId,
 				documentEntity,
-				documentDto);
+				documentDto,
+				comprovarMetaExpedient);
 	}
 	
 	@Transactional

@@ -48,21 +48,25 @@ public class DocumentServiceBean implements DocumentService {
 	public DocumentDto create(
 			Long entitatId,
 			Long contenidorId,
-			DocumentDto document) {
+			DocumentDto document,
+			boolean comprovarMetaExpedient) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
-				document);
+				document,
+				comprovarMetaExpedient);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public DocumentDto update(
 			Long entitatId,
-			DocumentDto document) {
+			DocumentDto document,
+			boolean comprovarMetaExpedient) {
 		return delegate.update(
 				entitatId,
-				document);
+				document,
+				comprovarMetaExpedient);
 	}
 
 	@Override

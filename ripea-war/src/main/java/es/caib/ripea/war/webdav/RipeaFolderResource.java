@@ -230,7 +230,8 @@ public class RipeaFolderResource implements FolderResource {
 		DocumentDto document = getDocumentService().create(
 				contingut.getEntitat().getId(),
 				contingut.getId(),
-				dto);
+				dto,
+				true);
 		return contenidorToResource(document);
 	}
 

@@ -27,6 +27,17 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+<style type="text/css">
+.tooltip {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+}
+
+.tooltip-inner {
+  max-width: 600px;
+  padding: 3px 8px;
+}
+</style>
 <script>
 function mostrarDocument(fileName) {
 	$fileinput = $('#arxiu').closest('.fileinput');
@@ -120,6 +131,24 @@ $(document).ready(function() {
 			
 		}
 	}
+	
+	var nom = $('#nom');
+	var invalid = new RegExp('[\/:*?\"<>|]');
+	$(nom).keypress(function(e) {
+		var s = String.fromCharCode(e.which);
+		//Comprovar cada lletra
+	    if (invalid.test(s)) {
+	    	$('#nom').tooltip("show");
+	    }
+	    //Comprovar títol
+	    if (invalid.test($(nom).val())) {
+	    	$('#nom').tooltip('enable');
+	    	$('#nom').tooltip("show");
+	    } else {
+	    	$('#nom').tooltip('disable');
+	    	$('#nom').tooltip("hide");
+	    }
+	});
 });
 </script>
 </head>
@@ -147,7 +176,7 @@ $(document).ready(function() {
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
 
-		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true"/>
+		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters"/>
 		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>

@@ -52,7 +52,8 @@ public interface DocumentService {
 	public DocumentDto create(
 			Long entitatId,
 			Long pareId,
-			DocumentDto document) throws NotFoundException, ValidationException;
+			DocumentDto document,
+			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
@@ -70,7 +71,8 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto update(
 			Long entitatId,
-			DocumentDto document) throws NotFoundException, ValidationException;
+			DocumentDto document,
+			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException;
 
 	/**
 	 * Consulta un document donat el seu id.

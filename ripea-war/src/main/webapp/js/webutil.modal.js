@@ -11,7 +11,8 @@
 			elementBotons: "#modal-botons",
 			elementForm: "#modal-form",
 			elementTancarData: "modal-cancel",
-			elementRetorn: null
+			elementRetorn: null,
+			segonaModal: false
 		}
 		var $element = $(element), element = element;
 		var plugin = this;
@@ -77,7 +78,8 @@
 								elementTancarData: plugin.settings.elementTancarData,
 								contentUrl: webutilUrlAmbPrefix(href, '/modal'),
 								dataTableId: dataTableId,
-								elementRetorn: plugin.settings.elementRetorn
+								elementRetorn: plugin.settings.elementRetorn,
+								segonaModal: plugin.settings.segonaModal
 							});
 							
 						} else {
@@ -92,7 +94,8 @@
 								elementForm: plugin.settings.elementForm,
 								elementTancarData: plugin.settings.elementTancarData,
 								dataTableId: dataTableId,
-								elementRetorn: plugin.settings.elementRetorn
+								elementRetorn: plugin.settings.elementRetorn,
+								segonaModal: plugin.settings.segonaModal
 							});
 						}
 						$('#' + modalDivId).data('elementRetorn', plugin.settings.elementRetorn);
@@ -105,7 +108,12 @@
 								$(nomElementRetorn).trigger('blur');
 							}
 						});
-						
+						//if (plugin.settings.segonaModal) {
+						//	$('#' + modalDivId).on('hidden.bs.modal', function() {
+						//		$('button.close', $(window.frameElement).parent().parent().parent().parent()).trigger('click');
+						//		window.location.reload(true);
+						//	});
+						//}
 					} else {
 						window.open(href, '_blank');
 					}

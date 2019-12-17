@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -579,6 +580,38 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			}
 		}
 		return metaDocuments;
+	}
+
+	@Override
+	@Transactional
+	public MetaDocumentDto findByTipusGeneric(
+			Long entitatId, 
+			MetaDocumentTipusGenericEnumDto tipusGeneric) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByEntitatAndTipusGeneric(
+				entitat,
+				tipusGeneric);
+		
+		if (metaDocumentEntity != null) {
+			return conversioTipusHelper.convertir(
+					metaDocumentEntity, 
+					MetaDocumentDto.class);
+		} else {
+			logger.error(
+					"Error a l'hora de recuperar el metaDocument (" +
+					"entitatId=" + entitat.getId() + 
+					"metaDocumentTipus=" + tipusGeneric+ ")");
+			throw new RuntimeException(
+					"Error a l'hora de recuperar el metaDocument (" +
+							"entitatId=" + entitat.getId() + 
+							"metaDocumentTipus=" + tipusGeneric+ ")");
+		}
+		
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentServiceImpl.class);

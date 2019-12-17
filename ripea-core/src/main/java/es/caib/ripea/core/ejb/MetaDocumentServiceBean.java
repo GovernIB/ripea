@@ -14,6 +14,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
@@ -197,6 +198,16 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 			Long entitatId,
 			Long metaDocumentId) {
 		return delegate.findById(entitatId, metaDocumentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findByTipusGeneric(
+			Long entitatId, 
+			MetaDocumentTipusGenericEnumDto tipusGeneric) {
+		return delegate.findByTipusGeneric(
+				entitatId, 
+				tipusGeneric);
 	}
 
 }

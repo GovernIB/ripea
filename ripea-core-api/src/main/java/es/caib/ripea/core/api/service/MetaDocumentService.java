@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
@@ -274,5 +275,10 @@ public interface MetaDocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	MetaDocumentDto findById(Long entitatId,
 			Long metaDocumentId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	MetaDocumentDto findByTipusGeneric(
+			Long entitatId,
+			MetaDocumentTipusGenericEnumDto tipusGeneric);
 
 }

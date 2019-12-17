@@ -270,6 +270,11 @@ public abstract class ContingutDto extends AuditoriaDto {
 			for (ContingutDto contenidor: fills) {
 				if (!(contenidor instanceof RegistreAnotacioDto))
 					count++;
+				//No contar resultat concatenació i zip
+				if (contenidor.isDocument() && 
+						((DocumentDto) contenidor).getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+					count--;
+				}
 			}
 			return count;
 		}

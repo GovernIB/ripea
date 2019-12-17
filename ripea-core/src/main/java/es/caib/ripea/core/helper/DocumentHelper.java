@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
@@ -63,7 +62,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
@@ -217,7 +215,8 @@ public class DocumentHelper {
 	public DocumentDto updateDocument(
 			Long entitatId,
 			DocumentEntity documentEntity,
-			DocumentDto document) {
+			DocumentDto document,
+			boolean comprovarMetaExpedient) {
 
 		MetaDocumentEntity metaDocument = null;
 		List<ArxiuFirmaDto> firmes = null;
@@ -226,7 +225,8 @@ public class DocumentHelper {
 					documentEntity.getEntitat(),
 					documentEntity.getMetaDocument().getMetaExpedient(),
 					document.getMetaDocument().getId(),
-					false);
+					false,
+					comprovarMetaExpedient);
 		} else {
 			throw new ValidationException(
 					documentEntity.getId(),

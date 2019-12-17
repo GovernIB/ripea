@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 
@@ -80,6 +81,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private boolean firmaBiometricaActiva;
 	@Column(name = "biometrica_lectura")
 	private boolean biometricaLectura;
+	
+	@Column(name = "meta_document_tipus_gen", length = 256)
+	@Enumerated(EnumType.STRING)
+	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
 	
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;

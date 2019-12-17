@@ -61,7 +61,8 @@ public interface ExpedientTascaService {
 			Long entitatId,
 			Long pareId,
 			Long tascaId,
-			DocumentDto document);
+			DocumentDto document,
+			boolean comprovarMetaExpedient);
 
 	public DocumentDto findDocumentById(
 			Long entitatId,
@@ -71,7 +72,8 @@ public interface ExpedientTascaService {
 	public DocumentDto updateDocument(
 			Long entitatId,
 			Long tascaId,
-			DocumentDto documentDto);
+			DocumentDto documentDto,
+			boolean comprovarMetaExpedient);
 
 	public ContingutDto deleteTascaReversible(
 			Long entitatId,

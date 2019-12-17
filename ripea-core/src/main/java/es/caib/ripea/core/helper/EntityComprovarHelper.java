@@ -253,9 +253,11 @@ public class EntityComprovarHelper {
 					MetaDocumentEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
 		}
-		comprovarMetaExpedient(
-				entitat,
-				metaDocument.getMetaExpedient().getId());
+		if (metaDocument.getMetaExpedient() != null) {
+			comprovarMetaExpedient(
+					entitat,
+					metaDocument.getMetaExpedient().getId());
+		}
 		
 		return metaDocument;
 	}	
@@ -289,11 +291,20 @@ public class EntityComprovarHelper {
 			EntitatEntity entitat,
 			MetaExpedientEntity metaExpedient,
 			Long id,
-			boolean comprovarActiu) {
-		MetaDocumentEntity metaDocument = comprovarMetaDocument(
-				entitat,
-				metaExpedient,
-				id);
+			boolean comprovarActiu,
+			boolean comprovarMetaExpedient) {
+		MetaDocumentEntity metaDocument;
+		
+		if (comprovarMetaExpedient) {
+			metaDocument = comprovarMetaDocument(
+					entitat,
+					metaExpedient,
+					id);
+		} else {
+			metaDocument = comprovarMetaDocument(
+					entitat,
+					id);
+		}
 		if (comprovarActiu) {
 			if (!metaDocument.isActiu()) {
 				throw new ValidationException(
@@ -301,7 +312,8 @@ public class EntityComprovarHelper {
 						MetaDocumentEntity.class,
 						"El meta-document no es troba actiu (id=" + id + ")");
 			}
-		}return metaDocument;
+		}
+		return metaDocument;
 	}
 
 	public MetaDadaEntity comprovarMetaDada(

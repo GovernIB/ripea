@@ -41,7 +41,7 @@
 	vertical-align: top;
 	zoom: 1;
 	margin-bottom: 1%;
-	width: auto;
+	width: 20%;
 }
 #contenidor-contingut .thumbnail {
 	margin-bottom: 0 !important;
@@ -148,9 +148,6 @@ $(document).ready(function() {
 							</p>
 						</div>
 					</div>
-					 <script>
-					 
-					</script>
 				</li>
 			</c:forEach>
 		</ul>
@@ -158,7 +155,7 @@ $(document).ready(function() {
 	<div class="contenidor-botons col-md-12 text-center">
 		<div class="btn-group">
 			<div id="descarregar-mult" class="btn-group">
-				<a href="<c:url value="/contingut/${contingut.id}/concatenarDocuments/new"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default">
+				<a href="<c:url value="/contingut/${contingut.id}/notificarForm"/>" data-toggle="modal" data-refresh-pagina="true" data-segona-modal="true" class="btn btn-default">
 					<span class="fa fa-paperclip"></span>
 					<spring:message code="concatenacio.form.boto.concatenar"/>
 				</a>

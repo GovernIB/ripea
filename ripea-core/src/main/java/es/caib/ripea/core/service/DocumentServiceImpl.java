@@ -120,7 +120,8 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto create(
 			Long entitatId,
 			Long pareId,
-			DocumentDto document) {
+			DocumentDto document,
+			boolean comprovarMetaExpedient) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
@@ -143,7 +144,8 @@ public class DocumentServiceImpl implements DocumentService {
 					pare.getEntitat(),
 					expedient.getMetaExpedient(),
 					document.getMetaDocument().getId(),
-					true);
+					true,
+					comprovarMetaExpedient);
 		} else {
 			throw new ValidationException(
 					"<creacio>",
@@ -163,7 +165,8 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public DocumentDto update(
 			Long entitatId,
-			DocumentDto documentDto) {
+			DocumentDto documentDto,
+			boolean comprovarMetaExpedient) {
 		logger.debug("Actualitzant el document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentDto.getId() + ", " +
@@ -179,7 +182,8 @@ public class DocumentServiceImpl implements DocumentService {
 		return documentHelper.updateDocument(
 				entitatId,
 				documentEntity,
-				documentDto);
+				documentDto,
+				comprovarMetaExpedient);
 	}
 
 	@Transactional(readOnly = true)

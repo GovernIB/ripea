@@ -4,7 +4,6 @@
 package es.caib.ripea.core.ejb;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -18,20 +17,13 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.ExpedientComentariDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 
 /**
@@ -128,11 +120,13 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	public DocumentDto createDocument(Long entitatId,
 			Long pareId,
 			Long tascaId,
-			DocumentDto document) {
+			DocumentDto document,
+			boolean comprovarMetaExpedient) {
 		delegate.createDocument(entitatId,
 				pareId,
 				tascaId,
-				document);
+				document,
+				comprovarMetaExpedient);
 		return null;
 	}
 
@@ -152,11 +146,13 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	@RolesAllowed("tothom")
 	public DocumentDto updateDocument(Long entitatId,
 			Long tascaId,
-			DocumentDto documentDto) {
+			DocumentDto documentDto,
+			boolean comprovarMetaExpedient) {
 		return delegate.updateDocument(
 				entitatId,
 				tascaId,
-				documentDto);
+				documentDto,
+				comprovarMetaExpedient);
 	}
 
 	@Override
