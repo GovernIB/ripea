@@ -11,6 +11,10 @@ package es.caib.ripea.core.api.dto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum DocumentNotificacioEstatEnumDto {
-	PENDENT,
-	FINALITZADA
+	PENDENT, 
+	ENVIADA, 
+	REGISTRADA, 
+	FINALITZADA, 
+	PROCESSADA
 }
+

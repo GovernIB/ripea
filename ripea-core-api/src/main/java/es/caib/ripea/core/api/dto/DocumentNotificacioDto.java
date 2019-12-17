@@ -19,9 +19,11 @@ import java.util.Set;
  */
 public class DocumentNotificacioDto extends DocumentEnviamentDto {
 
+	private Long id;
 	private DocumentNotificacioTipusEnumDto tipus;
 	private Date dataProgramada;
 	private Integer retard;
+
 	private Date dataCaducitat;
 
 
@@ -31,12 +33,19 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	
 	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();
 	
+	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	
 	private ServeiTipusEnumDto serveiTipusEnum;
 	
 	private Boolean entregaPostal;
 	private List<InteressatDto> interessats = new ArrayList<InteressatDto>();
 	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public DocumentNotificacioTipusEnumDto getTipus() {
 		return tipus;
 	}
@@ -111,6 +120,12 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	}
 	public void setDocumentEnviamentInteressats(Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats) {
 		this.documentEnviamentInteressats = documentEnviamentInteressats;
+	}
+	public DocumentNotificacioEstatEnumDto getNotificacioEstat() {
+		return notificacioEstat;
+	}
+	public void setNotificacioEstat(DocumentNotificacioEstatEnumDto notificacioEstat) {
+		this.notificacioEstat = notificacioEstat;
 	}
 	
 	

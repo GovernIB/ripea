@@ -27,6 +27,8 @@ import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
+
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
@@ -2691,7 +2693,8 @@ public class PluginHelper {
 				}
 			}
 			
-			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+			FitxerDto fitxer =  arxiuDocumentVersioImprimible(documentEntity);
+//			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
 			notificacio.setDocumentArxiuNom(fitxer.getNom());
 			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
@@ -2747,7 +2750,10 @@ public class PluginHelper {
 					enviament.setEntregaPostalLinea2(
 							provincia.getNom() + ", " +
 									pais.getNom());
-					enviament.setEntregaPostalCodiPostal("00000");
+
+					enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
+					enviament.setEntregaPostalPaisCodi(interessatPerAdresa.getPais());
+					
 				}
 				// ########## ENVIAMENT DEH  ###############
 				if (interessatEntity.getEntregaDeh() != null && interessatEntity.getEntregaDeh()) {
@@ -2793,6 +2799,20 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	public byte[] notificacioConsultarIDescarregarCertificacio(
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+
+		RespostaConsultaEstatEnviament resposta;
+		try {
+			resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		byte[] certificacio = resposta.getCertificacioContingut();
+		return certificacio;
+	}
+	
 	
 	
 
@@ -2841,7 +2861,7 @@ public class PluginHelper {
 			
 			
 			notificacio.updateNotificacioEstat(
-					respostaNotificioEstat.isFinalitzada(),
+					respostaNotificioEstat.getEstat(),
 					resposta.getEstatData(),
 					respostaNotificioEstat.isError(),
 					respostaNotificioEstat.getErrorDescripcio(),

@@ -398,8 +398,11 @@ public class DocumentController extends BaseUserController {
 				}
 			}
 		}
+		String forsarTancamentModal = aplicacioService.propertyFindByNom("plugin.passarelafirma.forsar.tancament.modal");
 		if (ignorarModal) {
 			return "redirect:/contingut/" + documentId;
+		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
+			return "redirect:/passarelaModalTancar";
 		} else {
 			return getModalControllerReturnValueSuccess(
 					request, 

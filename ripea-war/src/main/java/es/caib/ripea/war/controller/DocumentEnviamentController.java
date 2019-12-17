@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validator;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -25,21 +26,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.war.command.DocumentNotificacioCommand;
 import es.caib.ripea.war.command.DocumentNotificacioCommand.Electronica;
 import es.caib.ripea.war.command.DocumentPublicacioCommand;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ValidationHelper;
 
 /**
@@ -57,6 +62,9 @@ public class DocumentEnviamentController extends BaseUserController {
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private ContingutService contingutService;
+	
+	@Autowired
+	private DocumentService documentService;
 
 	@Autowired
 	private Validator validator;
@@ -207,6 +215,60 @@ public class DocumentEnviamentController extends BaseUserController {
 				"redirect:../../../../contingut/" + documentId,
 				"expedient.controller.notificacio.esborrada.ok");
 	}
+	
+	
+	
+	
+	@RequestMapping(value = "/{pareId}/document/{documentId}/descarregar", method = RequestMethod.GET)
+	public String descarregar(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				documentId,
+				true,
+				false);
+		if (contingut instanceof DocumentDto) {
+			FitxerDto fitxer = documentService.descarregar(
+					entitatActual.getId(),
+					documentId,
+					null);
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
+		}
+		MissatgesHelper.error(
+				request, 
+				getMessage(
+						request, 
+						"document.controller.descarregar.error"));
+		if (contingut.getPare() != null)
+			return "redirect:../../contingut/" + pareId;
+		else
+			return "redirect:../../expedient";
+	}
+	
+	
+	@RequestMapping(value = "/{enviamentId}/descarregarCertificacio", method = RequestMethod.GET)
+	public String notificacioConsultarIDescarregarCertificacio(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long enviamentId) throws IOException {
+
+		writeFileToResponse(
+				"justificant.pdf",
+				documentService.notificacioConsultarIDescarregarCertificacio(enviamentId),
+				response);
+		return null;
+	}
+	
+	
+	
 
 	/*@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/refrescar")
 	public String notificacioRefrescar(

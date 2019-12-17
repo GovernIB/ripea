@@ -195,7 +195,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 			} else {
 				notificacioEntity.updateEnviat(
 						null,
-						respostaEnviar.getEstat().equals(NotificacioEstat.ENVIADA),
+						respostaEnviar.getEstat(),
 						respostaEnviar.getIdentificador());
 			}
 
