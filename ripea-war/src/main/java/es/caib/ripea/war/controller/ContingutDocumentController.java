@@ -373,6 +373,11 @@ public class ContingutDocumentController extends BaseUserController {
 		if (totsDocuments && totsFirmats) {
 			model.addAttribute("documents", documents);
 			model.addAttribute("contingut", contingut);
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"contingut.document.form.titol.concatenacio.info"));
 			return "contingutConcatenacioForm";
 		} else {
 			DocumentConcatenatCommand command = new DocumentConcatenatCommand();
@@ -387,7 +392,11 @@ public class ContingutDocumentController extends BaseUserController {
 					docsIdx,
 					contingut,
 					null);
-			
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"contingut.document.form.titol.compresio.info"));
 			return createUpdateDocument(
 					request,
 					null,
@@ -397,7 +406,6 @@ public class ContingutDocumentController extends BaseUserController {
 					false);
 		}
 	}
-	
 	
 	@RequestMapping(value = "/{pareId}/notificarForm", method = RequestMethod.GET)
 	public String concatenarDocuments(

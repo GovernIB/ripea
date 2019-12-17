@@ -123,9 +123,6 @@ $(document).ready(function() {
 </head>
 <body>
 <div class="container">
-	<div class="alert alert-warning" role="alert">
-	  <div><spring:message code="contingut.document.form.titol.concatenacio.info"/></div>
-	</div>
 	<div class="container col-md-12">
 		<div><spring:message code="contingut.document.form.titol.concatenacio.ordre"/></div>
 	</div>

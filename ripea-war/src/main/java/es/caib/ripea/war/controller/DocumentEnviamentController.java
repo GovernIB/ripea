@@ -44,7 +44,6 @@ import es.caib.ripea.war.command.DocumentNotificacioCommand;
 import es.caib.ripea.war.command.DocumentNotificacioCommand.Electronica;
 import es.caib.ripea.war.command.DocumentPublicacioCommand;
 import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.MessageHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ValidationHelper;
 

@@ -2,7 +2,6 @@ package es.caib.ripea.war.helper;
 
 import javax.servlet.http.HttpServletRequest;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 
 public class TasquesPendentsHelper {
