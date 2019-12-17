@@ -59,7 +59,7 @@ border: 1px solid #ddd;
 					</tr>
 					<tr>						
 						<td><strong><spring:message code="notificacio.info.camp.estat"/></strong></td>
-						<td><spring:message code="notificacio.estat.enum.${notificacio.estat}"/></td>
+						<td><spring:message code="notificacio.notificacioEstat.enum.${notificacio.notificacioEstat}"/></td>
 					</tr>
 					<tr>						
 						<td><strong><spring:message code="notificacio.info.camp.assumpte"/></strong></td>
@@ -242,29 +242,35 @@ border: 1px solid #ddd;
 							   	</td>					    
 							  </tr>		
 						  </c:if>
-						  <!------- CERTIFICACIO DATA ------->	
+						  <!------- CERTIFICACIO ------->	
 						  <c:if test="${not empty enviament.enviamentCertificacioData}">
 							  <tr>
 							    <td style="width: 15%">
-							      	<strong><spring:message code="notificacio.info.camp.certifiacioData"/></strong>
+							      	<strong><spring:message code="notificacio.info.camp.certifiacio"/></strong>
 							    </td>
 							    <td>
-							    	${enviament.enviamentCertificacioData}
+									<table class="table table-bordered" style="margin-bottom: 0px">
+										<thead>
+											<tr>
+												<th><spring:message code="notificacio.info.camp.certifiacioData"/></th>
+												<th><spring:message code="notificacio.info.camp.certifiacioOrigen"/></th>
+												<th><spring:message code="notificacio.info.camp.certifiacioDecarregar"/></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>${enviament.enviamentCertificacioData}</td>
+												<td>${enviament.enviamentCertificacioOrigen}</td>
+												<td>
+													<a href="<c:url value="/document/${enviament.id}/descarregarCertificacio"/>" class="btn btn-default btn-sm pull-right"> <span class="fa fa-download"></span></a>
+												</td>
+											</tr>
+										</tbody>
+									</table>							    
 							   	</td>					    
 							  </tr>	
 						  </c:if>
-						  <!------- CERTIFICACIO ORIGEN ------->	
-						  <c:if test="${not empty enviament.enviamentCertificacioOrigen}">
-							  <tr>
-							    <td style="width: 15%">
-							      	<strong><spring:message code="notificacio.info.camp.certifiacioOrigen"/></strong>
-							    </td>
-							    <td>
-							    	${enviament.enviamentCertificacioOrigen}
-							   	</td>					    
-							  </tr>	
-						  </c:if>
-						  <!------- CERTIFICACIO ERROR ------->	
+						  <!------- ERROR ------->	
 						  <c:if test="${not empty enviament.errorDescripcio}">
 							  <tr>
 							    <td style="width: 15%">
@@ -277,7 +283,7 @@ border: 1px solid #ddd;
 							    	${enviament.errorDescripcio}
 							   	</td>					    
 							  </tr>	
-						  </c:if>					  
+						  </c:if>						  				  
 					</table>	
 					</div>
 				</c:forEach>	

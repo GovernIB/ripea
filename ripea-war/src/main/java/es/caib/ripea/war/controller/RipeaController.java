@@ -98,6 +98,11 @@ public class RipeaController {
 		return "util/error";
 	}
 
+	@RequestMapping(value = "/passarelaModalTancar", method = RequestMethod.GET)
+	public String passarelaModalTancar() {
+		return "passarelaModalTancar";
+	}
+
 	public static class ErrorObject {
 		Integer statusCode;
 		Throwable throwable;

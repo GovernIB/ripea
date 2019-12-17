@@ -520,5 +520,7 @@ public interface DocumentService {
 	void notificacioActualitzarEstat(String identificador,
 			String referencia);
 
+	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId);
+
 
 }

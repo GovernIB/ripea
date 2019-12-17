@@ -28,6 +28,7 @@ import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.SistemaExternException;

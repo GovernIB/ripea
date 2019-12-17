@@ -25,6 +25,7 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 
 /**
  * Classe del model de dades que representa una notificació d'un document
@@ -68,9 +69,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@Column(name="entrega_postal")
 	private Boolean entregaPostal;
 	
-	@Column(name = "notificacio_estat", nullable = false)
-	@Enumerated(EnumType.STRING)
-	protected DocumentNotificacioEstatEnumDto notificacioEstat;
 	
 	
 	@OneToMany(
@@ -108,9 +106,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		return tipus;
 	}	
 	
-	public DocumentNotificacioEstatEnumDto getNotificacioEstat() {
-		return notificacioEstat;
-	}
+
 	public void update(
 			DocumentNotificacioEstatEnumDto notificacioEstat,
 			String assumpte,
@@ -122,14 +118,13 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 
 	public void updateEnviat(
 			Date enviatData,
-			boolean enviat,
+			NotificacioEstat estat,
 			String enviamentIdentificador) {
 		super.updateEnviat(enviatData);
 		this.enviamentIdentificador = enviamentIdentificador;
 		this.enviatData = enviatData;
-		if (!enviat) {
-			this.notificacioEstat = DocumentNotificacioEstatEnumDto.PENDENT;
-		}
+		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
+
 	}
 	
 	public void updateEnviatError(
@@ -142,7 +137,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	}
 
 	public void updateNotificacioEstat(
-			boolean notificacioFinalitzada,
+			NotificacioEstat estat,
 			Date estatData,
 			boolean error,
 			String errorDescripcio,
@@ -150,8 +145,8 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		this.enviamentCertificacioArxiuId = enviamentCertificacioArxiuId;
 		this.error = error;
 		this.errorDescripcio = errorDescripcio;
-		this.notificacioEstat = notificacioFinalitzada ? DocumentNotificacioEstatEnumDto.FINALITZADA : DocumentNotificacioEstatEnumDto.PENDENT;
-		this.processatData = notificacioFinalitzada ? estatData : null;
+		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
+		this.processatData = estatData;
 	}
 
 	public static Builder getBuilder(

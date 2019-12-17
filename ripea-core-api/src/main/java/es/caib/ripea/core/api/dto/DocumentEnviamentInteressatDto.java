@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class DocumentEnviamentInteressatDto {
 	
-	
+	private Long id;
 	protected InteressatDto interessat;
 	
 	private String enviamentReferencia;
@@ -17,7 +17,12 @@ public class DocumentEnviamentInteressatDto {
 	protected Boolean error;
 	protected String errorDescripcio;
 	
-	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public InteressatDto getInteressat() {
 		return interessat;
 	}
