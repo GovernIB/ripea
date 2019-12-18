@@ -76,7 +76,9 @@ $(document).ready(function() {
 				<rip:inputDate name="dataProgramada" textKey="notificacio.form.camp.data.programada" comment="notificacio.form.camp.data.programada.comment"/>
 				<rip:inputDate name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
 				<rip:inputNumber name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
-				<rip:inputCheckbox name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
+				<c:if test="${entregaPostal}">
+					<rip:inputCheckbox name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
+				</c:if>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="annexos">
 				<rip:inputSelect name="annexos" textKey="notificacio.form.camp.annexos" optionItems="${annexos}" emptyOption="true" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.form.camp.annexos"/>

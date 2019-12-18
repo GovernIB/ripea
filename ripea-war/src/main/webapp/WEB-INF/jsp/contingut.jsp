@@ -994,7 +994,7 @@ function deselectAll() {
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a> 
-											<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult nomaximized" data-toggle="modal">
+											<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>">
 												<span class="fa fa-envelope-o"></span>
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>

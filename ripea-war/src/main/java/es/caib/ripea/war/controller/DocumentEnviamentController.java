@@ -45,6 +45,7 @@ import es.caib.ripea.war.command.DocumentNotificacioCommand.Electronica;
 import es.caib.ripea.war.command.DocumentPublicacioCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.ValidationHelper;
 
 /**
@@ -56,6 +57,8 @@ import es.caib.ripea.war.helper.ValidationHelper;
 @RequestMapping("/document")
 public class DocumentEnviamentController extends BaseUserController {
 
+	private static final String SESSION_ATTRIBUTE_ENTREGA_POSTAL = "ContingutDocumentController.session.entregaPostal";
+	
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
@@ -80,6 +83,10 @@ public class DocumentEnviamentController extends BaseUserController {
 				model);
 		DocumentNotificacioCommand command = new DocumentNotificacioCommand();
 		command.setDocumentId(documentId);
+		boolean entregaPostalHablitada = (boolean)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_ENTREGA_POSTAL);
+		model.addAttribute("entregaPostal", entregaPostalHablitada);
 		model.addAttribute(
 				"serveiTipusEstats",
 				EnumHelper.getOptionsForEnum(

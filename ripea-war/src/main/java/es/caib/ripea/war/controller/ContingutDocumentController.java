@@ -83,6 +83,7 @@ public class ContingutDocumentController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_ORDRE = "ContingutDocumentController.session.ordre";
+	private static final String SESSION_ATTRIBUTE_ENTREGA_POSTAL = "ContingutDocumentController.session.entregaPostal";
 	
 	@Autowired
 	private ServletContext servletContext;
@@ -177,7 +178,6 @@ public class ContingutDocumentController extends BaseUserController {
 					request,
 					command,
 					null,
-					model,
 					false,
 					true);
 		} catch (Exception exception) {
@@ -214,7 +214,6 @@ public class ContingutDocumentController extends BaseUserController {
 					request,
 					command,
 					null,
-					model,
 					false,
 					true);
 		} catch (Exception exception) {
@@ -326,6 +325,12 @@ public class ContingutDocumentController extends BaseUserController {
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 		boolean totsFirmats = true; 
 		boolean totsDocuments = true;
+		boolean mostrarTextLoading = true;
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_ENTREGA_POSTAL,
+				mostrarTextLoading);
 		
 		ContingutDto contingut = contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -373,6 +378,13 @@ public class ContingutDocumentController extends BaseUserController {
 		if (totsDocuments && totsFirmats) {
 			model.addAttribute("documents", documents);
 			model.addAttribute("contingut", contingut);
+			boolean entregaPostal = true;
+			
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_ENTREGA_POSTAL,
+					entregaPostal);
+			
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
@@ -382,6 +394,12 @@ public class ContingutDocumentController extends BaseUserController {
 		} else {
 			DocumentConcatenatCommand command = new DocumentConcatenatCommand();
 			command.setPareId(contingutId);
+			boolean entregaPostal = false;
+			
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_ENTREGA_POSTAL,
+					entregaPostal);
 			
 			documentHelper.generarFitxerZip(
 					entitatActual.getId(),
@@ -401,7 +419,6 @@ public class ContingutDocumentController extends BaseUserController {
 					request,
 					null,
 					command,
-					model,
 					true,
 					false);
 		}
@@ -435,7 +452,6 @@ public class ContingutDocumentController extends BaseUserController {
 					request,
 					null,
 					command,
-					model,
 					true,
 					false);
 		} catch (Exception exception) {
@@ -717,7 +733,6 @@ public class ContingutDocumentController extends BaseUserController {
 			HttpServletRequest request,
 			DocumentCommand command,
 			DocumentConcatenatCommand commandConc,
-			Model model,
 			boolean notificar,
 			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);

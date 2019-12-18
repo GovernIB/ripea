@@ -12,7 +12,7 @@
 			elementForm: "#modal-form",
 			elementTancarData: "modal-cancel",
 			elementRetorn: null,
-			segonaModal: false
+			missatgeLoading: null
 		}
 		var $element = $(element), element = element;
 		var plugin = this;
@@ -58,7 +58,10 @@
 								'				</div>' +
 								'				<div class="modal-body" style="padding:0">' +
 								'					<iframe frameborder="0" height="100" width="100%"></iframe>' +
-								'					<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div>' +
+								'					<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
+								'						<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>' + 
+								(plugin.settings.missatgeLoading != null ? '<p>' + plugin.settings.missatgeLoading + '</p>' : '') +	
+								'					</div>' +
 								'				</div>' +
 								'				<div class="modal-footer"></div>' +
 								'			</div>' +
@@ -108,12 +111,6 @@
 								$(nomElementRetorn).trigger('blur');
 							}
 						});
-						//if (plugin.settings.segonaModal) {
-						//	$('#' + modalDivId).on('hidden.bs.modal', function() {
-						//		$('button.close', $(window.frameElement).parent().parent().parent().parent()).trigger('click');
-						//		window.location.reload(true);
-						//	});
-						//}
 					} else {
 						window.open(href, '_blank');
 					}

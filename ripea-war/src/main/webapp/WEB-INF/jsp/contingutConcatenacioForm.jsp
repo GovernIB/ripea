@@ -152,7 +152,7 @@ $(document).ready(function() {
 	<div class="contenidor-botons col-md-12 text-center">
 		<div class="btn-group">
 			<div id="descarregar-mult" class="btn-group">
-				<a href="<c:url value="/contingut/${contingut.id}/notificarForm"/>" data-toggle="modal" data-refresh-pagina="true" data-segona-modal="true" class="btn btn-default">
+				<a href="<c:url value="/contingut/${contingut.id}/notificarForm"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"  data-missatge-loading="<spring:message code="concatenacio.pdf.modal.missatge"/>">
 					<span class="fa fa-paperclip"></span>
 					<spring:message code="concatenacio.form.boto.concatenar"/>
 				</a>

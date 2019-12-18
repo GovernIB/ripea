@@ -31,11 +31,18 @@
 .tooltip {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 14px;
+  display: block;
 }
-
+.tooltip-arrow {
+}
 .tooltip-inner {
-  max-width: 600px;
-  padding: 3px 8px;
+  max-width: 700px;
+  padding: 2% 1% 1% 1%;
+  background-color: #fff;
+  color: black;
+  padding: 1%;
+  border: 1px solid black;
+  border-radius: 3px;
 }
 </style>
 <script>
