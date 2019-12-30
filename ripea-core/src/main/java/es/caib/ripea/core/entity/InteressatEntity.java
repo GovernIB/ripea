@@ -130,7 +130,13 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 			orphanRemoval = true)
 	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
 	
-	
+
+	@Transient
+	private String paisNom;
+	@Transient
+	private String provinciaNom;
+	@Transient
+	private String municipiNom;
 
 	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
 		return documentEnviamentInteressats;
@@ -215,6 +221,24 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	}
 	public Boolean getIncapacitat() {
 		return incapacitat != null ? incapacitat : false;
+	}
+	public String getPaisNom() {
+		return paisNom;
+	}
+	public void setPaisNom(String paisNom) {
+		this.paisNom = paisNom;
+	}
+	public String getProvinciaNom() {
+		return provinciaNom;
+	}
+	public void setProvinciaNom(String provinciaNom) {
+		this.provinciaNom = provinciaNom;
+	}
+	public String getMunicipiNom() {
+		return municipiNom;
+	}
+	public void setMunicipiNom(String municipiNom) {
+		this.municipiNom = municipiNom;
 	}
 	public abstract String getIdentificador();
 

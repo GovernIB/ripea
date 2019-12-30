@@ -20,8 +20,11 @@ public abstract class InteressatDto implements Serializable {
 	protected InteressatDocumentTipusEnumDto documentTipus;
 	protected String documentNum;
 	protected String pais;
+	protected String paisNom;
 	protected String provincia;
+	protected String provinciaNom;
 	protected String municipi;
+	protected String municipiNom;
 	protected String adresa;
 	protected String codiPostal;
 	protected String email;
@@ -148,7 +151,25 @@ public abstract class InteressatDto implements Serializable {
 	public void setIdentificador(String identificador) {
 		this.identificador = identificador;
 	}
-
+	public String getPaisNom() {
+		return paisNom;
+	}
+	public void setPaisNom(String paisNom) {
+		this.paisNom = paisNom;
+	}
+	public String getProvinciaNom() {
+		return provinciaNom;
+	}
+	public void setProvinciaNom(String provinciaNom) {
+		this.provinciaNom = provinciaNom;
+	}
+	public String getMunicipiNom() {
+		return municipiNom;
+	}
+	public void setMunicipiNom(String municipiNom) {
+		this.municipiNom = municipiNom;
+	}
+	
 	public boolean isPersonaFisica() {
 		return this instanceof InteressatPersonaFisicaDto;
 	}
