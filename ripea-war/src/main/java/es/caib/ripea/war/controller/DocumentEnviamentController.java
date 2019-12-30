@@ -83,10 +83,16 @@ public class DocumentEnviamentController extends BaseUserController {
 				model);
 		DocumentNotificacioCommand command = new DocumentNotificacioCommand();
 		command.setDocumentId(documentId);
-		boolean entregaPostalHablitada = (boolean)RequestSessionHelper.obtenirObjecteSessio(
+		Object entrega_postal_sessio = RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_ENTREGA_POSTAL);
-		model.addAttribute("entregaPostal", entregaPostalHablitada);
+		
+		if (entrega_postal_sessio != null) {
+			boolean entregaPostalHablitada = (boolean)entrega_postal_sessio;
+			model.addAttribute("entregaPostal", entregaPostalHablitada);
+		} else {
+			model.addAttribute("entregaPostal", true);
+		}
 		model.addAttribute(
 				"serveiTipusEstats",
 				EnumHelper.getOptionsForEnum(
