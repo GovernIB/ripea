@@ -23,6 +23,8 @@
 	<rip:modalHead/>
 <script>
 $(document).ready(function() {
+	$('#tipus').val("NOTIFICACIO");
+	
 	$('#tipus').on('change', function() {
 		if ($(this).val() == 'MANUAL') {
 			$('ul.nav-tabs li a[href="#avisofici"]').removeAttr('data-toggle');
