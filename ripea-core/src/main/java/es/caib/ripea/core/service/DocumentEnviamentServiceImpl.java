@@ -712,6 +712,37 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		}
 		return resposta;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<DocumentEnviamentDto> findNotificacionsAmbDocument(
+			Long entitatId,
+			Long documentId) {
+		logger.debug("Obtenint la llista d'enviaments de l'expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"documentId=" + documentId + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				true);
+		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
+		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByEnviatDataAsc(
+				document);
+		for (DocumentNotificacioEntity notificacio: notificacions) {
+			DocumentNotificacioDto documentNotificacio = 
+					conversioTipusHelper.convertir(
+							notificacio,
+							DocumentNotificacioDto.class);
+			//informació no necessària en aquest cas (acelerar conversió a JSON)
+			documentNotificacio.setDocument(null);
+			documentNotificacio.setDocumentEnviamentInteressats(null);
+			
+			resposta.add(documentNotificacio);
+		}
+		
+		return resposta;
+	}
 
 	@Override
 	@Transactional

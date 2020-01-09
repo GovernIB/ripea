@@ -257,6 +257,8 @@ public class ContingutHelper {
 			dto.setNtiTipoFirma(document.getNtiTipoFirma());
 			dto.setNtiCsv(document.getNtiCsv());
 			dto.setNtiCsvRegulacion(document.getNtiCsvRegulacion());
+			dto.setAmbNotificacions(document.isAmbNotificacions());
+			
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);

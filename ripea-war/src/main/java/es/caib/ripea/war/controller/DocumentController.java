@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
@@ -42,6 +43,7 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
@@ -70,7 +72,8 @@ public class DocumentController extends BaseUserController {
 	private PassarelaFirmaHelper passarelaFirmaHelper;
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-
+	@Autowired
+	private DocumentEnviamentService documentEnviamentService;
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -503,6 +506,18 @@ public class DocumentController extends BaseUserController {
 				viaFirmaUsuari,
 				usuariActual);
 		return dispositius;
+	}
+	
+	@RequestMapping(value = "/{documentId}/enviament/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public List<DocumentEnviamentDto> enviamentDatatable(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return documentEnviamentService.findNotificacionsAmbDocument(
+						entitatActual.getId(),
+						documentId);		
 	}
 	
 	@InitBinder

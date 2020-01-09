@@ -61,6 +61,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -80,6 +81,7 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
@@ -123,7 +125,9 @@ public class ContingutServiceImpl implements ContingutService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-
+	@Autowired
+	private DocumentNotificacioRepository documentNotificacioRepository;
+	
 	@Transactional
 	@Override
 	public ContingutDto rename(
@@ -726,7 +730,16 @@ public class ContingutServiceImpl implements ContingutService {
 		} else {
 			contingut = contingutRepository.findOne(contingutId);
 		}
-
+		//comprobar si hi ha notificacions del document
+		for (ContingutEntity document: contingut.getFills()) {
+			if (document instanceof DocumentEntity) {
+				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByEnviatDataAsc((DocumentEntity)document);
+				if (notificacions != null && notificacions.size() > 0) {
+					document.setAmbNotificacions(true);
+				}
+			}
+		}
+		
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -736,6 +749,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions);
+		
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);

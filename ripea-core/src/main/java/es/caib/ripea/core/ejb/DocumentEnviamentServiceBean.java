@@ -15,6 +15,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 
 /**
@@ -143,6 +144,17 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 			Long documentId) {
 		return delegate.findAmbDocument(
 				entitatId,
+				documentId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<DocumentEnviamentDto> findNotificacionsAmbDocument(
+			Long entitatId, 
+			Long documentId)
+			throws NotFoundException {
+		return delegate.findNotificacionsAmbDocument(
+				entitatId, 
 				documentId);
 	}
 
