@@ -85,6 +85,10 @@
 				</c:if>
 			</c:forEach>
 		</ul>
+		<div id="drag_container" class="drag_activated">
+			<span class="down fa fa-upload"></span>
+			<p><spring:message code="contingut.drag.info"/></p>
+		</div>
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
 		<%--------------------- TABLE -------------------%>
@@ -171,6 +175,10 @@
 				</c:forEach>
 			</tbody>
 		</table>
+		<div id="drag_container" class="drag_activated">
+			<span class="down fa fa-upload"></span>
+			<p><spring:message code="contingut.drag.info"/></p>
+		</div>
 	</c:when>
 </c:choose>
 <c:if test="${empty fills}">

@@ -201,6 +201,13 @@ ul.interessats {
 }
 .drag_activated {
 	border: 4px dashed #ffd351;
+	height: 200px;
+	width: 100%;
+	background-color: #f5f5f5;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 }
 .disabled {
 	pointer-events: none;
@@ -216,6 +223,9 @@ ul.interessats {
 }
 .selectd {
 	background-color: #c6c6c6
+}
+.down {
+	font-size: 90px;
 }
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -478,7 +488,7 @@ $(document).ready(function() {
 		$('#pipella-contingut').removeClass( "active" );
 		$('#pipella-peticions').addClass( "active" );
 	}
-	$('#contingut').filedrop({
+	$('#drag_container').filedrop({
 		maxfiles: 1,
 		fallback_dropzoneClick : false,
 		error: function(err, file) {
@@ -499,14 +509,14 @@ $(document).ready(function() {
 			}
 		},
 		dragOver: function() {
-			$('#contingut').addClass('drag_activated');
+			$('#drag_container').css('background-color', '#e6e3e3');
 		},
 		dragLeave: function() {
-			$('#contingut').removeClass('drag_activated');
+			$('#drag_container').css('background-color', '#f5f5f5');
 		},
 		drop: function(e) {
 			let files = e.originalEvent.dataTransfer.files;
-			$('#contingut').removeClass('drag_activated');
+			$('#drag_container').css('background-color', '#f5f5f5');
 			document.querySelector('#dropped-files').files = files;
 			$('#document-new').trigger('click');
 		}
@@ -1235,6 +1245,8 @@ function deselectAll() {
 											{{if notificacio}}
 												{{if tipus == 'MANUAL'}}
 													<spring:message code="contingut.enviament.notificacio.man"/>
+												{{else tipus == 'COMUNICACIO'}}
+													<spring:message code="contingut.enviament.comunicacio"/>
 												{{else}}
 													<spring:message code="contingut.enviament.notificacio.elec"/>
 												{{/if}}
