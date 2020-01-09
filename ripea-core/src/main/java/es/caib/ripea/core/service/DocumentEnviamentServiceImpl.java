@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
@@ -24,8 +25,12 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MunicipiDto;
+import es.caib.ripea.core.api.dto.PaisDto;
+import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
@@ -60,7 +65,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
 	private DocumentPublicacioRepository documentPublicacioRepository;
-
 	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
@@ -79,6 +83,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private MessageHelper messageHelper;
 	@Autowired
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+	@Autowired
+	private DadesExternesService dadesExternesService;
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
@@ -407,7 +413,30 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				DocumentNotificacioDto.class);
 		
 		for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacioEntity.getDocumentEnviamentInteressats()) {
-			documentNotificacioDto.getInteressats().add(conversioTipusHelper.convertir(documentEnviamentInteressatEntity.getInteressat(), InteressatDto.class));
+			documentNotificacioDto.getInteressats().add(
+					conversioTipusHelper.convertir(
+							documentEnviamentInteressatEntity.getInteressat(), 
+							InteressatDto.class));
+		}
+
+		for (DocumentEnviamentInteressatDto documentEnviamentInteressat: documentNotificacioDto.getDocumentEnviamentInteressats()) {
+			String provinciaCodi = documentEnviamentInteressat.getInteressat().getProvincia();
+			
+			for (PaisDto paisDto : dadesExternesService.findPaisos()) {
+				if (paisDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getPais())) {
+					documentEnviamentInteressat.getInteressat().setPaisNom(paisDto.getNom());
+				}
+			}
+			for (ProvinciaDto provinciaDto : dadesExternesService.findProvincies()) {
+				if (provinciaDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getProvincia())) {
+					documentEnviamentInteressat.getInteressat().setProvinciaNom(provinciaDto.getNom());
+				}
+			}
+			for (MunicipiDto municipiDto : dadesExternesService.findMunicipisPerProvincia(provinciaCodi)) {
+				if (municipiDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getMunicipi())) {
+					documentEnviamentInteressat.getInteressat().setMunicipiNom(municipiDto.getNom());
+				}
+			}
 		}
 		
 		return documentNotificacioDto;

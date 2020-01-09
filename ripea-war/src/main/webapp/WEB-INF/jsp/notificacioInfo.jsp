@@ -127,9 +127,9 @@ border: 1px solid #ddd;
 													<div class="row">
 														<div class="col-xs-6">
 															<dl class="dl-horizontal">
-																<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.pais}</dd>
-																<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provincia}</dd>											
-																<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipi}</dd>
+																<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.paisNom}</dd>
+																<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provinciaNom}</dd>											
+																<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipiNom}</dd>
 																<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${interessat.adresa}</dd>
 																<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${interessat.codiPostal}</dd>
 															</dl>
