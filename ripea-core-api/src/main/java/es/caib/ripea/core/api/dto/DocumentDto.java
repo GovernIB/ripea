@@ -45,6 +45,7 @@ public class DocumentDto extends NodeDto {
 	private int versioCount;
 	private List<DocumentVersioDto> versions;
 	private boolean firmaSeparada;
+	private boolean ambNotificacions;
 	
 	private Long pareId;
 	
@@ -258,6 +259,12 @@ public class DocumentDto extends NodeDto {
 	}
 	public void setVersions(List<DocumentVersioDto> versions) {
 		this.versions = versions;
+	}
+	public boolean isAmbNotificacions() {
+		return ambNotificacions;
+	}
+	public void setAmbNotificacions(boolean ambNotificacions) {
+		this.ambNotificacions = ambNotificacions;
 	}
 
 	public MetaDocumentDto getMetaDocument() {

@@ -208,6 +208,21 @@ public interface DocumentEnviamentService {
 			Long documentId) throws NotFoundException;
 	
 	/**
+	 * Retorna la llista de les notificacions associades a un document.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id del document.
+	 * @return La llista de notificacions.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	public List<DocumentEnviamentDto> findNotificacionsAmbDocument(
+			Long entitatId,
+			Long documentId) throws NotFoundException;
+	
+	/**
 	 * Actualitza l'estat d'un enviament de la notificació.
 	 * 
 	 * @param identificador

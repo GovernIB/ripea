@@ -23,6 +23,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
@@ -98,6 +99,10 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 			orphanRemoval = true)
 	@OrderBy("createdDate ASC")
 	protected List<AlertaEntity> alertes = new ArrayList<AlertaEntity>();
+	
+	@Transient
+	protected boolean ambNotificacions;
+	
 	@Version
 	private long version = 0;
 
@@ -166,6 +171,12 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	}
 	public void updateDarrerMoviment(ContingutMovimentEntity darrerMoviment) {
 		this.darrerMoviment = darrerMoviment;
+	}
+	public boolean isAmbNotificacions() {
+		return ambNotificacions;
+	}
+	public void setAmbNotificacions(boolean ambNotificacions) {
+		this.ambNotificacions = ambNotificacions;
 	}
 	public void updateArxiu(
 			String arxiuUuid) {

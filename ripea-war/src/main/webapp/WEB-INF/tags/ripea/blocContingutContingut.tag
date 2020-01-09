@@ -29,6 +29,9 @@
 									<c:if test="${fill.node and not fill.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
 									<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 									<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
+									<c:if test="${fill.document && fill.ambNotificacions}">
+										<span class="fa fa-envelope popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
+									</c:if>
 									${fill.nom}
 								</p>
 								<rip:blocContingutAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}" nodeco="${nodeco}"/>
@@ -85,6 +88,10 @@
 				</c:if>
 			</c:forEach>
 		</ul>
+		<div id="drag_container" class="drag_activated">
+			<span class="down fa fa-upload"></span>
+			<p><spring:message code="contingut.drag.info"/></p>
+		</div>
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
 		<%--------------------- TABLE -------------------%>
@@ -113,6 +120,9 @@
 							<rip:blocIconaContingut contingut="${fill}"/>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
+							<c:if test="${fill.document && fill.ambNotificacions}">
+								<span class="fa fa-envelope popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
+							</c:if>
 							&nbsp;${fill.nom}
 							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
 								<span class="fa fa-clock-o" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
@@ -171,6 +181,11 @@
 				</c:forEach>
 			</tbody>
 		</table>
+		
+		<div id="drag_container" class="drag_activated">
+			<span class="down fa fa-upload"></span>
+			<p><spring:message code="contingut.drag.info"/></p>
+		</div>
 	</c:when>
 </c:choose>
 <c:if test="${empty fills}">

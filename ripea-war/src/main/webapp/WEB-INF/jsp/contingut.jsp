@@ -201,6 +201,13 @@ ul.interessats {
 }
 .drag_activated {
 	border: 4px dashed #ffd351;
+	height: 200px;
+	width: 100%;
+	background-color: #f5f5f5;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 }
 .disabled {
 	pointer-events: none;
@@ -216,6 +223,15 @@ ul.interessats {
 }
 .selectd {
 	background-color: #c6c6c6
+}
+.down {
+	font-size: 90px;
+}
+.popover{
+	max-width: none;
+    z-index: 100;
+    cursor: default;
+	width: 500px;
 }
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -478,7 +494,7 @@ $(document).ready(function() {
 		$('#pipella-contingut').removeClass( "active" );
 		$('#pipella-peticions').addClass( "active" );
 	}
-	$('#contingut').filedrop({
+	$('#drag_container').filedrop({
 		maxfiles: 1,
 		fallback_dropzoneClick : false,
 		error: function(err, file) {
@@ -499,14 +515,14 @@ $(document).ready(function() {
 			}
 		},
 		dragOver: function() {
-			$('#contingut').addClass('drag_activated');
+			$('#drag_container').css('background-color', '#e6e3e3');
 		},
 		dragLeave: function() {
-			$('#contingut').removeClass('drag_activated');
+			$('#drag_container').css('background-color', '#f5f5f5');
 		},
 		drop: function(e) {
 			let files = e.originalEvent.dataTransfer.files;
-			$('#contingut').removeClass('drag_activated');
+			$('#drag_container').css('background-color', '#f5f5f5');
 			document.querySelector('#dropped-files').files = files;
 			$('#document-new').trigger('click');
 		}
@@ -626,7 +642,95 @@ $(document).ready(function() {
 			}
 		});
 	}
+
+	$("span[class*='popover-']").popover({
+		html: true,
+	    content: function () {
+	    	return getEnviamentsDocument($(this));   
+	  	}
+	}).on('mouseenter', function () {
+	    $(this).popover("show");
+	   
+	    $(".popover").on('mouseleave', function () {
+	        $(this).popover('hide');
+	    });
+	}).on('mouseleave', function () {
+	   	if (!$('.popover:hover').length) {
+	    	$(this).popover('hide');
+	    }
+	});
 });
+
+function getEnviamentsDocument(document) {
+	var content;
+	var documentId = $(document).attr('id');
+	console.log(documentId);
+	var enviamentsUrl = '<c:url value="/document/' + documentId + '/enviament/datatable"/>';
+	$.ajax({
+		type: 'GET',
+        url: enviamentsUrl,
+        async: false,
+        success: function(data){
+        	if (data && data.length > 0) {
+            content =  "<table data-toggle='datatable' class='table table-bordered table-striped' style='width:100%'>";
+            content += "<thead>";
+        	content += "<tr>";
+        	content += "<th> <spring:message code='contingut.enviament.columna.tipus'/> </th>";
+        	content += "<th> <spring:message code='contingut.enviament.columna.data'/> </th>";
+        	content += "<th> <spring:message code='contingut.enviament.columna.estat'/> </th>";
+        	content += "</tr>";
+        	content += "</thead>";
+	            $.each(data, function(i, val) {
+	            	content += "<tbody>";
+	             	content += "<tr>";
+	             	content += "<td width='25%'>";
+	             	if (val.tipus == "NOTIFICACIO") {
+	             		content += "<spring:message code='contingut.enviament.notificacio.elec'/>";
+	             	} else if (val.tipus == "COMUNICACIO") {
+	             		content += "<spring:message code='contingut.enviament.comunicacio'/>";
+	             	}
+	             	content += "</td>";
+	             	content += "<td width='20%'>" + new Date (val.createdDate).toLocaleString() + "</td>";
+	             	content += "<td width='10%'>";
+	             	if (val.estat == 'PENDENT') {
+	             		content += "<span class='label label-warning'><span class='fa fa-clock-o'></span> ";
+	             		content += "<spring:message code='notificacio.notificacioEstat.enum.PENDENT'/></span> ";
+	             		if (val.error) {
+	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+	             		}
+	             	} else if (val.estat == 'ENVIADA') {
+	             		content += "<span class='label label-warning'><span class='fa fa-envelope-o'></span> ";
+	             		content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA'/></span>";
+	             		if (val.error) {
+	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+	             		}
+	             	} else if (val.estat == 'REGISTRADA') {
+	             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+	             		content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
+	             	} else if (val.estat == 'FINALITZADA') {
+	             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+	             		content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA'/></span>";
+	             		if (val.error) {
+	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+	             		}
+	             	} else if (val.estat == 'PROCESSADA') {
+	             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+	             		content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
+	             		if (val.error) {
+	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+	             		}
+	             	}
+	             	content += "</td>";
+	             	content += "</tr>";
+	             	content += "</tbody>";
+	            });
+            content += "</table>";
+        	}
+        }
+    });	
+	console.log(content);
+    return content;
+}
 
 function enableDisableButton() {
 	var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut"/>';
@@ -1235,6 +1339,8 @@ function deselectAll() {
 											{{if notificacio}}
 												{{if tipus == 'MANUAL'}}
 													<spring:message code="contingut.enviament.notificacio.man"/>
+												{{else tipus == 'COMUNICACIO'}}
+													<spring:message code="contingut.enviament.comunicacio"/>
 												{{else}}
 													<spring:message code="contingut.enviament.notificacio.elec"/>
 												{{/if}}
