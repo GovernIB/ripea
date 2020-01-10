@@ -181,7 +181,6 @@
 				</c:forEach>
 			</tbody>
 		</table>
-		
 		<div id="drag_container" class="drag_activated">
 			<span class="down fa fa-upload"></span>
 			<p><spring:message code="contingut.drag.info"/></p>

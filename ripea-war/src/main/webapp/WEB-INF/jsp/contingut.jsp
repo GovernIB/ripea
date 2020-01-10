@@ -672,7 +672,13 @@ function getEnviamentsDocument(document) {
         async: false,
         success: function(data){
         	if (data && data.length > 0) {
+<<<<<<< HEAD
+            content =  "<table data-toggle='datatable' ";
+            content += "class='table table-bordered table-striped' ";
+            content += "style='width:100%'>";
+=======
             content =  "<table data-toggle='datatable' class='table table-bordered table-striped' style='width:100%'>";
+>>>>>>> refs/heads/0.9.72.PRE_356
             content += "<thead>";
         	content += "<tr>";
         	content += "<th> <spring:message code='contingut.enviament.columna.tipus'/> </th>";
