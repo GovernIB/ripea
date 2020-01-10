@@ -664,78 +664,72 @@ $(document).ready(function() {
 function getEnviamentsDocument(document) {
 	var content;
 	var documentId = $(document).attr('id');
-	console.log(documentId);
-	var enviamentsUrl = '<c:url value="/document/' + documentId + '/enviament/datatable"/>';
-	$.ajax({
-		type: 'GET',
-        url: enviamentsUrl,
-        async: false,
-        success: function(data){
-        	if (data && data.length > 0) {
-<<<<<<< HEAD
-            content =  "<table data-toggle='datatable' ";
-            content += "class='table table-bordered table-striped' ";
-            content += "style='width:100%'>";
-=======
-            content =  "<table data-toggle='datatable' class='table table-bordered table-striped' style='width:100%'>";
->>>>>>> refs/heads/0.9.72.PRE_356
-            content += "<thead>";
-        	content += "<tr>";
-        	content += "<th> <spring:message code='contingut.enviament.columna.tipus'/> </th>";
-        	content += "<th> <spring:message code='contingut.enviament.columna.data'/> </th>";
-        	content += "<th> <spring:message code='contingut.enviament.columna.estat'/> </th>";
-        	content += "</tr>";
-        	content += "</thead>";
-	            $.each(data, function(i, val) {
-	            	content += "<tbody>";
-	             	content += "<tr>";
-	             	content += "<td width='25%'>";
-	             	if (val.tipus == "NOTIFICACIO") {
-	             		content += "<spring:message code='contingut.enviament.notificacio.elec'/>";
-	             	} else if (val.tipus == "COMUNICACIO") {
-	             		content += "<spring:message code='contingut.enviament.comunicacio'/>";
-	             	}
-	             	content += "</td>";
-	             	content += "<td width='20%'>" + new Date (val.createdDate).toLocaleString() + "</td>";
-	             	content += "<td width='10%'>";
-	             	if (val.estat == 'PENDENT') {
-	             		content += "<span class='label label-warning'><span class='fa fa-clock-o'></span> ";
-	             		content += "<spring:message code='notificacio.notificacioEstat.enum.PENDENT'/></span> ";
-	             		if (val.error) {
-	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-	             		}
-	             	} else if (val.estat == 'ENVIADA') {
-	             		content += "<span class='label label-warning'><span class='fa fa-envelope-o'></span> ";
-	             		content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA'/></span>";
-	             		if (val.error) {
-	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-	             		}
-	             	} else if (val.estat == 'REGISTRADA') {
-	             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
-	             		content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
-	             	} else if (val.estat == 'FINALITZADA') {
-	             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
-	             		content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA'/></span>";
-	             		if (val.error) {
-	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-	             		}
-	             	} else if (val.estat == 'PROCESSADA') {
-	             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
-	             		content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
-	             		if (val.error) {
-	             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-	             		}
-	             	}
-	             	content += "</td>";
-	             	content += "</tr>";
-	             	content += "</tbody>";
-	            });
-            content += "</table>";
-        	}
-        }
-    });	
-	console.log(content);
-    return content;
+	if (documentId != undefined) {
+		var enviamentsUrl = '<c:url value="/document/' + documentId + '/enviament/datatable"/>';
+		$.ajax({
+			type: 'GET',
+	        url: enviamentsUrl,
+	        async: false,
+	        success: function(data){
+	        	if (data && data.length > 0) {
+	        	content =  "<table data-toggle='datatable' class='table table-bordered table-striped' style='width:100%'>";
+	            content += "<thead>";
+	        	content += "<tr>";
+	        	content += "<th> <spring:message code='contingut.enviament.columna.tipus'/> </th>";
+	        	content += "<th> <spring:message code='contingut.enviament.columna.data'/> </th>";
+	        	content += "<th> <spring:message code='contingut.enviament.columna.estat'/> </th>";
+	        	content += "</tr>";
+	        	content += "</thead>";
+		            $.each(data, function(i, val) {
+		            	content += "<tbody>";
+		             	content += "<tr>";
+		             	content += "<td width='25%'>";
+		             	if (val.tipus == "NOTIFICACIO") {
+		             		content += "<spring:message code='contingut.enviament.notificacio.elec'/>";
+		             	} else if (val.tipus == "COMUNICACIO") {
+		             		content += "<spring:message code='contingut.enviament.comunicacio'/>";
+		             	}
+		             	content += "</td>";
+		             	content += "<td width='20%'>" + new Date (val.createdDate).toLocaleString() + "</td>";
+		             	content += "<td width='10%'>";
+		             	if (val.estat == 'PENDENT') {
+		             		content += "<span class='label label-warning'><span class='fa fa-clock-o'></span> ";
+		             		content += "<spring:message code='notificacio.notificacioEstat.enum.PENDENT'/></span> ";
+		             		if (val.error) {
+		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+		             		}
+		             	} else if (val.estat == 'ENVIADA') {
+		             		content += "<span class='label label-warning'><span class='fa fa-envelope-o'></span> ";
+		             		content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA'/></span>";
+		             		if (val.error) {
+		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+		             		}
+		             	} else if (val.estat == 'REGISTRADA') {
+		             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+		             		content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
+		             	} else if (val.estat == 'FINALITZADA') {
+		             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+		             		content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA'/></span>";
+		             		if (val.error) {
+		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+		             		}
+		             	} else if (val.estat == 'PROCESSADA') {
+		             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+		             		content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
+		             		if (val.error) {
+		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+		             		}
+		             	}
+		             	content += "</td>";
+		             	content += "</tr>";
+		             	content += "</tbody>";
+		            });
+	            content += "</table>";
+	        	}
+	        }
+	    });	
+	    return content;
+	}
 }
 
 function enableDisableButton() {
