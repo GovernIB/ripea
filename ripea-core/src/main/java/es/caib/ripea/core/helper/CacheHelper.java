@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -191,6 +192,11 @@ public class CacheHelper {
 			String usuariCodi) {
 		return pluginHelper.dadesUsuariFindAmbCodi(
 				usuariCodi);
+	}
+	
+	@CacheEvict(allEntries = true, value = "usuariAmbCodi", key="#usuariCodi")
+	@Scheduled(fixedDelay = 86400000)
+	public void evictUsuariAmbCodi() {
 	}
 
 	@Cacheable(value = "unitatsOrganitzatives", key="#entitatCodi")

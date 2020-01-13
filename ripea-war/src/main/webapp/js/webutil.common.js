@@ -413,7 +413,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 										$('<option>', {
 											value: resposta[suggestValue],
 											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
-											selected: value == resposta["codi"]
+											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : value == resposta["codi"]
 										}));
 						}
 					});
@@ -427,12 +427,22 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 					url: urlInicial,
 					async: false,
 					success: function(resposta) {
-						suggest.append(
+						if (value == resposta[suggestValue] != false) {
+							suggest.append(
 									$('<option>', {
 										value: resposta[suggestValue],
 										text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
 										selected: value == resposta[suggestValue]
 									}));
+						} else {
+							//específic pel suggest de responsables portafib
+							suggest.append(
+									$('<option>', {
+										value: resposta[suggestValue],
+										text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+										selected: value == resposta["nif"] ? value == resposta["nif"] : value == resposta["codi"]
+									}));
+						}
 					}
 				});
 			} else {

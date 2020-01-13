@@ -151,6 +151,10 @@ public class UsuariHelper {
 
 		logger.debug("Cercant d’usuari a la base de dades (usuariCodi=" + usuariCodi + ")");
 		UsuariEntity usuari = usuariRepository.findOne(usuariCodi);
+		
+		if (usuari == null)
+			usuari = usuariRepository.findByNif(usuariCodi);
+			
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + usuariCodi + ")");
