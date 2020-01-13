@@ -42,7 +42,19 @@
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
-		<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>
+		
+		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+		<rip:inputSuggest 
+			name="portafirmesResponsables" 
+			urlConsultaInicial="${urlConsultaInicial}" 
+			urlConsultaLlistat="${urlConsultaLlistat}" 
+			textKey="metadocument.form.camp.portafirmes.responsables"
+			suggestValue="nif"
+			suggestText="nom"
+			suggestTextAddicional="nif"
+			required="true"/>
+					
 		<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.portafirmes.enviar"/></button>

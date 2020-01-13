@@ -390,30 +390,55 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	}
 	
 	$.fn.webutilInputSuggest = function() {
+		var urlActual = $(this).data('urlInicial');
+		
 		var value = $(this).data('currentValue');
-		var urlInicial = $(this).data('urlInicial') + "/" + value;
+		var urlInicial = urlActual + "/" + value;
 		var suggestValue = $(this).data('suggestValue');
 		var suggestText = $(this).data('suggestText');
+		var suggestTextAddicional = $(this).data('suggestTextAddicional');
 		var suggest = $(this);
-
-		// Preselected value
-		if (value) {
-			$.ajax({
-				url: urlInicial,
-				async: false,
-				success: function(resposta) {
-					suggest.append(
-								$('<option>', {
-									value: resposta[suggestValue],
-									text: resposta[suggestText],
-									selected: value == resposta[suggestValue]
-								}));
-				}
-			});
-		} else {
-			$(this).empty();
-		}
 		
+		if (value != null && value.includes(",")) {
+			var valueArr = value.split(',');
+			valueArr.forEach(function(value) {
+				urlInicial = urlActual + "/" + value;
+				// Preselected value
+				if (value) {
+					$.ajax({
+						url: urlInicial,
+						async: false,
+						success: function(resposta) {
+							suggest.append(
+										$('<option>', {
+											value: resposta[suggestValue],
+											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+											selected: value == resposta["codi"]
+										}));
+						}
+					});
+				} else {
+					$(this).empty();
+				}
+			})
+		} else {
+			if (value) {
+				$.ajax({
+					url: urlInicial,
+					async: false,
+					success: function(resposta) {
+						suggest.append(
+									$('<option>', {
+										value: resposta[suggestValue],
+										text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+										selected: value == resposta[suggestValue]
+									}));
+					}
+				});
+			} else {
+				$(this).empty();
+			}
+		}
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
@@ -430,7 +455,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 						var item = data[i];
 						results.push({
 							id: item[suggestValue],
-							text: item[suggestText]
+							text: (suggestTextAddicional != undefined && item[suggestTextAddicional] != null) ? item[suggestText] + " (" + item[suggestTextAddicional] + ")" : item[suggestText]
 						});
 					}
 					

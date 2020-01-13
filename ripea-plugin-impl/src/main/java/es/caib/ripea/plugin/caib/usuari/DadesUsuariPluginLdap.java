@@ -157,7 +157,7 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 		LOGGER.debug("Consulta de les dades de l'usuari (filtre=" + filtre + ")");
 		try {
 			return consultaUsuaris(
-					getLdapFiltreNom(), 
+					getLdapFiltre(), 
 					filtre);
 		} catch (NamingException e) {
 			throw new SistemaExternException(
@@ -194,9 +194,9 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.codi");
 	}
-	private String getLdapFiltreNom() {
+	private String getLdapFiltre() {
 		// Exemple: (&(displayName=inetOrgPersonCAIB)(cn=XXX))
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.nom");
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre");
 	}
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))

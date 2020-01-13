@@ -107,7 +107,20 @@ pageContext.setAttribute(
 					</c:otherwise>
 				</c:choose>
 				<%--rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id"/--%>
-				<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>
+				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
+				
+				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+					name="portafirmesResponsables" 
+					urlConsultaInicial="${urlConsultaInicial}" 
+					urlConsultaLlistat="${urlConsultaLlistat}" 
+					textKey="metadocument.form.camp.portafirmes.responsables"
+					suggestValue="codi"
+					suggestText="nom"
+					suggestTextAddicional="nif"
+					required="true"/>
+			
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<rip:inputText name="portafirmesCustodiaTipus" textKey="metadocument.form.camp.portafirmes.custodia"/>				
 			</div>
