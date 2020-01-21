@@ -107,6 +107,7 @@ import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
@@ -869,6 +870,7 @@ public class PluginHelper {
 	}
 	
 
+
 	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid){
 
 		List<ContingutArxiu> continguts = arxiuExpedientConsultarPerUuid(expedientUuid).getContinguts();
@@ -1196,9 +1198,9 @@ public class PluginHelper {
 				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 				firmes = Arrays.asList(firma);
 			}
-			
-			
-			
+
+
+
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
@@ -2816,6 +2818,20 @@ public class PluginHelper {
 	
 	
 
+	public RespostaConsultaInfoRegistre notificacioConsultarIDescarregarJustificant(
+			DocumentEnviamentInteressatEntity documentEnviamentEtity) {
+		RespostaConsultaInfoRegistre resposta = null;
+		try {
+			resposta = getNotificacioPlugin().consultarRegistreInfo(
+					null,
+					documentEnviamentEtity.getEnviamentReferencia(),
+					true);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return resposta;
+	}
+
 	public void notificacioConsultarIActualitzarEstat(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 		
@@ -2855,6 +2871,7 @@ public class PluginHelper {
 			
 			
 
+			actualitzarDadesRegistre(documentEnviamentInteressatEntity);
 			
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(
 					documentEnviamentInteressatEntity.getNotificacio().getEnviamentIdentificador());
@@ -2890,6 +2907,45 @@ public class PluginHelper {
 		}
 	}
 
+	public void actualitzarDadesRegistre(DocumentEnviamentInteressatEntity enviament) {
+		String accioDescripcio = "Consulta dades registre de l'enviament amb referència: " + enviament.getEnviamentReferencia();
+		Map<String, String> accioParams = getAccioParams(enviament);
+		long t0 = System.currentTimeMillis();
+		try {
+			RespostaConsultaInfoRegistre respostaInfoRegistre = getNotificacioPlugin().consultarRegistreInfo(
+					null,
+					enviament.getEnviamentReferencia(),
+					false);
+	
+			if (respostaInfoRegistre != null) {
+				enviament.updateEnviamentInfoRegistre(
+						respostaInfoRegistre.getDataRegistre(),
+						respostaInfoRegistre.getNumRegistre(),
+						respostaInfoRegistre.getNumRegistreFormatat());
+			}
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de notificacions";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					errorDescripcio,
+					ex);
+		}
+	}
 	public String gestioDocumentalCreate(
 			String agrupacio,
 			InputStream contingut) {

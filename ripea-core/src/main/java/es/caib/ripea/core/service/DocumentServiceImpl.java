@@ -32,6 +32,7 @@ import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -73,6 +74,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -905,8 +907,46 @@ public class DocumentServiceImpl implements DocumentService {
 				documentEnviamentInteressatId);
 		return pluginHelper.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatEntity);
 	}
-
-
+	
+	@Override
+	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(
+			Long entitatId,
+			Long documentId,
+			Long docuemntEnviamentId) {
+		NotificacioInfoRegistreDto infoRegistre = new NotificacioInfoRegistreDto();
+		try {
+			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+					entitatId,
+					documentId,
+					false,
+					true);
+			ExpedientEntity expedient = document.getExpedient();
+			if (expedient == null) {
+				throw new ValidationException(
+						documentId,
+						DocumentEntity.class,
+						"El document no te cap expedient associat (documentId=" + documentId + ")");
+			}
+			DocumentEnviamentInteressatEntity enviament = documentEnviamentInteressatRepository.findOne(docuemntEnviamentId);
+			
+			RespostaConsultaInfoRegistre resposta = pluginHelper.notificacioConsultarIDescarregarJustificant(
+					enviament);
+			
+			if (!resposta.isError() && resposta != null) {
+				infoRegistre.setDataRegistre(resposta.getDataRegistre());
+				infoRegistre.setNumRegistreFormatat(resposta.getNumRegistreFormatat());
+				infoRegistre.setJustificant(resposta.getJustificant());
+			} else {
+				infoRegistre.setError(true);
+				infoRegistre.setErrorData(resposta.getErrorData());
+				infoRegistre.setErrorDescripcio(resposta.getErrorDescripcio());
+				return infoRegistre;
+			}
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la informació del registre", ex);
+		}
+		return infoRegistre;
+	}
 
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
@@ -920,14 +960,6 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 	}
-
-
-
-
 	
-
-
-
-
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
 }

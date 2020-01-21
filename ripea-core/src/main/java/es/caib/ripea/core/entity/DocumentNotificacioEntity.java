@@ -20,11 +20,9 @@ import javax.persistence.TemporalType;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
-import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 
 /**
@@ -68,7 +66,14 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	
 	@Column(name="entrega_postal")
 	private Boolean entregaPostal;
-	
+
+	@Column(name="not_env_registre_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date registreData;
+	@Column(name="not_env_registre_numero", length = 19)
+	private Integer registreNumero;
+	@Column(name="not_env_registre_num_formatat", length = 50)
+	private String registreNumeroFormatat;
 	
 	
 	@OneToMany(
@@ -76,7 +81,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			fetch = FetchType.LAZY,
 			orphanRemoval = true)
 	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
-	
+
 
 	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
 		return documentEnviamentInteressats;
@@ -104,9 +109,25 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	}
 	public DocumentNotificacioTipusEnumDto getTipus() {
 		return tipus;
-	}	
-	
-
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public Integer getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(Integer registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
 	public void update(
 			DocumentNotificacioEstatEnumDto notificacioEstat,
 			String assumpte,
@@ -148,7 +169,16 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
 		this.processatData = estatData;
 	}
-
+	
+	public void updateNotificacioInfoRegistre(
+			Date registreData,
+			Integer numeroRegistre,
+			String numeroRegistreFormatat) {
+		this.registreData = registreData;
+		this.registreNumero = numeroRegistre;
+		this.registreNumeroFormatat = numeroRegistreFormatat;
+	}
+	
 	public static Builder getBuilder(
 			DocumentNotificacioEstatEnumDto notificacioEstat,
 			String assumpte,

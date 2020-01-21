@@ -208,6 +208,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : notificacioEntity.getDocumentEnviamentInteressats()) {
 					if(documentEnviamentInteressatEntity.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
 						documentEnviamentInteressatEntity.updateEnviamentReferencia(enviamentReferencia.getReferencia());
+						pluginHelper.actualitzarDadesRegistre(documentEnviamentInteressatEntity);
 					}
 				}
 			}

@@ -13,22 +13,20 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.caib.notib.client.NotificacioRestClient;
 import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.ws.notificacio.Certificacio;
+import es.caib.notib.ws.notificacio.DadesConsulta;
 import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.SistemaExternException;
@@ -41,6 +39,7 @@ import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
 
@@ -249,6 +248,38 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 	
 	
 
+	@Override
+	public RespostaConsultaInfoRegistre consultarRegistreInfo(
+			String identificador,
+			String referencia,
+			boolean ambJustificant) throws SistemaExternException {
+		RespostaConsultaInfoRegistre resposta = new RespostaConsultaInfoRegistre();
+		try {
+			DadesConsulta dadesConsulta = new DadesConsulta();
+			dadesConsulta.setAmbJustificant(ambJustificant);
+			dadesConsulta.setIdentificador(identificador);
+			dadesConsulta.setReferencia(referencia);
+			es.caib.notib.ws.notificacio.RespostaConsultaDadesRegistre respostaConsultaInfoRegistre = getNotificacioService().consultaDadesRegistre(dadesConsulta);
+			if (respostaConsultaInfoRegistre != null) {
+				resposta.setDataRegistre(toDate(respostaConsultaInfoRegistre.getDataRegistre()));
+				resposta.setNumRegistre(respostaConsultaInfoRegistre.getNumRegistre());
+				resposta.setNumRegistreFormatat(respostaConsultaInfoRegistre.getNumRegistreFormatat());
+				if (respostaConsultaInfoRegistre.getJustificant() != null) {
+					resposta.setJustificant(respostaConsultaInfoRegistre.getJustificant());
+				}
+				resposta.setError(respostaConsultaInfoRegistre.isError());
+				resposta.setErrorData(toDate(respostaConsultaInfoRegistre.getErrorData()));
+				resposta.setErrorDescripcio(respostaConsultaInfoRegistre.getErrorDescripcio());
+			}
+		return resposta;
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar la informació del registre de la notificació (" +
+					"identificador=" + identificador + ")",
+					ex);
+		}
+	}
 
 
 

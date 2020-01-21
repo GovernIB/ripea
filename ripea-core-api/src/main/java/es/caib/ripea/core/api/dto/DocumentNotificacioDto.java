@@ -40,6 +40,12 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private Boolean entregaPostal;
 	private List<InteressatDto> interessats = new ArrayList<InteressatDto>();
 	
+	private Date registreData;
+	private String registreNumero;
+	private String registreNumeroFormatat;
+	
+	private boolean ambRegistres;
+	
 	public Long getId() {
 		return id;
 	}
@@ -127,7 +133,34 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	public void setNotificacioEstat(DocumentNotificacioEstatEnumDto notificacioEstat) {
 		this.notificacioEstat = notificacioEstat;
 	}
-	
-	
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public String getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+	public boolean isAmbRegistres() {
+		if (documentEnviamentInteressats != null) {
+			for (DocumentEnviamentInteressatDto enviament : documentEnviamentInteressats) {
+				if (enviament.getRegistreNumeroFormatat() != null && ! enviament.getRegistreNumeroFormatat().isEmpty())
+					ambRegistres = true;
+				else
+					ambRegistres = false;
+			}
+		}
+		return ambRegistres;
+	}
 
 }

@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -297,6 +298,12 @@ public class DocumentServiceBean implements DocumentService {
 	@Override
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
 		return delegate.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatId);
+	}
+
+	@Override
+	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(Long entitatId, Long documentId,
+			Long documentNotificacioId) {
+		return delegate.notificacioConsultarIDescarregarJustificant(entitatId, documentId, documentNotificacioId);
 	}
 
 }

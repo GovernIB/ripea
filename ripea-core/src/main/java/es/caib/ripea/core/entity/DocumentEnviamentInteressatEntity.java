@@ -56,6 +56,14 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	@Column(name = "not_env_cert_orig", length = 20)
 	private String enviamentCertificacioOrigen;
 	
+	@Column(name="not_env_registre_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date registreData;
+	@Column(name="not_env_registre_numero", length = 19)
+	private Integer registreNumero;
+	@Column(name="not_env_registre_num_formatat", length = 50)
+	private String registreNumeroFormatat;
+	
 	@Column(name = "error")
 	protected Boolean error;
 	@Column(name = "error_desc", length = ERROR_DESC_TAMANY)
@@ -145,6 +153,15 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 //		}
 	}
 	
+	public void updateEnviamentInfoRegistre(
+			Date registreData,
+			Integer numeroRegistre,
+			String numeroRegistreFormatat) {
+		this.registreData = registreData;
+		this.registreNumero = numeroRegistre;
+		this.registreNumeroFormatat = numeroRegistreFormatat;
+	}
+	
 	public InteressatEntity getInteressat() {
 		return interessat;
 	}
@@ -192,6 +209,41 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 
 	public String getErrorDescripcio() {
 		return errorDescripcio;
+	}
+
+
+	public Date getRegistreData() {
+		return registreData;
+	}
+
+
+
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+
+
+
+	public Integer getRegistreNumero() {
+		return registreNumero;
+	}
+
+
+
+	public void setRegistreNumero(Integer registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+
+
+
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+
+
+
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 
 

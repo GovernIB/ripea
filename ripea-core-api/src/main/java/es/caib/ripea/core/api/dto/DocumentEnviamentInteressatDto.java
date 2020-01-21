@@ -16,6 +16,10 @@ public class DocumentEnviamentInteressatDto {
 	private String enviamentCertificacioOrigen;
 	protected Boolean error;
 	protected String errorDescripcio;
+
+	private Date registreData;
+	private Integer registreNumero;
+	private String registreNumeroFormatat;
 	
 	public Long getId() {
 		return id;
@@ -64,6 +68,24 @@ public class DocumentEnviamentInteressatDto {
 	}
 	public void setEnviamentCertificacioOrigen(String enviamentCertificacioOrigen) {
 		this.enviamentCertificacioOrigen = enviamentCertificacioOrigen;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public Integer getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(Integer registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 	public Boolean getError() {
 		return error;

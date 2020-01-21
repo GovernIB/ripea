@@ -13,8 +13,34 @@
 .panel>.table-bordered>tbody>tr:last-child>td{
 border: 1px solid #ddd;
 }
-
 </style>	
+
+<script type="text/javascript">
+$(document).ready(function(){
+	//$('.numRegistre').text('tetete'); 
+	//recuperar informaciço
+	$('.registre').on('click', function(){
+		$(document).on({
+			ajaxStart: function() {
+				console.log("loading...");   
+			},
+			ajaxStop: function() {
+				console.log("loaded...");   
+			}    
+		});
+		
+//		$.ajax({
+//			type: 'GET',
+//			url: "<c:url value="/document/${notificacio.document.id}/notificacio/${notificacio.id}/registre/info"/>",
+//			success: function(data) {
+//				$('.numRegistre').text(data.numRegistreFormatat); 
+//				$('.dataRegistre').text(data.dataRegistre); 
+//			}
+//		});
+//	});
+	
+});
+</script>
 </head>
 <body>
 	<!---------------------------------------- TABLIST ------------------------------------------>
@@ -22,6 +48,12 @@ border: 1px solid #ddd;
 		<li class="active" role="presentation">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.dades"/></a>
 		</li>
+		<c:set var="ambRegistres" value="false"/>
+		<c:if test="${notificacio.notificacioEstat != null && notificacio.notificacioEstat != 'PENDENT' && notificacio.ambRegistres}">
+			<li role="presentation" class="registre">
+				<a href="#registre" role="tab" data-toggle="tab"><spring:message code="notificacio.info.pipella.registre"/></a>
+			</li>
+		</c:if>
 		<c:if test="${notificacio.error}">
 			<li role="presentation">
 				<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="notificacio.info.pipella.errors"/></a>
@@ -337,6 +369,58 @@ border: 1px solid #ddd;
 				</div>
 			</c:if>
 --%>
+		</div>
+		<!------------------------------ TABPANEL REGISTRE INFO ------------------------------------->
+		<div class="tab-pane" id="registre" role="tabpanel">
+		
+		<c:forEach var="enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
+		<c:set var="registreAnterior" value="${enviament.registreNumeroFormatat}"/>
+		<c:set var="isMateixRegistre" value="true"/>
+			<c:forEach var="_enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
+			<c:set var="registreActual" value="${_enviament.registreNumeroFormatat}"/>
+				<c:if test="${registreAnterior != registreActual}">
+       				<c:set var="isMateixRegistre" value="false"/>
+        		</c:if>
+			</c:forEach>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<c:choose>
+						<c:when test="${!isMateixRegistre}">
+							<h3 class="panel-title"><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</h3>
+						</c:when>
+						<c:otherwise>
+							<h3 class="panel-title"><spring:message code="notificacio.info.camp.notificacio"/></h3>
+						</c:otherwise>
+					</c:choose>
+					
+					
+				</div>
+					<table class="table table-bordered">
+						<c:if test="${enviament.registreNumeroFormatat != null}">
+							<tbody>
+								<tr>
+									<td><strong><spring:message code="notificacio.info.camp.num.registre"/></strong></td>
+									<td>${enviament.registreNumeroFormatat}</td>
+								</tr>
+								<tr>
+									<td><strong><spring:message code="notificacio.info.camp.data.registre"/></strong></td>
+									<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+								</tr>
+								<tr>
+									<td><strong><spring:message code="notificacio.info.camp.justificant"/></strong></td>
+									<td>
+									<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/${enviament.id}/descarregarJustificant'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+									<spring:message code="notificacio.info.camp.justificant.boto"/>
+										<span class="fa fa-download"></span>
+									</a>
+									</td>
+								</tr>
+							</tbody>
+						</c:if>
+			 		</table>
+			 	</div>
+		 </c:forEach>		
 		</div>
 	</div>
 	<div id="modal-botons" class="well">

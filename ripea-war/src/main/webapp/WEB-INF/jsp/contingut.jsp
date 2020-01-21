@@ -692,29 +692,29 @@ function getEnviamentsDocument(document) {
 		             	content += "</td>";
 		             	content += "<td width='20%'>" + new Date (val.createdDate).toLocaleString() + "</td>";
 		             	content += "<td width='10%'>";
-		             	if (val.estat == 'PENDENT') {
+		             	if (val.notificacioEstat == 'PENDENT') {
 		             		content += "<span class='label label-warning'><span class='fa fa-clock-o'></span> ";
 		             		content += "<spring:message code='notificacio.notificacioEstat.enum.PENDENT'/></span> ";
 		             		if (val.error) {
 		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 		             		}
-		             	} else if (val.estat == 'ENVIADA') {
-		             		content += "<span class='label label-warning'><span class='fa fa-envelope-o'></span> ";
+		             	} else if (val.notificacioEstat == 'ENVIADA') {
+		             		content += "<span class='label label-info'><span class='fa fa-envelope-o'></span> ";
 		             		content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA'/></span>";
 		             		if (val.error) {
 		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 		             		}
-		             	} else if (val.estat == 'REGISTRADA') {
-		             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+		             	} else if (val.notificacioEstat == 'REGISTRADA') {
+		             		content += "<span class='label label-success'><span class='fa fa-check'></span> ";
 		             		content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
-		             	} else if (val.estat == 'FINALITZADA') {
-		             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+		             	} else if (val.notificacioEstat == 'FINALITZADA') {
+		             		content += "<span class='label label-success'><span class='fa fa-check'></span> ";
 		             		content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA'/></span>";
 		             		if (val.error) {
 		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 		             		}
-		             	} else if (val.estat == 'PROCESSADA') {
-		             		content += "<span class='label label-warning'><span class='fa fa-check'></span> ";
+		             	} else if (val.notificacioEstat == 'PROCESSADA') {
+		             		content += "<span class='label label-success'><span class='fa fa-check'></span> ";
 		             		content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
 		             		if (val.error) {
 		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";

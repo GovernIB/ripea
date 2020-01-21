@@ -38,5 +38,18 @@ public interface NotificacioPlugin {
 	 */
 	public RespostaConsultaEstatEnviament consultarEnviament(
 			String referencia) throws SistemaExternException;
+	
+	/**
+	 * Consulta la informació del registre d'una notifiació.
+	 * 
+	 * @param identificador l'identificador de la notificació a consultar.
+	 * @param ambJustificant indicar si recuperar el justificant del registre o no.
+	 * @return informació del registre fet de la notificació indicada.
+	 * @throws SistemaExternException
+	 */
+	public RespostaConsultaInfoRegistre consultarRegistreInfo(
+			String identificador,
+			String referencia,
+			boolean ambJustificant) throws SistemaExternException;
 
 }

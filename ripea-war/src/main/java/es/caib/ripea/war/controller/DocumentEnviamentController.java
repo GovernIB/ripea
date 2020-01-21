@@ -34,6 +34,7 @@ import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
@@ -175,6 +176,34 @@ public class DocumentEnviamentController extends BaseUserController {
 						notificacioId));
 		return "notificacioInfo";
 	}
+
+	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/{enviamentId}/descarregarJustificant", method = RequestMethod.GET)
+	public String notificacioConsultarIDescarregarJustificant(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long documentId,
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		NotificacioInfoRegistreDto registreInfo = documentService.notificacioConsultarIDescarregarJustificant(
+				entitatActual.getId(),
+				documentId,
+				enviamentId);
+		
+		if (registreInfo.getJustificant() != null) {
+			writeFileToResponse(
+					registreInfo.getNumRegistreFormatat() != null ? "justificant" + registreInfo.getNumRegistreFormatat() + ".pdf" : "justificant.pdf",
+					registreInfo.getJustificant(),
+					response);
+		} else {
+			return this.getModalControllerReturnValueError(
+					request,
+					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
+					"expedient.controller.notificacio.justificant.ko");
+		}
+		return null;
+	}
+
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}", method = RequestMethod.GET)
 	public String notificacioUpdateGet(
