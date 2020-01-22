@@ -248,7 +248,7 @@ $(document).ready(function(){
 							      	<strong><spring:message code="notificacio.info.camp.estat"/></strong>
 							    </td>
 							    <td>
-							    	${enviament.enviamentDatatEstat}
+							    	<spring:message code="notificacio.enviamentEstat.enum.${enviament.enviamentDatatEstat}"/>
 							   	</td>					    
 							  </tr>
 						  </c:if>
