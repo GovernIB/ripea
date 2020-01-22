@@ -1026,7 +1026,7 @@ public class ContingutHelper {
 			} else if (contingut instanceof DocumentEntity) {
 				String custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
 						(DocumentEntity) contingut,
-						contingut.getPare(),
+						isCarpetaLogica() ? contingut.getExpedientPare() : contingut.getPare(),
 						serieDocumental,
 						fitxer,
 						documentAmbFirma,
@@ -1053,9 +1053,10 @@ public class ContingutHelper {
 
 			//##################### CARPETA #####################
 			} else if (contingut instanceof CarpetaEntity) {
-				//pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
-				//		contingut.getPare());
-
+				if (!isCarpetaLogica()) {
+					pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
+							contingut.getPare());
+				}
 			} else {
 				throw new ValidationException(
 						contingut.getId(),
@@ -1241,6 +1242,11 @@ public class ContingutHelper {
 	
 	public String getBaseDir() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
+	}
+	
+	public boolean isCarpetaLogica() {
+		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
+		return Boolean.valueOf(carpetesLogiques);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
