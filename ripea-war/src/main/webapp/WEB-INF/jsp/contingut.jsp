@@ -503,6 +503,7 @@ $(document).ready(function() {
 				alert('browser does not support HTML5 drag and drop')
 				break;
 			case 'TooManyFiles':
+				alert('Només es pemet adjuntar un document a la vegada!')
 				break;
 			case 'FileTooLarge':
 				break;
@@ -521,10 +522,14 @@ $(document).ready(function() {
 			$('#drag_container').css('background-color', '#f5f5f5');
 		},
 		drop: function(e) {
-			let files = e.originalEvent.dataTransfer.files;
-			$('#drag_container').css('background-color', '#f5f5f5');
-			document.querySelector('#dropped-files').files = files;
-			$('#document-new').trigger('click');
+			if (e.originalEvent.dataTransfer != null) {
+				let files = e.originalEvent.dataTransfer.files;
+				$('#drag_container').css('background-color', '#f5f5f5');
+				if (!(files.length > 1)) {
+					document.querySelector('#dropped-files').files = files;
+					$('#document-new').trigger('click');
+				}
+			}
 		}
 	});
 

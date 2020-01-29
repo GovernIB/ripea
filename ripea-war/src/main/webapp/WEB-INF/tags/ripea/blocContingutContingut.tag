@@ -88,10 +88,6 @@
 				</c:if>
 			</c:forEach>
 		</ul>
-		<div id="drag_container" class="drag_activated">
-			<span class="down fa fa-upload"></span>
-			<p><spring:message code="contingut.drag.info"/></p>
-		</div>
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
 		<%--------------------- TABLE -------------------%>
@@ -181,13 +177,16 @@
 				</c:forEach>
 			</tbody>
 		</table>
-		<div id="drag_container" class="drag_activated">
-			<span class="down fa fa-upload"></span>
-			<p><spring:message code="contingut.drag.info"/></p>
-		</div>
 	</c:when>
 </c:choose>
+
 <c:if test="${empty fills}">
 	<h1 style="opacity: .1; text-align: center; margin-top: 1em"><rip:blocIconaContingut contingut="${fill}" tamanyEnorme="true"/></h1>
 	<h3 style="opacity: .2; text-align: center; margin-bottom: 3em"><strong><spring:message code="contingut.sense.contingut"/></strong></h3>
+</c:if>
+<c:if test="${contingut.estat != 'TANCAT'}">
+	<div id="drag_container" class="drag_activated">
+		<span class="down fa fa-upload"></span>
+		<p><spring:message code="contingut.drag.info"/></p>
+	</div>
 </c:if>
