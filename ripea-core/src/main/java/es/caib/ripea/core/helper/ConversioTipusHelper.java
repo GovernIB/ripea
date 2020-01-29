@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
+import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
@@ -27,6 +30,8 @@ import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.entity.AlertaEntity;
+import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
@@ -145,6 +150,37 @@ public class ConversioTipusHelper {
 						target.setEntregaDehObligat(source.getEntregaDehObligat());
 						target.setIncapacitat(source.getIncapacitat());
 						target.setRepresentant(source.getRepresentant() != null ? convertir(source.getRepresentant(),InteressatDto.class) : null);
+						return target;
+					}
+				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<CarpetaEntity, ContingutDto>() {
+					@Override
+					public CarpetaDto convert(CarpetaEntity source, Type<? extends ContingutDto> destinationType) {
+						CarpetaDto target = new CarpetaDto();
+						if(source instanceof HibernateProxy) {
+							HibernateProxy hibernateProxy = (HibernateProxy) source;
+							LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+							source = (CarpetaEntity)initializer.getImplementation();
+						}
+						target.setArxiuDataActualitzacio(source.getArxiuDataActualitzacio());
+						target.setArxiuUuid(source.getArxiuUuid());
+						target.setCreatedBy(convertir(
+								source.getCreatedBy(), 
+								UsuariDto.class));
+						target.setCreatedDate(source.getCreatedDate().toDate());
+						target.setEntitat(convertir(
+								source.getEntitat(),
+								EntitatDto.class));
+						target.setEsborrat(source.getEsborrat());
+						target.setEsborratData(source.getEsborratData());
+						target.setId(source.getId());
+						target.setLastModifiedBy(convertir(
+								source.getLastModifiedBy(), 
+								UsuariDto.class));
+						target.setLastModifiedDate(source.getLastModifiedDate().toDate());
+						target.setNom(source.getNom());
 						return target;
 					}
 				});
