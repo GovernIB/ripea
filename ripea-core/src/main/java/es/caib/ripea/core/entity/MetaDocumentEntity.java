@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -46,8 +47,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "portafirmes_respons", length = 512)
 	private String portafirmesResponsables;
 	@Enumerated(EnumType.STRING)
-	@Column(name = "portafirmes_fluxtip")
-	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+	@Column(name = "portafirmes_seqtip")
+	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	@Column(name = "portafirmes_custip", length = 64)
 	private String portafirmesCustodiaTipus;
 	@Column(name = "firma_passarela")
@@ -86,6 +87,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Enumerated(EnumType.STRING)
 	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "portafirmes_fluxtip")
+	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+	
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
@@ -103,8 +108,11 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			return null;
 		return portafirmesResponsables.split(",");
 	}
-	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
-		return portafirmesFluxTipus;
+	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesSequenciaTipus() {
+		return portafirmesSequenciaTipus;
+	}
+	public MetaDocumentTipusGenericEnumDto getMetaDocumentTipusGeneric() {
+		return metaDocumentTipusGeneric;
 	}
 	public String getPortafirmesCustodiaTipus() {
 		return portafirmesCustodiaTipus;
@@ -142,6 +150,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public boolean isBiometricaLectura() {
 		return biometricaLectura;
 	}
+	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
+		return portafirmesFluxTipus;
+	}
 	
 	public void update(
 			String codi,
@@ -152,7 +163,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String portafirmesDocumentTipus,
 			String portafirmesFluxId,
 			String[] portafirmesResponsables,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus,
 			String portafirmesCustodiaTipus,
 			boolean firmaPassarelaActiva,
 			String firmaPassarelaCustodiaTipus,
@@ -160,7 +171,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
 			boolean firmaBiometricaActiva,
-			boolean biometricaLectura) {
+			boolean biometricaLectura,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		update(
 				codi,
 				nom,
@@ -170,7 +182,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.portafirmesDocumentTipus = portafirmesDocumentTipus;
 		this.portafirmesFluxId = portafirmesFluxId;
 		this.portafirmesResponsables = getResponsablesFromArray(portafirmesResponsables);
-		this.portafirmesFluxTipus = portafirmesFluxTipus;
+		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
 		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus;
 		this.firmaPassarelaActiva = firmaPassarelaActiva;
 		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus;
@@ -179,6 +191,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.ntiTipoDocumental = ntiTipoDocumental;
 		this.firmaBiometricaActiva = firmaBiometricaActiva;
 		this.biometricaLectura = biometricaLectura;
+		this.portafirmesFluxTipus = portafirmesFluxTipus;
 	}
 
 	public void updatePlantilla(
@@ -267,8 +280,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.portafirmesResponsables = getResponsablesFromArray(portafirmesResponsables);
 			return this;
 		}
-		public Builder portafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
-			built.portafirmesFluxTipus = portafirmesFluxTipus;
+		public Builder portafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus) {
+			built.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
 			return this;
 		}
 		public Builder portafirmesCustodiaTipus(String portafirmesCustodiaTipus) {
@@ -281,6 +294,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		}
 		public Builder firmaPassarelaCustodiaTipus(String firmaPassarelaCustodiaTipus) {
 			built.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus;
+			return this;
+		}
+		public Builder portafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+			built.portafirmesFluxTipus = portafirmesFluxTipus;
 			return this;
 		}
 		public MetaDocumentEntity build() {

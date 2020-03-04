@@ -6,19 +6,24 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-pageContext.setAttribute(
+	pageContext.setAttribute(
 		"idioma",
 		org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());
 pageContext.setAttribute(
 		"multiplicitatEnumOptions",
 		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-				es.caib.ripea.core.api.dto.MultiplicitatEnumDto.class,
-				"multiplicitat.enum."));
+		es.caib.ripea.core.api.dto.MultiplicitatEnumDto.class,
+		"multiplicitat.enum."));
+pageContext.setAttribute(
+		"metadocumentSequenciatipEnumOptions",
+		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
+		"metadocument.seqtip.enum."));
 pageContext.setAttribute(
 		"metadocumentFluxtipEnumOptions",
 		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-				es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
-				"metadocument.fluxtip.enum."));
+		es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
+		"metadocument.fluxtip.enum."));
 %>
 
 <c:choose>
@@ -28,6 +33,7 @@ pageContext.setAttribute(
 <html>
 <head>
 	<title>${titol}</title>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
@@ -37,10 +43,45 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 	
-	
+<style type="text/css">
+.ui-dialog {
+	z-index: 1000;
+}
+.modal-dialog {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.modal-content {
+	height: auto;
+	min-height: 100%;
+}
+
+.iframe_container {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-bottom: 40%;
+}
+
+.iframe_content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+#fluxModal {
+	margin: 1%;
+}
+.portafirmesFluxId_btn:hover {
+	cursor: pointer;
+}
+</style>	
 <script type="text/javascript">
 	$(document).ready(function() {
-		
+		console.log(localStorage.getItem('fluxid'));
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
 				$(".callback").removeClass("hidden");
@@ -62,6 +103,77 @@ pageContext.setAttribute(
 	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
 	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
 	            }			
+		});
+		
+		$("#portafirmesFluxTipus").on('change', function(){
+			if($(this).val() == 'SIMPLE') {
+				$('.flux_portafib').hide();
+				$('.flux_simple').show();
+			} else {
+				$('.flux_portafib').show();
+				$('.flux_simple').hide();
+			}
+		});
+		
+		$("#portafirmesFluxTipus").trigger('change');
+		
+		$(".portafirmesFluxId_btn").on('click', function(){
+			var tipusDocumentNom = '${metaDocumentCommand.nom}';
+			$.ajax({
+				type: 'GET',
+				dataType: "json",
+				data: {tipusDocumentNom: tipusDocumentNom},
+				url: "<c:url value="/modal/metaExpedient/metaDocument/iniciarTransaccio"/>",
+				success: function(transaccioResponse) {
+					if (transaccioResponse != null) {
+						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+						$("#fluxModal").modal('show');
+						$("#fluxModal").find(".modal-body").html('<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+						webutilModalAdjustHeight();
+					}
+				},
+				error: function(err) {
+					console.log("Error recuperant la transacció");
+				}
+			});
+		});
+		
+		$("#fluxModal").on('hidden.bs.modal', function() {
+			var fluxid = localStorage.getItem('fluxid');
+			var FluxError = localStorage.getItem('FluxError');
+			var FluxCreat = localStorage.getItem('FluxCreat');
+			var alertDiv;
+			
+			if (FluxError != null && FluxError != '') {
+				alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>'
+			} else if (FluxCreat != null && FluxCreat != '') {
+				alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span></div>'
+			}
+			$(alertDiv).insertBefore("form");
+			
+			if (fluxid != null && fluxid != '')
+				$('#portafirmesFluxId').val(fluxid);
+			
+			localStorage.removeItem('fluxid');
+			localStorage.removeItem('FluxError');
+			localStorage.removeItem('FluxCreat');
+		});
+		
+		$("#fluxModal").on('hide.bs.modal', function() {
+			var idTransaccio = localStorage.getItem('transaccioId');
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value='/modal/metaExpedient/metaDocument/tancarTransaccio/" + idTransaccio + "'/>",
+				error: function(err) {
+					console.log("Error tancant la transacció");
+				},
+				complete: function() {
+					localStorage.removeItem('transaccioId');
+				}
+			});
+		});
+		$('.modal-cancel').on('click', function(){
+			localStorage.getItem('transaccioId');
 		});
 	});
 </script>
@@ -108,20 +220,25 @@ pageContext.setAttribute(
 				</c:choose>
 				<%--rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id"/--%>
 				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
-				
-				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
-					name="portafirmesResponsables" 
-					urlConsultaInicial="${urlConsultaInicial}" 
-					urlConsultaLlistat="${urlConsultaLlistat}" 
-					textKey="metadocument.form.camp.portafirmes.responsables"
-					suggestValue="codi"
-					suggestText="nom"
-					suggestTextAddicional="nif"
-					required="true"/>
-			
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<div class="flux_portafib">
+					<rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
+				</div>
+				<div class="flux_simple">
+					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<rip:inputSuggest 
+						name="portafirmesResponsables" 
+						urlConsultaInicial="${urlConsultaInicial}" 
+						urlConsultaLlistat="${urlConsultaLlistat}" 
+						textKey="metadocument.form.camp.portafirmes.responsables"
+						suggestValue="codi"
+						suggestText="nom"
+						suggestTextAddicional="nif"
+						required="true"/>
+				
+					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				</div>					
 				<rip:inputText name="portafirmesCustodiaTipus" textKey="metadocument.form.camp.portafirmes.custodia"/>				
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-passarela">
@@ -137,8 +254,21 @@ pageContext.setAttribute(
 		</div>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/metaDocument"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/metaDocument"/>" class="btn btn-default modal-cancel" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
+	
+	<div class="modal fade" id="fluxModal" tabindex="-1" role="dialog" aria-labelledby="fluxModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="fluxModalLabel"><spring:message code="metadocument.form.camp.portafirmes.flux"/></h4>
+	      </div>
+	      <div class="modal-body">
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </body>
 </html>

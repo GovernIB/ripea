@@ -4,12 +4,8 @@
 <head>
 <script>
 let rootIframe = window.frameElement;
-while (rootIframe && rootIframe.ownerDocument.defaultView.frameElement) {
-	rootIframe = rootIframe.ownerDocument.defaultView.frameElement;
-}
 if (rootIframe) {
-	rootIframe.src = '../modal/tancar';
-	//rootIframe.parentElement.parentElement.querySelector('button.close').click()
+	rootIframe.parentElement.parentElement.querySelector('button.close').click();
 }
 </script>
 </head>

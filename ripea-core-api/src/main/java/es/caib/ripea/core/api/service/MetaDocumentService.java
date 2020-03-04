@@ -268,17 +268,45 @@ public interface MetaDocumentService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus();
 	
-	
+	/**
+	 * Consulta la llista de tipus de document del plugin de portafirmes.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del tipus d'expedient.
+	 * @return La llista de tipus o null si el plugin no suporta la consulta.
+	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId);
-
+	
+	/**
+	 * Consulta la llista de tipus de document del plugin de portafirmes.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaDocumentId
+	 *            Id del tipus de document.
+	 * @return El tipus de document o null si el plugin no suporta la consulta.
+	 */
 	@PreAuthorize("hasRole('tothom')")
-	MetaDocumentDto findById(Long entitatId,
+	MetaDocumentDto findById(
+			Long entitatId,
 			Long metaDocumentId);
 	
+	/**
+	 * Consulta la llista de tipus de document del plugin de portafirmes.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param tipusGeneric
+	 *            El tipus genèric del que es volen recuperar el tipus.
+	 * @return El tipus de document genèric o null si el plugin no suporta la consulta.
+	 */
 	@PreAuthorize("hasRole('tothom')")
 	MetaDocumentDto findByTipusGeneric(
 			Long entitatId,
 			MetaDocumentTipusGenericEnumDto tipusGeneric);
 
+	
 }

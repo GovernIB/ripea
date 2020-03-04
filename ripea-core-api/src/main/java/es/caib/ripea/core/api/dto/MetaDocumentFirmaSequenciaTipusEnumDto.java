@@ -9,7 +9,7 @@ package es.caib.ripea.core.api.dto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum MetaDocumentFirmaFluxTipusEnumDto {
-	SIMPLE,
-	PORTAFIB
+public enum MetaDocumentFirmaSequenciaTipusEnumDto {
+	SERIE,
+	PARALEL
 }

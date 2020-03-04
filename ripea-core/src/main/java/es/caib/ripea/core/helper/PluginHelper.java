@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.core.helper;
 
@@ -64,12 +64,14 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxErrorTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
@@ -112,6 +114,7 @@ import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -126,7 +129,7 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
@@ -148,7 +151,7 @@ public class PluginHelper {
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 	private ViaFirmaPlugin viaFirmaPlugin;
-	
+
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -225,7 +228,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException {
 		String accioDescripcio = "Consulta d'usuaris d'un filtre";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -257,10 +260,10 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
 			String pareCodi) {
 		String accioDescripcio = "Consulta llista d'unitats donat un pare";
@@ -382,14 +385,14 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindByFiltre(
-			String codiUnitat, 
+			String codiUnitat,
 			String denominacioUnitat,
-			String codiNivellAdministracio, 
-			String codiComunitat, 
-			String codiProvincia, 
-			String codiLocalitat, 
+			String codiNivellAdministracio,
+			String codiComunitat,
+			String codiProvincia,
+			String codiLocalitat,
 			Boolean esUnitatArrel) {
 		String accioDescripcio = "Consulta d'unitats organitzatives donat un filtre";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -404,13 +407,13 @@ public class PluginHelper {
 		try {
 			List<UnitatOrganitzativaDto> unitatsOrganitzatives = conversioTipusHelper.convertirList(
 					getUnitatsOrganitzativesPlugin().cercaUnitats(
-							codiUnitat, 
-							denominacioUnitat, 
-							toLongValue(codiNivellAdministracio), 
-							toLongValue(codiComunitat), 
-							false, 
-							esUnitatArrel, 
-							toLongValue(codiProvincia), 
+							codiUnitat,
+							denominacioUnitat,
+							toLongValue(codiNivellAdministracio),
+							toLongValue(codiComunitat),
+							false,
+							esUnitatArrel,
+							toLongValue(codiProvincia),
 							codiLocalitat),
 					UnitatOrganitzativaDto.class);
 			integracioHelper.addAccioOk(
@@ -533,7 +536,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public Expedient arxiuExpedientConsultarPerUuid(
 			String uuid) {
 		String accioDescripcio = "Consulta d'un expedient per uuid";
@@ -541,7 +544,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		try {
 			Expedient arxiuExpedient = getArxiuPlugin().expedientDetalls(
-					uuid, 
+					uuid,
 					null);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
@@ -637,7 +640,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public void arxiuExpedientEsborrarPerUuid(
 			String uuid) {
 		String accioDescripcio = "Eliminació d'un expedient";
@@ -792,7 +795,7 @@ public class PluginHelper {
 		accioParams.put("serieDocumental", serieDocumental);
 		long t0 = System.currentTimeMillis();
 		try {
-			
+
 			if (document.getArxiuUuid() == null) {
 				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
 						toArxiuDocument(
@@ -868,7 +871,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 
 
 	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid){
@@ -881,20 +884,20 @@ public class PluginHelper {
 				noms.add(contingut.getNom());
 			}
 			String newName = new String(nomPerComprovar);
-			
+
 			while(noms.indexOf(newName) >= 0) {
 				ocurrences ++;
 				newName = nomPerComprovar + " (" + ocurrences + ")";
 			}
 
 			return newName;
-		
+
 	}
 	return nomPerComprovar;
 }
-	
 
-	
+
+
 	/*public void arxiuFirmaActualitzar(
 			DocumentEntity document,
 			FitxerDto fitxer,
@@ -941,7 +944,7 @@ public class PluginHelper {
 				document.updateArxiu(
 						documentCreat.getIdentificador());
 			}
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -977,8 +980,8 @@ public class PluginHelper {
 				ambContingut,
 				false);
 	}
-	
-	
+
+
 	public Document arxiuDocumentConsultar(
 			ContingutEntity contingut,
 			String arxiuUuid,
@@ -1189,7 +1192,7 @@ public class PluginHelper {
 			List<ArxiuFirmaDto> firmes = null;
 			if (getPropertyArxiuFirmaDetallsActiu()) {
 				firmes = validaSignaturaObtenirFirmes(
-						fitxerPdfFirmat.getContingut(), 
+						fitxerPdfFirmat.getContingut(),
 						null,
 						fitxerAmbFirma.getContentType());
 			} else {
@@ -1227,7 +1230,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
-			
+
 			if (getArxiuPlugin().suportaMetadadesNti()) {
 				Document documentDetalls = getArxiuPlugin().documentDetalls(
 						documentModificat.getIdentificador(),
@@ -1237,9 +1240,9 @@ public class PluginHelper {
 						documentDetalls,
 						document);
 			}
-			
-			
-			
+
+
+
 			return document.getId().toString();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1268,7 +1271,7 @@ public class PluginHelper {
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
-		
+
 		String serieDocumental = null;
 		ExpedientEntity expedientSuperior = document.getExpedient();
 		if (expedientSuperior != null) {
@@ -1317,7 +1320,7 @@ public class PluginHelper {
 					ex);
 		}
 	}*/
-	
+
 	public void arxiuDocumentCopiar(
 			DocumentEntity document,
 			String arxiuUuidDesti) {
@@ -1353,7 +1356,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public ContingutArxiu arxiuDocumentLink(
 			DocumentEntity document,
 			String arxiuUuidDesti) {
@@ -1706,7 +1709,7 @@ public class PluginHelper {
 		try {
 			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
 					numeroRegistre);
-			
+
 			return contingutArxiu;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1724,7 +1727,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public Document importarDocument(
 			String arxiuUuidPare,
 			String arxiuUuid,
@@ -1736,10 +1739,10 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		try {
 			Document document = getArxiuPlugin().documentDetalls(
-					arxiuUuid, 
-					null, 
+					arxiuUuid,
+					null,
 					false);
-			
+
 			if (moureDocument) {
 				nouContingut = getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
 			}
@@ -1768,7 +1771,7 @@ public class PluginHelper {
 			Date dataCaducitat,
 			String documentTipus,
 			String[] responsables,
-			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+			MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
 			String fluxId,
 			List<DocumentEntity> annexos) {
 
@@ -1783,7 +1786,7 @@ public class PluginHelper {
 				fluxTipus,
 				fluxId,
 				annexos);
-		
+
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
 		portafirmesDocument.setTitol(document.getNom());
 		portafirmesDocument.setFirmat(
@@ -1805,7 +1808,7 @@ public class PluginHelper {
 		portafirmesDocument.setArxiuContingut(
 				fitxerConvertit.getContingut());
 		List<PortafirmesFluxBloc> flux = new ArrayList<PortafirmesFluxBloc>();
-		if (MetaDocumentFirmaFluxTipusEnumDto.SERIE.equals(fluxTipus)) {
+		if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
 			for (String responsable: responsables) {
 				PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
 				bloc.setMinSignataris(1);
@@ -1813,7 +1816,7 @@ public class PluginHelper {
 				bloc.setObligatorietats(new boolean[] {true});
 				flux.add(bloc);
 			}
-		} else if (MetaDocumentFirmaFluxTipusEnumDto.PARALEL.equals(fluxTipus)) {
+		} else if (MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL.equals(fluxTipus)) {
 			PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
 			bloc.setMinSignataris(responsables.length);
 			bloc.setDestinataris(responsables);
@@ -1868,7 +1871,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 
 	public PortafirmesDocument portafirmesDownload(
 			DocumentPortafirmesEntity documentPortafirmes) {
@@ -1999,6 +2002,99 @@ public class PluginHelper {
 		return !getPortafirmesPlugin().isCustodiaAutomatica();
 	}
 
+	public Map<String, String> portafirmesIniciarFluxDeFirma(
+			String idioma,
+			boolean isPlantilla,
+			String nom,
+			String descripcio,
+			boolean descripcioVisible,
+			String urlReturn) {
+		String accioDescripcio = "Iniciant flux de firma";
+		long t0 = System.currentTimeMillis();
+		Map<String, String> transaccioResponse = new HashMap<String, String>();
+		try {
+			transaccioResponse = getPortafirmesPlugin().iniciarFluxDeFirma(
+					idioma,
+					isPlantilla,
+					nom,
+					descripcio,
+					descripcioVisible,
+					urlReturn);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return transaccioResponse;
+	}
+	
+	public PortafirmesFluxRespostaDto portafirmesRecuperarFluxDeFirma(
+			String idTransaccio) {
+		String accioDescripcio = "Recuperant flux de firma";
+		long t0 = System.currentTimeMillis();
+		PortafirmesFluxRespostaDto respostaDto;
+		try {
+			respostaDto = new PortafirmesFluxRespostaDto();
+			PortafirmesFluxResposta resposta = getPortafirmesPlugin().recuperarFluxDeFirma(
+					idTransaccio);
+			
+			if (resposta != null) {
+				respostaDto.setError(resposta.isError());
+				respostaDto.setFluxId(resposta.getFluxId());
+				respostaDto.setErrorTipus(resposta.getErrorTipus() != null ? PortafirmesFluxErrorTipusDto.valueOf(resposta.getErrorTipus().toString()) : null);
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return respostaDto;
+	}
+	
+	public void portafirmesTancarFluxDeFirma(
+			String idTransaccio) {
+		String accioDescripcio = "Tancant flux de firma";
+		long t0 = System.currentTimeMillis();
+		try {
+			getPortafirmesPlugin().tancarTransaccioFlux(
+					idTransaccio);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
 	public String conversioConvertirPdfArxiuNom(
 			String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);
@@ -2392,7 +2488,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public List<Provincia> dadesExternesProvinciesFindAll() {
 		String accioDescripcio = "Consulta de totes les províncies";
 		long t0 = System.currentTimeMillis();
@@ -2647,26 +2743,26 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
-	
+
+
 
 
 
 	public RespostaEnviar notificacioEnviar(
 			DocumentNotificacioDto notificacioDto,
-			ExpedientEntity expedientEntity, 
+			ExpedientEntity expedientEntity,
 			DocumentEntity documentEntity,
 			List<InteressatEntity> interessats) {
-		
+
 
 		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
 		String accioDescripcio = "Enviament d'una notificació electrònica";
-		
+
 		Map<String, String> accioParams = getNotificacioAccioParams(notificacioDto, expedientEntity, documentEntity, interessats);
-		
+
 		long t0 = System.currentTimeMillis();
 		try {
-			
+
 			Notificacio notificacio = new Notificacio();
 			String forsarEntitat = getPropertyNotificacioForsarEntitat();
 			if (forsarEntitat != null) {
@@ -2674,14 +2770,14 @@ public class PluginHelper {
 			} else {
 				notificacio.setEmisorDir3Codi(expedientEntity.getEntitat().getUnitatArrel());
 			}
-			
+
 			notificacio.setEnviamentTipus(notificacioDto.getTipus() != null ? EnviamentTipus.valueOf(notificacioDto.getTipus().toString()) : null);
 			notificacio.setConcepte(notificacioDto.getAssumpte());
 			notificacio.setDescripcio(notificacioDto.getObservacions());
 			notificacio.setEnviamentDataProgramada(notificacioDto.getDataProgramada());
 			notificacio.setRetard(
 					(notificacioDto.getRetard() != null) ? notificacioDto.getRetard() : getPropertyNotificacioRetardNumDies());
-			
+
 			if (notificacioDto.getDataCaducitat() != null) {
 				notificacio.setCaducitat(notificacioDto.getDataCaducitat());
 			} else {
@@ -2694,20 +2790,20 @@ public class PluginHelper {
 					notificacio.setCaducitat(cal.getTime());
 				}
 			}
-			
+
 			FitxerDto fitxer =  arxiuDocumentVersioImprimible(documentEntity);
 //			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
 			notificacio.setDocumentArxiuNom(fitxer.getNom());
 			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
-			
+
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
 			for(InteressatEntity interessatEntity: interessats) {
-				
+
 				Enviament enviament = new Enviament();
 				enviament.setTitular(convertirAmbPersona(interessatEntity));
-				
+
 				if (interessatEntity.getIncapacitat() != null && interessatEntity.getIncapacitat() == true) {
 					if (interessatEntity.getRepresentant() != null) {
 						enviament.setDestinataris(Arrays.asList(convertirAmbPersona(interessatEntity.getRepresentant())));
@@ -2729,7 +2825,7 @@ public class PluginHelper {
 								interessatPerAdresa.getPais(),
 								PaisDto.class);
 					}
-					
+
 					ProvinciaDto provincia = dadesExternesHelper.getProvinciaAmbCodi(
 							interessatPerAdresa.getProvincia());
 					if (provincia == null) {
@@ -2755,7 +2851,7 @@ public class PluginHelper {
 
 					enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
 					enviament.setEntregaPostalPaisCodi(interessatPerAdresa.getPais());
-					
+
 				}
 				// ########## ENVIAMENT DEH  ###############
 				if (interessatEntity.getEntregaDeh() != null && interessatEntity.getEntregaDeh()) {
@@ -2767,10 +2863,10 @@ public class PluginHelper {
 				}
 				enviaments.add(enviament);
 			}
-			
+
 			notificacio.setEnviaments(enviaments);
-			
-			notificacio.setUsuariCodi(usuari.getCodi());			
+
+			notificacio.setUsuariCodi(usuari.getCodi());
 			notificacio.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());
 
 			// ############## ALTA NOTIFICACIO #######################
@@ -2782,9 +2878,9 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			
+
 			return respostaEnviar;
-			
+
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de notificacions";
 			integracioHelper.addAccioError(
@@ -2801,7 +2897,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public byte[] notificacioConsultarIDescarregarCertificacio(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 
@@ -2814,9 +2910,9 @@ public class PluginHelper {
 		byte[] certificacio = resposta.getCertificacioContingut();
 		return certificacio;
 	}
-	
-	
-	
+
+
+
 
 	public RespostaConsultaInfoRegistre notificacioConsultarIDescarregarJustificant(
 			DocumentEnviamentInteressatEntity documentEnviamentEtity) {
@@ -2834,17 +2930,17 @@ public class PluginHelper {
 
 	public void notificacioConsultarIActualitzarEstat(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-		
+
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		
+
 		String accioDescripcio = "Consulta d'estat d'una notificació electrònica";
 		Map<String, String> accioParams = getAccioParams(documentEnviamentInteressatEntity);
 		long t0 = System.currentTimeMillis();
 		try {
-			
+
 			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(
 					documentEnviamentInteressatEntity.getEnviamentReferencia());
-			
+
 			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
 			if (resposta.getCertificacioData() != null) {
 				byte[] certificacio = resposta.getCertificacioContingut();
@@ -2859,7 +2955,7 @@ public class PluginHelper {
 							new ByteArrayInputStream(certificacio));
 				}
 			}
-			
+
 			documentEnviamentInteressatEntity.updateEnviamentEstat(
 					resposta.getEstat(),
 					resposta.getEstatData(),
@@ -2868,22 +2964,22 @@ public class PluginHelper {
 					resposta.getCertificacioOrigen(),
 					resposta.isError(),
 					resposta.getErrorDescripcio());
-			
-			
+
+
 
 			actualitzarDadesRegistre(documentEnviamentInteressatEntity);
-			
+
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(
 					documentEnviamentInteressatEntity.getNotificacio().getEnviamentIdentificador());
-			
-			
+
+
 			notificacio.updateNotificacioEstat(
 					respostaNotificioEstat.getEstat(),
 					resposta.getEstatData(),
 					respostaNotificioEstat.isError(),
 					respostaNotificioEstat.getErrorDescripcio(),
 					gestioDocumentalId);
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,
@@ -2916,14 +3012,14 @@ public class PluginHelper {
 					null,
 					enviament.getEnviamentReferencia(),
 					false);
-	
+
 			if (respostaInfoRegistre != null) {
 				enviament.updateEnviamentInfoRegistre(
 						respostaInfoRegistre.getDataRegistre(),
 						respostaInfoRegistre.getNumRegistre(),
 						respostaInfoRegistre.getNumRegistreFormatat());
 			}
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,
@@ -2962,7 +3058,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public void gestioDocumentalUpdate(
 			String id,
 			String agrupacio,
@@ -3012,7 +3108,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public String viaFirmaUpload(
 			DocumentEntity document,
 			DocumentViaFirmaEntity documentViaFirmaEntity) {
@@ -3045,7 +3141,7 @@ public class PluginHelper {
 			viaFirmaDispositiu.setLocal(documentViaFirmaEntity.getDispositiuEnviament().getLocal());
 			viaFirmaDispositiu.setTipus(documentViaFirmaEntity.getDispositiuEnviament().getTipus());
 			viaFirmaDispositiu.setToken(documentViaFirmaEntity.getDispositiuEnviament().getToken());
-			
+
 			String encodedBase64 = new String(Base64.encodeBase64(fitxerConvertit.getContingut()));
 			parametresViaFirma.setContingut(encodedBase64);
 			parametresViaFirma.setCodiUsuari(documentViaFirmaEntity.getCodiUsuari());
@@ -3054,7 +3150,7 @@ public class PluginHelper {
 			parametresViaFirma.setLecturaObligatoria(documentViaFirmaEntity.isLecturaObligatoria());
 			parametresViaFirma.setTitol(documentViaFirmaEntity.getTitol());
 			parametresViaFirma.setViaFirmaDispositiu(viaFirmaDispositiu);
-			
+
 			viaFirmaResponse = getViaFirmaPlugin().uploadDocument(parametresViaFirma);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
@@ -3073,7 +3169,7 @@ public class PluginHelper {
 		}
 		return viaFirmaResponse.getCodiMissatge();
 	}
-	
+
 	public ViaFirmaDocument viaFirmaDownload(DocumentViaFirmaEntity documentViaFirma) {
 		String accioDescripcio = "Descarregar document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -3118,18 +3214,18 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
 	public List<ViaFirmaDispositiuDto> getDeviceUser(
 			String codiUsuari,
 			String contasenya) {
 		List<ViaFirmaDispositiuDto> viaFirmaDispositiusDto = new ArrayList<ViaFirmaDispositiuDto>();
 		try {
-			
+
 			List<ViaFirmaDispositiu> viaFirmaDispositius = getViaFirmaPlugin().getDeviceUser(
 					codiUsuari,
 					contasenya);
 			viaFirmaDispositiusDto = conversioTipusHelper.convertirList(
-					viaFirmaDispositius, 
+					viaFirmaDispositius,
 					ViaFirmaDispositiuDto.class);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
@@ -3140,7 +3236,7 @@ public class PluginHelper {
 		}
 		return viaFirmaDispositiusDto;
 	}
-	
+
 	private boolean gestioDocumentalPluginConfiguracioProvada = false;
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
@@ -3308,7 +3404,7 @@ public class PluginHelper {
 			boolean enPaper,
 			String serieDocumental) {
 		Document document = new Document();
-		
+
 		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
 		document.setNom(documentNomInArxiu);
 		document.setIdentificador(documentUuid);
@@ -3668,7 +3764,7 @@ public class PluginHelper {
 
 	private Persona convertirAmbPersona(InteressatEntity interessat) {
 		interessat = HibernateHelper.deproxy(interessat);
-		
+
 		Persona persona = new Persona();
 		persona.setNif(interessat.getDocumentNum());
 		if (interessat instanceof InteressatPersonaFisicaEntity) {
@@ -3862,7 +3958,7 @@ public class PluginHelper {
 		String ntiCsv = null;
 		String ntiCsvRegulacion = null;
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-			
+
 			FirmaTipus firmaTipus = null;
 			for (Firma firma : documentArxiu.getFirmes()) {
 				if (firma.getTipus() != FirmaTipus.CSV) {
@@ -3899,7 +3995,7 @@ public class PluginHelper {
 				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
 				break;
 			}
-			
+
 			for (Firma firma : documentArxiu.getFirmes()) {
 				if (firma.getTipus() == FirmaTipus.CSV) {
 					ntiCsvRegulacion = firma.getCsvRegulacio();
@@ -3930,7 +4026,7 @@ public class PluginHelper {
 		}
 		return null;
 	}
-	
+
 	private Map<String, String> getAccioParamsPerPortaFirmesUpload(
 			DocumentEntity document,
 			String motiu,
@@ -3938,10 +4034,10 @@ public class PluginHelper {
 			Date dataCaducitat,
 			String documentTipus,
 			String[] responsables,
-			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+			MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
 			String fluxId,
 			List<DocumentEntity> annexos) {
-		
+
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put(
 				"documentId",
@@ -3982,14 +4078,14 @@ public class PluginHelper {
 			accioParams.put("annexosTitols", annexosTitols.toString());
 		}
 		return accioParams;
-	}	
-	
+	}
+
 	private Map<String, String> getAccioParams(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-		
+
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		ExpedientEntity expedient = notificacio.getExpedient();
 		DocumentEntity document = notificacio.getDocument();
-		
+
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
 		accioParams.put("expedientId", expedient.getId().toString());
@@ -4004,10 +4100,10 @@ public class PluginHelper {
 		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
 		return accioParams;
 	}
-	
 
 
-	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {		
+
+	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {
 		ArxiuFirmaPerfilEnumDto perfilFirma = null;
 		switch (perfil) {
 		case "AdES-BES":
@@ -4039,7 +4135,7 @@ public class PluginHelper {
 	}
 	private ArxiuFirmaTipusEnumDto toArxiuFirmaTipusEnum(
 			String tipus,
-			String format) {		
+			String format) {
 		ArxiuFirmaTipusEnumDto tipusFirma = null;
 		if (tipus.equals("PAdES") || format.equals("implicit_enveloped/attached")) {
 			tipusFirma = ArxiuFirmaTipusEnumDto.PADES;
@@ -4054,7 +4150,7 @@ public class PluginHelper {
 		}
 		return tipusFirma;
 	}
-	
+
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 		if (dadesUsuariPlugin == null) {
 			String pluginClass = getPropertyPluginDadesUsuari();
@@ -4208,12 +4304,12 @@ public class PluginHelper {
 		}
 		return ciutadaPlugin;
 	}*/
-	
-	
+
+
 	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {
-		
+
 		Map<String, String> accioParams = new HashMap<String, String>();
-		
+
 		accioParams.put("setEmisorDir3Codi", expedientEntity.getEntitat().getUnitatArrel());
 		accioParams.put("expedientId", expedientEntity.getId().toString());
 		accioParams.put("expedientTitol", expedientEntity.getNom());
@@ -4239,10 +4335,10 @@ public class PluginHelper {
 		if (notificacio.getDataCaducitat() != null) {
 			accioParams.put("dataCaducitat", notificacio.getDataCaducitat().toString());
 		}
-		
+
 		return accioParams;
-	}	
-	
+	}
+
 	private DadesExternesPlugin getDadesExternesPlugin() {
 		if (dadesExternesPlugin == null) {
 			String pluginClass = getPropertyPluginDadesExternes();
@@ -4325,7 +4421,7 @@ public class PluginHelper {
 					viaFirmaPlugin = (ViaFirmaPlugin)clazz.newInstance();
 				} catch (Exception ex) {
 					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_VIAFIRMA, 
+							IntegracioHelper.INTCODI_VIAFIRMA,
 							"Error al crear la instància del plugin de via firma",
 							ex);
 				}

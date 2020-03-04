@@ -106,6 +106,22 @@
 			<artifactId>portafib-ws-api</artifactId>
 			<version>${portafib.version}</version>
 		</dependency>
+		<!-- Flux firma -->
+		<dependency>
+	      <artifactId>apiplantillafluxsimple-api</artifactId>
+	      <groupId>org.fundaciobit.apisib.apiplantillafluxsimple</groupId>
+	      <version>1.0</version>
+	   </dependency>
+	   <dependency>
+	      <artifactId>apiplantillafluxsimple-jersey</artifactId>
+	      <groupId>org.fundaciobit.apisib.apiplantillafluxsimple</groupId>
+	      <version>1.0.0</version>
+	    </dependency>
+	   	<dependency>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<version>2.4.2</version>
+		</dependency>
 		<!-- Signatura en el servidor amb PortaFib -->
 		<dependency>
 			<groupId>org.fundaciobit.plugins</groupId>

@@ -1,10 +1,11 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -24,17 +26,19 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.MetaDocumentFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
 
 /**
  * Controlador per al manteniment de meta-documents.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -47,7 +51,9 @@ public class MetaDocumentController extends BaseAdminController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	
+	@Autowired
+	private MetaDocumentFluxService metaDocumentFluxService;
+
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -191,7 +197,7 @@ public class MetaDocumentController extends BaseAdminController {
 			metaDocumentService.delete(
 					entitatActual.getId(),
 					metaExpedientId,
-					metaDocumentId);	
+					metaDocumentId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
@@ -201,22 +207,22 @@ public class MetaDocumentController extends BaseAdminController {
 				String excMsg = exc.getCause().getCause().getMessage();
 				if (excMsg.contains("ORA-02292")) {
 					return getAjaxControllerReturnValueError(
-							request, 
+							request,
 							"redirect:../../esborrat",
 							"meta.document.noespotesborrar");
 				} else {
 					return getAjaxControllerReturnValueErrorMessageText(
-							request, 
+							request,
 							"redirect:../../esborrat",
 							exc.getCause().getCause().getMessage());
 				}
 			} else {
 				return getAjaxControllerReturnValueErrorMessageText(
-						request, 
+						request,
 						"redirect:../../metaExpedient",
 						exc.getMessage());
 			}
-		}		
+		}
 	}
 
 	@RequestMapping(value = "/metaDocument/findAll", method = RequestMethod.GET)
@@ -226,6 +232,79 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaDocumentService.findByEntitat(entitatActual.getId());
+	}
+
+	@RequestMapping(value = "/metaDocument/iniciarTransaccio", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, String> iniciarTransaccio(
+			HttpServletRequest request,
+			@RequestParam(value="tipusDocumentNom", required = false) String tipusDocumentNom,
+			Model model) {
+		String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
+		Map<String, String> transaccioResponse = metaDocumentFluxService.iniciarFluxFirma(
+				urlReturn,
+				tipusDocumentNom);
+		return transaccioResponse;
+	}
+
+	@RequestMapping(value = "/metaDocument/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
+	@ResponseBody
+	public void tancarTransaccio(
+			HttpServletRequest request,
+			@PathVariable String idTransaccio,
+			Model model) {
+		metaDocumentFluxService.tancarTransaccio(idTransaccio);
+	}
+
+	@RequestMapping(value = "/metaDocument/flux/returnurl/{transactionId}", method = RequestMethod.GET)
+	public String transaccioEstat(
+			HttpServletRequest request,
+			@PathVariable String transactionId,
+			Model model) {
+		PortafirmesFluxRespostaDto resposta = metaDocumentFluxService.recuperarFluxFirma(transactionId);
+
+		if (resposta.isError() && resposta.getErrorTipus() != null) {
+			switch (resposta.getErrorTipus()) {
+			case INITIALIZING:
+				model.addAttribute(
+						"FluxError",
+						getMessage(
+						request,
+						"metadocument.form.camp.portafirmes.flux.enum.INITIALIZING"));
+				break;
+			case IN_PROGRESS:
+				model.addAttribute(
+						"FluxError",
+						getMessage(
+						request,
+						"metadocument.form.camp.portafirmes.flux.enum.IN_PROGRESS"));
+				break;
+			case CANCELLED:
+				model.addAttribute(
+						"FluxError",
+						getMessage(
+						request,
+						"metadocument.form.camp.portafirmes.flux.enum.CANCELLED"));
+				break;
+			case FINAL_ERROR:
+				model.addAttribute(
+						"FluxError",
+						getMessage(
+						request,
+						"metadocument.form.camp.portafirmes.flux.enum.FINAL_ERROR"));
+				break;
+			default:
+				break;
+			}
+		} else {
+			model.addAttribute(
+					"FluxCreat",
+					getMessage(
+					request,
+					"metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
+			model.addAttribute("fluxId", resposta.getFluxId());
+		}
+		return "portafirmesModalTancar";
 	}
 
 	public void emplenarModelForm(
@@ -253,7 +332,7 @@ public class MetaDocumentController extends BaseAdminController {
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiEstadoElaboracionEnumDto.class,
 						"document.nti.estela.enum."));
-		model.addAttribute("isFirmaBiometrica", 
+		model.addAttribute("isFirmaBiometrica",
 				Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 
 	}

@@ -98,7 +98,7 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
-		command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+		command.setPortafirmesFluxTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		model.addAttribute(command);
 		return "portafirmesForm";

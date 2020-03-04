@@ -109,10 +109,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
 				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
 				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
-				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
+				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
 				portafirmesCustodiaTipus(metaDocument.getPortafirmesCustodiaTipus()).
 				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
 				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
+				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
 				build();
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
@@ -159,7 +160,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getPortafirmesDocumentTipus(),
 				metaDocument.getPortafirmesFluxId(),
 				metaDocument.getPortafirmesResponsables(),
-				metaDocument.getPortafirmesFluxTipus(),
+				metaDocument.getPortafirmesSequenciaTipus(),
 				metaDocument.getPortafirmesCustodiaTipus(),
 				metaDocument.isFirmaPassarelaActiva(),
 				metaDocument.getFirmaPassarelaCustodiaTipus(),
@@ -167,7 +168,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isFirmaBiometricaActiva(),
-				metaDocument.isBiometricaLectura());
+				metaDocument.isBiometricaLectura(),
+				metaDocument.getPortafirmesFluxTipus());
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
 					plantillaNom,

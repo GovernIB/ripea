@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,18 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplate;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetFlowResultResponse;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetTransactionIdRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStartTransactionRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStatus;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.jersey.ApiFlowTemplateSimpleJersey;
+import org.fundaciobit.apisib.core.exceptions.ApisIBClientException;
+import org.fundaciobit.apisib.core.exceptions.ApisIBServerException;
+import org.fundaciobit.apisib.core.exceptions.ApisIBTimeOutException;
+import org.slf4j.LoggerFactory;
+
 import es.caib.portafib.ws.api.v1.FitxerBean;
 import es.caib.portafib.ws.api.v1.FluxDeFirmesWs;
 import es.caib.portafib.ws.api.v1.PeticioDeFirmaWs;
@@ -39,6 +52,8 @@ import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxErrorTipus;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
@@ -46,7 +61,7 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
 /**
  * Implementació del plugin de portafirmes emprant el portafirmes
  * de la CAIB desenvolupat per l'IBIT (PortaFIB).
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class PortafirmesPluginPortafib implements PortafirmesPlugin {
@@ -167,7 +182,212 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		return false;
 	}
 
+	@Override
+	public Map<String, String> iniciarFluxDeFirma(
+			String idioma,
+			boolean isPlantilla,
+			String nom,
+			String descripcio,
+			boolean descripcioVisible,
+			String urlReturn) throws SistemaExternException {
+		Map<String, String> transaccioResponse = new HashMap<String, String>();
+		try {
+			String idTransaccio = getTransaction(
+					idioma,
+					isPlantilla,
+					nom,
+					descripcio,
+					descripcioVisible);
 
+			String urlRedireccio = startTransaction(
+					idTransaccio,
+					urlReturn + idTransaccio);
+			transaccioResponse.put("idTransaccio", idTransaccio);
+			transaccioResponse.put("urlRedireccio", urlRedireccio);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return transaccioResponse;
+	}
+
+	@Override
+	public PortafirmesFluxResposta recuperarFluxDeFirma(String idTransaccio) throws SistemaExternException {
+		PortafirmesFluxResposta resposta = new PortafirmesFluxResposta();
+		try {
+			FlowTemplateSimpleGetFlowResultResponse result = getFlowTemplateResult(idTransaccio);
+			FlowTemplateSimpleStatus transactionStatus = result.getStatus();
+			int status = transactionStatus.getStatus();
+
+			switch (status) {
+
+				case FlowTemplateSimpleStatus.STATUS_INITIALIZING:
+					{
+						resposta.setError(true);
+						resposta.setErrorTipus(PortafirmesFluxErrorTipus.INITIALIZING);
+						logger.error("S'ha rebut un estat inconsistent del procés de construcció del flux."
+								+ " (Inialitzant). Consulti amb el seu administrador.");
+						return resposta;
+					}
+				case FlowTemplateSimpleStatus.STATUS_IN_PROGRESS:
+					{
+						resposta.setError(true);
+						resposta.setErrorTipus(PortafirmesFluxErrorTipus.IN_PROGRESS);
+						logger.error("S'ha rebut un estat inconsistent de construcció "
+								+ "del flux (En Progrés). Consulti amb el seu administrador.");
+						return resposta;
+					}
+				case FlowTemplateSimpleStatus.STATUS_FINAL_ERROR:
+					{
+						String desc = transactionStatus.getErrorStackTrace();
+						resposta.setError(true);
+						resposta.setErrorTipus(PortafirmesFluxErrorTipus.FINAL_ERROR);
+
+						if (desc != null) {
+							logger.error(desc);
+						}
+						logger.error("Error durant la construcció del flux: " + transactionStatus.getErrorMessage());
+						return resposta;
+					}
+				case FlowTemplateSimpleStatus.STATUS_CANCELLED:
+					{
+						resposta.setError(true);
+						resposta.setErrorTipus(PortafirmesFluxErrorTipus.CANCELLED);
+						logger.error("L'usuari ha cancelat la construcció del flux");
+						return resposta;
+					}
+				case FlowTemplateSimpleStatus.STATUS_FINAL_OK:
+					{
+						FlowTemplateSimpleFlowTemplate flux = result.getFlowInfo();
+
+						resposta.setError(false);
+						resposta.setFluxId(flux.getIntermediateServerFlowTemplateId());
+					}
+					break;
+
+				default: {
+					throw new Exception("Codi d'estat desconegut (" + status + ")");
+				}
+			}
+		} catch (ApisIBClientException ex) {
+			throw new SistemaExternException(
+					"S'ha produït un error en el ConnectionManager del Client",
+					ex);
+		} catch (ApisIBServerException ex) {
+			throw new SistemaExternException(
+					"S'ha produït un error indeterminat al Servidor",
+					ex);
+		} catch (ApisIBTimeOutException ex) {
+			throw new SistemaExternException(
+					"Problemes de comunicació amb el servidor intermedi",
+					ex);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"S'ha produït un error en el ConnectionManager del Client",
+					ex);
+		} finally {
+			try {
+				closeTransaction(idTransaccio);
+			} catch (Exception ex) {
+				throw new SistemaExternException(
+						"S'ha produït un error tancant la transacció",
+						ex);
+			}
+		}
+		return resposta;
+	}
+
+	public void tancarTransaccioFlux (String idTransaccio) throws SistemaExternException {
+		try {
+			closeTransaction(idTransaccio);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"S'ha produït un error tancant la transacció",
+					ex);
+		}
+	}
+
+	private String getTransaction(
+			String idioma,
+			boolean isPlantilla,
+			String nom,
+			String descripcio,
+			boolean descripcioVisible) throws SistemaExternException {
+		String transactionId = null;
+		FlowTemplateSimpleGetTransactionIdRequest transactionRequest;
+
+		try {
+			transactionRequest = new FlowTemplateSimpleGetTransactionIdRequest(
+					idioma,
+					isPlantilla,
+					nom,
+					descripcio,
+					descripcioVisible);
+
+			transactionId = getFluxDeFirmaClient().getTransactionID(transactionRequest);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut recuperar el id de la transacció (" +
+					"nom=" + nom + ", " +
+					"descripcio=" + descripcio + ")",
+					ex);
+		}
+		return transactionId;
+	}
+
+	private String startTransaction(
+			String idTransaccio,
+			String urlReturn) throws SistemaExternException {
+		String urlRedireccio = null;
+		FlowTemplateSimpleStartTransactionRequest transactionRequest;
+
+		try {
+			transactionRequest = new FlowTemplateSimpleStartTransactionRequest(
+					idTransaccio,
+					urlReturn);
+
+			urlRedireccio = getFluxDeFirmaClient().startTransaction(transactionRequest);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut iniciar la transacció (" +
+					"transactionId=" + idTransaccio + ", " +
+					"returnUrl=" + urlReturn + ")",
+					ex);
+		}
+		return urlRedireccio;
+	}
+
+	private FlowTemplateSimpleGetFlowResultResponse getFlowTemplateResult(
+			String transactionID) {
+		FlowTemplateSimpleGetFlowResultResponse result = null;
+
+		try {
+			result = getFluxDeFirmaClient().getFlowTemplateResult(transactionID);
+			System.out.println(result.getStatus());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		return result;
+	}
+
+	private void closeTransaction(
+			String transactionID) {
+		try {
+			getFluxDeFirmaClient().closeTransaction(transactionID);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+	}
+
+	private ApiFlowTemplateSimple getFluxDeFirmaClient() throws MalformedURLException {
+		String apiRestUrl = getBaseUrl() + "/common/rest/apiflowtemplatesimple/v1";
+		ApiFlowTemplateSimple api = new ApiFlowTemplateSimpleJersey(
+				apiRestUrl,
+				getUsername(),
+				getPassword());
+		return api;
+	}
 
 	private FitxerBean toFitxerBean(
 			PortafirmesDocument document) throws Exception {
@@ -345,5 +565,6 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			}
 		}
 	}
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PortafirmesPluginPortafib.class);
 
 }

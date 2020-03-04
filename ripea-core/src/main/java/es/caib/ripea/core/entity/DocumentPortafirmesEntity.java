@@ -14,7 +14,7 @@ import javax.persistence.TemporalType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 
@@ -38,7 +38,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	@Column(name = "pf_responsables", length = 1024)
 	private String responsables;
 	@Column(name = "pf_flux_tipus")
-	private MetaDocumentFirmaFluxTipusEnumDto fluxTipus;
+	private MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus;
 	@Column(name = "pf_flux_id", length = 64)
 	private String fluxId;
 	@Column(name = "pf_portafirmes_id", length = 64, unique = true)
@@ -58,7 +58,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	public String[] getResponsables() {
 		return responsables.split(",");
 	}
-	public MetaDocumentFirmaFluxTipusEnumDto getFluxTipus() {
+	public MetaDocumentFirmaSequenciaTipusEnumDto getFluxTipus() {
 		return fluxTipus;
 	}
 	public String getFluxId() {
@@ -90,7 +90,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			Date caducitatData,
 			String documentTipus,
 			String[] responsables,
-			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+			MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
 			String fluxId,
 			ExpedientEntity expedient,
 			DocumentEntity document) {
@@ -116,7 +116,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				Date caducitatData,
 				String documentTipus,
 				String[] responsables,
-				MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
+				MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
 				String fluxId,
 				ExpedientEntity expedient,
 				DocumentEntity document) {

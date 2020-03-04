@@ -46,7 +46,7 @@ import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -104,7 +104,7 @@ public class DocumentHelper {
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +

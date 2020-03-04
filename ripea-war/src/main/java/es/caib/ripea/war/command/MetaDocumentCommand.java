@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -54,7 +55,7 @@ public class MetaDocumentCommand {
 	@Size(max=64)
 	private String portafirmesFluxId;
 	private String[] portafirmesResponsables;
-	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	@Size(max=64)
 	private String portafirmesCustodiaTipus;
 	private boolean firmaPassarelaActiva;
@@ -70,7 +71,7 @@ public class MetaDocumentCommand {
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;	
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
-	
+	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	
 	public Long getId() {
 		return id;
@@ -132,11 +133,11 @@ public class MetaDocumentCommand {
 	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
 		this.portafirmesResponsables = portafirmesResponsables;
 	}
-	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
-		return portafirmesFluxTipus;
+	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesSequenciaTipus() {
+		return portafirmesSequenciaTipus;
 	}
-	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
-		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	public void setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus) {
+		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
 	}
 	public String getPortafirmesCustodiaTipus() {
 		return portafirmesCustodiaTipus;
@@ -203,6 +204,12 @@ public class MetaDocumentCommand {
 	}
 	public void setBiometricaLectura(boolean biometricaLectura) {
 		this.biometricaLectura = biometricaLectura;
+	}
+	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
+		return portafirmesFluxTipus;
+	}
+	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+		this.portafirmesFluxTipus = portafirmesFluxTipus;
 	}
 	
 	public static List<MetaDocumentCommand> toEntitatCommands(

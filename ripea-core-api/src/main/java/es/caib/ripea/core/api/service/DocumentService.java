@@ -13,7 +13,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -241,7 +241,7 @@ public interface DocumentService {
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) throws NotFoundException, IllegalStateException, SistemaExternException;
+			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Recupera els dispositius disponibles per un usuari

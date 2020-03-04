@@ -37,6 +37,7 @@ import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
@@ -205,8 +206,26 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 		return true;
 	}
 
+	@Override
+	public Map<String, String> iniciarFluxDeFirma(
+			String idioma,
+			boolean isPlantilla,
+			String nom,
+			String descripcio,
+			boolean descripcioVisible,
+			String urlReturn) throws SistemaExternException {
+		
+		return new HashMap<String, String>();
+	}
+	
+	@Override
+	public PortafirmesFluxResposta recuperarFluxDeFirma(String idTransaccio) {
+		return new PortafirmesFluxResposta();
+	}
 
-
+	@Override
+	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {}
+	
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,
 			String documentTipus,

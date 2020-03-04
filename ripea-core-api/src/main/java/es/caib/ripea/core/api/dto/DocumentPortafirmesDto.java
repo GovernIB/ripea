@@ -17,7 +17,7 @@ public class DocumentPortafirmesDto extends DocumentEnviamentDto {
 	private Date caducitatData;
 	private String documentTipus;
 	private String[] responsables;
-	private MetaDocumentFirmaFluxTipusEnumDto fluxTipus;
+	private MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus;
 	private String fluxId;
 	private String portafirmesId;
 	private PortafirmesCallbackEstatEnumDto callbackEstat;
@@ -46,10 +46,10 @@ public class DocumentPortafirmesDto extends DocumentEnviamentDto {
 	public void setResponsables(String[] responsables) {
 		this.responsables = responsables;
 	}
-	public MetaDocumentFirmaFluxTipusEnumDto getFluxTipus() {
+	public MetaDocumentFirmaSequenciaTipusEnumDto getFluxTipus() {
 		return fluxTipus;
 	}
-	public void setFluxTipus(MetaDocumentFirmaFluxTipusEnumDto fluxTipus) {
+	public void setFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus) {
 		this.fluxTipus = fluxTipus;
 	}
 	public String getFluxId() {

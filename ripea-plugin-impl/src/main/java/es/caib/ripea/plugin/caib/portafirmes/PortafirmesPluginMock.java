@@ -3,14 +3,23 @@
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetFlowResultResponse;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetTransactionIdRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStartTransactionRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.jersey.ApiFlowTemplateSimpleJersey;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 
@@ -74,4 +83,55 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 		return false;
 	}
 
+	@Override
+	public Map<String, String> iniciarFluxDeFirma(
+			String idioma,
+			boolean isPlantilla,
+			String nom,
+			String descripcio,
+			boolean descripcioVisible,
+			String urlReturn) throws SistemaExternException {
+		Map<String, String> transaccioResponse = null;
+		try {
+//			String idTransaccio = getTransaction(
+//					idioma, 
+//					isPlantilla, 
+//					nom, 
+//					descripcio, 
+//					descripcioVisible);
+//			
+//			urlRedireccio = startTransaction(
+//					idTransaccio, 
+//					urlReturn + idTransaccio);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return transaccioResponse;
+	}
+	
+	@Override
+	public PortafirmesFluxResposta recuperarFluxDeFirma(String idTransaccio) {
+		PortafirmesFluxResposta urlRedireccio = null;
+		try {
+//			FlowTemplateSimpleGetFlowResultResponse result = getFluxDeFirmaClient().getFlowTemplateResult(idTransaccio);
+//			
+//			result.getFlowInfo().getIntermediateServerFlowTemplateId();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				// getFluxDeFirmaClient().closeTransaction(idTransaccio);
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
+		}
+		return urlRedireccio;
+	}
+
+	@Override
+	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		
+	}
 }

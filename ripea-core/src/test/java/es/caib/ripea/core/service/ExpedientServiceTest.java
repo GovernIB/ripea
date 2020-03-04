@@ -29,7 +29,7 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
@@ -101,7 +101,7 @@ public class ExpedientServiceTest extends BaseServiceTest {
 		metaDocument.setPortafirmesDocumentTipus("1234");
 		metaDocument.setPortafirmesFluxId("1234");
 		metaDocument.setPortafirmesResponsables(new String[] {"123456789Z"});
-		metaDocument.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SERIE);
+		metaDocument.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocument.setPortafirmesCustodiaTipus("1234");
 		metaDocument.setFirmaPassarelaCustodiaTipus("1234");
 		metaExpedient = new MetaExpedientDto();
