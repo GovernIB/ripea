@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.core.service;
 
@@ -17,7 +17,6 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -32,7 +31,7 @@ import es.caib.ripea.core.helper.PluginHelper;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
@@ -58,7 +57,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		ExpedientEntity expedientSuperior;
 		FitxerDto fitxer = new FitxerDto();;
 		List<DocumentDto> listDto = new ArrayList<DocumentDto>();
-		
+
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -66,25 +65,25 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false,
 				false);
-		
+
 		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(numeroRegistre);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			expedientSuperior = (ExpedientEntity)contingut;
 		} else {
 			expedientSuperior = contingut.getExpedient();
 		}
-		
+
 		for (ContingutArxiu documentArxiu : documentsArxiu) {
-			
+
 			Document document = pluginHelper.importarDocument(
 					expedientSuperior.getArxiuUuid(),
 					documentArxiu.getIdentificador(),
 					true);
-			
+
 			fitxer.setNom(document.getNom());
 			fitxer.setContentType(document.getContingut().getTipusMime());
 			fitxer.setContingut(document.getContingut().getContingut());
-			
+
 			DocumentEntity entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.DIGITAL,
 					document.getNom(),
@@ -101,7 +100,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 					expedientSuperior,
 					null,
 					document.getIdentificador());
-			
+
 			if (fitxer != null) {
 				entity.updateFitxer(
 						fitxer.getNom(),
@@ -130,10 +129,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 				true,
 				false);
 	}
-	
+
 	private static NtiOrigenEnumDto getOrigen(Document document) {
-		NtiOrigenEnumDto origen = null; 
-		
+		NtiOrigenEnumDto origen = null;
+
 		switch (document.getMetadades().getOrigen()) {
 		case CIUTADA:
 			origen = NtiOrigenEnumDto.O0;
@@ -144,10 +143,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 		}
 		return origen;
 	}
-	
+
 	private static DocumentNtiEstadoElaboracionEnumDto getEstatElaboracio(Document document) {
 		DocumentNtiEstadoElaboracionEnumDto estatElaboracio = null;
-		
+
 		switch (document.getMetadades().getEstatElaboracio()) {
 		case ORIGINAL:
 			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE01;
@@ -168,74 +167,79 @@ public class ImportacioServiceImpl implements ImportacioService {
 		return estatElaboracio;
 	}
 
-	private static DocumentNtiTipoDocumentalEnumDto getTipusDocumental(Document document) {
-		DocumentNtiTipoDocumentalEnumDto tipusDocumental = null;
-		
-		switch (document.getMetadades().getTipusDocumental()) {
-		case RESOLUCIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD01;
-			break;
-		case ACORD:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD02;
-			break;
-		case CONTRACTE:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD03;
-			break;
-		case CONVENI:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD04;
-			break;
-		case DECLARACIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD05;
-			break;
-		case COMUNICACIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD06;
-			break;
-		case NOTIFICACIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD07;
-			break;
-		case PUBLICACIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD08;
-			break;
-		case JUSTIFICANT_RECEPCIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD09;
-			break;
-		case ACTA:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD10;
-			break;
-		case CERTIFICAT:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD11;
-			break;
-		case DILIGENCIA:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD12;
-			break;
-		case INFORME:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD13;
-			break;
-		case SOLICITUD:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD14;
-			break;
-		case DENUNCIA:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD15;
-			break;
-		case ALEGACIO:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD16;
-			break;
-		case RECURS:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD17;
-			break;
-		case COMUNICACIO_CIUTADA:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD18;
-			break;
-		case FACTURA:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD19;
-			break;
-		case ALTRES_INCAUTATS:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD20;
-			break;
-		case ALTRES:
-			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD99;
-			break;
+	private static String getTipusDocumental(Document document) {
+		String tipusDocumental = null;
+
+		if (document.getMetadades().getTipusDocumental() != null) {
+			switch (document.getMetadades().getTipusDocumental()) {
+			case RESOLUCIO:
+				tipusDocumental = "TD01";
+				break;
+			case ACORD:
+				tipusDocumental = "TD02";
+				break;
+			case CONTRACTE:
+				tipusDocumental = "TD03";
+				break;
+			case CONVENI:
+				tipusDocumental = "TD04";
+				break;
+			case DECLARACIO:
+				tipusDocumental = "TD05";
+				break;
+			case COMUNICACIO:
+				tipusDocumental = "TD06";
+				break;
+			case NOTIFICACIO:
+				tipusDocumental = "TD07";
+				break;
+			case PUBLICACIO:
+				tipusDocumental = "TD08";
+				break;
+			case JUSTIFICANT_RECEPCIO:
+				tipusDocumental = "TD09";
+				break;
+			case ACTA:
+				tipusDocumental = "TD10";
+				break;
+			case CERTIFICAT:
+				tipusDocumental = "TD11";
+				break;
+			case DILIGENCIA:
+				tipusDocumental = "TD12";
+				break;
+			case INFORME:
+				tipusDocumental = "TD13";
+				break;
+			case SOLICITUD:
+				tipusDocumental = "TD14";
+				break;
+			case DENUNCIA:
+				tipusDocumental = "TD15";
+				break;
+			case ALEGACIO:
+				tipusDocumental = "TD16";
+				break;
+			case RECURS:
+				tipusDocumental = "TD17";
+				break;
+			case COMUNICACIO_CIUTADA:
+				tipusDocumental = "TD18";
+				break;
+			case FACTURA:
+				tipusDocumental = "TD19";
+				break;
+			case ALTRES_INCAUTATS:
+				tipusDocumental = "TD20";
+				break;
+			case ALTRES:
+				tipusDocumental = "TD99";
+				break;
+			}
+		} else if (document.getMetadades().getTipusDocumentalAddicional() != null) {
+			tipusDocumental = document.getMetadades().getTipusDocumentalAddicional();
 		}
+
 		return tipusDocumental;
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ImportacioServiceImpl.class);

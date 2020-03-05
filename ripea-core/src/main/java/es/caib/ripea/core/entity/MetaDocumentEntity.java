@@ -19,7 +19,6 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
@@ -74,8 +73,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Column(name = "nti_tipdoc", length = 4)
-	@Enumerated(EnumType.STRING)
-	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private String ntiTipoDocumental;
 	
 	@Column(name = "firma_biometrica")
 	private boolean firmaBiometricaActiva;
@@ -133,7 +131,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
 	}
-	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+	public String getNtiTipoDocumental() {
 		return ntiTipoDocumental;
 	}
 	public boolean isFirmaBiometricaActiva() {
@@ -158,7 +156,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String firmaPassarelaCustodiaTipus,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+			String ntiTipoDocumental,
 			boolean firmaBiometricaActiva,
 			boolean biometricaLectura) {
 		update(
@@ -198,7 +196,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			MetaExpedientEntity metaExpedient,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+			String ntiTipoDocumental) {
 		return new Builder(
 				entitat,
 				codi,
@@ -219,7 +217,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				MetaExpedientEntity metaExpedient,
 				NtiOrigenEnumDto ntiOrigen,
 				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-				DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+				String ntiTipoDocumental) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;

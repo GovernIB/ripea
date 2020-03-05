@@ -10,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,90 +17,66 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
 /**
- * Classe del model de dades que representa una tasca d'un meta-expedient.
+ * Classe del model de dades que representa un meta-document.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(
-		name = "ipa_metaexp_domini",
-		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {"codi", "meta_expedient_id"})
-		})
+@Table(name = "ipa_tipus_documental")
 @EntityListeners(AuditingEntityListener.class)
-public class MetaExpedientDominiEntity extends RipeaAuditable<Long> {
+public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codi;
 	@Column(name = "nom", length = 256, nullable = false)
 	private String nom;
-	@Column(name = "descripcio", length = 1024)
-	private String descripcio;
-	
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "meta_expedient_id")
-	@ForeignKey(name = "ipa_metaexp_metaexpdom_fk")
-	private MetaExpedientEntity metaExpedient;
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
-	@ForeignKey(name = "ipa_entitat_metexp_metaedom_fk")
+	@ForeignKey(name = "ipa_entitat_tipus_doc_fk")
 	protected EntitatEntity entitat;
 	
 	public String getCodi() {
 		return codi;
 	}
+
 	public String getNom() {
 		return nom;
 	}
-	public String getDescripcio() {
-		return descripcio;
-	}
+
 	public EntitatEntity getEntitat() {
 		return entitat;
-	}
-	public MetaExpedientEntity getMetaExpedient() {
-		return metaExpedient;
 	}
 
 	public void update(
 			String codi,
-			String nom,
-			String descripcio) {
+			String nom) {
 		this.codi = codi;
 		this.nom = nom;
-		this.descripcio = descripcio;
 	}
-	
+
 	public static Builder getBuilder(
 			String codi,
 			String nom,
-			String descripcio,
-			EntitatEntity entitat,
-			MetaExpedientEntity metaExpedient) {
+			EntitatEntity entitat) {
 		return new Builder(
 				codi,
 				nom,
-				descripcio,
-				entitat,
-				metaExpedient);
+				entitat);
 	}
 	public static class Builder {
-		MetaExpedientDominiEntity built;
+		TipusDocumentalEntity built;
 		Builder(
 				String codi,
 				String nom,
-				String descripcio,
-				EntitatEntity entitat,
-				MetaExpedientEntity metaExpedient) {
-			built = new MetaExpedientDominiEntity();
+				EntitatEntity entitat) {
+			built = new TipusDocumentalEntity();
 			built.codi = codi;
 			built.nom = nom;
-			built.descripcio = descripcio;
 			built.entitat = entitat;
-			built.metaExpedient = metaExpedient;
+			
 		}
-		public MetaExpedientDominiEntity build() {
+		public TipusDocumentalEntity build() {
 			return built;
 		}
 	}
@@ -111,7 +86,6 @@ public class MetaExpedientDominiEntity extends RipeaAuditable<Long> {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
-		result = prime * result + ((metaExpedient == null) ? 0 : metaExpedient.hashCode());
 		return result;
 	}
 	@Override
@@ -122,19 +96,14 @@ public class MetaExpedientDominiEntity extends RipeaAuditable<Long> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MetaExpedientDominiEntity other = (MetaExpedientDominiEntity) obj;
+		TipusDocumentalEntity other = (TipusDocumentalEntity) obj;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;
-		} else if (!codi.equals(other.codi))
-			return false;
-		if (metaExpedient == null) {
-			if (other.metaExpedient != null)
-				return false;
-		} else if (!metaExpedient.equals(other.metaExpedient))
-			return false;
+		}
 		return true;
 	}
-	
-	private static final long serialVersionUID = -5248524362190811653L;
+
+	private static final long serialVersionUID = -2299453443943600172L;
+
 }

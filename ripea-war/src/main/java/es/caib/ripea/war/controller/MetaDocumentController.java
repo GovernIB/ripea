@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.war.controller;
 
@@ -19,22 +19,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
 
 /**
  * Controlador per al manteniment de meta-documents.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -47,7 +48,9 @@ public class MetaDocumentController extends BaseAdminController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	
+	@Autowired
+	private TipusDocumentalService tipusDocumentalService;
+
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -106,7 +109,7 @@ public class MetaDocumentController extends BaseAdminController {
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
-		emplenarModelForm(model);
+		emplenarModelForm(request,model);
 		return "metaDocumentForm";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.POST)
@@ -118,7 +121,7 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelForm(model);
+			emplenarModelForm(request,model);
 			return "metaDocumentForm";
 		}
 		if (command.getId() != null) {
@@ -191,7 +194,7 @@ public class MetaDocumentController extends BaseAdminController {
 			metaDocumentService.delete(
 					entitatActual.getId(),
 					metaExpedientId,
-					metaDocumentId);	
+					metaDocumentId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
@@ -201,22 +204,22 @@ public class MetaDocumentController extends BaseAdminController {
 				String excMsg = exc.getCause().getCause().getMessage();
 				if (excMsg.contains("ORA-02292")) {
 					return getAjaxControllerReturnValueError(
-							request, 
+							request,
 							"redirect:../../esborrat",
 							"meta.document.noespotesborrar");
 				} else {
 					return getAjaxControllerReturnValueErrorMessageText(
-							request, 
+							request,
 							"redirect:../../esborrat",
 							exc.getCause().getCause().getMessage());
 				}
 			} else {
 				return getAjaxControllerReturnValueErrorMessageText(
-						request, 
+						request,
 						"redirect:../../metaExpedient",
 						exc.getMessage());
 			}
-		}		
+		}
 	}
 
 	@RequestMapping(value = "/metaDocument/findAll", method = RequestMethod.GET)
@@ -229,8 +232,12 @@ public class MetaDocumentController extends BaseAdminController {
 	}
 
 	public void emplenarModelForm(
+			HttpServletRequest request,
 			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
+		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(
+				entitatActual.getId());
 		model.addAttribute(
 				"isPortafirmesDocumentTipusSuportat",
 				new Boolean(tipus != null));
@@ -245,15 +252,13 @@ public class MetaDocumentController extends BaseAdminController {
 						"document.nti.origen.enum."));
 		model.addAttribute(
 				"ntiTipusDocumentalOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiTipoDocumentalEnumDto.class,
-						"document.nti.tipdoc.enum."));
+				tipusDocumental);
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiEstadoElaboracionEnumDto.class,
 						"document.nti.estela.enum."));
-		model.addAttribute("isFirmaBiometrica", 
+		model.addAttribute("isFirmaBiometrica",
 				Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 
 	}
