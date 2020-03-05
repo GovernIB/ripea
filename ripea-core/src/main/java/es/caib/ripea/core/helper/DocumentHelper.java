@@ -40,7 +40,6 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
@@ -439,7 +438,7 @@ public class DocumentHelper {
 			String ntiOrgano,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+			String ntiTipoDocumental,
 			MetaDocumentEntity metaDocument,
 			ContingutEntity pare,
 			EntitatEntity entitat,

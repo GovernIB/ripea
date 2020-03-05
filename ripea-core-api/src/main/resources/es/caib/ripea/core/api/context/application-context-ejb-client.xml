@@ -83,6 +83,10 @@
 	<jee:local-slsb
 			id="expedientTascaService"
 			jndi-name="ripea/ExpedientTascaServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.ExpedientTascaService"/>			
+			business-interface="es.caib.ripea.core.api.service.ExpedientTascaService"/>		
+	<jee:local-slsb
+			id="tipusDocumentalService"
+			jndi-name="ripea/TipusDocumentalServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.TipusDocumentalService"/>	
 		
 </beans>

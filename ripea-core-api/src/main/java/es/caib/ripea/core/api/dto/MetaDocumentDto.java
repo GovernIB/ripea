@@ -26,7 +26,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private String plantillaNom;
 	private String plantillaContentType;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private String ntiTipoDocumental;
 	private NtiOrigenEnumDto ntiOrigen;
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
@@ -104,10 +104,10 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 	}
-	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+	public String getNtiTipoDocumental() {
 		return ntiTipoDocumental;
 	}
-	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+	public void setNtiTipoDocumental(String ntiTipoDocumental) {
 		this.ntiTipoDocumental = ntiTipoDocumental;
 	}
 	public NtiOrigenEnumDto getNtiOrigen() {

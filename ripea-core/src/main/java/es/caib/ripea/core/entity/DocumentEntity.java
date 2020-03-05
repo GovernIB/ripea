@@ -23,7 +23,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -83,7 +82,7 @@ public class DocumentEntity extends NodeEntity {
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Column(name = "nti_tipdoc", length = 4, nullable = false)
 	@Enumerated(EnumType.STRING)
-	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private String ntiTipoDocumental;
 	@Column(name = "nti_idorig", length = 48)
 	private String ntiIdDocumentoOrigen;
 	@Column(name = "nti_tipfir", length = 4)
@@ -158,7 +157,7 @@ public class DocumentEntity extends NodeEntity {
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
 	}
-	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+	public String getNtiTipoDocumental() {
 		return ntiTipoDocumental;
 	}
 	public String getNtiIdDocumentoOrigen() {
@@ -191,7 +190,7 @@ public class DocumentEntity extends NodeEntity {
 			String ntiOrgano,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+			String ntiTipoDocumental,
 			String ntiIdDocumentoOrigen,
 			DocumentNtiTipoFirmaEnumDto ntiTipoFirma,
 			String ntiCsv,
@@ -221,7 +220,7 @@ public class DocumentEntity extends NodeEntity {
 			String ntiOrgano,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+			String ntiTipoDocumental,
 			String ntiIdDocumentoOrigen,
 			DocumentNtiTipoFirmaEnumDto ntiTipoFirma,
 			String ntiCsv,
@@ -276,7 +275,7 @@ public class DocumentEntity extends NodeEntity {
 			String ntiOrgano,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+			String ntiTipoDocumental,
 			MetaNodeEntity metaNode,
 			ContingutEntity pare,
 			EntitatEntity entitat,
@@ -311,7 +310,7 @@ public class DocumentEntity extends NodeEntity {
 				String ntiOrgano,
 				NtiOrigenEnumDto ntiOrigen,
 				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-				DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental,
+				String ntiTipoDocumental,
 				MetaNodeEntity metaNode,
 				ContingutEntity pare,
 				EntitatEntity entitat,

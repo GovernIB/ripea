@@ -67,7 +67,7 @@ public class MetaDocumentCommand {
 	@NotNull
 	private NtiOrigenEnumDto ntiOrigen;
 	@NotNull
-	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;
+	private String ntiTipoDocumental;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;	
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
@@ -181,10 +181,10 @@ public class MetaDocumentCommand {
 	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
 		this.ntiOrigen = ntiOrigen;
 	}
-	public DocumentNtiTipoDocumentalEnumDto getNtiTipoDocumental() {
+	public String getNtiTipoDocumental() {
 		return ntiTipoDocumental;
 	}
-	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
+	public void setNtiTipoDocumental(String ntiTipoDocumental) {
 		this.ntiTipoDocumental = ntiTipoDocumental;
 	}
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {

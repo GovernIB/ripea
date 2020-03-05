@@ -21,16 +21,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -53,6 +54,9 @@ public class MetaDocumentController extends BaseAdminController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private MetaDocumentFluxService metaDocumentFluxService;
+	@Autowired
+	private TipusDocumentalService tipusDocumentalService;
+
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
 	public String get(
@@ -112,7 +116,7 @@ public class MetaDocumentController extends BaseAdminController {
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
-		emplenarModelForm(model);
+		emplenarModelForm(request,model);
 		return "metaDocumentForm";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.POST)
@@ -124,7 +128,7 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelForm(model);
+			emplenarModelForm(request,model);
 			return "metaDocumentForm";
 		}
 		if (command.getId() != null) {
@@ -308,8 +312,12 @@ public class MetaDocumentController extends BaseAdminController {
 	}
 
 	public void emplenarModelForm(
+			HttpServletRequest request,
 			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
+		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(
+				entitatActual.getId());
 		model.addAttribute(
 				"isPortafirmesDocumentTipusSuportat",
 				new Boolean(tipus != null));
@@ -324,9 +332,7 @@ public class MetaDocumentController extends BaseAdminController {
 						"document.nti.origen.enum."));
 		model.addAttribute(
 				"ntiTipusDocumentalOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiTipoDocumentalEnumDto.class,
-						"document.nti.tipdoc.enum."));
+				tipusDocumental);
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",
 				EnumHelper.getOptionsForEnum(

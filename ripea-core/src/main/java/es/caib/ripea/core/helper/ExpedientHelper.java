@@ -34,7 +34,6 @@ import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -685,76 +684,76 @@ public class ExpedientHelper {
 		return documentNtiEstadoElaboracionEnumDto;
 	}
 
-	private DocumentNtiTipoDocumentalEnumDto toDocumentNtiTipoDocumentalEnumDto(NtiTipoDocumento ntiTipoDocumento) {
-		DocumentNtiTipoDocumentalEnumDto documentNtiTipoDocumentalEnumDto = null;
+	private String toDocumentNtiTipoDocumentalEnumDto(NtiTipoDocumento ntiTipoDocumento) {
+		String documentNtiTipoDocumental = null;
 		if (ntiTipoDocumento != null) {
 			switch (ntiTipoDocumento) {
 			case RESOLUCIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD01;
+				documentNtiTipoDocumental = "TD01";
 				break;
 			case ACORD:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD02;
+				documentNtiTipoDocumental = "TD02";
 				break;
 			case CONTRACTE:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD03;
+				documentNtiTipoDocumental = "TD03";
 				break;
 			case CONVENI:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD04;
+				documentNtiTipoDocumental = "TD04";
 				break;
 			case DECLARACIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD05;
+				documentNtiTipoDocumental = "TD05";
 				break;
 			case COMUNICACIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD06;
+				documentNtiTipoDocumental = "TD06";
 				break;
 			case NOTIFICACIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD07;
+				documentNtiTipoDocumental = "TD07";
 				break;
 			case PUBLICACIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD08;
+				documentNtiTipoDocumental = "TD08";
 				break;
 			case JUSTIFICANT_RECEPCIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD09;
+				documentNtiTipoDocumental = "TD09";
 				break;
 			case ACTA:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD10;
+				documentNtiTipoDocumental = "TD10";
 				break;
 			case CERTIFICAT:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD11;
+				documentNtiTipoDocumental = "TD11";
 				break;
 			case DILIGENCIA:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD12;
+				documentNtiTipoDocumental = "TD12";
 				break;
 			case INFORME:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD13;
+				documentNtiTipoDocumental = "TD13";
 				break;
 			case SOLICITUD:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD14;
+				documentNtiTipoDocumental = "TD14";
 				break;
 			case DENUNCIA:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD15;
+				documentNtiTipoDocumental = "TD15";
 				break;
 			case ALEGACIO:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD16;
+				documentNtiTipoDocumental = "TD16";
 				break;
 			case RECURS:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD17;
+				documentNtiTipoDocumental = "TD17";
 				break;
 			case COMUNICACIO_CIUTADA:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD18;
+				documentNtiTipoDocumental = "TD18";
 				break;
 			case FACTURA:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD19;
+				documentNtiTipoDocumental = "TD19";
 				break;
 			case ALTRES_INCAUTATS:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD20;
+				documentNtiTipoDocumental = "TD20";
 				break;
 			case ALTRES:
-				documentNtiTipoDocumentalEnumDto = DocumentNtiTipoDocumentalEnumDto.TD99;
+				documentNtiTipoDocumental = "TD99";
 				break;
 			}
 		}
-		return documentNtiTipoDocumentalEnumDto;
+		return documentNtiTipoDocumental;
 	}
 
 	private Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {

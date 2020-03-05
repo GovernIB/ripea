@@ -226,7 +226,7 @@ public class RipeaFolderResource implements FolderResource {
 		dto.setDataCaptura(ara);
 		dto.setNtiOrigen(NtiOrigenEnumDto.O0);
 		dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
-		dto.setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
+		dto.setNtiTipoDocumental("TD99");
 		DocumentDto document = getDocumentService().create(
 				contingut.getEntitat().getId(),
 				contingut.getId(),
