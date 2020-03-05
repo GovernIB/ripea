@@ -1090,6 +1090,11 @@ public class ContingutHelper {
 						ContingutEntity.class,
 						"S'ha d'esborrar un contingut de l'arxiu però el plugin no està habilitat");
 			}
+		//Carpeta lògica
+		} else if (contingut.getArxiuUuid() == null && contingut instanceof CarpetaEntity) {
+			for (ContingutEntity fill : contingut.getFills()) {
+				arxiuPropagarEliminacio(fill);
+			}
 		}
 	}
 
