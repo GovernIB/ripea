@@ -46,7 +46,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "portafirmes_respons", length = 512)
 	private String portafirmesResponsables;
 	@Enumerated(EnumType.STRING)
-	@Column(name = "portafirmes_seqtip")
+	@Column(name = "portafirmes_seqtip", length = 256)
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	@Column(name = "portafirmes_custip", length = 64)
 	private String portafirmesCustodiaTipus;
@@ -86,7 +86,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name = "portafirmes_fluxtip")
+	@Column(name = "portafirmes_fluxtip", length = 256)
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	
 	public MultiplicitatEnumDto getMultiplicitat() {
