@@ -4,7 +4,11 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -12,6 +16,8 @@ import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
 
+@Stateless
+@Interceptors(SpringBeanAutowiringInterceptor.class)
 public class TipusDocumentalServiceBean implements TipusDocumentalService {
 
 	@Autowired
@@ -73,5 +79,12 @@ public class TipusDocumentalServiceBean implements TipusDocumentalService {
 	public List<TipusDocumentalDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegate.findByEntitat(entitatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public TipusDocumentalDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
+		return delegate.findByCodiAndEntitat(codi, entitatId);
+
 	}
 }

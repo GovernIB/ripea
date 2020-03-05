@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.service;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -33,7 +34,7 @@ public interface ImportacioService {
 	public List<DocumentDto> getDocuments(
 			Long entitatId,
 			Long contingutId,
-			String numeroRegistre) throws NotFoundException, ValidationException;
+			ImportacioDto dades) throws NotFoundException, ValidationException;
 
 
 }

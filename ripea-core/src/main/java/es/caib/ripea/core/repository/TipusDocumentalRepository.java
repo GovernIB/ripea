@@ -20,8 +20,10 @@ import es.caib.ripea.core.entity.TipusDocumentalEntity;
  */
 public interface TipusDocumentalRepository extends JpaRepository<TipusDocumentalEntity, Long> {
 
-	List<TipusDocumentalEntity> findByEntitat(EntitatEntity entitat);
+	List<TipusDocumentalEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 	Page<TipusDocumentalEntity> findByEntitat(
 			EntitatEntity entitat, 
 			Pageable pageable);
+	TipusDocumentalEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+
 }

@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -51,9 +52,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 	public List<DocumentDto> getDocuments(
 			Long entitatId,
 			Long contingutId,
-			String numeroRegistre) {
+			ImportacioDto dades) {
 		logger.debug("Important documents de l'arxiu digital (" +
-				"numeroRegistre=" + numeroRegistre + ")");
+				"numeroRegistre=" + dades.getNumeroRegistre() + ")");
 		ExpedientEntity expedientSuperior;
 		FitxerDto fitxer = new FitxerDto();;
 		List<DocumentDto> listDto = new ArrayList<DocumentDto>();
@@ -66,7 +67,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false);
 
-		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(numeroRegistre);
+		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(
+				dades.getNumeroRegistre(),
+				dades.getTipusRegistre());
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			expedientSuperior = (ExpedientEntity)contingut;
 		} else {
@@ -85,7 +88,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setContingut(document.getContingut().getContingut());
 
 			DocumentEntity entity = documentHelper.crearDocumentDB(
-					DocumentTipusEnumDto.DIGITAL,
+					DocumentTipusEnumDto.IMPORTAT,
 					document.getNom(),
 					document.getMetadades().getDataCaptura(),
 					document.getMetadades().getDataCaptura(),

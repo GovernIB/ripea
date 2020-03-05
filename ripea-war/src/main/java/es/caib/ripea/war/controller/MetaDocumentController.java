@@ -57,7 +57,6 @@ public class MetaDocumentController extends BaseAdminController {
 	@Autowired
 	private TipusDocumentalService tipusDocumentalService;
 
-
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,

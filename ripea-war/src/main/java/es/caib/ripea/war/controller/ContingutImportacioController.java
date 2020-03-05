@@ -7,13 +7,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.service.ImportacioService;
-import es.caib.ripea.war.command.ContenidorCommand.Create;
-import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ImportacioCommand;
+import es.caib.ripea.war.helper.EnumHelper;
 
 /**
  * Controlador per al manteniment d'importació de documents.
@@ -56,6 +56,11 @@ public class ContingutImportacioController extends BaseUserController {
 		
 		command.setPareId(contingutId);
 		model.addAttribute(command);
+		model.addAttribute(
+			"tipusRegistreOptions",
+			EnumHelper.getOptionsForEnum(
+					TipusRegistreEnumDto.class,
+					"contingut.importacio.tipus.enum."));
 		return "contingutImportacioForm";
 	}
 
@@ -63,7 +68,7 @@ public class ContingutImportacioController extends BaseUserController {
 	public String postNew(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			@Validated({Create.class}) ImportacioCommand command,
+			@Valid ImportacioCommand command,
 			BindingResult bindingResult,
 			Model model) {
 		return postUpdate(
@@ -77,7 +82,7 @@ public class ContingutImportacioController extends BaseUserController {
 	public String postUpdate(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			@Validated({Update.class}) ImportacioCommand command,
+			@Valid ImportacioCommand command,
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -88,7 +93,7 @@ public class ContingutImportacioController extends BaseUserController {
 		importacioService.getDocuments(
 				entitatActual.getId(), 
 				contingutId,
-				command.getNumeroRegistre());
+				ImportacioCommand.asDto(command));
 		
 		return getModalControllerReturnValueSuccess(
 				request,

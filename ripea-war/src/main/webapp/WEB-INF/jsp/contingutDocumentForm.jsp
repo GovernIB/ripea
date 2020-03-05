@@ -44,6 +44,22 @@
   border: 1px solid black;
   border-radius: 3px;
 }
+#escaneig {
+	padding: 0 0 5% 0;
+}
+.iframe_container {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-bottom: 50%;
+}
+
+.iframe_content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
 </style>
 <script>
 function mostrarDocument(fileName) {
@@ -156,6 +172,67 @@ $(document).ready(function() {
 	    	$('#nom').tooltip("hide");
 	    }
 	});
+
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		 var pipella = $(e.target).attr("class");
+		 if (pipella == 'fitxer') {
+			 $('#origen').val('DISC');
+		 } else {
+			 $('#origen').val('ESCANER');
+		 }
+	});
+	
+	//escaneig
+	$('.scan-start').on('click', function(){
+		$('.scan-start').hide();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value='/digitalitzacio/perfils'/>",
+			success: function(perfils) {
+				for ( var i in perfils) {
+					var perfilsDiv = $('.scan-profile');					
+					$(perfilsDiv).append('<span class="btn btn-primary btn-lg" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+					$(perfilsDiv).append('</br>');
+				}
+				$(perfilsDiv).show();
+				$('.scan-cancel').removeClass('hidden');
+			},
+			error: function(err) {
+				console.log("Error tancant la transacció");
+			},
+			complete: function() {
+				localStorage.removeItem('transaccioId');
+			}
+		});
+	});
+	
+	//Iniciar procés digitalització després de triar perfil
+	$(document).on('click', '.scan-profile', function(){
+		$('.scan-profile').hide();
+	    var codi_perfil = $('span', this).attr('id');
+	    $.ajax({
+	    	type: 'GET',
+			url: "<c:url value='/digitalitzacio/iniciarDigitalitzacio/" + codi_perfil + "'/>",
+			success: function(transaccioResponse) {
+				if (transaccioResponse != null) {
+					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+					var iframeScan = '<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+					$('.scan-result').append(iframeScan);
+					webutilModalAdjustHeight();
+				}
+			},
+			error: function(err) {
+				console.log("Error tancant la transacció");
+			}
+	    });
+	});
+	
+	$('.scan-cancel').on('click', function(){
+		$('.scan-start').show();
+		$('.scan-profile').empty().hide();
+		$('.scan-cancel').addClass('hidden');
+	});
+	
 });
 </script>
 </head>
@@ -182,22 +259,45 @@ $(document).ready(function() {
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
-
+		<form:hidden path="origen"/>
+		
 		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters"/>
 		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
-		<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
-
-		<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-		<div id="input-firma" class="hidden">
-			<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-			<div id="input-firma-arxiu" class="hidden">
-				<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+		
+		
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dades"/></a></li>
+			<li role="presentation" class="active"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dadesnti"/></a></li>
+		</ul>
+		<br/>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane" id="fitxer">
+				<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
+				<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+				<div id="input-firma" class="hidden">
+					<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+					<div id="input-firma-arxiu" class="hidden">
+						<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane active" id="escaneig">
+				<div class="steps">
+					<div class="col-md-12 text-center scan-start">
+						<span class="btn btn-default btn-md">Començar escaneig <i class="fa fa-play"></i></span>
+					</div>
+					<div class="col-md-12 text-center scan-profile"></div>
+					<div class="col-md-12 text-center scan-result"></div>
+					<div class="col-md-12 text-center scan-cancel hidden">
+						<span class="btn btn-default btn-lg">Tornar <i class="fa fa-back"></i></span>
+					</div>
+				</div>
 			</div>
 		</div>
-
+		
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

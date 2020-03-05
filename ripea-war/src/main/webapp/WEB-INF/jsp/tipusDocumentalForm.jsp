@@ -22,6 +22,7 @@
 	<c:set var="formAction"><rip:modalUrl value="/tipusDocumental/save"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="tipusDocumentalCommand">
 		<form:hidden path="id"/>
+		<form:hidden path="entitatId"/>
 		<rip:inputText name="codi" textKey="tipusdocumental.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="tipusdocumental.form.camp.nom" required="true"/>
 		<div id="modal-botons" class="well">

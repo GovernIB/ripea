@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DadaDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
@@ -54,6 +55,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DigitalitzacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -84,6 +86,9 @@ public class ContingutDocumentController extends BaseUserController {
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_ORDRE = "ContingutDocumentController.session.ordre";
 	private static final String SESSION_ATTRIBUTE_ENTREGA_POSTAL = "ContingutDocumentController.session.entregaPostal";
+	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
+	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
+	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
 	
 	@Autowired
 	private ServletContext servletContext;
@@ -104,7 +109,9 @@ public class ContingutDocumentController extends BaseUserController {
 	private BeanGeneratorHelper beanGeneratorHelper;
 	@Autowired 
 	private DocumentHelper documentHelper;
-
+	@Autowired
+	private DigitalitzacioService digitalitzacioService;
+	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -163,6 +170,28 @@ public class ContingutDocumentController extends BaseUserController {
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+
+		//Recuperar document escanejat
+		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+			String idTransaccio = (String) RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO);
+			boolean returnScannedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RETURN_SCANNED);
+			boolean returnSignedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RETURN_SIGNED);
+			
+			DigitalitzacioResultatDto resultat = digitalitzacioService.recuperarResultat(
+					idTransaccio, 
+					returnScannedFile, 
+					returnSignedFile);
+			
+			System.out.println(resultat);
+		}
+		
+		
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -200,6 +229,7 @@ public class ContingutDocumentController extends BaseUserController {
 			@Validated({UpdateDigital.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
