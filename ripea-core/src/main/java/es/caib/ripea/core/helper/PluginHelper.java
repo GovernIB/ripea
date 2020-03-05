@@ -27,8 +27,6 @@ import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
@@ -57,7 +55,6 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
@@ -3303,7 +3300,7 @@ public class PluginHelper {
 			List<String> ntiOrgans,
 			Date ntiDataCaptura,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstatElaboracio,
-			DocumentNtiTipoDocumentalEnumDto ntiTipusDocumental,
+			String ntiTipusDocumental,
 			DocumentEstat estat,
 			boolean enPaper,
 			String serieDocumental) {
@@ -3440,7 +3437,7 @@ public class PluginHelper {
 			String ntiIdentificador,
 			Date ntiDataCaptura,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstatElaboracio,
-			DocumentNtiTipoDocumentalEnumDto ntiTipusDocumental,
+			String ntiTipusDocumental,
 			String fitxerExtensio,
 			List<String> ntiOrgans,
 			String serieDocumental,
@@ -3477,72 +3474,76 @@ public class PluginHelper {
 		}
 		metadades.setEstatElaboracio(estatElaboracio);
 		DocumentTipus tipusDocumental = null;
+		String tipusDocumentalAddicional = null;
 		switch (ntiTipusDocumental) {
-		case TD01:
+		case "TD01":
 			tipusDocumental = DocumentTipus.RESOLUCIO;
 			break;
-		case TD02:
+		case "TD02":
 			tipusDocumental = DocumentTipus.ACORD;
 			break;
-		case TD03:
+		case "TD03":
 			tipusDocumental = DocumentTipus.CONTRACTE;
 			break;
-		case TD04:
+		case "TD04":
 			tipusDocumental = DocumentTipus.CONVENI;
 			break;
-		case TD05:
+		case "TD05":
 			tipusDocumental = DocumentTipus.DECLARACIO;
 			break;
-		case TD06:
+		case "TD06":
 			tipusDocumental = DocumentTipus.COMUNICACIO;
 			break;
-		case TD07:
+		case "TD07":
 			tipusDocumental = DocumentTipus.NOTIFICACIO;
 			break;
-		case TD08:
+		case "TD08":
 			tipusDocumental = DocumentTipus.PUBLICACIO;
 			break;
-		case TD09:
+		case "TD09":
 			tipusDocumental = DocumentTipus.JUSTIFICANT_RECEPCIO;
 			break;
-		case TD10:
+		case "TD10":
 			tipusDocumental = DocumentTipus.ACTA;
 			break;
-		case TD11:
+		case "TD11":
 			tipusDocumental = DocumentTipus.CERTIFICAT;
 			break;
-		case TD12:
+		case "TD12":
 			tipusDocumental = DocumentTipus.DILIGENCIA;
 			break;
-		case TD13:
+		case "TD13":
 			tipusDocumental = DocumentTipus.INFORME;
 			break;
-		case TD14:
+		case "TD14":
 			tipusDocumental = DocumentTipus.SOLICITUD;
 			break;
-		case TD15:
+		case "TD15":
 			tipusDocumental = DocumentTipus.DENUNCIA;
 			break;
-		case TD16:
+		case "TD16":
 			tipusDocumental = DocumentTipus.ALEGACIO;
 			break;
-		case TD17:
+		case "TD17":
 			tipusDocumental = DocumentTipus.RECURS;
 			break;
-		case TD18:
+		case "TD18":
 			tipusDocumental = DocumentTipus.COMUNICACIO_CIUTADA;
 			break;
-		case TD19:
+		case "TD19":
 			tipusDocumental = DocumentTipus.FACTURA;
 			break;
-		case TD20:
+		case "TD20":
 			tipusDocumental = DocumentTipus.ALTRES_INCAUTATS;
 			break;
-		default:
+		case "TD99":
 			tipusDocumental = DocumentTipus.ALTRES;
 			break;
+		default:
+			tipusDocumentalAddicional = ntiTipusDocumental;
 		}
 		metadades.setTipusDocumental(tipusDocumental);
+		metadades.setTipusDocumentalAddicional(tipusDocumentalAddicional);
 		DocumentExtensio extensio = null;
 		if (fitxerExtensio != null) {
 			String extensioAmbPunt = (fitxerExtensio.startsWith(".")) ? fitxerExtensio.toLowerCase(): "." + fitxerExtensio.toLowerCase();
@@ -3790,74 +3791,77 @@ public class PluginHelper {
 				break;
 			}
 		}
-		DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental = null;
+		String ntiTipoDocumental = null;
 		if (documentArxiu.getMetadades().getTipusDocumental() != null) {
 			switch (documentArxiu.getMetadades().getTipusDocumental()) {
 			case RESOLUCIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD01;
+				ntiTipoDocumental = "TD01";
 				break;
 			case ACORD:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD02;
+				ntiTipoDocumental = "TD02";
 				break;
 			case CONTRACTE:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD03;
+				ntiTipoDocumental = "TD03";
 				break;
 			case CONVENI:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD04;
+				ntiTipoDocumental = "TD04";
 				break;
 			case DECLARACIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD05;
+				ntiTipoDocumental = "TD05";
 				break;
 			case COMUNICACIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD06;
+				ntiTipoDocumental = "TD06";
 				break;
 			case NOTIFICACIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD07;
+				ntiTipoDocumental = "TD07";
 				break;
 			case PUBLICACIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD08;
+				ntiTipoDocumental = "TD08";
 				break;
 			case JUSTIFICANT_RECEPCIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD09;
+				ntiTipoDocumental = "TD09";
 				break;
 			case ACTA:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD10;
+				ntiTipoDocumental = "TD10";
 				break;
 			case CERTIFICAT:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD11;
+				ntiTipoDocumental = "TD11";
 				break;
 			case DILIGENCIA:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD12;
+				ntiTipoDocumental = "TD12";
 				break;
 			case INFORME:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD13;
+				ntiTipoDocumental = "TD13";
 				break;
 			case SOLICITUD:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD14;
+				ntiTipoDocumental = "TD14";
 				break;
 			case DENUNCIA:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD15;
+				ntiTipoDocumental = "TD15";
 				break;
 			case ALEGACIO:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD16;
+				ntiTipoDocumental = "TD16";
 				break;
 			case RECURS:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD17;
+				ntiTipoDocumental = "TD17";
 				break;
 			case COMUNICACIO_CIUTADA:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD18;
+				ntiTipoDocumental = "TD18";
 				break;
 			case FACTURA:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD19;
+				ntiTipoDocumental = "TD19";
 				break;
 			case ALTRES_INCAUTATS:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD20;
+				ntiTipoDocumental = "TD20";
 				break;
 			case ALTRES:
-				ntiTipoDocumental = DocumentNtiTipoDocumentalEnumDto.TD99;
+				ntiTipoDocumental = "TD99";
 				break;
 			}
+		} else if (documentArxiu.getMetadades().getTipusDocumentalAddicional() != null) {
+			ntiTipoDocumental = documentArxiu.getMetadades().getTipusDocumentalAddicional();
 		}
+		
 		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
 		String ntiCsv = null;
 		String ntiCsvRegulacion = null;
