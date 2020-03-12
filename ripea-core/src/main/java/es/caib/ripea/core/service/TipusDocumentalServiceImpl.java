@@ -40,11 +40,11 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-	
+
 	@Transactional
 	@Override
 	public TipusDocumentalDto create(
-			Long entitatId, 
+			Long entitatId,
 			TipusDocumentalDto tipusDocumental) throws NotFoundException {
 		logger.debug("Creant un nou tipus documental per l'entitat (" +
 				"entitatId=" + entitatId + ")");
@@ -54,37 +54,37 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				true,
 				false);
 		TipusDocumentalEntity entity = TipusDocumentalEntity.getBuilder(
-				tipusDocumental.getCodi(), 
+				tipusDocumental.getCodi(),
 				tipusDocumental.getNom(),
 				entitat).build();
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
-				tipusDocumentalRepository.save(entity), 
+				tipusDocumentalRepository.save(entity),
 				TipusDocumentalDto.class);
 		return dto;
 	}
-	
+
 	@Transactional
 	@Override
 	public TipusDocumentalDto update(
-			Long entitatId, 
+			Long entitatId,
 			TipusDocumentalDto tipusDocumental) throws NotFoundException {
 		logger.debug("Actualitzant el tipus documental per l'entitat (" +
-				"entitatId=" + entitatId + 
+				"entitatId=" + entitatId +
 				"tipusDocumentalId=" + tipusDocumental.getId() + ")");
-		
+
 		TipusDocumentalEntity entity = tipusDocumentalRepository.findOne(tipusDocumental.getId());
-		
+
 		if (entity == null || !entity.getId().equals(tipusDocumental.getId())) {
 			throw new NotFoundException(
 					tipusDocumental.getId(),
 					TipusDocumentalEntity.class);
 		}
-		
+
 		entity.update(
-				tipusDocumental.getCodi(), 
+				tipusDocumental.getCodi(),
 				tipusDocumental.getNom());
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
-				entity, 
+				entity,
 				TipusDocumentalDto.class);
 		return dto;
 	}
@@ -92,32 +92,32 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	@Transactional
 	@Override
 	public TipusDocumentalDto delete(
-			Long entitatId, 
+			Long entitatId,
 			Long id) throws NotFoundException {
 		logger.debug("Esborrant el tipus documental per l'entitat (" +
-				"entitatId=" + entitatId + 
+				"entitatId=" + entitatId +
 				"tipusDocumentalId=" + id + ")");
-		
+
 		TipusDocumentalEntity entity = tipusDocumentalRepository.findOne(id);
-		
+
 		tipusDocumentalRepository.delete(entity);
-		
+
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
-				entity, 
+				entity,
 				TipusDocumentalDto.class);
 		return dto;
 	}
-	
+
 	@Transactional
 	@Override
 	public TipusDocumentalDto findById(Long entitatId, Long id) throws NotFoundException {
 		logger.debug("Consultant el tipus documental per l'entitat (" +
-				"entitatId=" + entitatId + 
+				"entitatId=" + entitatId +
 				"tipusDocumentalId=" + id + ")");
 		TipusDocumentalEntity entity = tipusDocumentalRepository.findOne(id);
-				
+
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
-				entity, 
+				entity,
 				TipusDocumentalDto.class);
 		return dto;
 	}
@@ -132,30 +132,44 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true,
 				false);
-		
+
 		Page<TipusDocumentalEntity> page = tipusDocumentalRepository.findByEntitat(
 				entitat,
 				paginacioHelper.toSpringDataPageable(paginacioParams));
-		
+
 		return paginacioHelper.toPaginaDto(
-				page, 
+				page,
 				TipusDocumentalDto.class);
 	}
-	
+
 	@Override
 	public List<TipusDocumentalDto> findByEntitat(Long entitatId) throws NotFoundException {
-		
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false);
-		List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByEntitat(entitat);
-		
+		List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
+
 		return conversioTipusHelper.convertirList(
-				tipusDocumentals, 
+				tipusDocumentals,
 				TipusDocumentalDto.class);
 	}
 
+	@Override
+	public TipusDocumentalDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+
+		TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
+				codi, 
+				entitat);
+		return conversioTipusHelper.convertir(tipusDocumental, TipusDocumentalDto.class);
+	}
 	private static final Logger logger = LoggerFactory.getLogger(TipusDocumentalServiceImpl.class);
+
 }
