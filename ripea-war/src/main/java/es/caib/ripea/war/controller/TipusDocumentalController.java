@@ -77,8 +77,10 @@ public class TipusDocumentalController extends BaseAdminController {
 		TipusDocumentalCommand command = null;
 		if (tipusDocumental != null) {
 			command = TipusDocumentalCommand.asCommand(tipusDocumental);
+			command.setEntitatId(entitatActual.getId());
 		} else {
 			command = new TipusDocumentalCommand();
+			command.setEntitatId(entitatActual.getId());
 		}
 		model.addAttribute(command);
 		return "tipusDocumentalForm";

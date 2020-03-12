@@ -72,7 +72,7 @@
 			<dt><spring:message code="contingut.admin.info.camp.eni.estat.elab"/></dt>
 			<dd><spring:message code="document.nti.estela.enum.${contingut.ntiEstadoElaboracion}"/></dd>
 			<dt><spring:message code="contingut.admin.info.camp.eni.tipus.doc"/></dt>
-			<dd><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></dd>
+			<dd>${contingut.ntiTipoDocumentalNom}</dd>
 			<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
 				<dt><spring:message code="contingut.admin.info.camp.eni.doc.origen.id"/></dt>
 				<dd>${contingut.ntiIdDocumentoOrigen}</dd>
