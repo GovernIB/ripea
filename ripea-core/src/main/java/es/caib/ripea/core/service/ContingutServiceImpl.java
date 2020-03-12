@@ -1170,7 +1170,7 @@ public class ContingutServiceImpl implements ContingutService {
 						break;
 					}
 				}
-				if (metadades.getTipusDocumental() != null) {
+				if (metadades.getTipusDocumental() != null || metadades.getTipusDocumentalAddicional() != null) {
 					switch (metadades.getTipusDocumental()) {
 					case RESOLUCIO:
 						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD01);

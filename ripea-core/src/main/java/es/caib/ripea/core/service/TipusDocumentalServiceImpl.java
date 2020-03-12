@@ -150,6 +150,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true,
 				false);
+
 		List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
 
 		return conversioTipusHelper.convertirList(
