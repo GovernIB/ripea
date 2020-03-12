@@ -10,12 +10,14 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.CodiTipusNoRepetit;
 
 /**
  * Command per al manteniment de meta-documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@CodiTipusNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
 public class TipusDocumentalCommand {
 
 	private Long id;

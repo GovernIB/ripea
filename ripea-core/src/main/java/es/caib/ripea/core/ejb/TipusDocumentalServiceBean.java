@@ -79,4 +79,10 @@ public class TipusDocumentalServiceBean implements TipusDocumentalService {
 			Long entitatId) throws NotFoundException {
 		return delegate.findByEntitat(entitatId);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public TipusDocumentalDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
+		return delegate.findByCodiAndEntitat(codi, entitatId);
+	}
 }

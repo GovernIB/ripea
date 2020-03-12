@@ -67,6 +67,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -85,6 +86,7 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
@@ -127,6 +129,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired
+	private TipusDocumentalRepository tipusDocumentalRepository;
 	
 	@Transactional
 	@Override
@@ -1086,6 +1090,11 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutId,
 				true,
 				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
@@ -1161,7 +1170,7 @@ public class ContingutServiceImpl implements ContingutService {
 						break;
 					}
 				}
-				if (metadades.getTipusDocumental() != null) {
+				if (metadades.getTipusDocumental() != null || metadades.getTipusDocumentalAddicional() != null) {
 					switch (metadades.getTipusDocumental()) {
 					case RESOLUCIO:
 						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD01);
@@ -1226,7 +1235,16 @@ public class ContingutServiceImpl implements ContingutService {
 					case ALTRES:
 						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
 						break;
-					}
+					default:
+						if (metadades.getTipusDocumentalAddicional() != null && !metadades.getTipusDocumentalAddicional().isEmpty()) {
+							logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
+							TipusDocumentalEntity tipusDocuemntal = tipusDocumentalRepository.findByCodiAndEntitat(
+									metadades.getTipusDocumentalAddicional(),
+									entitat);
+							arxiuDetall.setEniTipusDocumentalAddicional(tipusDocuemntal.getNom());
+						}
+						break;
+					}	
 				}
 				arxiuDetall.setEniOrgans(metadades.getOrgans());
 				if (metadades.getFormat() != null) {

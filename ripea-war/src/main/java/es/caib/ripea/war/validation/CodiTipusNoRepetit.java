@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.war.validation;
 
@@ -14,15 +14,15 @@ import javax.validation.Payload;
 /**
  * Constraint de validació que controla que no es repeteixi
  * el codi d'entitat.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=CodiEntitatNoRepetitValidator.class)
-public @interface CodiEntitatNoRepetit {
+@Constraint(validatedBy=CodiTipusNoRepetitValidator.class)
+public @interface CodiTipusNoRepetit {
 
-	String message() default "Ja existeix una altra entitat amb aquest codi";
+	String message() default "Ja existeix un altre tipus documental amb aquest codi";
 
 	Class<?>[] groups() default {};
 
@@ -31,4 +31,6 @@ public @interface CodiEntitatNoRepetit {
 	String campId();
 
 	String campCodi();
+
+	String campEntitatId();
 }

@@ -126,12 +126,18 @@
 										<td><spring:message code="document.nti.estela.enum.${arxiuDetall.eniEstatElaboracio}"/></td>
 									</tr>
 								</c:if>
-								<c:if test="${not empty arxiuDetall.eniTipusDocumental}">
-									<tr>
-										<td><strong><spring:message code="contingut.arxiu.camp.eni.tipus.doc"/></strong></td>
-										<td><spring:message code="document.nti.tipdoc.enum.${arxiuDetall.eniTipusDocumental}"/></td>
-									</tr>
-								</c:if>
+								<c:choose>
+									<c:when  test="${not empty arxiuDetall.eniTipusDocumental}">
+										<tr>
+											<td><strong><spring:message code="contingut.arxiu.camp.eni.tipus.doc"/></strong></td>
+											<td><spring:message code="document.nti.tipdoc.enum.${arxiuDetall.eniTipusDocumental}"/></td>
+										</tr>
+									</c:when>
+									<c:otherwise>
+											<td><strong><spring:message code="contingut.arxiu.camp.eni.tipus.doc"/></strong></td>
+											<td>${arxiuDetall.eniTipusDocumentalAddicional}</td>
+									</c:otherwise>
+								</c:choose>
 								<c:if test="${not empty arxiuDetall.eniFormat}">
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.format.nom"/></strong></td>
