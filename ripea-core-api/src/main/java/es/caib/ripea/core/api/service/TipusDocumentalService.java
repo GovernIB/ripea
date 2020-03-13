@@ -110,4 +110,20 @@ public interface TipusDocumentalService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<TipusDocumentalDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
+
+	/**
+	 * Llista un tipus documental d'una entitat a partir del seu codi.
+	 * 
+	 * @param codi
+	 *            Codi del tipus documental.
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @return El tipus documental.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public TipusDocumentalDto findByCodiAndEntitat(
+			String codi,
+			Long entitatId) throws NotFoundException;
 }

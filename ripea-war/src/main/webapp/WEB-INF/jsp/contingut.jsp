@@ -1012,7 +1012,7 @@ function deselectAll() {
 									</tr>
 									<tr>
 										<td><strong><spring:message code="contingut.info.nti.tipus.doc"/></strong></td>
-										<td><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></td>
+										<td>${contingut.ntiTipoDocumentalNom}</td>
 									</tr>																		
 									<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
 										<td><strong><spring:message code="contingut.info.nti.doc.origen.id"/></strong></td>

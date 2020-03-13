@@ -37,6 +37,7 @@ public class DocumentDto extends NodeDto {
 	private NtiOrigenEnumDto ntiOrigen;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	private String ntiTipoDocumental;
+	private String ntiTipoDocumentalNom;
 	private String ntiIdDocumentoOrigen;
 	private DocumentNtiTipoFirmaEnumDto ntiTipoFirma;
 	private String ntiCsv;
@@ -217,6 +218,12 @@ public class DocumentDto extends NodeDto {
 	}
 	public void setNtiTipoDocumental(String ntiTipoDocumental) {
 		this.ntiTipoDocumental = ntiTipoDocumental;
+	}
+	public String getNtiTipoDocumentalNom() {
+		return ntiTipoDocumentalNom;
+	}
+	public void setNtiTipoDocumentalNom(String ntiTipoDocumentalNom) {
+		this.ntiTipoDocumentalNom = ntiTipoDocumentalNom;
 	}
 	public String getNtiIdDocumentoOrigen() {
 		return ntiIdDocumentoOrigen;

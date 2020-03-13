@@ -60,6 +60,7 @@ import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
@@ -69,6 +70,7 @@ import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -120,6 +122,8 @@ public class ContingutHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired
+	private TipusDocumentalRepository tipusDocumentalRepository;
 
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
@@ -253,6 +257,14 @@ public class ContingutHelper {
 			dto.setNtiOrigen(document.getNtiOrigen());
 			dto.setNtiEstadoElaboracion(document.getNtiEstadoElaboracion());
 			dto.setNtiTipoDocumental(document.getNtiTipoDocumental());
+			if (document.getNtiTipoDocumental() != null) {
+				TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
+						document.getNtiTipoDocumental(),
+						contingut.getEntitat());
+				if (tipusDocumental != null)
+					dto.setNtiTipoDocumentalNom(tipusDocumental.getNom());
+				
+			}
 			dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
 			dto.setNtiTipoFirma(document.getNtiTipoFirma());
 			dto.setNtiCsv(document.getNtiCsv());
@@ -1073,8 +1085,11 @@ public class ContingutHelper {
 					pluginHelper.arxiuExpedientEsborrar(
 							(ExpedientEntity)contingut);
 				} else if (contingut instanceof DocumentEntity) {
-					pluginHelper.arxiuDocumentEsborrar(
-							(DocumentEntity)contingut);
+					DocumentTipusEnumDto documentTipus = ((DocumentEntity)contingut).getDocumentTipus();
+					if (!documentTipus.equals(DocumentTipusEnumDto.IMPORTAT)) {
+						pluginHelper.arxiuDocumentEsborrar(
+								(DocumentEntity)contingut);
+					}
 				} else if (contingut instanceof CarpetaEntity) {
 					pluginHelper.arxiuCarpetaEsborrar(
 							(CarpetaEntity)contingut);
