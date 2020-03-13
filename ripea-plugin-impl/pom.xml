@@ -117,6 +117,26 @@
 	      <groupId>org.fundaciobit.apisib.apiplantillafluxsimple</groupId>
 	      <version>1.0.0</version>
 	    </dependency>
+	    <dependency>
+	      <artifactId>apiscanwebsimple-api</artifactId>
+	      <groupId>org.fundaciobit.apisib.apiscanwebsimple</groupId>
+	      <version>1.0</version>
+	    </dependency>
+	    <dependency>
+	      <artifactId>apiscanwebsimple-jersey</artifactId>
+	      <groupId>org.fundaciobit.apisib.apiscanwebsimple</groupId>
+	      <version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<artifactId>apifirmaasyncsimple-api</artifactId>
+			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<artifactId>apifirmaasyncsimple-jersey</artifactId>
+			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>
+			<version>2.0.0</version>
+		</dependency>
 		<dependency>
 			<artifactId>apifirmaasyncsimple-api</artifactId>
 			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>

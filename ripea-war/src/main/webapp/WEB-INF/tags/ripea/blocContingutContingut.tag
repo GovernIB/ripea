@@ -26,7 +26,6 @@
 							</div>
 							<div class="caption">
 								<p class="text-center">
-									<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 									<c:if test="${fill.node and not fill.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
 									<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 									<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
@@ -89,10 +88,6 @@
 				</c:if>
 			</c:forEach>
 		</ul>
-	<c:if test="${empty fills}">
-		<h1 style="opacity: .1; text-align: center; margin-bottom: 1em;"><rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false"/><strong><spring:message code="contingut.sense.contingut"/></strong></h1>				
-		<!--<h3 style="opacity: .2; text-align: center; margin-bottom: 3em"><strong><spring:message code="contingut.sense.contingut"/></strong></h3>  -->
-	</c:if>
 	</c:when>
 	<c:when test="${vistaLlistat and fn:length(fills) > 0}">
 		<%--------------------- TABLE -------------------%>
@@ -119,7 +114,6 @@
 						</td>
 						<td>
 							<rip:blocIconaContingut contingut="${fill}"/>
-							<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							<c:if test="${fill.document && fill.ambNotificacions}">
@@ -186,30 +180,10 @@
 	</c:when>
 </c:choose>
 
-<c:if test="${vistaLlistat and empty fills}">
-	<%--------------------- TABLE -------------------%>
-	<table class="table table-striped table-bordered table-hover" id="table-documents">
-		<thead>
-			<tr>
-				<th></th>
-				<th><spring:message code="contingut.info.nom"/></th>
-				<th><spring:message code="contingut.info.tipus"/></th>
-				<th><spring:message code="contingut.info.createl"/></th>
-				<th><spring:message code="contingut.info.creatper"/></th>
-				<th width="10%">&nbsp;</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr class="odd">
-					<td colspan="9" valign="top">
-						<h1 style="opacity: .1; text-align: center;"><rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false"/><strong><spring:message code="contingut.sense.contingut"/></strong></h1>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<!--<h3 style="opacity: .2; text-align: center; margin-bottom: 3em"><strong><spring:message code="contingut.sense.contingut"/></strong></h3>  -->
+<c:if test="${empty fills}">
+	<h1 style="opacity: .1; text-align: center; margin-top: 1em"><rip:blocIconaContingut contingut="${fill}" tamanyEnorme="true"/></h1>
+	<h3 style="opacity: .2; text-align: center; margin-bottom: 3em"><strong><spring:message code="contingut.sense.contingut"/></strong></h3>
 </c:if>
-
 <c:if test="${(contingut.expedient && contingut.estat != 'TANCAT') || contingut.carpeta && contingut.expedientPare.estat != 'TANCAT'}">
 	<div id="drag_container" class="drag_activated">
 		<span class="down fa fa-upload"></span>

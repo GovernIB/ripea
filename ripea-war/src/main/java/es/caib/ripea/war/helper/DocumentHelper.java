@@ -27,7 +27,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.war.command.DocumentConcatenatCommand;
+import es.caib.ripea.war.command.DocumentGenericCommand;
 
 /**
  * Mètodes d'ajuda per a gestionar els documents.
@@ -45,7 +45,7 @@ public class DocumentHelper {
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
-			DocumentConcatenatCommand command,
+			DocumentGenericCommand command,
 			Map<String, Long> ordre) {
 		MetaDocumentDto metaDocument = metaDocumentService.findByTipusGeneric(
 				entitatId, 
@@ -98,7 +98,7 @@ public class DocumentHelper {
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
-			DocumentConcatenatCommand command,
+			DocumentGenericCommand command,
 			Set<Long> docsIdx,
 			ContingutDto contingut,
 			ByteArrayOutputStream baos) {

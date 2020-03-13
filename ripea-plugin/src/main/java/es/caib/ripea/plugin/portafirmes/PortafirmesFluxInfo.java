@@ -6,7 +6,6 @@ public class PortafirmesFluxInfo implements Serializable {
 
 	private String nom;
 	private String descripcio;
-	
 	public String getNom() {
 		return nom;
 	}

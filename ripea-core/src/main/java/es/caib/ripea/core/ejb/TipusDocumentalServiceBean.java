@@ -3,6 +3,7 @@ package es.caib.ripea.core.ejb;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
+
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 

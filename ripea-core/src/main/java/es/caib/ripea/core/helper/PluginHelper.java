@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.awt.BufferCapabilities.FlipContents;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,6 +52,10 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioErrorTipusDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -99,6 +104,10 @@ import es.caib.ripea.plugin.dadesext.DadesExternesPlugin;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -144,6 +153,7 @@ public class PluginHelper {
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
 	private PortafirmesPlugin portafirmesPlugin;
+	private DigitalitzacioPlugin digitalitzacioPlugin;
 	private ConversioPlugin conversioPlugin;
 	//private CiutadaPlugin ciutadaPlugin;
 	private DadesExternesPlugin dadesExternesPlugin;
@@ -1712,7 +1722,7 @@ public class PluginHelper {
 		try {
 			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
 					numeroRegistre + ";" + tipusRegistre.getLabel());
-			
+
 			return contingutArxiu;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2072,7 +2082,7 @@ public class PluginHelper {
 					IntegracioHelper.INTCODI_PFIRMA,
 					accioDescripcio,
 					null,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
@@ -2108,6 +2118,140 @@ public class PluginHelper {
 		}
 	}
 	
+	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles(String idioma) {
+		String accioDescripcio = "Recuperant perfils disponibles";
+		long t0 = System.currentTimeMillis();
+		List<DigitalitzacioPerfilDto> perfilsDto = new ArrayList<DigitalitzacioPerfilDto>();;
+		try {
+			List<DigitalitzacioPerfil> perfils = getDigitalitzacioPlugin().recuperarPerfilsDisponibles(idioma);
+			
+			if (perfils != null) {
+				for (DigitalitzacioPerfil perfil : perfils) {
+					DigitalitzacioPerfilDto perfilDto = new DigitalitzacioPerfilDto();
+					perfilDto.setCodi(perfil.getCodi());
+					perfilDto.setNom(perfil.getNom());
+					perfilDto.setDescripcio(perfil.getDescripcio());
+					perfilDto.setTipus(perfil.getTipus());
+					perfilsDto.add(perfilDto);
+				}
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					errorDescripcio,
+					ex);
+		}
+		return perfilsDto;
+	}
+	
+	public DigitalitzacioTransaccioRespostaDto digitalitzacioIniciarProces(
+			String idioma,
+			String codiPerfil,
+			UsuariDto funcionari,
+			String urlReturn) {
+		String accioDescripcio = "Iniciant procés digitalització";
+		long t0 = System.currentTimeMillis();
+		DigitalitzacioTransaccioRespostaDto respostaDto = new DigitalitzacioTransaccioRespostaDto();
+		try {
+			DigitalitzacioTransaccioResposta resposta = getDigitalitzacioPlugin().iniciarProces(
+					codiPerfil, 
+					idioma, 
+					funcionari, 
+					urlReturn);
+			if (resposta != null) {
+				respostaDto.setIdTransaccio(resposta.getIdTransaccio());
+				respostaDto.setUrlRedireccio(resposta.getUrlRedireccio());
+				respostaDto.setReturnScannedFile(resposta.isReturnScannedFile());
+				respostaDto.setReturnSignedFile(resposta.isReturnSignedFile());
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					errorDescripcio,
+					ex);
+		}
+		return respostaDto;
+	}
+	
+	public DigitalitzacioResultatDto digitalitzacioRecuperarResultat(
+			String idTransaccio,
+			boolean returnScannedFile,
+			boolean returnSignedFile) {
+		String accioDescripcio = "Recuperant resultat digitalització";
+		long t0 = System.currentTimeMillis();
+		DigitalitzacioResultatDto resultatDto = new DigitalitzacioResultatDto();
+		try {
+			DigitalitzacioResultat resultat = getDigitalitzacioPlugin().recuperarResultat(
+					idTransaccio, 
+					returnScannedFile,
+					returnSignedFile);
+			if (resultat != null) {
+				resultatDto.setError(resultat.isError());
+				resultatDto.setErrorDescripcio(resultat.getErrorDescripcio());
+				resultatDto.setErrorTipus(resultat.getErrorTipus() != null ? DigitalitzacioErrorTipusDto.valueOf(resultat.getErrorTipus().toString()) : null);
+				resultatDto.setContingut(resultat.getContingut());
+				resultatDto.setNomDocument(resultat.getNomDocument());
+				resultatDto.setMimeType(resultat.getMimeType());
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					errorDescripcio,
+					ex);
+		}
+		return resultatDto;
+	}
+	
+	public void digitalitzacioTancarTransaccio(
+			String idTransaccio) {
+		String accioDescripcio = "Tancant transacció digitalització";
+		long t0 = System.currentTimeMillis();
+		try {
+			getDigitalitzacioPlugin().tancarTransaccio(
+					idTransaccio);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					errorDescripcio,
+					ex);
+		}
+	}
 	public PortafirmesFluxInfoDto portafirmesRecuperarInfoFluxDeFirma(
 			String plantillaFluxId,
 			String idioma) {
@@ -4320,6 +4464,27 @@ public class PluginHelper {
 		}
 		return conversioPlugin;
 	}
+	private DigitalitzacioPlugin getDigitalitzacioPlugin() {
+		if (digitalitzacioPlugin == null) {
+			String pluginClass = getPropertyPluginDigitalitzacio();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					digitalitzacioPlugin = (DigitalitzacioPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_DIGITALITZACIO,
+							"Error al crear la instància del plugin de digitalització",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_DIGITALITZACIO,
+						"No està configurada la classe per al plugin de digitalització");
+			}
+		}
+		return digitalitzacioPlugin;
+	}
 //	private RegistrePlugin getRegistrePlugin() {
 //		if (registrePlugin == null) {
 //			String pluginClass = getPropertyPluginRegistre();
@@ -4503,6 +4668,10 @@ public class PluginHelper {
 	private String getPropertyPluginPortafirmes() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.portafirmes.class");
+	}
+	private String getPropertyPluginDigitalitzacio() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.digitalitzacio.class");
 	}
 	private String getPropertyPluginConversio() {
 		return PropertiesHelper.getProperties().getProperty(

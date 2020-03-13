@@ -167,13 +167,63 @@ body.loading .rmodal {
 			});
 		});
 		
+<<<<<<< HEAD
+		//$("#fluxModal").on("show.bs.modal", function () {
+		//	 $(".modal-body").html('<img src="loading.gif" />');
+		//});
+		//$body = $("#fluxModal");
+		//$(document).on({
+		//	ajaxStart: function() { $body.addClass("loading");    },
+		//	ajaxStop: function() { $body.removeClass("loading"); }    
+		//});
+=======
 		$('#fluxIframe').ready(function () {
 		    $(this).addClass("loading");
 		});
 		$('#fluxIframe').load(function () {
 		    $(this).removeClass("loading");
 		});
+>>>>>>> refs/heads/ripea-0.9-tmp
 		
+<<<<<<< HEAD
+		$("#fluxModal").on('hidden.bs.modal', function() {
+			var fluxid = localStorage.getItem('fluxid');
+			var FluxError = localStorage.getItem('FluxError');
+			var FluxCreat = localStorage.getItem('FluxCreat');
+			var alertDiv;
+			
+			if (FluxError != null && FluxError != '') {
+				alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>'
+			} else if (FluxCreat != null && FluxCreat != '') {
+				alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span></div>'
+			}
+			$(alertDiv).insertBefore("form").delay(3000).queue(function() {
+				$(this).remove();
+			});
+			
+			if (fluxid != null && fluxid != '')
+				$('#portafirmesFluxId').val(fluxid);
+			
+			localStorage.removeItem('fluxid');
+			localStorage.removeItem('FluxError');
+			localStorage.removeItem('FluxCreat');
+		});
+		
+		$("#fluxModal").on('hide.bs.modal', function() {
+			var idTransaccio = localStorage.getItem('transaccioId');
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value='/modal/metaExpedient/metaDocument/tancarTransaccio/" + idTransaccio + "'/>",
+				error: function(err) {
+					console.log("Error tancant la transacció");
+				},
+				complete: function() {
+					localStorage.removeItem('transaccioId');
+				}
+			});
+		});
+=======
+>>>>>>> refs/heads/ripea-0.9-tmp
 		$('.modal-cancel').on('click', function(){
 			localStorage.removeItem('transaccioId');
 		});

@@ -49,7 +49,7 @@
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
-				<c:when test="${(contingut.document and contingut.estat == 'REDACCIO') || (contingut.document and contingut.documentTipus == 'IMPORTAT')}">
+				<c:when test="${contingut.document and contingut.estat == 'REDACCIO'}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
@@ -132,7 +132,7 @@
 				<c:set var="mostrarSeparador" value="${false}"/>
 				<li role="separator" class="divider"></li>
 			</c:if>
-			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
+			<c:if test="${contingut.documentTipus == 'DIGITAL'}">
 				<c:if test="${contingut.custodiat and !isTasca}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
 				</c:if>
@@ -211,9 +211,7 @@
 					</c:if>
 					
 					<%---- Publicar ----%>
-					<c:if test="${isMostrarPublicar}">
-						<li><a href="<c:url value="/document/${contingut.id}/publicar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-clipboard"></span>&nbsp;<spring:message code="comu.boto.publicar"/>...</a></li>
-					</c:if>
+					<li><a href="<c:url value="/document/${contingut.id}/publicar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-clipboard"></span>&nbsp;<spring:message code="comu.boto.publicar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 				

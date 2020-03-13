@@ -13,7 +13,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.war.command.DocumentConcatenatCommand.ConcatenarDigital;
+import es.caib.ripea.war.command.DocumentGenericCommand.ConcatenarDigital;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.NomDocumentNoRepetit;
 
@@ -23,7 +23,7 @@ import es.caib.ripea.war.validation.NomDocumentNoRepetit;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @NomDocumentNoRepetit(groups = {ConcatenarDigital.class})
-public class DocumentConcatenatCommand extends ContenidorCommand {
+public class DocumentGenericCommand extends ContenidorCommand {
 
 	@NotNull(groups = {ConcatenarDigital.class})
 	private DocumentTipusEnumDto documentTipus = DocumentTipusEnumDto.DIGITAL;
@@ -96,17 +96,17 @@ public class DocumentConcatenatCommand extends ContenidorCommand {
 	public void setNtiIdDocumentoOrigen(String ntiIdDocumentoOrigen) {
 		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;
 	}
-	public static DocumentConcatenatCommand asCommand(DocumentDto dto) {
-		DocumentConcatenatCommand command = ConversioTipusHelper.convertir(
+	public static DocumentGenericCommand asCommand(DocumentDto dto) {
+		DocumentGenericCommand command = ConversioTipusHelper.convertir(
 				dto,
-				DocumentConcatenatCommand.class);
+				DocumentGenericCommand.class);
 		if (dto.getPare() != null)
 			command.setPareId(dto.getPare().getId());
 		if (dto.getMetaNode() != null)
 			command.setMetaNodeId(dto.getMetaNode().getId());
 		return command;
 	}
-	public static DocumentDto asDto(DocumentConcatenatCommand command) throws IOException{
+	public static DocumentDto asDto(DocumentGenericCommand command) throws IOException{
 		DocumentDto dto = ConversioTipusHelper.convertir(
 				command,
 				DocumentDto.class);

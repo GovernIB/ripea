@@ -167,7 +167,12 @@ function removeLoading() {
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
+<<<<<<< HEAD
+
+		<rip:inputText name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" readonly="true"/>
+=======
 		<form:hidden name="portafirmesFluxTipus" path="portafirmesFluxTipus"/>
+>>>>>>> refs/heads/ripea-0.9-tmp
 		<c:choose>
 		<c:when test="${fluxTipus == 'SIMPLE'}">
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

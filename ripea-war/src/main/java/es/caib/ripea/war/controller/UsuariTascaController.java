@@ -708,7 +708,6 @@ public class UsuariTascaController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
-		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		if (metaDocument.getPortafirmesFluxTipus() != null) {

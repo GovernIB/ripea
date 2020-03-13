@@ -283,7 +283,7 @@ public class MetaDocumentController extends BaseAdminController {
 					"FluxCreat",
 					getMessage(
 					request,
-					"metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
+					"metadocument.portafirmes.flux.enum.FINAL_OK"));
 			model.addAttribute("fluxId", resposta.getFluxId());
 		}
 		return "portafirmesModalTancar";

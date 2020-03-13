@@ -20,6 +20,8 @@ public class ImportacioCommand {
 
 	@NotEmpty
 	private String numeroRegistre;
+	@NotNull
+	private TipusRegistreEnumDto tipusRegistre; 
 	
 	protected Long pareId;
 	
@@ -35,6 +37,13 @@ public class ImportacioCommand {
 	public void setNumeroRegistre(String numeroRegistre) {
 		this.numeroRegistre = numeroRegistre;
 	}
+	public TipusRegistreEnumDto getTipusRegistre() {
+		return tipusRegistre;
+	}
+	public void setTipusRegistre(TipusRegistreEnumDto tipusRegistre) {
+		this.tipusRegistre = tipusRegistre;
+	}
+	
 	public static ImportacioCommand asCommand(ImportacioDto dto) {
 		ImportacioCommand command = ConversioTipusHelper.convertir(
 				dto,
@@ -42,10 +51,8 @@ public class ImportacioCommand {
 		return command;
 	}
 	public static ImportacioDto asDto(ImportacioCommand command) {
-		ImportacioDto importacioDto = ConversioTipusHelper.convertir(
+		return ConversioTipusHelper.convertir(
 				command,
 				ImportacioDto.class);
-		importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);
-		return importacioDto;
 	}
 }

@@ -38,13 +38,14 @@ public class DocumentDigitalExistentValidator implements ConstraintValidator<Doc
 				}
 			}
 		} else if (DocumentFisicOrigenEnum.ESCANER.equals(command.getOrigen())) {
-			if (command.getEscanejatTempId() == null || command.getEscanejatTempId().isEmpty()) {
-				context.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("ArxiuNoBuit"))
-				.addNode("escanejatTempId")
-				.addConstraintViolation();
-				valid = false;
-			}
+//						
+//			if (command.getEscanejatTempId() == null || command.getEscanejatTempId().isEmpty()) {
+//				context.buildConstraintViolationWithTemplate(
+//						MessageHelper.getInstance().getMessage("ArxiuNoBuit"))
+//				.addNode("escanejatTempId")
+//				.addConstraintViolation();
+//				valid = false;
+//			}
 		}
 		if (!valid)
 			context.disableDefaultConstraintViolation();

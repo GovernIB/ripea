@@ -28,6 +28,26 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 <style type="text/css">
+
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+#escaneig.loading {
+    overflow: hidden;   
+}
+#escaneig.loading .rmodal {
+    display: block;
+}
 .tooltip {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 14px;
@@ -44,6 +64,29 @@
   border: 1px solid black;
   border-radius: 3px;
 }
+#escaneig {
+	padding: 0 0 5% 0;
+}
+.iframe_container {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-bottom: 50%;
+}
+
+.iframe_content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+.downloadLink {
+	background-color: #f4faff;
+	padding: 2%;
+}
+.scan-cancel-btn {
+	margin-top: 3%;
+}
 </style>
 <script>
 function mostrarDocument(fileName) {
@@ -54,6 +97,7 @@ function mostrarDocument(fileName) {
 }
 
 $(document).ready(function() {
+	let rootIframe = window.frameElement;
 	let fileName = "${nomDocument}";
 	if (fileName !== '') {
 		mostrarDocument(fileName);
@@ -156,6 +200,114 @@ $(document).ready(function() {
 	    	$('#nom').tooltip("hide");
 	    }
 	});
+
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		 var pipella = $(e.target).attr("class");
+		 if (pipella == 'fitxer') {
+			 $('#origen').val('DISC');
+			 webutilModalAdjustHeight();
+		 } else {
+			 $('#origen').val('ESCANER');
+			 webutilModalAdjustHeight();
+		 }
+	});
+	
+	//Recuperar perfils disponibles en cas de no definir un per defecte
+	$('.start-scan-btn').on('click', function(){
+		$('.start-scan-btn').hide();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value='/digitalitzacio/perfils'/>",
+			success: function(perfils) {
+				for ( var i in perfils) {
+					$('.scan-profile').append('<span class="btn btn-primary btn-lg btn-block" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+					$('.scan-profile').append('</br>');
+				}
+				$('.scan-profile').show();
+				$('.scan-back-btn').removeClass('hidden');
+				webutilModalAdjustHeight();
+			},
+			error: function(err) {
+				console.log("Error tancant la transacció");
+			},
+			complete: function() {
+				localStorage.removeItem('transaccioId');
+			}
+		});
+	});
+	
+	//Iniciar procés digitalització després de triar perfil
+	$(document).on('click', '.scan-profile', function(){
+	    var codi_perfil = $('span', this).attr('id');
+	    $(this).html('');
+		$('.scan-profile').hide();
+	    $.ajax({
+	    	type: 'GET',
+			url: "<c:url value='/digitalitzacio/iniciarDigitalitzacio/" + codi_perfil + "'/>",
+			success: function(transaccioResponse) {
+				if (transaccioResponse != null) {
+					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+					var iframeScan = '<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+					$('.scan-result').append(iframeScan);
+					$('.scan-back-btn').addClass('hidden');
+					webutilModalAdjustHeight();
+				}
+			},
+			error: function(err) {
+				console.log("Error tancant la transacció");
+			}
+	    });
+	});
+	
+	//$("#fluxModal").on("show.bs.modal", function () {
+	//	 $(".modal-body").html('<img src="loading.gif" />');
+	//});
+	$body = $("#escaneig");
+	$(document).on({
+		ajaxStart: function() {console.log("loading..."); $body.addClass("loading");    },
+		ajaxStop: function() {console.log("finish"); $body.removeClass("loading"); }    
+	});
+	
+	
+	//Iniciar procés digitalització després de triar perfil
+	$(document).on('click', '.scan-cancel-btn', function(){
+		var idTransaccio = localStorage.getItem('transaccioId');
+	    var codi_perfil = $('span', this).attr('id');
+		$('.scan-profile').hide();
+	    $.ajax({
+	    	type: 'GET',
+			url: "<c:url value='/digitalitzacio/tancarTransaccio/" + idTransaccio + "'/>",
+			success: function(transaccioResponse) {
+				$('.scan-result').html('');
+				$('.start-scan-btn').show();
+				localStorage.removeItem('transaccioId');
+			},
+			error: function(err) {
+				console.log("Error tancant la transacció");
+			}
+	    });
+	});
+	//javascript
+	$('div.modal.hide').on('shown', function(){
+	    var id = $(this).attr('id');
+	    console.log(id);
+	});
+	var idTransaccio = localStorage.getItem('transaccioId');
+	if (idTransaccio != null && fileName != null && fileName != '') {
+		$('.start-scan-btn').hide();
+		var urlDescarrega = "<a href='<c:url value='/digitalitzacio/descarregarResultat/" + idTransaccio + "'/>' >" + fileName + "</a>"
+		var urlCancel = " <br><span class='btn btn-default scan-cancel-btn'>Cancel·lar</span>"
+		
+		$('.scan-result').append(urlDescarrega);
+		$('.scan-result').append(urlCancel);
+	}
+	
+	$('.scan-back-btn').on('click', function(){
+		$('.start-scan-btn').show();
+		$('.scan-profile').empty().hide();
+		$('.scan-back-btn').addClass('hidden');
+	});
+	
 });
 </script>
 </head>
@@ -182,33 +334,48 @@ $(document).ready(function() {
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
-
-		<c:choose>
-			<c:when test="${documentCommand.documentTipus == 'IMPORTAT'}">
-				<c:set var="readOnlyValue" value="true"/>
-				<p class="comentari col-xs-10 col-xs-offset-2"><spring:message code="contingut.document.form.importat"/></p><br><br>
-			</c:when>
-			<c:otherwise>
-				<c:set var="readOnlyValue" value="false"/>
-			</c:otherwise>
-		</c:choose>
-
-		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters" readonly="${readOnlyValue}"/>
-		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
+		<form:hidden path="origen"/>
+		
+		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters"/>
+		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
-		<c:if test="${!readOnlyValue}">
-			<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" />
-	
-			<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-			<div id="input-firma" class="hidden">
-				<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<div id="input-firma-arxiu" class="hidden">
-					<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+		
+		
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
+			<li role="presentation" class="active"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
+		</ul>
+		<br/>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane" id="fitxer">
+				<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
+				<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+				<div id="input-firma" class="hidden">
+					<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+					<div id="input-firma-arxiu" class="hidden">
+						<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+					</div>
 				</div>
 			</div>
-		</c:if>
+			<div role="tabpanel" class="tab-pane active" id="escaneig">
+			<c:if test="${not empty noFileScanned}">
+				<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>No s'ha escanejat cap document</span></div>
+			</c:if>
+				<div class="steps">
+					<div class="col-md-12 text-center start-scan-btn">
+						<span class="btn btn-default btn-md"><spring:message code="contingut.document.form.camp.escaneig.iniciar"/> <i class="fa fa-play"></i></span>
+					</div>
+					<div class="col-md-12 text-center scan-profile"></div>
+					<div class="col-md-12 text-center scan-result"></div>
+					<div class="col-md-12 text-center scan-back-btn hidden">
+						<span class="btn btn-default btn-lg"><spring:message code="contingut.document.form.camp.escaneig.tornar"/> <i class="fa fa-back"></i></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="rmodal"></div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

@@ -88,8 +88,5 @@
 			id="tipusDocumentalService"
 			jndi-name="ripea/TipusDocumentalServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.TipusDocumentalService"/>	
-	<jee:local-slsb
-			id="portafirmesFluxService"
-			jndi-name="ripea/PortafirmesFluxServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.PortafirmesFluxService"/>	
+		
 </beans>
