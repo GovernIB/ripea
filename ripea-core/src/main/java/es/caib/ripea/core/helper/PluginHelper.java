@@ -74,6 +74,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxErrorTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -1707,14 +1708,16 @@ public class PluginHelper {
 		}
 	}
 
-	public List<ContingutArxiu> getCustodyIdDocuments(String numeroRegistre) {
+	public List<ContingutArxiu> getCustodyIdDocuments(
+			String numeroRegistre,
+			TipusRegistreEnumDto tipusRegistre) {
 		String accioDescripcio = "Importar documents";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("numeroRegistre", numeroRegistre);
 		long t0 = System.currentTimeMillis();
 		try {
 			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
-					numeroRegistre);
+					numeroRegistre + ";" + tipusRegistre.getLabel());
 
 			return contingutArxiu;
 		} catch (Exception ex) {
