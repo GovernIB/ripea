@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ImportacioService;
@@ -35,12 +36,12 @@ public class ImportacioServiceBean implements ImportacioService {
 	public List<DocumentDto> getDocuments(
 			Long entitatId, 
 			Long contingutId, 
-			String numeroRegistre)
+			ImportacioDto dades)
 			throws NotFoundException, ValidationException {
 		return delegate.getDocuments(
 				entitatId, 
 				contingutId,
-				numeroRegistre);
+				dades);
 	}
 
 	

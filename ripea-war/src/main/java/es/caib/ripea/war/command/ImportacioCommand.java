@@ -3,7 +3,13 @@
  */
 package es.caib.ripea.war.command;
 
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
+
+import es.caib.ripea.core.api.dto.ImportacioDto;
+import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
+import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 /**
  * Command per al manteniment d'importació de documents.
@@ -14,6 +20,9 @@ public class ImportacioCommand {
 
 	@NotEmpty
 	private String numeroRegistre;
+	@NotNull
+	private TipusRegistreEnumDto tipusRegistre; 
+	
 	protected Long pareId;
 	
 	public String getNumeroRegistre() {
@@ -27,5 +36,23 @@ public class ImportacioCommand {
 	}
 	public void setNumeroRegistre(String numeroRegistre) {
 		this.numeroRegistre = numeroRegistre;
+	}
+	public TipusRegistreEnumDto getTipusRegistre() {
+		return tipusRegistre;
+	}
+	public void setTipusRegistre(TipusRegistreEnumDto tipusRegistre) {
+		this.tipusRegistre = tipusRegistre;
+	}
+	
+	public static ImportacioCommand asCommand(ImportacioDto dto) {
+		ImportacioCommand command = ConversioTipusHelper.convertir(
+				dto,
+				ImportacioCommand.class);
+		return command;
+	}
+	public static ImportacioDto asDto(ImportacioCommand command) {
+		return ConversioTipusHelper.convertir(
+				command,
+				ImportacioDto.class);
 	}
 }
