@@ -15,17 +15,17 @@ import es.caib.ripea.war.command.MetaDocumentCommand;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ResponsableNotEmptyValidator implements ConstraintValidator<ResponsableNotEmpty, MetaDocumentCommand> {
+public class FluxIdNotEmptyValidator implements ConstraintValidator<FluxIdNotEmpty, MetaDocumentCommand> {
 
 
 	@Override
-	public void initialize(final ResponsableNotEmpty constraintAnnotation) {
+	public void initialize(final FluxIdNotEmpty constraintAnnotation) {
 	}
 
 	@Override
 	public boolean isValid(final MetaDocumentCommand metaDocument, final ConstraintValidatorContext context) {
 		
-		if (metaDocument.isFirmaPortafirmesActiva() && metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE) && (metaDocument.getPortafirmesResponsables() == null || metaDocument.getPortafirmesResponsables().length==0))
+		if (metaDocument.isFirmaPortafirmesActiva() && metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && (metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()))
 			return false;
 		else 
 			return true;

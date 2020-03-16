@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
@@ -22,6 +21,7 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
+import es.caib.ripea.war.validation.FluxIdNotEmpty;
 import es.caib.ripea.war.validation.PortafirmesDocumentTipusNotEmpty;
 import es.caib.ripea.war.validation.ResponsableNotEmpty;
 
@@ -31,6 +31,7 @@ import es.caib.ripea.war.validation.ResponsableNotEmpty;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @ResponsableNotEmpty
+@FluxIdNotEmpty
 @PortafirmesDocumentTipusNotEmpty
 @CodiMetaDocumentNoRepetit(
 		campId = "id",
@@ -230,6 +231,9 @@ public class MetaDocumentCommand {
 				MetaDocumentCommand.class);
 	}
 	public static MetaDocumentDto asDto(MetaDocumentCommand command) {
+		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE)
+			command.setPortafirmesFluxId(null);
+		
 		return ConversioTipusHelper.convertir(
 				command,
 				MetaDocumentDto.class);

@@ -98,7 +98,8 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
-		command.setPortafirmesFluxTipus(metaDocument.getPortafirmesSequenciaTipus());
+		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		model.addAttribute(command);
 		return "portafirmesForm";
@@ -125,7 +126,7 @@ public class DocumentController extends BaseUserController {
 				command.getPrioritat(),
 				command.getDataCaducitat(),
 				command.getPortafirmesResponsables(),
-				command.getPortafirmesFluxTipus());
+				command.getPortafirmesSequenciaTipus());
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

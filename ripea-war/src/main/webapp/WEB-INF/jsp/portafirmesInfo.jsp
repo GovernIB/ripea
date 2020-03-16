@@ -67,7 +67,7 @@
 				<c:if test="${not empty portafirmes.fluxTipus}">
 					<tr>
 						<td><strong><spring:message code="firma.info.camp.flux.tipus"/></strong></td>
-						<td><spring:message code="metadocument.fluxtip.enum.${portafirmes.fluxTipus}"/></td>
+						<td><spring:message code="metadocument.seqtip.enum.${portafirmes.fluxTipus}"/></td>
 					</tr>
 				</c:if>
 				<c:if test="${not empty portafirmes.fluxId}">

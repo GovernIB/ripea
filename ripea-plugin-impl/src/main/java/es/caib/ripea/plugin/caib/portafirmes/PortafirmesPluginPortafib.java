@@ -27,10 +27,23 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.ApiFirmaAsyncSimple;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleExternalSigner;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleFile;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleReviser;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignature;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureBlock;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureRequestWithSignBlockList;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSigner;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimpleJersey;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleBlock;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplate;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetFlowResultResponse;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetTransactionIdRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleReviser;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleSignature;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStartTransactionRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStatus;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.jersey.ApiFlowTemplateSimpleJersey;
@@ -79,42 +92,80 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			List<PortafirmesDocument> annexos,
 			boolean signarAnnexos) throws SistemaExternException {
 		try {
-			PeticioDeFirmaWs requestPeticioDeFirmaWs = new PeticioDeFirmaWs();
-			requestPeticioDeFirmaWs.setTitol(document.getTitol());
-			requestPeticioDeFirmaWs.setDescripcio(document.getDescripcio());
-			requestPeticioDeFirmaWs.setMotiu(motiu);
-			requestPeticioDeFirmaWs.setRemitentNom(remitent);
-			if (prioritat != null) {
-				switch (prioritat) {
-				case BAIXA:
-					requestPeticioDeFirmaWs.setPrioritatID(0);
-					break;
-				case NORMAL:
-					requestPeticioDeFirmaWs.setPrioritatID(5);
-					break;
-				case ALTA:
-					requestPeticioDeFirmaWs.setPrioritatID(9);
+			long peticioDeFirmaId = 0;
+			//Petició simple
+			if (plantillaFluxId == null) {
+				PeticioDeFirmaWs requestPeticioDeFirmaWs = new PeticioDeFirmaWs();
+				requestPeticioDeFirmaWs.setTitol(document.getTitol());
+				requestPeticioDeFirmaWs.setDescripcio(document.getDescripcio());
+				requestPeticioDeFirmaWs.setMotiu(motiu);
+				requestPeticioDeFirmaWs.setRemitentNom(remitent);
+				if (prioritat != null) {
+					switch (prioritat) {
+					case BAIXA:
+						requestPeticioDeFirmaWs.setPrioritatID(0);
+						break;
+					case NORMAL:
+						requestPeticioDeFirmaWs.setPrioritatID(5);
+						break;
+					case ALTA:
+						requestPeticioDeFirmaWs.setPrioritatID(9);
+					}
 				}
+				GregorianCalendar gcal = new GregorianCalendar();
+				gcal.setTime(dataCaducitat);
+				DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
+				requestPeticioDeFirmaWs.setDataCaducitat(
+						new java.sql.Timestamp(dataCaducitat.getTime()));
+				requestPeticioDeFirmaWs.setFluxDeFirmes(
+						toFluxDeFirmes(
+								flux,
+								plantillaFluxId));
+				requestPeticioDeFirmaWs.setFitxerAFirmar(
+						toFitxerBean(document));
+				requestPeticioDeFirmaWs.setTipusDocumentID(
+						new Long(documentTipus));
+				requestPeticioDeFirmaWs.setModeDeFirma(
+						new Boolean(false));
+				requestPeticioDeFirmaWs.setIdiomaID("ca");
+				PeticioDeFirmaWs responsePeticioDeFirmaWs = getPeticioDeFirmaWs().createAndStartPeticioDeFirma(
+						requestPeticioDeFirmaWs);
+				peticioDeFirmaId = responsePeticioDeFirmaWs.getPeticioDeFirmaID();
+			//Petició a partir de plantilla
+			} else {
+				FirmaAsyncSimpleSignatureRequestWithSignBlockList signatureRequest = new FirmaAsyncSimpleSignatureRequestWithSignBlockList();
+
+				signatureRequest.setTitle(document.getTitol());
+				signatureRequest.setDescription(document.getDescripcio());
+				signatureRequest.setReason(motiu);
+				signatureRequest.setSenderName(remitent);
+				if (prioritat != null) {
+					switch (prioritat) {
+					case BAIXA:
+						signatureRequest.setPriority(0);
+						break;
+					case NORMAL:
+						signatureRequest.setPriority(5);
+						break;
+					case ALTA:
+						signatureRequest.setPriority(9);
+					}
+				}
+				//Caducitat??
+				signatureRequest.setAdditionalInformation(null);
+				
+				signatureRequest.setFileToSign(toFirmaAsyncSimpleFile(document));
+				signatureRequest.setDocumentType(new Long(documentTipus));
+				signatureRequest.setLanguageUI("ca");
+				
+				FirmaAsyncSimpleSignatureBlock[] signatureBlocks = getFlowInfoByFlowTemplateID(plantillaFluxId, "ca");
+
+				signatureRequest.setSignatureBlocks(signatureBlocks);
+				
+				peticioDeFirmaId = getPeticioFirmaAsyncSimpleClient().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
+				
 			}
-			GregorianCalendar gcal = new GregorianCalendar();
-			gcal.setTime(dataCaducitat);
-			DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
-			requestPeticioDeFirmaWs.setDataCaducitat(
-					new java.sql.Timestamp(dataCaducitat.getTime()));
-			requestPeticioDeFirmaWs.setFluxDeFirmes(
-					toFluxDeFirmes(
-							flux,
-							plantillaFluxId));
-			requestPeticioDeFirmaWs.setFitxerAFirmar(
-					toFitxerBean(document));
-			requestPeticioDeFirmaWs.setTipusDocumentID(
-					new Long(documentTipus));
-			requestPeticioDeFirmaWs.setModeDeFirma(
-					new Boolean(false));
-			requestPeticioDeFirmaWs.setIdiomaID("ca");
-			PeticioDeFirmaWs responsePeticioDeFirmaWs = getPeticioDeFirmaWs().createAndStartPeticioDeFirma(
-					requestPeticioDeFirmaWs);
-			return new Long(responsePeticioDeFirmaWs.getPeticioDeFirmaID()).toString();
+			return new Long(peticioDeFirmaId).toString();
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut pujar el document al portafirmes (" +
@@ -204,7 +255,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					urlReturn + idTransaccio);
 			transaccioResponse.put("idTransaccio", idTransaccio);
 			transaccioResponse.put("urlRedireccio", urlRedireccio);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -308,6 +359,92 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		}
 	}
 
+
+	private FirmaAsyncSimpleSignatureBlock[] getFlowInfoByFlowTemplateID(
+			String plantillaFluxId,
+			String idioma) throws SistemaExternException {
+		FirmaAsyncSimpleSignatureBlock[] blocsAsyncs = null;
+		int i = 0;
+		try {
+			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest();
+
+			request.setFlowTemplateId(plantillaFluxId);
+			request.setLanguageUI(idioma);
+
+			FlowTemplateSimpleFlowTemplate result = getFluxDeFirmaClient().getFlowInfoByFlowTemplateID(request);
+
+			List<FlowTemplateSimpleBlock> blocks = result.getBlocks();
+			//Prova
+			blocsAsyncs = new FirmaAsyncSimpleSignatureBlock[blocks.size()];
+
+			for (FlowTemplateSimpleBlock flowTemplateSimpleBlock : blocks) {
+				FirmaAsyncSimpleSignatureBlock blocAsync = new FirmaAsyncSimpleSignatureBlock();
+				//firmes mínimes
+				blocAsync.setMinimumNumberOfSignaturesRequired(flowTemplateSimpleBlock.getSignatureMinimum());
+
+				//Firmants
+				List<FirmaAsyncSimpleSignature> signatures = new ArrayList<FirmaAsyncSimpleSignature>();
+
+				for (FlowTemplateSimpleSignature flowTemplateSimpleSignature : flowTemplateSimpleBlock.getSignatures()) {
+					FirmaAsyncSimpleSignature signature = new FirmaAsyncSimpleSignature();
+					signature.setMinimumNumberOfRevisers(flowTemplateSimpleSignature.getMinimumNumberOfRevisers());
+					signature.setReason(flowTemplateSimpleSignature.getReason());
+					signature.setRequired(flowTemplateSimpleSignature.isRequired());
+
+					//Revisor
+					if (flowTemplateSimpleSignature.getRevisers() != null) {
+						List<FirmaAsyncSimpleReviser> revisers = new ArrayList<FirmaAsyncSimpleReviser>();
+						for (FlowTemplateSimpleReviser flowTemplateSimpleReviser : flowTemplateSimpleSignature.getRevisers()) {
+							FirmaAsyncSimpleReviser reviser = new FirmaAsyncSimpleReviser();
+
+							reviser.setAdministrationID(flowTemplateSimpleReviser.getAdministrationID());
+							reviser.setIntermediateServerUsername(flowTemplateSimpleReviser.getIntermediateServerUsername());
+							reviser.setPositionInTheCompany(flowTemplateSimpleReviser.getPositionInTheCompany());
+							reviser.setRequired(flowTemplateSimpleReviser.isRequired());
+							reviser.setUsername(flowTemplateSimpleReviser.getUsername());
+
+							revisers.add(reviser);
+						}
+						signature.setRevisers(revisers);
+					}
+					//Firmant
+					FirmaAsyncSimpleSigner signer = new FirmaAsyncSimpleSigner();
+
+					if (flowTemplateSimpleSignature.getSigner() != null) {
+						signer.setAdministrationID(flowTemplateSimpleSignature.getSigner().getAdministrationID());
+
+						if (flowTemplateSimpleSignature.getSigner().getExternalSigner() != null) {
+							FirmaAsyncSimpleExternalSigner externalSigner = new FirmaAsyncSimpleExternalSigner();
+
+							externalSigner.setAdministrationId(flowTemplateSimpleSignature.getSigner().getExternalSigner().getAdministrationId());
+							externalSigner.setEmail(flowTemplateSimpleSignature.getSigner().getExternalSigner().getEmail());
+							externalSigner.setLanguage(flowTemplateSimpleSignature.getSigner().getExternalSigner().getLanguage());
+							externalSigner.setName(flowTemplateSimpleSignature.getSigner().getExternalSigner().getName());
+							externalSigner.setSecurityLevel(flowTemplateSimpleSignature.getSigner().getExternalSigner().getSecurityLevel());
+							externalSigner.setSurnames(flowTemplateSimpleSignature.getSigner().getExternalSigner().getSurnames());
+
+							signer.setExternalSigner(externalSigner);
+						}
+						signer.setIntermediateServerUsername(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
+						signer.setPositionInTheCompany(flowTemplateSimpleSignature.getSigner().getPositionInTheCompany());
+						signer.setUsername(flowTemplateSimpleSignature.getSigner().getUsername());
+
+						signature.setSigner(signer);
+					}
+					signatures.add(signature);
+				}
+
+				blocAsync.setSigners(signatures);
+				blocsAsyncs[i] = blocAsync;
+				i++;
+			}
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(ex.getMessage());
+		}
+		return blocsAsyncs;
+	}
+
 	private String getTransaction(
 			String idioma,
 			boolean isPlantilla,
@@ -364,7 +501,6 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 
 		try {
 			result = getFluxDeFirmaClient().getFlowTemplateResult(transactionID);
-			System.out.println(result.getStatus());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
@@ -380,15 +516,6 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		}
 	}
 
-	private ApiFlowTemplateSimple getFluxDeFirmaClient() throws MalformedURLException {
-		String apiRestUrl = getBaseUrl() + "/common/rest/apiflowtemplatesimple/v1";
-		ApiFlowTemplateSimple api = new ApiFlowTemplateSimpleJersey(
-				apiRestUrl,
-				getUsername(),
-				getPassword());
-		return api;
-	}
-
 	private FitxerBean toFitxerBean(
 			PortafirmesDocument document) throws Exception {
 		if (!"pdf".equalsIgnoreCase(document.getArxiuExtensio())) {
@@ -399,6 +526,19 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		fitxer.setNom(document.getArxiuNom());
 		fitxer.setMime("application/pdf");
 		fitxer.setTamany(document.getArxiuContingut().length);
+		fitxer.setData(document.getArxiuContingut());
+		return fitxer;
+	}
+	
+	private FirmaAsyncSimpleFile toFirmaAsyncSimpleFile(
+			PortafirmesDocument document) throws Exception {
+		if (!"pdf".equalsIgnoreCase(document.getArxiuExtensio())) {
+			throw new SistemaExternException(
+					"Els arxius per firmar han de ser de tipus PDF");
+		}
+		FirmaAsyncSimpleFile fitxer = new FirmaAsyncSimpleFile();
+		fitxer.setNom(document.getArxiuNom());
+		fitxer.setMime("application/pdf");
 		fitxer.setData(document.getArxiuContingut());
 		return fitxer;
 	}
@@ -460,6 +600,24 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 	}*/
 
+	private ApiFirmaAsyncSimple getPeticioFirmaAsyncSimpleClient() throws MalformedURLException {
+		String apiRestUrl = getBaseUrl() + "/common/rest/apifirmaasyncsimple/v2";
+		ApiFirmaAsyncSimple api = new ApiFirmaAsyncSimpleJersey(
+				apiRestUrl,
+				getUsername(),
+				getPassword());
+		return api;
+	}
+	
+	private ApiFlowTemplateSimple getFluxDeFirmaClient() throws MalformedURLException {
+		String apiRestUrl = getBaseUrl() + "/common/rest/apiflowtemplatesimple/v1";
+		ApiFlowTemplateSimple api = new ApiFlowTemplateSimpleJersey(
+				apiRestUrl,
+				getUsername(),
+				getPassword());
+		return api;
+	}
+	
 	private PortaFIBPeticioDeFirmaWs getPeticioDeFirmaWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBPeticioDeFirma";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");

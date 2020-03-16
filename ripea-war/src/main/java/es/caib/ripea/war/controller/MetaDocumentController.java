@@ -267,38 +267,11 @@ public class MetaDocumentController extends BaseAdminController {
 		PortafirmesFluxRespostaDto resposta = metaDocumentFluxService.recuperarFluxFirma(transactionId);
 
 		if (resposta.isError() && resposta.getErrorTipus() != null) {
-			switch (resposta.getErrorTipus()) {
-			case INITIALIZING:
-				model.addAttribute(
+			model.addAttribute(
 						"FluxError",
 						getMessage(
 						request,
-						"metadocument.form.camp.portafirmes.flux.enum.INITIALIZING"));
-				break;
-			case IN_PROGRESS:
-				model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum.IN_PROGRESS"));
-				break;
-			case CANCELLED:
-				model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum.CANCELLED"));
-				break;
-			case FINAL_ERROR:
-				model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum.FINAL_ERROR"));
-				break;
-			default:
-				break;
-			}
+						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getErrorTipus()));
 		} else {
 			model.addAttribute(
 					"FluxCreat",

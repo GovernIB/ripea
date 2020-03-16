@@ -216,10 +216,12 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 
 	private static String getResponsablesFromArray(String[] responsables) {
 		StringBuilder responsablesStr = new StringBuilder();
-		for (String responsable: responsables) {
-			if (responsablesStr.length() > 0)
-				responsablesStr.append(",");
-			responsablesStr.append(responsable);
+		if (responsables != null) {
+			for (String responsable: responsables) {
+				if (responsablesStr.length() > 0)
+					responsablesStr.append(",");
+				responsablesStr.append(responsable);
+			}
 		}
 		return responsablesStr.toString();
 	}

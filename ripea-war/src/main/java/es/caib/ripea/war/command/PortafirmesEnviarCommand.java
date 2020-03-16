@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 
@@ -31,9 +32,7 @@ public class PortafirmesEnviarCommand {
 	private Date dataInici;
 	private boolean enviarCorreu;
 	private String[] portafirmesResponsables;
-	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus;
-
-
+	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	
 	public String[] getPortafirmesResponsables() {
 		return portafirmesResponsables;
@@ -43,12 +42,12 @@ public class PortafirmesEnviarCommand {
 		this.portafirmesResponsables = portafirmesResponsables;
 	}
 
-	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesFluxTipus() {
-		return portafirmesFluxTipus;
+	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesSequenciaTipus() {
+		return portafirmesSequenciaTipus;
 	}
 
-	public void setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus) {
-		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	public void setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus) {
+		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
 	}
 
 	public PortafirmesEnviarCommand() {

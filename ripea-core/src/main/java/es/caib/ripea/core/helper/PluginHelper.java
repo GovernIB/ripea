@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.awt.BufferCapabilities.FlipContents;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1808,22 +1809,24 @@ public class PluginHelper {
 		portafirmesDocument.setArxiuContingut(
 				fitxerConvertit.getContingut());
 		List<PortafirmesFluxBloc> flux = new ArrayList<PortafirmesFluxBloc>();
-		if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
-			for (String responsable: responsables) {
+		if (fluxId == null) {
+			if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
+				for (String responsable: responsables) {
+					PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
+					bloc.setMinSignataris(1);
+					bloc.setDestinataris(new String[] {responsable});
+					bloc.setObligatorietats(new boolean[] {true});
+					flux.add(bloc);
+				}
+			} else if (MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL.equals(fluxTipus)) {
 				PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
-				bloc.setMinSignataris(1);
-				bloc.setDestinataris(new String[] {responsable});
-				bloc.setObligatorietats(new boolean[] {true});
+				bloc.setMinSignataris(responsables.length);
+				bloc.setDestinataris(responsables);
+				boolean[] obligatorietats = new boolean[responsables.length];
+				Arrays.fill(obligatorietats, true);
+				bloc.setObligatorietats(obligatorietats);
 				flux.add(bloc);
 			}
-		} else if (MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL.equals(fluxTipus)) {
-			PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
-			bloc.setMinSignataris(responsables.length);
-			bloc.setDestinataris(responsables);
-			boolean[] obligatorietats = new boolean[responsables.length];
-			Arrays.fill(obligatorietats, true);
-			bloc.setObligatorietats(obligatorietats);
-			flux.add(bloc);
 		}
 		try {
 			Calendar dataCaducitatCal = Calendar.getInstance();

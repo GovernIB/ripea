@@ -92,16 +92,19 @@ pageContext.setAttribute(
         if($("#firmaPortafirmesActiva").prop("checked") == true){
         	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
+        	$("label[for='portafirmesFluxId']").append( " *" );
         }
 
 		$("#firmaPortafirmesActiva").on('change', function(){
 	            if($(this).prop("checked") == true){
 	            	$("label[for='portafirmesDocumentTipus']").append( " *" );
 	            	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
+	            	$("label[for='portafirmesFluxId']").append( " *" );
 	            }
 	            else if($(this).prop("checked") == false){
 	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
 	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
+	            	$("label[for='portafirmesFluxId']").text( $("label[for='portafirmesFluxId']").text().replace(' *', '') );
 	            }			
 		});
 		
