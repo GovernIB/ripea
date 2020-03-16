@@ -39,13 +39,16 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -55,6 +58,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.core.api.service.MetaDocumentFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.DocumentCommand;
@@ -109,7 +113,8 @@ public class UsuariTascaController extends BaseUserController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
-
+	@Autowired
+	private MetaDocumentFluxService metaDocumentFluxService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -702,8 +707,23 @@ public class UsuariTascaController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
+		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
+		if (metaDocument.getPortafirmesFluxTipus() != null) {
+			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+		} else if (metaDocument.getPortafirmesFluxId() == null) {
+			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+		} else {
+			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
+		}
+		
+		if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null) {
+			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(metaDocument.getPortafirmesFluxId());
+			command.setPortafirmesFluxId(metaDocument.getPortafirmesFluxId());
+			command.setPortafirmesFluxNom(info.getNom());
+			command.setPortafirmesFluxDescripcio(info.getDescripcio());
+		}
 		model.addAttribute(command);
 		model.addAttribute("tascaId", tascaId);
 		return "portafirmesForm";
@@ -779,12 +799,20 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long documentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
+				entitatActual.getId(),
+				documentId);
+		
 		model.addAttribute(
 				"portafirmes",
-				expedientTascaService.portafirmesInfo(
-						entitatActual.getId(),
-						tascaId,
-						documentId));
+				portafirmes);
+		
+		if (portafirmes.getFluxTipus() != null && (portafirmes.getFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && portafirmes.getFluxId() != null)) {
+			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(portafirmes.getFluxId());
+			model.addAttribute(
+					"fluxInfo",
+					info);
+		}
 		model.addAttribute("tascaId", tascaId);
 		return "portafirmesInfo";
 	}
