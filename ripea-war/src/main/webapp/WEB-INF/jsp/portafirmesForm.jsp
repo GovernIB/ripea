@@ -42,20 +42,29 @@
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
-		
-		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-		<rip:inputSuggest 
-			name="portafirmesResponsables" 
-			urlConsultaInicial="${urlConsultaInicial}" 
-			urlConsultaLlistat="${urlConsultaLlistat}" 
-			textKey="metadocument.form.camp.portafirmes.responsables"
-			suggestValue="nif"
-			suggestText="nom"
-			suggestTextAddicional="nif"
-			required="true"/>
-					
-		<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<rip:inputText name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" readonly="true"/>
+		<c:choose>
+		<c:when test="${fluxTipus == 'SIMPLE'}">
+			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+			<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+			<rip:inputSuggest 
+				name="portafirmesResponsables" 
+				urlConsultaInicial="${urlConsultaInicial}" 
+				urlConsultaLlistat="${urlConsultaLlistat}" 
+				textKey="metadocument.form.camp.portafirmes.responsables"
+				suggestValue="nif"
+				suggestText="nom"
+				suggestTextAddicional="nif"
+				required="true"/>
+						
+			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		</c:when>
+		<c:otherwise>
+			<rip:inputText name="portafirmesFluxId" textKey="contenidor.document.portafirmes.camp.flux.id"  readonly="true"/>
+			<rip:inputText name="portafirmesFluxNom" textKey="contenidor.document.portafirmes.camp.flux.nom" readonly="true"/>
+			<rip:inputText name="portafirmesFluxDescripcio" textKey="contenidor.document.portafirmes.camp.flux.descripcio" readonly="true"/>
+		</c:otherwise>
+		</c:choose>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.portafirmes.enviar"/></button>
 			<a href="<c:url value="/contenidor/${document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

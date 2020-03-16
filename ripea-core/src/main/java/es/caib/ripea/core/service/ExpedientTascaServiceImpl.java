@@ -21,6 +21,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -420,7 +421,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
-			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus,
+			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long tascaId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
@@ -441,6 +443,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				prioritat,
 				dataCaducitat,
 				portafirmesResponsables,
+				portafirmesSeqTipus,
 				portafirmesFluxTipus);
 	}
 	

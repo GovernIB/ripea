@@ -5,7 +5,6 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -26,6 +25,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentFluxService;
@@ -239,12 +239,12 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/metaDocument/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, String> iniciarTransaccio(
+	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="tipusDocumentNom", required = false) String tipusDocumentNom,
 			Model model) {
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
-		Map<String, String> transaccioResponse = metaDocumentFluxService.iniciarFluxFirma(
+		PortafirmesIniciFluxRespostaDto transaccioResponse = metaDocumentFluxService.iniciarFluxFirma(
 				urlReturn,
 				tipusDocumentNom);
 		return transaccioResponse;
@@ -267,38 +267,11 @@ public class MetaDocumentController extends BaseAdminController {
 		PortafirmesFluxRespostaDto resposta = metaDocumentFluxService.recuperarFluxFirma(transactionId);
 
 		if (resposta.isError() && resposta.getErrorTipus() != null) {
-			switch (resposta.getErrorTipus()) {
-			case INITIALIZING:
-				model.addAttribute(
+			model.addAttribute(
 						"FluxError",
 						getMessage(
 						request,
-						"metadocument.form.camp.portafirmes.flux.enum.INITIALIZING"));
-				break;
-			case IN_PROGRESS:
-				model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum.IN_PROGRESS"));
-				break;
-			case CANCELLED:
-				model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum.CANCELLED"));
-				break;
-			case FINAL_ERROR:
-				model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum.FINAL_ERROR"));
-				break;
-			default:
-				break;
-			}
+						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getErrorTipus()));
 		} else {
 			model.addAttribute(
 					"FluxCreat",

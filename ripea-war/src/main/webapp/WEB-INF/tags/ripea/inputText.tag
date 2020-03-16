@@ -17,13 +17,20 @@
 <%@ attribute name="button" required="false" rtexprvalue="true"%>
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
+<%@ attribute name="readonly" required="false" rtexprvalue="true"%>
+
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}"> *</c:if></c:set>
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
-
+<c:set var="myReadonly">
+	<c:choose>
+		<c:when test="${empty readonly}">false</c:when>
+		<c:otherwise>${readonly}</c:otherwise>
+	</c:choose>
+</c:set>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>
 	<c:when test="${not inline}">
@@ -32,12 +39,12 @@
 			<c:choose>
 				<c:when test="${tooltip && not button}">
 					<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}"/>
 				</c:when>
 				<c:when test="${button && not tooltip}">
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}"/>
 					<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
 					</div>
 				</c:when>
@@ -45,12 +52,12 @@
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
 						<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
-						<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}"/>
+						<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}"/>
 						<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}"  readonly="${myReadonly}"/>
 				</c:otherwise>
 			</c:choose>
 			
@@ -60,7 +67,7 @@
 	</c:when>
 	<c:otherwise>
 		<label class="sr-only" for="${campPath}">${campLabelText}</label>
-   		<form:input path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}"/>
+   		<form:input path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
 		<c:if test="${button}">
 			<button class="btn btn-outline-secondary" type="button">Button</button>
 		</c:if>

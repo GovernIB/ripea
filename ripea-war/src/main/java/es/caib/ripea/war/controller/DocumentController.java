@@ -36,15 +36,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.MetaDocumentFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
@@ -74,6 +78,8 @@ public class DocumentController extends BaseUserController {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
+	@Autowired
+	private MetaDocumentFluxService metaDocumentFluxService;
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -98,8 +104,24 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
-		command.setPortafirmesFluxTipus(metaDocument.getPortafirmesSequenciaTipus());
+		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
+		if (metaDocument.getPortafirmesFluxTipus() != null) {
+			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+		} else if (metaDocument.getPortafirmesFluxId() == null) {
+			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+		} else {
+			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
+		}
+		
+		if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null) {
+			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(metaDocument.getPortafirmesFluxId());
+			command.setPortafirmesFluxId(metaDocument.getPortafirmesFluxId());
+			command.setPortafirmesFluxNom(info.getNom());
+			command.setPortafirmesFluxDescripcio(info.getDescripcio());
+		}
+		
 		model.addAttribute(command);
 		return "portafirmesForm";
 	}
@@ -125,6 +147,7 @@ public class DocumentController extends BaseUserController {
 				command.getPrioritat(),
 				command.getDataCaducitat(),
 				command.getPortafirmesResponsables(),
+				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus());
 		return this.getModalControllerReturnValueSuccess(
 				request,
@@ -165,11 +188,20 @@ public class DocumentController extends BaseUserController {
 			@PathVariable Long documentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
+				entitatActual.getId(),
+				documentId);
+		
 		model.addAttribute(
 				"portafirmes",
-				documentService.portafirmesInfo(
-						entitatActual.getId(),
-						documentId));
+				portafirmes);
+		
+		if (portafirmes.getFluxTipus() != null && (portafirmes.getFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && portafirmes.getFluxId() != null)) {
+			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(portafirmes.getFluxId());
+			model.addAttribute(
+					"fluxInfo",
+					info);
+		}
 		return "portafirmesInfo";
 	}
 

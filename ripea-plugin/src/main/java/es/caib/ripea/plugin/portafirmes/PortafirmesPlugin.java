@@ -2,20 +2,19 @@ package es.caib.ripea.plugin.portafirmes;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import es.caib.ripea.plugin.SistemaExternException;
 
 /**
  * Plugin per a la integració amb portafirmes.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface PortafirmesPlugin {
 
 	/**
 	 * Envia un document a firmar al portafirmes.
-	 * 
+	 *
 	 * @param document
 	 *            L'arxiu a firmar.
 	 * @param documentTipus
@@ -54,7 +53,7 @@ public interface PortafirmesPlugin {
 
 	/**
 	 * Descarrega un document del portafirmes.
-	 * 
+	 *
 	 * @param id
 	 *            L'identificador del document a descarregar.
 	 * @return El document.
@@ -66,7 +65,7 @@ public interface PortafirmesPlugin {
 
 	/**
 	 * Esborra un document del portafirmes.
-	 * 
+	 *
 	 * @param id
 	 *            L'identificador del document a esborrar.
 	 * @throws SistemaExternException
@@ -77,7 +76,7 @@ public interface PortafirmesPlugin {
 
 	/**
 	 * Retorna la llista amb tots els tipus de document permesos.
-	 * 
+	 *
 	 * @return La llista de tipus de document o null si aquesta
 	 *            característica no està suportada.
 	 * @throws SistemaExternException
@@ -88,43 +87,71 @@ public interface PortafirmesPlugin {
 	/**
 	 * Indica si el plugin suporta la custòdia de documents i si aquesta
 	 * es fa de manera automàtica una vegada firmat el document.
-	 * 
+	 *
 	 * @return true si està suportada i es fa de forma automàtica o false
 	 *            en cas contrari.
 	 */
 	public boolean isCustodiaAutomatica();
-	
+
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
-	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * Inicia un nou flux de firma a partir dels paràmetres d'entrada
+	 * proporcionats.
+	 *
+	 * @param idioma
+	 * 			Idioma per crear el flux.
+	 * @param isPlantilla
+	 * 			Indicar si guardar una plantilla de flux.
+	 * @param nom
+	 * 			Nom de flux a crear.
+	 * @param descripcio
+	 * 			Una descripció del flux a crear.
+	 * @param descripcioVisible
+	 * 			Indicar si visualitzar la descripció.
+	 * @param returnUrl
+	 * 			Url redirecció on redirigir la resposta una vegada s'ha iniciat
+	 * 			la transacció.
+	 * @return la informació del flux de firma creat (idTransacció i urlRedirecció).
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public Map<String, String> iniciarFluxDeFirma(
+	public PortafirmesIniciFluxResposta iniciarFluxDeFirma(
 			String idioma,
 			boolean isPlantilla,
 			String nom,
 			String descripcio,
 			boolean descripcioVisible,
 			String returnUrl) throws SistemaExternException;
-	
+
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
-	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * Recupera el id del flux de firma creat.
+	 *
+	 * @param idTransaccio
+	 * 				Id de la transacció creada anteriorment.
+	 * @return el id del flux de firma o error.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
 	public PortafirmesFluxResposta recuperarFluxDeFirma(
 			String idTransaccio) throws SistemaExternException;
 
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
-	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * Recupera el detall d'un flux de firma creat (nom + descripció).
+	 *
+	 * @param idTransaccio
+	 * 				Id de la transacció.
+	 * @return la informació del flux de firma.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(
+			String idTransaccio,
+			String idioma) throws SistemaExternException;
+
+	/**
+	 * Tanca una transacció.
+	 *
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
 	public void tancarTransaccioFlux(
 			String idTransaccio) throws SistemaExternException;

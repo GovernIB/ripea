@@ -37,7 +37,9 @@ import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
@@ -207,7 +209,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	}
 
 	@Override
-	public Map<String, String> iniciarFluxDeFirma(
+	public PortafirmesIniciFluxResposta iniciarFluxDeFirma(
 			String idioma,
 			boolean isPlantilla,
 			String nom,
@@ -215,7 +217,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 			boolean descripcioVisible,
 			String urlReturn) throws SistemaExternException {
 		
-		return new HashMap<String, String>();
+		return new PortafirmesIniciFluxResposta();
 	}
 	
 	@Override
@@ -225,6 +227,12 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 
 	@Override
 	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {}
+	
+	@Override
+	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(String idTransaccio, String idioma)
+			throws SistemaExternException {
+		return new PortafirmesFluxInfo();
+	}
 	
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,

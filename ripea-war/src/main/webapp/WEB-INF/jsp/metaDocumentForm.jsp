@@ -44,6 +44,27 @@ pageContext.setAttribute(
 	<rip:modalHead/>
 	
 <style type="text/css">
+
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
+
 .ui-dialog {
 	z-index: 1000;
 }
@@ -81,7 +102,6 @@ pageContext.setAttribute(
 </style>	
 <script type="text/javascript">
 	$(document).ready(function() {
-		console.log(localStorage.getItem('fluxid'));
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
 				$(".callback").removeClass("hidden");
@@ -92,16 +112,19 @@ pageContext.setAttribute(
         if($("#firmaPortafirmesActiva").prop("checked") == true){
         	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
+        	$("label[for='portafirmesFluxId']").append( " *" );
         }
 
 		$("#firmaPortafirmesActiva").on('change', function(){
 	            if($(this).prop("checked") == true){
 	            	$("label[for='portafirmesDocumentTipus']").append( " *" );
 	            	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
+	            	$("label[for='portafirmesFluxId']").append( " *" );
 	            }
 	            else if($(this).prop("checked") == false){
 	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
 	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
+	            	$("label[for='portafirmesFluxId']").text( $("label[for='portafirmesFluxId']").text().replace(' *', '') );
 	            }			
 		});
 		
@@ -138,6 +161,15 @@ pageContext.setAttribute(
 			});
 		});
 		
+		$("#fluxModal").on("show.bs.modal", function () {
+			 $(".modal-body").html('<img src="loading.gif" />');
+		});
+		$body = $("#fluxModal");
+		$(document).on({
+			ajaxStart: function() { $body.addClass("loading");    },
+			ajaxStop: function() { $body.removeClass("loading"); }    
+		});
+		
 		$("#fluxModal").on('hidden.bs.modal', function() {
 			var fluxid = localStorage.getItem('fluxid');
 			var FluxError = localStorage.getItem('FluxError');
@@ -149,7 +181,7 @@ pageContext.setAttribute(
 			} else if (FluxCreat != null && FluxCreat != '') {
 				alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span></div>'
 			}
-			$(alertDiv).insertBefore("form");
+			$(alertDiv).insertBefore("form").delay(3000).queue(function() { $(this).remove(); });
 			
 			if (fluxid != null && fluxid != '')
 				$('#portafirmesFluxId').val(fluxid);
@@ -270,5 +302,6 @@ pageContext.setAttribute(
 	    </div>
 	  </div>
 	</div>
+	<div class="rmodal"></div>
 </body>
 </html>

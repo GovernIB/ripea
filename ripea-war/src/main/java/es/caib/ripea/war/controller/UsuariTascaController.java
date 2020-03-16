@@ -702,7 +702,7 @@ public class UsuariTascaController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
-		command.setPortafirmesFluxTipus(metaDocument.getPortafirmesSequenciaTipus());
+		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		model.addAttribute(command);
 		model.addAttribute("tascaId", tascaId);
@@ -732,6 +732,7 @@ public class UsuariTascaController extends BaseUserController {
 				command.getPrioritat(),
 				command.getDataCaducitat(),
 				command.getPortafirmesResponsables(),
+				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
 				tascaId);
 		return this.getModalControllerReturnValueSuccess(

@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 
@@ -31,9 +32,11 @@ public class PortafirmesEnviarCommand {
 	private Date dataInici;
 	private boolean enviarCorreu;
 	private String[] portafirmesResponsables;
-	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus;
-
-
+	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
+	private String portafirmesFluxId;
+	private String portafirmesFluxNom;
+	private String portafirmesFluxDescripcio;
+	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	
 	public String[] getPortafirmesResponsables() {
 		return portafirmesResponsables;
@@ -43,11 +46,43 @@ public class PortafirmesEnviarCommand {
 		this.portafirmesResponsables = portafirmesResponsables;
 	}
 
-	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesFluxTipus() {
+	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesSequenciaTipus() {
+		return portafirmesSequenciaTipus;
+	}
+
+	public void setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus) {
+		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
+	}
+
+	public String getPortafirmesFluxId() {
+		return portafirmesFluxId;
+	}
+
+	public void setPortafirmesFluxId(String portafirmesFluxId) {
+		this.portafirmesFluxId = portafirmesFluxId;
+	}
+
+	public String getPortafirmesFluxNom() {
+		return portafirmesFluxNom;
+	}
+
+	public void setPortafirmesFluxNom(String portafirmesFluxNom) {
+		this.portafirmesFluxNom = portafirmesFluxNom;
+	}
+
+	public String getPortafirmesFluxDescripcio() {
+		return portafirmesFluxDescripcio;
+	}
+
+	public void setPortafirmesFluxDescripcio(String portafirmesFluxDescripcio) {
+		this.portafirmesFluxDescripcio = portafirmesFluxDescripcio;
+	}
+
+	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
 		return portafirmesFluxTipus;
 	}
 
-	public void setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus) {
+	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		this.portafirmesFluxTipus = portafirmesFluxTipus;
 	}
 

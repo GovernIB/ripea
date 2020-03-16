@@ -8,12 +8,15 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -37,8 +40,11 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	private String documentTipus;
 	@Column(name = "pf_responsables", length = 1024)
 	private String responsables;
+	@Column(name = "pf_seq_tipus")
+	private MetaDocumentFirmaSequenciaTipusEnumDto sequenciaTipus;
 	@Column(name = "pf_flux_tipus")
-	private MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus;
+	@Enumerated(EnumType.STRING)
+	private MetaDocumentFirmaFluxTipusEnumDto fluxTipus;
 	@Column(name = "pf_flux_id", length = 64)
 	private String fluxId;
 	@Column(name = "pf_portafirmes_id", length = 64, unique = true)
@@ -56,10 +62,18 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 		return documentTipus;
 	}
 	public String[] getResponsables() {
-		return responsables.split(",");
+		if (responsables != null) {
+			return responsables.split(",");
+		} else {
+			return null;
+		}
+		
 	}
-	public MetaDocumentFirmaSequenciaTipusEnumDto getFluxTipus() {
+	public MetaDocumentFirmaFluxTipusEnumDto getFluxTipus() {
 		return fluxTipus;
+	}
+	public MetaDocumentFirmaSequenciaTipusEnumDto getSequenciaTipus() {
+		return sequenciaTipus;
 	}
 	public String getFluxId() {
 		return fluxId;
@@ -90,7 +104,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			Date caducitatData,
 			String documentTipus,
 			String[] responsables,
-			MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
+			MetaDocumentFirmaSequenciaTipusEnumDto sequenciaTipus,
+			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
 			String fluxId,
 			ExpedientEntity expedient,
 			DocumentEntity document) {
@@ -101,6 +116,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				caducitatData,
 				documentTipus,
 				responsables,
+				sequenciaTipus,
 				fluxTipus,
 				fluxId,
 				expedient,
@@ -116,7 +132,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				Date caducitatData,
 				String documentTipus,
 				String[] responsables,
-				MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
+				MetaDocumentFirmaSequenciaTipusEnumDto sequenciaTipus,
+				MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
 				String fluxId,
 				ExpedientEntity expedient,
 				DocumentEntity document) {
@@ -128,6 +145,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			built.caducitatData = caducitatData;
 			built.documentTipus = documentTipus;
 			built.responsables = getResponsablesFromArray(responsables);
+			built.sequenciaTipus = sequenciaTipus;
 			built.fluxTipus = fluxTipus;
 			built.fluxId = fluxId;
 			built.expedient = expedient;
@@ -216,10 +234,12 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 
 	private static String getResponsablesFromArray(String[] responsables) {
 		StringBuilder responsablesStr = new StringBuilder();
-		for (String responsable: responsables) {
-			if (responsablesStr.length() > 0)
-				responsablesStr.append(",");
-			responsablesStr.append(responsable);
+		if (responsables != null) {
+			for (String responsable: responsables) {
+				if (responsablesStr.length() > 0)
+					responsablesStr.append(",");
+				responsablesStr.append(responsable);
+			}
 		}
 		return responsablesStr.toString();
 	}

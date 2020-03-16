@@ -6,13 +6,14 @@ package es.caib.ripea.plugin.caib.portafirmes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 
@@ -77,14 +78,14 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	}
 
 	@Override
-	public Map<String, String> iniciarFluxDeFirma(
+	public PortafirmesIniciFluxResposta iniciarFluxDeFirma(
 			String idioma,
 			boolean isPlantilla,
 			String nom,
 			String descripcio,
 			boolean descripcioVisible,
 			String urlReturn) throws SistemaExternException {
-		Map<String, String> transaccioResponse = null;
+		PortafirmesIniciFluxResposta transaccioResponse = null;
 		try {
 //			String idTransaccio = getTransaction(
 //					idioma, 
@@ -126,5 +127,12 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(String idTransaccio, String idioma)
+			throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

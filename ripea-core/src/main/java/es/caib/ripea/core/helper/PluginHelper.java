@@ -68,7 +68,9 @@ import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxErrorTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
@@ -112,7 +114,9 @@ import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -1808,22 +1812,24 @@ public class PluginHelper {
 		portafirmesDocument.setArxiuContingut(
 				fitxerConvertit.getContingut());
 		List<PortafirmesFluxBloc> flux = new ArrayList<PortafirmesFluxBloc>();
-		if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
-			for (String responsable: responsables) {
+		if (fluxId == null) {
+			if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
+				for (String responsable: responsables) {
+					PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
+					bloc.setMinSignataris(1);
+					bloc.setDestinataris(new String[] {responsable});
+					bloc.setObligatorietats(new boolean[] {true});
+					flux.add(bloc);
+				}
+			} else if (MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL.equals(fluxTipus)) {
 				PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
-				bloc.setMinSignataris(1);
-				bloc.setDestinataris(new String[] {responsable});
-				bloc.setObligatorietats(new boolean[] {true});
+				bloc.setMinSignataris(responsables.length);
+				bloc.setDestinataris(responsables);
+				boolean[] obligatorietats = new boolean[responsables.length];
+				Arrays.fill(obligatorietats, true);
+				bloc.setObligatorietats(obligatorietats);
 				flux.add(bloc);
 			}
-		} else if (MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL.equals(fluxTipus)) {
-			PortafirmesFluxBloc bloc = new PortafirmesFluxBloc();
-			bloc.setMinSignataris(responsables.length);
-			bloc.setDestinataris(responsables);
-			boolean[] obligatorietats = new boolean[responsables.length];
-			Arrays.fill(obligatorietats, true);
-			bloc.setObligatorietats(obligatorietats);
-			flux.add(bloc);
 		}
 		try {
 			Calendar dataCaducitatCal = Calendar.getInstance();
@@ -2002,7 +2008,7 @@ public class PluginHelper {
 		return !getPortafirmesPlugin().isCustodiaAutomatica();
 	}
 
-	public Map<String, String> portafirmesIniciarFluxDeFirma(
+	public PortafirmesIniciFluxRespostaDto portafirmesIniciarFluxDeFirma(
 			String idioma,
 			boolean isPlantilla,
 			String nom,
@@ -2011,15 +2017,19 @@ public class PluginHelper {
 			String urlReturn) {
 		String accioDescripcio = "Iniciant flux de firma";
 		long t0 = System.currentTimeMillis();
-		Map<String, String> transaccioResponse = new HashMap<String, String>();
+		PortafirmesIniciFluxRespostaDto transaccioResponseDto = new PortafirmesIniciFluxRespostaDto();
 		try {
-			transaccioResponse = getPortafirmesPlugin().iniciarFluxDeFirma(
+			PortafirmesIniciFluxResposta transaccioResponse = getPortafirmesPlugin().iniciarFluxDeFirma(
 					idioma,
 					isPlantilla,
 					nom,
 					descripcio,
 					descripcioVisible,
 					urlReturn);
+			if (transaccioResponse != null) {
+				transaccioResponseDto.setIdTransaccio(transaccioResponse.getIdTransaccio());
+				transaccioResponseDto.setUrlRedireccio(transaccioResponse.getUrlRedireccio());
+			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -2035,7 +2045,7 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-		return transaccioResponse;
+		return transaccioResponseDto;
 	}
 	
 	public PortafirmesFluxRespostaDto portafirmesRecuperarFluxDeFirma(
@@ -2095,11 +2105,45 @@ public class PluginHelper {
 		}
 	}
 	
+	public PortafirmesFluxInfoDto portafirmesRecuperarInfoFluxDeFirma(
+			String idTransaccio,
+			String idioma) {
+		String accioDescripcio = "Recuperant detall flux de firma";
+		long t0 = System.currentTimeMillis();
+		PortafirmesFluxInfoDto respostaDto;
+		try {
+			respostaDto = new PortafirmesFluxInfoDto();
+			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarDetallFluxDeFirma(
+					idTransaccio,
+					idioma);
+			
+			if (resposta != null) {
+				respostaDto.setNom(resposta.getNom());
+				respostaDto.setDescripcio(resposta.getDescripcio());
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return respostaDto;
+	}
+	
 	public String conversioConvertirPdfArxiuNom(
 			String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);
 	}
-
+	
 	public FitxerDto conversioConvertirPdf(
 			FitxerDto original,
 			String urlPerEstampar) {

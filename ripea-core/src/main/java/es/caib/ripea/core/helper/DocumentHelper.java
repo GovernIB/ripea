@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -103,7 +104,8 @@ public class DocumentHelper {
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
-			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesFluxTipus) {
+			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +
@@ -162,6 +164,7 @@ public class DocumentHelper {
 				dataCaducitat,
 				document.getMetaDocument().getPortafirmesDocumentTipus(),
 				portafirmesResponsables,
+				portafirmesSeqTipus,
 				portafirmesFluxTipus,
 				document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
@@ -604,7 +607,7 @@ public class DocumentHelper {
 					documentPortafirmes.getCaducitatData(),
 					documentPortafirmes.getDocumentTipus(),
 					documentPortafirmes.getResponsables(),
-					documentPortafirmes.getFluxTipus(),
+					documentPortafirmes.getSequenciaTipus(),
 					documentPortafirmes.getFluxId(),
 					null);
 			documentPortafirmes.updateEnviat(

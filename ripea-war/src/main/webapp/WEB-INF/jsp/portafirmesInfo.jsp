@@ -58,10 +58,10 @@
 					<td><strong><spring:message code="firma.info.camp.document.tipus"/></strong></td>
 					<td>${portafirmes.documentTipus}</td>
 				</tr>
-				<c:if test="${not empty portafirmes.destinatari}">
+				<c:if test="${not empty portafirmes.responsables}">
 					<tr>
 						<td><strong><spring:message code="firma.info.camp.responsables"/></strong></td>
-						<td>${portafirmes.destinatari}</td>
+						<td><c:forEach var="responsable" items="${portafirmes.responsables}" varStatus="loop">${responsable}${!loop.last ? ',' : ''}</c:forEach></td>
 					</tr>
 				</c:if>
 				<c:if test="${not empty portafirmes.fluxTipus}">
@@ -70,10 +70,28 @@
 						<td><spring:message code="metadocument.fluxtip.enum.${portafirmes.fluxTipus}"/></td>
 					</tr>
 				</c:if>
+				<c:if test="${not empty portafirmes.sequenciaTipus}">
+					<tr>
+						<td><strong><spring:message code="firma.info.camp.flux.seq"/></strong></td>
+						<td><spring:message code="metadocument.seqtip.enum.${portafirmes.sequenciaTipus}"/></td>
+					</tr>
+				</c:if>
 				<c:if test="${not empty portafirmes.fluxId}">
 					<tr>
 						<td><strong><spring:message code="firma.info.camp.flux.id"/></strong></td>
 						<td>${portafirmes.fluxId}</td>
+					</tr>
+				</c:if>
+				<c:if test="${(not empty fluxInfo) && (not empty fluxInfo.nom)}">
+					<tr>
+						<td><strong><spring:message code="firma.info.camp.flux.nom"/></strong></td>
+						<td>${fluxInfo.nom}</td>
+					</tr>
+				</c:if>
+				<c:if test="${(not empty fluxInfo) && (not empty fluxInfo.descripcio)}">
+					<tr>
+						<td><strong><spring:message code="firma.info.camp.flux.descripcio"/></strong></td>
+						<td>${fluxInfo.descripcio}</td>
 					</tr>
 				</c:if>
 				<c:if test="${not empty portafirmes.portafirmesId}">
