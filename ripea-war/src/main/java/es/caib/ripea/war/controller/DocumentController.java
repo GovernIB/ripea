@@ -48,7 +48,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.MetaDocumentFluxService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
@@ -79,7 +79,7 @@ public class DocumentController extends BaseUserController {
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
-	private MetaDocumentFluxService metaDocumentFluxService;
+	private PortafirmesFluxService metaDocumentFluxService;
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -115,7 +115,7 @@ public class DocumentController extends BaseUserController {
 			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
 		}
 		
-		if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null) {
+		if (metaDocument.getPortafirmesFluxTipus() != null && (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null)) {
 			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(metaDocument.getPortafirmesFluxId());
 			command.setPortafirmesFluxId(metaDocument.getPortafirmesFluxId());
 			command.setPortafirmesFluxNom(info.getNom());

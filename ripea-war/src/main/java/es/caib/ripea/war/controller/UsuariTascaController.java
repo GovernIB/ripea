@@ -58,7 +58,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.core.api.service.MetaDocumentFluxService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.DocumentCommand;
@@ -114,7 +114,7 @@ public class UsuariTascaController extends BaseUserController {
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
 	@Autowired
-	private MetaDocumentFluxService metaDocumentFluxService;
+	private PortafirmesFluxService metaDocumentFluxService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(

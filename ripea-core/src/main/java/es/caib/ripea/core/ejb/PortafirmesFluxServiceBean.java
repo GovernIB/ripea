@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +14,19 @@ import org.springframework.stereotype.Service;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.core.api.service.MetaDocumentFluxService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 
 /**
  * Implementació del servei de gestió de meta-documents.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Service
+@Stateless
 @Interceptors(SpringBeanAutowiringInterceptor.class)
-public class MetaDocumentFluxServiceBean implements MetaDocumentFluxService {
+public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 
 	@Autowired
-	MetaDocumentFluxService delegate;
+	PortafirmesFluxService delegate;
 
 
 	@Override

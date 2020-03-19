@@ -12,7 +12,7 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.MetaDocumentFluxService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.helper.PluginHelper;
 
 /**
@@ -21,7 +21,7 @@ import es.caib.ripea.core.helper.PluginHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
-public class MetaDocumentFluxServiceImpl implements MetaDocumentFluxService {
+public class MetaDocumentFluxServiceImpl implements PortafirmesFluxService {
 
 	@Autowired
 	PluginHelper pluginHelper;

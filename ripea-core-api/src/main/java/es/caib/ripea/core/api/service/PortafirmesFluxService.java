@@ -14,7 +14,7 @@ import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface MetaDocumentFluxService {
+public interface PortafirmesFluxService {
 
 	/**
 	 * Inicia un flux de firma

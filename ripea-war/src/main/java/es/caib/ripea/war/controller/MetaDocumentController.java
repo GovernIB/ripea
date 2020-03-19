@@ -28,7 +28,7 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.MetaDocumentFluxService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
@@ -53,7 +53,7 @@ public class MetaDocumentController extends BaseAdminController {
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
-	private MetaDocumentFluxService metaDocumentFluxService;
+	private PortafirmesFluxService metaDocumentFluxService;
 	@Autowired
 	private TipusDocumentalService tipusDocumentalService;
 
