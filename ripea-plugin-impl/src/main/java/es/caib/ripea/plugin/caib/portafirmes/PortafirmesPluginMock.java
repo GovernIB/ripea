@@ -36,7 +36,8 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 			List<PortafirmesFluxBloc> flux,
 			String plantillaFluxId,
 			List<PortafirmesDocument> annexos,
-			boolean signarAnnexos) throws SistemaExternException {
+			boolean signarAnnexos,
+			String transaccioId) throws SistemaExternException {
 		//throw new SistemaExternException("Això no acaba d'anar be");
 		return new Long(System.currentTimeMillis()).toString();
 	}
@@ -105,7 +106,7 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	}
 	
 	@Override
-	public PortafirmesFluxResposta recuperarFluxDeFirma(String idTransaccio) {
+	public PortafirmesFluxResposta recuperarIdPlantillaFluxDeFirma(String idTransaccio) {
 		PortafirmesFluxResposta urlRedireccio = null;
 		try {
 //			FlowTemplateSimpleGetFlowResultResponse result = getFluxDeFirmaClient().getFlowTemplateResult(idTransaccio);
@@ -130,7 +131,7 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	}
 
 	@Override
-	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(String idTransaccio, String idioma)
+	public PortafirmesFluxInfo recuperarDetallPlantillaFluxDeFirma(String idTransaccio, String idioma)
 			throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;

@@ -423,7 +423,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
-			Long tascaId) {
+			Long tascaId,
+			String transaccioId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentId + ", " +
@@ -444,7 +445,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				dataCaducitat,
 				portafirmesResponsables,
 				portafirmesSeqTipus,
-				portafirmesFluxTipus);
+				portafirmesFluxTipus,
+				transaccioId);
 	}
 	
 	

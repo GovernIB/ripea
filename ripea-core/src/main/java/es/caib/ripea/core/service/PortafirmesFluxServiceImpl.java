@@ -21,7 +21,7 @@ import es.caib.ripea.core.helper.PluginHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
-public class MetaDocumentFluxServiceImpl implements PortafirmesFluxService {
+public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 
 	@Autowired
 	PluginHelper pluginHelper;
@@ -31,7 +31,8 @@ public class MetaDocumentFluxServiceImpl implements PortafirmesFluxService {
 	@Override
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
-			String tipusDocumentNom) {
+			String tipusDocumentNom,
+			boolean isPlantilla) {
 		logger.debug("(Iniciant flux de firma (" +
 				"urlRedireccio=" + urlReturn + "," +
 				"tipusDocumentNom=" + tipusDocumentNom + ")");
@@ -39,7 +40,7 @@ public class MetaDocumentFluxServiceImpl implements PortafirmesFluxService {
 		
 		PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(
 				idioma,
-				true,
+				isPlantilla,
 				tipusDocumentNom + "_plantilla_flux",
 				tipusDocumentNom + "_plantilla_flux_desc",
 				true,
@@ -72,5 +73,5 @@ public class MetaDocumentFluxServiceImpl implements PortafirmesFluxService {
 				idioma);
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentFluxServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(PortafirmesFluxServiceImpl.class);
 }

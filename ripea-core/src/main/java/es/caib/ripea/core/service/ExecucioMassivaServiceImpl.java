@@ -409,6 +409,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					em.getDataCaducitat(),
 					null,
 					null,
+					null,
 					null);
 				
 			emc.updateFinalitzat(new Date());

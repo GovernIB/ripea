@@ -91,11 +91,47 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			List<PortafirmesFluxBloc> flux,
 			String plantillaFluxId,
 			List<PortafirmesDocument> annexos,
-			boolean signarAnnexos) throws SistemaExternException {
+			boolean signarAnnexos,
+			String idTransaccio) throws SistemaExternException {
 		try {
 			long peticioDeFirmaId = 0;
-			//Petició simple
-			if (plantillaFluxId == null) {
+			
+			//Petició a partir de plantilla
+			if (plantillaFluxId != null || idTransaccio != null) {
+				FirmaAsyncSimpleSignatureRequestWithSignBlockList signatureRequest = new FirmaAsyncSimpleSignatureRequestWithSignBlockList();
+
+				signatureRequest.setTitle(document.getTitol());
+				signatureRequest.setDescription(document.getDescripcio());
+				signatureRequest.setReason(motiu);
+				signatureRequest.setSenderName(remitent);
+				if (prioritat != null) {
+					switch (prioritat) {
+					case BAIXA:
+						signatureRequest.setPriority(0);
+						break;
+					case NORMAL:
+						signatureRequest.setPriority(5);
+						break;
+					case ALTA:
+						signatureRequest.setPriority(9);
+					}
+				}
+				//Caducitat??
+				signatureRequest.setAdditionalInformation(null);
+				
+				signatureRequest.setFileToSign(toFirmaAsyncSimpleFile(document));
+				signatureRequest.setDocumentType(new Long(documentTipus));
+				signatureRequest.setLanguageUI("ca");
+				signatureRequest.setLanguageDoc("ca");
+				signatureRequest.setProfileCode(getPerfil());
+				FirmaAsyncSimpleSignatureBlock[] signatureBlocks = plantillaFluxId != null ? toFirmaAsyncSimpleSignatureBlockFromId(plantillaFluxId, "ca") : recuperarFluxDeFirma(idTransaccio);
+
+				signatureRequest.setSignatureBlocks(signatureBlocks);
+				
+				peticioDeFirmaId = getPeticioFirmaAsyncSimpleClient().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
+				//Petició simple
+			} else {
+				
 				PeticioDeFirmaWs requestPeticioDeFirmaWs = new PeticioDeFirmaWs();
 				requestPeticioDeFirmaWs.setTitol(document.getTitol());
 				requestPeticioDeFirmaWs.setDescripcio(document.getDescripcio());
@@ -132,40 +168,6 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				PeticioDeFirmaWs responsePeticioDeFirmaWs = getPeticioDeFirmaWs().createAndStartPeticioDeFirma(
 						requestPeticioDeFirmaWs);
 				peticioDeFirmaId = responsePeticioDeFirmaWs.getPeticioDeFirmaID();
-			//Petició a partir de plantilla
-			} else {
-				FirmaAsyncSimpleSignatureRequestWithSignBlockList signatureRequest = new FirmaAsyncSimpleSignatureRequestWithSignBlockList();
-
-				signatureRequest.setTitle(document.getTitol());
-				signatureRequest.setDescription(document.getDescripcio());
-				signatureRequest.setReason(motiu);
-				signatureRequest.setSenderName(remitent);
-				if (prioritat != null) {
-					switch (prioritat) {
-					case BAIXA:
-						signatureRequest.setPriority(0);
-						break;
-					case NORMAL:
-						signatureRequest.setPriority(5);
-						break;
-					case ALTA:
-						signatureRequest.setPriority(9);
-					}
-				}
-				//Caducitat??
-				signatureRequest.setAdditionalInformation(null);
-				
-				signatureRequest.setFileToSign(toFirmaAsyncSimpleFile(document));
-				signatureRequest.setDocumentType(new Long(documentTipus));
-				signatureRequest.setLanguageUI("ca");
-				signatureRequest.setLanguageDoc("ca");
-				signatureRequest.setProfileCode(getPerfil());
-				FirmaAsyncSimpleSignatureBlock[] signatureBlocks = toFirmaAsyncSimpleSignatureBlock(plantillaFluxId, "ca");
-
-				signatureRequest.setSignatureBlocks(signatureBlocks);
-				
-				peticioDeFirmaId = getPeticioFirmaAsyncSimpleClient().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
-				
 			}
 			return new Long(peticioDeFirmaId).toString();
 		} catch (Exception ex) {
@@ -266,9 +268,9 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 
 		return transaccioResponse;
 	}
-
+	
 	@Override
-	public PortafirmesFluxResposta recuperarFluxDeFirma(String idTransaccio) throws SistemaExternException {
+	public PortafirmesFluxResposta recuperarIdPlantillaFluxDeFirma(String idTransaccio) throws SistemaExternException {
 		PortafirmesFluxResposta resposta = new PortafirmesFluxResposta();
 		try {
 			FlowTemplateSimpleGetFlowResultResponse result = getFlowTemplateResult(idTransaccio);
@@ -343,7 +345,8 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					ex);
 		} finally {
 			try {
-				closeTransaction(idTransaccio);
+				if (resposta.getFluxId() != null)
+					closeTransaction(idTransaccio);
 			} catch (Exception ex) {
 				throw new SistemaExternException(
 						"S'ha produït un error tancant la transacció",
@@ -364,7 +367,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 
 	@Override
-	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(
+	public PortafirmesFluxInfo recuperarDetallPlantillaFluxDeFirma(
 			String plantillaFluxId,
 			String idioma) throws SistemaExternException {
 		PortafirmesFluxInfo info = null;
@@ -389,11 +392,38 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		return info;
 	}
 	
-	private FirmaAsyncSimpleSignatureBlock[] toFirmaAsyncSimpleSignatureBlock(
+	private FirmaAsyncSimpleSignatureBlock[] recuperarFluxDeFirma(String idTransaccio) throws SistemaExternException {
+		List<FlowTemplateSimpleBlock> blocks = null;
+		FirmaAsyncSimpleSignatureBlock[] blocsAsyncs = null;
+		try {
+			FlowTemplateSimpleGetFlowResultResponse result = getFlowTemplateResult(idTransaccio);
+			
+			if (result != null && result.getFlowInfo() != null) {
+				blocks = new ArrayList<FlowTemplateSimpleBlock>();			
+				FlowTemplateSimpleFlowTemplate flux = result.getFlowInfo();
+				blocks = flux.getBlocks();
+				
+				blocsAsyncs = toFirmaAsyncSimpleSignatureBlock(blocks);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			try {
+				closeTransaction(idTransaccio);
+			} catch (Exception ex) {
+				throw new SistemaExternException(
+						"S'ha produït un error tancant la transacció",
+						ex);
+			}
+		}
+		return blocsAsyncs;
+	}
+	
+	private FirmaAsyncSimpleSignatureBlock[] toFirmaAsyncSimpleSignatureBlockFromId(
 			String plantillaFluxId,
 			String idioma) throws SistemaExternException {
 		FirmaAsyncSimpleSignatureBlock[] blocsAsyncs = null;
-		int i = 0;
+		List<FlowTemplateSimpleBlock> blocks = null;
 		try {
 			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest();
 
@@ -402,75 +432,91 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 
 			FlowTemplateSimpleFlowTemplate result = getFluxDeFirmaClient().getFlowInfoByFlowTemplateID(request);
 
-			List<FlowTemplateSimpleBlock> blocks = result.getBlocks();
-			blocsAsyncs = new FirmaAsyncSimpleSignatureBlock[blocks.size()];
-
-			for (FlowTemplateSimpleBlock flowTemplateSimpleBlock : blocks) {
-				FirmaAsyncSimpleSignatureBlock blocAsync = new FirmaAsyncSimpleSignatureBlock();
-				//firmes mínimes
-				blocAsync.setMinimumNumberOfSignaturesRequired(flowTemplateSimpleBlock.getSignatureMinimum());
-
-				//Firmants
-				List<FirmaAsyncSimpleSignature> signatures = new ArrayList<FirmaAsyncSimpleSignature>();
-
-				for (FlowTemplateSimpleSignature flowTemplateSimpleSignature : flowTemplateSimpleBlock.getSignatures()) {
-					FirmaAsyncSimpleSignature signature = new FirmaAsyncSimpleSignature();
-					signature.setMinimumNumberOfRevisers(flowTemplateSimpleSignature.getMinimumNumberOfRevisers());
-					signature.setReason(flowTemplateSimpleSignature.getReason());
-					signature.setRequired(flowTemplateSimpleSignature.isRequired());
-
-					//Revisor
-					if (flowTemplateSimpleSignature.getRevisers() != null) {
-						List<FirmaAsyncSimpleReviser> revisers = new ArrayList<FirmaAsyncSimpleReviser>();
-						for (FlowTemplateSimpleReviser flowTemplateSimpleReviser : flowTemplateSimpleSignature.getRevisers()) {
-							FirmaAsyncSimpleReviser reviser = new FirmaAsyncSimpleReviser();
-
-							reviser.setAdministrationID(flowTemplateSimpleReviser.getAdministrationID());
-							reviser.setIntermediateServerUsername(flowTemplateSimpleReviser.getIntermediateServerUsername());
-							reviser.setPositionInTheCompany(flowTemplateSimpleReviser.getPositionInTheCompany());
-							reviser.setRequired(flowTemplateSimpleReviser.isRequired());
-							reviser.setUsername(flowTemplateSimpleReviser.getUsername());
-
-							revisers.add(reviser);
-						}
-						signature.setRevisers(revisers);
-					}
-					//Firmant
-					FirmaAsyncSimpleSigner signer = new FirmaAsyncSimpleSigner();
-
-					if (flowTemplateSimpleSignature.getSigner() != null) {
-						signer.setAdministrationID(flowTemplateSimpleSignature.getSigner().getAdministrationID());
-
-						if (flowTemplateSimpleSignature.getSigner().getExternalSigner() != null) {
-							FirmaAsyncSimpleExternalSigner externalSigner = new FirmaAsyncSimpleExternalSigner();
-
-							externalSigner.setAdministrationId(flowTemplateSimpleSignature.getSigner().getExternalSigner().getAdministrationId());
-							externalSigner.setEmail(flowTemplateSimpleSignature.getSigner().getExternalSigner().getEmail());
-							externalSigner.setLanguage(flowTemplateSimpleSignature.getSigner().getExternalSigner().getLanguage());
-							externalSigner.setName(flowTemplateSimpleSignature.getSigner().getExternalSigner().getName());
-							externalSigner.setSecurityLevel(flowTemplateSimpleSignature.getSigner().getExternalSigner().getSecurityLevel());
-							externalSigner.setSurnames(flowTemplateSimpleSignature.getSigner().getExternalSigner().getSurnames());
-
-							signer.setExternalSigner(externalSigner);
-						}
-						signer.setIntermediateServerUsername(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
-						signer.setPositionInTheCompany(flowTemplateSimpleSignature.getSigner().getPositionInTheCompany());
-						signer.setUsername(flowTemplateSimpleSignature.getSigner().getUsername());
-						
-						signature.setSigner(signer);
-					}
-					signatures.add(signature);
-				}
-
-				blocAsync.setSigners(signatures);
-				blocsAsyncs[i] = blocAsync;
-				i++;
+			if (result != null) {
+				blocks = result.getBlocks();
 			}
-
+		
+			blocsAsyncs = toFirmaAsyncSimpleSignatureBlock(blocks);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"S'ha produït un error transformant en l'objecte FirmaAsyncSimpleSignatureBlock[]",
 					ex);
+		}
+		return blocsAsyncs;
+	}
+	
+	private FirmaAsyncSimpleSignatureBlock[] toFirmaAsyncSimpleSignatureBlock(List<FlowTemplateSimpleBlock> blocks) {
+		FirmaAsyncSimpleSignatureBlock[] blocsAsyncs = null;
+		int i = 0;
+		
+		try {
+			if (blocks != null) {
+				blocsAsyncs = new FirmaAsyncSimpleSignatureBlock[blocks.size()];
+		
+				for (FlowTemplateSimpleBlock flowTemplateSimpleBlock : blocks) {
+					FirmaAsyncSimpleSignatureBlock blocAsync = new FirmaAsyncSimpleSignatureBlock();
+					//firmes mínimes
+					blocAsync.setMinimumNumberOfSignaturesRequired(flowTemplateSimpleBlock.getSignatureMinimum());
+		
+					//Firmants
+					List<FirmaAsyncSimpleSignature> signatures = new ArrayList<FirmaAsyncSimpleSignature>();
+		
+					for (FlowTemplateSimpleSignature flowTemplateSimpleSignature : flowTemplateSimpleBlock.getSignatures()) {
+						FirmaAsyncSimpleSignature signature = new FirmaAsyncSimpleSignature();
+						signature.setMinimumNumberOfRevisers(flowTemplateSimpleSignature.getMinimumNumberOfRevisers());
+						signature.setReason(flowTemplateSimpleSignature.getReason());
+						signature.setRequired(flowTemplateSimpleSignature.isRequired());
+		
+						//Revisor
+						if (flowTemplateSimpleSignature.getRevisers() != null) {
+							List<FirmaAsyncSimpleReviser> revisers = new ArrayList<FirmaAsyncSimpleReviser>();
+							for (FlowTemplateSimpleReviser flowTemplateSimpleReviser : flowTemplateSimpleSignature.getRevisers()) {
+								FirmaAsyncSimpleReviser reviser = new FirmaAsyncSimpleReviser();
+		
+								reviser.setAdministrationID(flowTemplateSimpleReviser.getAdministrationID());
+								reviser.setIntermediateServerUsername(flowTemplateSimpleReviser.getIntermediateServerUsername());
+								reviser.setPositionInTheCompany(flowTemplateSimpleReviser.getPositionInTheCompany());
+								reviser.setRequired(flowTemplateSimpleReviser.isRequired());
+								reviser.setUsername(flowTemplateSimpleReviser.getUsername());
+		
+								revisers.add(reviser);
+							}
+							signature.setRevisers(revisers);
+						}
+						//Firmant
+						FirmaAsyncSimpleSigner signer = new FirmaAsyncSimpleSigner();
+		
+						if (flowTemplateSimpleSignature.getSigner() != null) {
+							signer.setAdministrationID(flowTemplateSimpleSignature.getSigner().getAdministrationID());
+		
+							if (flowTemplateSimpleSignature.getSigner().getExternalSigner() != null) {
+								FirmaAsyncSimpleExternalSigner externalSigner = new FirmaAsyncSimpleExternalSigner();
+		
+								externalSigner.setAdministrationId(flowTemplateSimpleSignature.getSigner().getExternalSigner().getAdministrationId());
+								externalSigner.setEmail(flowTemplateSimpleSignature.getSigner().getExternalSigner().getEmail());
+								externalSigner.setLanguage(flowTemplateSimpleSignature.getSigner().getExternalSigner().getLanguage());
+								externalSigner.setName(flowTemplateSimpleSignature.getSigner().getExternalSigner().getName());
+								externalSigner.setSecurityLevel(flowTemplateSimpleSignature.getSigner().getExternalSigner().getSecurityLevel());
+								externalSigner.setSurnames(flowTemplateSimpleSignature.getSigner().getExternalSigner().getSurnames());
+		
+								signer.setExternalSigner(externalSigner);
+							}
+							signer.setIntermediateServerUsername(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
+							signer.setPositionInTheCompany(flowTemplateSimpleSignature.getSigner().getPositionInTheCompany());
+							signer.setUsername(flowTemplateSimpleSignature.getSigner().getUsername());
+							
+							signature.setSigner(signer);
+						}
+						signatures.add(signature);
+					}
+		
+					blocAsync.setSigners(signatures);
+					blocsAsyncs[i] = blocAsync;
+					i++;
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 		return blocsAsyncs;
 	}

@@ -344,7 +344,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			String transaccioId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
@@ -367,7 +368,8 @@ public class DocumentServiceImpl implements DocumentService {
 				dataCaducitat,
 				portafirmesResponsables,
 				portafirmesSeqTipus,
-				portafirmesFluxTipus);
+				portafirmesFluxTipus,
+				transaccioId);
 	}
 
 	@Transactional

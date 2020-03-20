@@ -90,7 +90,8 @@ public interface ExpedientTascaService {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
-			Long tascaId);
+			Long tascaId,
+			String transaccioId);
 
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,

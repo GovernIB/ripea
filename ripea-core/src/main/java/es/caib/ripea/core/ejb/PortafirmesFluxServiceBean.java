@@ -9,7 +9,6 @@ import javax.interceptor.Interceptors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-import org.springframework.stereotype.Service;
 
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
@@ -31,10 +30,14 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(String urlReturn, String tipusDocumentNom) {
+	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
+			String urlReturn, 
+			String tipusDocumentNom,
+			boolean isPlantilla) {
 		return delegate.iniciarFluxFirma(
 				urlReturn, 
-				tipusDocumentNom);
+				tipusDocumentNom,
+				isPlantilla);
 	}
 	
 	@Override

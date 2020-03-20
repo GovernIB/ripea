@@ -243,7 +243,8 @@ public interface DocumentService {
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) throws NotFoundException, IllegalStateException, SistemaExternException;
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			String transaccioId) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Recupera els dispositius disponibles per un usuari

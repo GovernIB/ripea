@@ -21,7 +21,6 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
-import es.caib.ripea.war.validation.FluxIdNotEmpty;
 import es.caib.ripea.war.validation.PortafirmesDocumentTipusNotEmpty;
 import es.caib.ripea.war.validation.ResponsableNotEmpty;
 
@@ -31,7 +30,6 @@ import es.caib.ripea.war.validation.ResponsableNotEmpty;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @ResponsableNotEmpty
-@FluxIdNotEmpty
 @PortafirmesDocumentTipusNotEmpty
 @CodiMetaDocumentNoRepetit(
 		campId = "id",

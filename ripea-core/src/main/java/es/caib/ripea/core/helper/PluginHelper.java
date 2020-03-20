@@ -1747,10 +1747,11 @@ public class PluginHelper {
 					null,
 					false);
 
+			document.setIdentificador(arxiuUuid);
 			if (moureDocument) {
-				nouContingut = getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
+				getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
+				//document.setIdentificador(nouContingut.getIdentificador());
 			}
-			document.setIdentificador(nouContingut.getIdentificador());
 			return document;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1777,7 +1778,8 @@ public class PluginHelper {
 			String[] responsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
 			String fluxId,
-			List<DocumentEntity> annexos) {
+			List<DocumentEntity> annexos,
+			String transaccioId) {
 
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(
@@ -1853,7 +1855,8 @@ public class PluginHelper {
 					flux,
 					fluxId,
 					null,
-					false);
+					false,
+					transaccioId);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PFIRMA,
 					"Enviament de document a firmar",
@@ -2055,7 +2058,7 @@ public class PluginHelper {
 		PortafirmesFluxRespostaDto respostaDto;
 		try {
 			respostaDto = new PortafirmesFluxRespostaDto();
-			PortafirmesFluxResposta resposta = getPortafirmesPlugin().recuperarFluxDeFirma(
+			PortafirmesFluxResposta resposta = getPortafirmesPlugin().recuperarIdPlantillaFluxDeFirma(
 					idTransaccio);
 			
 			if (resposta != null) {
@@ -2113,7 +2116,7 @@ public class PluginHelper {
 		PortafirmesFluxInfoDto respostaDto;
 		try {
 			respostaDto = new PortafirmesFluxInfoDto();
-			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarDetallFluxDeFirma(
+			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarDetallPlantillaFluxDeFirma(
 					idTransaccio,
 					idioma);
 			

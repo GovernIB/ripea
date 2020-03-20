@@ -122,7 +122,8 @@ public class DocumentServiceBean implements DocumentService {
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			String transaccioId) {
 		delegate.portafirmesEnviar(
 				entitatId,
 				id,
@@ -131,7 +132,8 @@ public class DocumentServiceBean implements DocumentService {
 				dataCaducitat,
 				portafirmesResponsables,
 				portafirmesSeqTipus,
-				portafirmesFluxTipus);
+				portafirmesFluxTipus,
+				transaccioId);
 	}
 
 	@Override

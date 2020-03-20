@@ -28,7 +28,8 @@ public interface PortafirmesFluxService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
-			String tipusDocumentNom);
+			String tipusDocumentNom,
+			boolean isPlantilla);
 	
 	/**
 	 * Recupera un flux de firma creat (id)
