@@ -1036,14 +1036,19 @@ public class ContingutHelper {
 
 			//##################### DOCUMENT #####################
 			} else if (contingut instanceof DocumentEntity) {
-				String custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
-						(DocumentEntity) contingut,
-						isCarpetaLogica() ? contingut.getExpedientPare() : contingut.getPare(),
-						serieDocumental,
-						fitxer,
-						documentAmbFirma,
-						firmaSeparada,
-						firmes);
+				//No actualizar dins SGD si és un document importat de Regweb
+				String custodiaDocumentId = null;
+				DocumentEntity document = (DocumentEntity) contingut;
+				if (document.getDocumentTipus() != null && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+					custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
+							(DocumentEntity) contingut,
+							isCarpetaLogica() ? contingut.getExpedientPare() : contingut.getPare(),
+							serieDocumental,
+							fitxer,
+							documentAmbFirma,
+							firmaSeparada,
+							firmes);
+				}
 				documentHelper.actualitzarVersionsDocument((DocumentEntity) contingut);
 
 				if (firmes != null) {
@@ -1051,13 +1056,13 @@ public class ContingutHelper {
 					((DocumentEntity) contingut).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 					((DocumentEntity) contingut).updateInformacioCustodia(
 							new Date(),
-							custodiaDocumentId,
+							custodiaDocumentId != null ? custodiaDocumentId : document.getArxiuUuid(),
 							((DocumentEntity) contingut).getCustodiaCsv());
 					// Registra al log la custòdia de la firma del document
 					contingutLogHelper.log((
 							(DocumentEntity) contingut),
 							LogTipusEnumDto.ARXIU_CUSTODIAT,
-							custodiaDocumentId,
+							custodiaDocumentId != null ? custodiaDocumentId : document.getArxiuUuid(),
 							null,
 							false,
 							false);

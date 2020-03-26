@@ -115,7 +115,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 					getOrigen(document),
 					getEstatElaboracio(document),
 					getTipusDocumental(document),
-					metaDocumentEntity,
+					null, //metaDocumentEntity
 					contingut,
 					contingut.getEntitat(),
 					expedientSuperior,

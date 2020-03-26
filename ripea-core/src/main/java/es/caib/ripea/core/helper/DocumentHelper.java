@@ -228,7 +228,7 @@ public class DocumentHelper {
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					documentEntity.getEntitat(),
-					documentEntity.getMetaDocument().getMetaExpedient(),
+					documentEntity.getMetaDocument() != null ? documentEntity.getMetaDocument().getMetaExpedient() : null,
 					document.getMetaDocument().getId(),
 					false,
 					comprovarMetaExpedient);
