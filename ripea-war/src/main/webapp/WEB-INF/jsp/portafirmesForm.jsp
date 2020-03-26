@@ -20,6 +20,25 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 <style type="text/css">
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
 .modal-lg {
 	width: 100%;
 }
@@ -37,8 +56,8 @@
 .iframe_container {
 	position: relative;
 	width: 100%;
-	height: 100vh;
-	padding-bottom: 40%;
+	height: 97vh;
+	padding-bottom: 0;
 }
 
 .iframe_content {
@@ -81,9 +100,11 @@ $(document).ready(function() {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 					$('.content').addClass("hidden");
-					$('.flux_container').html('<div class="iframe_container"><iframe id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+					$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
 					
 					adjustModalPerFlux();
+					$body = $("body");
+					$body.addClass("loading");
 				}
 			},
 			error: function(err) {
@@ -108,6 +129,10 @@ function adjustModalPerFlux() {
 	$iframe.closest('div.modal-lg').css('width', '95%');
 }
 
+function removeLoading() {
+	$body = $("body");
+	$body.removeClass("loading");
+}
 </script>
 </head>
 <body>
@@ -172,5 +197,6 @@ function adjustModalPerFlux() {
 		</div>
 	</form:form>
 	<div class="flux_container"></div>
+	<div class="rmodal"></div>
 </body>
 </html>

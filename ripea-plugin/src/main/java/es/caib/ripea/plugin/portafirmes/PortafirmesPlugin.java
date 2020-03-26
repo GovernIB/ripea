@@ -132,7 +132,7 @@ public interface PortafirmesPlugin {
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public PortafirmesFluxResposta recuperarIdPlantillaFluxDeFirma(
+	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(
 			String idTransaccio) throws SistemaExternException;
 
 	/**
@@ -144,7 +144,7 @@ public interface PortafirmesPlugin {
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public PortafirmesFluxInfo recuperarDetallPlantillaFluxDeFirma(
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String idTransaccio,
 			String idioma) throws SistemaExternException;
 

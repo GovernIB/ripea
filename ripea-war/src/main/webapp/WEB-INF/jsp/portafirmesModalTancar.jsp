@@ -20,18 +20,28 @@ if (fluxIframe) {
 	var idFlux = "${fluxId}";
 	var FluxError = "${FluxError}";
 	var FluxCreat = "${FluxCreat}";
+	var FluxNom = "${FluxNom}";
+	var FluxDescripcio = "${FluxDescripcio}";
 	var alertDiv;
-	debugger
+	
 	if (idFlux != null && idFlux != '') {
 		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').val(idFlux);
 	} else if (FluxError != null && FluxError != '') {
-		alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>'
+		alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>';
 	}
-	
 	if (FluxCreat != null && FluxCreat != '') {
-		alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span></div>'
+		alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span>';
+		
+		if ((FluxNom != null && FluxNom != '') && (FluxDescripcio != null && FluxDescripcio != '')) {
+			alertDiv += '<br>' +
+						'<ul>' +
+							'<li>Nom flux: ' + FluxNom + '</li>' +
+							'<li>Descripció flux: ' + FluxDescripcio + '</li>' +
+						'</ul></div>';
+		}
 	}
 	$(fluxIframe.parentElement.parentElement).prev().removeClass('hidden');
+	$(fluxIframe.parentElement.parentElement).prev().find('.alert').remove();
 	$(fluxIframe.parentElement.parentElement).prev().prepend(alertDiv);
 	
 	//Adjust modal width/height

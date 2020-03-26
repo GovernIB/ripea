@@ -106,7 +106,7 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	}
 	
 	@Override
-	public PortafirmesFluxResposta recuperarIdPlantillaFluxDeFirma(String idTransaccio) {
+	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(String idTransaccio) {
 		PortafirmesFluxResposta urlRedireccio = null;
 		try {
 //			FlowTemplateSimpleGetFlowResultResponse result = getFluxDeFirmaClient().getFlowTemplateResult(idTransaccio);
@@ -129,9 +129,8 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
-	public PortafirmesFluxInfo recuperarDetallPlantillaFluxDeFirma(String idTransaccio, String idioma)
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String idTransaccio, String idioma)
 			throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;

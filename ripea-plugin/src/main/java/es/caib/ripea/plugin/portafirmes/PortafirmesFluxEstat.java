@@ -1,6 +1,6 @@
 package es.caib.ripea.plugin.portafirmes;
 
-public enum PortafirmesFluxErrorTipus {
+public enum PortafirmesFluxEstat {
 	INITIALIZING,
 	IN_PROGRESS,
 	FINAL_ERROR,

@@ -594,18 +594,22 @@ public class DocumentController extends BaseUserController {
 			Model model) {
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 
-		if (resposta.isError() && resposta.getErrorTipus() != null) {
+		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
 						"FluxError",
 						getMessage(
 						request,
-						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getErrorTipus()));
+						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
 		} else {
 			model.addAttribute(
 					"FluxCreat",
 					getMessage(
 					request,
-					"metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
+					"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+			model.addAttribute(
+					"FluxNom", resposta.getNom());
+			model.addAttribute(
+					"FluxDescripcio", resposta.getDescripcio());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_TRANSACCIOID,

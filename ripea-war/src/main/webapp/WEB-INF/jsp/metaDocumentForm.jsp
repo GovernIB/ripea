@@ -83,8 +83,8 @@ body.loading .rmodal {
 .iframe_container {
 	position: relative;
 	width: 100%;
-	height: 0;
-	padding-bottom: 40%;
+	height: 97vh;
+	padding-bottom: 0;
 }
 
 .iframe_content {
@@ -116,19 +116,16 @@ body.loading .rmodal {
         if($("#firmaPortafirmesActiva").prop("checked") == true){
         	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
-        	$("label[for='portafirmesFluxId']").append( " *" );
         }
 
 		$("#firmaPortafirmesActiva").on('change', function(){
 	            if($(this).prop("checked") == true){
 	            	$("label[for='portafirmesDocumentTipus']").append( " *" );
 	            	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
-	            	$("label[for='portafirmesFluxId']").append( " *" );
 	            }
 	            else if($(this).prop("checked") == false){
 	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
 	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
-	            	$("label[for='portafirmesFluxId']").text( $("label[for='portafirmesFluxId']").text().replace(' *', '') );
 	            }			
 		});
 		

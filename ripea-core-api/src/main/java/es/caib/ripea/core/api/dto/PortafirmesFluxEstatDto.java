@@ -1,6 +1,6 @@
 package es.caib.ripea.core.api.dto;
 
-public enum PortafirmesFluxErrorTipusDto {
+public enum PortafirmesFluxEstatDto {
 	INITIALIZING,
 	IN_PROGRESS,
 	FINAL_ERROR,

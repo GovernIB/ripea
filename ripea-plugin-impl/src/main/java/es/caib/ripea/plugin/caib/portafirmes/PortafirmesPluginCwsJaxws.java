@@ -222,7 +222,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	}
 	
 	@Override
-	public PortafirmesFluxResposta recuperarIdPlantillaFluxDeFirma(String idTransaccio) {
+	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(String idTransaccio) {
 		return new PortafirmesFluxResposta();
 	}
 
@@ -230,7 +230,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {}
 	
 	@Override
-	public PortafirmesFluxInfo recuperarDetallPlantillaFluxDeFirma(String idTransaccio, String idioma)
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String fluxId, String idioma)
 			throws SistemaExternException {
 		return new PortafirmesFluxInfo();
 	}

@@ -64,12 +64,12 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	}
 
 	@Override
-	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String idTransaccio) {
-		logger.debug("Recuperant flux de firma (" +
-				"idTransaccio=" + idTransaccio +")");
+	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId) {
+		logger.debug("Recuperant detall flux de firma (" +
+				"plantillaFluxId=" + plantillaFluxId +")");
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
 		return pluginHelper.portafirmesRecuperarInfoFluxDeFirma(
-				idTransaccio, 
+				plantillaFluxId, 
 				idioma);
 	}
 	

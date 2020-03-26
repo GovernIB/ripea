@@ -64,7 +64,7 @@ import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxErrorTipus;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxEstat;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
@@ -270,7 +270,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 	
 	@Override
-	public PortafirmesFluxResposta recuperarIdPlantillaFluxDeFirma(String idTransaccio) throws SistemaExternException {
+	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(String idTransaccio) throws SistemaExternException {
 		PortafirmesFluxResposta resposta = new PortafirmesFluxResposta();
 		try {
 			FlowTemplateSimpleGetFlowResultResponse result = getFlowTemplateResult(idTransaccio);
@@ -282,7 +282,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				case FlowTemplateSimpleStatus.STATUS_INITIALIZING:
 					{
 						resposta.setError(true);
-						resposta.setErrorTipus(PortafirmesFluxErrorTipus.INITIALIZING);
+						resposta.setEstat(PortafirmesFluxEstat.INITIALIZING);
 						logger.error("S'ha rebut un estat inconsistent del procés de construcció del flux."
 								+ " (Inialitzant). Consulti amb el seu administrador.");
 						return resposta;
@@ -290,7 +290,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				case FlowTemplateSimpleStatus.STATUS_IN_PROGRESS:
 					{
 						resposta.setError(true);
-						resposta.setErrorTipus(PortafirmesFluxErrorTipus.IN_PROGRESS);
+						resposta.setEstat(PortafirmesFluxEstat.IN_PROGRESS);
 						logger.error("S'ha rebut un estat inconsistent de construcció "
 								+ "del flux (En Progrés). Consulti amb el seu administrador.");
 						return resposta;
@@ -299,7 +299,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					{
 						String desc = transactionStatus.getErrorStackTrace();
 						resposta.setError(true);
-						resposta.setErrorTipus(PortafirmesFluxErrorTipus.FINAL_ERROR);
+						resposta.setEstat(PortafirmesFluxEstat.FINAL_ERROR);
 
 						if (desc != null) {
 							logger.error(desc);
@@ -310,7 +310,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				case FlowTemplateSimpleStatus.STATUS_CANCELLED:
 					{
 						resposta.setError(true);
-						resposta.setErrorTipus(PortafirmesFluxErrorTipus.CANCELLED);
+						resposta.setEstat(PortafirmesFluxEstat.CANCELLED);
 						logger.error("L'usuari ha cancelat la construcció del flux");
 						return resposta;
 					}
@@ -319,7 +319,10 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 						FlowTemplateSimpleFlowTemplate flux = result.getFlowInfo();
 
 						resposta.setError(false);
+						resposta.setEstat(PortafirmesFluxEstat.FINAL_OK);
 						resposta.setFluxId(flux.getIntermediateServerFlowTemplateId());
+						resposta.setNom(flux.getName());
+						resposta.setDescripcio(flux.getDescription());
 					}
 					break;
 
@@ -367,7 +370,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 
 	@Override
-	public PortafirmesFluxInfo recuperarDetallPlantillaFluxDeFirma(
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String plantillaFluxId,
 			String idioma) throws SistemaExternException {
 		PortafirmesFluxInfo info = null;
