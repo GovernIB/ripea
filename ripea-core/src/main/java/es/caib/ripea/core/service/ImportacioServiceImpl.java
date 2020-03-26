@@ -16,6 +16,7 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -126,6 +127,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 						fitxer.getNom(),
 						fitxer.getContentType(),
 						fitxer.getContingut());
+			}
+			if (document.getFirmes() != null && !document.getFirmes().isEmpty()) {
+				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
 			entity.updateArxiu(document.getIdentificador());
 			contingutLogHelper.logCreacio(
