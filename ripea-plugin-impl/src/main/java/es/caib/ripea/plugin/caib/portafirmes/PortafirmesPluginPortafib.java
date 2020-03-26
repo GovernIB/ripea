@@ -124,13 +124,13 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				signatureRequest.setLanguageUI("ca");
 				signatureRequest.setLanguageDoc("ca");
 				signatureRequest.setProfileCode(getPerfil());
-				FirmaAsyncSimpleSignatureBlock[] signatureBlocks = plantillaFluxId != null ? toFirmaAsyncSimpleSignatureBlockFromId(plantillaFluxId, "ca") : recuperarFluxDeFirma(idTransaccio);
+				FirmaAsyncSimpleSignatureBlock[] signatureBlocks = idTransaccio != null ? recuperarFluxDeFirma(idTransaccio) : toFirmaAsyncSimpleSignatureBlockFromId(plantillaFluxId, "ca");
 
 				signatureRequest.setSignatureBlocks(signatureBlocks);
 				
 				peticioDeFirmaId = getPeticioFirmaAsyncSimpleClient().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
 				//Petició simple
-			} else {
+			} else if (flux != null && ! flux.isEmpty()) {
 				
 				PeticioDeFirmaWs requestPeticioDeFirmaWs = new PeticioDeFirmaWs();
 				requestPeticioDeFirmaWs.setTitol(document.getTitol());

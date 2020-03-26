@@ -81,27 +81,36 @@ body.loading .rmodal {
 .btn-flux:hover {
 	color: #fff; 
 }
+.disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+	opacity: .65;
+	box-shadow: none;
+}
 </style>
 
 <script type="text/javascript">
 $(document).ready(function() {
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
-	console.log(localStorage.getItem("currentIframeHeight"));
+	let fluxPredefinit = ${nouFluxDeFirma};
+	
+	if (fluxPredefinit != null && fluxPredefinit) {
+		$('form').find('button').addClass('disabled');
+	} 
 	
 	$(".portafirmesFlux_btn").on('click', function(){		
-		var tipusDocumentNom = '${document.fitxerNom}';
+		let documentNom = '${document.nom}';
 		$.ajax({
 			type: 'GET',
 			dataType: "json",
-			data: {tipusDocumentNom: tipusDocumentNom},
+			data: {nom: documentNom},
 			url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
 			success: function(transaccioResponse) {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 					$('.content').addClass("hidden");
 					$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
-					
 					adjustModalPerFlux();
 					$body = $("body");
 					$body.addClass("loading");
@@ -116,7 +125,7 @@ $(document).ready(function() {
 });
 
 function adjustModalPerFlux() {
-	var $iframe = $(window.frameElement);
+	let $iframe = $(window.frameElement);
 	$iframe.css('height', '100%');
 	$iframe.parent().css('height', '600px');
 	$iframe.closest('div.modal-content').css('height',  'auto');
@@ -127,8 +136,9 @@ function adjustModalPerFlux() {
 		'padding': '0'
 	});
 	$iframe.closest('div.modal-lg').css('width', '95%');
-}
-
+	$iframe.parent().next().addClass('hidden');
+}	
+	
 function removeLoading() {
 	$body = $("body");
 	$body.removeClass("loading");
@@ -174,25 +184,21 @@ function removeLoading() {
 						
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
-		<c:when test="${fluxTipus == 'PORTAFIB' && nouFluxDeFirma}">
+		<c:when test="${fluxTipus == 'PORTAFIB'}">
 			<div class="form-group">
+				<label class="control-label col-xs-4"><spring:message code="metadocument.form.camp.portafirmes.flux" /> *</label>
+				<c:if test="${!nouFluxDeFirma}">
+					<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /></p>
+				</c:if>
 				<label class="col-xs-4"></label>
 				<div class="col-xs-8">
 					<span class='btn btn-flux form-control portafirmesFlux_btn' title="<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>"><spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>  <i class="fa fa-external-link"></i></span>
 				</div>
 			</div>
-			<!-- 
-			<rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
-			 -->
 		</c:when>
-		<c:otherwise>
-			<rip:inputText name="portafirmesFluxId" textKey="contenidor.document.portafirmes.camp.flux.id"  readonly="true"/>
-			<rip:inputText name="portafirmesFluxNom" textKey="contenidor.document.portafirmes.camp.flux.nom" readonly="true"/>
-			<rip:inputText name="portafirmesFluxDescripcio" textKey="contenidor.document.portafirmes.camp.flux.descripcio" readonly="true"/>
-		</c:otherwise>
 		</c:choose>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.portafirmes.enviar"/></button>
+			<button type="submit" class="btn btn-success"><span class="s"></span> <spring:message code="contenidor.document.portafirmes.enviar"/></button>
 			<a href="<c:url value="/contenidor/${document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

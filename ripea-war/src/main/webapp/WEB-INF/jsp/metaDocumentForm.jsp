@@ -142,11 +142,11 @@ body.loading .rmodal {
 		$("#portafirmesFluxTipus").trigger('change');
 		
 		$(".portafirmesFluxId_btn").on('click', function(){
-			var tipusDocumentNom = '${metaDocumentCommand.nom}';
+			var metaDocumentNom = '${metaDocumentCommand.nom}';
 			$.ajax({
 				type: 'GET',
 				dataType: "json",
-				data: {tipusDocumentNom: tipusDocumentNom},
+				data: {nom: metaDocumentNom},
 				url: "<c:url value="/modal/metaExpedient/metaDocument/iniciarTransaccio"/>",
 				success: function(transaccioResponse) {
 					if (transaccioResponse != null) {
@@ -154,9 +154,11 @@ body.loading .rmodal {
 						//$("#fluxModal").modal('show');
 						//$("#fluxModal").find(".modal-body").html('<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
 						$('#metaDocumentCommand').addClass("hidden");
-						$('.flux_container').html('<div class="iframe_container"><iframe id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+						$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
 						
 						adjustModalPerFlux();
+						$body = $("body");
+						$body.addClass("loading");
 					}
 				},
 				error: function(err) {
@@ -189,6 +191,12 @@ function adjustModalPerFlux() {
 		'padding': '0'
 	});
 	$iframe.closest('div.modal-lg').css('width', '95%');
+	$iframe.parent().next().addClass('hidden');
+}
+
+function removeLoading() {
+	$body = $("body");
+	$body.removeClass("loading");
 }
 </script>
 	

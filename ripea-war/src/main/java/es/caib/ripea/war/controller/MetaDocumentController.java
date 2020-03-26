@@ -241,12 +241,17 @@ public class MetaDocumentController extends BaseAdminController {
 	@ResponseBody
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
-			@RequestParam(value="tipusDocumentNom", required = false) String tipusDocumentNom,
+			@RequestParam(value="nom", required = false) String nom,
 			Model model) {
+		String descripcio = getMessage(
+				request, 
+				"document.controller.portafirmes.flux.desc");
+		
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
 		PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
 				urlReturn,
-				tipusDocumentNom,
+				nom,
+				descripcio,
 				true);
 		return transaccioResponse;
 	}

@@ -183,21 +183,32 @@ $(document).ready(function() {
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
 
-		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters"/>
-		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
+		<c:choose>
+			<c:when test="${documentCommand.documentTipus == 'IMPORTAT'}">
+				<c:set var="readOnlyValue" value="true"/>
+				<p class="comentari col-xs-10 col-xs-offset-2"><spring:message code="contingut.document.form.importat"/></p><br><br>
+			</c:when>
+			<c:otherwise>
+				<c:set var="readOnlyValue" value="false"/>
+			</c:otherwise>
+		</c:choose>
+
+		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters" readonly="${readOnlyValue}"/>
+		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
-		<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
-
-		<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-		<div id="input-firma" class="hidden">
-			<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-			<div id="input-firma-arxiu" class="hidden">
-				<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+		<c:if test="${!readOnlyValue}">
+			<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" />
+	
+			<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+			<div id="input-firma" class="hidden">
+				<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<div id="input-firma-arxiu" class="hidden">
+					<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+				</div>
 			</div>
-		</div>
-
+		</c:if>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

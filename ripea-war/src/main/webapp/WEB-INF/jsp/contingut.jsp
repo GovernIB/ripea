@@ -1202,7 +1202,7 @@ function deselectAll() {
 						<div class="tab-pane" id="dades">
 							<c:choose>
 								<c:when test="${not empty metaDades}">
-									<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
+									<form:form onsubmit="window.location.reload();" id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
 										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 											<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 										</c:if>

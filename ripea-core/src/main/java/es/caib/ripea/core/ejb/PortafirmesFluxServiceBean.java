@@ -33,10 +33,12 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn, 
 			String tipusDocumentNom,
+			String descripcio,
 			boolean isPlantilla) {
 		return delegate.iniciarFluxFirma(
 				urlReturn, 
 				tipusDocumentNom,
+				descripcio,
 				isPlantilla);
 	}
 	

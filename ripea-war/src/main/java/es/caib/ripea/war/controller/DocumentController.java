@@ -112,15 +112,10 @@ public class DocumentController extends BaseUserController {
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
-		if (metaDocument.getPortafirmesFluxTipus() != null) {
-			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
-			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
-				model.addAttribute("nouFluxDeFirma", true);
-			}
-		} else {
-			model.addAttribute("nouFluxDeFirma", false);
-			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
-		}
+		setFluxPredefinit(
+				metaDocument, 
+				model, 
+				command);
 		
 		if (metaDocument.getPortafirmesFluxTipus() != null && (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null)) {
 			PortafirmesFluxInfoDto info = portafirmesFluxService.recuperarDetallFluxFirma(metaDocument.getPortafirmesFluxId());
@@ -128,7 +123,7 @@ public class DocumentController extends BaseUserController {
 			command.setPortafirmesFluxNom(info.getNom());
 			command.setPortafirmesFluxDescripcio(info.getDescripcio());
 		}
-		
+		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		model.addAttribute(command);
 		return "portafirmesForm";
 	}
@@ -147,9 +142,34 @@ public class DocumentController extends BaseUserController {
 					model);
 			return "portafirmesForm";
 		}
+		DocumentDto document = documentService.findById(
+				entitatActual.getId(),
+				documentId);
+		
+		MetaDocumentDto metaDocument = metaDocumentService.findById(
+				entitatActual.getId(),
+				document.getMetaDocument().getId());
+		
 		String transaccioId = null;
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB)) {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
+		}
+		
+		if ((command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) &&
+				(command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && transaccioId == null)) {
+			emplenarModelPortafirmes(
+					request,
+					documentId,
+					model);
+			setFluxPredefinit(
+					metaDocument, 
+					model, 
+					command);
+			MissatgesHelper.error(
+					request, 
+					"document.controller.portafirmes.flux.ko");
+			model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+			return "portafirmesForm";
 		}
 		documentService.portafirmesEnviar(
 				entitatActual.getId(),
@@ -161,6 +181,7 @@ public class DocumentController extends BaseUserController {
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
 				transaccioId);
+		
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,
@@ -208,12 +229,6 @@ public class DocumentController extends BaseUserController {
 				"portafirmes",
 				portafirmes);
 		
-		if (portafirmes.getFluxTipus() != null && (portafirmes.getFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && portafirmes.getFluxId() != null)) {
-			PortafirmesFluxInfoDto info = portafirmesFluxService.recuperarDetallFluxFirma(portafirmes.getFluxId());
-			model.addAttribute(
-					"fluxInfo",
-					info);
-		}
 		return "portafirmesInfo";
 	}
 
@@ -568,12 +583,17 @@ public class DocumentController extends BaseUserController {
 	@ResponseBody
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
-			@RequestParam(value="tipusDocumentNom", required = false) String tipusDocumentNom,
+			@RequestParam(value="nom", required = false) String nom,
 			Model model) {
+		String descripcio = getMessage(
+				request, 
+				"document.controller.portafirmes.flux.desc");
+		
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
 		PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
 				urlReturn,
-				tipusDocumentNom,
+				nom,
+				descripcio,
 				false);
 		return transaccioResponse;
 	}
@@ -616,6 +636,23 @@ public class DocumentController extends BaseUserController {
 					transactionId);
 		}
 		return "portafirmesModalTancar";
+	}
+	
+	private void setFluxPredefinit(
+			MetaDocumentDto metaDocument,
+			Model model,
+			PortafirmesEnviarCommand command) {
+		if (metaDocument.getPortafirmesFluxTipus() != null) {
+			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
+				model.addAttribute("nouFluxDeFirma", true);
+			} else {
+				model.addAttribute("nouFluxDeFirma", false);
+			}
+		} else {
+			model.addAttribute("nouFluxDeFirma", false);
+			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+		}
 	}
 	
 	@InitBinder
