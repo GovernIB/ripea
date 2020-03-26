@@ -1012,7 +1012,14 @@ function deselectAll() {
 									</tr>
 									<tr>
 										<td><strong><spring:message code="contingut.info.nti.tipus.doc"/></strong></td>
-										<td>${contingut.ntiTipoDocumentalNom}</td>
+										<c:choose>
+											<c:when test="${not empty contingut.ntiTipoDocumentalNom}">
+												<td>${contingut.ntiTipoDocumentalNom}</td>
+											</c:when>
+											<c:otherwise>
+												<td><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></td>
+											</c:otherwise>
+										</c:choose>
 									</tr>																		
 									<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
 										<td><strong><spring:message code="contingut.info.nti.doc.origen.id"/></strong></td>

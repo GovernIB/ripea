@@ -16,19 +16,25 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.
@@ -46,7 +52,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
-
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
+	
 	@Transactional
 	@Override
 	public List<DocumentDto> getDocuments(
@@ -59,6 +69,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 		FitxerDto fitxer = new FitxerDto();;
 		List<DocumentDto> listDto = new ArrayList<DocumentDto>();
 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
+				true, 
+				false, 
+				false);
+		
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -86,7 +101,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setNom(document.getNom());
 			fitxer.setContentType(document.getContingut().getTipusMime());
 			fitxer.setContingut(document.getContingut().getContingut());
-
+			MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByEntitatAndTipusGeneric(
+					entitat,
+					MetaDocumentTipusGenericEnumDto.OTROS);
+			
 			DocumentEntity entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
 					document.getNom(),
@@ -97,7 +115,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 					getOrigen(document),
 					getEstatElaboracio(document),
 					getTipusDocumental(document),
-					null,
+					metaDocumentEntity,
 					contingut,
 					contingut.getEntitat(),
 					expedientSuperior,
@@ -109,6 +127,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 						fitxer.getNom(),
 						fitxer.getContentType(),
 						fitxer.getContingut());
+			}
+			if (document.getFirmes() != null && !document.getFirmes().isEmpty()) {
+				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
 			entity.updateArxiu(document.getIdentificador());
 			contingutLogHelper.logCreacio(

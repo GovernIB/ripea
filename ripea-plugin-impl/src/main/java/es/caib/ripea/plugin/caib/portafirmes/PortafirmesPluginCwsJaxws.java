@@ -88,7 +88,8 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 			List<PortafirmesFluxBloc> flux,
 			String plantillaFluxId,
 			List<PortafirmesDocument> annexos,
-			boolean signarAnnexos) throws SistemaExternException {
+			boolean signarAnnexos,
+			String transaccioId) throws SistemaExternException {
 		try {
 			comprovarExtensioArxiu(document.getArxiuExtensio());
 			UploadRequest uploadRequest = new UploadRequest();
@@ -221,7 +222,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	}
 	
 	@Override
-	public PortafirmesFluxResposta recuperarFluxDeFirma(String idTransaccio) {
+	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(String idTransaccio) {
 		return new PortafirmesFluxResposta();
 	}
 
@@ -229,7 +230,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {}
 	
 	@Override
-	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(String idTransaccio, String idioma)
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String fluxId, String idioma)
 			throws SistemaExternException {
 		return new PortafirmesFluxInfo();
 	}

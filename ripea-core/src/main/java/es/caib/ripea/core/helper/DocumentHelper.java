@@ -105,7 +105,8 @@ public class DocumentHelper {
 			Date dataCaducitat,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			String transaccioId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +
@@ -170,7 +171,9 @@ public class DocumentHelper {
 				document.getExpedient(),
 				document).build();
 		// Si l'enviament produeix excepcions la retorna
-		SistemaExternException sex = portafirmesEnviar(documentPortafirmes);
+		SistemaExternException sex = portafirmesEnviar(
+				documentPortafirmes,
+				transaccioId);
 		if (sex != null) {
 			throw sex;
 		}
@@ -333,7 +336,9 @@ public class DocumentHelper {
 				false,
 				false);
 		if (DocumentEnviamentEstatEnumDto.PENDENT.equals(documentPortafirmes.getEstat())) {
-			portafirmesEnviar(documentPortafirmes);
+			portafirmesEnviar(
+					documentPortafirmes,
+					null);
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			portafirmesProcessar(documentPortafirmes);
 		}
@@ -597,7 +602,8 @@ public class DocumentHelper {
 	}
 
 	public SistemaExternException portafirmesEnviar(
-			DocumentPortafirmesEntity documentPortafirmes) {
+			DocumentPortafirmesEntity documentPortafirmes,
+			String transaccioId) {
 		DocumentEntity document = documentPortafirmes.getDocument();
 		try {
 			String portafirmesId = pluginHelper.portafirmesUpload(
@@ -609,7 +615,8 @@ public class DocumentHelper {
 					documentPortafirmes.getResponsables(),
 					documentPortafirmes.getSequenciaTipus(),
 					documentPortafirmes.getFluxId(),
-					null);
+					null,
+					transaccioId);
 			documentPortafirmes.updateEnviat(
 					new Date(),
 					portafirmesId);

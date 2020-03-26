@@ -91,7 +91,8 @@ import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 public class UsuariTascaController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientTascaController.session.filtre";
-	
+	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
+
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
 
@@ -745,6 +746,11 @@ public class UsuariTascaController extends BaseUserController {
 					model);
 			return "portafirmesForm";
 		}
+		String transaccioId = null;
+		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB)) {
+			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
+		}
+		
 		expedientTascaService.portafirmesEnviar(
 				entitatActual.getId(),
 				documentId,
@@ -754,7 +760,8 @@ public class UsuariTascaController extends BaseUserController {
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
-				tascaId);
+				tascaId,
+				transaccioId);
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

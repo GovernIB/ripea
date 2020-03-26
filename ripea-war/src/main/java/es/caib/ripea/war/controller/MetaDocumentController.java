@@ -53,7 +53,7 @@ public class MetaDocumentController extends BaseAdminController {
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
-	private PortafirmesFluxService metaDocumentFluxService;
+	private PortafirmesFluxService portafirmesFluxService;
 	@Autowired
 	private TipusDocumentalService tipusDocumentalService;
 
@@ -244,9 +244,10 @@ public class MetaDocumentController extends BaseAdminController {
 			@RequestParam(value="tipusDocumentNom", required = false) String tipusDocumentNom,
 			Model model) {
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
-		PortafirmesIniciFluxRespostaDto transaccioResponse = metaDocumentFluxService.iniciarFluxFirma(
+		PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
 				urlReturn,
-				tipusDocumentNom);
+				tipusDocumentNom,
+				true);
 		return transaccioResponse;
 	}
 
@@ -256,7 +257,7 @@ public class MetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable String idTransaccio,
 			Model model) {
-		metaDocumentFluxService.tancarTransaccio(idTransaccio);
+		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
 	@RequestMapping(value = "/metaDocument/flux/returnurl/{transactionId}", method = RequestMethod.GET)
@@ -264,14 +265,14 @@ public class MetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable String transactionId,
 			Model model) {
-		PortafirmesFluxRespostaDto resposta = metaDocumentFluxService.recuperarFluxFirma(transactionId);
+		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 
-		if (resposta.isError() && resposta.getErrorTipus() != null) {
+		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
 						"FluxError",
 						getMessage(
 						request,
-						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getErrorTipus()));
+						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
 		} else {
 			model.addAttribute(
 					"FluxCreat",

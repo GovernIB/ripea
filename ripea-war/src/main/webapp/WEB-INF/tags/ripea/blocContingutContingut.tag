@@ -26,6 +26,7 @@
 							</div>
 							<div class="caption">
 								<p class="text-center">
+									<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 									<c:if test="${fill.node and not fill.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
 									<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 									<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
@@ -114,6 +115,7 @@
 						</td>
 						<td>
 							<rip:blocIconaContingut contingut="${fill}"/>
+							<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							<c:if test="${fill.document && fill.ambNotificacions}">

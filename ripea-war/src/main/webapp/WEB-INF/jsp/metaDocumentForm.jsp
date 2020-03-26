@@ -83,8 +83,8 @@ body.loading .rmodal {
 .iframe_container {
 	position: relative;
 	width: 100%;
-	height: 0;
-	padding-bottom: 40%;
+	height: 97vh;
+	padding-bottom: 0;
 }
 
 .iframe_content {
@@ -102,6 +102,10 @@ body.loading .rmodal {
 </style>	
 <script type="text/javascript">
 	$(document).ready(function() {
+		let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
+		localStorage.setItem("currentIframeHeight", currentHeight);
+		console.log(localStorage.getItem("currentIframeHeight"));
+		
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
 				$(".callback").removeClass("hidden");
@@ -112,19 +116,16 @@ body.loading .rmodal {
         if($("#firmaPortafirmesActiva").prop("checked") == true){
         	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
-        	$("label[for='portafirmesFluxId']").append( " *" );
         }
 
 		$("#firmaPortafirmesActiva").on('change', function(){
 	            if($(this).prop("checked") == true){
 	            	$("label[for='portafirmesDocumentTipus']").append( " *" );
 	            	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
-	            	$("label[for='portafirmesFluxId']").append( " *" );
 	            }
 	            else if($(this).prop("checked") == false){
 	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
 	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
-	            	$("label[for='portafirmesFluxId']").text( $("label[for='portafirmesFluxId']").text().replace(' *', '') );
 	            }			
 		});
 		
@@ -150,9 +151,12 @@ body.loading .rmodal {
 				success: function(transaccioResponse) {
 					if (transaccioResponse != null) {
 						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-						$("#fluxModal").modal('show');
-						$("#fluxModal").find(".modal-body").html('<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
-						webutilModalAdjustHeight();
+						//$("#fluxModal").modal('show');
+						//$("#fluxModal").find(".modal-body").html('<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+						$('#metaDocumentCommand').addClass("hidden");
+						$('.flux_container').html('<div class="iframe_container"><iframe id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+						
+						adjustModalPerFlux();
 					}
 				},
 				error: function(err) {
@@ -161,53 +165,31 @@ body.loading .rmodal {
 			});
 		});
 		
-		$("#fluxModal").on("show.bs.modal", function () {
-			 $(".modal-body").html('<img src="loading.gif" />');
+		$('#fluxIframe').ready(function () {
+		    $(this).addClass("loading");
 		});
-		$body = $("#fluxModal");
-		$(document).on({
-			ajaxStart: function() { $body.addClass("loading");    },
-			ajaxStop: function() { $body.removeClass("loading"); }    
+		$('#fluxIframe').load(function () {
+		    $(this).removeClass("loading");
 		});
 		
-		$("#fluxModal").on('hidden.bs.modal', function() {
-			var fluxid = localStorage.getItem('fluxid');
-			var FluxError = localStorage.getItem('FluxError');
-			var FluxCreat = localStorage.getItem('FluxCreat');
-			var alertDiv;
-			
-			if (FluxError != null && FluxError != '') {
-				alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>'
-			} else if (FluxCreat != null && FluxCreat != '') {
-				alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span></div>'
-			}
-			$(alertDiv).insertBefore("form").delay(3000).queue(function() { $(this).remove(); });
-			
-			if (fluxid != null && fluxid != '')
-				$('#portafirmesFluxId').val(fluxid);
-			
-			localStorage.removeItem('fluxid');
-			localStorage.removeItem('FluxError');
-			localStorage.removeItem('FluxCreat');
-		});
-		
-		$("#fluxModal").on('hide.bs.modal', function() {
-			var idTransaccio = localStorage.getItem('transaccioId');
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value='/modal/metaExpedient/metaDocument/tancarTransaccio/" + idTransaccio + "'/>",
-				error: function(err) {
-					console.log("Error tancant la transacció");
-				},
-				complete: function() {
-					localStorage.removeItem('transaccioId');
-				}
-			});
-		});
 		$('.modal-cancel').on('click', function(){
-			localStorage.getItem('transaccioId');
+			localStorage.removeItem('transaccioId');
 		});
 	});
+	
+function adjustModalPerFlux() {
+	var $iframe = $(window.frameElement);
+	$iframe.css('height', '100%');
+	$iframe.parent().css('height', '600px');
+	$iframe.closest('div.modal-content').css('height',  'auto');
+	$iframe.closest('div.modal-dialog').css({
+		'height':'auto',
+		'height': '100%',
+		'margin': '3% auto',
+		'padding': '0'
+	});
+	$iframe.closest('div.modal-lg').css('width', '95%');
+}
 </script>
 	
 </head>
@@ -227,7 +209,7 @@ body.loading .rmodal {
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaExpedientId"/>
 		<br/>
-		<div class="tab-content">
+		<div class="tab-content content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
 				<rip:inputText name="codi" textKey="metadocument.form.camp.codi" required="true"/>
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true"/>
@@ -289,19 +271,7 @@ body.loading .rmodal {
 			<a href="<c:url value="/metaDocument"/>" class="btn btn-default modal-cancel" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
-	
-	<div class="modal fade" id="fluxModal" tabindex="-1" role="dialog" aria-labelledby="fluxModalLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="fluxModalLabel"><spring:message code="metadocument.form.camp.portafirmes.flux"/></h4>
-	      </div>
-	      <div class="modal-body">
-	      </div>
-	    </div>
-	  </div>
-	</div>
+	<div class="flux_container"></div>
 	<div class="rmodal"></div>
 </body>
 </html>

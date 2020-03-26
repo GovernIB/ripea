@@ -19,6 +19,121 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+<style type="text/css">
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
+.modal-lg {
+	width: 100%;
+}
+.modal-dialog {
+	width: 95%;
+	height: 100%;
+	margin: 5% auto;
+	padding: 0;
+}
+
+.modal-content {
+	height: auto;
+}
+
+.iframe_container {
+	position: relative;
+	width: 100%;
+	height: 97vh;
+	padding-bottom: 0;
+}
+
+.iframe_content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+#fluxModal {
+	margin: 1%;
+}
+.portafirmesFluxId_btn:hover {
+	cursor: pointer;
+}
+.btn-flux {
+	color: #fff; 
+	background-color: #bfbfbf;
+	border-color: #bfbfbf;
+}
+
+.btn-flux:hover {
+	color: #fff; 
+}
+</style>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
+	localStorage.setItem("currentIframeHeight", currentHeight);
+	console.log(localStorage.getItem("currentIframeHeight"));
+	
+	$(".portafirmesFlux_btn").on('click', function(){		
+		var tipusDocumentNom = '${document.fitxerNom}';
+		$.ajax({
+			type: 'GET',
+			dataType: "json",
+			data: {tipusDocumentNom: tipusDocumentNom},
+			url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
+			success: function(transaccioResponse) {
+				if (transaccioResponse != null) {
+					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+					$('.content').addClass("hidden");
+					$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+					
+					adjustModalPerFlux();
+					$body = $("body");
+					$body.addClass("loading");
+				}
+			},
+			error: function(err) {
+				console.log("Error recuperant la transacció");
+			}
+		});
+	});	
+					
+});
+
+function adjustModalPerFlux() {
+	var $iframe = $(window.frameElement);
+	$iframe.css('height', '100%');
+	$iframe.parent().css('height', '600px');
+	$iframe.closest('div.modal-content').css('height',  'auto');
+	$iframe.closest('div.modal-dialog').css({
+		'height':'auto',
+		'height': '100%',
+		'margin': '3% auto',
+		'padding': '0'
+	});
+	$iframe.closest('div.modal-lg').css('width', '95%');
+}
+
+function removeLoading() {
+	$body = $("body");
+	$body.removeClass("loading");
+}
+</script>
 </head>
 <body>
 	<c:if test="${document.fitxerNom != document.fitxerNomEnviamentPortafirmes}">
@@ -38,11 +153,11 @@
 			<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/portafirmes/upload"/></c:set>
 		</c:otherwise>
 	</c:choose>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="portafirmesEnviarCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal content" commandName="portafirmesEnviarCommand" role="form">
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
-		<rip:inputText name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" readonly="true"/>
+		<form:hidden name="portafirmesFluxTipus" path="portafirmesFluxTipus"/>
 		<c:choose>
 		<c:when test="${fluxTipus == 'SIMPLE'}">
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
@@ -59,6 +174,17 @@
 						
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
+		<c:when test="${fluxTipus == 'PORTAFIB' && nouFluxDeFirma}">
+			<div class="form-group">
+				<label class="col-xs-4"></label>
+				<div class="col-xs-8">
+					<span class='btn btn-flux form-control portafirmesFlux_btn' title="<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>"><spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>  <i class="fa fa-external-link"></i></span>
+				</div>
+			</div>
+			<!-- 
+			<rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
+			 -->
+		</c:when>
 		<c:otherwise>
 			<rip:inputText name="portafirmesFluxId" textKey="contenidor.document.portafirmes.camp.flux.id"  readonly="true"/>
 			<rip:inputText name="portafirmesFluxNom" textKey="contenidor.document.portafirmes.camp.flux.nom" readonly="true"/>
@@ -70,5 +196,7 @@
 			<a href="<c:url value="/contenidor/${document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
+	<div class="flux_container"></div>
+	<div class="rmodal"></div>
 </body>
 </html>

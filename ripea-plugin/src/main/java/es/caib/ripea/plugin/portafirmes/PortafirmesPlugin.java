@@ -49,7 +49,8 @@ public interface PortafirmesPlugin {
 			List<PortafirmesFluxBloc> flux,
 			String plantillaFluxId,
 			List<PortafirmesDocument> annexos,
-			boolean signarAnnexos) throws SistemaExternException;
+			boolean signarAnnexos,
+			String transaccioId) throws SistemaExternException;
 
 	/**
 	 * Descarrega un document del portafirmes.
@@ -131,7 +132,7 @@ public interface PortafirmesPlugin {
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public PortafirmesFluxResposta recuperarFluxDeFirma(
+	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(
 			String idTransaccio) throws SistemaExternException;
 
 	/**
@@ -143,7 +144,7 @@ public interface PortafirmesPlugin {
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public PortafirmesFluxInfo recuperarDetallFluxDeFirma(
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String idTransaccio,
 			String idioma) throws SistemaExternException;
 

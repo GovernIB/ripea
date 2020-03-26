@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
@@ -67,7 +66,7 @@ import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxErrorTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
@@ -1738,7 +1737,6 @@ public class PluginHelper {
 			boolean moureDocument) {
 		String accioDescripcio = "Importar documents";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		ContingutArxiu nouContingut = new ContingutArxiu(ContingutTipus.DOCUMENT);
 		accioParams.put("arxiuUuid", arxiuUuid);
 		long t0 = System.currentTimeMillis();
 		try {
@@ -1747,10 +1745,11 @@ public class PluginHelper {
 					null,
 					false);
 
+			document.setIdentificador(arxiuUuid);
 			if (moureDocument) {
-				nouContingut = getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
+				getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
+				//document.setIdentificador(nouContingut.getIdentificador());
 			}
-			document.setIdentificador(nouContingut.getIdentificador());
 			return document;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1777,7 +1776,8 @@ public class PluginHelper {
 			String[] responsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus,
 			String fluxId,
-			List<DocumentEntity> annexos) {
+			List<DocumentEntity> annexos,
+			String transaccioId) {
 
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(
@@ -1853,7 +1853,8 @@ public class PluginHelper {
 					flux,
 					fluxId,
 					null,
-					false);
+					false,
+					transaccioId);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PFIRMA,
 					"Enviament de document a firmar",
@@ -2055,13 +2056,15 @@ public class PluginHelper {
 		PortafirmesFluxRespostaDto respostaDto;
 		try {
 			respostaDto = new PortafirmesFluxRespostaDto();
-			PortafirmesFluxResposta resposta = getPortafirmesPlugin().recuperarFluxDeFirma(
+			PortafirmesFluxResposta resposta = getPortafirmesPlugin().recuperarFluxDeFirmaByIdTransaccio(
 					idTransaccio);
 			
 			if (resposta != null) {
 				respostaDto.setError(resposta.isError());
 				respostaDto.setFluxId(resposta.getFluxId());
-				respostaDto.setErrorTipus(resposta.getErrorTipus() != null ? PortafirmesFluxErrorTipusDto.valueOf(resposta.getErrorTipus().toString()) : null);
+				respostaDto.setNom(resposta.getNom());
+				respostaDto.setDescripcio(resposta.getDescripcio());
+				respostaDto.setEstat(resposta.getEstat() != null ? PortafirmesFluxEstatDto.valueOf(resposta.getEstat().toString()) : null);
 			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
@@ -2106,15 +2109,15 @@ public class PluginHelper {
 	}
 	
 	public PortafirmesFluxInfoDto portafirmesRecuperarInfoFluxDeFirma(
-			String idTransaccio,
+			String plantillaFluxId,
 			String idioma) {
 		String accioDescripcio = "Recuperant detall flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesFluxInfoDto respostaDto;
 		try {
 			respostaDto = new PortafirmesFluxInfoDto();
-			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarDetallFluxDeFirma(
-					idTransaccio,
+			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarFluxDeFirmaByIdPlantilla(
+					plantillaFluxId,
 					idioma);
 			
 			if (resposta != null) {

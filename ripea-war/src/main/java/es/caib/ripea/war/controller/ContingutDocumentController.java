@@ -44,6 +44,7 @@ import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -179,7 +180,7 @@ public class ContingutDocumentController extends BaseUserController {
 					command,
 					null,
 					false,
-					true);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
@@ -215,7 +216,7 @@ public class ContingutDocumentController extends BaseUserController {
 					command,
 					null,
 					false,
-					true);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
 		} catch (Exception exception) {
 			MissatgesHelper.error(request, exception.getMessage());
 			omplirModelFormulari(
