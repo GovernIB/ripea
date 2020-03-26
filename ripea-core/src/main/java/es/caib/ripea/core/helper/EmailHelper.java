@@ -76,15 +76,17 @@ public class EmailHelper {
 		} else if (contingut instanceof CarpetaEntity) {
 			tipus = "carpeta";
 		}
-		missatge.setTo(usuariOriginal.getEmail());
-		missatge.setSubject(PREFIX_RIPEA + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom());
-		missatge.setText(
-				"Informació de l'element de l'escriptori:\n" +
-				"\tEntitat: " + contingut.getEntitat().getNom() + "\n" +
-				"\tTipus: " + tipus + "\n" +
-				"\tNom: " + contingut.getNom() + "\n\n" + 
-				"\tPersona que ho ha agafat: " + usuariNou.getNom() + "(" + usuariNou.getCodi() + ").");
-		mailSender.send(missatge);
+		if (usuariOriginal.getEmail() != null) {
+			missatge.setTo(usuariOriginal.getEmail());
+			missatge.setSubject(PREFIX_RIPEA + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom());
+			missatge.setText(
+					"Informació de l'element de l'escriptori:\n" +
+					"\tEntitat: " + contingut.getEntitat().getNom() + "\n" +
+					"\tTipus: " + tipus + "\n" +
+					"\tNom: " + contingut.getNom() + "\n\n" + 
+					"\tPersona que ho ha agafat: " + usuariNou.getNom() + "(" + usuariNou.getCodi() + ").");
+			mailSender.send(missatge);
+		}
 	}
 
 	public void execucioMassivaFinalitzada(
