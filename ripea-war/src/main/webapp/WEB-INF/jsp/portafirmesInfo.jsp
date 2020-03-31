@@ -76,24 +76,6 @@
 						<td><spring:message code="metadocument.seqtip.enum.${portafirmes.sequenciaTipus}"/></td>
 					</tr>
 				</c:if>
-				<c:if test="${not empty portafirmes.fluxId}">
-					<tr>
-						<td><strong><spring:message code="firma.info.camp.flux.id"/></strong></td>
-						<td>${portafirmes.fluxId}</td>
-					</tr>
-				</c:if>
-				<c:if test="${(not empty fluxInfo) && (not empty fluxInfo.nom)}">
-					<tr>
-						<td><strong><spring:message code="firma.info.camp.flux.nom"/></strong></td>
-						<td>${fluxInfo.nom}</td>
-					</tr>
-				</c:if>
-				<c:if test="${(not empty fluxInfo) && (not empty fluxInfo.descripcio)}">
-					<tr>
-						<td><strong><spring:message code="firma.info.camp.flux.descripcio"/></strong></td>
-						<td>${fluxInfo.descripcio}</td>
-					</tr>
-				</c:if>
 				<c:if test="${not empty portafirmes.portafirmesId}">
 					<tr>
 						<td><strong><spring:message code="firma.info.camp.portafirmes.id"/></strong></td>

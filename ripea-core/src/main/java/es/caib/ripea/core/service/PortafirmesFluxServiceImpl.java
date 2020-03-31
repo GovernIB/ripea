@@ -3,6 +3,10 @@
  */
 package es.caib.ripea.core.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +35,19 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Override
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
-			String tipusDocumentNom,
+			String documentNom,
+			String descripcio,
 			boolean isPlantilla) {
 		logger.debug("(Iniciant flux de firma (" +
 				"urlRedireccio=" + urlReturn + "," +
-				"tipusDocumentNom=" + tipusDocumentNom + ")");
+				"tipusDocumentNom=" + documentNom + ")");
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
 		
 		PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(
 				idioma,
 				isPlantilla,
-				tipusDocumentNom + "_plantilla_flux",
-				tipusDocumentNom + "_plantilla_flux_desc",
+				generarNomFlux(documentNom),
+				descripcio,
 				true,
 				urlReturn);
 		
@@ -71,6 +76,15 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 		return pluginHelper.portafirmesRecuperarInfoFluxDeFirma(
 				plantillaFluxId, 
 				idioma);
+	}
+	
+	private String generarNomFlux(String documentNom) {		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
+		Date date = new Date();
+		documentNom = documentNom.replace(" ", "_");
+		
+		String nomFlux = "Flux_" + documentNom + "_" + dateFormat.format(date);
+		return nomFlux;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(PortafirmesFluxServiceImpl.class);

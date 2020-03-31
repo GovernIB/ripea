@@ -17,12 +17,11 @@
 let fluxIframe = window.frameElement;
 
 if (fluxIframe) {
-	var idFlux = "${fluxId}";
-	var FluxError = "${FluxError}";
-	var FluxCreat = "${FluxCreat}";
-	var FluxNom = "${FluxNom}";
-	var FluxDescripcio = "${FluxDescripcio}";
-	var alertDiv;
+	let idFlux = "${fluxId}";
+	let FluxError = "${FluxError}";
+	let FluxCreat = "${FluxCreat}";
+	let FluxNom = "${FluxNom}";
+	let alertDiv;
 	
 	if (idFlux != null && idFlux != '') {
 		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').val(idFlux);
@@ -31,13 +30,11 @@ if (fluxIframe) {
 	}
 	if (FluxCreat != null && FluxCreat != '') {
 		alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span>';
-		
-		if ((FluxNom != null && FluxNom != '') && (FluxDescripcio != null && FluxDescripcio != '')) {
-			alertDiv += '<br>' +
-						'<ul>' +
-							'<li>Nom flux: ' + FluxNom + '</li>' +
-							'<li>Descripció flux: ' + FluxDescripcio + '</li>' +
-						'</ul></div>';
+		if ((FluxNom != null && FluxNom != '')) {
+			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').text('');
+			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').html('Flux de firma seleccionat: <span>' + FluxNom + '</span>');
+			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').css('color', '#3c763d');
+			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').find('span').css('font-weight', 'bold');
 		}
 	}
 	$(fluxIframe.parentElement.parentElement).prev().removeClass('hidden');
@@ -45,12 +42,11 @@ if (fluxIframe) {
 	$(fluxIframe.parentElement.parentElement).prev().prepend(alertDiv);
 	
 	//Adjust modal width/height
-	adjustModalPerFluxRemove();
-	
+	adjustModalPerFluxRemove(FluxNom);
 	$(fluxIframe.parentElement).trigger('remove');
 }
 
-function adjustModalPerFluxRemove() {
+function adjustModalPerFluxRemove(FluxNom) {
 	webutilModalAdjustHeight();
 	let $iframe = $(window.parent.frameElement);
 	let height = localStorage.getItem('currentIframeHeight');
@@ -63,6 +59,11 @@ function adjustModalPerFluxRemove() {
 		'padding': '0'
 	});
 	$iframe.closest('div.modal-lg').css('width', '900px');
+
+	$iframe.parent().next().removeClass('hidden');
+	if ($iframe.parent().next().find('button').hasClass('disabled') && (FluxNom != null && FluxNom != '')) {
+		$iframe.parent().next().find('button').removeClass("disabled");
+	}
 	localStorage.removeItem('currentIframeHeight');
 }
 
