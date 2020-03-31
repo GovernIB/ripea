@@ -719,12 +719,6 @@ public class UsuariTascaController extends BaseUserController {
 			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
 		}
 		
-		if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null) {
-			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(metaDocument.getPortafirmesFluxId());
-			command.setPortafirmesFluxId(metaDocument.getPortafirmesFluxId());
-			command.setPortafirmesFluxNom(info.getNom());
-			command.setPortafirmesFluxDescripcio(info.getDescripcio());
-		}
 		model.addAttribute(command);
 		model.addAttribute("tascaId", tascaId);
 		return "portafirmesForm";
@@ -814,12 +808,6 @@ public class UsuariTascaController extends BaseUserController {
 				"portafirmes",
 				portafirmes);
 		
-		if (portafirmes.getFluxTipus() != null && (portafirmes.getFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && portafirmes.getFluxId() != null)) {
-			PortafirmesFluxInfoDto info = metaDocumentFluxService.recuperarDetallFluxFirma(portafirmes.getFluxId());
-			model.addAttribute(
-					"fluxInfo",
-					info);
-		}
 		model.addAttribute("tascaId", tascaId);
 		return "portafirmesInfo";
 	}

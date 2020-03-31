@@ -186,7 +186,7 @@ function removeLoading() {
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">
 			<div class="form-group">
-				<label class="control-label col-xs-4"><spring:message code="metadocument.form.camp.portafirmes.flux" /> *</label>
+				<label class="control-label col-xs-4 fluxInputLabel"><spring:message code="metadocument.form.camp.portafirmes.flux" /> *</label>
 				<c:if test="${!nouFluxDeFirma}">
 					<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /></p>
 				</c:if>
