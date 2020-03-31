@@ -22,7 +22,6 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="importacioCommand">
 		<br/>
 		<rip:inputText name="numeroRegistre" textKey="contingut.importacio.form.camp.nom" required="true"/>
-		<rip:inputSelect name="tipusRegistre" textKey="contingut.importacio.form.camp.tipus" optionItems="${tipusRegistreOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<br/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.importar"/></button>
