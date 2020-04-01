@@ -117,12 +117,6 @@ public class DocumentController extends BaseUserController {
 				model, 
 				command);
 		
-		if (metaDocument.getPortafirmesFluxTipus() != null && (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() != null)) {
-			PortafirmesFluxInfoDto info = portafirmesFluxService.recuperarDetallFluxFirma(metaDocument.getPortafirmesFluxId());
-			command.setPortafirmesFluxId(metaDocument.getPortafirmesFluxId());
-			command.setPortafirmesFluxNom(info.getNom());
-			command.setPortafirmesFluxDescripcio(info.getDescripcio());
-		}
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		model.addAttribute(command);
 		return "portafirmesForm";

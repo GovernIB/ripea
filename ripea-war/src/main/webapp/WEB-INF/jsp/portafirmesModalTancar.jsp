@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:set var="fluxid">${fluxId}</c:set>
 
 <html>
@@ -31,10 +35,16 @@ if (fluxIframe) {
 	if (FluxCreat != null && FluxCreat != '') {
 		alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span>';
 		if ((FluxNom != null && FluxNom != '')) {
-			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').text('');
-			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').html('Flux de firma seleccionat: <span>' + FluxNom + '</span>');
-			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').css('color', '#3c763d');
-			$(fluxIframe.parentElement.parentElement).prev().find('.comentari').find('span').css('font-weight', 'bold');
+			let $comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
+			if ($comentari.length < 1) {
+				$(fluxIframe.parentElement.parentElement).prev().find('.fluxInputLabel').after('<p class="comentari col-xs-8"></p>');
+			}
+			$comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
+			$comentari.text('');
+			var text = '<spring:message code='contingut.document.form.camp.portafirmes.flux.seleccionat'/>';
+			$comentari.html(text + " <span>" + FluxNom + "</span>");
+			$comentari.css('color', '#3c763d');
+			$comentari.find('span').css('font-weight', 'bold');
 		}
 	}
 	$(fluxIframe.parentElement.parentElement).prev().removeClass('hidden');
