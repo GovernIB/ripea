@@ -17,7 +17,7 @@ import javax.validation.Payload;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy=ArxiuNoBuitValidator.class)
 public @interface ArxiuNoBuit {

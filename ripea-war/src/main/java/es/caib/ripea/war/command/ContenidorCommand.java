@@ -13,7 +13,7 @@ import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentCommand.UpdateFisic;
-import es.caib.ripea.war.command.DocumentConcatenatCommand.ConcatenarDigital;
+import es.caib.ripea.war.command.DocumentGenericCommand.ConcatenarDigital;
 
 /**
  * Command per al manteniment de contenidors.

@@ -92,4 +92,8 @@
 			id="portafirmesFluxService"
 			jndi-name="ripea/PortafirmesFluxServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.PortafirmesFluxService"/>	
+	<jee:local-slsb
+			id="digitalitzacioService"
+			jndi-name="ripea/DigitalitzacioServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.DigitalitzacioService"/>	
 </beans>

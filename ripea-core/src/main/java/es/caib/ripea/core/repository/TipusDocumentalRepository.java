@@ -25,4 +25,5 @@ public interface TipusDocumentalRepository extends JpaRepository<TipusDocumental
 			EntitatEntity entitat, 
 			Pageable pageable);
 	TipusDocumentalEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+
 }

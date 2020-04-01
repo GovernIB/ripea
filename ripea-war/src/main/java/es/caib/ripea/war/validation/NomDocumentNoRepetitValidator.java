@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.war.command.DocumentCommand;
-import es.caib.ripea.war.command.DocumentConcatenatCommand;
+import es.caib.ripea.war.command.DocumentGenericCommand;
 import es.caib.ripea.war.helper.MessageHelper;
 
 /**
@@ -37,10 +37,10 @@ public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDoc
 			final Object obj, 
 			final ConstraintValidatorContext context) {
 		try {
-			Long entitatId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getEntitatId() : ((DocumentConcatenatCommand) obj).getEntitatId();
-			Long pareId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getPareId() : ((DocumentConcatenatCommand) obj).getPareId();
-			Long id = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getId() : ((DocumentConcatenatCommand) obj).getId();
-			String nom = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getNom() : ((DocumentConcatenatCommand) obj).getNom();
+			Long entitatId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getEntitatId() : ((DocumentGenericCommand) obj).getEntitatId();
+			Long pareId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getPareId() : ((DocumentGenericCommand) obj).getPareId();
+			Long id = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getId() : ((DocumentGenericCommand) obj).getId();
+			String nom = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getNom() : ((DocumentGenericCommand) obj).getNom();
 			
 			boolean valid = true;
 			ContingutDto contingutPare = contingutService.findAmbIdUser(

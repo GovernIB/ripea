@@ -168,6 +168,7 @@ function removeLoading() {
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
 		<form:hidden name="portafirmesFluxTipus" path="portafirmesFluxTipus"/>
+
 		<c:choose>
 		<c:when test="${fluxTipus == 'SIMPLE'}">
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

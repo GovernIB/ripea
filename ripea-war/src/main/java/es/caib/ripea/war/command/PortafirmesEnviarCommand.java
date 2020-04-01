@@ -33,6 +33,7 @@ public class PortafirmesEnviarCommand {
 	private boolean enviarCorreu;
 	private String[] portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
+
 	private String portafirmesFluxId;
 	private String portafirmesFluxNom;
 	private String portafirmesFluxDescripcio;

@@ -109,6 +109,7 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
+		
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
@@ -116,7 +117,6 @@ public class DocumentController extends BaseUserController {
 				metaDocument, 
 				model, 
 				command);
-		
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		model.addAttribute(command);
 		return "portafirmesForm";

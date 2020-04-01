@@ -172,4 +172,5 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		return conversioTipusHelper.convertir(tipusDocumental, TipusDocumentalDto.class);
 	}
 	private static final Logger logger = LoggerFactory.getLogger(TipusDocumentalServiceImpl.class);
+
 }

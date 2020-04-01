@@ -33,6 +33,8 @@ import es.caib.ripea.war.validation.ValidIfSeparada;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+
+@ArxiuNoBuit(groups = {CreateDigital.class, CreateFirmaSeparada.class})
 @NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class})
 @DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
 @ValidIfSeparada(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
@@ -47,7 +49,6 @@ public class DocumentCommand extends ContenidorCommand {
 	private Long metaNodeId;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date data;
-	@ArxiuNoBuit(groups = {CreateDigital.class, CreateFirmaSeparada.class})
 	private MultipartFile arxiu;
 	private DocumentFisicOrigenEnum origen;
 	private boolean ambFirma;
@@ -68,7 +69,9 @@ public class DocumentCommand extends ContenidorCommand {
 	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;*/
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=48)
 	private String ntiIdDocumentoOrigen;
-
+	private String fitxerContentType;
+	private String fitxerNom;
+	private byte[] fitxerContingut;
 
 
 	public DocumentTipusEnumDto getDocumentTipus() {
@@ -124,6 +127,24 @@ public class DocumentCommand extends ContenidorCommand {
 	}
 	public void setEscanejatTempId(String escanejatTempId) {
 		this.escanejatTempId = escanejatTempId;
+	}
+	public String getFitxerContentType() {
+		return fitxerContentType;
+	}
+	public void setFitxerContentType(String fitxerContentType) {
+		this.fitxerContentType = fitxerContentType;
+	}
+	public String getFitxerNom() {
+		return fitxerNom;
+	}
+	public void setFitxerNom(String fitxerNom) {
+		this.fitxerNom = fitxerNom;
+	}
+	public byte[] getFitxerContingut() {
+		return fitxerContingut;
+	}
+	public void setFitxerContingut(byte[] fitxerContingut) {
+		this.fitxerContingut = fitxerContingut;
 	}
 	/*public Date getDataCaptura() {
 		return dataCaptura;
@@ -187,12 +208,20 @@ public class DocumentCommand extends ContenidorCommand {
 			dto.setFitxerNom(command.getArxiu().getOriginalFilename());
 			dto.setFitxerContentType(command.getArxiu().getContentType());
 			dto.setFitxerContingut(command.getArxiu().getBytes());
+		} else {
+			dto.setFitxerNom(command.getFitxerNom());
+			dto.setFitxerContentType(command.getFitxerContentType());
+			dto.setFitxerContingut(command.getFitxerContingut());
 		}
 
 		if (command.isAmbFirma()) {
 			dto.setFirmaNom(command.getFirma().getOriginalFilename());
 			dto.setFirmaContentType(command.getFirma().getContentType());
 			dto.setFirmaContingut(command.getFirma().getBytes());
+		} else {
+			dto.setFitxerNom(command.getFitxerNom());
+			dto.setFitxerContentType(command.getFitxerContentType());
+			dto.setFitxerContingut(command.getFitxerContingut());
 		}
 		
 		dto.setFirmaSeparada(command.getTipusFirma() == DocumentTipusFirmaEnumDto.SEPARAT ? true : false);
