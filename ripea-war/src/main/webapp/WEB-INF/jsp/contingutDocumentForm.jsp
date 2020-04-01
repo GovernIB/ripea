@@ -338,11 +338,22 @@ $(document).ready(function() {
 		
 		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters"/>
 		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true"/>
+
+		<c:choose>
+			<c:when test="${documentCommand.documentTipus == 'IMPORTAT'}">
+				<c:set var="readOnlyValue" value="true"/>
+				<p class="comentari col-xs-10 col-xs-offset-2"><spring:message code="contingut.document.form.importat"/></p><br><br>
+			</c:when>
+			<c:otherwise>
+				<c:set var="readOnlyValue" value="false"/>
+			</c:otherwise>
+		</c:choose>
+
+		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters" readonly="${readOnlyValue}"/>
+		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
-		
-		
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
 			<li role="presentation" class="active"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
