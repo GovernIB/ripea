@@ -78,10 +78,15 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 					"filtre=" + filtre + ", " +
 					"valor=" + valor + ")");
 		} else if(usuaris.size() == 0){
-			throw new SistemaExternException(
-					"La consulta d'usuari únic no ha retornat cap resultat (" +
-					"filtre=" + filtre + ", " +
-					"valor=" + valor + ")");
+			usuaris = findAmbFiltre(valor);
+			if (usuaris.size() == 0) {
+				throw new SistemaExternException(
+						"La consulta d'usuari únic no ha retornat cap resultat (" +
+						"filtre=" + filtre + ", " +
+						"valor=" + valor + ")");
+			} else {
+				return usuaris.get(0);
+			}
 		} else {
 			throw new SistemaExternException("Error desconegut al consultar un usuari únic");
 		}
