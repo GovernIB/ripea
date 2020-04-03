@@ -204,7 +204,7 @@ public class ContingutDocumentController extends BaseUserController {
 						idTransaccio, 
 						returnScannedFile, 
 						returnSignedFile);
-				if (resultat != null && !resultat.getEstat().equals(DigitalitzacioEstatDto.FINAL_OK)) {
+				if (resultat != null && resultat.isError() && !resultat.getEstat().equals(DigitalitzacioEstatDto.FINAL_OK)) {
 					MissatgesHelper.error(
 							request,
 							getMessage(
@@ -217,7 +217,6 @@ public class ContingutDocumentController extends BaseUserController {
 							pareId,
 							model);
 					model.addAttribute("contingutId", pareId);
-					model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");	
 					return "contingutDocumentForm";
 				}
 				model.addAttribute("nomDocument", resultat.getNomDocument());

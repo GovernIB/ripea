@@ -104,7 +104,6 @@ body.loading .rmodal {
 	$(document).ready(function() {
 		let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 		localStorage.setItem("currentIframeHeight", currentHeight);
-		console.log(localStorage.getItem("currentIframeHeight"));
 		
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){

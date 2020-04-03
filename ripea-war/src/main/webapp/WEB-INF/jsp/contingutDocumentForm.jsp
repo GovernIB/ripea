@@ -42,12 +42,13 @@
                 50% 50% 
                 no-repeat;
 }
-#escaneig.loading {
+body.loading {
     overflow: hidden;   
 }
-#escaneig.loading .rmodal {
+body.loading .rmodal {
     display: block;
 }
+
 .tooltip {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 14px;
@@ -97,6 +98,9 @@ function mostrarDocument(fileName) {
 }
 
 $(document).ready(function() {
+	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
+	localStorage.setItem("currentIframeHeight", currentHeight);
+	console.log(currentHeight);
 	let rootIframe = window.frameElement;
 	let fileName = "${nomDocument}";
 	if (fileName !== '') {
@@ -215,6 +219,7 @@ $(document).ready(function() {
 	
 	//Recuperar perfils disponibles en cas de no definir un per defecte
 	$('.start-scan-btn').on('click', function(){
+		$('#escaneig').find('.alert').remove();
 		$('.start-scan-btn').hide();
 		$.ajax({
 			type: 'GET',
@@ -239,19 +244,21 @@ $(document).ready(function() {
 	
 	//Iniciar procés digitalització després de triar perfil
 	$(document).on('click', '.scan-profile', function(){
+		$('.scan-profile').hide();
 	    var codi_perfil = $('span', this).attr('id');
 	    $(this).html('');
-		$('.scan-profile').hide();
 	    $.ajax({
 	    	type: 'GET',
 			url: "<c:url value='/digitalitzacio/iniciarDigitalitzacio/" + codi_perfil + "'/>",
 			success: function(transaccioResponse) {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-					var iframeScan = '<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
 					$('.scan-result').append(iframeScan);
 					$('.scan-back-btn').addClass('hidden');
 					webutilModalAdjustHeight();
+					$body = $("body");
+					$body.addClass("loading");
 				}
 			},
 			error: function(err) {
@@ -259,16 +266,6 @@ $(document).ready(function() {
 			}
 	    });
 	});
-	
-	//$("#fluxModal").on("show.bs.modal", function () {
-	//	 $(".modal-body").html('<img src="loading.gif" />');
-	//});
-	$body = $("#escaneig");
-	$(document).on({
-		ajaxStart: function() {console.log("loading..."); $body.addClass("loading");    },
-		ajaxStop: function() {console.log("finish"); $body.removeClass("loading"); }    
-	});
-	
 	
 	//Iniciar procés digitalització després de triar perfil
 	$(document).on('click', '.scan-cancel-btn', function(){
@@ -288,20 +285,6 @@ $(document).ready(function() {
 			}
 	    });
 	});
-	//javascript
-	$('div.modal.hide').on('shown', function(){
-	    var id = $(this).attr('id');
-	    console.log(id);
-	});
-	var idTransaccio = localStorage.getItem('transaccioId');
-	if (idTransaccio != null && fileName != null && fileName != '') {
-		$('.start-scan-btn').hide();
-		var urlDescarrega = "<a href='<c:url value='/digitalitzacio/descarregarResultat/" + idTransaccio + "'/>' >" + fileName + "</a>"
-		var urlCancel = " <br><span class='btn btn-default scan-cancel-btn'>Cancel·lar</span>"
-		
-		$('.scan-result').append(urlDescarrega);
-		$('.scan-result').append(urlCancel);
-	}
 	
 	$('.scan-back-btn').on('click', function(){
 		$('.start-scan-btn').show();
@@ -310,6 +293,11 @@ $(document).ready(function() {
 	});
 	
 });
+
+function removeLoading() {
+	$body = $("body");
+	$body.removeClass("loading");
+}
 </script>
 </head>
 <body>

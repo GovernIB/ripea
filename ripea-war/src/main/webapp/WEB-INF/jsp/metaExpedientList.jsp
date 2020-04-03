@@ -45,7 +45,8 @@
 			<tr>
 				<th data-col-name="codi"><spring:message code="metaexpedient.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="metaexpedient.list.columna.nom"/></th>
-				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="7%">
+				<th data-col-name="serieDocumental" width="3%"><spring:message code="metaexpedient.list.columna.serie.documenal"/></th>
+				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
