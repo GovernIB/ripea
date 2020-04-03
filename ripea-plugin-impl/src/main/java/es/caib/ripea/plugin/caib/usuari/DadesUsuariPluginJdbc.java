@@ -69,10 +69,20 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 				sqlQuery,
 				paramName,
 				paramValue);
-		if (llista.size() > 0)
+		if (llista.size() > 0) {
 			return llista.get(0);
-		else
+		} else if (llista.size() == 0) {
+			llista = consultaDadesUsuari(
+					getJdbcQueryUsuariFiltre(),
+					"filtre",
+					paramValue);
+			if (llista.size() > 0)
+				return llista.get(0);
+			else
+				return null;
+		} else {
 			return null;
+		}
 	}
 
 	private List<DadesUsuari> consultaDadesUsuari(
