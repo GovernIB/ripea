@@ -413,7 +413,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 										$('<option>', {
 											value: resposta[suggestValue],
 											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
-											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : value == resposta["codi"]
+											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
 										}));
 						}
 					});
