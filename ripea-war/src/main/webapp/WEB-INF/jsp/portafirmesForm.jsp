@@ -5,6 +5,13 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<%
+pageContext.setAttribute(
+		"metadocumentFluxtipEnumOptions",
+		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
+		"metadocument.fluxtip.enum."));
+%>
 <c:set var="titol"><spring:message code="contenidor.document.portafirmes.titol"/></c:set>
 <c:set var="isTasca" value="${not empty tascaId}"/>
 <html>
@@ -101,8 +108,10 @@ $(document).ready(function() {
 	
 	$(".portafirmesFlux_btn").on('click', function(){		
 		let documentNom = '${document.nom}';
+		debugger
 		$.ajax({
 			type: 'GET',
+			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			data: {nom: documentNom},
 			url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
