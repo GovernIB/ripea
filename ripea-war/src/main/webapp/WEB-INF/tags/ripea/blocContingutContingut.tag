@@ -131,7 +131,17 @@
 							</c:if>
 						</td>
 						<td>
-							<c:if test="${not fill.carpeta}">${fill.metaNode.nom}</c:if>
+							<c:choose>
+								<c:when test="${not fill.carpeta && fill.metaNode != null}">
+									${fill.metaNode.nom}
+								</c:when>
+								<c:when test="${not fill.carpeta && fill.metaNode == null}">
+									<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
+										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
+										<spring:message code="contingut.info.document.tipusdocument"/>
+									</div>
+								</c:when>
+							</c:choose>
 						</td>
 						<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${fill.createdBy.nom}</td>

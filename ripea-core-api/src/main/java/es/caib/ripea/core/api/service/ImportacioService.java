@@ -3,9 +3,8 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
-import es.caib.ripea.core.api.dto.DocumentDto;
+
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -31,7 +30,7 @@ public interface ImportacioService {
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<DocumentDto> getDocuments(
+	public int getDocuments(
 			Long entitatId,
 			Long contingutId,
 			ImportacioDto dades) throws NotFoundException, ValidationException;

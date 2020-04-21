@@ -3,8 +3,6 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
@@ -12,7 +10,6 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -33,7 +30,7 @@ public class ImportacioServiceBean implements ImportacioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<DocumentDto> getDocuments(
+	public int getDocuments(
 			Long entitatId, 
 			Long contingutId, 
 			ImportacioDto dades)

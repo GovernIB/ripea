@@ -21,20 +21,15 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
-import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.
@@ -52,14 +47,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
 	
 	@Transactional
 	@Override
-	public List<DocumentDto> getDocuments(
+	public int getDocuments(
 			Long entitatId,
 			Long contingutId,
 			ImportacioDto dades) {
@@ -67,14 +58,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 				"numeroRegistre=" + dades.getNumeroRegistre() + ")");
 		ExpedientEntity expedientSuperior;
 		FitxerDto fitxer = new FitxerDto();;
+		int documentsRepetits = 0;
 		List<DocumentDto> listDto = new ArrayList<DocumentDto>();
-
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
-				true, 
-				false, 
-				false);
-		
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+		ContingutEntity contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
 				false,
@@ -85,29 +71,35 @@ public class ImportacioServiceImpl implements ImportacioService {
 		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(
 				dades.getNumeroRegistre(),
 				dades.getTipusRegistre());
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			expedientSuperior = (ExpedientEntity)contingut;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
+			expedientSuperior = (ExpedientEntity)contingutPare;
 		} else {
-			expedientSuperior = contingut.getExpedient();
+			expedientSuperior = contingutPare.getExpedient();
 		}
 
-		for (ContingutArxiu documentArxiu : documentsArxiu) {
-
+		outerloop: for (ContingutArxiu documentArxiu : documentsArxiu) {
+			DocumentEntity entity = null;
 			Document document = pluginHelper.importarDocument(
 					expedientSuperior.getArxiuUuid(),
 					documentArxiu.getIdentificador(),
 					true);
-
+			String tituloDoc = (String) document.getMetadades().getMetadadaAddicional("tituloDoc");
+			
 			fitxer.setNom(document.getNom());
 			fitxer.setContentType(document.getContingut().getTipusMime());
 			fitxer.setContingut(document.getContingut().getContingut());
-			MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByEntitatAndTipusGeneric(
-					entitat,
-					MetaDocumentTipusGenericEnumDto.OTROS);
-			
-			DocumentEntity entity = documentHelper.crearDocumentDB(
+
+			for (ContingutEntity contingut: contingutPare.getFills()) {
+				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
+					if (contingut.getNom().equals(tituloDoc)) {
+						documentsRepetits++;
+						continue outerloop;
+					} 
+				}
+			}
+			entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
-					document.getNom(),
+					tituloDoc != null ? tituloDoc : document.getNom(),
 					document.getMetadades().getDataCaptura(),
 					document.getMetadades().getDataCaptura(),
 					//Només hi ha un òrgan
@@ -116,12 +108,12 @@ public class ImportacioServiceImpl implements ImportacioService {
 					getEstatElaboracio(document),
 					getTipusDocumental(document),
 					null, //metaDocumentEntity
-					contingut,
-					contingut.getEntitat(),
+					contingutPare,
+					contingutPare.getEntitat(),
 					expedientSuperior,
 					null,
 					document.getIdentificador());
-
+		
 			if (fitxer != null) {
 				entity.updateFitxer(
 						fitxer.getNom(),
@@ -136,9 +128,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 					entity,
 					true,
 					true);
-			listDto.add(toDocumentDto(entity));
+				listDto.add(toDocumentDto(entity));
 		}
-		return listDto;
+		return documentsRepetits;
 	}
 
 	private DocumentDto toDocumentDto(

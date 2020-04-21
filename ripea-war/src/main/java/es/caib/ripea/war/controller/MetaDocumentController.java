@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -242,7 +243,8 @@ public class MetaDocumentController extends BaseAdminController {
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
-			Model model) {
+			Model model) throws UnsupportedEncodingException {
+		String nomCodificat = new String(nom.getBytes(), "UTF-8");
 		String descripcio = getMessage(
 				request, 
 				"document.controller.portafirmes.flux.desc");
@@ -250,7 +252,7 @@ public class MetaDocumentController extends BaseAdminController {
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
 		PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
 				urlReturn,
-				nom,
+				nomCodificat,
 				descripcio,
 				true);
 		return transaccioResponse;

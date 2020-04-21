@@ -813,6 +813,8 @@ public class PluginHelper {
 								null,
 								contingutPare.getArxiuUuid(),
 								document.getNom(),
+								document.getMetaDocument().getNom(),
+								false,
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -844,6 +846,8 @@ public class PluginHelper {
 								document.getArxiuUuid(),
 								contingutPare.getArxiuUuid(),
 								document.getNom(),
+								document.getMetaDocument().getNom(),
+								document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -1220,6 +1224,8 @@ public class PluginHelper {
 							document.getArxiuUuid(),
 							document.getPare().getArxiuUuid(),
 							document.getNom(),
+							document.getMetaDocument().getNom(),
+							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
 							fitxerAmbFirma,
 							true,
 							false,
@@ -3581,6 +3587,8 @@ public class PluginHelper {
 			String documentUuid,
 			String expedientUuid,
 			String nom,
+			String tipusDocumentNom,
+			boolean documentImportat,
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
@@ -3649,9 +3657,14 @@ public class PluginHelper {
 					document.getFirmes().add(firma);
 				}
 			}
-			if (firmes != null && ! firmes.isEmpty() && getPropertyArxiuFirmaDetallsActiu()) {
+			if (getPropertyArxiuMetadadesAddicionalsActiu()) {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
-				metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
+				metadadesAddicionals.put("tipusDocumentNom", tipusDocumentNom);
+				metadadesAddicionals.put("isImportacio", documentImportat);
+				
+				if (firmes != null && ! firmes.isEmpty()) {
+					metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
+				}
 				metadades.setMetadadesAddicionals(metadadesAddicionals);
 			}
 		}
@@ -4704,6 +4717,11 @@ public class PluginHelper {
 				"es.caib.ripea.plugin.signatura.signarAnnexos");
 	}
 
+	private boolean getPropertyArxiuMetadadesAddicionalsActiu() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.ripea.arxiu.metadades.addicionals.actiu");
+	}
+	
 	private boolean getPropertyArxiuFirmaDetallsActiu() {
 		return PropertiesHelper.getProperties().getAsBoolean(
 				"es.caib.ripea.arxiu.firma.detalls.actiu");
