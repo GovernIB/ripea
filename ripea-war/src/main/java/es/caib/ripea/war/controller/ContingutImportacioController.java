@@ -25,6 +25,7 @@ import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.war.command.ImportacioCommand;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per al manteniment d'importació de documents.
@@ -70,7 +71,7 @@ public class ContingutImportacioController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@Valid ImportacioCommand command,
 			BindingResult bindingResult,
-			Model model) {
+			Model model) throws Exception {
 		return postUpdate(
 				request,
 				contingutId,
@@ -84,16 +85,28 @@ public class ContingutImportacioController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@Valid ImportacioCommand command,
 			BindingResult bindingResult,
-			Model model) {
+			Model model) throws Exception {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (bindingResult.hasErrors()) {
 			return "contingutImportacioForm";
 		}
-		importacioService.getDocuments(
-				entitatActual.getId(), 
-				contingutId,
-				ImportacioCommand.asDto(command));
+
+		int documentsRepetits = importacioService.getDocuments(
+					entitatActual.getId(), 
+					contingutId,
+					ImportacioCommand.asDto(command));
+		if (documentsRepetits > 0) {
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"document.controller.importacio.repetit",
+							new Object[] {documentsRepetits}));
+			return modalUrlTancar();
+		}
+		
+		
 		
 		return getModalControllerReturnValueSuccess(
 				request,

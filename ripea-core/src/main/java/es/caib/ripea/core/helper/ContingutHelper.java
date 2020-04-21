@@ -1039,16 +1039,14 @@ public class ContingutHelper {
 				//No actualizar dins SGD si és un document importat de Regweb
 				String custodiaDocumentId = null;
 				DocumentEntity document = (DocumentEntity) contingut;
-				if (document.getDocumentTipus() != null && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
-					custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
-							(DocumentEntity) contingut,
-							isCarpetaLogica() ? contingut.getExpedientPare() : contingut.getPare(),
-							serieDocumental,
-							fitxer,
-							documentAmbFirma,
-							firmaSeparada,
-							firmes);
-				}
+				custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
+						(DocumentEntity) contingut,
+						isCarpetaLogica() ? contingut.getExpedientPare() : contingut.getPare(),
+						serieDocumental,
+						fitxer,
+						documentAmbFirma,
+						firmaSeparada,
+						firmes);
 				documentHelper.actualitzarVersionsDocument((DocumentEntity) contingut);
 
 				if (firmes != null) {
@@ -1271,6 +1269,7 @@ public class ContingutHelper {
 	
 	public boolean isCarpetaLogica() {
 		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
+		logger.info("carpeta lògica: " + carpetesLogiques);
 		return Boolean.valueOf(carpetesLogiques);
 	}
 
