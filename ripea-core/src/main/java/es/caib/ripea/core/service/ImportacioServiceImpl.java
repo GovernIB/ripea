@@ -4,11 +4,14 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,15 +79,20 @@ public class ImportacioServiceImpl implements ImportacioService {
 		} else {
 			expedientSuperior = contingutPare.getExpedient();
 		}
-
+		int idx = 1;
+		List<Document> documents = new ArrayList<Document>();
 		outerloop: for (ContingutArxiu documentArxiu : documentsArxiu) {
 			DocumentEntity entity = null;
 			Document document = pluginHelper.importarDocument(
 					expedientSuperior.getArxiuUuid(),
 					documentArxiu.getIdentificador(),
 					true);
+
+			documents.add(document);
+			documents = findAndCorrectDuplicates(
+					documents,
+					idx);	
 			String tituloDoc = (String) document.getMetadades().getMetadadaAddicional("tituloDoc");
-			
 			fitxer.setNom(document.getNom());
 			fitxer.setContentType(document.getContingut().getTipusMime());
 			fitxer.setContingut(document.getContingut().getContingut());
@@ -128,11 +136,34 @@ public class ImportacioServiceImpl implements ImportacioService {
 					entity,
 					true,
 					true);
+			try {
 				listDto.add(toDocumentDto(entity));
+			} catch (DataIntegrityViolationException e) {
+					documentsRepetits++;
+					logger.error("No s'ha pogut importar el document", e);
+			}
 		}
 		return documentsRepetits;
 	}
 
+	private List<Document> findAndCorrectDuplicates(
+			List<Document> documents,
+			int idx) {
+
+	    List<Document> corrected = new ArrayList<Document>();
+	    Set<String> uniques = new HashSet<>();
+
+	    for(Document document : documents) {
+	    	String tituloDoc = (String)document.getMetadades().getMetadadaAddicional("tituloDoc");
+	        if(!uniques.add(tituloDoc)) {
+	            document.getMetadades().addMetadadaAddicional("tituloDoc", tituloDoc + "_" + idx);
+	        }
+	        corrected.add(document);
+	    }
+
+	    return corrected;
+	}
+	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto)contingutHelper.toContingutDto(
