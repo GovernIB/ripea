@@ -13,21 +13,25 @@ import es.caib.ripea.plugin.SistemaExternException;
 public interface DigitalitzacioPlugin {
 
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
+	 * Recupera els perfils disponibles i els mostra amb l'idioma indicat.
 	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * @return Llistat dels perfils disponibles per l'usuari d'aplicació.
 	 */
 	public List<DigitalitzacioPerfil> recuperarPerfilsDisponibles(
 			String idioma) throws SistemaExternException;
 	
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
+	 * Inicia el procés de digitalització mostrant el fomulari per escanejar documents.
 	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * @param codiPerfil
+	 * 				El codi del perfil que s'ha seleccionat per iniciar l'escaneig.
+	 * @param idioma
+	 * 				El codi del perfil que s'ha seleccionat per iniciar l'escaneig.
+	 * @param funcionari
+	 * 				El usuari que realitza l'operació.
+	 * @param urlReturn
+	 * 				Url on es retornarà la cridada de Portafib. 
+	 * @return Resposta de DigutalIB amb el id de la transacció.
 	 */
 	public DigitalitzacioTransaccioResposta iniciarProces(
 			String codiPerfil,
@@ -36,11 +40,15 @@ public interface DigitalitzacioPlugin {
 			String returnUrl) throws SistemaExternException;
 	
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
+	 * Recupera el resultat d'un escaneig.
 	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * @param idTransaccio
+	 * 				Id de la transacció de la qual es vol recuperar el resultat.
+	 * @param returnScannedFile
+	 * 				Indica si s'ha escanejat un document sense firma. 
+	 * @param returnSignedFile
+	 * 				Indica si s'ha escanejat un document amb firma. 
+	 * @return L'estat i el document escanejat.
 	 */
 	public DigitalitzacioResultat recuperarResultat(
 			String idTransaccio,
@@ -48,11 +56,10 @@ public interface DigitalitzacioPlugin {
 			boolean returnSignedFile) throws SistemaExternException;
 
 	/**
-	 * Indica si el plugin suporta la custòdia de documents i si aquesta
-	 * es fa de manera automàtica una vegada firmat el document.
+	 * Tanca un transacció.
 	 * 
-	 * @return true si està suportada i es fa de forma automàtica o false
-	 *            en cas contrari.
+	 * @param transaccioId
+	 * 				Id de la transacció.
 	 */
 	public void tancarTransaccio(
 			String idTransaccio) throws SistemaExternException;

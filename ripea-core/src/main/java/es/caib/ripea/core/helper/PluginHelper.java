@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.awt.BufferCapabilities.FlipContents;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;

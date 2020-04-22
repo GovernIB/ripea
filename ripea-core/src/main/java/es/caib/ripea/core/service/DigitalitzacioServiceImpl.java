@@ -47,8 +47,8 @@ public class DigitalitzacioServiceImpl implements DigitalitzacioService {
 	public DigitalitzacioTransaccioRespostaDto iniciarDigitalitzacio(
 			String codiPerfil,
 			String urlReturn) {
+		logger.debug("Iniciant el procés d'escaneig");
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		
 		String idioma = usuariActual.getIdioma();
 		
 		if (idioma != null)
@@ -67,6 +67,7 @@ public class DigitalitzacioServiceImpl implements DigitalitzacioService {
 			String idTransaccio,
 			boolean returnScannedFile,
 			boolean returnSignedFile) {
+		logger.debug("Recuperant resultat escaneig");
 		DigitalitzacioResultatDto resultat = pluginHelper.digitalitzacioRecuperarResultat(
 				idTransaccio, 
 				returnScannedFile, 
@@ -77,6 +78,7 @@ public class DigitalitzacioServiceImpl implements DigitalitzacioService {
 	@Override
 	public void tancarTransaccio(
 			String idTransaccio) {
+		logger.debug("Tancant la transacció: " + idTransaccio);
 		pluginHelper.digitalitzacioTancarTransaccio(idTransaccio);
 	}
 

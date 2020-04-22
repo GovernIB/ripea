@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="fluxid">${fluxId}</c:set>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <html>
 <head>
@@ -12,10 +15,9 @@ if (rootIframe) {
 	var digitalizacioError = "${digitalizacioError}";
 	var digitalizacioFinalOk = "${digitalizacioFinalOk}";
 	var nomDocument = "${nomDocument}";
-	
 	var idTransaccio = localStorage.getItem('transaccioId');
-	var urlDescarrega = "<a class='downloadLink' href='<c:url value='/digitalitzacio/descarregarResultat/" + idTransaccio + "'/>' >" + nomDocument + "</a> <br>"
-	var urlCancel = "<span class='btn btn-default scan-cancel-btn'>Cancel·lar</span>"
+	var urlDescarrega = "<a class='downloadLink' href='<c:url value='/digitalitzacio/descarregarResultat/" + idTransaccio + "'/>' >" + nomDocument + "</a> <br>";
+	var urlCancel = "<span class='btn btn-default scan-cancel-btn'><spring:message code='contingut.document.form.camp.escaneig.cancelar'/></span>";
 
 	if (digitalizacioError != null && digitalizacioError != '') {
 		alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + digitalizacioError + '</span></div>'

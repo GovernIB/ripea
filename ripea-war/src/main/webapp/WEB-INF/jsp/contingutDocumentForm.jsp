@@ -88,6 +88,15 @@ body.loading .rmodal {
 .scan-cancel-btn {
 	margin-top: 3%;
 }
+.scan-profile > span {
+	border-radius: 0px;
+	color: #fff;
+	background-color: #c4c4c4;
+	border-color: #c4c4c4;
+}
+.scan-profile > span:hover {
+	color: #fff;
+} 
 </style>
 <script>
 function mostrarDocument(fileName) {
@@ -205,9 +214,19 @@ $(document).ready(function() {
 	    }
 	});
 
+	if($('#origen').val() == 'ESCANER') {
+		$('#escaneig').addClass('active');
+		$('#fitxer').removeClass('active');
+		$('.escaneig').parent().addClass('active');
+		$('.fitxer').parent().removeClass('active');
+	} else {
+		$('#fitxer').addClass('active');
+		$('#escaneig').removeClass('active');
+		$('.fitxer').parent().addClass('active');
+		$('.escaneig').parent().removeClass('active');
+	}
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		 var pipella = $(e.target).attr("class");
-		 console.log(pipella);
 		 if (pipella == 'fitxer') {
 			 $('#origen').val('DISC');
 			 webutilModalAdjustHeight();
@@ -226,7 +245,7 @@ $(document).ready(function() {
 			url: "<c:url value='/digitalitzacio/perfils'/>",
 			success: function(perfils) {
 				for ( var i in perfils) {
-					$('.scan-profile').append('<span class="btn btn-primary btn-lg btn-block" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+					$('.scan-profile').append('<span class="btn btn-lg btn-block" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
 					$('.scan-profile').append('</br>');
 				}
 				$('.scan-profile').show();
@@ -340,12 +359,12 @@ function removeLoading() {
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
-			<li role="presentation" class="active"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
+			<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
+			<li role="presentation"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
 		</ul>
 		<br/>
 		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane" id="fitxer">
+			<div role="tabpanel" class="tab-pane active" id="fitxer">
 				<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
 				<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
 				<div id="input-firma" class="hidden">
@@ -355,16 +374,24 @@ function removeLoading() {
 					</div>
 				</div>
 			</div>
-			<div role="tabpanel" class="tab-pane active" id="escaneig">
+			<div role="tabpanel" class="tab-pane" id="escaneig">
 			<c:if test="${not empty noFileScanned}">
-				<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>No s'ha escanejat cap document</span></div>
+				<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span><spring:message code="contingut.document.form.camp.escaneig.buid"/></span></div>
 			</c:if>
 				<div class="steps">
-					<div class="col-md-12 text-center start-scan-btn">
-						<span class="btn btn-default btn-md"><spring:message code="contingut.document.form.camp.escaneig.iniciar"/> <i class="fa fa-play"></i></span>
+					<div class="col-md-12 text-center">
+						<span class="btn btn-default start-scan-btn btn-md"><spring:message code="contingut.document.form.camp.escaneig.iniciar"/> <i class="fa fa-play"></i></span>
 					</div>
 					<div class="col-md-12 text-center scan-profile"></div>
-					<div class="col-md-12 text-center scan-result"></div>
+					<div class="col-md-12 text-center scan-result">
+						<c:if test="${not empty nomDocument}">
+							<script>
+								$('.start-scan-btn').hide();
+							</script>
+							<a class="downloadLink" href="<c:url value="/digitalitzacio/descarregarResultat/${idTransaccio}"/>">${nomDocument}</a> <br>
+							<span class='btn btn-default scan-cancel-btn'><spring:message code="contingut.document.form.camp.escaneig.cancelar"/></span>
+						</c:if>
+					</div>
 					<div class="col-md-12 text-center scan-back-btn hidden">
 						<span class="btn btn-default btn-lg"><spring:message code="contingut.document.form.camp.escaneig.tornar"/> <i class="fa fa-back"></i></span>
 					</div>

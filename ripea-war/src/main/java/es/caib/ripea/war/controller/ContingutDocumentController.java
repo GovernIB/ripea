@@ -220,6 +220,7 @@ public class ContingutDocumentController extends BaseUserController {
 					return "contingutDocumentForm";
 				}
 				model.addAttribute("nomDocument", resultat.getNomDocument());
+				model.addAttribute("idTransaccio", idTransaccio);
 				command.setFitxerNom(resultat.getNomDocument());
 				command.setFitxerContentType(resultat.getMimeType());
 				command.setFitxerContingut(resultat.getContingut());
@@ -250,6 +251,7 @@ public class ContingutDocumentController extends BaseUserController {
 					null,
 					pareId,
 					model);
+			command.setArxiu(null);
 			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
