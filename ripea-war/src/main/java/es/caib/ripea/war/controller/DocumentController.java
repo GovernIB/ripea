@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
@@ -43,17 +44,17 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
@@ -87,7 +88,9 @@ public class DocumentController extends BaseUserController {
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
-
+	@Autowired
+	private ContingutService contingutService;
+	
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
 			HttpServletRequest request,
@@ -633,6 +636,24 @@ public class DocumentController extends BaseUserController {
 					transactionId);
 		}
 		return "portafirmesModalTancar";
+	}
+	
+	@RequestMapping(value = "/{documentId}/urlValidacio", method = RequestMethod.GET)
+	@ResponseBody
+	public String getUrlValidacio(
+			HttpServletRequest request,
+			@PathVariable Long documentId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url");
+		
+		ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
+				entitatActual.getId(),
+				documentId);
+		
+		if (urlValidacio != null) {
+			return urlValidacio + arxiuDetall.getMetadadesAddicionals().get("csv");
+		}
+		return urlValidacio;
 	}
 	
 	private void setFluxPredefinit(
