@@ -4,6 +4,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<%
+pageContext.setAttribute(
+		"expedientEstatsOptdions",
+		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
+		"expedient.estat.enum."));
+%>
 <html>
 <head>
 	<title><spring:message code="expedient.list.user.titol"/></title>

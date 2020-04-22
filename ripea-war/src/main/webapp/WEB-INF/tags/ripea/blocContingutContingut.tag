@@ -33,6 +33,9 @@
 									<c:if test="${fill.document && fill.ambNotificacions}">
 										<span class="fa fa-envelope popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
 									</c:if>
+									<c:if test="${not fill.carpeta && fill.metaNode == null}">
+										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
+									</c:if>
 									${fill.nom}
 								</p>
 								<rip:blocContingutAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}" nodeco="${nodeco}"/>
@@ -136,7 +139,7 @@
 									${fill.metaNode.nom}
 								</c:when>
 								<c:when test="${not fill.carpeta && fill.metaNode == null}">
-									<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
+									<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable col-md-8">
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
 										<spring:message code="contingut.info.document.tipusdocument"/>
 									</div>

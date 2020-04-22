@@ -118,9 +118,9 @@ public class ExpedientController extends BaseUserController {
 		Long metaExpedientId = (Long)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_METAEXP_ID);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
 		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);

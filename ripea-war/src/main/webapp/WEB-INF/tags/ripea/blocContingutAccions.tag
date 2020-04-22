@@ -135,6 +135,25 @@
 			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
 				<c:if test="${contingut.custodiat and !isTasca}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
+				
+					<c:if test="${isUrlValidacioDefinida}">
+						<li><a href="#copy"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
+						<script>
+							$('a[href = "#copy"]').click(function(){
+								$.get("../document/" + ${contingut.id} + "/urlValidacio", function(data) {
+									var dummy = $('<input>').val(data).appendTo('body').select();
+									document.execCommand("copy");
+									$(dummy).remove();
+									
+								});
+								$('.copy').remove();
+								$('.panel-body').prepend("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
+								setTimeout(function(){	
+									$('.copy').remove();
+								}, 2000);
+							}); 
+						</script>
+					</c:if>
 				</c:if>
 				<%---- Descarregar ----%>
 				<c:choose>

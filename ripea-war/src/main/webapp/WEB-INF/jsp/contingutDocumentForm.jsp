@@ -186,7 +186,6 @@ $(document).ready(function() {
 		<c:choose>
 			<c:when test="${documentCommand.documentTipus == 'IMPORTAT'}">
 				<c:set var="readOnlyValue" value="true"/>
-				<p class="comentari col-xs-10 col-xs-offset-2"><spring:message code="contingut.document.form.importat"/></p><br><br>
 			</c:when>
 			<c:otherwise>
 				<c:set var="readOnlyValue" value="false"/>
