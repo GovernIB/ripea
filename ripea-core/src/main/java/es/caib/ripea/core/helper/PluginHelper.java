@@ -2844,8 +2844,12 @@ public class PluginHelper {
 				}
 			}
 
-			FitxerDto fitxer =  arxiuDocumentVersioImprimible(documentEntity);
-//			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+			FitxerDto fitxer = null;
+			if (!documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+				fitxer =  arxiuDocumentVersioImprimible(documentEntity);
+			} else {
+				fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+			}
 			notificacio.setDocumentArxiuNom(fitxer.getNom());
 			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());

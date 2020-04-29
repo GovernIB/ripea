@@ -2,8 +2,10 @@ package es.caib.ripea.war.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,7 +22,6 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
@@ -37,6 +38,12 @@ import es.caib.ripea.war.command.DocumentConcatenatCommand;
 @Component
 public class DocumentHelper {
 
+	public static final SecureRandom DEFAULT_NUMBER_GENERATOR = new SecureRandom();
+
+    public static final char[] DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+
+    public static final int DEFAULT_SIZE = 8;
+    
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 	
@@ -143,13 +150,13 @@ public class DocumentHelper {
 	
 				if (command != null) {
 					reportContent = baos.toByteArray();
-					command.setNom("notificacio_" + new Date().getTime());
+					command.setNom("notificacio_" + randomUUID());
 					command.setData(new Date());
 					command.setMetaNodeId(metaDocument.getId()); //Notificació
 					command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
 					command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
 					command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
-					command.setFitxerNom(revisarContingutNom(((ExpedientDto)contingut).getNom()) + ".zip");
+					command.setFitxerNom(command.getNom() + ".zip");
 					command.setFitxerContentType("application/zip");
 					command.setFitxerContingut(reportContent);
 				}	
@@ -160,6 +167,33 @@ public class DocumentHelper {
 					ex);
 		}
 	}
+	
+	private static String randomUUID() {
+        return randomUUID(DEFAULT_NUMBER_GENERATOR, DEFAULT_ALPHABET, DEFAULT_SIZE);
+    }
+
+	private static String randomUUID(final Random random, final char[] alphabet, final int size) {
+        if (random == null) throw new IllegalArgumentException("Random no puede ser nulo");
+        if (alphabet == null) throw new IllegalArgumentException("El alfabeto no puede ser nulo");
+        if (alphabet.length == 0 || alphabet.length >= 256) throw new IllegalArgumentException("El alfabeto debe contener entre 1 y 255 símbolos");
+        if (size <= 0) throw new IllegalArgumentException("El tatamañomannyo debe ser mayor que cero");
+        final int mask = (2 << (int) Math.floor(Math.log(alphabet.length - 1) / Math.log(2))) - 1;
+        final int step = (int) Math.ceil(1.6 * mask * size / alphabet.length);
+        final StringBuilder idBuilder = new StringBuilder();
+        while (true) {
+            final byte[] bytes = new byte[step];
+            random.nextBytes(bytes);
+            for (int i = 0; i < step; i++) {
+                final int alphabetIndex = bytes[i] & mask;
+                if (alphabetIndex < alphabet.length) {
+                    idBuilder.append(alphabet[alphabetIndex]);
+                    if (idBuilder.length() == size) {
+                        return idBuilder.toString();
+                    }
+                }
+            }
+        }
+    }
 	
 	private static String revisarContingutNom(String nom) {
 		if (nom == null) {
