@@ -33,6 +33,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -66,6 +67,7 @@ import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
@@ -73,8 +75,10 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 
 /**
@@ -116,8 +120,10 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired
 	private ViaFirmaHelper viaFirmaHelper;
 	@Autowired
-	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
-
+	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
+	
 	@Transactional
 	@Override
 	public DocumentDto create(
@@ -894,7 +900,25 @@ public class DocumentServiceImpl implements DocumentService {
 				logger.error("Callback de notib envia notificació que no existeix a la base de dades: identificador=" + identificador + ", referencia=" + referencia);
 				// throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
 			} else {
-				pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
+				RespostaConsultaEstatEnviament resposta = pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
+				if (getPropertyGuardarCertificacioExpedient()) {
+					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
+							true, 
+							null, 
+							MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
+					DocumentDto document = documentHelper.certificacioToDocumentDto(
+							documentEnviamentInteressatEntity,
+							metaDocument,
+							resposta);
+					DocumentDto documentCreat = documentHelper.crearDocument(
+							document, 
+							documentEnviamentInteressatEntity.getNotificacio().getDocument().getPare(), 
+							documentEnviamentInteressatEntity.getNotificacio().getDocument().getExpedientPare(), 
+							metaDocument);
+					
+					DocumentEntity documentEntity = documentRepository.findOne(documentCreat.getId());
+					documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				}
 			}
 			
 		} catch (Exception ex) {
@@ -964,6 +988,11 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				true,
 				false);
+	}
+	
+	private boolean getPropertyGuardarCertificacioExpedient() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);

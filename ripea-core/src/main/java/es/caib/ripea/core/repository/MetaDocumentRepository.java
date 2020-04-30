@@ -66,9 +66,10 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 	@Query(	"from " +
 			"    MetaDocumentEntity md " +
 			"where " +
-			"    md.entitat = :entitat " +
+			"   (:esNullEntitat = true or md.entitat = :entitat) " +
 			"and md.metaDocumentTipusGeneric = :metaDocumentTipusGeneric")
 	MetaDocumentEntity findByEntitatAndTipusGeneric(
+			@Param("esNullEntitat") boolean esNullEntitat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaDocumentTipusGeneric") MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric);
 }

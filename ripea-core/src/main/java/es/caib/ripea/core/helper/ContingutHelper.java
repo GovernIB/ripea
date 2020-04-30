@@ -52,10 +52,12 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -73,6 +75,7 @@ import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 
 /**
  * Utilitat per a gestionar contenidors.
@@ -419,6 +422,41 @@ public class ContingutHelper {
 			}
 		}
 		return resposta;
+	}
+	
+	public DocumentDto generarDocumentDto(
+			DocumentNotificacioEntity notificacio,
+			MetaDocumentEntity metaDocument,
+			RespostaConsultaEstatEnviament resposta) {
+		DocumentDto dto = new DocumentDto();
+		MetaNodeDto metaNode = null;
+		dto.setNom("Justificant_" + notificacio.getAssumpte());
+		dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		dto.setUbicacio(null);
+		dto.setData(resposta.getCertificacioData());
+		if (resposta.getCertificacioContingut() != null) {
+			dto.setAmbFirma(true);
+			dto.setFitxerNom("Justificant_" + notificacio.getAssumpte() + ".pdf");
+			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
+			dto.setFitxerContingut(resposta.getCertificacioContingut());
+		}
+		dto.setVersioCount(0);
+		dto.setDataCaptura(new Date());
+		dto.setNtiVersion("1.0");
+		dto.setNtiIdentificador(resposta.getCertificacioHash());
+		dto.setNtiOrgano(resposta.getReceptorNif());
+		dto.setNtiOrganoDescripcio(resposta.getReceptorNom());
+		dto.setNtiOrigen(metaDocument.getNtiOrigen());
+		dto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+		dto.setNtiTipoDocumental(metaDocument.getNtiTipoDocumental());
+		
+		dto.setNtiCsv(resposta.getCertificacioCsv());
+		
+		metaNode = conversioTipusHelper.convertir(
+				metaDocument,
+				MetaDocumentDto.class);
+		dto.setMetaNode(metaNode);
+		return dto;
 	}
 
 	public NodeEntity comprovarNodeDinsExpedientModificable(

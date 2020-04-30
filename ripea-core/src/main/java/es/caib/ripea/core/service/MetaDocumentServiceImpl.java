@@ -596,6 +596,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false);
 		
 		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByEntitatAndTipusGeneric(
+				false,
 				entitat,
 				tipusGeneric);
 		
