@@ -2987,8 +2987,12 @@ public class PluginHelper {
 				}
 			}
 
-			FitxerDto fitxer =  arxiuDocumentVersioImprimible(documentEntity);
-//			FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+			FitxerDto fitxer = null;
+			if (!documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+				fitxer =  arxiuDocumentVersioImprimible(documentEntity);
+			} else {
+				fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+			}
 			notificacio.setDocumentArxiuNom(fitxer.getNom());
 			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
@@ -3124,21 +3128,21 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	public void notificacioConsultarIActualitzarEstat(
+	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-
+		RespostaConsultaEstatEnviament resposta = null;
 		String accioDescripcio = "Consulta d'estat d'una notificació electrònica";
 		Map<String, String> accioParams = getAccioParams(documentEnviamentInteressatEntity);
 		long t0 = System.currentTimeMillis();
 		try {
 
-			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(
+			resposta = getNotificacioPlugin().consultarEnviament(
 					documentEnviamentInteressatEntity.getEnviamentReferencia());
 
 			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
-			if (resposta.getCertificacioData() != null) {
+			if (!getPropertyGuardarCertificacioExpedient() && resposta.getCertificacioData() != null) {
 				byte[] certificacio = resposta.getCertificacioContingut();
 				if (gestioDocumentalId != null && documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
 					gestioDocumentalDelete(
@@ -3197,6 +3201,7 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
+		return resposta;
 	}
 
 	public void actualitzarDadesRegistre(DocumentEnviamentInteressatEntity enviament) {
@@ -4739,6 +4744,11 @@ public class PluginHelper {
 	private String getPropertyNotificacioForsarEntitat() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.notificacio.forsar.entitat");
+	}
+	
+	private boolean getPropertyGuardarCertificacioExpedient() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
 
 }

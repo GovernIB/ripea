@@ -56,6 +56,8 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -64,6 +66,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
@@ -344,6 +347,17 @@ public class DocumentHelper {
 		}
 	}
 	
+	public DocumentDto certificacioToDocumentDto(
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
+			MetaDocumentEntity metaDocument,
+			RespostaConsultaEstatEnviament resposta) {
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		return generarDocumentDto(
+					notificacio,
+					metaDocument,
+					resposta);
+		
+	}
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
@@ -435,6 +449,16 @@ public class DocumentHelper {
 				true,
 				true,
 				false);
+	}
+	
+	private DocumentDto generarDocumentDto(
+			DocumentNotificacioEntity notificacio,
+			MetaDocumentEntity metaDocument,
+			RespostaConsultaEstatEnviament resposta) {
+		return contingutHelper.generarDocumentDto(
+				notificacio,
+				metaDocument,
+				resposta);
 	}
 	
 
