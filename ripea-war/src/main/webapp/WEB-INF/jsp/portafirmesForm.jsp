@@ -7,10 +7,10 @@
 
 <%
 pageContext.setAttribute(
-		"metadocumentFluxtipEnumOptions",
+		"metadocumentSeqtipEnumOptions",
 		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
-		"metadocument.fluxtip.enum."));
+		es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
+		"metadocument.seqtip.enum."));
 %>
 <c:set var="titol"><spring:message code="contenidor.document.portafirmes.titol"/></c:set>
 <c:set var="isTasca" value="${not empty tascaId}"/>
@@ -191,7 +191,7 @@ function removeLoading() {
 				suggestTextAddicional="nif"
 				required="true"/>
 						
-			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSeqtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">
 			<div class="form-group">
