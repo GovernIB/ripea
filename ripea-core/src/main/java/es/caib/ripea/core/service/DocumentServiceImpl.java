@@ -901,7 +901,7 @@ public class DocumentServiceImpl implements DocumentService {
 				// throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
 			} else {
 				RespostaConsultaEstatEnviament resposta = pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
-				if (getPropertyGuardarCertificacioExpedient()) {
+				if (getPropertyGuardarCertificacioExpedient() && documentEnviamentInteressatEntity.getEnviamentCertificacioData() == null) {
 					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
 							true, 
 							null, 

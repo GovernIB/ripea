@@ -26,7 +26,7 @@ public class ArxiuNoBuitValidator implements ConstraintValidator<ArxiuNoBuit, Do
 			final DocumentCommand value,
 			final ConstraintValidatorContext context) {
 		boolean valid = true;
-		if (!(!value.getOrigen().equals(DocumentFisicOrigenEnum.DISC) && (value.getArxiu() == null || value.getArxiu().isEmpty()))) {
+		if ((value.getOrigen().equals(DocumentFisicOrigenEnum.DISC) && (value.getArxiu() == null || value.getArxiu().isEmpty()))) {
 			context.buildConstraintViolationWithTemplate(
 					MessageHelper.getInstance().getMessage(
 							"contingut.expedient.relacionar.validacio.mateix"))

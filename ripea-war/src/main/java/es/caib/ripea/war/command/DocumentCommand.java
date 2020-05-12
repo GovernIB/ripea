@@ -214,15 +214,20 @@ public class DocumentCommand extends ContenidorCommand {
 			dto.setFitxerContingut(command.getFitxerContingut());
 		}
 
-		if (command.isAmbFirma()) {
+		if (command.getArxiu() != null && !command.getArxiu().isEmpty() && command.isAmbFirma()) {
 			dto.setFirmaNom(command.getFirma().getOriginalFilename());
 			dto.setFirmaContentType(command.getFirma().getContentType());
 			dto.setFirmaContingut(command.getFirma().getBytes());
-		} else {
-			dto.setFitxerNom(command.getFitxerNom());
-			dto.setFitxerContentType(command.getFitxerContentType());
-			dto.setFitxerContingut(command.getFitxerContingut());
+		} else if ((command.getArxiu() == null || command.getArxiu().isEmpty()) && command.isAmbFirma()){
+			dto.setFirmaNom(command.getFitxerNom());
+			dto.setFirmaContentType(command.getFitxerContentType());
+			dto.setFirmaContingut(command.getFitxerContingut());
 		}
+//		else {
+//			dto.setFitxerNom(command.getFitxerNom());
+//			dto.setFitxerContentType(command.getFitxerContentType());
+//			dto.setFitxerContingut(command.getFitxerContingut());
+//		}
 		
 		dto.setFirmaSeparada(command.getTipusFirma() == DocumentTipusFirmaEnumDto.SEPARAT ? true : false);
 
