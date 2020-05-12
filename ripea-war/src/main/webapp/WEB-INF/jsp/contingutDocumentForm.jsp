@@ -384,7 +384,7 @@ function removeLoading() {
 					</div>
 					<div class="col-md-12 text-center scan-profile"></div>
 					<div class="col-md-12 text-center scan-result">
-						<c:if test="${not empty nomDocument}">
+						<c:if test="${not empty nomDocument && empty documentCommand.id}">
 							<script>
 								$('.start-scan-btn').hide();
 							</script>
