@@ -175,74 +175,12 @@ public class ContingutDocumentController extends BaseUserController {
 
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
-			boolean returnScannedFile = false;
-			boolean returnSignedFile = false;
-			
-			String idTransaccio = (String) RequestSessionHelper.obtenirObjecteSessio(
+			recuperarResultatEscaneig(
 					request,
-					SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO);
-			
-			Object scannedFile = RequestSessionHelper.obtenirObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_RETURN_SCANNED);
-			Object signedFile = RequestSessionHelper.obtenirObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_RETURN_SIGNED);
-			
-			if (scannedFile != null) {
-				returnScannedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_RETURN_SCANNED);
-			}
-			if (signedFile != null) {
-				returnSignedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						SESSION_ATTRIBUTE_RETURN_SIGNED);
-			}
-			if (idTransaccio != null) { 
-				DigitalitzacioResultatDto resultat = digitalitzacioService.recuperarResultat(
-						idTransaccio, 
-						returnScannedFile, 
-						returnSignedFile);
-				if (resultat != null && resultat.isError() && !resultat.getEstat().equals(DigitalitzacioEstatDto.FINAL_OK)) {
-					MissatgesHelper.error(
-							request,
-							getMessage(
-									request, 
-									"document.digitalitzacio.estat.enum."+ resultat.getEstat()));
-					omplirModelFormulari(
-							request,
-							command,
-							null,
-							pareId,
-							model);
-					model.addAttribute("contingutId", pareId);
-					return "contingutDocumentForm";
-				}
-				model.addAttribute("nomDocument", resultat.getNomDocument());
-				model.addAttribute("idTransaccio", idTransaccio);
-				command.setFitxerNom(resultat.getNomDocument());
-				command.setFitxerContentType(resultat.getMimeType());
-				command.setFitxerContingut(resultat.getContingut());
-					
-				//Amb firma?
-				if (returnSignedFile) {
-					command.setAmbFirma(true);
-				}
-			} else {
-				omplirModelFormulari(
-						request,
-						command,
-						null,
-						pareId,
-						model);
-				model.addAttribute("contingutId", pareId);
-				model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");	
-				return "contingutDocumentForm";
-			}
-			
+					pareId,
+					command,
+					model);
 		}
-		
 		
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
@@ -283,6 +221,15 @@ public class ContingutDocumentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
+		//Recuperar document escanejat
+		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+			recuperarResultatEscaneig(
+					request,
+					contingutId,
+					command,
+					model);
+		}
+				
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -311,7 +258,78 @@ public class ContingutDocumentController extends BaseUserController {
 		}
 	}
 
-
+	private String recuperarResultatEscaneig(
+			HttpServletRequest request,
+			Long contingutId,
+			DocumentCommand command,
+			Model model) throws ClassNotFoundException, IOException {
+		boolean returnScannedFile = false;
+		boolean returnSignedFile = false;
+		
+		String idTransaccio = (String) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO);
+		
+		Object scannedFile = RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_SCANNED);
+		Object signedFile = RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_SIGNED);
+		
+		if (scannedFile != null) {
+			returnScannedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_SCANNED);
+		}
+		if (signedFile != null) {
+			returnSignedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RETURN_SIGNED);
+		}
+		if (idTransaccio != null) { 
+			DigitalitzacioResultatDto resultat = digitalitzacioService.recuperarResultat(
+					idTransaccio, 
+					returnScannedFile, 
+					returnSignedFile);
+			if (resultat != null && resultat.isError() && !resultat.getEstat().equals(DigitalitzacioEstatDto.FINAL_OK)) {
+				MissatgesHelper.error(
+						request,
+						getMessage(
+								request, 
+								"document.digitalitzacio.estat.enum."+ resultat.getEstat()));
+				omplirModelFormulari(
+						request,
+						command,
+						null,
+						contingutId,
+						model);
+				model.addAttribute("contingutId", contingutId);
+				return "contingutDocumentForm";
+			}
+			model.addAttribute("nomDocument", resultat.getNomDocument());
+			model.addAttribute("idTransaccio", idTransaccio);
+			command.setFitxerNom(resultat.getNomDocument());
+			command.setFitxerContentType(resultat.getMimeType());
+			command.setFitxerContingut(resultat.getContingut());
+				
+			//Amb firma?
+			if (returnSignedFile) {
+				command.setAmbFirma(true);
+			}
+		} else {
+			omplirModelFormulari(
+					request,
+					command,
+					null,
+					contingutId,
+					model);
+			model.addAttribute("contingutId", contingutId);
+			model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");	
+			return "contingutDocumentForm";
+		}
+		return idTransaccio;
+	}
 	
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
 	@ResponseBody
@@ -888,7 +906,7 @@ public class ContingutDocumentController extends BaseUserController {
 			Long contingutId,
 			Model model,
 			DocumentDto document) throws ClassNotFoundException, IOException {
-		if(document.getFitxerNom() != null  && command.getOrigen().equals(DocumentFisicOrigenEnum.DISC)) {
+		if(document.getFitxerNom() != null) {
 			model.addAttribute("nomDocument", document.getFitxerNom());
 		}
 		omplirModelFormulari(request, command, commandGeneric, contingutId, model);
