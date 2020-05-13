@@ -7,123 +7,123 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
- * Declaració dels mètodes per a la gestió dels tipus documentals.
+ * Declaració dels mètodes per a la gestió dels dominis.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface TipusDocumentalService {
+public interface DominiService {
 
 	/**
-	 * Crea un nou tipus documental.
+	 * Crea un nou domini.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param tipusDocumental
-	 *            Informació del tipus documental a crear;
-	 * @return El tipus documental creat.
+	 * @param domini
+	 *            Informació del domini a crear;
+	 * @return El domini creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public TipusDocumentalDto create(
+	public DominiDto create(
 			Long entitatId,
-			TipusDocumentalDto tipusDocumental) throws NotFoundException;
+			DominiDto domini) throws NotFoundException;
 
 	/**
-	 * Actualitza la informació del meta-document que tengui el mateix
+	 * Actualitza la informació del domini que tengui el mateix
 	 * id que l'especificat per paràmetre.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param tipusDocumental
-	 *            Informació del tipus documental a modificar.
-	 * @return El tipus documental modificat.
+	 * @param domini
+	 *            Informació del domini a modificar.
+	 * @return El domini modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public TipusDocumentalDto update(
+	public DominiDto update(
 			Long entitatId,
-			TipusDocumentalDto tipusDocumental) throws NotFoundException;
+			DominiDto tipusDocumental) throws NotFoundException;
 
 	/**
-	 * Esborra el tipus documental amb el mateix id que l'especificat.
+	 * Esborra el domini amb el mateix id que l'especificat.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param id
-	 *            Atribut id del tipus documental a esborrar.
-	 * @return El tipus documental esborrat.
+	 *            Atribut id del domini a esborrar.
+	 * @return El domini esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public TipusDocumentalDto delete(
+	public DominiDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
 	/**
-	 * Consulta un tipus documental donat el seu id.
+	 * Consulta un domini donat el seu id.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param id
-	 *            Atribut id del tipus documental a trobar.
-	 * @return El tipus documental amb l'id especificat o null si no s'ha trobat.
+	 *            Atribut id del domini a cercar.
+	 * @return El domini amb l'id especificat o null si no s'ha trobat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public TipusDocumentalDto findById(
+	public DominiDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
 	/**
-	 * Llistat paginat amb tots els tipus documentals de l'entitat.
+	 * Llistat paginat amb tots els dominis de l'entitat.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @return La llista de tipus documentals.
+	 * @return La llista dels dominis.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<TipusDocumentalDto> findByEntitatPaginat(
+	public PaginaDto<DominiDto> findByEntitatPaginat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 	
 	/**
-	 * Llistat amb tots els tipus documentals de l'entitat.
+	 * Llistat amb tots els dominis de l'entitat.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @return La llista de tipus documentals.
+	 * @return La llista de dominis.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<TipusDocumentalDto> findByEntitat(
+	public List<DominiDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
 	/**
-	 * Llista un tipus documental d'una entitat a partir del seu codi.
+	 * Recupera un domini d'una entitat a partir del seu codi.
 	 * 
 	 * @param codi
-	 *            Codi del tipus documental.
+	 *            Codi del domini.
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @return El tipus documental.
+	 * @return El domini.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public TipusDocumentalDto findByCodiAndEntitat(
+	public DominiDto findByCodiAndEntitat(
 			String codi,
 			Long entitatId) throws NotFoundException;
 }

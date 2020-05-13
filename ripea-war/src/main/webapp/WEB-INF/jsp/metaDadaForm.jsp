@@ -17,6 +17,10 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+<script type="text/javascript">
+
+</script>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada"/></c:set>
