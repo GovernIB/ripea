@@ -690,7 +690,7 @@ public class DocumentHelper {
 					// Si el document no ha estat custodiat pel portafirmes
 					// actualitza la informació de firma a l'arxiu.
 					FitxerDto fitxer = new FitxerDto();
-					fitxer.setNom(portafirmesDocument.getArxiuNom());
+					fitxer.setNom(document.getFitxerNom());
 					fitxer.setContingut(portafirmesDocument.getArxiuContingut());
 					fitxer.setContentType("application/pdf");
 					documentPortafirmes.updateProcessat(
