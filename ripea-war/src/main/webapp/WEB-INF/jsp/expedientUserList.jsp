@@ -314,7 +314,7 @@ function getCookie(cname) {
 										{{/if}}
 									{{/if}}
 								{{/if}}
-								{{if metaNode.usuariActualDelete}}
+								{{if metaNode.usuariActualDelete && estat != 'TANCAT'}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 							</ul>
