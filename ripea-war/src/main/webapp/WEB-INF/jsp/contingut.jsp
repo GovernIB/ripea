@@ -233,6 +233,36 @@ ul.interessats {
     cursor: default;
 	width: 500px;
 }
+.esborranys.alert.alert-warning {
+	color: #734b29;
+	background-color: #ffab66;
+	border-color: #ff8d30;
+}
+.icona-esborrany {
+	font-weight: bold;
+	color: #ffab66;
+}
+.definitiu.fa.fa-check-square {
+	color: #02cda2;
+}
+.firmat.fa.fa-pencil-square {
+	color: #02cda2;
+}
+.pendent.fa.fa-pencil-square {
+	color: #67bdff;
+}
+.error.fa.fa-pencil-square {
+	color: #ffab66;
+}
+.pendent.fa.fa-envelope-square {
+	color: #67bdff;
+}
+.enviada.fa.fa-envelope-square {
+	color: #02cda2;
+}
+.error.fa.fa-envelope-square {
+	color: #ffab66;
+}
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
@@ -903,6 +933,21 @@ function deselectAll() {
 		</c:if>
 		<!------------------------------------------------------------------------- CONTINGUT BLOCK (CENTER/RIGHT SIDE OF THE PAGE) ------------------------------------------------------------------------------->
 		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
+			<c:choose>
+				<c:when test="${!isTasca && contingut.expedient and contingut.hasEsborranys and not isArxiuCaib}">
+					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
+						<span class="fa fa-exclamation-triangle"></span>
+						<spring:message code="contingut.errors.expedient.conte.esborranys"/>
+						<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
+					</div>
+				</c:when>
+				<c:when test="${!isTasca && contingut.expedient and contingut.hasEsborranys and isArxiuCaib}">
+					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
+						<span class="fa fa-exclamation-triangle"></span>
+						<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
+					</div>
+				</c:when>
+			</c:choose>
 			<c:if test="${!isTasca && contingut.node and (not contingut.valid or contingut.alerta)}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
 					<span class="fa fa-exclamation-triangle"></span>
@@ -1102,6 +1147,7 @@ function deselectAll() {
 									</div>
 								</div>
 								<c:if test="${expedientAgafatPerUsuariActual and expedientPare.estat != 'TANCAT'}">
+									<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
 									<%---- Button notificar mult ----%>
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
@@ -1112,6 +1158,20 @@ function deselectAll() {
 											</a> 
 											<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>">
 												<span class="fa fa-envelope-o"></span>
+												
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</a>
+										</div>
+									</div>
+									<div class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
+											<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
+												<span class="fa fa-check-square"></span>
+												
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</a> 
+											<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
+												<span class="fa fa-check-square"></span>
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>

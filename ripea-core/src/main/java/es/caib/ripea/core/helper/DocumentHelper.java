@@ -1098,6 +1098,18 @@ public class DocumentHelper {
 		return firmes;
 	}
 
+	public boolean hasFillsEsborranys(
+			List<DocumentEntity> documents) {
+		logger.debug("Consulta els documents esborranys d'un expedient");
+		for (DocumentEntity document : documents) {
+			if (document.getEsborrat() == 0 
+					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
+					&& document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public void processarFirmaClient(
 			String identificador,

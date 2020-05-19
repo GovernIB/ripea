@@ -92,7 +92,7 @@
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
 						<c:choose>
-							<c:when test="${contingut.valid && contingut.conteDocumentsFirmats}">
+							<c:when test="${contingut.valid && !contingut.hasEsborranys && contingut.conteDocumentsFirmats}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>
@@ -116,15 +116,16 @@
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.node"/></c:set>
 				</c:otherwise>
 			</c:choose>
-			<c:choose>
-				<c:when test="${isTasca}">
-					<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-				</c:when>
-				<c:otherwise>
-					<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-				</c:otherwise>
-			</c:choose>
-
+			<c:if test="${!contingut.document || (contingut.document && contingut.estat != 'DEFINITIU')}">
+				<c:choose>
+					<c:when test="${isTasca}">
+						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+					</c:when>
+					<c:otherwise>
+						<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
 		<c:if test="${contingut.document}">
@@ -257,7 +258,11 @@
 				</c:if>
 			</c:if>
 		</c:if>
-		
+		<c:if test="${contingut.document && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && not isArxiuCaib}">	
+			<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu"/></c:set>
+			<li role="separator" class="divider"></li>			
+			<li><a href="<c:url value="/document/${contingut.id}/convertir"/>" data-refresh-pagina="true" data-confirm="${definitiuConfirmacioMsg}"><span class="fa fa-check-square"></span>&nbsp;<spring:message code="contingut.boto.definitiu"/></a></li>
+		</c:if>
 		<%---- Històric d'accions ----%>
 		<c:if test="${!isTasca}">
 			<c:if test="${mostrarSeparador}">

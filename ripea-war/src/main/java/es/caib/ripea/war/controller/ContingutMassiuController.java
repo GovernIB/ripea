@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
@@ -36,6 +38,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -60,6 +63,8 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutMassiuController.session.seleccio";
 
 	@Autowired
+	private DocumentService documentService;
+	@Autowired
 	private ContingutService contingutService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
@@ -82,6 +87,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		filtreCommand.setBloquejarTipusElement(true);
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
+		model.addAttribute("portafirmes", true);
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -139,6 +145,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 				SESSION_ATTRIBUTE_SELECCIO);
 		
 		if (seleccio == null || seleccio.isEmpty()) {
+			model.addAttribute("portafirmes", true);
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/portafirmes",
@@ -151,6 +158,103 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		model.addAttribute(command);
 		
 		return "enviarPortafirmes";
+	}
+	
+	@RequestMapping(value = "/definitiu", method = RequestMethod.GET)
+	public String getDocumentsEsborranys(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
+		filtreCommand.setBloquejarTipusElement(true);
+		filtreCommand.setBloquejarMetaDada(true);
+		filtreCommand.setBloquejarMetaExpedient(false);
+		model.addAttribute("portafirmes", false);
+		model.addAttribute(
+				"seleccio",
+				RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_SELECCIO));
+		model.addAttribute(
+				"titolMassiu",
+				getMessage(request, "accio.massiva.titol.definitiu"));
+		model.addAttribute(
+				"botoMassiu",
+				getMessage(request, "accio.massiva.boto.crear.definitiu"));
+		model.addAttribute(
+				filtreCommand);
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
+		if (filtreCommand.getTipusExpedient() != null)
+			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getTipusExpedient());
+		model.addAttribute(
+				"expedients",
+				expedients);
+		return "contingutMassiuList";
+	}
+	
+	@RequestMapping(value = "/definitiu", method = RequestMethod.POST)
+	public String filtrePost(
+			HttpServletRequest request,
+			@Valid ContingutMassiuFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model) {
+		if (!bindingResult.hasErrors()) {
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE,
+					filtreCommand);
+		}
+		
+		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
+		filtreCommand.setBloquejarTipusElement(true);
+		filtreCommand.setBloquejarMetaDada(true);
+		filtreCommand.setBloquejarMetaExpedient(false);
+		
+		return "redirect:/massiu/definitiu";
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/marcar/definitiu", method = RequestMethod.GET)
+	public String marcarDefinitiu(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		
+		if (seleccio == null || seleccio.isEmpty()) {
+			model.addAttribute("portafirmes", false);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:/massiu/definitiu",
+					"accio.massiva.seleccio.buida");
+		}
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		for (Long docId: seleccio) {
+			DocumentDto document = (DocumentDto) contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					docId,
+					true,
+					false);
+			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+				documentService.documentActualitzarEstat(
+						entitatActual.getId(), 
+						docId, 
+						DocumentEstatEnumDto.DEFINITIU);
+			}
+			
+		}
+		return this.getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/massiu/definitiu",
+				"document.controller.estat.canviat.ok");
 	}
 	
 	@SuppressWarnings("unchecked")

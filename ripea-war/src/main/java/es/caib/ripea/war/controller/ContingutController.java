@@ -117,7 +117,7 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(mostrarPblicar != null ? mostrarPblicar : "true"));
 		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
-		
+		model.addAttribute("isArxiuCaib", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.arxiu.caib")));
 		return "contingut";
 	}
 	

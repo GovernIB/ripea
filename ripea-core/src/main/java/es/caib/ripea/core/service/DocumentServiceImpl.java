@@ -977,6 +977,30 @@ public class DocumentServiceImpl implements DocumentService {
 		return infoRegistre;
 	}
 
+	@Override
+	@Transactional
+	public void documentActualitzarEstat(
+			Long entitatId, 
+			Long documentId,
+			DocumentEstatEnumDto nouEstat) {
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				true);
+			
+		if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+			document.updateEstat(nouEstat);
+		}
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.CANVI_ESTAT,
+				nouEstat.name(),
+				null,
+				false,
+				false);
+	}
+	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto)contingutHelper.toContingutDto(
@@ -996,4 +1020,5 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
+	
 }

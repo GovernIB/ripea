@@ -47,6 +47,9 @@ public class DocumentDto extends NodeDto {
 	private List<DocumentVersioDto> versions;
 	private boolean firmaSeparada;
 	private boolean ambNotificacions;
+	private boolean errorDarreraNotificacio;
+	private String estatDarreraNotificacio;
+	private boolean errorEnviamentPortafirmes;
 	
 	private Long pareId;
 	
@@ -272,6 +275,27 @@ public class DocumentDto extends NodeDto {
 	}
 	public void setAmbNotificacions(boolean ambNotificacions) {
 		this.ambNotificacions = ambNotificacions;
+	}
+	public boolean isErrorDarreraNotificacio() {
+		return errorDarreraNotificacio;
+	}
+
+	public void setErrorDarreraNotificacio(boolean errorDarreraNotificacio) {
+		this.errorDarreraNotificacio = errorDarreraNotificacio;
+	}
+
+	public String getEstatDarreraNotificacio() {
+		return estatDarreraNotificacio;
+	}
+	public void setEstatDarreraNotificacio(String estatDarreraNotificacio) {
+		this.estatDarreraNotificacio = estatDarreraNotificacio;
+	}
+	public boolean isErrorEnviamentPortafirmes() {
+		return errorEnviamentPortafirmes;
+	}
+
+	public void setErrorEnviamentPortafirmes(boolean errorEnviamentPortafirmes) {
+		this.errorEnviamentPortafirmes = errorEnviamentPortafirmes;
 	}
 
 	public MetaDocumentDto getMetaDocument() {

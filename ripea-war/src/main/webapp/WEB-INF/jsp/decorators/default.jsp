@@ -265,6 +265,9 @@ body {
 									</button>
 									<ul class="dropdown-menu">
 										<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
+										<c:if test="${not isArxiuCaib}">
+										<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
+										</c:if>
 									</ul>
 								</div>								
 							</c:when>

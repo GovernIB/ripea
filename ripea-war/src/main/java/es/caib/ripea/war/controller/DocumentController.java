@@ -37,8 +37,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -654,6 +656,26 @@ public class DocumentController extends BaseUserController {
 			return urlValidacio + arxiuDetall.getMetadadesAddicionals().get("csv");
 		}
 		return urlValidacio;
+	}
+	
+	@RequestMapping(value = "/{documentId}/convertir", method = RequestMethod.GET)
+	public String convertir(
+			HttpServletRequest request,
+			@PathVariable Long documentId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				documentId,
+				true,
+				false);
+		documentService.documentActualitzarEstat(
+				entitatActual.getId(), 
+				documentId, 
+				DocumentEstatEnumDto.DEFINITIU);
+		return this.getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../contingut/" + contingut.getPare().getId(),
+				"document.controller.estat.canviat.ok");
 	}
 	
 	private void setFluxPredefinit(

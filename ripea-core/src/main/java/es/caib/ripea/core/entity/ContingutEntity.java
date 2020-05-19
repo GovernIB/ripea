@@ -102,6 +102,12 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	
 	@Transient
 	protected boolean ambNotificacions;
+	@Transient
+	protected String estatDarreraNotificacio;
+	@Transient
+	protected boolean errorDarreraNotificacio;
+	@Transient
+	protected boolean errorEnviamentPortafirmes;
 	
 	@Version
 	private long version = 0;
@@ -177,6 +183,27 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	}
 	public void setAmbNotificacions(boolean ambNotificacions) {
 		this.ambNotificacions = ambNotificacions;
+	}
+	public boolean isErrorDarreraNotificacio() {
+		return errorDarreraNotificacio;
+	}
+	public void setErrorDarreraNotificacio(boolean errorDarreraNotificacio) {
+		this.errorDarreraNotificacio = errorDarreraNotificacio;
+	}
+	public String getEstatDarreraNotificacio() {
+		return estatDarreraNotificacio;
+	}
+	public void setEstatDarreraNotificacio(String estatDarreraNotificacio) {
+		this.estatDarreraNotificacio = estatDarreraNotificacio;
+	}
+	public boolean isErrorEnviamentPortafirmes() {
+		return errorEnviamentPortafirmes;
+	}
+	public void setErrorEnviamentPortafirmes(boolean errorEnviamentPortafirmes) {
+		this.errorEnviamentPortafirmes = errorEnviamentPortafirmes;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 	public void updateArxiu(
 			String arxiuUuid) {

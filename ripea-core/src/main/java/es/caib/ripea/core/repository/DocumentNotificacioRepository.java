@@ -30,5 +30,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 
 	List<DocumentNotificacioEntity> findByDocumentOrderByEnviatDataAsc(
 			DocumentEntity document);
+	List<DocumentNotificacioEntity> findByDocumentOrderByCreatedDateAsc(
+			DocumentEntity document);
 
 }
