@@ -934,14 +934,14 @@ function deselectAll() {
 		<!------------------------------------------------------------------------- CONTINGUT BLOCK (CENTER/RIGHT SIDE OF THE PAGE) ------------------------------------------------------------------------------->
 		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
 			<c:choose>
-				<c:when test="${!isTasca && contingut.expedient and contingut.hasEsborranys and not isArxiuCaib}">
+				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys and convertirDefinitiu}">
 					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
 						<span class="fa fa-exclamation-triangle"></span>
 						<spring:message code="contingut.errors.expedient.conte.esborranys"/>
 						<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
 					</div>
 				</c:when>
-				<c:when test="${!isTasca && contingut.expedient and contingut.hasEsborranys and isArxiuCaib}">
+				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys && !convertirDefinitiu}">
 					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
 						<span class="fa fa-exclamation-triangle"></span>
 						<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
@@ -1146,7 +1146,7 @@ function deselectAll() {
 										</a>
 									</div>
 								</div>
-								<c:if test="${expedientAgafatPerUsuariActual and expedientPare.estat != 'TANCAT'}">
+								<c:if test="${expedientAgafatPerUsuariActual and !expedientTancat}">
 									<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
 									<%---- Button notificar mult ----%>
 									<div class="btn-group">
@@ -1164,7 +1164,7 @@ function deselectAll() {
 										</div>
 									</div>
 									<div class="btn-group">
-										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" class="btn-group">
 											<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
 												<span class="fa fa-check-square"></span>
 												

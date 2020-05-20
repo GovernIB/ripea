@@ -255,12 +255,12 @@
 					<li><a href="<c:url value="/document/${contingut.id}/viafirma/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.viafirma.info"/></a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
+				<c:if test="${contingut.document && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && convertirDefinitiu}">	
+					<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu"/></c:set>
+					<li role="separator" class="divider"></li>			
+					<li><a href="<c:url value="/document/${contingut.id}/convertir"/>" data-refresh-pagina="true" data-confirm="${definitiuConfirmacioMsg}"><span class="fa fa-check-square"></span>&nbsp;<spring:message code="contingut.boto.definitiu"/></a></li>
+				</c:if>
 			</c:if>
-		</c:if>
-		<c:if test="${contingut.document && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && not isArxiuCaib}">	
-			<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu"/></c:set>
-			<li role="separator" class="divider"></li>			
-			<li><a href="<c:url value="/document/${contingut.id}/convertir"/>" data-refresh-pagina="true" data-confirm="${definitiuConfirmacioMsg}"><span class="fa fa-check-square"></span>&nbsp;<spring:message code="contingut.boto.definitiu"/></a></li>
 		</c:if>
 		<%---- Històric d'accions ----%>
 		<c:if test="${!isTasca}">

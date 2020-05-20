@@ -589,7 +589,7 @@ public class ContingutDocumentController extends BaseUserController {
 					docId,
 					true,
 					false);
-			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 				existsEsborrat = true;
 				documentService.documentActualitzarEstat(
 						entitatActual.getId(), 
