@@ -127,6 +127,7 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		model.addAttribute("metaExpedientDominisOptions", metaExpedientService.dominiFindByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
 			MissatgesHelper.warning(
 					request, 

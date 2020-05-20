@@ -989,7 +989,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true);
 			
-		if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+		if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
 		contingutLogHelper.log(
