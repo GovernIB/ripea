@@ -170,6 +170,23 @@
 			<artifactId>bootstrap-datepicker</artifactId>
 			<version>1.6.1</version>
 		</dependency>
+		<!-- 
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>bootstrap-datetimepicker</artifactId>
+		    <version>2.4.4</version>
+		</dependency>
+		-->
+		<dependency>
+		    <groupId>org.webjars.bower</groupId>
+		    <artifactId>eonasdan-bootstrap-datetimepicker</artifactId>
+		    <version>4.7.14</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars.bower</groupId>
+		    <artifactId>moment</artifactId>
+		    <version>2.15.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>jsrender</artifactId>
@@ -205,6 +222,11 @@
 		    <groupId>org.apache.pdfbox</groupId>
 		    <artifactId>pdfbox</artifactId>
 		    <version>${pdfbox.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>joda-time</groupId>
+		  <artifactId>joda-time</artifactId>
+		  <version>2.3</version>
 		</dependency>
 	</dependencies>
 	<profiles>
@@ -375,6 +397,7 @@
 								WEB-INF/lib/datatables*,
 								WEB-INF/lib/select2*,
 								WEB-INF/lib/bootstrap-datepicker*,
+								WEB-INF/lib/bootstrap-datetimepicker*,
 								WEB-INF/lib/jsrender*,
 								WEB-INF/lib/jstree*
 								WEB-INF/lib/Sortable*

@@ -156,6 +156,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		$('[data-botons-titol-eval]', $clon).removeAttr('data-botons-titol-eval');
 		$('[data-select2-eval]', $clon).removeAttr('data-select2-eval');
 		$('[data-datepicker-eval]', $clon).removeAttr('data-datepicker-eval');
+		$('[data-datetimepicker-eval]', $clon).removeAttr('data-datetimepicker-eval');
 		$('[data-autonumeric-eval]', $clon).removeAttr('data-autonumeric-eval');
 		return $clon;
 	}
@@ -524,6 +525,32 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		});
 	}
 
+	$.fn.webutilDateTimepicker = function() {
+		$(this).datetimepicker({
+			format: 'DD/MM/YYYY HH:mm:ss',
+			sideBySide: true,
+			locale: $(this).data('idioma'),
+			icons: {
+				previous: "fa fa-angle-double-left",
+				next: "fa fa-angle-double-right"
+			}
+		}).on('dp.show', function() {
+			webutilModalAdjustHeight();
+		}).on('dp.hide', function() {
+			webutilModalAdjustHeight();
+		});
+		$('.input-group-addon', $(this).parent()).click(function() {
+			$('[data-toggle="datetimepicker"]', $(this).parent()).data("DateTimePicker").show();
+		});
+	}
+	$.fn.webutilDateTimepickerEval = function() {
+		$('[data-toggle="datetimepicker"]', this).each(function() {
+			if (!$(this).attr('data-datetimepicker-eval')) {
+				$(this).webutilDateTimepicker();
+				$(this).attr('data-datetimepicker-eval', 'true');
+			}
+		});
+	}
 	$.fn.webutilAutonumeric = function() {
 		if (!$(this).data('a-dec')) {
 			$(this).attr('data-a-dec', '');
@@ -583,6 +610,12 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			if (!$(this).attr('data-datepicker-eval')) {
 				$(this).webutilDatepicker();
 				$(this).attr('data-datepicker-eval', 'true');
+			}
+		});
+		$('[data-toggle="datetimepicker"]', this).each(function() {
+			if (!$(this).attr('data-datetimepicker-eval')) {
+				$(this).webutilDateTimepicker();
+				$(this).attr('data-datetimepicker-eval', 'true');
 			}
 		});
 		$('[data-toggle="autonumeric"]', this).each(function() {

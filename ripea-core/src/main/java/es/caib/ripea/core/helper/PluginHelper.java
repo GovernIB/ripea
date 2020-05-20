@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1719,14 +1720,17 @@ public class PluginHelper {
 
 	public List<ContingutArxiu> getCustodyIdDocuments(
 			String numeroRegistre,
+			Date dataPresentacio,
 			TipusRegistreEnumDto tipusRegistre) {
 		String accioDescripcio = "Importar documents";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("numeroRegistre", numeroRegistre);
 		long t0 = System.currentTimeMillis();
 		try {
+			DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");  
+			String dataPresentacioStr = dateFormat.format(dataPresentacio);  
 			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
-					numeroRegistre + ";" + tipusRegistre.getLabel());
+					numeroRegistre + ";" + tipusRegistre.getLabel() + ";" + dataPresentacioStr);
 
 			return contingutArxiu;
 		} catch (Exception ex) {
