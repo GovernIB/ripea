@@ -44,11 +44,13 @@ import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
@@ -560,6 +562,53 @@ public class ContingutDocumentController extends BaseUserController {
 					request, 
 					null, 
 					exception.getMessage());
+		}
+	}
+	
+	@RequestMapping(value = "/{contingutId}/defintiu", method = RequestMethod.GET)
+	public String defintiu(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		boolean existsEsborrat  = false;
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutId,
+				true,
+				false);
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		
+		for (Long docId: docsIdx) {
+			DocumentDto document = (DocumentDto) contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					docId,
+					true,
+					false);
+			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+				existsEsborrat = true;
+				documentService.documentActualitzarEstat(
+						entitatActual.getId(), 
+						docId, 
+						DocumentEstatEnumDto.DEFINITIU);
+			}
+			
+		}
+		if (existsEsborrat) {
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + contingut.getId(),
+					"document.controller.estat.canviat.ok");
+		} else {
+			//No s'ha seleccionat cap document de tipus esborrany
+			return this.getModalControllerReturnValueError(
+					request,
+					"redirect:../../contingut/" + contingut.getId(),
+					"document.controller.estat.canviat.ko");
 		}
 	}
 

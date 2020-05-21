@@ -44,7 +44,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean peticions;
 	private boolean processatOk;
 	private boolean tasques;
-	
+	private boolean hasEsborranys;
 	private Set<InteressatDto> interessats;
 	
 //	public String getInteressatsResum() {
@@ -268,6 +268,12 @@ public class ExpedientDto extends NodeDto {
 
 	public void setInteressats(Set<InteressatDto> interessats) {
 		this.interessats = interessats;
+	}
+	public boolean isHasEsborranys() {
+		return hasEsborranys;
+	}
+	public void setHasEsborranys(boolean hasEsborranys) {
+		this.hasEsborranys = hasEsborranys;
 	}
 
 }

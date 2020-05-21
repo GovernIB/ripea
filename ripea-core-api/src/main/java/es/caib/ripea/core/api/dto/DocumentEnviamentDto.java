@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public abstract class DocumentEnviamentDto extends AuditoriaDto {
+public abstract class DocumentEnviamentDto extends AuditoriaDto implements Comparable<DocumentEnviamentDto> {
 
 	private Long id;
 	private DocumentEnviamentEstatEnumDto estat;
@@ -131,5 +131,13 @@ public abstract class DocumentEnviamentDto extends AuditoriaDto {
 
 	public abstract String getDestinatari();
 	public abstract String getDestinatariAmbDocument();
+	
+	@Override
+	public int compareTo(DocumentEnviamentDto enviament) {
+		if (getEnviatData() == null || enviament.getEnviatData() == null) {
+			return 0;
+		}
+		return getEnviatData().compareTo(enviament.getEnviatData());
+	}
 
 }

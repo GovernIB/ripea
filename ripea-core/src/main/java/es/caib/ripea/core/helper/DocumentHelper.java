@@ -690,7 +690,7 @@ public class DocumentHelper {
 					// Si el document no ha estat custodiat pel portafirmes
 					// actualitza la informació de firma a l'arxiu.
 					FitxerDto fitxer = new FitxerDto();
-					fitxer.setNom(portafirmesDocument.getArxiuNom());
+					fitxer.setNom(document.getFitxerNom());
 					fitxer.setContingut(portafirmesDocument.getArxiuContingut());
 					fitxer.setContentType("application/pdf");
 					documentPortafirmes.updateProcessat(
@@ -1098,6 +1098,18 @@ public class DocumentHelper {
 		return firmes;
 	}
 
+	public boolean hasFillsEsborranys(
+			List<DocumentEntity> documents) {
+		logger.debug("Consulta els documents esborranys d'un expedient");
+		for (DocumentEntity document : documents) {
+			if (document.getEsborrat() == 0 
+					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
+					&& document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public void processarFirmaClient(
 			String identificador,

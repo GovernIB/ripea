@@ -169,7 +169,7 @@ public class DadaEntity extends RipeaAuditable<Long> {
 			Object valor) {
 		if (valor == null)
 			return null;
-		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT)) {
+		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT) || metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
 			if (valor instanceof String) {
 				return (String)valor;
 			} else {
@@ -212,7 +212,7 @@ public class DadaEntity extends RipeaAuditable<Long> {
 	private static Object getDadaValorPerRetornar(
 			MetaDadaEntity metaDada,
 			String valor) {
-		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT)) {
+		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT) || metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
 			return valor;
 		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DATA)) {
 			try {

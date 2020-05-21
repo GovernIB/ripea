@@ -190,6 +190,7 @@ public class ContingutHelper {
 			dto.setMetaNode(metaNode);
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+			dto.setHasEsborranys(documentHelper.hasFillsEsborranys(documentRepository.findByExpedientAndEsborrat(expedient, 0)));
 			boolean conteDocumentsFirmats = !documentRepository.findByExpedientAndEstat(
 					expedient,
 					DocumentEstatEnumDto.CUSTODIAT).isEmpty();
@@ -273,7 +274,9 @@ public class ContingutHelper {
 			dto.setNtiCsv(document.getNtiCsv());
 			dto.setNtiCsvRegulacion(document.getNtiCsvRegulacion());
 			dto.setAmbNotificacions(document.isAmbNotificacions());
-			
+			dto.setEstatDarreraNotificacio(document.getEstatDarreraNotificacio());
+			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
+			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);

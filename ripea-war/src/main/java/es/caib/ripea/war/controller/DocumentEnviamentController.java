@@ -5,7 +5,9 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,9 +27,11 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
@@ -473,7 +477,24 @@ public class DocumentEnviamentController extends BaseUserController {
 	    				true));
 	}
 
-
+	@RequestMapping(value = "/{documentId}/estat", method = RequestMethod.GET)
+	@ResponseBody
+	public String getEstatDarreraNotificació(
+			HttpServletRequest request,
+			@PathVariable Long documentId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentEnviamentDto lastEnviament = null;
+		List<DocumentEnviamentDto> enviaments = documentEnviamentService.findAmbDocument(
+				entitatActual.getId(), 
+				documentId);
+		if (enviaments != null && !enviaments.isEmpty()) {
+			//Order by date
+			Collections.sort(enviaments);
+			lastEnviament = enviaments.get(enviaments.size() - 1);
+			return lastEnviament.getEstat().name();
+		}
+		return null;
+	}
 
 	private ExpedientDto emplenarModelNotificacio(
 			HttpServletRequest request,

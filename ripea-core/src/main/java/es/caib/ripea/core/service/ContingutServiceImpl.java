@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.core.service;
 
@@ -61,7 +61,9 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -83,6 +85,7 @@ import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
@@ -93,7 +96,7 @@ import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
@@ -131,7 +134,9 @@ public class ContingutServiceImpl implements ContingutService {
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
 	private TipusDocumentalRepository tipusDocumentalRepository;
-	
+	@Autowired
+	private DocumentPortafirmesRepository documentPortafirmesRepository;
+
 	@Transactional
 	@Override
 	public ContingutDto rename(
@@ -222,7 +227,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true);
-	
+
 
 		return contingutHelper.deleteReversible(
 				entitatId,
@@ -333,9 +338,9 @@ public class ContingutServiceImpl implements ContingutService {
 				null,
 				true,
 				true);
-		
+
 		if (!conteDocumentsDefinitius(contingut)) {
-			
+
 			// Propaga l'acció a l'arxiu
 			FitxerDto fitxer = null;
 			if (contingut instanceof DocumentEntity) {
@@ -354,7 +359,7 @@ public class ContingutServiceImpl implements ContingutService {
 				fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
 		}
-		
+
 		return dto;
 	}
 
@@ -664,7 +669,7 @@ public class ContingutServiceImpl implements ContingutService {
 		ContingutArxiu nouContingut = contingutHelper.arxiuPropagarLink(
 				contingutOrigen,
 				contingutDesti);
-		
+
 		// Realitza la còpia del contingut
 		ContingutEntity contingutCopia = vincularContingut(
 				contingutOrigen.getEntitat(),
@@ -690,8 +695,8 @@ public class ContingutServiceImpl implements ContingutService {
 				false);
 		return dto;
 	}
-	
-	
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -707,9 +712,9 @@ public class ContingutServiceImpl implements ContingutService {
 				ambVersions,
 				true);
 	}
-	
-	
-	
+
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -723,7 +728,7 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutId=" + contingutId + ", "
 				+ "ambFills=" + ambFills + ", "
 				+ "ambVersions=" + ambVersions + ")");
-		
+
 		ContingutEntity contingut;
 		if (ambPermisos) {
 			contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
@@ -737,13 +742,21 @@ public class ContingutServiceImpl implements ContingutService {
 		//comprobar si hi ha notificacions del document
 		for (ContingutEntity document: contingut.getFills()) {
 			if (document instanceof DocumentEntity) {
-				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByEnviatDataAsc((DocumentEntity)document);
+				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateAsc((DocumentEntity)document);
+				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocument((DocumentEntity)document);
 				if (notificacions != null && notificacions.size() > 0) {
 					document.setAmbNotificacions(true);
+					DocumentNotificacioEntity lastNofificacio = notificacions.get(notificacions.size() - 1);
+					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat().name());
+					document.setErrorDarreraNotificacio(lastNofificacio.isError());
+				}
+				if (enviaments != null && enviaments.size() > 0) {
+					DocumentEnviamentEntity lastEnviament = enviaments.get(enviaments.size() - 1);
+					document.setErrorEnviamentPortafirmes(lastEnviament.isError());
 				}
 			}
 		}
-		
+
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -753,15 +766,15 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions);
-		
+
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
 
 		return dto;
 	}
-	
-	
+
+
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1015,7 +1028,7 @@ public class ContingutServiceImpl implements ContingutService {
 					}
 				});
 	}
-	
+
 
 
 	@Transactional(readOnly = true)
@@ -1235,9 +1248,9 @@ public class ContingutServiceImpl implements ContingutService {
 					case ALTRES:
 						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
 						break;
-					}	
+					}
 				}
-				
+
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
 					TipusDocumentalEntity tipusDocuemntal = tipusDocumentalRepository.findByCodiAndEntitat(
@@ -1245,7 +1258,7 @@ public class ContingutServiceImpl implements ContingutService {
 							entitat);
 					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocuemntal.getNom());
 				}
-				
+
 				arxiuDetall.setEniOrgans(metadades.getOrgans());
 				if (metadades.getFormat() != null) {
 					arxiuDetall.setEniFormat(metadades.getFormat().toString());
@@ -1261,7 +1274,7 @@ public class ContingutServiceImpl implements ContingutService {
 					arxiuDetall.setContingutTipusMime(
 							arxiuDocument.getContingut().getTipusMime());
 				}
-				
+
 			}
 		} else if (contingut instanceof CarpetaEntity) {
 			Carpeta arxiuCarpeta = pluginHelper.arxiuCarpetaConsultar(
@@ -1412,7 +1425,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
-			Long entitatId, 
+			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -1584,7 +1597,7 @@ public class ContingutServiceImpl implements ContingutService {
 			idMetaNode = filtre.getTipusExpedient();
 		else if (filtre.getTipusElement() == ContingutTipusEnumDto.DOCUMENT && filtre.getTipusDocument() != null)
 			idMetaNode = filtre.getTipusDocument();
-		
+
 		if (idMetaNode != null) {
 			metaNode = metaNodeRepository.findOne(idMetaNode);
 			if (metaNode == null) {
@@ -1672,7 +1685,7 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		return creat;
 	}
-	
+
 	private ContingutEntity vincularContingut(
 			EntitatEntity entitat,
 			ContingutEntity contingutOrigen,
@@ -1700,13 +1713,13 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		if (creat != null) {
 			if (creat instanceof DocumentEntity) {
-				DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;		
+				DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 				creat.updateArxiu(uuidDocumentoOrigen);
 				creat.updateExpedient((ExpedientEntity)contingutDesti);
 				creat.updatePare(contingutDesti);
 				((DocumentEntity) creat).updateFitxer(
-						documentOrigen.getFitxerNom(), 
-						documentOrigen.getFitxerContentType(), 
+						documentOrigen.getFitxerNom(),
+						documentOrigen.getFitxerContentType(),
 						null);
 			}
 			if (creat instanceof NodeEntity) {

@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
@@ -117,7 +118,7 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(mostrarPblicar != null ? mostrarPblicar : "true"));
 		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
-		
+		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		return "contingut";
 	}
 	
@@ -541,11 +542,13 @@ public class ContingutController extends BaseUserController {
 					contingut.getId()));
 		}
 		if (contingut instanceof NodeDto) {
+			//TODO si tipus == domini consulta resultat SQL
+			List<MetaDadaDto> metadades = metaDadaService.findByNode(
+					entitatActual.getId(),
+					contingut.getId());
 			model.addAttribute(
 					"metaDades",
-					metaDadaService.findByNode(
-							entitatActual.getId(),
-							contingut.getId()));
+					metadades);
 			model.addAttribute(
 					"dadesCommand",
 					beanGeneratorHelper.generarCommandDadesNode(

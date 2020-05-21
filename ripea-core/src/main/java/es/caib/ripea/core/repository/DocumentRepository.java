@@ -60,7 +60,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    DocumentEntity c " +
 			"where " +
 			"    c.entitat = :entitat " +
-			"and c.estat = 0 " +
+			"and c.estat = 0 "  + 
+			"and c.documentTipus != 2 " + 
+			"and c.documentTipus != 3 " +
 			"and (:esNullMetaExpedientId = true or c.expedient.metaNode.id = :metaExpedientId) " +
 			"and (:esNullExpedientId = true or c.expedient.id = :expedientId) " +
 			"and (:esNullMetaDocumentId = true or c.metaNode.id = :metaDocumentId) " +
@@ -92,6 +94,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    DocumentEntity c " +
 			"where " +
 			"    c.entitat = :entitat " +
+			"and c.documentTipus != 2 " + 
+			"and c.documentTipus != 3 " +
 			"and (:esNullTipusExpedient = true or c.expedient.metaNode.id = :tipusExpedientId) " +
 			"and (:esNullExpedient = true or c.expedient.id = :expedientId) " +
 			"and (:esNullTipusDocument = true or c.metaNode.id = :tipusDocumentId) " +

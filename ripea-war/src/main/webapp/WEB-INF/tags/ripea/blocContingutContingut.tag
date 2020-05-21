@@ -26,12 +26,34 @@
 							</div>
 							<div class="caption">
 								<p class="text-center">
+									<c:if test="${fill.document && fill.documentTipus != 'IMPORTAT' && fill.estat == 'REDACCIO'}"><span class="icona-esborrany" title="<spring:message code="contingut.info.estat.redaccio"/>">B</span></c:if>
 									<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 									<c:if test="${fill.node and not fill.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
-									<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
+									<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 									<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
+									<c:if test="${fill.document && fill.estat == 'DEFINITIU'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
 									<c:if test="${fill.document && fill.ambNotificacions}">
-										<span class="fa fa-envelope popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
+										<c:choose>
+											<c:when test="${!fill.errorDarreraNotificacio && fill.estatDarreraNotificacio == 'PENDENT'}">
+												<c:set var="envelope" value="pendent fa fa-envelope-square"/>
+											</c:when>
+											<c:when  test="${!fill.errorDarreraNotificacio && fill.estatDarreraNotificacio == 'ENVIADA'}">
+												<c:set var="envelope" value="enviada fa fa-envelope-square"/>
+											</c:when>
+											<c:when  test="${fill.errorDarreraNotificacio}">
+												<c:set var="envelope" value="error fa fa-envelope-square"/>
+											</c:when>
+											<c:otherwise>
+												<c:set var="envelope" value="fa fa-envelope-square"/>
+											</c:otherwise>
+										</c:choose>
+										<span class="${envelope} popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
+									</c:if>
+									<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
+										<span class="pendent fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
+									</c:if>
+									<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && fill.errorEnviamentPortafirmes}">
+										<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 									</c:if>
 									<c:if test="${not fill.carpeta && fill.metaNode == null}">
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
@@ -122,16 +144,35 @@
 						</td>
 						<td>
 							<rip:blocIconaContingut contingut="${fill}"/>
+							<c:if test="${fill.document && fill.documentTipus != 'IMPORTAT' && fill.estat == 'REDACCIO'}"><span class="icona-esborrany" title="<spring:message code="contingut.info.estat.redaccio"/>">B</span></c:if>
 							<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
-							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
+							<c:if test="${fill.document && fill.estat == 'CUSTODIAT'}"><span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
+							<c:if test="${fill.document && fill.estat == 'DEFINITIU' && fill.documentTipus != 'IMPORTAT'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
 							<c:if test="${fill.document && fill.ambNotificacions}">
-								<span class="fa fa-envelope popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
+								<c:choose>
+									<c:when test="${!fill.errorDarreraNotificacio && fill.estatDarreraNotificacio == 'PENDENT'}">
+										<c:set var="envelope" value="pendent fa fa-envelope-square"/>
+									</c:when>
+									<c:when  test="${!fill.errorDarreraNotificacio && fill.estatDarreraNotificacio == 'ENVIADA'}">
+										<c:set var="envelope" value="enviada fa fa-envelope-square"/>
+									</c:when>
+									<c:when  test="${fill.errorDarreraNotificacio}">
+										<c:set var="envelope" value="error fa fa-envelope-square"/>
+									</c:when>
+									<c:otherwise>
+										<c:set var="envelope" value="fa fa-envelope-square"/>
+									</c:otherwise>
+								</c:choose>
+								<span class="${envelope} popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
+							</c:if>
+							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
+								<span class="pendent fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
+							</c:if>
+							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && fill.errorEnviamentPortafirmes}">
+								<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 							</c:if>
 							&nbsp;${fill.nom}
-							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
-								<span class="fa fa-clock-o" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
-							</c:if>
 						</td>
 						<td>
 							<c:choose>

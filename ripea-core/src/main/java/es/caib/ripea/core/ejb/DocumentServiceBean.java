@@ -15,6 +15,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -306,9 +307,19 @@ public class DocumentServiceBean implements DocumentService {
 	}
 
 	@Override
+	@RolesAllowed("tothom")
 	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(Long entitatId, Long documentId,
 			Long documentNotificacioId) {
 		return delegate.notificacioConsultarIDescarregarJustificant(entitatId, documentId, documentNotificacioId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void documentActualitzarEstat(Long entitatId, Long documentId, DocumentEstatEnumDto nouEstat) {
+		delegate.documentActualitzarEstat(
+				entitatId, 
+				documentId, 
+				nouEstat);
 	}
 
 }

@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -542,4 +543,17 @@ public interface DocumentService {
 			Long entitatId,
 			Long documentId,
 			Long documentEnviamentId);
+	
+	/**
+	 * Actualitza l'estat d'un document de forma manual.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document del que es vol canviar l'estat.
+	 */
+	public void documentActualitzarEstat(
+			Long entitatId,
+			Long documentId,
+			DocumentEstatEnumDto nouEstat);
 }

@@ -149,9 +149,18 @@
 		<div class="btn-group pull-right">
 			<button type="button" id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 			<button type="button" id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			<button type="button" class="btn btn-default" href="./crear/portafirmes" data-toggle="modal" data-refresh-pagina="false">
-				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
-			</button>
+			{{if ${portafirmes}}}
+				<button type="button" class="btn btn-default" href="./crear/portafirmes" data-toggle="modal" data-refresh-pagina="false">
+					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
+				</button>
+			{{else}}
+				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
+					<button type="button" class="btn btn-default" data-refresh-pagina="false">
+						<a style="text-decoration: none; color: black;" href="<c:url value="/massiu/marcar/definitiu"/>" data-confirm="${definitiuConfirmacioMsg}">
+							<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
+						</a>
+					</button>
+			{{/if}}
 		</div>
 	</script>
 		

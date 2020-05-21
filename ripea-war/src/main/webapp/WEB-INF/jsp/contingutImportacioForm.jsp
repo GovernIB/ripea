@@ -11,9 +11,19 @@
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${idioma}.js"/>"></script>
-	<link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<!--  
+	<link href="<c:url value="/webjars/bootstrap-datetimepicker/2.4.4/css/bootstrap-datetimepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datetimepicker/2.4.4/js/bootstrap-datetimepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datetimepicker/2.4.4/js/locales/bootstrap-datetimepicker.${requestLocale}.js"/>"></script>
+	-->
+	<script src="<c:url value="/webjars/moment/2.15.1/min/moment.min.js"/>"></script>
+	<script src="<c:url value="/webjars/moment/2.15.1/min/locales.min.js"/>"></script>
+	<script src="<c:url value="/webjars/moment/2.15.1/locale/${requestLocale}.js"/>"></script>
+	<link href="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/css/bootstrap-datetimepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build//js/bootstrap-datetimepicker.min.js"/>"></script>
+	
+	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 </head>
@@ -22,6 +32,7 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="importacioCommand">
 		<br/>
 		<rip:inputText name="numeroRegistre" textKey="contingut.importacio.form.camp.nom" required="true"/>
+		<rip:inputDateTime name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true"/>
 		<br/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.importar"/></button>

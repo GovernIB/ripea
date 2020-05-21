@@ -73,6 +73,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 
 		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(
 				dades.getNumeroRegistre(),
+				dades.getDataPresentacioFormatted(),
 				dades.getTipusRegistre());
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
 			expedientSuperior = (ExpedientEntity)contingutPare;
