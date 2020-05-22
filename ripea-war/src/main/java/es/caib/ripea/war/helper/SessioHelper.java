@@ -31,7 +31,7 @@ public class SessioHelper {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			AplicacioService aplicacioService) {
-		if (request.getUserPrincipal() != null) {
+		if (request.getUserPrincipal() != null && !request.getServletPath().startsWith("/error")) {
 			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(
 					SESSION_ATTRIBUTE_AUTH_PROCESSADA);
 			if (autenticacioProcessada == null) {
