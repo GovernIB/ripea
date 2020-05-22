@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
@@ -23,6 +24,9 @@ import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.PropertiesHelper;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
  * Tests per al servei d'entitats.
@@ -46,8 +50,10 @@ public class BaseServiceTest {
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 
+	@Autowired
+	private  UsuariRepository usuariRepository;
 
-
+	@Transactional
 	protected void autenticarUsuari(String usuariCodi) {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(usuariCodi);
 		Authentication authToken = new UsernamePasswordAuthenticationToken(
@@ -55,6 +61,17 @@ public class BaseServiceTest {
 				userDetails.getPassword(),
 				userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
+        
+        UsuariEntity usuariEntity = usuariRepository.getOne(usuariCodi);
+		if (usuariEntity == null) {
+			usuariRepository.save(UsuariEntity.getBuilder(usuariCodi,
+					usuariCodi,
+					"NIF",
+					usuariCodi +
+							"@gmail.com",
+					"CA").build());
+		}
+
 	}
 
 	protected void testCreantElements(
@@ -79,30 +96,31 @@ public class BaseServiceTest {
 				} else {
 					autenticarUsuari("admin");
 					if (entitatId != null) {
-						if (element instanceof MetaDadaDto) {
-							elementsCreats.add(
-									metaDadaService.create(
-											entitatId,
-											null, // TODO
-											(MetaDadaDto)element));
-						} else if (element instanceof MetaDocumentDto) {
-							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
-									entitatId,
-									null, // TODO
-									(MetaDocumentDto)element,
-									null,
-									null,
-									null);
-							elementsCreats.add(metaDocumentCreat);
-							if (((MetaDocumentDto)element).getPermisos() != null) {
-								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
-									metaExpedientService.permisUpdate(
-											entitatId,
-											metaDocumentCreat.getId(),
-											permis);
-								}
-							}
-						} else if (element instanceof MetaExpedientDto) {
+//						if (element instanceof MetaDadaDto) {
+//							elementsCreats.add(
+//									metaDadaService.create(
+//											entitatId,
+//											null, // TODO
+//											(MetaDadaDto)element));
+//						} else if (element instanceof MetaDocumentDto) {
+//							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
+//									entitatId,
+//									null, // TODO
+//									(MetaDocumentDto)element,
+//									null,
+//									null,
+//									null);
+//							elementsCreats.add(metaDocumentCreat);
+//							if (((MetaDocumentDto)element).getPermisos() != null) {
+//								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
+//									metaExpedientService.permisUpdate(
+//											entitatId,
+//											metaDocumentCreat.getId(),
+//											permis);
+//								}
+//							}
+//						} else 
+							if (element instanceof MetaExpedientDto) {
 							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
 									entitatId,
 									(MetaExpedientDto)element);
@@ -115,10 +133,11 @@ public class BaseServiceTest {
 											permis);
 								}
 							}
-						} else {
-							throw new RuntimeException(
-									"Tipus d'element desconegut: " + element.getClass().getName());
-						}
+						} 
+//							else {
+//							throw new RuntimeException(
+//									"Tipus d'element desconegut: " + element.getClass().getName());
+//						}
 					} else {
 						throw new RuntimeException("No s'ha especificat cap entitat");
 					}

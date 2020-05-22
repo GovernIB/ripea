@@ -128,25 +128,29 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
 	 * @param acl containing the ACEs to insert
 	 */
 	protected void createEntries(final MutableAcl acl) {
-		jdbcTemplate.batchUpdate(
-				insertEntry,
-				new BatchPreparedStatementSetter() {
-					public int getBatchSize() {
-						return acl.getEntries().size();
-					}
-					public void setValues(PreparedStatement stmt, int i) throws SQLException {
-						AccessControlEntry entry_ = acl.getEntries().get(i);
-						Assert.isTrue(entry_ instanceof AccessControlEntryImpl, "Unknown ACE class");
-						AccessControlEntryImpl entry = (AccessControlEntryImpl) entry_;
-						stmt.setLong(1, ((Long) acl.getId()).longValue());
-						stmt.setInt(2, i);
-						stmt.setLong(3, createOrRetrieveSidPrimaryKey(entry.getSid(), true).longValue());
-						stmt.setInt(4, entry.getPermission().getMask());
-						stmt.setBoolean(5, entry.isGranting());
-						stmt.setBoolean(6, entry.isAuditSuccess());
-						stmt.setBoolean(7, entry.isAuditFailure());
-					}
-				});
+		if(acl.getEntries().size()>0){
+			jdbcTemplate.batchUpdate(
+					insertEntry,
+					new BatchPreparedStatementSetter() {
+						public int getBatchSize() {
+							return acl.getEntries().size();
+						}
+						public void setValues(PreparedStatement stmt, int i) throws SQLException {
+							AccessControlEntry entry_ = acl.getEntries().get(i);
+							Assert.isTrue(entry_ instanceof AccessControlEntryImpl, "Unknown ACE class");
+							AccessControlEntryImpl entry = (AccessControlEntryImpl) entry_;
+							stmt.setLong(1, ((Long) acl.getId()).longValue());
+							stmt.setInt(2, i);
+							stmt.setLong(3, createOrRetrieveSidPrimaryKey(entry.getSid(), true).longValue());
+							stmt.setInt(4, entry.getPermission().getMask());
+							stmt.setBoolean(5, entry.isGranting());
+							stmt.setBoolean(6, entry.isAuditSuccess());
+							stmt.setBoolean(7, entry.isAuditFailure());
+						}
+					});
+		}
+		
+
 	}
 
 	/**
