@@ -242,8 +242,9 @@ ul.interessats {
 	border-color: #ff8d30;
 }
 .icona-esborrany {
-	font-weight: bold;
 	color: #ffab66;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .definitiu.fa.fa-check-square {
 	color: #02cda2;
@@ -271,6 +272,11 @@ ul.interessats {
 	vertical-align: text-top;
 }
 .enviada.fa.fa-envelope-square {
+	color: #67bdff;
+	font-size: 16px;
+	vertical-align: text-top;
+}
+.processada.fa.fa-envelope-square {
 	color: #02cda2;
 	font-size: 16px;
 	vertical-align: text-top;
@@ -279,6 +285,9 @@ ul.interessats {
 	color: #ffab66;
 	font-size: 16px;
 	vertical-align: text-top;
+}
+.importat.fa.fa-info-circle {
+	color: #02CDA2;
 }
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -344,7 +353,7 @@ $(document).ready(function() {
 
 	var iconaIdx = $('.esborranys > p').text().indexOf('(B)');
 	if (iconaIdx != -1) {
-		var newValidacioTxt = $('.esborranys > p').text().replace('B', '<span style="color:white;">B</span>');
+		var newValidacioTxt = $('.esborranys > p').text().replace('B', '<i class="fa fa-bold" />');
 		$('.esborranys > p').html(newValidacioTxt);
 	} 
 	$("#tascaBtn").appendTo(".panel-heading h2");
