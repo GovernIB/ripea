@@ -233,6 +233,9 @@ ul.interessats {
     cursor: default;
 	width: 500px;
 }
+.esborranys {
+	text-align: center;
+}
 .esborranys.alert.alert-warning {
 	color: #734b29;
 	background-color: #ffab66;
@@ -244,24 +247,38 @@ ul.interessats {
 }
 .definitiu.fa.fa-check-square {
 	color: #02cda2;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .firmat.fa.fa-pencil-square {
 	color: #02cda2;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .pendent.fa.fa-pencil-square {
 	color: #67bdff;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .error.fa.fa-pencil-square {
 	color: #ffab66;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .pendent.fa.fa-envelope-square {
 	color: #67bdff;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .enviada.fa.fa-envelope-square {
 	color: #02cda2;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 .error.fa.fa-envelope-square {
 	color: #ffab66;
+	font-size: 16px;
+	vertical-align: text-top;
 }
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -325,8 +342,11 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 </c:forEach>
 $(document).ready(function() {
 
-
-
+	var iconaIdx = $('.esborranys > p').text().indexOf('(B)');
+	if (iconaIdx != -1) {
+		var newValidacioTxt = $('.esborranys > p').text().replace('B', '<span style="color:white;">B</span>');
+		$('.esborranys > p').html(newValidacioTxt);
+	} 
 	$("#tascaBtn").appendTo(".panel-heading h2");
 
 	
@@ -936,14 +956,12 @@ function deselectAll() {
 			<c:choose>
 				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys and convertirDefinitiu}">
 					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
-						<span class="fa fa-exclamation-triangle"></span>
-						<spring:message code="contingut.errors.expedient.conte.esborranys"/>
+						<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
 						<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
 					</div>
 				</c:when>
 				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys && !convertirDefinitiu}">
 					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
-						<span class="fa fa-exclamation-triangle"></span>
 						<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
 					</div>
 				</c:when>
