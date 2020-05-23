@@ -72,7 +72,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentCreate.setPortafirmesDocumentTipus("1234");
 		metaDocumentCreate.setPortafirmesFluxId("1234");
 		metaDocumentCreate.setPortafirmesResponsables(new String[] {"123456789Z"});
-		metaDocumentCreate.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
+//		metaDocumentCreate.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocumentCreate.setPortafirmesCustodiaTipus("1234");
 		metaDocumentCreate.setFirmaPassarelaCustodiaTipus("1234");
 		metaDocumentUpdate = new MetaDocumentDto();
@@ -86,7 +86,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentUpdate.setPortafirmesDocumentTipus("12341");
 		metaDocumentUpdate.setPortafirmesFluxId("12342");
 		metaDocumentUpdate.setPortafirmesResponsables(new String[] {"00000000T"});
-		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
+//		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocumentUpdate.setPortafirmesCustodiaTipus("12343");
 		metaDocumentUpdate.setFirmaPassarelaCustodiaTipus("12344");
 		metaDocumentUpdate.setFirmaBiometricaActiva(true);

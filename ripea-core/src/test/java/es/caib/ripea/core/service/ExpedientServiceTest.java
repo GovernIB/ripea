@@ -17,14 +17,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.ContingutTipus;
-import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -34,11 +33,13 @@ import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -53,9 +54,16 @@ import es.caib.ripea.core.repository.UsuariRepository;
 public class ExpedientServiceTest extends BaseServiceTest {
 	
 	
+
+    @Mock
+    private IArxiuPlugin iArxiuplugin;
+    
+
+	
 	@Autowired
 	private ContingutService contingutService;
 	@Autowired
+	@InjectMocks
 	private ExpedientService expedientService;
 	@Autowired
 	private  UsuariRepository usuariRepository;
@@ -73,6 +81,10 @@ public class ExpedientServiceTest extends BaseServiceTest {
 
 	@Before
 	public void setUp() {
+
+		
+		
+		
 		PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
 		entitat = new EntitatDto();
 		entitat.setCodi("LIMIT");
@@ -118,6 +130,7 @@ public class ExpedientServiceTest extends BaseServiceTest {
 //		metaDocument.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocument.setPortafirmesCustodiaTipus("1234");
 		metaDocument.setFirmaPassarelaCustodiaTipus("1234");
+		metaDocument.setMultiplicitat(MultiplicitatEnumDto.M_1);
 		metaExpedient = new MetaExpedientDto();
 		metaExpedient.setCodi("TEST1");
 		metaExpedient.setNom("Metadocument de test");
@@ -188,7 +201,7 @@ System.out.println("OK");
 					public void executar(List<Object> elementsCreats) {
 						
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(2);
-						ExpedientDto ExpedientDto = expedientService.findById(1l, expedientCreat.getId());
+						ExpedientDto expedientDtoFromDB = expedientService.findById(((EntitatEntity)elementsCreats.get(0)).getId(), expedientCreat.getId());
 						assertNotNull(expedientCreat);
 						assertNotNull(expedientCreat.getId());
 						comprovarExpedientCoincideix(
@@ -430,10 +443,6 @@ System.out.println("OK");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
 						
-						
-
-						
-
 						ExpedientDto creat = expedientService.create(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
@@ -445,12 +454,14 @@ System.out.println("OK");
 								null,
 								false);
 						try {
+							
 							elementsCreats.add(creat);
 							testAmbExpedientCreat.executar(
 									elementsCreats);
 						} catch (Exception ex) {
 							System.out.println("El test ha produït una excepció:");
 							ex.printStackTrace(System.out);
+							fail("No hauria d'haver tret cap excepció");
 						} finally {
 							for (Object element: elementsCreats) {
 								if (element instanceof ExpedientDto) {
@@ -465,9 +476,9 @@ System.out.println("OK");
 					}
 				},
 				entitat,
-				metaDada,
+				metaExpedient,
 				metaDocument,
-				metaExpedient);
+				metaDada);
 	}
 
 	class TestAmbElementsIExpedient extends TestAmbElementsCreats {

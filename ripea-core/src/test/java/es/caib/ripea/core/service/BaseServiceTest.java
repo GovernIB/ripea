@@ -24,10 +24,10 @@ import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.UsuariRepository;
-
+import static org.junit.Assert.fail;
 /**
  * Tests per al servei d'entitats.
  * 
@@ -96,48 +96,37 @@ public class BaseServiceTest {
 				} else {
 					autenticarUsuari("admin");
 					if (entitatId != null) {
-//						if (element instanceof MetaDadaDto) {
-//							elementsCreats.add(
-//									metaDadaService.create(
-//											entitatId,
-//											null, // TODO
-//											(MetaDadaDto)element));
-//						} else if (element instanceof MetaDocumentDto) {
-//							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
-//									entitatId,
-//									null, // TODO
-//									(MetaDocumentDto)element,
-//									null,
-//									null,
-//									null);
-//							elementsCreats.add(metaDocumentCreat);
-//							if (((MetaDocumentDto)element).getPermisos() != null) {
-//								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
-//									metaExpedientService.permisUpdate(
-//											entitatId,
-//											metaDocumentCreat.getId(),
-//											permis);
-//								}
-//							}
-//						} else 
-							if (element instanceof MetaExpedientDto) {
-							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
-									entitatId,
-									(MetaExpedientDto)element);
+						if (element instanceof MetaExpedientDto) {
+							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(entitatId,
+									(MetaExpedientDto) element);
 							elementsCreats.add(metaExpedientCreat);
-							if (((MetaExpedientDto)element).getPermisos() != null) {
-								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
-									metaExpedientService.permisUpdate(
-											entitatId,
+							if (((MetaExpedientDto) element).getPermisos() != null) {
+								for (PermisDto permis : ((MetaExpedientDto) element).getPermisos()) {
+									metaExpedientService.permisUpdate(entitatId,
 											metaExpedientCreat.getId(),
 											permis);
 								}
 							}
-						} 
-//							else {
-//							throw new RuntimeException(
-//									"Tipus d'element desconegut: " + element.getClass().getName());
-//						}
+						} else if (element instanceof MetaDocumentDto) {
+							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(entitatId,
+									((MetaExpedientDto) elementsCreats.get(1)).getId(),
+									(MetaDocumentDto) element,
+									null,
+									null,
+									null);
+							elementsCreats.add(metaDocumentCreat);
+							if (((MetaDocumentDto) element).getPermisos() != null) {
+								for (PermisDto permis : ((MetaDocumentDto) element).getPermisos()) {
+									metaExpedientService.permisUpdate(entitatId,
+											metaDocumentCreat.getId(),
+											permis);
+								}
+							}
+						} else if (element instanceof MetaDadaDto) {
+							elementsCreats.add(metaDadaService.create(entitatId,
+									((MetaExpedientDto) elementsCreats.get(1)).getId(),
+									(MetaDadaDto) element));
+						}
 					} else {
 						throw new RuntimeException("No s'ha especificat cap entitat");
 					}
@@ -147,6 +136,7 @@ public class BaseServiceTest {
 		} catch (Exception ex) {
 			System.out.println("El test ha produït una excepció:");
 			ex.printStackTrace(System.out);
+			fail("Test shouldnytthrow exception");
 		} finally {
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {

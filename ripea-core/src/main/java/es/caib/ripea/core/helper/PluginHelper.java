@@ -26,6 +26,7 @@ import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -164,7 +165,6 @@ public class PluginHelper {
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 	private ViaFirmaPlugin viaFirmaPlugin;
-
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -490,17 +490,8 @@ public class PluginHelper {
 				}
 			}
 			if (expedient.getArxiuUuid() == null) {
-				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
-						toArxiuExpedient(
-								null,
-								expedient.getNom(),
-								null,
-								Arrays.asList(organCodiDir3),
-								expedient.getCreatedDate().toDate(),
-								classificacio,
-								expedient.getEstat(),
-								interessats,
-								metaExpedient.getSerieDocumental()));
+				
+				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(new Expedient());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
 							expedientCreat.getIdentificador(),
@@ -4419,12 +4410,7 @@ public class PluginHelper {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				if(pluginClass.equals("es.caib.ripea.plugin.caib.arxiu.ArxiuPluginMock")){
-					
-					IArxiuPlugin listMock = Mockito.mock(IArxiuPlugin.class);
-					ContingutArxiu contingutArxiu = new ContingutArxiu(ContingutTipus.EXPEDIENT);
-					contingutArxiu.setIdentificador("uuidArxiu");
-					Mockito.when(listMock.expedientCrear(new Expedient())).thenReturn(contingutArxiu);
-					arxiuPlugin = listMock;
+					arxiuPlugin = getMockArxiuPlugin();
 				} else {
 					try {
 						Class<?> clazz = Class.forName(pluginClass);
@@ -4446,7 +4432,6 @@ public class PluginHelper {
 								ex);
 					}
 				}
-
 			} else {
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_ARXIU,
@@ -4556,6 +4541,23 @@ public class PluginHelper {
 		}
 		return ciutadaPlugin;
 	}*/
+	
+	private IArxiuPlugin getMockArxiuPlugin(){
+		IArxiuPlugin mock = Mockito.mock(IArxiuPlugin.class);
+		ContingutArxiu contingutArxiu = new ContingutArxiu(ContingutTipus.EXPEDIENT);
+		contingutArxiu.setIdentificador("uuidArxiu");
+		
+//		  when(mock.myFunction(anyString())).thenAnswer(new Answer<String>() {
+//			    @Override
+//			    public String answer(InvocationOnMock invocation) throws Throwable {
+//			      Object[] args = invocation.getArguments();
+//			      return (String) args[0];
+//			    }
+		
+		Mockito.when(mock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(contingutArxiu);
+		Mockito.when(mock.expedientCrear(null)).thenThrow(NullPointerException.class);
+		return mock;
+	}
 
 
 	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {
