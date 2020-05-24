@@ -12,7 +12,6 @@ import java.util.Date;
  */
 public class ExpedientPeticioDto {
 
-
 	private Long id;
 	private String identificador;
 	private String clauAcces;
@@ -22,7 +21,8 @@ public class ExpedientPeticioDto {
 	private String metaExpedientNom;
 	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
 	private String notificaDistError;
-	
+
+	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {
 		ExpedientPeticioEstatViewEnumDto estatView = null;
 		if (estat != null) {

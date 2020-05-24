@@ -1118,8 +1118,6 @@ public class DocumentHelper {
 			DocumentEntity document) {
 		logger.debug("Custodiar identificador firma applet ("
 				+ "identificador=" + identificador + ")");
-		ObjecteFirmaApplet objecte = null;
-
 		// Registra al log la firma del document
 		contingutLogHelper.log(
 				document,

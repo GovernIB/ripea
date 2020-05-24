@@ -14,7 +14,7 @@ V_ENTITAT_ID NUMBER(19) := 1;
 V_CREATEDBY_CODI VARCHAR2(64) := 'admin'; 
 BEGIN
     -- Metadocument OTROS / Metanode id
-    SELECT hibernate_sequence.NEXTVAL
+    SELECT ipa_hibernate_seq.NEXTVAL
     INTO V_METANODE_ID
     FROM   dual;
 	    -- Create metanode and return id 
@@ -25,7 +25,7 @@ BEGIN
 		VALUES (V_METANODE_ID,'2','0',NULL,NULL,NULL,NULL, NULL,'0',NULL,NULL,NULL,NULL,'O1','EE99','TD99','0','0','OTROS');
 
 	-- Metadocument ACUSE_RECIBO / Metanode id
-    SELECT hibernate_sequence.NEXTVAL
+    SELECT ipa_hibernate_seq.NEXTVAL
     INTO V_METANODE_ID
     FROM   dual;
    
@@ -37,7 +37,7 @@ BEGIN
 		VALUES (V_METANODE_ID,'2','0',NULL,NULL,NULL,NULL, NULL,'0',NULL,NULL,NULL,NULL,'O1','EE01','TD09','0','0','ACUSE_RECIBO_NOTIFICACION');
 
 	-- Metadocument NOTIFICACIÓN / Metanode id
-    SELECT hibernate_sequence.NEXTVAL
+    SELECT ipa_hibernate_seq.NEXTVAL
     INTO V_METANODE_ID
     FROM   dual;
    
@@ -49,7 +49,7 @@ BEGIN
 		VALUES (V_METANODE_ID,'2','0',NULL,NULL,NULL,NULL, NULL,'0',NULL,NULL,NULL,NULL,'O1','EE02','TD07','0','0','NOTIFICACION');
 	
 	-- Metadocument JUSTIFICANTE_REGISTRO / Metanode id
-    SELECT hibernate_sequence.NEXTVAL
+    SELECT ipa_hibernate_seq.NEXTVAL
     INTO V_METANODE_ID
     FROM   dual;
    

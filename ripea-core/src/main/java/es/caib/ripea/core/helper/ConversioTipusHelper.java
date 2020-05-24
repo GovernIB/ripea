@@ -31,7 +31,6 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;

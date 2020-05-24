@@ -5,7 +5,6 @@ package es.caib.ripea.core.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1835,7 +1834,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 
 
-	private void fitxerDocumentEsborratGuardarEnTmp(
+	/*private void fitxerDocumentEsborratGuardarEnTmp(
 			DocumentEntity document) throws IOException {
 		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
@@ -1845,7 +1844,7 @@ public class ContingutServiceImpl implements ContingutService {
 				null);
 		outContent.write(fitxer.getContingut());
 		outContent.close();
-	}
+	}*/
 
 	private FitxerDto fitxerDocumentEsborratLlegir(
 			DocumentEntity document) throws IOException {

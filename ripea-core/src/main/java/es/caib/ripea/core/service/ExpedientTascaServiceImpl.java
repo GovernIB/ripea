@@ -46,7 +46,6 @@ import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
@@ -89,7 +88,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientTascaDto> findAmbExpedient(
@@ -110,7 +109,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientTascaDto> findAmbAuthentication(
@@ -129,8 +128,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 						paginacioParams));
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findTascaExpedient(
@@ -166,9 +164,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		return dto;
 	}
-	
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto descarregar(
@@ -190,9 +186,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				document,
 				versio);
 	}	
-	
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public long countTasquesPendents() {
@@ -204,9 +198,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		return cacheHelper.countTasquesPendents(
 				auth.getName());
 	}
-	
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientTascaDto> findAmbMetaExpedient(
@@ -227,8 +219,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				MetaExpedientTascaDto.class);
 	}
 
-	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientTascaDto findOne(Long expedientTascaId) {
@@ -244,7 +234,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				ExpedientTascaDto.class);
 
 	}
-	
+
 	@Transactional
 	@Override
 	public ExpedientTascaDto canviarEstat(Long expedientTascaId, TascaEstatEnumDto tascaEstatEnumDto, String motiu) {
@@ -268,7 +258,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		return conversioTipusHelper.convertir(expedientTascaEntity,
 				ExpedientTascaDto.class);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public MetaExpedientTascaDto findMetaExpedientTascaById(Long metaExpedientTascaId) {
@@ -283,19 +273,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				metaExpedientTascaEntity,
 				MetaExpedientTascaDto.class);
 
-	}	
-	
-	
-	private String getIdiomaPerDefecte() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.usuari.idioma.defecte",
-				"CA");
 	}
 
-
-	
-	
-	
 	@Override
 	@Transactional
 	public ExpedientTascaDto createTasca(
@@ -330,7 +309,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					ExpedientTascaDto.class);
 		
 	}	
-	
+
 	@Override
 	@Transactional
 	public void enviarEmailCrearTasca(Long expedientTascaId) {
@@ -387,8 +366,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				expedient,
 				metaDocument);
 	}
-	
-	
+
 	@Transactional
 	@Override
 	public DocumentDto updateDocument(
@@ -411,7 +389,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				documentDto,
 				comprovarMetaExpedient);
 	}
-	
+
 	@Transactional
 	@Override
 	public void portafirmesEnviar(
@@ -448,8 +426,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				portafirmesFluxTipus,
 				transaccioId);
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public DocumentPortafirmesDto portafirmesInfo(
@@ -468,7 +445,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				entitatId,
 				document);
 	}
-	
+
 	@Transactional
 	@Override
 	public void portafirmesReintentar(
@@ -487,8 +464,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				document);
 
 	}
-	
-	
+
 	@Transactional
 	@Override
 	public void portafirmesCancelar(
@@ -507,8 +483,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				entitatId,
 				document);
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public DocumentDto findDocumentById(
@@ -524,7 +499,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				documentId);
 		return toDocumentDto(document);
 	}
-	
+
 	@Transactional
 	@Override
 	public FitxerDto convertirPdfPerFirmaClient(
@@ -545,9 +520,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				documentHelper.getFitxerAssociat(document, null),
 				null);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	public String generarIdentificadorFirmaClient(
@@ -600,40 +573,22 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					ex);
 		}
 		if (objecte != null) {
-			
 			DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(objecte.getEntitatId(), tascaId, objecte.getDocumentId());
-		
 			documentHelper.processarFirmaClient(
 					identificador,
 					arxiuNom,
 					arxiuContingut,
 					document);
 		} else {
-		logger.error(
-				"No s'han trobat les dades del document amb identificador applet (" +
-				"identificador=" + identificador + ")");
-		throw new RuntimeException(
-				"No s'han trobat les dades del document amb identificador applet (" +
-				"identificador=" + identificador + ")");
+			logger.error(
+					"No s'han trobat les dades del document amb identificador applet (" +
+					"identificador=" + identificador + ")");
+			throw new RuntimeException(
+					"No s'han trobat les dades del document amb identificador applet (" +
+					"identificador=" + identificador + ")");
+		}
 	}
-	}
-	
-	
-	private DocumentDto toDocumentDto(
-			DocumentEntity document) {
-		return (DocumentDto)contingutHelper.toContingutDto(
-				document,
-				false,
-				false,
-				false,
-				false,
-				true,
-				true,
-				false);
-	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
@@ -655,12 +610,24 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				contingut);
 	}
 
-	
-	
-	
-	
-	
-	
+	private DocumentDto toDocumentDto(
+			DocumentEntity document) {
+		return (DocumentDto)contingutHelper.toContingutDto(
+				document,
+				false,
+				false,
+				false,
+				false,
+				true,
+				true,
+				false);
+	}
+
+	/*private String getIdiomaPerDefecte() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.usuari.idioma.defecte",
+				"CA");
+	}*/
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientTascaServiceImpl.class);
 

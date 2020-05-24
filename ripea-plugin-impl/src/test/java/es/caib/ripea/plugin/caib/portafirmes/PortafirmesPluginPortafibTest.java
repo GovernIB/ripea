@@ -95,7 +95,8 @@ public class PortafirmesPluginPortafibTest {
 				flux,
 				null,
 				null,
-				false);
+				false,
+				null);
 		plugin.delete(documentId);
 	}
 

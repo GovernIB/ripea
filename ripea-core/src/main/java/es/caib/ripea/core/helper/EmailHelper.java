@@ -31,8 +31,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.ExpedientTascaRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -55,10 +53,6 @@ public class EmailHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private JavaMailSender mailSender;
-	@Autowired
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
 
 	public void contingutAgafatSensePermis(
 			ContingutEntity contingut,

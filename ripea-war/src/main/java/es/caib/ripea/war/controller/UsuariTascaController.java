@@ -48,7 +48,6 @@ import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -58,7 +57,6 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.DocumentCommand;
@@ -114,8 +112,6 @@ public class UsuariTascaController extends BaseUserController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
-	@Autowired
-	private PortafirmesFluxService metaDocumentFluxService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(

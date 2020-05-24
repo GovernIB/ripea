@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
@@ -72,7 +73,8 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentCreate.setPortafirmesDocumentTipus("1234");
 		metaDocumentCreate.setPortafirmesFluxId("1234");
 		metaDocumentCreate.setPortafirmesResponsables(new String[] {"123456789Z"});
-		metaDocumentCreate.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
+		metaDocumentCreate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+		metaDocumentCreate.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocumentCreate.setPortafirmesCustodiaTipus("1234");
 		metaDocumentCreate.setFirmaPassarelaCustodiaTipus("1234");
 		metaDocumentUpdate = new MetaDocumentDto();
@@ -86,7 +88,8 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentUpdate.setPortafirmesDocumentTipus("12341");
 		metaDocumentUpdate.setPortafirmesFluxId("12342");
 		metaDocumentUpdate.setPortafirmesResponsables(new String[] {"00000000T"});
-		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
+		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+		metaDocumentCreate.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocumentUpdate.setPortafirmesCustodiaTipus("12343");
 		metaDocumentUpdate.setFirmaPassarelaCustodiaTipus("12344");
 		metaDocumentUpdate.setFirmaBiometricaActiva(true);

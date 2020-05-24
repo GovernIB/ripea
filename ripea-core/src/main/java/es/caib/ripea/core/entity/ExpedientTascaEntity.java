@@ -22,7 +22,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.entity.MetaExpedientTascaEntity.Builder;
 
 /**
  * Classe del model de dades que representa una tasca del expedient.
@@ -32,6 +31,7 @@ import es.caib.ripea.core.entity.MetaExpedientTascaEntity.Builder;
 @Entity
 @Table(	name = "ipa_expedient_tasca")
 @EntityListeners(AuditingEntityListener.class)
+@SuppressWarnings("serial")
 public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 
 	
