@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
@@ -55,6 +58,15 @@ public class BaseServiceTest {
 
 	@Autowired
 	private  UsuariRepository usuariRepository;
+
+	@BeforeClass
+	public static void beforeClass() {
+		PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
+	}
+
+	@AfterClass
+	public static void afterClass() {
+	}
 
 	@Transactional
 	protected void autenticarUsuari(String usuariCodi) {
