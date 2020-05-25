@@ -55,6 +55,9 @@
 	<script src="<c:url value="/js/clamp.js"/>"></script>
 	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
 	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<c:if test="${isContingutDetail}">
 		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
@@ -1036,7 +1039,7 @@ function deselectAll() {
 			</c:if>
 			<div class="tab-content">
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
-				<div class="tab-pane active in" id="contingut">
+				<div class="tab-pane in" id="contingut">
 					<c:choose>
 						<%--------------- WHEN CONTINGUT IS DOCUMENT (SHOWS DOCUMENT DETAILS) ---------------%>
 						<c:when test="${contingut.document}">
@@ -1286,7 +1289,7 @@ function deselectAll() {
 				<c:if test="${!isTasca}">
 					<c:if test="${contingut.node}">
 						<!------------------------------ TABPANEL DADES ------------------------------------->
-						<div class="tab-pane" id="dades">
+						<div class="tab-pane active" id="dades">
 							<c:choose>
 								<c:when test="${not empty metaDades}">
 									<form:form onsubmit="window.location.reload();" id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
@@ -1336,7 +1339,32 @@ function deselectAll() {
 																				<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DOMINI'}">
-																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
+																			
+																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}" multiple="false"></form:select>
+																				<script type="text/javascript">
+																					var multipleUrl = '<c:url value="/metaExpedient/${contingut.metaNode.id}/metaDada/domini/${metaDada.codi}"/>';
+																					
+																					$.ajax({
+																	 					type: 'GET',
+																	 					url: multipleUrl, 
+																	 					success: function(data) {
+																								var selDomini = $("#${metaDada.codi}");
+																								selDomini.empty();
+																								selDomini.append("<option value=\"\"></option>");
+																								console.log("Data: " + data);
+																								if (data) {
+																									var items = [];
+																		 							$.each(data, function(i, val) {
+																		 								console.log("Val: " + val);
+
+																			 							selDomini.append("<option value=\"" + val + "\">" + val + "</option>");
+																		 							});
+																								}
+																								var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+																								selDomini.select2(select2Options);
+																	 					}
+																	 				});
+																				</script>
 																			</c:when>
 																			<c:otherwise>
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>

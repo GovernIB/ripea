@@ -3,7 +3,11 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -213,6 +217,21 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<Long, String> getDomini(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable String dominiCodi){
+		Map<Long, String> resultatConsulta = new HashMap<Long, String>();
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
+		
+		resultatConsulta.put(1L, "port de palma");
+		resultatConsulta.put(2L, "port de tant");
+		return resultatConsulta;
 	}
 
 }
