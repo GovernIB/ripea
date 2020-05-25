@@ -17,6 +17,56 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+	$('select#tipus').change(function() {
+		if ($(this).val() == 'DOMINI') {
+			let valor = $('#valor').val();
+			$('#valor').parent().parent().hide();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada/domini"/>",
+				success: function(data) {
+					var $selOrgan = $('#domini');
+					$selOrgan.empty();
+					$selOrgan.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.nom
+							});
+							if (valor == val.codi) {
+								$selOrgan.append("<option value=\"" + val.codi + "\" selected>" + val.nom + "</option>");
+							} else {
+								$selOrgan.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+							}
+						});
+					}
+					var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+					$selOrgan.select2("destroy");
+					$selOrgan.select2(select2Options);
+				}
+			});
+		} else {
+			$('#valor').parent().parent().show();
+		}
+	});
+	$('select#domini').change(function() {
+		var dominiCodiSelected = $(this).val();		
+		var dominiNomSelected = $(this).text();
+		if (dominiCodiSelected != null && dominiCodiSelected != '') {
+			$('#codi').val(dominiCodiSelected);
+			$('#nom').val(dominiNomSelected);
+			//$('#valor').val(dominiSelected);
+		}
+	});
+	$('select#domini').trigger('change');
+	$('select#tipus').trigger('change');
+});
+</script>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada"/></c:set>
@@ -29,6 +79,7 @@
 		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto"/>
 		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
 		<rip:inputText name="valor" textKey="metadada.form.camp.valor"/>
+		<rip:inputSelect name="domini"/>
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

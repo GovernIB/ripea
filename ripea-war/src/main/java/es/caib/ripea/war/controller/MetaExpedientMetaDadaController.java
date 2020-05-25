@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
@@ -36,6 +40,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	private MetaDadaService metaDadaService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private DominiService dominiService;
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
@@ -197,6 +203,16 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 				request,
 				"redirect:../../metaDada",
 				"metadada.controller.esborrat.ok");
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini", method = RequestMethod.GET)
+	@ResponseBody
+	public List<DominiDto> getDominis(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
+		return dominis;
 	}
 
 }

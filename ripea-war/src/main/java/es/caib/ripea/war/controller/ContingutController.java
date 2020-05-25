@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
@@ -541,11 +542,13 @@ public class ContingutController extends BaseUserController {
 					contingut.getId()));
 		}
 		if (contingut instanceof NodeDto) {
+			//TODO si tipus == domini consulta resultat SQL
+			List<MetaDadaDto> metadades = metaDadaService.findByNode(
+					entitatActual.getId(),
+					contingut.getId());
 			model.addAttribute(
 					"metaDades",
-					metaDadaService.findByNode(
-							entitatActual.getId(),
-							contingut.getId()));
+					metadades);
 			model.addAttribute(
 					"dadesCommand",
 					beanGeneratorHelper.generarCommandDadesNode(

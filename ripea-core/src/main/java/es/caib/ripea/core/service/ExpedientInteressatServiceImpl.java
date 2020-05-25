@@ -340,20 +340,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
 				null,
 				id);
-		
-		if (interessat instanceof InteressatPersonaFisicaEntity)
-			return conversioTipusHelper.convertir(
-					interessat,
-					InteressatPersonaFisicaDto.class);
-		else if (interessat instanceof InteressatPersonaJuridicaEntity)
-			return conversioTipusHelper.convertir(
-					interessat,
-					InteressatPersonaJuridicaDto.class);
-		else if (interessat instanceof InteressatAdministracioEntity)
-			return conversioTipusHelper.convertir(
-					interessat,
-					InteressatAdministracioDto.class);
-		
 		return conversioTipusHelper.convertir(
 				interessat,
 				InteressatDto.class);

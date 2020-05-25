@@ -1335,6 +1335,9 @@ function deselectAll() {
 																			<c:when test="${metaDada.tipus == 'BOOLEA'}">
 																				<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
 																			</c:when>
+																			<c:when test="${metaDada.tipus == 'DOMINI'}">
+																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
+																			</c:when>
 																			<c:otherwise>
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
 																			</c:otherwise>
