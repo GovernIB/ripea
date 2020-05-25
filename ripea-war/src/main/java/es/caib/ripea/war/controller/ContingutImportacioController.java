@@ -89,13 +89,38 @@ public class ContingutImportacioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (bindingResult.hasErrors()) {
+			command.setPareId(contingutId);
+			model.addAttribute(command);
+			model.addAttribute(
+				"tipusRegistreOptions",
+				EnumHelper.getOptionsForEnum(
+						TipusRegistreEnumDto.class,
+						"contingut.importacio.tipus.enum."));
 			return "contingutImportacioForm";
 		}
 
-		int documentsRepetits = importacioService.getDocuments(
-					entitatActual.getId(), 
-					contingutId,
-					ImportacioCommand.asDto(command));
+		int documentsRepetits = 0;
+		
+		try {
+			documentsRepetits = importacioService.getDocuments(
+						entitatActual.getId(), 
+						contingutId,
+						ImportacioCommand.asDto(command));
+		} catch (Exception e) {
+			command.setPareId(contingutId);
+			model.addAttribute(command);
+			model.addAttribute(
+				"tipusRegistreOptions",
+				EnumHelper.getOptionsForEnum(
+						TipusRegistreEnumDto.class,
+						"contingut.importacio.tipus.enum."));
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"document.controller.importat.ko"));
+			return "contingutImportacioForm";
+		}
 		if (documentsRepetits > 0) {
 			MissatgesHelper.warning(
 					request, 
@@ -105,9 +130,7 @@ public class ContingutImportacioController extends BaseUserController {
 							new Object[] {documentsRepetits}));
 			return modalUrlTancar();
 		}
-		
-		
-		
+	
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + contingutId,

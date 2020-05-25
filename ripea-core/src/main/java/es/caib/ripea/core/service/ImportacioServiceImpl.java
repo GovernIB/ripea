@@ -25,6 +25,7 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -33,6 +34,7 @@ import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import javassist.NotFoundException;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.
@@ -56,7 +58,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 	public int getDocuments(
 			Long entitatId,
 			Long contingutId,
-			ImportacioDto dades) {
+			ImportacioDto dades) throws ValidationException {
 		logger.debug("Important documents de l'arxiu digital (" +
 				"numeroRegistre=" + dades.getNumeroRegistre() + ")");
 		ExpedientEntity expedientSuperior;
@@ -75,6 +77,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 				dades.getNumeroRegistre(),
 				dades.getDataPresentacioFormatted(),
 				dades.getTipusRegistre());
+		if (documentsArxiu != null && documentsArxiu.isEmpty())
+			throw new ValidationException("No s'han trobat registres amb les dades especificades");
+		
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
 			expedientSuperior = (ExpedientEntity)contingutPare;
 		} else {

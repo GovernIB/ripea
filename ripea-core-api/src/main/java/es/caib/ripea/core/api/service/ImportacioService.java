@@ -33,7 +33,7 @@ public interface ImportacioService {
 	public int getDocuments(
 			Long entitatId,
 			Long contingutId,
-			ImportacioDto dades) throws NotFoundException, ValidationException;
+			ImportacioDto dades) throws ValidationException;
 
 
 }
