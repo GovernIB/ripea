@@ -102,7 +102,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "registre_id")
-	@ForeignKey(name = "dis_interessat_registre_fk")
+	@ForeignKey(name = "ipa_annex_registre_fk")
 	private RegistreEntity registre;
 	
 	

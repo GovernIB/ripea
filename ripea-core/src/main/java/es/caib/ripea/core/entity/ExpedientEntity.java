@@ -138,12 +138,12 @@ public class ExpedientEntity extends NodeEntity {
 	private List<ExpedientTascaEntity> tasques = new ArrayList<ExpedientTascaEntity>();
 	
 	
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_estat_id")
 	@ForeignKey(name = "ipa_expestat_expedient_fk")
 	private ExpedientEstatEntity expedientEstat;
 	
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaexpedient_domini_id")
 	@ForeignKey(name = "ipa_metaexpdom_expedient_fk")
 	private MetaExpedientDominiEntity metaExpedientDomini;

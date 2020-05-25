@@ -30,7 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class UsuariEntity implements Serializable {
 
 	@Id
-	@Column(name = "codi", length = 64, nullable = false, unique = true)
+	@Column(name = "codi", length = 64, nullable = false)
 	private String codi;
 	@Column(name = "nom", length = 200)
 	private String nom;

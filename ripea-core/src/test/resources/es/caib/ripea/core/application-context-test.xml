@@ -28,7 +28,8 @@
 	</bean>
 
 	<jdbc:embedded-database id="dataSource" type="HSQL">
-		<jdbc:script location="classpath:/es/caib/ripea/core/hsql_schema.sql"/>
+		<!--jdbc:script location="classpath:/es/caib/ripea/core/hsql_schema.sql"/-->
+		<jdbc:script location="classpath:/es/caib/ripea/core/hsql_acl_schema.sql"/>
 	</jdbc:embedded-database>
 
 	<bean id="testSmtpServer" class="com.dumbster.smtp.SimpleSmtpServer" destroy-method="stop" factory-method="start">

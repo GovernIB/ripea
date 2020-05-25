@@ -25,12 +25,14 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
+import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
@@ -104,10 +106,10 @@ import es.caib.ripea.plugin.dadesext.DadesExternesPlugin;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
-import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -162,7 +164,6 @@ public class PluginHelper {
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 	private ViaFirmaPlugin viaFirmaPlugin;
-
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -488,17 +489,8 @@ public class PluginHelper {
 				}
 			}
 			if (expedient.getArxiuUuid() == null) {
-				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
-						toArxiuExpedient(
-								null,
-								expedient.getNom(),
-								null,
-								Arrays.asList(organCodiDir3),
-								expedient.getCreatedDate().toDate(),
-								classificacio,
-								expedient.getEstat(),
-								interessats,
-								metaExpedient.getSerieDocumental()));
+				
+				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(new Expedient());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
 							expedientCreat.getIdentificador(),
@@ -4416,24 +4408,28 @@ public class PluginHelper {
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					if (PropertiesHelper.getProperties().isLlegirSystem()) {
-						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-								String.class).newInstance(
-								"es.caib.ripea.");
-					} else {
-						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-								String.class,
-								Properties.class).newInstance(
-								"es.caib.ripea.",
-								PropertiesHelper.getProperties().findAll());
+				if(pluginClass.equals("es.caib.ripea.plugin.caib.arxiu.ArxiuPluginMock")){
+					arxiuPlugin = getMockArxiuPlugin();
+				} else {
+					try {
+						Class<?> clazz = Class.forName(pluginClass);
+						if (PropertiesHelper.getProperties().isLlegirSystem()) {
+							arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+									String.class).newInstance(
+									"es.caib.ripea.");
+						} else {
+							arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+									String.class,
+									Properties.class).newInstance(
+									"es.caib.ripea.",
+									PropertiesHelper.getProperties().findAll());
+						}
+					} catch (Exception ex) {
+						throw new SistemaExternException(
+								IntegracioHelper.INTCODI_ARXIU,
+								"Error al crear la instància del plugin d'arxiu digital",
+								ex);
 					}
-				} catch (Exception ex) {
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_ARXIU,
-							"Error al crear la instància del plugin d'arxiu digital",
-							ex);
 				}
 			} else {
 				throw new SistemaExternException(
@@ -4544,6 +4540,23 @@ public class PluginHelper {
 		}
 		return ciutadaPlugin;
 	}*/
+	
+	private IArxiuPlugin getMockArxiuPlugin(){
+		IArxiuPlugin mock = Mockito.mock(IArxiuPlugin.class);
+		ContingutArxiu contingutArxiu = new ContingutArxiu(ContingutTipus.EXPEDIENT);
+		contingutArxiu.setIdentificador("uuidArxiu");
+		
+//		  when(mock.myFunction(anyString())).thenAnswer(new Answer<String>() {
+//			    @Override
+//			    public String answer(InvocationOnMock invocation) throws Throwable {
+//			      Object[] args = invocation.getArguments();
+//			      return (String) args[0];
+//			    }
+		
+		Mockito.when(mock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(contingutArxiu);
+		Mockito.when(mock.expedientCrear(null)).thenThrow(NullPointerException.class);
+		return mock;
+	}
 
 
 	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {

@@ -75,11 +75,11 @@ public class RegistreInteressatEntity extends RipeaAuditable<Long> {
 	private InteressatTipus tipus;
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "representant_id")
-	@ForeignKey(name = "dis_interessat_representant_fk")
+	@ForeignKey(name = "ipa_interessat_representant_fk")
 	private RegistreInteressatEntity representant;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "registre_id")
-	@ForeignKey(name = "dis_interessat_registre_fk")
+	@ForeignKey(name = "ipa_interessat_registre_fk")
 	private RegistreEntity registre;
 	@Column(name = "organ_codi", length = 9)
 	private String organCodi;

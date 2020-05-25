@@ -40,7 +40,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	private String nom;
 	@Column(name = "tipus", nullable = false)
 	private MetaDadaTipusEnumDto tipus;
-	@Column(name = "multiplicitat")
+	@Column(name = "multiplicitat", nullable = false)
 	private MultiplicitatEnumDto multiplicitat;
 	@Column(name = "valor")
 	private String valor;

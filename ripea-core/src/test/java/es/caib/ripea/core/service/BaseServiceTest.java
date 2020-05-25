@@ -3,16 +3,21 @@
  */
 package es.caib.ripea.core.service;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
@@ -23,6 +28,8 @@ import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
  * Tests per al servei d'entitats.
@@ -46,15 +53,29 @@ public class BaseServiceTest {
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 
+	@Autowired
+	private  UsuariRepository usuariRepository;
 
-
+	@Transactional
 	protected void autenticarUsuari(String usuariCodi) {
+		logger.debug("Autenticant usuari " + usuariCodi + "...");
 		UserDetails userDetails = userDetailsService.loadUserByUsername(usuariCodi);
 		Authentication authToken = new UsernamePasswordAuthenticationToken(
 				userDetails.getUsername(),
 				userDetails.getPassword(),
 				userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
+        UsuariEntity usuariEntity = usuariRepository.findOne(usuariCodi);
+		if (usuariEntity == null) {
+			usuariRepository.save(
+					UsuariEntity.getBuilder(
+							usuariCodi,
+							usuariCodi,
+							"00000000T",
+							usuariCodi + "@mail.com",
+							"CA").build());
+		}
+		logger.debug("... usuari " + usuariCodi + " autenticat correctament");
 	}
 
 	protected void testCreantElements(
@@ -64,6 +85,8 @@ public class BaseServiceTest {
 		Long entitatId = null;
 		try {
 			for (Object element: elements) {
+				Long id = null;
+				logger.info("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
 					EntitatDto entitatCreada = entitatService.create((EntitatDto)element);
@@ -76,62 +99,68 @@ public class BaseServiceTest {
 									permis);
 						}
 					}
+					id = entitatCreada.getId();
 				} else {
 					autenticarUsuari("admin");
 					if (entitatId != null) {
-						if (element instanceof MetaDadaDto) {
-							elementsCreats.add(
-									metaDadaService.create(
-											entitatId,
-											null, // TODO
-											(MetaDadaDto)element));
+						if (element instanceof MetaExpedientDto) {
+							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
+									entitatId,
+									(MetaExpedientDto) element);
+							elementsCreats.add(metaExpedientCreat);
+							if (((MetaExpedientDto)element).getPermisos() != null) {
+								for (PermisDto permis: ((MetaExpedientDto) element).getPermisos()) {
+									metaExpedientService.permisUpdate(entitatId,
+											metaExpedientCreat.getId(),
+											permis);
+								}
+							}
+							id = metaExpedientCreat.getId();
 						} else if (element instanceof MetaDocumentDto) {
 							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
 									entitatId,
-									null, // TODO
-									(MetaDocumentDto)element,
+									((MetaExpedientDto) elementsCreats.get(1)).getId(),
+									(MetaDocumentDto) element,
 									null,
 									null,
 									null);
 							elementsCreats.add(metaDocumentCreat);
 							if (((MetaDocumentDto)element).getPermisos() != null) {
-								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
-									metaExpedientService.permisUpdate(
-											entitatId,
+								for (PermisDto permis: ((MetaDocumentDto) element).getPermisos()) {
+									metaExpedientService.permisUpdate(entitatId,
 											metaDocumentCreat.getId(),
 											permis);
 								}
 							}
-						} else if (element instanceof MetaExpedientDto) {
-							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
+							id = metaDocumentCreat.getId();
+						} else if (element instanceof MetaDadaDto) {
+							MetaDadaDto metaDadaCreada = metaDadaService.create(
 									entitatId,
-									(MetaExpedientDto)element);
-							elementsCreats.add(metaExpedientCreat);
-							if (((MetaExpedientDto)element).getPermisos() != null) {
-								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
-									metaExpedientService.permisUpdate(
-											entitatId,
-											metaExpedientCreat.getId(),
-											permis);
-								}
-							}
+									((MetaExpedientDto) elementsCreats.get(1)).getId(),
+									(MetaDadaDto) element);
+							elementsCreats.add(metaDadaCreada);
+							id = metaDadaCreada.getId();
 						} else {
-							throw new RuntimeException(
-									"Tipus d'element desconegut: " + element.getClass().getName());
+							fail("Tipus d'objecte desconegut: " + element.getClass().getSimpleName());
 						}
 					} else {
-						throw new RuntimeException("No s'ha especificat cap entitat");
+						fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
 					}
 				}
+				logger.info("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
 			}
+			logger.info("Executant test amb els elements creats...");
 			test.executar(elementsCreats);
+			logger.info("...test executat.");
 		} catch (Exception ex) {
-			System.out.println("El test ha produït una excepció:");
-			ex.printStackTrace(System.out);
+			logger.error("L'execució del test ha produït una excepció", ex);
+			fail("L'execució del test ha produït una excepció");
 		} finally {
+			Long metaExpedientId = ((MetaExpedientDto)elementsCreats.get(1)).getId();
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {
 				autenticarUsuari("admin");
+				logger.info("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
 					entitatService.delete(
@@ -140,26 +169,27 @@ public class BaseServiceTest {
 				} else if (element instanceof MetaDadaDto) {
 					metaDadaService.delete(
 							entitatId,
-							null, // TODO
+							metaExpedientId,
 							((MetaDadaDto)element).getId());
 				} else if (element instanceof MetaDocumentDto) {
 					metaDocumentService.delete(
 							entitatId,
-							null, // TODO
+							metaExpedientId,
 							((MetaDocumentDto)element).getId());
 				} else if (element instanceof MetaExpedientDto) {
 					metaExpedientService.delete(
 							entitatId,
 							((MetaExpedientDto)element).getId());
 				}
+				logger.info("...objecte de tipus " + element.getClass().getSimpleName() + "esborrat correctament");
 			}
 		}
 	}
 
-
-
 	abstract class TestAmbElementsCreats {
 		public abstract void executar(List<Object> elementsCreats);
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
 
 }
