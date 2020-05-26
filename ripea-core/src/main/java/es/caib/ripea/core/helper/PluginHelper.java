@@ -25,14 +25,12 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
@@ -879,29 +877,23 @@ public class PluginHelper {
 		}
 	}
 
-
-
-	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid){
-
+	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid) {
 		List<ContingutArxiu> continguts = arxiuExpedientConsultarPerUuid(expedientUuid).getContinguts();
 		int ocurrences = 0;
-		if(continguts != null) {
+		if (continguts != null) {
 			List<String> noms = new ArrayList<String>();
 			for(ContingutArxiu contingut : continguts) {
 				noms.add(contingut.getNom());
 			}
 			String newName = new String(nomPerComprovar);
-
 			while(noms.indexOf(newName) >= 0) {
 				ocurrences ++;
 				newName = nomPerComprovar + " (" + ocurrences + ")";
 			}
-
 			return newName;
-
+		}
+		return nomPerComprovar;
 	}
-	return nomPerComprovar;
-}
 
 
 
@@ -1723,7 +1715,6 @@ public class PluginHelper {
 			String dataPresentacioStr = dateFormat.format(dataPresentacio);  
 			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
 					numeroRegistre + ";" + tipusRegistre.getLabel() + ";" + dataPresentacioStr);
-
 			return contingutArxiu;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -4408,28 +4399,24 @@ public class PluginHelper {
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
-				if(pluginClass.equals("es.caib.ripea.plugin.caib.arxiu.ArxiuPluginMock")){
-					arxiuPlugin = getMockArxiuPlugin();
-				} else {
-					try {
-						Class<?> clazz = Class.forName(pluginClass);
-						if (PropertiesHelper.getProperties().isLlegirSystem()) {
-							arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-									String.class).newInstance(
-									"es.caib.ripea.");
-						} else {
-							arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-									String.class,
-									Properties.class).newInstance(
-									"es.caib.ripea.",
-									PropertiesHelper.getProperties().findAll());
-						}
-					} catch (Exception ex) {
-						throw new SistemaExternException(
-								IntegracioHelper.INTCODI_ARXIU,
-								"Error al crear la instància del plugin d'arxiu digital",
-								ex);
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					if (PropertiesHelper.getProperties().isLlegirSystem()) {
+						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+								String.class).newInstance(
+								"es.caib.ripea.");
+					} else {
+						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+								String.class,
+								Properties.class).newInstance(
+								"es.caib.ripea.",
+								PropertiesHelper.getProperties().findAll());
 					}
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_ARXIU,
+							"Error al crear la instància del plugin d'arxiu digital",
+							ex);
 				}
 			} else {
 				throw new SistemaExternException(
@@ -4540,24 +4527,6 @@ public class PluginHelper {
 		}
 		return ciutadaPlugin;
 	}*/
-	
-	private IArxiuPlugin getMockArxiuPlugin(){
-		IArxiuPlugin mock = Mockito.mock(IArxiuPlugin.class);
-		ContingutArxiu contingutArxiu = new ContingutArxiu(ContingutTipus.EXPEDIENT);
-		contingutArxiu.setIdentificador("uuidArxiu");
-		
-//		  when(mock.myFunction(anyString())).thenAnswer(new Answer<String>() {
-//			    @Override
-//			    public String answer(InvocationOnMock invocation) throws Throwable {
-//			      Object[] args = invocation.getArguments();
-//			      return (String) args[0];
-//			    }
-		
-		Mockito.when(mock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(contingutArxiu);
-		Mockito.when(mock.expedientCrear(null)).thenThrow(NullPointerException.class);
-		return mock;
-	}
-
 
 	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {
 
@@ -4766,6 +4735,10 @@ public class PluginHelper {
 	private boolean getPropertyGuardarCertificacioExpedient() {
 		return PropertiesHelper.getProperties().getAsBoolean(
 				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
+	}
+
+	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
+		this.arxiuPlugin = arxiuPlugin;
 	}
 
 }

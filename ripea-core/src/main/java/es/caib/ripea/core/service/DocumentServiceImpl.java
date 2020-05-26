@@ -142,11 +142,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false);
-		
-
 		ExpedientEntity expedient = pare.getExpedientPare();
-		
-		
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
@@ -161,8 +157,6 @@ public class DocumentServiceImpl implements DocumentService {
 					ExpedientEntity.class,
 					"No es pot crear un document sense un meta-document associat");
 		}
-
-
 		return documentHelper.crearDocument(
 				document,
 				pare,
@@ -187,7 +181,6 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false);
-	
 		return documentHelper.updateDocument(
 				entitatId,
 				documentEntity,

@@ -364,13 +364,9 @@ public class DocumentHelper {
 			ContingutEntity pare,
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument) {
-		
-
-		
 		if (expedient != null) {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
 		}
-		
 		contingutHelper.comprovarNomValid(
 				pare,
 				document.getNom(),
@@ -390,7 +386,6 @@ public class DocumentHelper {
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 					"expedientId=" + expedient.getId() + ")");
 		}
-		
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
 				document.getNom(),
@@ -434,9 +429,7 @@ public class DocumentHelper {
 				document.isFirmaSeparada(),
 				firmes);
 		DocumentDto dto = toDocumentDto(entity);
-		
 		return dto;
-		
 	}
 	
 	private DocumentDto toDocumentDto(
@@ -493,8 +486,7 @@ public class DocumentHelper {
 				metaDocument,
 				pare,
 				entitat,
-				expedient
-				).
+				expedient).
 				ubicacio(ubicacio).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);
