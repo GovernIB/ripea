@@ -3,18 +3,26 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
@@ -22,10 +30,12 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.helper.PluginHelper;
 
 /**
  * Classe que es pot utilitzar com a base dels tests que requereixen la creació
@@ -35,14 +45,13 @@ import es.caib.ripea.core.api.service.ExpedientService;
  */
 public class BaseExpedientServiceTest extends BaseServiceTest {
 
-	@Mock
-    private IArxiuPlugin iArxiuplugin;
-
 	@Autowired
 	protected ContingutService contingutService;
 	@Autowired
 	@InjectMocks
 	protected ExpedientService expedientService;
+	@Autowired
+	protected PluginHelper pluginHelper;
 
 	private EntitatDto entitat;
 	private MetaDadaDto metaDada;
@@ -102,6 +111,9 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		metaDocument.setPortafirmesCustodiaTipus("1234");
 		metaDocument.setFirmaPassarelaCustodiaTipus("1234");
 		metaDocument.setMultiplicitat(MultiplicitatEnumDto.M_1);
+		metaDocument.setNtiOrigen(NtiOrigenEnumDto.O0);
+		metaDocument.setNtiTipoDocumental("TD99");
+		metaDocument.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
 		metaExpedient = new MetaExpedientDto();
 		metaExpedient.setCodi("TEST1");
 		metaExpedient.setNom("Metadocument de test");
@@ -140,15 +152,16 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		permisUserRead.setRead(true);
 		permisUserRead.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
 		permisUserRead.setPrincipalNom("user");*/
-		//usuariRepository.findAll();
 	}
 
 	protected void testAmbElementsIExpedient(
-			final TestAmbElementsCreats testAmbExpedientCreat) {
+			final TestAmbElementsCreats testAmbExpedientCreat,
+			String descripcioTest) {
 		testCreantElements(
 				new TestAmbElementsCreats() {
 					@Override
-					public void executar(List<Object> elementsCreats) {
+					public void executar(List<Object> elementsCreats) throws Exception {
+						configureMockArxiuPlugin();
 						autenticarUsuari("user");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
@@ -178,16 +191,66 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 						}
 					}
 				},
+				descripcioTest,
 				entitat,
 				metaExpedient,
 				metaDocument,
 				metaDada);
 	}
 
-	class TestAmbElementsIExpedient extends TestAmbElementsCreats {
-		@Override
-		public void executar(List<Object> elementsCreats) {
-		}
+	protected void testAmbElementsIExpedient(
+			final TestAmbElementsCreats testAmbExpedientCreat) {
+		testAmbElementsIExpedient(testAmbExpedientCreat, null);
+	}
+
+	private void configureMockArxiuPlugin() throws IOException {
+		IArxiuPlugin mock = Mockito.mock(IArxiuPlugin.class);
+		Expedient expedientArxiu = new Expedient();
+		expedientArxiu.setIdentificador(UUID.randomUUID().toString());
+		expedientArxiu.setNom("nom");
+		expedientArxiu.setVersio("1");
+		Document documentArxiu = new Document();
+		documentArxiu.setIdentificador(UUID.randomUUID().toString());
+		documentArxiu.setNom("nom");
+		documentArxiu.setVersio("1");
+		Document documentArxiuAmbContingut = new Document();
+		documentArxiuAmbContingut.setIdentificador(UUID.randomUUID().toString());
+		documentArxiuAmbContingut.setNom("nom");
+		documentArxiuAmbContingut.setVersio("1");
+		DocumentContingut documentContingut = new DocumentContingut();
+		documentContingut.setArxiuNom("arxiu.pdf");
+		documentContingut.setTipusMime("application/pdf");
+		FitxerDto fitxer = getFitxerPdfDeTest();
+		documentContingut.setArxiuNom(fitxer.getNom());
+		documentContingut.setTipusMime(fitxer.getContentType());
+		documentContingut.setContingut(fitxer.getContingut());
+		documentContingut.setTamany(fitxer.getTamany());
+		documentArxiuAmbContingut.setContingut(documentContingut);
+	
+//		  when(mock.myFunction(anyString())).thenAnswer(new Answer<String>() {
+//			    @Override
+//			    public String answer(InvocationOnMock invocation) throws Throwable {
+//			      Object[] args = invocation.getArguments();
+//			      return (String) args[0];
+//			    }
+		
+		Mockito.when(mock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(expedientArxiu);
+		Mockito.when(mock.expedientCrear(null)).thenThrow(NullPointerException.class);
+		Mockito.when(mock.expedientDetalls(Mockito.anyString(), Mockito.nullable(String.class))).thenReturn(expedientArxiu);
+		Mockito.when(mock.documentCrear(Mockito.any(Document.class), Mockito.anyString())).thenReturn(documentArxiu);
+		Mockito.when(mock.documentCrear(null, null)).thenThrow(NullPointerException.class);
+		Mockito.when(mock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
+		pluginHelper.setArxiuPlugin(mock);
+	}
+
+	protected FitxerDto getFitxerPdfDeTest() throws IOException {
+		FitxerDto dto = new FitxerDto();
+		dto.setNom("arxiu.pdf");
+		dto.setContentType("application/pdf");
+		dto.setContingut(
+				IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/ripea/core/arxiu.pdf")));
+		dto.setTamany(dto.getContingut().length);
+		return dto;
 	}
 
 }

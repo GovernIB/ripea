@@ -92,13 +92,18 @@ public class BaseServiceTest {
 
 	protected void testCreantElements(
 			TestAmbElementsCreats test,
+			String descripcioTest,
 			Object... elements) {
+		String descripcio = (descripcioTest != null && !descripcioTest.isEmpty()) ? descripcioTest : "";
+		logger.info("-------------------------------------------------------------------");
+		logger.info("-- Executant test \"" + descripcio + "\" amb els elements creats...");
+		logger.info("-------------------------------------------------------------------");
 		List<Object> elementsCreats = new ArrayList<Object>();
 		Long entitatId = null;
 		try {
 			for (Object element: elements) {
 				Long id = null;
-				logger.info("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				logger.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
 					EntitatDto entitatCreada = entitatService.create((EntitatDto)element);
@@ -159,11 +164,11 @@ public class BaseServiceTest {
 						fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
 					}
 				}
-				logger.info("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
+				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
 			}
-			logger.info("Executant test amb els elements creats...");
+			logger.debug("Executant accions del test...");
 			test.executar(elementsCreats);
-			logger.info("...test executat.");
+			logger.debug("...accions del test executades.");
 		} catch (Exception ex) {
 			logger.error("L'execució del test ha produït una excepció", ex);
 			fail("L'execució del test ha produït una excepció");
@@ -172,7 +177,7 @@ public class BaseServiceTest {
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {
 				autenticarUsuari("admin");
-				logger.info("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
 					entitatService.delete(
@@ -193,13 +198,23 @@ public class BaseServiceTest {
 							entitatId,
 							((MetaExpedientDto)element).getId());
 				}
-				logger.info("...objecte de tipus " + element.getClass().getSimpleName() + "esborrat correctament");
+				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
+			logger.info("-------------------------------------------------------------------");
+			logger.info("-- ...test \"" + descripcio + "\" executat.");
+			logger.info("-------------------------------------------------------------------");
 		}
 	}
 
+	protected void testCreantElements(
+			final TestAmbElementsCreats test,
+			Object... elements) {
+		testCreantElements(test, null, elements);
+	}
+
 	abstract class TestAmbElementsCreats {
-		public abstract void executar(List<Object> elementsCreats);
+		public abstract void executar(
+				List<Object> elementsCreats) throws Exception;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);

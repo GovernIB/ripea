@@ -1310,7 +1310,6 @@ public class ContingutHelper {
 	
 	public boolean isCarpetaLogica() {
 		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
-		logger.info("carpeta lògica: " + carpetesLogiques);
 		return Boolean.valueOf(carpetesLogiques);
 	}
 

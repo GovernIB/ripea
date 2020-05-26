@@ -56,9 +56,9 @@ public class DocumentEntity extends NodeEntity {
 	private String custodiaId;
 	@Column(name = "custodia_csv", length = 256)
 	private String custodiaCsv;
-	@Column(name = "fitxer_nom", length = 256, nullable = false)
+	@Column(name = "fitxer_nom", length = 256)
 	private String fitxerNom;
-	@Column(name = "fitxer_content_type", length = 256, nullable = false)
+	@Column(name = "fitxer_content_type", length = 256)
 	private String fitxerContentType;
 	@Lob
 	@Basic(fetch = FetchType.LAZY)

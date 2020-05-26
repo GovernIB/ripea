@@ -6,41 +6,26 @@ package es.caib.ripea.core.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
-import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.service.DocumentService;
 
 /**
  * Tests per al servei de gestió de documents dels expedients.
@@ -48,417 +33,162 @@ import es.caib.ripea.core.repository.UsuariRepository;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/ripea/core/application-context-test.xml"})
-public class DocumentServiceTest extends BaseServiceTest {
+@ContextConfiguration(locations = { "/es/caib/ripea/core/application-context-test.xml" })
+public class DocumentServiceTest extends BaseExpedientServiceTest {
 
 	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	@InjectMocks
-	private ExpedientService expedientService;
-	@Autowired
-	private  UsuariRepository usuariRepository;
-
-	private EntitatDto entitat;
-	private MetaDadaDto metaDada;
-	private MetaDocumentDto metaDocument;
-	private MetaExpedientDto metaExpedient;
-	private ExpedientDto expedientCreate;
-	private ExpedientDto expedientUpdate;
-	private PermisDto permisUserRead;
-
-	@Before
-	public void setUp() {
-		entitat = new EntitatDto();
-		entitat.setCodi("LIMIT");
-		entitat.setNom("Limit Tecnologies");
-		entitat.setCif("00000000T");
-		entitat.setUnitatArrel(CODI_UNITAT_ARREL);
-		List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
-		PermisDto permisAdminAdmin = new PermisDto();
-		permisAdminAdmin.setAdministration(true);
-		permisAdminAdmin.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
-		permisAdminAdmin.setPrincipalNom("admin");
-		permisAdminAdmin.setRead(true);
-		permisAdminAdmin.setWrite(true);
-		permisAdminAdmin.setCreate(true);
-		permisAdminAdmin.setDelete(true);
-		permisosEntitat.add(permisAdminAdmin);
-		PermisDto permisReadUser = new PermisDto();
-		permisReadUser.setRead(true);
-		permisReadUser.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
-		permisReadUser.setPrincipalNom("user");
-		permisosEntitat.add(permisReadUser);
-		entitat.setPermisos(permisosEntitat);
-		metaDada = new MetaDadaDto();
-		metaDada.setCodi("TEST1");
-		metaDada.setNom("Metadada de test");
-		metaDada.setDescripcio("Descripció de test");
-		metaDada.setTipus(MetaDadaTipusEnumDto.TEXT);
-		metaDada.setMultiplicitat(MultiplicitatEnumDto.M_0_N);
-		/*metaDada.setGlobalExpedient(false);
-		metaDada.setGlobalDocument(false);
-		metaDada.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDada.setGlobalReadOnly(false);*/
-		metaDocument = new MetaDocumentDto();
-		metaDocument.setCodi("TEST1");
-		metaDocument.setNom("Metadocument de test");
-		metaDocument.setDescripcio("Descripció de test");
-		/*metaDocument.setGlobalExpedient(false);
-		metaDocument.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
-		metaDocument.setGlobalReadOnly(false);*/
-		metaDocument.setFirmaPortafirmesActiva(false);
-		metaDocument.setPortafirmesDocumentTipus("1234");
-		metaDocument.setPortafirmesFluxId("1234");
-		metaDocument.setPortafirmesResponsables(new String[] {"123456789Z"});
-		metaDocument.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
-		metaDocument.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
-		metaDocument.setPortafirmesCustodiaTipus("1234");
-		metaDocument.setFirmaPassarelaCustodiaTipus("1234");
-		metaDocument.setMultiplicitat(MultiplicitatEnumDto.M_1);
-		metaExpedient = new MetaExpedientDto();
-		metaExpedient.setCodi("TEST1");
-		metaExpedient.setNom("Metadocument de test");
-		metaExpedient.setDescripcio("Descripció de test");
-		metaExpedient.setSerieDocumental("S0001");
-		metaExpedient.setClassificacioSia("00000");
-		metaExpedient.setNotificacioActiva(false);
-		/*metaExpedient.setNotificacioSeuProcedimentCodi("1234");
-		metaExpedient.setNotificacioSeuRegistreLlibre("1234");
-		metaExpedient.setNotificacioSeuRegistreOficina("1234");
-		metaExpedient.setNotificacioSeuRegistreOrgan("1234");
-		metaExpedient.setNotificacioSeuExpedientUnitatOrganitzativa("1234");
-		metaExpedient.setNotificacioAvisTitol("1234");
-		metaExpedient.setNotificacioAvisText("1234");
-		metaExpedient.setNotificacioAvisTextMobil("1234");
-		metaExpedient.setNotificacioOficiTitol("1234");
-		metaExpedient.setNotificacioOficiText("1234");*/
-		metaExpedient.setPareId(null);
-		List<PermisDto> permisosExpedient = new ArrayList<PermisDto>();
-		PermisDto permisUser = new PermisDto();
-		permisUser.setRead(true);
-		permisUser.setWrite(true);
-		permisUser.setCreate(true);
-		permisUser.setDelete(true);
-		permisUser.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
-		permisUser.setPrincipalNom("user");
-		permisosExpedient.add(permisUser);
-		metaExpedient.setPermisos(permisosExpedient);
-		expedientCreate = new ExpedientDto();
-		expedientCreate.setAny(Calendar.getInstance().get(Calendar.YEAR));
-		expedientCreate.setNom("Expedient de test (" + System.currentTimeMillis() + ")");
-		expedientUpdate = new ExpedientDto();
-		expedientUpdate.setAny(Calendar.getInstance().get(Calendar.YEAR));
-		expedientUpdate.setNom("Expedient de test2");
-		permisUserRead = new PermisDto();
-		permisUserRead.setRead(true);
-		permisUserRead.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
-		permisUserRead.setPrincipalNom("user");
-		usuariRepository.findAll();
-//		try {
-//			Connection conn = DriverManager.getConnection(
-//			        "jdbc:hsqldb:mem:mydb22", "SA", "");
-//			
-//			Statement st = conn.createStatement();
-//			ResultSet rs = st.executeQuery("SELECT * FROM INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_TYPE='TABLE'");
-//			while(rs.next()) {
-//			    System.out.println(rs);
-//			}
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-	}
+	private DocumentService documentService;
 
 	@Test
-    public void create() {
+	public void create() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
-					public void executar(List<Object> elementsCreats) {
+					public void executar(
+							List<Object> elementsCreats) throws IOException {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						//ExpedientDto expedientDtoFromDB = expedientService.findById(((EntitatEntity)elementsCreats.get(0)).getId(), expedientCreat.getId());
-						assertNotNull(expedientCreat);
-						assertNotNull(expedientCreat.getId());
-						comprovarExpedientCoincideix(
-								expedientCreate,
-								expedientCreat);
-					}
-				});
-	}
-
-	@Test
-	public void findById() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						ExpedientDto trobat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertNotNull(trobat);
-						assertNotNull(trobat.getId());
-						comprovarExpedientCoincideix(
-								expedientCreat,
-								trobat);
-					}
-				});
-    }
-
-//	@Test
-    public void update() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						ExpedientDto modificat = expedientService.update(
+						DocumentDto dto = new DocumentDto();
+						dto.setNom("Test");
+						dto.setData(new Date());
+						dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+						dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+						dto.setNtiOrigen(NtiOrigenEnumDto.O0);
+						emplenarDocumentArxiu(dto);
+						dto.setFirmaSeparada(false);
+						MetaDocumentDto metaDocument = new MetaDocumentDto();
+						metaDocument.setId(metaDocumentCreat.getId());
+						dto.setMetaNode(metaDocument);
+						DocumentDto documentCreat = documentService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								expedientUpdate.getNom());
-						assertNotNull(modificat);
-						assertNotNull(modificat.getId());
-						assertEquals(
-								expedientCreat.getId(),
-								modificat.getId());
-						comprovarExpedientCoincideix(
-								expedientUpdate,
-								modificat);
-					}
-				});
-	}
-
-//	@Test
-    public void deleteReversible() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						try {
-							ContingutDto esborrat = contingutService.deleteReversible(
-									entitatCreada.getId(),
-									expedientCreat.getId());
-							assertTrue(esborrat instanceof ExpedientDto);
-							comprovarExpedientCoincideix(
-									expedientCreate,
-									(ExpedientDto)esborrat);
-							try {
-								autenticarUsuari("user");
-								expedientService.findById(
-										entitatCreada.getId(),
-										expedientCreat.getId());
-								fail("L'expedient esborrat no s'hauria d'haver trobat");
-							} catch (NotFoundException expected) {
-							}
-							elementsCreats.remove(expedientCreat);
-						} catch (IOException ex) {
-							fail("S'han produit errors inesperats: " + ex);
-						}
-					}
-				});
-	}
-
-//	@Test
-    public void deleteDefinitiu() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						autenticarUsuari("admin");
-						ContingutDto esborrat = contingutService.deleteDefinitiu(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertTrue(esborrat instanceof ExpedientDto);
-						comprovarExpedientCoincideix(
-								expedientCreate,
-								(ExpedientDto)esborrat);
-						try {
-							autenticarUsuari("user");
-							expedientService.findById(
-									entitatCreada.getId(),
-									expedientCreat.getId());
-							fail("L'expedient esborrat no s'hauria d'haver trobat");
-						} catch (NotFoundException expected) {
-						}
-						elementsCreats.remove(expedientCreat);
-					}
-				});
-	}
-
-//	@Test
-    public void tancarReobrir() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						autenticarUsuari("user");
-						assertEquals(
-								ExpedientEstatEnumDto.OBERT, expedientCreat.getEstat());
-						String motiu = "Motiu de tancament de test";
-						expedientService.tancar(
-								entitatCreada.getId(),
-								expedientCreat.getId(),
-								motiu);
-						ExpedientDto tancat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertEquals(
-								ExpedientEstatEnumDto.TANCAT, tancat.getEstat());
-						assertEquals(motiu, tancat.getTancatMotiu());
-						expedientService.reobrir(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						ExpedientDto reobert = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertEquals(
-								ExpedientEstatEnumDto.OBERT, reobert.getEstat());
-						assertNull(reobert.getTancatMotiu());
-					}
-				});
-	}
-
-//	@Test
-    public void alliberarAgafarUser() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						autenticarUsuari("user");
-						assertTrue(
-								expedientCreat.isAgafat());
-						assertEquals("user", expedientCreat.getAgafatPer().getCodi());
-						expedientService.alliberarUser(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						ExpedientDto alliberat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertTrue(
-								!alliberat.isAgafat());
-						assertNull(alliberat.getAgafatPer());
-						expedientService.agafarUser(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						ExpedientDto agafat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertTrue(
-								agafat.isAgafat());
-						assertEquals("user", agafat.getAgafatPer().getCodi());
-					}
-				});
-	}
-
-//	@Test
-    public void alliberarAdminAgafarUser() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						assertTrue(
-								expedientCreat.isAgafat());
-						assertEquals("user", expedientCreat.getAgafatPer().getCodi());
-						autenticarUsuari("admin");
-						expedientService.alliberarAdmin(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						autenticarUsuari("user");
-						ExpedientDto alliberat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertTrue(
-								!alliberat.isAgafat());
-						assertNull(alliberat.getAgafatPer());
-						expedientService.agafarUser(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						ExpedientDto agafat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertTrue(
-								agafat.isAgafat());
-						assertEquals("user", agafat.getAgafatPer().getCodi());
-					}
-				});
-	}
-
-	private void comprovarExpedientCoincideix(
-			ExpedientDto original,
-			ExpedientDto perComprovar) {
-		assertEquals(
-				original.getAny(),
-				perComprovar.getAny());
-		assertEquals(
-				original.getNom(),
-				perComprovar.getNom());
-	}
-
-	private void testAmbElementsIExpedient(
-			final TestAmbElementsCreats testAmbExpedientCreat) {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						autenticarUsuari("user");
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
-						ExpedientDto creat = expedientService.create(
-								entitatCreada.getId(),
-								metaExpedientCreat.getId(),
-								null,
-								null,
-								expedientCreate.getAny(),
-								null,
-								expedientCreate.getNom(),
-								null,
-								false);
-						try {
-							elementsCreats.add(creat);
-							testAmbExpedientCreat.executar(
-									elementsCreats);
-						} catch (Exception ex) {
-							System.out.println("El test ha produït una excepció:");
-							ex.printStackTrace(System.out);
-							fail("No hauria d'haver tret cap excepció");
-						} finally {
-							for (Object element: elementsCreats) {
-								if (element instanceof ExpedientDto) {
-									autenticarUsuari("admin");
-									contingutService.deleteDefinitiu(
-											entitatCreada.getId(),
-											((ExpedientDto)element).getId());
-								}
-							}
-							elementsCreats.remove(creat);
-						}
+								dto,
+								true);
+						assertNotNull(documentCreat);
+						assertNotNull(documentCreat.getId());
+						assertNotNull(documentCreat.getEstat());
+						assertNotNull(documentCreat.getArxiuUuid());
+						assertNotNull(documentCreat.getNtiIdentificador());
+						assertNotNull(documentCreat.getNtiVersion());
+						assertNotNull(documentCreat.getDataCaptura());
+						assertNotNull(documentCreat.getNtiOrgano());
+						assertNotNull(documentCreat.getNtiTipoDocumental());
+						comprovarDocument(
+								dto,
+								documentCreat);
 					}
 				},
-				entitat,
-				metaExpedient,
-				metaDocument,
-				metaDada);
+				"Creació d'un document a dins un expedient");
 	}
 
-	class TestAmbElementsIExpedient extends TestAmbElementsCreats {
-		@Override
-		public void executar(List<Object> elementsCreats) {
-			
-		}
+	@Test
+	public void update() {
+		testAmbElementsIExpedient(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(
+							List<Object> elementsCreats) throws IOException {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						DocumentDto dto = new DocumentDto();
+						dto.setNom("Test");
+						dto.setData(new Date());
+						dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+						dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+						dto.setNtiOrigen(NtiOrigenEnumDto.O0);
+						emplenarDocumentArxiu(dto);
+						dto.setFirmaSeparada(false);
+						MetaDocumentDto metaDocument = new MetaDocumentDto();
+						metaDocument.setId(metaDocumentCreat.getId());
+						dto.setMetaNode(metaDocument);
+						DocumentDto documentCreat = documentService.create(
+								entitatCreada.getId(),
+								expedientCreat.getId(),
+								dto,
+								true);
+						assertNotNull(documentCreat);
+						assertNotNull(documentCreat.getId());
+						dto.setId(documentCreat.getId());
+						dto.setNom("Test 2");
+						dto.setData(new Date());
+						dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE99);
+						DocumentDto documentModificat = documentService.update(
+								entitatCreada.getId(),
+								dto,
+								true);
+						comprovarDocument(
+								dto,
+								documentModificat);
+					}
+				},
+				"Modificació d'un document a dins un expedient");
+	}
+
+	@Test
+	public void delete() {
+		testAmbElementsIExpedient(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(
+							List<Object> elementsCreats) throws IOException {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						DocumentDto dto = new DocumentDto();
+						dto.setNom("Test");
+						dto.setData(new Date());
+						dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+						dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+						dto.setNtiOrigen(NtiOrigenEnumDto.O0);
+						emplenarDocumentArxiu(dto);
+						dto.setFirmaSeparada(false);
+						MetaDocumentDto metaDocument = new MetaDocumentDto();
+						metaDocument.setId(metaDocumentCreat.getId());
+						dto.setMetaNode(metaDocument);
+						DocumentDto documentCreat = documentService.create(
+								entitatCreada.getId(),
+								expedientCreat.getId(),
+								dto,
+								true);
+						assertNotNull(documentCreat);
+						assertNotNull(documentCreat.getId());
+						DocumentDto documentObtingut1 = documentService.findById(
+								entitatCreada.getId(),
+								documentCreat.getId());
+						assertNotNull(documentObtingut1);
+						assertNotNull(documentObtingut1.getId());
+						assertNull(documentObtingut1.getEsborratData());
+						contingutService.deleteReversible(
+								entitatCreada.getId(),
+								documentCreat.getId());
+						DocumentDto documentObtingut2 = documentService.findById(
+								entitatCreada.getId(),
+								documentCreat.getId());
+						assertNotNull(documentObtingut2);
+						assertNotNull(documentObtingut2.getEsborratData());
+					}
+				},
+				"Eliminació d'un document de dins un expedient");
+	}
+
+	private void comprovarDocument(
+			DocumentDto original,
+			DocumentDto perComprovar) {
+		assertEquals(original.getNom(), perComprovar.getNom());
+		assertEquals(original.getData(), perComprovar.getData());
+		assertEquals(original.getTipus(), perComprovar.getTipus());
+		assertEquals(original.getDocumentTipus(), perComprovar.getDocumentTipus());
+		assertEquals(original.getNtiOrigen(), perComprovar.getNtiOrigen());
+		assertEquals(original.getNtiEstadoElaboracion(), perComprovar.getNtiEstadoElaboracion());
+	}
+
+	private void emplenarDocumentArxiu(DocumentDto dto) throws IOException {
+		FitxerDto fitxer = getFitxerPdfDeTest();
+		dto.setFitxerNom(fitxer.getNom());
+		dto.setFitxerContentType(fitxer.getContentType());
+		dto.setFitxerContingut(fitxer.getContingut());
 	}
 
 }
