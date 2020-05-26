@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -168,9 +170,52 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								documentCreat.getId());
 						assertNotNull(documentObtingut2);
 						assertNotNull(documentObtingut2.getEsborratData());
+						Mockito.verify(mock, Mockito.times(1)).documentEsborrar(Mockito.anyString());
 					}
 				},
 				"Eliminació d'un document de dins un expedient");
+	}
+
+	@Test
+	public void download() {
+		testAmbElementsIExpedient(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(
+							List<Object> elementsCreats) throws IOException {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						DocumentDto dto = new DocumentDto();
+						dto.setNom("Test");
+						dto.setData(new Date());
+						dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+						dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+						dto.setNtiOrigen(NtiOrigenEnumDto.O0);
+						emplenarDocumentArxiu(dto);
+						dto.setFirmaSeparada(false);
+						MetaDocumentDto metaDocument = new MetaDocumentDto();
+						metaDocument.setId(metaDocumentCreat.getId());
+						dto.setMetaNode(metaDocument);
+						DocumentDto documentCreat = documentService.create(
+								entitatCreada.getId(),
+								expedientCreat.getId(),
+								dto,
+								true);
+						assertNotNull(documentCreat);
+						assertNotNull(documentCreat.getId());
+						FitxerDto fitxer = documentService.descarregar(
+								entitatCreada.getId(),
+								documentCreat.getId(),
+								null);
+						assertNotNull(fitxer);
+						assertEquals(dto.getFitxerNom(), fitxer.getNom());
+						assertEquals(dto.getFitxerContentType(), fitxer.getContentType());
+						assertEquals(dto.getFitxerExtension(), fitxer.getExtensio());
+						assertArrayEquals(dto.getFitxerContingut(), fitxer.getContingut());
+					}
+				},
+				"Descàrrega d'un document de dins un expedient");
 	}
 
 	private void comprovarDocument(

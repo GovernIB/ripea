@@ -409,7 +409,6 @@ public class ContingutDocumentController extends BaseUserController {
 				entitatActual, 
 				null,
 				docsIdx,
-				expedient,
 				baos);
 		
 		reportContent = baos.toByteArray();
@@ -510,7 +509,6 @@ public class ContingutDocumentController extends BaseUserController {
 					entitatActual, 
 					command,
 					docsIdx,
-					contingut,
 					null);
 			MissatgesHelper.warning(
 					request, 
