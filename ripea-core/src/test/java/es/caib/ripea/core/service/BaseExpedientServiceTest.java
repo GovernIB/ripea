@@ -62,6 +62,8 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 	protected ExpedientDto expedientUpdate;
 	//private PermisDto permisUserRead;
 
+	protected IArxiuPlugin mock;
+
 	@Before
 	public void setUp() {
 		entitat = new EntitatDto();
@@ -204,7 +206,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 	}
 
 	private void configureMockArxiuPlugin() throws IOException {
-		IArxiuPlugin mock = Mockito.mock(IArxiuPlugin.class);
+		mock = Mockito.mock(IArxiuPlugin.class);
 		Expedient expedientArxiu = new Expedient();
 		expedientArxiu.setIdentificador(UUID.randomUUID().toString());
 		expedientArxiu.setNom("nom");

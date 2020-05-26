@@ -107,7 +107,6 @@ public class DocumentHelper {
 			EntitatDto entitatActual,
 			DocumentGenericCommand command,
 			Set<Long> docsIdx,
-			ContingutDto contingut,
 			ByteArrayOutputStream baos) {
 		
 		MetaDocumentDto metaDocument = metaDocumentService.findByTipusGeneric(
