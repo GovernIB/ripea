@@ -901,7 +901,8 @@ public class DocumentServiceImpl implements DocumentService {
 				// throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
 			} else {
 				RespostaConsultaEstatEnviament resposta = pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
-				if (getPropertyGuardarCertificacioExpedient() && documentEnviamentInteressatEntity.getEnviamentCertificacioData() == null) {
+				if (getPropertyGuardarCertificacioExpedient() && documentEnviamentInteressatEntity.getEnviamentCertificacioData() == null && resposta.getCertificacioData() != null) {
+					logger.debug("[CERT] Guardant certificació rebuda de Notib...");
 					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
 							true, 
 							null, 
@@ -918,6 +919,7 @@ public class DocumentServiceImpl implements DocumentService {
 					
 					DocumentEntity documentEntity = documentRepository.findOne(documentCreat.getId());
 					documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+					logger.debug("[CERT] La certificació s'ha guardat correctament...");
 				}
 			}
 			

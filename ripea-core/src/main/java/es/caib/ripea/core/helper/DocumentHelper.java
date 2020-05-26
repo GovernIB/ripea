@@ -426,6 +426,7 @@ public class DocumentHelper {
 				entity,
 				true,
 				true);
+		logger.debug("[CERT] Fitxer nom: " + fitxer.getNom());
 		contingutHelper.arxiuPropagarModificacio(
 				entity,
 				fitxer,
