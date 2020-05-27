@@ -157,7 +157,6 @@ public class WsClientHelper<T> {
 				} catch (Exception ex) {
 					sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
 				}
-				System.out.println(">>> " + sb.toString());
 				LOGGER.debug(sb.toString());
 			}
 		}

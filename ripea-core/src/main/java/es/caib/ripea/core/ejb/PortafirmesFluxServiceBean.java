@@ -29,7 +29,7 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn, 
 			String tipusDocumentNom,
@@ -43,13 +43,13 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 	}
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId) {
 		return delegate.recuperarFluxFirma(transactionId);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public void tancarTransaccio(String idTransaccio) {
 		delegate.tancarTransaccio(idTransaccio);
 	}

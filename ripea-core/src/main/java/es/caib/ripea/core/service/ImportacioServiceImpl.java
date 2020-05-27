@@ -34,7 +34,6 @@ import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import javassist.NotFoundException;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.

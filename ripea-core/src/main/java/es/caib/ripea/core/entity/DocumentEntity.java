@@ -4,8 +4,10 @@
 package es.caib.ripea.core.entity;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -13,6 +15,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -92,6 +95,9 @@ public class DocumentEntity extends NodeEntity {
 	private String ntiCsv;
 	@Column(name = "nti_csvreg", length = 512)
 	private String ntiCsvRegulacion;
+
+	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+	protected Set<DocumentEnviamentEntity> enviaments;
 	
 	public Long getPareId() {
 		return pare.getId();
