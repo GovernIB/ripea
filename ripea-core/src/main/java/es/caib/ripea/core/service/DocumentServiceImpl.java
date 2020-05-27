@@ -26,6 +26,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
@@ -51,6 +52,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -63,6 +65,7 @@ import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -123,6 +126,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	@Transactional
 	@Override
@@ -142,11 +147,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false);
-		
-
 		ExpedientEntity expedient = pare.getExpedientPare();
-		
-		
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
@@ -161,8 +162,6 @@ public class DocumentServiceImpl implements DocumentService {
 					ExpedientEntity.class,
 					"No es pot crear un document sense un meta-document associat");
 		}
-
-
 		return documentHelper.crearDocument(
 				document,
 				pare,
@@ -187,7 +186,6 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false);
-	
 		return documentHelper.updateDocument(
 				entitatId,
 				documentEntity,
@@ -900,8 +898,12 @@ public class DocumentServiceImpl implements DocumentService {
 				logger.error("Callback de notib envia notificació que no existeix a la base de dades: identificador=" + identificador + ", referencia=" + referencia);
 				// throw new NotFoundException(documentEnviamentInteressatEntity, DocumentEnviamentInteressatEntity.class);
 			} else {
+				DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+				DocumentNotificacioEstatEnumDto estatAnterior = notificacio.getNotificacioEstat();
+				logger.debug("Estat anterior: " + estatAnterior);
 				RespostaConsultaEstatEnviament resposta = pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
-				if (getPropertyGuardarCertificacioExpedient() && documentEnviamentInteressatEntity.getEnviamentCertificacioData() == null) {
+				if (getPropertyGuardarCertificacioExpedient() && documentEnviamentInteressatEntity.getEnviamentCertificacioData() == null && resposta.getCertificacioData() != null) {
+					logger.debug("[CERT] Guardant certificació rebuda de Notib...");
 					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
 							true, 
 							null, 
@@ -918,6 +920,12 @@ public class DocumentServiceImpl implements DocumentService {
 					
 					DocumentEntity documentEntity = documentRepository.findOne(documentCreat.getId());
 					documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+					logger.debug("[CERT] La certificació s'ha guardat correctament...");
+				}
+				DocumentNotificacioEstatEnumDto estatDespres = documentEnviamentInteressatEntity.getNotificacio().getNotificacioEstat();
+				logger.debug("Estat després: " + estatDespres);
+				if (estatAnterior != estatDespres) {
+					emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 				}
 			}
 			

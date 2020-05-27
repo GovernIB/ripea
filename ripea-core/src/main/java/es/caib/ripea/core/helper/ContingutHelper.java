@@ -438,10 +438,12 @@ public class ContingutHelper {
 		dto.setUbicacio(null);
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
+			logger.debug("[CERT] Generant fitxer certificació...");
 			dto.setAmbFirma(true);
 			dto.setFitxerNom("Justificant_" + notificacio.getAssumpte() + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
+			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
 		}
 		dto.setVersioCount(0);
 		dto.setDataCaptura(new Date());
@@ -1310,7 +1312,6 @@ public class ContingutHelper {
 	
 	public boolean isCarpetaLogica() {
 		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
-		logger.info("carpeta lògica: " + carpetesLogiques);
 		return Boolean.valueOf(carpetesLogiques);
 	}
 

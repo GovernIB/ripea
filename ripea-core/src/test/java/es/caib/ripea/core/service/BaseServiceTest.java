@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
@@ -56,6 +59,15 @@ public class BaseServiceTest {
 	@Autowired
 	private  UsuariRepository usuariRepository;
 
+	@BeforeClass
+	public static void beforeClass() {
+		PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
+	}
+
+	@AfterClass
+	public static void afterClass() {
+	}
+
 	@Transactional
 	protected void autenticarUsuari(String usuariCodi) {
 		logger.debug("Autenticant usuari " + usuariCodi + "...");
@@ -80,13 +92,18 @@ public class BaseServiceTest {
 
 	protected void testCreantElements(
 			TestAmbElementsCreats test,
+			String descripcioTest,
 			Object... elements) {
+		String descripcio = (descripcioTest != null && !descripcioTest.isEmpty()) ? descripcioTest : "";
+		logger.info("-------------------------------------------------------------------");
+		logger.info("-- Executant test \"" + descripcio + "\" amb els elements creats...");
+		logger.info("-------------------------------------------------------------------");
 		List<Object> elementsCreats = new ArrayList<Object>();
 		Long entitatId = null;
 		try {
 			for (Object element: elements) {
 				Long id = null;
-				logger.info("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				logger.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
 					EntitatDto entitatCreada = entitatService.create((EntitatDto)element);
@@ -147,11 +164,11 @@ public class BaseServiceTest {
 						fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
 					}
 				}
-				logger.info("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
+				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
 			}
-			logger.info("Executant test amb els elements creats...");
+			logger.debug("Executant accions del test...");
 			test.executar(elementsCreats);
-			logger.info("...test executat.");
+			logger.debug("...accions del test executades.");
 		} catch (Exception ex) {
 			logger.error("L'execució del test ha produït una excepció", ex);
 			fail("L'execució del test ha produït una excepció");
@@ -160,7 +177,7 @@ public class BaseServiceTest {
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {
 				autenticarUsuari("admin");
-				logger.info("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
 					entitatService.delete(
@@ -181,13 +198,23 @@ public class BaseServiceTest {
 							entitatId,
 							((MetaExpedientDto)element).getId());
 				}
-				logger.info("...objecte de tipus " + element.getClass().getSimpleName() + "esborrat correctament");
+				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
+			logger.info("-------------------------------------------------------------------");
+			logger.info("-- ...test \"" + descripcio + "\" executat.");
+			logger.info("-------------------------------------------------------------------");
 		}
 	}
 
+	protected void testCreantElements(
+			final TestAmbElementsCreats test,
+			Object... elements) {
+		testCreantElements(test, null, elements);
+	}
+
 	abstract class TestAmbElementsCreats {
-		public abstract void executar(List<Object> elementsCreats);
+		public abstract void executar(
+				List<Object> elementsCreats) throws Exception;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
