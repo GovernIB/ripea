@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
@@ -171,6 +172,41 @@ public class EmailHelper {
 		}
 	}
 	
+	public void canviEstatNotificacio(
+			DocumentNotificacioEntity documentNotificacio,
+			DocumentNotificacioEstatEnumDto estatAnterior) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (" +
+			"documentNotificacioId=" + documentNotificacio.getId() + ")");
+		DocumentEntity document = documentNotificacio.getDocument();
+		ExpedientEntity expedient = document.getExpedient();
+		Set<DadesUsuari> responsables = getGestors(expedient);
+		List<String> destinataris = new ArrayList<String>();
+		for (DadesUsuari responsable: responsables) {
+			if (responsable != null && (responsable.getEmail() != null && ! responsable.getEmail().isEmpty())) {
+				destinataris.add(responsable.getEmail());
+			}
+		}
+		if (!destinataris.isEmpty()) {
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(getRemitent());
+			missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
+			missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de notificació");
+			String estat = (documentNotificacio.getNotificacioEstat().toString());
+			missatge.setText(
+					"Informació del document:\n" +
+					"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+					"\tExpedient nom: " + expedient.getNom() + "\n" +
+					"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+					"\tDocument nom: " + document.getNom() + "\n" +
+					"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+					"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+					"Estat anterior:" + estatAnterior.toString() + "\n" +
+					"Estat actual:" + estat + "\n");
+			mailSender.send(missatge);
+		} else {
+			logger.error("No s'ha trobat cap destinatari per enviar el correu d'avís...");
+		}
+	}
 	
 	
 	public void enviarEmailCanviarEstatTasca(

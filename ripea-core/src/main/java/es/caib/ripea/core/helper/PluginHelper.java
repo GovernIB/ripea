@@ -487,8 +487,17 @@ public class PluginHelper {
 				}
 			}
 			if (expedient.getArxiuUuid() == null) {
-				
-				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(new Expedient());
+				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
+						toArxiuExpedient(
+								null,
+								expedient.getNom(),
+								null,
+								Arrays.asList(organCodiDir3),
+								expedient.getCreatedDate().toDate(),
+								classificacio,
+								expedient.getEstat(),
+								interessats,
+								metaExpedient.getSerieDocumental()));
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
 							expedientCreat.getIdentificador(),
