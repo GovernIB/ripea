@@ -25,7 +25,7 @@ public interface PortafirmesFluxService {
 	 * 				El nom del tipus de document per definir nom flux.
 	 * @return El id de la transacció i la url de redirecció.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
 			String documentNom,
@@ -39,7 +39,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la transacció.
 	 * @return La el id del flux de firma o error.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId);
 	
 	/**
@@ -48,7 +48,7 @@ public interface PortafirmesFluxService {
 	 * @param transaccioId
 	 * 				Id de la transacció.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public void tancarTransaccio(String idTransaccio);
 	
 	/**
