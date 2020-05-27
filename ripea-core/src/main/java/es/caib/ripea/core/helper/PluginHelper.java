@@ -4741,4 +4741,12 @@ public class PluginHelper {
 		this.arxiuPlugin = arxiuPlugin;
 	}
 
+	public void setPortafirmesPlugin(PortafirmesPlugin portafirmesPlugin) {
+		this.portafirmesPlugin = portafirmesPlugin;
+	}
+
+	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
+		this.dadesUsuariPlugin = dadesUsuariPlugin;
+	}
+
 }

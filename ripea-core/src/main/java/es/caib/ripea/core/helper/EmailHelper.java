@@ -117,23 +117,24 @@ public class EmailHelper {
 				destinataris.add(responsable.getEmail());
 			}
 		}
-		SimpleMailMessage missatge = new SimpleMailMessage();
-		missatge.setFrom(getRemitent());
-		missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
-		missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes");
-		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
-		String text = "Informació del document:\n" +
-				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
-				"\tExpedient nom: " + expedient.getNom() + "\n" +
-				"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
-				"\tDocument nom: " + document.getNom() + "\n" +
-				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
-				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
-				"Estat del document:" + estat + "\n";
-
-		missatge.setText(text);
-		logger.debug(missatge.toString());
-		mailSender.send(missatge);
+		if (destinataris != null && !destinataris.isEmpty()) {
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(getRemitent());
+			missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
+			missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes");
+			String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
+			String text = "Informació del document:\n" +
+					"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+					"\tExpedient nom: " + expedient.getNom() + "\n" +
+					"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+					"\tDocument nom: " + document.getNom() + "\n" +
+					"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+					"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+					"Estat del document:" + estat + "\n";
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
 	}
 
 	public void canviEstatNotificacio(
@@ -150,22 +151,24 @@ public class EmailHelper {
 				destinataris.add(responsable.getEmail());
 			}
 		}
-		SimpleMailMessage missatge = new SimpleMailMessage();
-		missatge.setFrom(getRemitent());
-		missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
-		missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de notificació");
-		String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
-		missatge.setText(
-				"Informació del document:\n" +
-				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
-				"\tExpedient nom: " + expedient.getNom() + "\n" +
-				"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
-				"\tDocument nom: " + document.getNom() + "\n" +
-				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
-				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
-				"Estat anterior:" + estatAnterior + "\n" +
-				"Estat actual:" + estat + "\n");
-		mailSender.send(missatge);
+		if (destinataris != null && !destinataris.isEmpty()) {
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(getRemitent());
+			missatge.setTo(destinataris.toArray(new String[destinataris.size()]));
+			missatge.setSubject(PREFIX_RIPEA + " Canvi d'estat de notificació");
+			String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
+			missatge.setText(
+					"Informació del document:\n" +
+					"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+					"\tExpedient nom: " + expedient.getNom() + "\n" +
+					"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+					"\tDocument nom: " + document.getNom() + "\n" +
+					"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+					"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+					"Estat anterior:" + estatAnterior + "\n" +
+					"Estat actual:" + estat + "\n");
+			mailSender.send(missatge);
+		}
 	}
 	
 	
@@ -194,13 +197,23 @@ public class EmailHelper {
 				MetaNodeEntity.class);
 		for (PermisDto permis: permisos) {
 			if (permis.isWrite()) {
-				if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
-					responsables.add(
-							pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
-				}
-				if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
-					responsables.addAll(
-							pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
+				try {
+					if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
+						responsables.add(
+								pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
+					}
+					if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
+						responsables.addAll(
+								pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
+					}
+				} catch (Exception ex) {
+					logger.error(
+							"No s'ha pogut obtenir el gestor de l'expedient(" +
+							"id=" + expedient.getId() + ", " +
+							"nom=" + expedient.getNom() + ", " +
+							"any=" + expedient.getAny() + ", " +
+							"sequencia=" + expedient.getSequencia() + ")",
+							ex);
 				}
 			}
 		}

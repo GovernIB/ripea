@@ -6,8 +6,10 @@ package es.caib.ripea.core.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -36,6 +38,11 @@ import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 
 /**
  * Classe que es pot utilitzar com a base dels tests que requereixen la creació
@@ -62,7 +69,9 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 	protected ExpedientDto expedientUpdate;
 	//private PermisDto permisUserRead;
 
-	protected IArxiuPlugin mock;
+	protected IArxiuPlugin arxiuPluginMock;
+	protected PortafirmesPlugin portafirmesPluginMock;
+	protected DadesUsuariPlugin dadesUsuariPluginMock;
 
 	@Before
 	public void setUp() {
@@ -104,7 +113,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		/*metaDocument.setGlobalExpedient(false);
 		metaDocument.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
 		metaDocument.setGlobalReadOnly(false);*/
-		metaDocument.setFirmaPortafirmesActiva(false);
+		metaDocument.setFirmaPortafirmesActiva(true);
 		metaDocument.setPortafirmesDocumentTipus("1234");
 		metaDocument.setPortafirmesFluxId("1234");
 		metaDocument.setPortafirmesResponsables(new String[] {"123456789Z"});
@@ -164,6 +173,8 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) throws Exception {
 						configureMockArxiuPlugin();
+						configureMockPortafirmesPlugin();
+						configureMockDadesUsuariPlugin();
 						autenticarUsuari("user");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
@@ -206,7 +217,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 	}
 
 	private void configureMockArxiuPlugin() throws IOException {
-		mock = Mockito.mock(IArxiuPlugin.class);
+		arxiuPluginMock = Mockito.mock(IArxiuPlugin.class);
 		Expedient expedientArxiu = new Expedient();
 		expedientArxiu.setIdentificador(UUID.randomUUID().toString());
 		expedientArxiu.setNom("nom");
@@ -228,21 +239,45 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		documentContingut.setContingut(fitxer.getContingut());
 		documentContingut.setTamany(fitxer.getTamany());
 		documentArxiuAmbContingut.setContingut(documentContingut);
-	
-//		  when(mock.myFunction(anyString())).thenAnswer(new Answer<String>() {
-//			    @Override
-//			    public String answer(InvocationOnMock invocation) throws Throwable {
-//			      Object[] args = invocation.getArguments();
-//			      return (String) args[0];
-//			    }
-		
-		Mockito.when(mock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(expedientArxiu);
-		Mockito.when(mock.expedientCrear(null)).thenThrow(NullPointerException.class);
-		Mockito.when(mock.expedientDetalls(Mockito.anyString(), Mockito.nullable(String.class))).thenReturn(expedientArxiu);
-		Mockito.when(mock.documentCrear(Mockito.any(Document.class), Mockito.anyString())).thenReturn(documentArxiu);
-		Mockito.when(mock.documentCrear(null, null)).thenThrow(NullPointerException.class);
-		Mockito.when(mock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
-		pluginHelper.setArxiuPlugin(mock);
+		Mockito.when(arxiuPluginMock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(expedientArxiu);
+		Mockito.when(arxiuPluginMock.expedientCrear(null)).thenThrow(NullPointerException.class);
+		Mockito.when(arxiuPluginMock.expedientDetalls(Mockito.anyString(), Mockito.nullable(String.class))).thenReturn(expedientArxiu);
+		Mockito.when(arxiuPluginMock.documentCrear(Mockito.any(Document.class), Mockito.anyString())).thenReturn(documentArxiu);
+		Mockito.when(arxiuPluginMock.documentCrear(null, null)).thenThrow(NullPointerException.class);
+		Mockito.when(arxiuPluginMock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
+		pluginHelper.setArxiuPlugin(arxiuPluginMock);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void configureMockPortafirmesPlugin() throws IOException, SistemaExternException {
+		portafirmesPluginMock = Mockito.mock(PortafirmesPlugin.class);
+		Mockito.when(portafirmesPluginMock.upload(
+				Mockito.any(PortafirmesDocument.class),
+				Mockito.anyString(),
+				Mockito.anyString(),
+				Mockito.anyString(),
+				Mockito.any(PortafirmesPrioritatEnum.class),
+				Mockito.any(Date.class),
+				Mockito.nullable(List.class),
+				Mockito.nullable(String.class),
+				Mockito.nullable(List.class),
+				Mockito.anyBoolean(),
+				Mockito.nullable(String.class))).thenReturn(Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE)));
+		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
+		FitxerDto pdfFirmat = getFitxerPdfFirmatDeTest();
+		portafirmesDocument.setTitol("Titol doc. portafirmes");
+		portafirmesDocument.setDescripcio("Descripció doc. portafirmes");
+		portafirmesDocument.setFirmat(true);
+		portafirmesDocument.setArxiuNom(pdfFirmat.getNom());
+		portafirmesDocument.setArxiuContingut(pdfFirmat.getContingut());
+		Mockito.when(portafirmesPluginMock.download(Mockito.anyString())).thenReturn(portafirmesDocument);
+		pluginHelper.setPortafirmesPlugin(portafirmesPluginMock);
+	}
+
+	private void configureMockDadesUsuariPlugin() throws IOException, SistemaExternException {
+		dadesUsuariPluginMock = Mockito.mock(DadesUsuariPlugin.class);
+		//Mockito.when(portafirmesMock.download(Mockito.anyString())).thenReturn(portafirmesDocument);
+		pluginHelper.setDadesUsuariPlugin(dadesUsuariPluginMock);
 	}
 
 	protected FitxerDto getFitxerPdfDeTest() throws IOException {
@@ -251,6 +286,16 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		dto.setContentType("application/pdf");
 		dto.setContingut(
 				IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/ripea/core/arxiu.pdf")));
+		dto.setTamany(dto.getContingut().length);
+		return dto;
+	}
+
+	protected FitxerDto getFitxerPdfFirmatDeTest() throws IOException {
+		FitxerDto dto = new FitxerDto();
+		dto.setNom("firma.pdf");
+		dto.setContentType("application/pdf");
+		dto.setContingut(
+				IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/ripea/core/firma.pdf")));
 		dto.setTamany(dto.getContingut().length);
 		return dto;
 	}
