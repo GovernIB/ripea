@@ -24,7 +24,7 @@ import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 @EntityListeners(AuditingEntityListener.class)
 public class DocumentPublicacioEntity extends DocumentEnviamentEntity {
 
-	@Column(name = "pub_tipus", nullable = false)
+	@Column(name = "pub_tipus")
 	private DocumentPublicacioTipusEnumDto tipus;
 
 	public DocumentPublicacioTipusEnumDto getTipus() {

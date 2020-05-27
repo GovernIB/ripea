@@ -104,7 +104,7 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 	
 	
 	
-	@Column(name = "notificacio_estat", nullable = false)
+	@Column(name = "notificacio_estat")
 	@Enumerated(EnumType.STRING)
 	protected DocumentNotificacioEstatEnumDto notificacioEstat;
 	
@@ -202,11 +202,11 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 		this.estat = DocumentEnviamentEstatEnumDto.ENVIAT;
 		this.error = true;
 		this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_TAMANY);
-		if (this.errorDescripcio != null) {
+		/*if (this.errorDescripcio != null) {
 			System.out.println(">>> error: " + this.errorDescripcio);
 			System.out.println(">>> length: " + this.errorDescripcio.length());
 			System.out.println(">>> length: " + this.errorDescripcio.getBytes().length);
-		}
+		}*/
 		this.processatData = null;
 		this.intentNum = intentNum++;
 		this.intentData = new Date();

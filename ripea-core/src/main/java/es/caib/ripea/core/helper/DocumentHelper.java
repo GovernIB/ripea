@@ -661,6 +661,10 @@ public class DocumentHelper {
 				portafirmesDocument = pluginHelper.portafirmesDownload(
 						documentPortafirmes);
 			} catch (Exception ex) {
+				logger.error("Error al descarregar document de portafirmes (" +
+						"id=" + documentPortafirmes.getId() + ", " +
+						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
+						ex);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentPortafirmes.updateProcessatError(
@@ -708,6 +712,10 @@ public class DocumentHelper {
 				}
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
 			} catch (Exception ex) {
+				logger.error("Error al custodiar document de portafirmes (" +
+						"id=" + documentPortafirmes.getId() + ", " +
+						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
+						ex);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentPortafirmes.updateProcessatError(
@@ -770,6 +778,7 @@ public class DocumentHelper {
 				viaFirmaDocument = pluginHelper.viaFirmaDownload(
 						documentViaFirma);
 			} catch (Exception ex) {
+				logger.error("Error al descarregar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentViaFirma.updateProcessatError(
@@ -807,6 +816,7 @@ public class DocumentHelper {
 							false);
 				}
 			} catch (Exception ex) {
+				logger.error("Error al custodiar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
