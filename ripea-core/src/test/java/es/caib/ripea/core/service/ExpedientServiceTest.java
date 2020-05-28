@@ -14,14 +14,19 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import es.caib.plugins.arxiu.api.ContingutTipus;
+import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
@@ -33,12 +38,14 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 @ContextConfiguration(locations = {"/es/caib/ripea/core/application-context-test.xml"})
 public class ExpedientServiceTest extends BaseExpedientServiceTest {
 
+
 	@Test
     public void create() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
+						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(1);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
 						//ExpedientDto expedientDtoFromDB = expedientService.findById(((EntitatEntity)elementsCreats.get(0)).getId(), expedientCreat.getId());
 						assertNotNull(expedientCreat);
@@ -46,40 +53,34 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						comprovarExpedientCoincideix(
 								expedientCreate,
 								expedientCreat);
+						
+						Mockito.verify(arxiuPluginMock, Mockito.times(1)).expedientCrear((Mockito.any(Expedient.class)));
+						ArgumentCaptor<Expedient> argument = ArgumentCaptor.forClass(Expedient.class);
+						Mockito.verify(arxiuPluginMock).expedientCrear(argument.capture());
+						assertEquals(null, argument.getValue().getContinguts());
+						assertEquals(null, argument.getValue().getFirmes());
+						assertEquals(null, argument.getValue().getIdentificador());
+						assertEquals(null, argument.getValue().getVersio());
+						assertEquals(ContingutTipus.EXPEDIENT, argument.getValue().getTipus());
+						
+						assertEquals(metaExpedient.getClassificacioSia(), argument.getValue().getMetadades().getClassificacio());
+						assertEquals(metaExpedient.getSerieDocumental(), argument.getValue().getMetadades().getSerieDocumental());
 					}
 				},
 				"Creació d'un expedient");
 	}
 
-	@Test
-	public void findById() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						ExpedientDto trobat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertNotNull(trobat);
-						assertNotNull(trobat.getId());
-						comprovarExpedientCoincideix(
-								expedientCreat,
-								trobat);
-					}
-				},
-				"Consulta d'un expedient");
-    }
 
-//	@Test
+
+	@Test
     public void update() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
+						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(1);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
 						ExpedientDto modificat = expedientService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -92,18 +93,31 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						comprovarExpedientCoincideix(
 								expedientUpdate,
 								modificat);
+						
+						Mockito.verify(arxiuPluginMock, Mockito.times(1)).expedientModificar((Mockito.any(Expedient.class)));
+						ArgumentCaptor<Expedient> argument = ArgumentCaptor.forClass(Expedient.class);
+						Mockito.verify(arxiuPluginMock).expedientModificar(argument.capture());
+						assertEquals(null, argument.getValue().getContinguts());
+						assertEquals(null, argument.getValue().getFirmes());
+						assertNotNull(argument.getValue().getIdentificador());
+						assertEquals(null, argument.getValue().getVersio());
+						assertEquals(ContingutTipus.EXPEDIENT, argument.getValue().getTipus());
+						
+						assertEquals(metaExpedient.getClassificacioSia(), argument.getValue().getMetadades().getClassificacio());
+						assertEquals(metaExpedient.getSerieDocumental(), argument.getValue().getMetadades().getSerieDocumental());
+						
 					}
 				});
 	}
 
-//	@Test
+	@Test
     public void deleteReversible() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
 						try {
 							ContingutDto esborrat = contingutService.deleteReversible(
 									entitatCreada.getId(),
@@ -121,21 +135,29 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 							} catch (NotFoundException expected) {
 							}
 							elementsCreats.remove(expedientCreat);
+							
+							Mockito.verify(arxiuPluginMock, Mockito.times(1)).expedientEsborrar(Mockito.any(String.class));
+							
 						} catch (IOException ex) {
 							fail("S'han produit errors inesperats: " + ex);
+						} finally {
+							autenticarUsuari("admin");
+							contingutService.deleteDefinitiu(
+									entitatCreada.getId(),
+									expedientCreat.getId());
 						}
 					}
 				});
 	}
 
-//	@Test
+	@Test
     public void deleteDefinitiu() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
 						autenticarUsuari("admin");
 						ContingutDto esborrat = contingutService.deleteDefinitiu(
 								entitatCreada.getId(),
@@ -149,57 +171,25 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 							expedientService.findById(
 									entitatCreada.getId(),
 									expedientCreat.getId());
-							fail("L'expedient esborrat no s'hauria d'haver trobat");
+							fail("L'expe`dient esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
 						}
 						elementsCreats.remove(expedientCreat);
+						
+//						Mockito.verify(mock, Mockito.times(1)).expedientEsborrar(Mockito.any(String.class));
+						
 					}
 				});
 	}
 
-//	@Test
-    public void tancarReobrir() {
+	@Test
+    public void alliberarUser() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						autenticarUsuari("user");
-						assertEquals(
-								ExpedientEstatEnumDto.OBERT, expedientCreat.getEstat());
-						String motiu = "Motiu de tancament de test";
-						expedientService.tancar(
-								entitatCreada.getId(),
-								expedientCreat.getId(),
-								motiu);
-						ExpedientDto tancat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertEquals(
-								ExpedientEstatEnumDto.TANCAT, tancat.getEstat());
-						assertEquals(motiu, tancat.getTancatMotiu());
-						expedientService.reobrir(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						ExpedientDto reobert = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertEquals(
-								ExpedientEstatEnumDto.OBERT, reobert.getEstat());
-						assertNull(reobert.getTancatMotiu());
-					}
-				});
-	}
-
-//	@Test
-    public void alliberarAgafarUser() {
-		testAmbElementsIExpedient(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(List<Object> elementsCreats) {
-						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
 						autenticarUsuari("user");
 						assertTrue(
 								expedientCreat.isAgafat());
@@ -213,41 +203,27 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						assertTrue(
 								!alliberat.isAgafat());
 						assertNull(alliberat.getAgafatPer());
-						expedientService.agafarUser(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						ExpedientDto agafat = expedientService.findById(
-								entitatCreada.getId(),
-								expedientCreat.getId());
-						assertTrue(
-								agafat.isAgafat());
-						assertEquals("user", agafat.getAgafatPer().getCodi());
 					}
 				});
 	}
 
-//	@Test
-	public void alliberarAdminAgafarUser() {
+    
+	@Test
+    public void agafarUser() {
+
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
-						assertTrue(
-								expedientCreat.isAgafat());
-						assertEquals("user", expedientCreat.getAgafatPer().getCodi());
-						autenticarUsuari("admin");
-						expedientService.alliberarAdmin(
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						autenticarUsuari("user");
+						expedientService.alliberarUser(
 								entitatCreada.getId(),
 								expedientCreat.getId());
-						autenticarUsuari("user");
 						ExpedientDto alliberat = expedientService.findById(
 								entitatCreada.getId(),
 								expedientCreat.getId());
-						assertTrue(
-								!alliberat.isAgafat());
-						assertNull(alliberat.getAgafatPer());
 						expedientService.agafarUser(
 								entitatCreada.getId(),
 								expedientCreat.getId());
@@ -260,6 +236,102 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					}
 				});
 	}
+//=========================================================================
+
+//	@Test
+//    public void tancarReobrir() {
+//		testAmbElementsIExpedient(
+//				new TestAmbElementsCreats() {
+//					@Override
+//					public void executar(List<Object> elementsCreats) {
+//						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+//						autenticarUsuari("user");
+//						assertEquals(
+//								ExpedientEstatEnumDto.OBERT, expedientCreat.getEstat());
+//						String motiu = "Motiu de tancament de test";
+//						expedientService.tancar(
+//								entitatCreada.getId(),
+//								expedientCreat.getId(),
+//								motiu);
+//						ExpedientDto tancat = expedientService.findById(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						assertEquals(
+//								ExpedientEstatEnumDto.TANCAT, tancat.getEstat());
+//						assertEquals(motiu, tancat.getTancatMotiu());
+//						expedientService.reobrir(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						ExpedientDto reobert = expedientService.findById(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						assertEquals(
+//								ExpedientEstatEnumDto.OBERT, reobert.getEstat());
+//						assertNull(reobert.getTancatMotiu());
+//					}
+//				});
+//	}
+//
+//    
+//    
+//	
+//	@Test
+//    public void alliberarAdminAgafarUser() {
+//		testAmbElementsIExpedient(
+//				new TestAmbElementsCreats() {
+//					@Override
+//					public void executar(List<Object> elementsCreats) {
+//						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+//						assertTrue(
+//								expedientCreat.isAgafat());
+//						assertEquals("user", expedientCreat.getAgafatPer().getCodi());
+//						autenticarUsuari("admin");
+//						expedientService.alliberarAdmin(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						autenticarUsuari("user");
+//						ExpedientDto alliberat = expedientService.findById(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						assertTrue(
+//								!alliberat.isAgafat());
+//						assertNull(alliberat.getAgafatPer());
+//						expedientService.agafarUser(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						ExpedientDto agafat = expedientService.findById(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						assertTrue(
+//								agafat.isAgafat());
+//						assertEquals("user", agafat.getAgafatPer().getCodi());
+//					}
+//				});
+//	}
+//    
+//	@Test
+//	public void findById() {
+//		testAmbElementsIExpedient(
+//				new TestAmbElementsCreats() {
+//					@Override
+//					public void executar(List<Object> elementsCreats) {
+//						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+//						ExpedientDto trobat = expedientService.findById(
+//								entitatCreada.getId(),
+//								expedientCreat.getId());
+//						assertNotNull(trobat);
+//						assertNotNull(trobat.getId());
+//						comprovarExpedientCoincideix(
+//								expedientCreat,
+//								trobat);
+//					}
+//				});
+//    }
+
+    
 
 	@Test
 	public void comentaris() {

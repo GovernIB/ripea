@@ -25,6 +25,7 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -4537,6 +4538,7 @@ public class PluginHelper {
 		return ciutadaPlugin;
 	}*/
 
+
 	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {
 
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -4748,6 +4750,10 @@ public class PluginHelper {
 
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
 		this.arxiuPlugin = arxiuPlugin;
+	}
+	
+	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
+		this.unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugin;
 	}
 
 	public void setPortafirmesPlugin(PortafirmesPlugin portafirmesPlugin) {
