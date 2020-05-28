@@ -136,8 +136,13 @@ public class ExpedientEntity extends NodeEntity {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<ExpedientTascaEntity> tasques = new ArrayList<ExpedientTascaEntity>();
-	
-	
+
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientComentariEntity> comentaris = new ArrayList<ExpedientComentariEntity>();
+
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_estat_id")
 	@ForeignKey(name = "ipa_expestat_expedient_fk")

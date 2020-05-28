@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -46,7 +47,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								expedientCreate,
 								expedientCreat);
 					}
-				});
+				},
+				"Creació d'un expedient");
 	}
 
 	@Test
@@ -66,7 +68,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								expedientCreat,
 								trobat);
 					}
-				});
+				},
+				"Consulta d'un expedient");
     }
 
 //	@Test
@@ -224,7 +227,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 	}
 
 //	@Test
-    public void alliberarAdminAgafarUser() {
+	public void alliberarAdminAgafarUser() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
@@ -256,6 +259,39 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						assertEquals("user", agafat.getAgafatPer().getCodi());
 					}
 				});
+	}
+
+	@Test
+	public void comentaris() {
+		testAmbElementsIExpedient(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(List<Object> elementsCreats) {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						String comentariText = "Comentari d'un usuari: amb accents i símbols $%&·\"'";
+						List<ExpedientComentariDto> comentaris0 = expedientService.findComentarisPerContingut(
+								entitatCreada.getId(),
+								expedientCreat.getId());
+						assertNotNull(comentaris0);
+						assertTrue(comentaris0.isEmpty());
+						expedientService.publicarComentariPerExpedient(
+								entitatCreada.getId(),
+								expedientCreat.getId(),
+								comentariText);
+						List<ExpedientComentariDto> comentaris1 = expedientService.findComentarisPerContingut(
+								entitatCreada.getId(),
+								expedientCreat.getId());
+						assertNotNull(comentaris1);
+						assertTrue(comentaris1.size() == 1);
+						ExpedientComentariDto comentari = comentaris1.get(0);
+						assertEquals(comentariText, comentari.getText());
+						assertNotNull(comentari.getCreatedBy());
+						assertEquals("user", comentari.getCreatedBy().getCodi());
+						assertNotNull(comentari.getCreatedDate());
+					}
+				},
+				"Gestionar comentaris d'un expedient");
 	}
 
 	private void comprovarExpedientCoincideix(
