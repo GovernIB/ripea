@@ -66,6 +66,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.CsvHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
@@ -140,6 +141,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private DocumentHelper documentHelper;
 
 	@Override
 	public ExpedientDto create(
@@ -1414,10 +1417,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
+		if (documentHelper.hasFillsEsborranys(expedient)) {
+			throw new ValidationException("No es pot tancar un expedient que contengui esborranys");
+		}
+		if (!documentHelper.hasAnyDocumentDefinitiu(expedient)) {
+			throw new ValidationException("No es pot tancar un expedient sense cap document definitiu");
+		}
 		expedient.updateEstat(
 				ExpedientEstatEnumDto.TANCAT,
 				motiu);
-		
 		expedient.updateExpedientEstat(null);
 		contingutLogHelper.log(
 				expedient,

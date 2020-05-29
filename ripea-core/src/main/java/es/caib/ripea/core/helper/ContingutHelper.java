@@ -190,7 +190,8 @@ public class ContingutHelper {
 			dto.setMetaNode(metaNode);
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
-			dto.setHasEsborranys(documentHelper.hasFillsEsborranys(documentRepository.findByExpedientAndEsborrat(expedient, 0)));
+			dto.setHasEsborranys(
+					documentHelper.hasFillsEsborranys(expedient));
 			boolean conteDocumentsFirmats = !documentRepository.findByExpedientAndEstat(
 					expedient,
 					DocumentEstatEnumDto.CUSTODIAT).isEmpty();

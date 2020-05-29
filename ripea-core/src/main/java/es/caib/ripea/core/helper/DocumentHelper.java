@@ -1102,12 +1102,26 @@ public class DocumentHelper {
 	}
 
 	public boolean hasFillsEsborranys(
-			List<DocumentEntity> documents) {
+			ExpedientEntity expedient) {
 		logger.debug("Consulta els documents esborranys d'un expedient");
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		for (DocumentEntity document : documents) {
 			if (document.getEsborrat() == 0 
 					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
 					&& document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean hasAnyDocumentDefinitiu(
+			ExpedientEntity expedient) {
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		for (DocumentEntity document : documents) {
+			if (document.getEsborrat() == 0 
+					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
+					&& (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
 				return true;
 			}
 		}
