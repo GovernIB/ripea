@@ -26,19 +26,19 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class DominiEntity extends RipeaAuditable<Long> {
 
-	@Column(name = "codi", length = 64, nullable = false)
+	@Column(name = "codi")
 	private String codi;
-	@Column(name = "nom", length = 256, nullable = false)
+	@Column(name = "nom")
 	private String nom;
-	@Column(name = "descripcio", length = 256, nullable = false)
+	@Column(name = "descripcio")
 	private String descripcio;
-	@Column(name = "consulta", length = 256, nullable = false)
+	@Column(name = "consulta")
 	private String consulta;
-	@Column(name = "cadena", length = 256, nullable = false)
+	@Column(name = "cadena")
 	private String cadena;
-	@Column(name = "usuari", length = 256, nullable = false)
+	@Column(name = "usuari")
 	private String usuari;
-	@Column(name = "contrasenya", length = 256, nullable = false)
+	@Column(name = "contrasenya")
 	private String contrasenya;
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)

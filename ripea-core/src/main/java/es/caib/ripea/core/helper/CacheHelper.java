@@ -5,13 +5,16 @@ package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -255,6 +258,12 @@ public class CacheHelper {
 		return pluginHelper.dadesExternesTipusViaAll();
 	}
 
+	@Cacheable(value = "connexioDomini", key="#entitatCodi")
+	public DataSource createDominiConnexio(
+			String entitatCodi,
+			Properties conProps) {
+		return new DriverManagerDataSource(conProps.getProperty("url"), conProps);
+	}
 
 
 	private ValidacioErrorDto crearValidacioError(

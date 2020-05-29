@@ -10,12 +10,14 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.validDomini;
 
 /**
  * Command per al manteniment de dominis.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@validDomini
 public class DominiCommand {
 
 	private Long id;
@@ -27,7 +29,7 @@ public class DominiCommand {
 	private Long entitatId;
 	@NotEmpty @Size(max=256)
 	private String consulta;
-	@NotEmpty @Size(max=256)
+	@NotEmpty @Size(max=1000)
 	private String cadena;
 	@NotEmpty @Size(max=256)
 	private String usuari;

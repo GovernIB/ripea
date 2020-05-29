@@ -3,11 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -24,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -38,7 +35,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/metaExpedient")
-public class MetaExpedientMetaDadaController extends BaseAdminController {
+public class MetaExpedientMetaDadaController extends BaseUserController {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
@@ -221,16 +218,16 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<Long, String> getDomini(
+	public List<ResultatDominiDto> getDomini(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi){
-		Map<Long, String> resultatConsulta = new HashMap<Long, String>();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
 		
-		resultatConsulta.put(1L, "port de palma");
-		resultatConsulta.put(2L, "port de tant");
+		List<ResultatDominiDto> resultatConsulta = dominiService.getResultDomini(
+				entitatActual.getId(),
+				domini);
 		return resultatConsulta;
 	}
 

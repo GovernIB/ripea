@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
@@ -126,4 +127,20 @@ public interface DominiService {
 	public DominiDto findByCodiAndEntitat(
 			String codi,
 			Long entitatId) throws NotFoundException;
+	
+	/**
+	 * Recupera el resultat de una consulta d'un domini.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param domini 
+	 * 				Informació del domini.
+	 * @return Resultat de la consulta.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<ResultatDominiDto> getResultDomini(
+			Long entitatId,
+			DominiDto domini) throws NotFoundException;
 }

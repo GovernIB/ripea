@@ -4,6 +4,9 @@
 package es.caib.ripea.core.service;
 
 import java.util.List;
+import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +17,14 @@ import org.springframework.stereotype.Service;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.entity.DominiEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DominiHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.DominiRepository;
@@ -39,7 +45,11 @@ public class DominiServiceImpl implements DominiService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	@Autowired
+	private DominiHelper dominiHelper;
+	
 	@Override
 	public DominiDto create(
 			Long entitatId,
@@ -152,8 +162,8 @@ public class DominiServiceImpl implements DominiService {
 	public List<DominiDto> findByEntitat(Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				true,
+				false,
 				false);
 
 		List<DominiEntity> tipusDocumentals = dominiRepository.findByEntitatOrderByNomAsc(entitat);
@@ -168,8 +178,8 @@ public class DominiServiceImpl implements DominiService {
 	public DominiDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				true,
+				false,
 				false);
 
 		DominiEntity tipusDocumental = dominiRepository.findByCodiAndEntitat(
@@ -179,6 +189,26 @@ public class DominiServiceImpl implements DominiService {
 				tipusDocumental, 
 				DominiDto.class);
 		return dominiDto;
+	}
+	
+	@Override
+	public List<ResultatDominiDto> getResultDomini(
+			Long entitatId,
+			DominiDto domini) throws NotFoundException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		Properties conProps = dominiHelper.getProperties(domini.getCadena());
+		
+		if (conProps != null && !conProps.isEmpty()) {
+			DataSource dataSource = cacheHelper.createDominiConnexio(
+					entitat.getCodi(),
+					conProps);
+			dominiHelper.setDataSource(dataSource);
+		}
+		return dominiHelper.findDominisByConsutla(domini.getConsulta());
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DominiServiceImpl.class);

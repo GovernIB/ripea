@@ -1321,7 +1321,7 @@ function deselectAll() {
 															<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 																<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																	<label class="hidden" for="${metaDada.codi}"></label>
-																	<div>
+																	<div class="controls col-xs-12">
 																		<c:choose>
 																			<c:when test="${metaDada.tipus == 'SENCER'}">
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
@@ -1340,7 +1340,7 @@ function deselectAll() {
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DOMINI'}">
 																			
-																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}" multiple="false"></form:select>
+																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="select2" cssClass="form-control${multipleClass}" multiple="false"/>
 																				<script type="text/javascript">
 																					var multipleUrl = '<c:url value="/metaExpedient/${contingut.metaNode.id}/metaDada/domini/${metaDada.codi}"/>';
 																					
@@ -1355,12 +1355,15 @@ function deselectAll() {
 																								if (data) {
 																									var items = [];
 																		 							$.each(data, function(i, val) {
-																		 								console.log("Val: " + val);
-
-																			 							selDomini.append("<option value=\"" + val + "\">" + val + "</option>");
+																		 								console.log("Val: " + val.id);
+																										if ("${dadaValor}" == val.id) {
+																				 							selDomini.append("<option value=\"" + val.id + "\" selected>" + val.valor + "</option>");
+																										} else {
+																											selDomini.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
+																										}
 																		 							});
 																								}
-																								var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+																								var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6", width: '100%', dropdownAutoWidth : true};
 																								selDomini.select2(select2Options);
 																	 					}
 																	 				});

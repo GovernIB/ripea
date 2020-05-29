@@ -12,6 +12,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DominiService;
 
@@ -85,5 +86,11 @@ public class DominiServiceBean implements DominiService {
 	public DominiDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
 		return delegate.findByCodiAndEntitat(codi, entitatId);
 
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<ResultatDominiDto> getResultDomini(Long entitatId, DominiDto domini) throws NotFoundException {
+		return delegate.getResultDomini(entitatId, domini);
 	}
 }
