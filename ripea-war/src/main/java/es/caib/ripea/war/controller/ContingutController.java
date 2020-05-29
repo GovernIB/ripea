@@ -126,28 +126,40 @@ public class ContingutController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) throws IOException {
-	
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				false);
-		contingutService.deleteReversible(
-				entitatActual.getId(),
-				contingutId);
-		
-		boolean isExpedient = contingut.getPare() == null;
+
 		String url = "";
-		if (isExpedient) {
-			url = "redirect:../../expedient";
-		} else {
-			url = "redirect:../../contingut/" + contingut.getPare().getId();
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			ContingutDto contingut = contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					contingutId,
+					true,
+					false);
+			
+			boolean isExpedient = contingut.getPare() == null;
+			if (isExpedient) {
+				url = "redirect:../../expedient";
+			} else {
+				url = "redirect:../../contingut/" +
+						contingut.getPare().getId();
+			}
+			
+			contingutService.deleteReversible(
+					entitatActual.getId(),
+					contingutId);
+
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					url,
+					"contingut.controller.element.esborrat.ok");
+
+		} catch (Exception e) {
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					url,
+					e.getMessage());
+
 		}
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				url,
-				"contingut.controller.element.esborrat.ok");
 	}
 
 	@RequestMapping(value = "/contingut/{contingutId}/canviVista/icones", method = RequestMethod.GET)
