@@ -70,7 +70,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 //	notificacioIdioma: 		COMÚ				per emmagatzemar l’idioma desitjat per a les notificacions.
 //	NotificacioAutoritzat: 	COMÚ				per indicar si l’interessat ha autoritzat la recepció de notificacions en format electrònic.
 
-	@Column(name = "document_tipus", length = 1)
+	@Column(name = "document_tipus", length = 40)
 	@Enumerated(EnumType.STRING)
 	protected InteressatDocumentTipusEnumDto documentTipus;
 	@Column(name = "document_num", length = 17)
@@ -102,7 +102,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "expedient_id")
 	@ForeignKey(name = "ipa_expedient_interessat_fk")
 	protected ExpedientEntity expedient;
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "representant_id")
 	@ForeignKey(name = "ipa_represent_interessat_fk")
 	protected InteressatEntity representant;

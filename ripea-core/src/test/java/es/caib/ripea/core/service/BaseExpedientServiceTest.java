@@ -13,7 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,6 +36,7 @@ import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
@@ -53,9 +53,10 @@ import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 public class BaseExpedientServiceTest extends BaseServiceTest {
 
 	@Autowired
+	protected MetaDadaService metaDadaService;
+	@Autowired
 	protected ContingutService contingutService;
 	@Autowired
-	@InjectMocks
 	protected ExpedientService expedientService;
 	@Autowired
 	protected PluginHelper pluginHelper;
