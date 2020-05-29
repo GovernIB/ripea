@@ -1778,23 +1778,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				agafatPer = usuariHelper.getUsuariAutenticat();
 			}
 			
-			// id of expedient clicked to get "Relacionar expedient" view, in this view only list of expedients not already related with clicked expedient should be shown 
-			ExpedientEntity expedient=null;
-			List <ExpedientEntity> expedientRelacionats=new ArrayList<>();
-			if (expedientId!=null){
-				expedient = entityComprovarHelper.comprovarExpedient(
-						entitatId,
-						expedientId,
-						false,
-						false,
-						true,
-						false,
-						false);
-				
-				expedientRelacionats = expedientRepository.findExpedientsRelacionats(expedient);
-				expedientRelacionats.add(expedient);
-			}
-			
+
 			ExpedientEstatEnumDto chosenEstatEnum = null;
 			ExpedientEstatEntity chosenEstat = null;
 			Long estatId = filtre.getExpedientEstatId();
@@ -1811,7 +1795,26 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ordenacioMap.put("numero", new String[] {"codi", "any", "sequencia"});
 			Page<ExpedientEntity> paginaExpedients;
 			
-			if(!expedientRelacionats.isEmpty()){
+			
+			
+			List<ExpedientEntity> expedientsToBeExluded = new ArrayList<>();
+			if (expedientId != null) {
+				// expedient for which "Relacionar expedient" list is shown
+				ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+						entitatId,
+						expedientId,
+						false,
+						false,
+						true,
+						false,
+						false);
+				// expedients already related with given expedient
+				expedientsToBeExluded = expedientRepository.findExpedientsRelacionats(expedient);
+				expedientsToBeExluded.add(expedient);
+			}
+			
+			if (!expedientsToBeExluded.isEmpty()) {
+				agafatPer = usuariHelper.getUsuariAutenticat();
 				paginaExpedients = expedientRepository.findByEntitatAndFiltre(
 						entitat,
 						metaExpedientsPermesos,
@@ -1841,7 +1844,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getSearch() == null ? "" : filtre.getSearch(),
 						filtre.getTipusId() == null,
 						filtre.getTipusId(),
-						expedientRelacionats,
+						expedientsToBeExluded,
 						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
 						filtre.getInteressat(),
 						paginacioHelper.toSpringDataPageable(
