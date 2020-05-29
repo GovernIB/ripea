@@ -717,16 +717,26 @@ public class ExpedientController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@PathVariable Long relacionatId) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		expedientService.relacioCreate(
-				entitatActual.getId(),
-				expedientId,
-				relacionatId);
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:/../../contingut/" + expedientId,
-				"expedient.controller.relacionat.ok");
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+			expedientService.relacioCreate(
+					entitatActual.getId(),
+					expedientId,
+					relacionatId);
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:/../../contingut/" + expedientId,
+					"expedient.controller.relacionat.ok");
+			
+		} catch (Exception e) {
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../../esborrat",
+					e.getMessage());
+
+		}
 	}
 
 	@RequestMapping(value = "/{expedientId}/relacio/datatable", method = RequestMethod.GET)
