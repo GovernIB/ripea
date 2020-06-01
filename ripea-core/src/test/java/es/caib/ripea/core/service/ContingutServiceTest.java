@@ -40,6 +40,8 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 	private MetaDadaDto metaDadaSencer;
 	private MetaDadaDto metaDadaFlotant;
 	private MetaDadaDto metaDadaBoolea;
+	
+	private MetaDadaDto metaDadaTextMultiple;
 	@Before
 	public void setUp() {
 		super.setUp();
@@ -84,6 +86,14 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 		metaDadaBoolea.setDescripcio("metaDadaBoolea");
 		metaDadaBoolea.setTipus(MetaDadaTipusEnumDto.BOOLEA);
 		metaDadaBoolea.setMultiplicitat(MultiplicitatEnumDto.M_1);
+		
+		
+		metaDadaTextMultiple = new MetaDadaDto();
+		metaDadaTextMultiple.setCodi("metaDadaTextMultiple");
+		metaDadaTextMultiple.setNom("metaDadaTextMultiple");
+		metaDadaTextMultiple.setDescripcio("metaDadaTextMultiple");
+		metaDadaTextMultiple.setTipus(MetaDadaTipusEnumDto.TEXT);
+		metaDadaTextMultiple.setMultiplicitat(MultiplicitatEnumDto.M_0_N);
 	}
 
 	@Test
@@ -128,6 +138,12 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 								metaExpedient.getId(),
 								metaDadaBoolea);
 						
+						MetaDadaDto metaDadaTextMultipleCreada = metaDadaService.create(
+								entitatCreada.getId(),
+								metaExpedient.getId(),
+								metaDadaTextMultiple);
+						
+						
 						autenticarUsuari("user");
 						
 				        Calendar cal = Calendar.getInstance();
@@ -146,6 +162,8 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 						valors.put(metaDadaSencerCreada.getCodi(),new Long(23));
 						valors.put(metaDadaFlotantCreada.getCodi(),new Double(13.00));
 						valors.put(metaDadaBooleaCreada.getCodi(), true);
+						valors.put(metaDadaTextMultipleCreada.getCodi(),
+								new String[] { "one", "two" });
 
 						contingutService.dadaSave(
 								entitatCreada.getId(),
@@ -160,13 +178,18 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 						
 						List<MetaDadaDto> metaDades = metaDadaService.findByNode(entitatCreada.getId(),
 								expedientCreat.getId());
+						int mutlipleCount = 0;
 						for (MetaDadaDto metaDadaDto : metaDades) {
 							for (DadaDto dadaDto : contingut.getDades()) {
 								if (dadaDto.getMetaDada().getCodi().equals(metaDadaDto.getCodi())) {
 
 									if (dadaDto.getMetaDada().getTipus() == MetaDadaTipusEnumDto.TEXT) {
-										if (!dadaDto.getValor().equals("text")) {
-											fail("Values don't match");
+										if (dadaDto.getMetaDada().getMultiplicitat() == MultiplicitatEnumDto.M_0_N) {
+											mutlipleCount++;
+										} else {
+											if (!dadaDto.getValor().equals("text")) {
+												fail("Values don't match");
+											}
 										}
 									} else if (dadaDto.getMetaDada().getTipus() == MetaDadaTipusEnumDto.DATA) {
 										if (!dadaDto.getValor().equals(cal.getTime())) {
@@ -188,17 +211,16 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 										if (!dadaDto.getValor().equals(true)) {
 											fail("Values don't match");
 										}
-									}
+									} 
 
 								}
 							}
 						}
-
-
 						
-//						metaExpedientService.delete(
-//								entitatId,
-//								((MetaExpedientDto)element).getId());
+						if (mutlipleCount != 2) {
+							fail("Incorrect creation of multiple dada");
+						}
+
 						
 					}
 				});
