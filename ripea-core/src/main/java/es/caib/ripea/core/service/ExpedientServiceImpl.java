@@ -1489,7 +1489,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
+		ExpedientEntity toRelate = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				relacionatId,
 				true,
@@ -1497,7 +1497,19 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		expedient.addRelacionat(relacionat);
+		
+		boolean alreadyRelatedTo = false;
+		for (ExpedientEntity relacionatPer : toRelate.getRelacionatsAmb()) {
+			if (relacionatPer.getId().equals(expedient.getId())) {
+				alreadyRelatedTo = true;
+			}
+		}
+		// checking if inverse relation doesnt already exist
+		if (alreadyRelatedTo) {
+			throw new ValidationException("Expedient ja relacionat");
+		}
+
+		expedient.addRelacionat(toRelate);
 		contingutLogHelper.log(
 				expedient,
 				LogTipusEnumDto.MODIFICACIO,
@@ -1808,8 +1820,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						true,
 						false,
 						false);
-				// expedients already related with given expedient
-				expedientsToBeExluded = expedientRepository.findExpedientsRelacionats(expedient);
+				expedientsToBeExluded.addAll(expedient.getRelacionatsAmb());
+				expedientsToBeExluded.addAll(expedient.getRelacionatsPer());
 				expedientsToBeExluded.add(expedient);
 			}
 			

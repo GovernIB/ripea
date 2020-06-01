@@ -906,12 +906,15 @@ function deselectAll() {
 							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
 						</c:if>
 						<c:if test="${contingut.expedient}">
+							<!---------  Tipus d'expedient  --------->
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
+							<!---------  Número  --------->
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.numero}</dd>
+							<!---------  Estat  --------->
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
@@ -924,12 +927,14 @@ function deselectAll() {
 						</c:if>
 					<c:if test="${contingut.expedient or contingut.document}">
 						<c:if test="${contingut.expedient}">
+							<!---------  Data d'obertura  --------->
 							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
 							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
 							<dd>${contingut.ntiClasificacionSia}</dd>
 						</c:if>
 					</c:if>
+					<!---------  Expedients relacionats  --------->
 					<c:if test="${!isTasca && not empty relacionats}">
 						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
 							<spring:message code="contingut.info.relacionats"/>
