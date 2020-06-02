@@ -267,6 +267,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.4.1</version>
 				<executions>
 					<execution>
 						<id>generate-reports-ws-code</id>
