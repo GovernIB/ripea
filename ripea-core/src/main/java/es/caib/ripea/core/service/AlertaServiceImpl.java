@@ -65,7 +65,9 @@ public class AlertaServiceImpl implements AlertaService {
 		logger.debug("Actualitzant alerta existent (alerta=" + alerta + ")");
 		AlertaEntity entity = alertaRepository.findOne(
 				alerta.getId());
-		if(entity == null ) throw new NotFoundException(alerta.getId(), AlertaEntity.class);
+		if (entity == null) {
+			throw new NotFoundException(alerta.getId(), AlertaEntity.class);
+		}
 		ContingutEntity contingut = contingutRepository.findOne(
 				alerta.getContingutId());
 		entity.update(

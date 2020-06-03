@@ -1718,14 +1718,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return fitxer;
 	}
 
-	
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			boolean accesAdmin,
 			boolean comprovarAccesMetaExpedients) {
-	
 		return findAmbFiltrePaginat(
 				entitatId,
 				filtre,
@@ -1735,10 +1733,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				null
 				);
 	}
-	
-	
-		
-
 
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
@@ -1767,7 +1761,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (filtre.getMetaExpedientDominiId() != null) {
 			metaExpedientDomini = metaExpedientDominiRepository.findOne(filtre.getMetaExpedientDominiId());
 		}
-		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
 				entitat);
 		if (comprovarAccesMetaExpedients) {
@@ -1789,8 +1782,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (filtre.isMeusExpedients()) {
 				agafatPer = usuariHelper.getUsuariAutenticat();
 			}
-			
-
 			ExpedientEstatEnumDto chosenEstatEnum = null;
 			ExpedientEstatEntity chosenEstat = null;
 			Long estatId = filtre.getExpedientEstatId();
@@ -1802,13 +1793,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					chosenEstat = expedientEstatRepository.findOne(estatId);
 				}
 			}
-			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] {"codi", "any", "sequencia"});
 			Page<ExpedientEntity> paginaExpedients;
-			
-			
-			
 			List<ExpedientEntity> expedientsToBeExluded = new ArrayList<>();
 			if (expedientId != null) {
 				// expedient for which "Relacionar expedient" list is shown
@@ -1824,7 +1811,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientsToBeExluded.addAll(expedient.getRelacionatsPer());
 				expedientsToBeExluded.add(expedient);
 			}
-			
 			if (!expedientsToBeExluded.isEmpty()) {
 				agafatPer = usuariHelper.getUsuariAutenticat();
 				paginaExpedients = expedientRepository.findByEntitatAndFiltre(
@@ -1899,8 +1885,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 								paginacioParams,
 								ordenacioMap));
 			}
-			
-			
 			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
 					paginaExpedients,
 					ExpedientDto.class,
@@ -1912,16 +1896,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 									true);
 						}
 					});
-			
-			for (ExpedientDto e: result) {
+			for (ExpedientDto expedient: result) {
 				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(
 						false,
-						e.getId()
+						expedient.getId()
 						) > 0;
-
-				e.setAlerta(enAlerta);
+						expedient.setAlerta(enAlerta);
 			}
-			
 			return result;
 		} else {
 			return paginacioHelper.getPaginaDtoBuida(
