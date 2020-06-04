@@ -118,3 +118,13 @@ table.dataTable tr.datatable-dades-carregant div {
 	color: #999;
 	margin-bottom: 0px;
 }
+
+a.exemple_boto {
+	margin-top: 2px;
+	background-color: #d9d9d9;
+}
+
+div.exemple {
+	display: none;
+	margin-top: 2px;
+}

@@ -22,6 +22,7 @@ import es.caib.distribucio.ws.backofficeintegracio.Estat;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -41,7 +42,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Resource
 	private EntitatRepository entitatRepository;
-	
+	@Resource
+	private CacheHelper cacheHelper;
 
 	/*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -129,6 +131,19 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					}
 				}
 			}
+		}
+	}
+	
+	@Override
+	@Scheduled(fixedDelayString = "${config:es.caib.ripea.dominis.cache.execucio}")
+	public void buidarCacheDominis() {
+		try {
+			//Connexió amb la BBDD del domini
+			cacheHelper.evictCreateDominiConnexio();
+			//Consulta
+			cacheHelper.evictFindDominisByConsutla();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut buidar la cache de dominis", ex);
 		}
 	}
 

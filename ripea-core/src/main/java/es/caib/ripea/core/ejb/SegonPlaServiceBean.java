@@ -32,4 +32,10 @@ public class SegonPlaServiceBean implements SegonPlaService {
 		delegate.consultarIGuardarAnotacionsPeticionsPendents();	
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void buidarCacheDominis() {
+		delegate.buidarCacheDominis();
+	}
+
 }

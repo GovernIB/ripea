@@ -4,4 +4,6 @@ public interface SegonPlaService {
 
 	void consultarIGuardarAnotacionsPeticionsPendents();
 
+	void buidarCacheDominis();
+
 }

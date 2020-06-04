@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 
@@ -63,6 +64,9 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 			Long metaNodeId);
 	List<MetaDadaEntity> findByMetaNodeIdInOrderByMetaNodeIdAscOrdreAsc(
 			List<Long> metaNodeIds);
+	List<MetaDadaEntity> findByMetaNodeIdAndTipusOrderByOrdreAsc(
+			Long metaNodeId,
+			MetaDadaTipusEnumDto tipus);
 	List<MetaDadaEntity> findByMetaNodeAndActivaTrueOrderByOrdreAsc(
 			MetaNodeEntity metaNode);
 

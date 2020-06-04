@@ -127,5 +127,15 @@ public class DominiController extends BaseAdminController {
 				"redirect:../../domini",
 				"domini.controller.esborrat.ok");
 	}
+	
+	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)
+	public String cacheRefrescar(
+			HttpServletRequest request) {
+		dominiService.evictDominiCache();
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../domini",
+				"domini.controller.evict");
+	}
 
 }

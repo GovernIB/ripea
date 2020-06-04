@@ -36,8 +36,6 @@ public class DominiEntity extends RipeaAuditable<Long> {
 	private String consulta;
 	@Column(name = "cadena")
 	private String cadena;
-	@Column(name = "usuari")
-	private String usuari;
 	@Column(name = "contrasenya")
 	private String contrasenya;
 
@@ -86,14 +84,6 @@ public class DominiEntity extends RipeaAuditable<Long> {
 		this.cadena = cadena;
 	}
 
-	public String getUsuari() {
-		return usuari;
-	}
-
-	public void setUsuari(String usuari) {
-		this.usuari = usuari;
-	}
-
 	public String getContrasenya() {
 		return contrasenya;
 	}
@@ -116,14 +106,12 @@ public class DominiEntity extends RipeaAuditable<Long> {
 			String descripcio,
 			String consulta,
 			String cadena,
-			String usuari,
 			String contrasenya) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.consulta = consulta;
 		this.cadena = cadena;
-		this.usuari = usuari;
 		this.contrasenya = contrasenya;
 	}
 
@@ -133,7 +121,6 @@ public class DominiEntity extends RipeaAuditable<Long> {
 			String descripcio,
 			String consulta,
 			String cadena,
-			String usuari,
 			String contrasenya,
 			EntitatEntity entitat) {
 		return new Builder(
@@ -142,7 +129,6 @@ public class DominiEntity extends RipeaAuditable<Long> {
 				descripcio,
 				consulta,
 				cadena,
-				usuari,
 				contrasenya,
 				entitat);
 	}
@@ -154,7 +140,6 @@ public class DominiEntity extends RipeaAuditable<Long> {
 				String descripcio,
 				String consulta,
 				String cadena,
-				String usuari,
 				String contrasenya,
 				EntitatEntity entitat) {
 			built = new DominiEntity();
@@ -163,7 +148,6 @@ public class DominiEntity extends RipeaAuditable<Long> {
 			built.descripcio = descripcio;
 			built.consulta = consulta;
 			built.cadena = cadena;
-			built.usuari = usuari;
 			built.contrasenya = contrasenya;
 			built.entitat = entitat;
 		}

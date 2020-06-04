@@ -19,7 +19,6 @@ public class DominiDto implements Serializable {
 	private Long entitatId;
 	private String consulta;
 	private String cadena;
-	private String usuari;
 	private String contrasenya;
 	
 	public Long getId() {
@@ -76,14 +75,6 @@ public class DominiDto implements Serializable {
 
 	public void setCadena(String cadena) {
 		this.cadena = cadena;
-	}
-
-	public String getUsuari() {
-		return usuari;
-	}
-
-	public void setUsuari(String usuari) {
-		this.usuari = usuari;
 	}
 
 	public String getContrasenya() {

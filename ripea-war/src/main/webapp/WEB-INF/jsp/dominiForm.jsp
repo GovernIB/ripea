@@ -26,9 +26,8 @@
 		<rip:inputText name="codi" textKey="domini.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="domini.form.camp.nom" required="true"/>
 		<rip:inputTextarea name="descripcio" textKey="domini.form.camp.descripcio"/>
-		<rip:inputTextarea name="consulta" textKey="domini.form.camp.consulta" required="true"/>
-		<rip:inputTextarea name="cadena" textKey="domini.form.camp.cadena" required="true"/>
-		<rip:inputText name="usuari" textKey="domini.form.camp.usuari" required="true"/>
+		<rip:inputTextarea name="consulta" textKey="domini.form.camp.consulta" required="true" exemple="domini.consulta.exemple"/>
+		<rip:inputTextarea name="cadena" textKey="domini.form.camp.cadena" required="true" exemple="domini.cadena.exemple"/>
 		<rip:inputText name="contrasenya" textKey="domini.form.camp.contrasenya" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

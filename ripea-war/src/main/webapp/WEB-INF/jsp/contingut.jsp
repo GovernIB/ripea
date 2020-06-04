@@ -58,6 +58,7 @@
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<c:if test="${isContingutDetail}">
 		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
@@ -291,6 +292,9 @@ ul.interessats {
 }
 .importat.fa.fa-info-circle {
 	color: #02CDA2;
+}
+.dominis ~ span > .selection {
+	width: 100%;
 }
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -854,6 +858,43 @@ function deselectAll() {
 			}
 	);
 }
+
+function recuperarResultatDomini(
+		metaExpedientId,
+		metaDadaCodi,
+		dadaValor) {
+	var multipleUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '"/>';
+	$.ajax({
+		type: 'GET',
+		url: multipleUrl, 
+		success: function(data) {
+			var selDomini = $("#" + metaDadaCodi);
+			selDomini.empty();
+			selDomini.append("<option value=\"\"></option>");
+			if (data) {
+				var existeix = false;
+				var items = [];
+					$.each(data, function(i, val) {
+					if (dadaValor == val.id) {
+						existeix = true;
+ 						selDomini.append("<option value=\"" + val.id + "\" selected>" + val.valor + "</option>");
+					} else {
+						selDomini.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
+					}
+					});
+					if (dadaValor != null && dadaValor != '' && !existeix) {
+						alert("El domini de les metadades s'ha canviat. Revisa les dades de l'expedient.")
+					}
+			}
+			var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6", width: '100%', dropdownAutoWidth : true};
+			selDomini.select2(select2Options);
+		},
+		error: function (error) {
+			if (error != null && error.responseJSON != null)
+				alert(error.responseJSON.message);
+		}
+	});
+}
 </script>
 
 </head>
@@ -1039,7 +1080,7 @@ function deselectAll() {
 			</c:if>
 			<div class="tab-content">
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
-				<div class="tab-pane in" id="contingut">
+				<div class="tab-pane active in" id="contingut">
 					<c:choose>
 						<%--------------- WHEN CONTINGUT IS DOCUMENT (SHOWS DOCUMENT DETAILS) ---------------%>
 						<c:when test="${contingut.document}">
@@ -1289,7 +1330,7 @@ function deselectAll() {
 				<c:if test="${!isTasca}">
 					<c:if test="${contingut.node}">
 						<!------------------------------ TABPANEL DADES ------------------------------------->
-						<div class="tab-pane active" id="dades">
+						<div class="tab-pane" id="dades">
 							<c:choose>
 								<c:when test="${not empty metaDades}">
 									<form:form onsubmit="window.location.reload();" id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
@@ -1319,9 +1360,9 @@ function deselectAll() {
 													<td>
 														<c:choose>
 															<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
-																<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
+																<div class="form-group <c:if test="${metaDada.tipus == 'DOMINI'}">col-xs-12</c:if>"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																	<label class="hidden" for="${metaDada.codi}"></label>
-																	<div class="controls col-xs-12">
+																	<div class="controls">
 																		<c:choose>
 																			<c:when test="${metaDada.tipus == 'SENCER'}">
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
@@ -1340,33 +1381,12 @@ function deselectAll() {
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DOMINI'}">
 																			
-																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="select2" cssClass="form-control${multipleClass}" multiple="false"/>
+																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="false"/>
 																				<script type="text/javascript">
-																					var multipleUrl = '<c:url value="/metaExpedient/${contingut.metaNode.id}/metaDada/domini/${metaDada.codi}"/>';
-																					
-																					$.ajax({
-																	 					type: 'GET',
-																	 					url: multipleUrl, 
-																	 					success: function(data) {
-																								var selDomini = $("#${metaDada.codi}");
-																								selDomini.empty();
-																								selDomini.append("<option value=\"\"></option>");
-																								console.log("Data: " + data);
-																								if (data) {
-																									var items = [];
-																		 							$.each(data, function(i, val) {
-																		 								console.log("Val: " + val.id);
-																										if ("${dadaValor}" == val.id) {
-																				 							selDomini.append("<option value=\"" + val.id + "\" selected>" + val.valor + "</option>");
-																										} else {
-																											selDomini.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
-																										}
-																		 							});
-																								}
-																								var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6", width: '100%', dropdownAutoWidth : true};
-																								selDomini.select2(select2Options);
-																	 					}
-																	 				});
+																				recuperarResultatDomini(
+																						"${contingut.metaNode.id}",
+																						"${metaDada.codi}",
+																						"${dadaValor}");
 																				</script>
 																			</c:when>
 																			<c:otherwise>
@@ -1376,6 +1396,16 @@ function deselectAll() {
 																		<span class="" aria-hidden="true"></span>
 																	</div>
 																</div>
+															</c:when>
+															<c:when test="${expedientTancat && (metaDada.tipus == 'DOMINI')}">
+																<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="false" disabled="true"/>
+																<script type="text/javascript">
+																	recuperarResultatDomini(
+																			"${contingut.metaNode.id}",
+																			"${metaDada.codi}",
+																			"${dadaValor}");
+																	
+																</script>
 															</c:when>
 															<c:otherwise>
 																${dadaValor}

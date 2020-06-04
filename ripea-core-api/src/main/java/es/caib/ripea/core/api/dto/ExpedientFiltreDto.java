@@ -17,7 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ExpedientFiltreDto implements Serializable {
 
 	private Long metaExpedientId;
-	private Long metaExpedientDominiId;
+	private String metaExpedientDominiCodi;
 	private String nom;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
@@ -32,16 +32,15 @@ public class ExpedientFiltreDto implements Serializable {
 	
 	private Long tipusId;
 	private String interessat;
-	
+	private String metaExpedientDominiValor;
 
-	
-	public Long getMetaExpedientDominiId() {
-		return metaExpedientDominiId;
-	}
-	public void setMetaExpedientDominiId(Long metaExpedientDominiId) {
-		this.metaExpedientDominiId = metaExpedientDominiId;
-	}
 
+	public String getMetaExpedientDominiCodi() {
+		return metaExpedientDominiCodi;
+	}
+	public void setMetaExpedientDominiCodi(String metaExpedientDominiCodi) {
+		this.metaExpedientDominiCodi = metaExpedientDominiCodi;
+	}
 	public String getInteressat() {
 		return interessat;
 	}
@@ -123,8 +122,12 @@ public class ExpedientFiltreDto implements Serializable {
 	public void setTipusId(Long tipusId) {
 		this.tipusId = tipusId;
 	}
-	
-	
+	public String getMetaExpedientDominiValor() {
+		return metaExpedientDominiValor;
+	}
+	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
+		this.metaExpedientDominiValor = metaExpedientDominiValor;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

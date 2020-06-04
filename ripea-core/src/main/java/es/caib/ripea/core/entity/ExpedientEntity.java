@@ -143,11 +143,6 @@ public class ExpedientEntity extends NodeEntity {
 	@ForeignKey(name = "ipa_expestat_expedient_fk")
 	private ExpedientEstatEntity expedientEstat;
 	
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@JoinColumn(name = "metaexpedient_domini_id")
-	@ForeignKey(name = "ipa_metaexpdom_expedient_fk")
-	private MetaExpedientDominiEntity metaExpedientDomini;
-	
 	public List<ExpedientTascaEntity> getTasques() {
 		return tasques;
 	}
@@ -220,9 +215,6 @@ public class ExpedientEntity extends NodeEntity {
 	public List<ExpedientEntity> getRelacionatsPer() {
 		return relacionatsPer;
 	}
-	public MetaExpedientDominiEntity getMetaExpedientDomini() {
-		return metaExpedientDomini;
-	}
 	public MetaExpedientEntity getMetaExpedient() {
 		return (MetaExpedientEntity)getMetaNode();
 	}
@@ -230,9 +222,6 @@ public class ExpedientEntity extends NodeEntity {
 	public void update(
 			String nom) {
 		this.nom = nom;
-	}
-	public void updateMetaExpedientDomini(MetaExpedientDominiEntity metaExpedientDomini) {
-		this.metaExpedientDomini = metaExpedientDomini;
 	}
 	
 	public void updateAny(
@@ -312,7 +301,6 @@ public class ExpedientEntity extends NodeEntity {
 	public static Builder getBuilder(
 			String nom,
 			MetaExpedientEntity metaExpedient,
-			MetaExpedientDominiEntity metaExpedientDomini,
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			String ntiVersion,
@@ -322,7 +310,6 @@ public class ExpedientEntity extends NodeEntity {
 		return new Builder(
 				nom,
 				metaExpedient,
-				metaExpedientDomini,
 				pare,
 				entitat,
 				ntiVersion,
@@ -336,7 +323,6 @@ public class ExpedientEntity extends NodeEntity {
 		Builder(
 				String nom,
 				MetaExpedientEntity metaExpedient,
-				MetaExpedientDominiEntity metaExpedientDomini,
 				ContingutEntity pare,
 				EntitatEntity entitat,
 				String ntiVersion,
@@ -347,7 +333,6 @@ public class ExpedientEntity extends NodeEntity {
 			built.nom = nom;
 			built.metaNode = metaExpedient;
 			built.metaExpedient = metaExpedient;
-			built.metaExpedientDomini = metaExpedientDomini;
 			built.pare = pare;
 			built.entitat = entitat;
 			built.ntiVersion = ntiVersion;

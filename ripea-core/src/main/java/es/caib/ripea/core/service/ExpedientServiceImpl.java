@@ -55,7 +55,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -84,7 +83,6 @@ import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientDominiRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -98,8 +96,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private MetaExpedientDominiRepository metaExpedientDominiRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
 	@Autowired
@@ -446,21 +442,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 				null,
 				false,
 				false);
-		MetaExpedientDominiEntity metaExpedientDominiEntity = null;
-		if (metaExpedientDominiId != null) {
-			MetaExpedientDominiEntity metaExpedientDominiEntityOriginal = expedient.getMetaExpedientDomini();
-			metaExpedientDominiEntity = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
-			expedient.updateMetaExpedientDomini(metaExpedientDominiEntity);
-			contingutLogHelper.log(
-					expedient,
-					LogTipusEnumDto.MODIFICACIO,
-					(metaExpedientDominiEntityOriginal!=(expedient.getMetaExpedientDomini())) ? String.valueOf(expedient.getMetaExpedientDomini().getCodi()) : null,
-					null,
-					false,
-					false);
-		} else {
-			expedient.updateMetaExpedientDomini(metaExpedientDominiEntity);
-		}
+//		MetaExpedientDominiEntity metaExpedientDominiEntity = null;
+//		if (metaExpedientDominiId != null) {
+//			MetaExpedientDominiEntity metaExpedientDominiEntityOriginal = expedient.getMetaExpedientDomini();
+//			metaExpedientDominiEntity = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
+//			expedient.updateMetaExpedientDomini(metaExpedientDominiEntity);
+//			contingutLogHelper.log(
+//					expedient,
+//					LogTipusEnumDto.MODIFICACIO,
+//					(metaExpedientDominiEntityOriginal!=(expedient.getMetaExpedientDomini())) ? String.valueOf(expedient.getMetaExpedientDomini().getCodi()) : null,
+//					null,
+//					false,
+//					false);
+//		} else {
+//			expedient.updateMetaExpedientDomini(metaExpedientDominiEntity);
+//		}
 		
 		ExpedientDto dto = toExpedientDto(
 				expedient,
@@ -1733,7 +1729,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				accesAdmin,
 				false);
 		MetaExpedientEntity metaExpedient = null;
-		MetaExpedientDominiEntity metaExpedientDomini = null;
 		
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
@@ -1744,9 +1739,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		if (filtre.getMetaExpedientDominiId() != null) {
-			metaExpedientDomini = metaExpedientDominiRepository.findOne(filtre.getMetaExpedientDominiId());
-		}
+//		if (filtre.getMetaExpedientDominiId() != null) {
+//			metaExpedientDomini = metaExpedientDominiRepository.findOne(filtre.getMetaExpedientDominiId());
+//		}
 		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
 				entitat);
@@ -1809,8 +1804,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 						metaExpedientsPermesos,
 						metaExpedient == null,
 						metaExpedient,
-						metaExpedientDomini == null,
-						metaExpedientDomini,
 						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
 						filtre.getNumero() == null ? "" : filtre.getNumero(),
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
@@ -1836,6 +1829,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						expedientRelacionats,
 						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
 						filtre.getInteressat(),
+						filtre.getMetaExpedientDominiValor() == null || filtre.getMetaExpedientDominiValor().isEmpty(),
+						filtre.getMetaExpedientDominiValor(),
 						paginacioHelper.toSpringDataPageable(
 								paginacioParams,
 								ordenacioMap));
@@ -1846,8 +1841,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 						metaExpedientsPermesos,
 						metaExpedient == null,
 						metaExpedient,
-						metaExpedientDomini == null,
-						metaExpedientDomini,
 						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
 						filtre.getNumero() == null ? "" : filtre.getNumero(),
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
@@ -1872,6 +1865,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getTipusId(),
 						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
 						filtre.getInteressat(),
+						filtre.getMetaExpedientDominiValor() == null || filtre.getMetaExpedientDominiValor().isEmpty(),
+						filtre.getMetaExpedientDominiValor(),
 						paginacioHelper.toSpringDataPageable(
 								paginacioParams,
 								ordenacioMap));

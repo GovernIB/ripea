@@ -32,8 +32,6 @@ public class DominiCommand {
 	@NotEmpty @Size(max=1000)
 	private String cadena;
 	@NotEmpty @Size(max=256)
-	private String usuari;
-	@NotEmpty @Size(max=256)
 	private String contrasenya;
 	
 	public Long getId() {
@@ -77,12 +75,6 @@ public class DominiCommand {
 	}
 	public void setCadena(String cadena) {
 		this.cadena = cadena;
-	}
-	public String getUsuari() {
-		return usuari;
-	}
-	public void setUsuari(String usuari) {
-		this.usuari = usuari;
 	}
 	public String getContrasenya() {
 		return contrasenya;

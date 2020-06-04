@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDominiDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -26,7 +25,6 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -39,7 +37,6 @@ import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientDominiRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -60,8 +57,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
 	private MetaExpedientTascaRepository metaExpedientTascaRepository;
-	@Autowired
-	private MetaExpedientDominiRepository metaExpedientDominiRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -307,7 +302,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				true);
 		
 		for(MetaExpedientDto metaExpedient:  resposta.getContingut()){
-			metaExpedient.setExpedientDominisCount(metaExpedientDominiRepository.countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
 			metaExpedient.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
 			metaExpedient.setExpedientTasquesCount(metaExpedientTascaRepository.countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
 		}
@@ -559,173 +553,173 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				MetaExpedientTascaDto.class);
 	}
 
-	@Transactional
-	@Override
-	public MetaExpedientDominiDto dominiCreate(
-			Long entitatId, 
-			Long metaExpedientId,
-			MetaExpedientDominiDto metaExpedientDomini) throws NotFoundException {
-		logger.debug("Creant un nou domini del meta-expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"metaExpedientDomini=" + metaExpedientDomini + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
-				false,
-				false,
-				false,
-				false);
-		MetaExpedientDominiEntity entity = MetaExpedientDominiEntity.getBuilder(
-				metaExpedientDomini.getCodi(),
-				metaExpedientDomini.getNom(),
-				metaExpedientDomini.getDescripcio(),
-				entitat,
-				metaExpedient).
-				build();
-		return conversioTipusHelper.convertir(
-				metaExpedientDominiRepository.save(entity),
-				MetaExpedientDominiDto.class);
-	}
-
-	@Transactional
-	@Override
-	public MetaExpedientDominiDto dominiUpdate(
-			Long entitatId, 
-			Long metaExpedientId,
-			MetaExpedientDominiDto metaExpedientDomini) throws NotFoundException {
-		logger.debug("Actualitzant el domini del meta-expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"metaExpedientDomini=" + metaExpedientDomini + ")");
-		MetaExpedientDominiEntity entity = getMetaExpedientDomini(
-				entitatId,
-				metaExpedientId,
-				metaExpedientDomini.getId());
-		entity.update(
-				metaExpedientDomini.getCodi(),
-				metaExpedientDomini.getNom(),
-				metaExpedientDomini.getDescripcio());
-		return conversioTipusHelper.convertir(
-				entity,
-				MetaExpedientDominiDto.class);
-	}
-
-	@Transactional
-	@Override
-	public MetaExpedientDominiDto dominiDelete(
-			Long entitatId, 
-			Long metaExpedientId, 
-			Long id) throws NotFoundException {
-		logger.debug("Esborrant el domini del meta-expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"id=" + id + ")");
-		MetaExpedientDominiEntity entity = getMetaExpedientDomini(
-				entitatId,
-				metaExpedientId,
-				id);
-		metaExpedientDominiRepository.delete(entity);
-		return conversioTipusHelper.convertir(
-				entity,
-				MetaExpedientDominiDto.class);
-	}
-
-	@Transactional
-	@Override
-	public MetaExpedientDominiDto dominiFindById(
-			Long entitatId, 
-			Long metaExpedientId, 
-			Long id)
-			throws NotFoundException {
-		logger.debug("Consultant el domini del meta-expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"id=" + id + ")");
-		MetaExpedientDominiEntity entity = getMetaExpedientDomini(
-				entitatId,
-				metaExpedientId,
-				id);
-		return conversioTipusHelper.convertir(
-				entity,
-				MetaExpedientDominiDto.class);
-	}
-
-	@Transactional
-	@Override
-	public PaginaDto<MetaExpedientDominiDto> dominiFindPaginatByMetaExpedient(
-			Long entitatId, 
-			Long metaExpedientId,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		logger.debug("Consulta paginada dels dominis del meta-expedient(" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"paginacioParams=" + paginacioParams + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
-				false,
-				false,
-				false,
-				false);
-		return paginacioHelper.toPaginaDto(
-				metaExpedientDominiRepository.findByEntitatAndMetaExpedientAndFiltre(
-						entitat,
-						metaExpedient,
-						paginacioParams.getFiltre() == null,
-						paginacioParams.getFiltre(),
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
-				MetaExpedientDominiDto.class);
-	}
-	
-
-	@Override
-	public List<MetaExpedientDominiDto> dominiFindByMetaExpedient(Long entitatId, Long metaExpedientId)
-			throws NotFoundException {
-		logger.debug("Consulta dels dominis del meta-expedient(" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ")");
-		MetaExpedientEntity metaExpedient = null;
-		List<MetaExpedientDominiDto> metaExpedientsDominis = null;
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false);
-		
-		if (metaExpedientId != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
-				false,
-				false,
-				false,
-				false);
-			
-			metaExpedientsDominis = conversioTipusHelper.convertirList(
-					metaExpedientDominiRepository.findByEntitatAndMetaExpedient(
-							entitat,
-							metaExpedient),
-					MetaExpedientDominiDto.class);
-		} else {
-			metaExpedientsDominis = conversioTipusHelper.convertirList(
-					metaExpedientDominiRepository.findByEntitat(
-							entitat),
-					MetaExpedientDominiDto.class);
-		}
-		return metaExpedientsDominis;
-	}
+//	@Transactional
+//	@Override
+//	public MetaExpedientDominiDto dominiCreate(
+//			Long entitatId, 
+//			Long metaExpedientId,
+//			MetaExpedientDominiDto metaExpedientDomini) throws NotFoundException {
+//		logger.debug("Creant un nou domini del meta-expedient (" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ", " +
+//				"metaExpedientDomini=" + metaExpedientDomini + ")");
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				true,
+//				false);
+//		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+//				entitat,
+//				metaExpedientId,
+//				false,
+//				false,
+//				false,
+//				false);
+//		MetaExpedientDominiEntity entity = MetaExpedientDominiEntity.getBuilder(
+//				metaExpedientDomini.getCodi(),
+//				metaExpedientDomini.getNom(),
+//				metaExpedientDomini.getDescripcio(),
+//				entitat,
+//				metaExpedient).
+//				build();
+//		return conversioTipusHelper.convertir(
+//				metaExpedientDominiRepository.save(entity),
+//				MetaExpedientDominiDto.class);
+//	}
+//
+//	@Transactional
+//	@Override
+//	public MetaExpedientDominiDto dominiUpdate(
+//			Long entitatId, 
+//			Long metaExpedientId,
+//			MetaExpedientDominiDto metaExpedientDomini) throws NotFoundException {
+//		logger.debug("Actualitzant el domini del meta-expedient (" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ", " +
+//				"metaExpedientDomini=" + metaExpedientDomini + ")");
+//		MetaExpedientDominiEntity entity = getMetaExpedientDomini(
+//				entitatId,
+//				metaExpedientId,
+//				metaExpedientDomini.getId());
+//		entity.update(
+//				metaExpedientDomini.getCodi(),
+//				metaExpedientDomini.getNom(),
+//				metaExpedientDomini.getDescripcio());
+//		return conversioTipusHelper.convertir(
+//				entity,
+//				MetaExpedientDominiDto.class);
+//	}
+//
+//	@Transactional
+//	@Override
+//	public MetaExpedientDominiDto dominiDelete(
+//			Long entitatId, 
+//			Long metaExpedientId, 
+//			Long id) throws NotFoundException {
+//		logger.debug("Esborrant el domini del meta-expedient (" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ", " +
+//				"id=" + id + ")");
+//		MetaExpedientDominiEntity entity = getMetaExpedientDomini(
+//				entitatId,
+//				metaExpedientId,
+//				id);
+//		metaExpedientDominiRepository.delete(entity);
+//		return conversioTipusHelper.convertir(
+//				entity,
+//				MetaExpedientDominiDto.class);
+//	}
+//
+//	@Transactional
+//	@Override
+//	public MetaExpedientDominiDto dominiFindById(
+//			Long entitatId, 
+//			Long metaExpedientId, 
+//			Long id)
+//			throws NotFoundException {
+//		logger.debug("Consultant el domini del meta-expedient (" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ", " +
+//				"id=" + id + ")");
+//		MetaExpedientDominiEntity entity = getMetaExpedientDomini(
+//				entitatId,
+//				metaExpedientId,
+//				id);
+//		return conversioTipusHelper.convertir(
+//				entity,
+//				MetaExpedientDominiDto.class);
+//	}
+//
+//	@Transactional
+//	@Override
+//	public PaginaDto<MetaExpedientDominiDto> dominiFindPaginatByMetaExpedient(
+//			Long entitatId, 
+//			Long metaExpedientId,
+//			PaginacioParamsDto paginacioParams) throws NotFoundException {
+//		logger.debug("Consulta paginada dels dominis del meta-expedient(" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ", " +
+//				"paginacioParams=" + paginacioParams + ")");
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				true,
+//				false);
+//		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+//				entitat,
+//				metaExpedientId,
+//				false,
+//				false,
+//				false,
+//				false);
+//		return paginacioHelper.toPaginaDto(
+//				metaExpedientDominiRepository.findByEntitatAndMetaExpedientAndFiltre(
+//						entitat,
+//						metaExpedient,
+//						paginacioParams.getFiltre() == null,
+//						paginacioParams.getFiltre(),
+//						paginacioHelper.toSpringDataPageable(paginacioParams)),
+//				MetaExpedientDominiDto.class);
+//	}
+//	
+//
+//	@Override
+//	public List<MetaExpedientDominiDto> dominiFindByMetaExpedient(Long entitatId, Long metaExpedientId)
+//			throws NotFoundException {
+//		logger.debug("Consulta dels dominis del meta-expedient(" +
+//				"entitatId=" + entitatId + ", " +
+//				"metaExpedientId=" + metaExpedientId + ")");
+//		MetaExpedientEntity metaExpedient = null;
+//		List<MetaExpedientDominiDto> metaExpedientsDominis = null;
+//		
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				false,
+//				false);
+//		
+//		if (metaExpedientId != null) {
+//			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+//				entitat,
+//				metaExpedientId,
+//				false,
+//				false,
+//				false,
+//				false);
+//			
+//			metaExpedientsDominis = conversioTipusHelper.convertirList(
+//					metaExpedientDominiRepository.findByEntitatAndMetaExpedient(
+//							entitat,
+//							metaExpedient),
+//					MetaExpedientDominiDto.class);
+//		} else {
+//			metaExpedientsDominis = conversioTipusHelper.convertirList(
+//					metaExpedientDominiRepository.findByEntitat(
+//							entitat),
+//					MetaExpedientDominiDto.class);
+//		}
+//		return metaExpedientsDominis;
+//	}
 	
 	@Transactional
 	@Override
@@ -899,30 +893,30 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return entity;
 	}
 	
-	private MetaExpedientDominiEntity getMetaExpedientDomini(
-			Long entitatId,
-			Long metaExpedientId,
-			Long id) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
-				false,
-				false,
-				false,
-				false);
-		MetaExpedientDominiEntity entity = metaExpedientDominiRepository.findOne(id);
-		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
-			throw new NotFoundException(
-					id,
-					MetaExpedientDominiEntity.class);
-		}
-		return entity;
-	}
+//	private MetaExpedientDominiEntity getMetaExpedientDomini(
+//			Long entitatId,
+//			Long metaExpedientId,
+//			Long id) {
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//				entitatId,
+//				false,
+//				true,
+//				false);
+//		entityComprovarHelper.comprovarMetaExpedient(
+//				entitat,
+//				metaExpedientId,
+//				false,
+//				false,
+//				false,
+//				false);
+//		MetaExpedientDominiEntity entity = metaExpedientDominiRepository.findOne(id);
+//		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
+//			throw new NotFoundException(
+//					id,
+//					MetaExpedientDominiEntity.class);
+//		}
+//		return entity;
+//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);
 

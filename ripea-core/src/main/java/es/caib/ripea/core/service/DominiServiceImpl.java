@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -12,22 +13,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.entity.DominiEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DominiHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.DominiRepository;
+import es.caib.ripea.core.repository.MetaDadaRepository;
 
 /**
  * Implementació del servei de gestió de meta-documents.
@@ -49,7 +57,10 @@ public class DominiServiceImpl implements DominiService {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private DominiHelper dominiHelper;
+	@Autowired
+	private MetaDadaRepository metaDadaRepository;
 	
+	@Transactional
 	@Override
 	public DominiDto create(
 			Long entitatId,
@@ -67,8 +78,7 @@ public class DominiServiceImpl implements DominiService {
 				domini.getDescripcio(),
 				domini.getConsulta(),
 				domini.getCadena(),
-				domini.getUsuari(),
-				domini.getContrasenya(),
+				dominiHelper.xifrarContrasenya(domini.getContrasenya()),
 				entitat).build();
 		DominiDto dominiDto = conversioTipusHelper.convertir(
 				dominiRepository.save(entity),
@@ -76,6 +86,7 @@ public class DominiServiceImpl implements DominiService {
 		return dominiDto;
 	}
 
+	@Transactional
 	@Override
 	public DominiDto update(
 			Long entitatId, 
@@ -91,21 +102,21 @@ public class DominiServiceImpl implements DominiService {
 					domini.getId(),
 					DominiEntity.class);
 		}
-
+		
 		entity.update(
 				domini.getCodi(),
 				domini.getNom(),
 				domini.getDescripcio(),
 				domini.getConsulta(),
 				domini.getCadena(),
-				domini.getUsuari(),
-				domini.getContrasenya());
+				dominiHelper.xifrarContrasenya(domini.getContrasenya()));
 		DominiDto dominiDto = conversioTipusHelper.convertir(
 				entity,
 				DominiDto.class);
 		return dominiDto;
 	}
 
+	@Transactional
 	@Override
 	public DominiDto delete(
 			Long entitatId, 
@@ -124,6 +135,7 @@ public class DominiServiceImpl implements DominiService {
 		return dominiDto;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public DominiDto findById(
 			Long entitatId, 
@@ -132,13 +144,15 @@ public class DominiServiceImpl implements DominiService {
 				"entitatId=" + entitatId +
 				"dominiId=" + id + ")");
 		DominiEntity entity = dominiRepository.findOne(id);
-
+		entity.setContrasenya(dominiHelper.desxifrarContrasenya(entity.getContrasenya()));
+		
 		DominiDto dominiDto = conversioTipusHelper.convertir(
 				entity,
 				DominiDto.class);
-		return dominiDto;
+		return dominiDto;	
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<DominiDto> findByEntitatPaginat(Long entitatId, PaginacioParamsDto paginacioParams)
 			throws NotFoundException {
@@ -150,6 +164,8 @@ public class DominiServiceImpl implements DominiService {
 
 		Page<DominiEntity> page = dominiRepository.findByEntitat(
 				entitat,
+				paginacioParams.getFiltre() == null,
+				paginacioParams.getFiltre(),
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 
 		PaginaDto<DominiDto> dominiDto = paginacioHelper.toPaginaDto(
@@ -158,6 +174,7 @@ public class DominiServiceImpl implements DominiService {
 		return dominiDto;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<DominiDto> findByEntitat(Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -174,6 +191,7 @@ public class DominiServiceImpl implements DominiService {
 		return dominisDto;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public DominiDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -191,26 +209,61 @@ public class DominiServiceImpl implements DominiService {
 		return dominiDto;
 	}
 	
+	@Transactional
 	@Override
 	public List<ResultatDominiDto> getResultDomini(
 			Long entitatId,
-			DominiDto domini) throws NotFoundException {
+			DominiDto domini) throws NotFoundException, DominiException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-		Properties conProps = dominiHelper.getProperties(domini.getCadena());
+		JdbcTemplate jdbcTemplate = null;
+		Properties conProps = dominiHelper.getProperties(domini);
 		
 		if (conProps != null && !conProps.isEmpty()) {
 			DataSource dataSource = cacheHelper.createDominiConnexio(
 					entitat.getCodi(),
 					conProps);
-			dominiHelper.setDataSource(dataSource);
+			jdbcTemplate = dominiHelper.setDataSource(dataSource);
 		}
-		return dominiHelper.findDominisByConsutla(domini.getConsulta());
+		return cacheHelper.findDominisByConsutla(
+				jdbcTemplate,
+				domini.getConsulta());
+	}
+	
+	@Override
+	public List<DominiDto> findByMetaNodePermisLecturaAndTipusDomini(
+			Long entitatId, 
+			MetaExpedientDto metaExpedient) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				true, 
+				false, 
+				false);
+		List<String> dominisCodis = new ArrayList<String>();
+		
+		//1. trobar metadades de tipus domini d'aquests metaexpedients
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeIdAndTipusOrderByOrdreAsc(
+				metaExpedient.getId(), 
+				MetaDadaTipusEnumDto.DOMINI);
+		//2. recuperar els tipus de domini d'aquestes metadades
+		for (MetaDadaEntity metaDadaEntity : metaDades) {
+			dominisCodis.add(metaDadaEntity.getValor());
+		}
+		List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodiInOrderByIdAsc(
+				entitat, 
+				dominisCodis);
+		return conversioTipusHelper.convertirList(
+				dominis, 
+				DominiDto.class);
 	}
 
+	public void evictDominiCache() {
+		cacheHelper.evictCreateDominiConnexio();
+		cacheHelper.evictFindDominisByConsutla();
+	}
 	private static final Logger logger = LoggerFactory.getLogger(DominiServiceImpl.class);
 
 }

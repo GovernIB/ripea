@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.acls.model.Permission;
@@ -31,9 +32,11 @@ import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
+import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -262,9 +265,40 @@ public class CacheHelper {
 	public DataSource createDominiConnexio(
 			String entitatCodi,
 			Properties conProps) {
-		return new DriverManagerDataSource(conProps.getProperty("url"), conProps);
+		DataSource dataSource = null;
+		try {
+			dataSource = new DriverManagerDataSource(
+					conProps.getProperty("url"),
+					conProps);
+		} catch (Exception e) {
+			throw new DominiException(
+					"No s'ha pogut crear el datasource " + e.getMessage(),
+					e.getCause());
+		}
+		return dataSource;
 	}
-
+	@CacheEvict(value = "connexioDomini", allEntries=true)
+	public void evictCreateDominiConnexio() {
+	}
+	
+	@Cacheable(value = "resultatConsultaDominis", key="#consulta")
+	public List<ResultatDominiDto> findDominisByConsutla(
+			JdbcTemplate jdbcTemplate,
+			String consulta) {
+		List<ResultatDominiDto> resultat = new ArrayList<ResultatDominiDto>();
+		try {
+			if (jdbcTemplate != null)
+				resultat = jdbcTemplate.query(consulta, new DominiRowMapperHelper());
+		} catch (Exception e) {
+			throw new DominiException(
+					"No s'ha pogut recuperar el resultat de consulta: " + e.getMessage(),
+					e.getCause());
+		}
+		return resultat;
+	}
+	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
+	public void evictFindDominisByConsutla() {
+	}
 
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,

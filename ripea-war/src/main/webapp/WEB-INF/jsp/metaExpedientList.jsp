@@ -77,11 +77,6 @@
 						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 				</th>
-				<th data-col-name="expedientDominisCount" data-template="#cellDominisTemplate" data-orderable="false" width="1%">
-					<script id="cellDominisTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/domini" class="btn btn-default"><spring:message code="metaexpedient.list.boto.dominis"/>&nbsp;<span class="badge">{{:expedientDominisCount}}</span></a>
-					</script>
-				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

@@ -110,9 +110,9 @@ $(document).ready(function() {
 		alert("Button Clicked");
 	});
 
-
+	var metaExpedientId = "";
 	$('#metaExpedientId').on('change', function() {
-		var tipus = $(this).val();
+		metaExpedientId = $(this).val();
 		$('#expedientEstatId').select2('val', '', true);
 		$('#expedientEstatId option[value!=""]').remove();
 		var metaNodeRefresh = function(data) {
@@ -120,14 +120,52 @@ $(document).ready(function() {
 				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
 			}
 		};
-		if (tipus != "") {
-			$.get("<c:url value="/expedient/estatValues/"/>"+tipus)
+		if (metaExpedientId != "") {
+			$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
 			.done(metaNodeRefresh)
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
 		}
+		//select dominis a partir de metaexpedient
+		var dominisRefresh = function(data) {	
+			$('#metaExpedientDominiCodi').append("<option value=\"\"></option>");
+			for (var i = 0; i < data.length; i++) {
+
+				console.log($('#metaExpedientDominiCodi').val());
+				$('#metaExpedientDominiCodi').append('<option value="' + data[i].codi + '">' + data[i].nom + '</option>');
+			}
+		};
+		if (metaExpedientId != "") {
+			var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDadaPermisLectura/domini"/>';
+			$.get(multipleUrl)
+			.done(dominisRefresh)
+			.fail(function() {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+		}
+		
 	});
+	$('#metaExpedientDominiCodi').on('change', function() {
+		var dominiCodi= $(this).val();
+		//get valor domini seleccionat
+		var dominisRefresh = function(data) {
+			$('#metaExpedientDominiValor').append("<option value=\"\"></option>");
+			for (var i = 0; i < data.length; i++) {
+				console.log(data[i]);
+				$('#metaExpedientDominiValor').append('<option value="' + data[i].id + '">' + data[i].valor + '</option>');
+			}
+		};
+		if (metaExpedientId != "") {
+			var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDada/domini/' + dominiCodi + '"/>';
+			$.get(multipleUrl)
+			.done(dominisRefresh)
+			.fail(function() {
+			alert("<spring:message code="error.jquery.ajax"/>");
+			});
+		}
+	});
+	$('#metaExpedientId').trigger('change');
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -197,8 +235,16 @@ function getCookie(cname) {
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/>
+			<div class="col-md-9">
+				<div class="row">
+					<div class="col-md-4">
+					<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
+						<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
+					</div>
+					<div class="col-md-4">
+						<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+					</div>
+				</div>
 			</div>	
 		</div>
 	</form:form>

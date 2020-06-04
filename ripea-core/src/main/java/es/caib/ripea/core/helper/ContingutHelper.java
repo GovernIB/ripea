@@ -58,7 +58,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
@@ -164,10 +163,6 @@ public class ContingutHelper {
 			dto.setTancatMotiu(expedient.getTancatMotiu());
 			dto.setAny(expedient.getAny());
 			dto.setSequencia(expedient.getSequencia());
-			dto.setMetaExpedientDomini(
-					conversioTipusHelper.convertir(
-							expedient.getMetaExpedientDomini(), 
-							MetaExpedientDominiDto.class));
 			dto.setCodi(expedient.getCodi());
 			dto.setNtiVersion(expedient.getNtiVersion());
 			dto.setNtiIdentificador(expedient.getNtiIdentificador());
@@ -882,7 +877,6 @@ public class ContingutHelper {
 	public ExpedientEntity crearNouExpedient(
 			String nom,
 			MetaExpedientEntity metaExpedient,
-			MetaExpedientDominiEntity metaExpedientDomini,
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			String ntiVersion,
@@ -899,7 +893,6 @@ public class ContingutHelper {
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
-				metaExpedientDomini,
 				pare,
 				entitat,
 				"1.0",

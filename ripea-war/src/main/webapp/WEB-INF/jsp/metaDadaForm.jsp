@@ -22,6 +22,7 @@
 $(document).ready(function() {
 	$('select#tipus').change(function() {
 		if ($(this).val() == 'DOMINI') {
+			$('#domini').parent().parent().show();
 			let valor = $('#valor').val();
 			$('#valor').parent().parent().hide();
 			$.ajax({
@@ -52,6 +53,7 @@ $(document).ready(function() {
 			});
 		} else {
 			$('#valor').parent().parent().show();
+			$('#domini').parent().parent().hide();
 		}
 	});
 	$('select#domini').change(function() {
@@ -59,8 +61,7 @@ $(document).ready(function() {
 		var dominiNomSelected = $(this).text();
 		if (dominiCodiSelected != null && dominiCodiSelected != '') {
 			$('#codi').val(dominiCodiSelected);
-			$('#nom').val(dominiNomSelected);
-			//$('#valor').val(dominiSelected);
+			$('#valor').val(dominiCodiSelected);
 		}
 	});
 	$('select#domini').trigger('change');
@@ -79,7 +80,7 @@ $(document).ready(function() {
 		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto"/>
 		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
 		<rip:inputText name="valor" textKey="metadada.form.camp.valor"/>
-		<rip:inputSelect name="domini"/>
+		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini"/>
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

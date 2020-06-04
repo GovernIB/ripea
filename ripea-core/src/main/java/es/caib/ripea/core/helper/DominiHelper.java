@@ -4,12 +4,19 @@
 package es.caib.ripea.core.helper;
 
 import java.io.IOException;
-import java.util.List;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import javax.sql.DataSource;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -17,7 +24,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.exception.CipherException;
+import es.caib.ripea.core.api.exception.ValidationException;
 
 /**
  * Helper per recuperar el resultat d'una consulta d'un domini.
@@ -27,19 +36,15 @@ import es.caib.ripea.core.api.dto.ResultatDominiDto;
 @Component
 public class DominiHelper {
 
-	private JdbcTemplate jdbcTemplate;
-
-	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+	public JdbcTemplate setDataSource(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
 	}
-
-	public List<ResultatDominiDto> findDominisByConsutla(String consulta) {
-		return jdbcTemplate.query(consulta, new DominiRowMapperHelper());
-	}
-
-	public Properties getProperties(String cadena) {
-		Properties conProp = new Properties();
+	
+	public Properties getProperties(DominiDto domini) {
+		Properties conProps = new Properties();
 		try {
+			String cadena = domini.getCadena();
+			String password = domini.getContrasenya();
 			Document document = XmlHelper.getDocumentFromContent(cadena.getBytes());
 			if (document != null) {
 				for (int i = 0; i < document.getElementsByTagName("local-tx-datasource").getLength(); i++) {
@@ -49,16 +54,13 @@ public class DominiHelper {
 							Node childNode = childList.item(j);
 							switch (childNode.getNodeName()) {
 							case "connection-url":
-								conProp.setProperty("url", childList.item(j).getTextContent().trim());
+								conProps.setProperty("url", childList.item(j).getTextContent().trim());
 								break;
 							case "driver-class":
-								conProp.setProperty("driver", childList.item(j).getTextContent().trim());
+								conProps.setProperty("driver", childList.item(j).getTextContent().trim());
 								break;
 							case "user-name":
-								conProp.setProperty("user", childList.item(j).getTextContent().trim());
-								break;
-							case "password":
-								conProp.setProperty("password", childList.item(j).getTextContent().trim());
+								conProps.setProperty("user", childList.item(j).getTextContent().trim());
 								break;
 							default:
 								break;
@@ -67,11 +69,48 @@ public class DominiHelper {
 					}
 				}
 			}
+			if (password != null && !password.isEmpty()) {
+				password = desxifrarContrasenya(password);
+				conProps.setProperty("password", password);
+			}
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ValidationException(e.getMessage());
 		}
-		return conProp;
+		return conProps;
+	}
+	
+	public String xifrarContrasenya(String contrasenya) {
+		byte[] xifrat = null;
+		if (contrasenya != null) {
+			byte[] bytes = contrasenya.getBytes();
+			Cipher cipher;
+			try {
+				cipher = Cipher.getInstance("RC4");
+				SecretKeySpec rc4Key = new SecretKeySpec("dom1n1".getBytes(),"RC4");
+				cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
+				xifrat = cipher.doFinal(bytes);
+			} catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException e) {
+				throw new CipherException(
+						"Hi ha hagut un error xifrant la contrasenya del domini", 
+						e.getCause());
+			} 
+		}
+		return new String(Base64.encodeBase64(xifrat));
+	}
+	
+	public String desxifrarContrasenya(String contrasenya) {	
+		byte[] desxifrat = null;
+		try {
+			Cipher cipher = Cipher.getInstance("RC4");
+			SecretKeySpec rc4Key = new SecretKeySpec("dom1n1".getBytes(),"RC4");
+			cipher.init(Cipher.DECRYPT_MODE, rc4Key);
+			desxifrat = cipher.doFinal(Base64.decodeBase64(contrasenya.getBytes()));
+		} catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException e) {
+			throw new CipherException(
+					"Hi ha hagut un error desxifrant la contrasenya del domini", 
+					e.getCause());
+		} 
+		return new String(desxifrat);
 	}
 
 }

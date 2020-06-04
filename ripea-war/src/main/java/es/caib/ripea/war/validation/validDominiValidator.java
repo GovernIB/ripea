@@ -42,7 +42,7 @@ public class validDominiValidator implements ConstraintValidator<validDomini, Do
         	LOGGER.error("XML no vàlid", ex);
         	validXml = false;
         	context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("domini.form.camp.cadena-validacio"))
 			.addNode("cadena")
 			.addConstraintViolation();
         }

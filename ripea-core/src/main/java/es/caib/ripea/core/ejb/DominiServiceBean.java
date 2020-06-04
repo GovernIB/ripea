@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
@@ -92,5 +93,17 @@ public class DominiServiceBean implements DominiService {
 	@RolesAllowed("tothom")
 	public List<ResultatDominiDto> getResultDomini(Long entitatId, DominiDto domini) throws NotFoundException {
 		return delegate.getResultDomini(entitatId, domini);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<DominiDto> findByMetaNodePermisLecturaAndTipusDomini(Long entitatId, MetaExpedientDto metaExpedient) {
+		return delegate.findByMetaNodePermisLecturaAndTipusDomini(entitatId, metaExpedient);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void evictDominiCache() {
+		delegate.evictDominiCache();
 	}
 }
