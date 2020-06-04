@@ -105,6 +105,7 @@ public class ConversioTipusHelper {
 						target.setDataFi(source.getDataFi());
 						target.setEstat(source.getEstat());
 						target.setMotiuRebuig(source.getMotiuRebuig());
+						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						return target;
 					}
 				});

@@ -126,12 +126,17 @@ span a {
 	margin: 0;
 	padding: 0;
 }
+#contenidor-info {
+	margin-bottom: 0;
+}
 #contenidor-info h3 {
 	font-weight: bold;
 	margin-top: 0;
 	border-bottom: 1px solid #e3e3e3;
 	padding-bottom: .6em;
+	padding-bottom: 6px;
 }
+	
 #contenidor-info h4 {
 	font-weight: bold;
 	margin-top: 0;
@@ -149,6 +154,42 @@ span a {
 	margin-bottom: 4px;    
 }
 #contenidor-info dd {
+	font-size: medium;
+	font-weight: bold;
+	margin-bottom: 0.4em;
+}
+
+#tasca-info {
+	margin-bottom: 10px;
+}
+#tasca-info dl {
+	margin-bottom: 0px;
+}
+#tasca-info h3 {
+	font-weight: bold;
+	margin-top: 0;
+	border-bottom: 1px solid #e3e3e3;
+	padding-bottom: .6em;
+	padding-bottom: 6px;
+}
+	
+#tasca-info h4 {
+	font-weight: bold;
+	margin-top: 0;
+	border-bottom: 1px solid #f5f5f5;
+	padding-bottom: .6em;
+}
+#tasca-info dt {
+	color: #999;
+	font-size: small;
+	font-style: italic;
+	font-weight: normal;
+}
+#tasca-info #botons-accions-info button{
+    padding: 1px 6px;
+	margin-bottom: 4px;    
+}
+#tasca-info dd {
 	font-size: medium;
 	font-weight: bold;
 	margin-bottom: 0.4em;
@@ -193,12 +234,7 @@ ul.interessats {
 #alerta-no-agafat {
 	margin-bottom: 15px;
 }
-#contenidor-info {
-	margin-bottom: 0;
-}
-#contenidor-info h3 {
-	padding-bottom: 6px;
-}
+
 .drag_activated {
 	border: 4px dashed #ffd351;
 	height: 200px;
@@ -882,14 +918,31 @@ function deselectAll() {
 	
 		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- INFORMACIÓ BLOCK (LEFT SIDE OF THE PAGE) ------------------------------------------------------------------------>
-			<div class="col-md-3 col-sm-4" id="colInfo">		
+			<div class="col-md-3 col-sm-4" id="colInfo">	
+			
+			<c:if test="${isTasca}">
+				<div id="tasca-info" class="well">
+					<h3>
+						<spring:message code="tasca"/>
+					</h3>
+					<dl>
+						<!---------  Data d'obertura  --------->
+						<dt><spring:message code="tasca.info.dataInici"/></dt>
+						<dd><fmt:formatDate value="${tasca.dataInici}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+						<dt><spring:message code="tasca.info.assignatPer"/></dt>
+						<dd>${tasca.createdBy.nom}</dd>
+						<dt><spring:message code="tasca.info.estat"/></dt>
+						<dd>${tasca.estat}</dd>
+					</dl>
+				</div>
+				</c:if>
 				<div id="contenidor-info" class="well">
 					<h3>
 						<c:choose>
 							<c:when test="${isTasca}">
-							<span style="width:100%" class="ellipsis" title="${contingut.nom}">
-								${contingut.nom}
-							</span>
+								<span style="width:100%" class="ellipsis" title="${contingut.nom}">
+									${contingut.nom}
+								</span>
 							</c:when>
 							<c:otherwise>
 								<spring:message code="contingut.info.informacio"/>
@@ -925,15 +978,16 @@ function deselectAll() {
 								</c:otherwise>
 							</c:choose>								
 						</c:if>
-					<c:if test="${contingut.expedient or contingut.document}">
-						<c:if test="${contingut.expedient}">
-							<!---------  Data d'obertura  --------->
-							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
-							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-							<dd>${contingut.ntiClasificacionSia}</dd>
+						<c:if test="${contingut.expedient or contingut.document}">
+							<c:if test="${contingut.expedient}">
+								<!---------  Data d'obertura  --------->
+								<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
+								<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+								<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
+								<dd>${contingut.ntiClasificacionSia}</dd>
+							</c:if>
 						</c:if>
-					</c:if>
+					</dl>
 					<!---------  Expedients relacionats  --------->
 					<c:if test="${!isTasca && not empty relacionats}">
 						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
