@@ -748,7 +748,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Override
 	@Transactional
 	public void notificacioActualitzarEstat(String identificador, String referencia) {
-		
 		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findByIdentificadorIReferencia(
 				identificador, referencia);
 		if (documentEnviamentInteressatEntity == null) {
@@ -760,6 +759,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 			pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
 			DocumentEnviamentEstatEnumDto estatDespres = notificacio.getEstat();
 			if (estatAbans != estatDespres) {
+				alertaHelper.crearAlerta(
+						"La notificació del document " + documentEnviamentInteressatEntity.getNotificacio().getDocument().getNom() + " ha canviat a l'estat " + estatDespres,
+						null,
+						documentEnviamentInteressatEntity.getNotificacio().getDocument().getExpedient().getId());
 				emailHelper.canviEstatNotificacio(notificacio, estatAbans);
 			}
 		} catch (Exception ex) {

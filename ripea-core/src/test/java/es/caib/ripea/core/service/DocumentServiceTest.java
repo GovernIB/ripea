@@ -25,6 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -361,6 +362,15 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 						assertNotNull(documentFirmat);
 						assertNotNull(documentFirmat.getId());
 						assertEquals(DocumentEstatEnumDto.CUSTODIAT, documentFirmat.getEstat());
+						ExpedientDto expedientAlerta = expedientService.findById(
+								entitatCreada.getId(),
+								expedientCreat.getId());
+						assertTrue(expedientAlerta.isAlerta());
+						List<AlertaDto> alertes = contingutService.findAlertes(
+								entitatCreada.getId(),
+								expedientCreat.getId());
+						assertNotNull(alertes);
+						assertTrue(alertes.size() == 1);
 					}
 				},
 				"Firma amb portafirmes d'un document a dins un expedient");

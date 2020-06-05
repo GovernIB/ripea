@@ -32,20 +32,6 @@
 	</script>
 </head>
 <body>
-	<c:if test="${!contingut.valid && contingut.alerta}">
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#alertes" data-toggle="tab"><spring:message code="contingut.tab.errors.alerta"/></a></li>
-			<li><a href="#validacions" data-toggle="tab"><spring:message code="contingut.tab.errors.validacio"/></a></li>
-		</ul>
-		<div class="tab-content">
-			<div id="alertes" class="tab-pane active in">
-	</c:if>
-	<c:if test="${contingut.alerta}">
-	</c:if>
-	<c:if test="${!contingut.valid && contingut.alerta}">		
-		</div>
-		<div id="validacions" class="tab-pane">
-	</c:if>
 	<c:if test="${!contingut.valid}">
 		<c:set var="hiHaMetaDades" value="${false}"/>
 		<c:set var="hiHaMetaDocuments" value="${false}"/>
@@ -73,9 +59,6 @@
 				</c:forEach>
 			</ul>
 		</c:if>
-	</c:if>
-	<c:if test="${!contingut.valid && contingut.alerta}">			
-		</div>
 	</c:if>
 	<div id="modal-botons" class="well">
 		<a href="<c:url value="/contingut/${contingut.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>

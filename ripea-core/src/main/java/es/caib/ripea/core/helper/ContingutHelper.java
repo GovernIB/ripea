@@ -64,6 +64,7 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -101,6 +102,8 @@ public class ContingutHelper {
 	private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired
+	private AlertaRepository alertaRepository;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
@@ -347,6 +350,10 @@ public class ContingutHelper {
 			resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
 		}
 		if (resposta != null) {
+			resposta.setAlerta(
+					alertaRepository.countByLlegidaAndContingutId(
+					false,
+					contingut.getId()) > 0);
 			if (ambPath) {
 				// Calcula el path
 				List<ContingutDto> path = getPathContingutComDto(

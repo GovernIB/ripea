@@ -15,6 +15,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
@@ -153,6 +154,14 @@ public class ContingutServiceBean implements ContingutService {
 			Long entitatId,
 			Long contingutId) {
 		return delegate.findErrorsValidacio(entitatId, contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<AlertaDto> findAlertes(
+			Long entitatId,
+			Long contingutId) throws NotFoundException {
+		return delegate.findAlertes(entitatId, contingutId);
 	}
 
 	@Override

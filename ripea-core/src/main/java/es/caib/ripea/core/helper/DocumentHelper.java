@@ -99,6 +99,8 @@ public class DocumentHelper {
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private AlertaHelper alertaHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -710,6 +712,10 @@ public class DocumentHelper {
 							false,
 							false);
 				}
+				alertaHelper.crearAlerta(
+						"La firma del document " + document.getNom() + " ha finalitzat correctament",
+						null,
+						document.getExpedient().getId());
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de portafirmes (" +
@@ -737,6 +743,10 @@ public class DocumentHelper {
 						null,
 						false,
 						false);
+				alertaHelper.crearAlerta(
+						"La firma del document " + document.getNom() + " ha estat rebutjada",
+						null,
+						document.getExpedient().getId());
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
 			} catch (Exception ex) {
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);

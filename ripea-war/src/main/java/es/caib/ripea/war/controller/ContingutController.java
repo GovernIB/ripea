@@ -359,10 +359,30 @@ public class ContingutController extends BaseUserController {
 						contingutId));
 		return "contingutErrors";
 	}
+	
+	@RequestMapping(value = "/contingut/{contingutId}/alertes", method = RequestMethod.GET)
+	public String alertes(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"contingut",
+				contingutService.findAmbIdUser(
+						entitatActual.getId(),
+						contingutId,
+						true,
+						false));
+		model.addAttribute(
+				"alertes",
+				contingutService.findAlertes(
+						entitatActual.getId(),
+						contingutId));
+		return "contingutAlertes";
+	}
 
-	@RequestMapping(value = "/contingut/{contingutId}/errors/{alertaId}/llegir", method = RequestMethod.GET)
-	@ResponseBody
-	public void llegirAlerta(
+	@RequestMapping(value = "/contingut/{contingutId}/alertes/{alertaId}/llegir", method = RequestMethod.GET)
+	public String llegirAlerta(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@PathVariable Long alertaId,
@@ -370,6 +390,10 @@ public class ContingutController extends BaseUserController {
 		AlertaDto alerta = alertaService.find(alertaId);
 		alerta.setLlegida(true);
 		alertaService.update(alerta);
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../../../modal/contingut/" + contingutId + "/alertes",
+				"contingut.controller.alerta.llegida");
 	}
 
 	@RequestMapping(value = "/contingut/{contingutId}/interessat/datatable", method = RequestMethod.GET)

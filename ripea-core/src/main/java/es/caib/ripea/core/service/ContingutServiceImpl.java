@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.api.Firma;
+import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuContingutDto;
 import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
@@ -55,6 +57,7 @@ import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
@@ -73,6 +76,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -129,6 +133,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
@@ -831,6 +837,33 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false);
 		return cacheHelper.findErrorsValidacioPerNode(node);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<AlertaDto> findAlertes(
+			Long entitatId,
+			Long contingutId) throws NotFoundException {
+		logger.debug("Obtenint alertes associades al contingut ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ")");
+		contingutHelper.comprovarContingutDinsExpedientAccessible(
+				entitatId,
+				contingutId,
+				true,
+				false);
+		List<AlertaEntity> alertes = alertaRepository.findByLlegidaAndContingutId(
+				false,
+				contingutId,
+				new Sort(Sort.Direction.DESC, "createdDate"));
+		List<AlertaDto> resposta = conversioTipusHelper.convertirList(
+				alertes,
+				AlertaDto.class);
+		for (int i = 0; i < alertes.size(); i++) {
+			resposta.get(i).setCreatedDate(
+					alertes.get(i).getCreatedDate().toDate());
+		}
+		return resposta;
 	}
 
 	@Transactional(readOnly = true)

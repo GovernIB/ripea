@@ -8,14 +8,13 @@ package es.caib.ripea.core.api.dto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AlertaDto {
+public class AlertaDto extends AuditoriaDto {
 	
 	private Long id;
 	private String text;
 	private String error;
 	private boolean llegida;
 	private Long contingutId;
-	
 	
 	public Long getId() {
 		return id;

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
@@ -260,7 +261,7 @@ public interface ContingutService {
 			String path) throws NotFoundException;
 
 	/**
-	 * Obté els errors de validació d'un contingut.
+	 * Obté els errors de validació associades a un contingut.
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat a la qual pertany el contingut.
@@ -272,6 +273,22 @@ public interface ContingutService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<ValidacioErrorDto> findErrorsValidacio(
+			Long entitatId,
+			Long contingutId) throws NotFoundException;
+
+	/**
+	 * Obté les alertes associades a un contingut.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contingut.
+	 * @param contingutId
+	 *            Atribut id del contingut del qual es vol consultar el contingut.
+	 * @return les alertes associades a un contingut.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<AlertaDto> findAlertes(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
 

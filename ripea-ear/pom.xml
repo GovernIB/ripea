@@ -136,7 +136,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>emiserv</finalName>
+		<finalName>ripea</finalName>
 	</build>
 	<repositories>
 		<repository>

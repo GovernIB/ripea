@@ -180,7 +180,6 @@ function getCookie(cname) {
 					<div class="col-md-3">
 						<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
 					</div>			
-						
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<div class="col-md-1">
 						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
@@ -190,7 +189,6 @@ function getCookie(cname) {
 			</div>
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
-					
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
@@ -250,17 +248,8 @@ function getCookie(cname) {
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
-						{{if !valid}}
-							{{if alerta}}
-								<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.dual"/>"></span>
-							{{else}}
-								<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient"/>"></span>
-							{{/if}}
-						{{else}}
-							{{if alerta}}
-								<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.segonpla"/>"></span>
-							{{/if}}
-						{{/if}}
+						{{if !valid}}<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.validacio"/>"></span>{{/if}}
+						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}
 						{{:nom}}
 					</script>
 				</th>
