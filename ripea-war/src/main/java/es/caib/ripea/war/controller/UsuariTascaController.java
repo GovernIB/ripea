@@ -59,6 +59,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
@@ -172,8 +173,6 @@ public class UsuariTascaController extends BaseUserController {
 				true,
 				true);
 		
-		
-		
 		omplirModelPerMostrarContingut(
 				request,
 				entitatActual,
@@ -183,6 +182,7 @@ public class UsuariTascaController extends BaseUserController {
 		model.addAttribute("tascaId", expedientTascaId);
 		model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
+		model.addAttribute("tasca", expedientTascaDto);
 		return "contingut";
 	}
 	

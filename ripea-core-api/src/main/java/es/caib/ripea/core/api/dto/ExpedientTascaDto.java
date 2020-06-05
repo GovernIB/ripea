@@ -15,6 +15,7 @@ public class ExpedientTascaDto {
 	private String responsableCodi;
 	private Long metaExpedientTascaId;
 	private String motiuRebuig;
+	private UsuariDto createdBy;
 	
 	public Long getId() {
 		return id;
@@ -75,6 +76,12 @@ public class ExpedientTascaDto {
 	}
 	public void setMotiuRebuig(String motiuRebuig) {
 		this.motiuRebuig = motiuRebuig;
+	}
+	public UsuariDto getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(UsuariDto createdBy) {
+		this.createdBy = createdBy;
 	}
 	
 }
