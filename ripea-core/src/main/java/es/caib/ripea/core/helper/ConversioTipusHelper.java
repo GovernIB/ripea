@@ -106,9 +106,13 @@ public class ConversioTipusHelper {
 						target.setEstat(source.getEstat());
 						target.setMotiuRebuig(source.getMotiuRebuig());
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
+						target.setDataLimit(source.getDataLimit());
+						target.setShouldNotifyAboutDeadline(TascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
+						
 						return target;
 					}
 				});
+		
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<InteressatEntity, InteressatDto>() {
@@ -185,6 +189,7 @@ public class ConversioTipusHelper {
 					}
 				});
 	}
+
 
 	public <T> T convertir(Object source, Class<T> targetType) {
 		if (source == null)

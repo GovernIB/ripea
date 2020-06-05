@@ -919,23 +919,43 @@ function deselectAll() {
 		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- INFORMACIÓ BLOCK (LEFT SIDE OF THE PAGE) ------------------------------------------------------------------------>
 			<div class="col-md-3 col-sm-4" id="colInfo">	
-			
-			<c:if test="${isTasca}">
-				<div id="tasca-info" class="well">
-					<h3>
-						<spring:message code="tasca"/>
-					</h3>
-					<dl>
-						<!---------  Data d'obertura  --------->
-						<dt><spring:message code="tasca.info.dataInici"/></dt>
-						<dd><fmt:formatDate value="${tasca.dataInici}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-						<dt><spring:message code="tasca.info.assignatPer"/></dt>
-						<dd>${tasca.createdBy.nom}</dd>
-						<dt><spring:message code="tasca.info.estat"/></dt>
-						<dd>${tasca.estat}</dd>
-					</dl>
-				</div>
+				<!------------  TASCA INFO  ------------->
+				<c:if test="${isTasca}">
+					<div id="tasca-info" class="well">
+						<h3>
+							<spring:message code="tasca"/>
+						</h3>
+						<dl>	
+							<c:if test="${!empty tasca.dataLimit}">
+								<!---------  Data límit  --------->
+								<dt><spring:message code="tasca.info.dataLimit"/></dt>
+								<dd>
+									<c:choose>
+										<c:when test="${tasca.shouldNotifyAboutDeadline}">
+											<span style="color: red;">
+												<fmt:formatDate value="${tasca.dataLimit}" pattern="dd/MM/yyyy" />
+												<span class="fa fa-clock-o"></span>
+											</span>
+										</c:when>
+										<c:otherwise>
+											<fmt:formatDate value="${tasca.dataLimit}" pattern="dd/MM/yyyy"/>
+										</c:otherwise>
+									</c:choose>
+								</dd>
+							</c:if>
+							<!---------  Data d'inici  --------->
+							<dt><spring:message code="tasca.info.dataInici"/></dt>
+							<dd><fmt:formatDate value="${tasca.dataInici}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							<!---------  Assignat per  --------->
+							<dt><spring:message code="tasca.info.assignatPer"/></dt>
+							<dd>${tasca.createdBy.nom}</dd>
+							<!---------  Estat  --------->
+							<dt><spring:message code="tasca.info.estat"/></dt>
+							<dd>${tasca.estat}</dd>
+						</dl>
+					</div>
 				</c:if>
+				<!------------  EXPEDIENT INFO  ------------->
 				<div id="contenidor-info" class="well">
 					<h3>
 						<c:choose>
@@ -1676,6 +1696,8 @@ function deselectAll() {
 										<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>								
 										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
+										<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+										<th data-col-name="dataLimit" data-converter="date"><spring:message code="expedient.tasca.list.columna.dataLimit"/></th>									
 										<th data-col-name="responsable.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable"/></th>								
 										<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
 											<spring:message code="expedient.tasca.list.columna.estat"/>

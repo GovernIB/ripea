@@ -436,7 +436,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientTasca.getNom(),
 				metaExpedientTasca.getDescripcio(),
 				metaExpedientTasca.getResponsable(),
-				metaExpedient).
+				metaExpedient, 
+				metaExpedientTasca.getDataLimit()).
 				build();
 		return conversioTipusHelper.convertir(
 				metaExpedientTascaRepository.save(entity),
@@ -461,7 +462,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientTasca.getCodi(),
 				metaExpedientTasca.getNom(),
 				metaExpedientTasca.getDescripcio(),
-				metaExpedientTasca.getResponsable());
+				metaExpedientTasca.getResponsable(),
+				metaExpedientTasca.getDataLimit());
 		return conversioTipusHelper.convertir(
 				entity,
 				MetaExpedientTascaDto.class);

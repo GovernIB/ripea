@@ -31,6 +31,23 @@
 				<th data-col-name="expedient.nomINumero" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.expedient"/></th>
 				<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
+				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+				<th data-col-name="dataLimitString" width="20%" data-template="#cellTascaDeadlineTemplate" >
+					<spring:message code="expedient.tasca.list.columna.dataLimit"/>
+					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
+					{{if dataLimitString}}	
+							{{if shouldNotifyAboutDeadline}}
+									<span style="color: red;">
+										{{:dataLimitString}}
+										<span class="fa fa-clock-o"></span>
+									</span>
+							{{else}}
+								{{:dataLimitString}}
+							{{/if}}
+					{{/if}}
+						
+					</script>
+				</th>
 				<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
 					<spring:message code="expedient.tasca.list.columna.estat"/>
 					<script id="cellTascaEstatTemplate" type="text/x-jsrender">

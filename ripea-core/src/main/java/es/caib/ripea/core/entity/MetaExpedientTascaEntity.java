@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -10,6 +12,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
@@ -41,6 +45,10 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	private String responsable;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_limit")
+	private Date dataLimit;
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = "ipa_metaexp_metaexptas_fk")
@@ -64,16 +72,21 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	public MetaExpedientEntity getMetaExpedient() {
 		return metaExpedient;
 	}
-
+	public Date getDataLimit() {
+		return dataLimit;
+	}
+	
 	public void update(
 			String codi,
 			String nom,
 			String descripcio,
-			String responsable) {
+			String responsable,
+			Date dataLimit) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.responsable = responsable;
+		this.dataLimit = dataLimit;
 	}
 	public void updateActiva(
 			boolean activa) {
@@ -85,13 +98,15 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			String nom,
 			String descripcio,
 			String responsable,
-			MetaExpedientEntity metaExpedient) {
+			MetaExpedientEntity metaExpedient,
+			Date dataLimit) {
 		return new Builder(
 				codi,
 				nom,
 				descripcio,
 				responsable,
-				metaExpedient);
+				metaExpedient,
+				dataLimit);
 	}
 	public static class Builder {
 		MetaExpedientTascaEntity built;
@@ -100,7 +115,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				String nom,
 				String descripcio,
 				String responsable,
-				MetaExpedientEntity metaExpedient) {
+				MetaExpedientEntity metaExpedient,
+				Date dataLimit) {
 			built = new MetaExpedientTascaEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -108,6 +124,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.responsable = responsable;
 			built.metaExpedient = metaExpedient;
 			built.activa = true;
+			built.dataLimit = dataLimit;
 		}
 		public MetaExpedientTascaEntity build() {
 			return built;
