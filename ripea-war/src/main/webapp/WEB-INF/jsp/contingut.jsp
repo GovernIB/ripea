@@ -55,6 +55,10 @@
 	<script src="<c:url value="/js/clamp.js"/>"></script>
 	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
 	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<c:if test="${isContingutDetail}">
 		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
