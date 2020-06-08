@@ -100,7 +100,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " + 
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select valor from DadaEntity dada where dada.node = e.id) = (:metaExpedientDominiValor)) ")
+			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0)")
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
