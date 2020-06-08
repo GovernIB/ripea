@@ -108,25 +108,36 @@ $(document).ready(function() {
 	
 	$(".portafirmesFlux_btn").on('click', function(){		
 		let documentNom = '${document.nom}';
-		debugger
 		$.ajax({
 			type: 'GET',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			data: {nom: documentNom},
 			url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
-			success: function(transaccioResponse) {
-				if (transaccioResponse != null) {
+			success: function(transaccioResponse, textStatus, XmlHttpRequest) {
+				if (transaccioResponse != null && !transaccioResponse.error) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 					$('.content').addClass("hidden");
 					$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
 					adjustModalPerFlux();
 					$body = $("body");
 					$body.addClass("loading");
+				} else if (transaccioResponse != null && transaccioResponse.error) {
+					let currentIframe = window.frameElement;
+					var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span></div>';
+					$('form').prev().find('.alert').remove();
+					$('form').prev().prepend(alertDiv);
+					webutilModalAdjustHeight();
 				}
 			},
-			error: function(err) {
-				console.log("Error recuperant la transacció");
+			error: function(error) {
+				if (error != null && error.responseText != null) {
+					let currentIframe = window.frameElement;
+					var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + error.responseText + '</span></div>';
+					$('form').prev().find('.alert').remove();
+					$('form').prev().prepend(alertDiv);
+					webutilModalAdjustHeight();
+				}
 			}
 		});
 	});	

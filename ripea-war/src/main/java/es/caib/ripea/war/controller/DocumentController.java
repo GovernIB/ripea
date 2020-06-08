@@ -6,7 +6,6 @@ package es.caib.ripea.war.controller;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -585,18 +584,25 @@ public class DocumentController extends BaseUserController {
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
-			Model model) throws UnsupportedEncodingException {
+			Model model) {
+		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
 		String descripcio = getMessage(
 				request, 
 				"document.controller.portafirmes.flux.desc");
 		
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
-		PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-				urlReturn,
-				nomCodificat,
-				descripcio,
-				false);
+		try {
+			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
+					urlReturn,
+					nomCodificat,
+					descripcio,
+					false);
+		} catch (Exception ex) {
+			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
+			transaccioResponse.setError(true);
+			transaccioResponse.setErrorDescripcio(ex.getMessage());
+		}
 		return transaccioResponse;
 	}
 	

@@ -262,7 +262,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"S'ha produït un error iniciant la transacció",
+					"S'ha produït un error iniciant la transacció: " + ex.getCause(),
 					ex);
 		}
 

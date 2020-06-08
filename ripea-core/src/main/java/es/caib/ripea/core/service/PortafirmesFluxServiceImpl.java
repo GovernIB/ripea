@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -37,7 +38,7 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 			String urlReturn,
 			String documentNom,
 			String descripcio,
-			boolean isPlantilla) {
+			boolean isPlantilla) throws SistemaExternException {
 		logger.debug("(Iniciant flux de firma (" +
 				"urlRedireccio=" + urlReturn + "," +
 				"tipusDocumentNom=" + documentNom + ")");

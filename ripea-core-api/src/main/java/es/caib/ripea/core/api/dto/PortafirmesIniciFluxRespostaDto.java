@@ -6,6 +6,8 @@ public class PortafirmesIniciFluxRespostaDto implements Serializable {
 
 	private String idTransaccio;
 	private String urlRedireccio;
+	private boolean error;
+	private String errorDescripcio;
 	
 	public String getIdTransaccio() {
 		return idTransaccio;
@@ -18,6 +20,18 @@ public class PortafirmesIniciFluxRespostaDto implements Serializable {
 	}
 	public void setUrlRedireccio(String urlRedireccio) {
 		this.urlRedireccio = urlRedireccio;
+	}
+	public boolean isError() {
+		return error;
+	}
+	public void setError(boolean error) {
+		this.error = error;
+	}
+	public String getErrorDescripcio() {
+		return errorDescripcio;
+	}
+	public void setErrorDescripcio(String errorDescripcio) {
+		this.errorDescripcio = errorDescripcio;
 	}
 
 
