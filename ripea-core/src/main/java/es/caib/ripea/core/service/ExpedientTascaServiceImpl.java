@@ -300,7 +300,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(expedientTasca.getResponsableCodi());
 
-		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(expedient, metaExpedientTascaEntity, responsable).build();
+		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(expedient, metaExpedientTascaEntity, responsable, expedientTasca.getDataLimit()).build();
 		
 		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
 		

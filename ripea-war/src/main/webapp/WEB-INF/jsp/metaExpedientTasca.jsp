@@ -26,6 +26,7 @@
 				<th data-col-name="codi" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.codi"/></th>
 				<th data-col-name="nom" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.nom"/></th>
 				<th data-col-name="responsable" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.responsable"/></th>
+				<th data-col-name="dataLimit" data-converter="date"><spring:message code="metaexpedient.tasca.form.camp.dataLimit"/></th>
 				<th data-col-name="activa" data-template="#cellActivaTemplate" data-orderable="false">
 					<spring:message code="metaexpedient.tasca.columna.activa"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">

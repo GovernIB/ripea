@@ -43,7 +43,11 @@
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.dataFi"/></strong></td>
 				<td><fmt:formatDate value="${expedientTascaDto.dataFi}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-			</tr>			
+			</tr>	
+			<tr>
+				<td><strong><spring:message code="expedient.tasca.form.camp.dataLimit"/></strong></td>
+				<td><fmt:formatDate value="${expedientTascaDto.dataLimit}" pattern="dd/MM/yyyy"/></td>
+			</tr>					
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.estat"/></strong></td>
 				<td>${expedientTascaDto.estat}</td>

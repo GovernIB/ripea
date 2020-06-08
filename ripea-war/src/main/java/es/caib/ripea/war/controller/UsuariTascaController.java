@@ -59,7 +59,6 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
@@ -77,6 +76,7 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.SessioHelper;
+import es.caib.ripea.war.helper.TasquesPendentsHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 
@@ -179,6 +179,7 @@ public class UsuariTascaController extends BaseUserController {
 				expedient,
 				SessioHelper.desmarcarLlegit(request),
 				model);
+		
 		model.addAttribute("tascaId", expedientTascaId);
 		model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());

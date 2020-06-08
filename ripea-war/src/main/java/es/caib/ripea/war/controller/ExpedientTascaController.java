@@ -123,6 +123,8 @@ public class ExpedientTascaController extends BaseUserController {
 		return "expedientTascaForm";
 	}
 	
+
+	
 	@RequestMapping(value = "/{expedientTascaId}/detall", method = RequestMethod.GET)
 	public String getExpedientTascaDetall(
 			HttpServletRequest request,
@@ -184,14 +186,6 @@ public class ExpedientTascaController extends BaseUserController {
 				"expedient.tasca.controller.creat.ok");
 	}
 	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 	
 	@RequestMapping(value = "{metaExpedientTascaId}/getMetaExpedientTasca", method = RequestMethod.GET)
 	@ResponseBody
@@ -202,6 +196,18 @@ public class ExpedientTascaController extends BaseUserController {
 		return expedientTascaService.findMetaExpedientTascaById(metaExpedientTascaId);
 	}
 	
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	}
+	
+	
+
 	
 	
 //	/**

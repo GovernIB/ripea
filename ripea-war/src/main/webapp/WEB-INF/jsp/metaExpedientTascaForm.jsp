@@ -16,6 +16,9 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<rip:modalHead/>
 </head>
 <body>
@@ -24,7 +27,6 @@
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="metaexpedient.tasca.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="metaexpedient.tasca.form.camp.nom" required="true"/>
-		
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
@@ -35,6 +37,7 @@
 			suggestValue="codi"
 			suggestText="nom"
 			placeholderKey="metaexpedient.tasca.form.camp.responsable"/>	
+		<rip:inputDate name="dataLimit" textKey="metaexpedient.tasca.form.camp.dataLimit"/>
 		<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

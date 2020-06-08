@@ -4,6 +4,8 @@
 package es.caib.ripea.core.api.dto;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -20,6 +22,7 @@ public class MetaExpedientTascaDto implements Serializable {
 	private String descripcio;
 	private String responsable;
 	private boolean activa;
+	private Date dataLimit;
 
 	public Long getId() {
 		return id;
@@ -57,11 +60,29 @@ public class MetaExpedientTascaDto implements Serializable {
 	public void setActiva(boolean activa) {
 		this.activa = activa;
 	}
+	
+	public String getDataLimitString() {
+		if (dataLimit != null) {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			return sdf.format(this.dataLimit);
+		} else {
+			return "";
+		}
+	}
+	public Date getDataLimit() {
+		return dataLimit;
+	}
+	public void setDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
+
 
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
+
 
 	private static final long serialVersionUID = -139254994389509932L;
 

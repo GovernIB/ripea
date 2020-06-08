@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.war.command;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -24,6 +27,7 @@ public class MetaExpedientTascaCommand {
 	private String descripcio;
 	private String responsable;
 	private boolean activa;
+	private Date dataLimit;
 
 	public Long getId() {
 		return id;
@@ -72,6 +76,13 @@ public class MetaExpedientTascaCommand {
 		return ConversioTipusHelper.convertir(
 				command,
 				MetaExpedientTascaDto.class);
+	}
+
+	public Date getDataLimit() {
+		return dataLimit;
+	}
+	public void setDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
 	}
 
 	public interface Create {}

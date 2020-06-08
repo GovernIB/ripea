@@ -19,8 +19,15 @@ public class ExpedientTascaCommand {
 	private String metaExpedientTascaDescripcio;
 	private Date dataInici;
 	private Date dataFi;
+	private Date dataLimit;
 	
-	
+
+	public Date getDataLimit() {
+		return dataLimit;
+	}
+	public void setDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
 	
 	public String getMetaExpedientTascaDescripcio() {
 		return metaExpedientTascaDescripcio;

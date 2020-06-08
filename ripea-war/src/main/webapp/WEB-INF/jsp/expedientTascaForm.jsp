@@ -14,24 +14,29 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<rip:modalHead/>
 	
 <script>
 $(document).ready(function(){
 
 	$('#metaExpedientTascaId').on('change', function() {
-		var tascaId = $(this).val();
+		var metaTascaId = $(this).val();
 		$('#expedientId').select2('val', '', true);
 		$('#expedientId option[value!=""]').remove();
 		
-		if (tascaId != null && tascaId != "") {
-			$.get("<c:url value="/expedientTasca/"/>" + tascaId + "/getMetaExpedientTasca")
+		if (metaTascaId != null && metaTascaId != "") {
+			$.get("<c:url value="/expedientTasca/"/>" + metaTascaId + "/getMetaExpedientTasca")
 			.done(function(data){
 
 				$('#metaExpedientTascaDescripcio').val(data.descripcio);
 				
 				$('#responsableCodi').data('currentValue', data.responsable);
 				$('#responsableCodi').webutilInputSuggest();
+
+				$('#dataLimit').val(data.dataLimitString);
 			})
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
@@ -67,7 +72,7 @@ $(document).ready(function(){
 			suggestValue="codi"
 			suggestText="nom"
 			required="true"/>				
-		
+		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
 		<rip:inputTextarea 
 			name="metaExpedientTascaDescripcio" 
 			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 

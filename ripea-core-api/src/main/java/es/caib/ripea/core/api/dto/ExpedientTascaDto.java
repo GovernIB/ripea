@@ -1,6 +1,8 @@
 package es.caib.ripea.core.api.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
 
 
 public class ExpedientTascaDto {
@@ -16,7 +18,23 @@ public class ExpedientTascaDto {
 	private Long metaExpedientTascaId;
 	private String motiuRebuig;
 	private UsuariDto createdBy;
-	
+	private Date dataLimit;
+	private boolean shouldNotifyAboutDeadline;
+
+	public String getDataLimitString() {
+		if (dataLimit != null) {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			return sdf.format(this.dataLimit);
+		} else {
+			return "";
+		}
+	}
+	public Date getDataLimit() {
+		return dataLimit;
+	}
+	public void setDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -82,6 +100,12 @@ public class ExpedientTascaDto {
 	}
 	public void setCreatedBy(UsuariDto createdBy) {
 		this.createdBy = createdBy;
+	}
+	public boolean isShouldNotifyAboutDeadline() {
+		return shouldNotifyAboutDeadline;
+	}
+	public void setShouldNotifyAboutDeadline(boolean shouldNotifyAboutDeadline) {
+		this.shouldNotifyAboutDeadline = shouldNotifyAboutDeadline;
 	}
 	
 }

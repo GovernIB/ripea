@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import es.caib.ripea.core.entity.ExpedientTascaEntity.Builder;
 
 /**
  * Classe del model de dades que representa una tasca del expedient.
@@ -66,15 +67,20 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Enumerated(EnumType.STRING)
 	private String motiuRebuig;
 
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_limit")
+	private Date dataLimit;
 	
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
-			UsuariEntity responsable) {
+			UsuariEntity responsable,
+			Date dataLimit) {
 		return new Builder(
 				expedient,
 				metaExpedientTasca,
-				responsable);
+				responsable,
+				dataLimit);
 	}
 	
 	public static class Builder {
@@ -82,13 +88,15 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		Builder(
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
-				UsuariEntity responsable) {
+				UsuariEntity responsable,
+				Date dataLimit) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
 			built.responsable = responsable;
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
+			built.dataLimit = dataLimit;
 		}
 		public ExpedientTascaEntity build() {
 			return built;
@@ -125,7 +133,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public Date getDataInici() {
 		return dataInici;
 	}
-
+	public Date getDataLimit() {
+		return dataLimit;
+	}
 	public Date getDataFi() {
 		return dataFi;
 	}
@@ -137,6 +147,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public String getMotiuRebuig() {
 		return motiuRebuig;
 	}
+
 
 
 
