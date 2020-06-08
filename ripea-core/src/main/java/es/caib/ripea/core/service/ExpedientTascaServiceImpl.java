@@ -252,6 +252,11 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			expedientTascaEntity.updateEstat(tascaEstatEnumDto);
 		}
 		
+		if (tascaEstatEnumDto == TascaEstatEnumDto.FINALITZADA && expedientTascaEntity.getMetaExpedientTasca().getEstatFinalitzarTasca() != null) {
+			ExpedientEntity expedientEntity = expedientTascaEntity.getExpedient();
+			expedientEntity.updateExpedientEstat(expedientTascaEntity.getMetaExpedientTasca().getEstatFinalitzarTasca());
+		}
+		
 		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior);
 		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
 		
@@ -301,6 +306,10 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(expedientTasca.getResponsableCodi());
 
 		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(expedient, metaExpedientTascaEntity, responsable, expedientTasca.getDataLimit()).build();
+		
+		if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
+			expedient.updateExpedientEstat(metaExpedientTascaEntity.getEstatCrearTasca());
+		}
 		
 		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
 		

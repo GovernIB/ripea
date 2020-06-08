@@ -584,15 +584,15 @@ public class ExpedientController extends BaseUserController {
 		ExpedientCommand command = null;
 		if (expedient != null) {
 			command = ExpedientCommand.asCommand(expedient);
-			if(expedient.getExpedientEstatNextInOrder()!=null){ 
+			if (expedient.getExpedientEstatNextInOrder() != null) {
 				command.setExpedientEstatId(expedient.getExpedientEstatNextInOrder());
 			} else { // if the state is obert
-				if(expedientEstats.size()>1){ //if there are custom states to choose from
+				if (expedientEstats.size() > 1) { // if there are custom states to choose from
 					command.setExpedientEstatId(expedientEstats.get(1).getId());
 				} else {
 					command.setExpedientEstatId(null);
 				}
-				
+
 			}
 			
 		} else {

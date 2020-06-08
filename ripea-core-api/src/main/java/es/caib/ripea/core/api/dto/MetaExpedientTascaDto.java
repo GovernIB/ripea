@@ -23,6 +23,8 @@ public class MetaExpedientTascaDto implements Serializable {
 	private String responsable;
 	private boolean activa;
 	private Date dataLimit;
+	private Long estatIdCrearTasca;
+	private Long estatIdFinalitzarTasca;
 
 	public Long getId() {
 		return id;
@@ -59,6 +61,18 @@ public class MetaExpedientTascaDto implements Serializable {
 	}
 	public void setActiva(boolean activa) {
 		this.activa = activa;
+	}
+	public Long getEstatIdCrearTasca() {
+		return estatIdCrearTasca;
+	}
+	public void setEstatIdCrearTasca(Long estatIdCrearTasca) {
+		this.estatIdCrearTasca = estatIdCrearTasca;
+	}
+	public Long getEstatIdFinalitzarTasca() {
+		return estatIdFinalitzarTasca;
+	}
+	public void setEstatIdFinalitzarTasca(Long estatIdFinalitzarTasca) {
+		this.estatIdFinalitzarTasca = estatIdFinalitzarTasca;
 	}
 	
 	public String getDataLimitString() {

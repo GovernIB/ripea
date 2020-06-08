@@ -254,7 +254,6 @@ public class UsuariTascaController extends BaseUserController {
 		getEntitatActualComprovantPermisos(request);
 		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.FINALITZADA, null);
 		
-		expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:/usuariTasca",

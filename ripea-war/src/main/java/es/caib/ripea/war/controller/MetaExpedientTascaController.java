@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaExpedientTascaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -39,6 +42,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private ExpedientService expedientService;
 
 	@RequestMapping(value = "/{metaExpedientId}/tasca", method = RequestMethod.GET)
 	public String get(
@@ -104,6 +109,14 @@ public class MetaExpedientTascaController extends BaseAdminController {
 					id);
 			model.addAttribute(tasca);
 		}
+		
+		List<ExpedientEstatDto> expedientEstats = expedientService.findExpedientEstatByMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId);
+		
+		model.addAttribute(
+				"expedientEstats",
+				expedientEstats);
 		MetaExpedientTascaCommand command = null;
 		if (tasca != null)
 			command = MetaExpedientTascaCommand.asCommand(tasca);

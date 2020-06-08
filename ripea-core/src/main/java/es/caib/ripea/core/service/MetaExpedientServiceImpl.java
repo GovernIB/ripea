@@ -25,6 +25,7 @@ import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -431,13 +432,19 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false,
 				false);
+
+		ExpedientEstatEntity estatCrearTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca());
+		ExpedientEstatEntity estatFinalitzarTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca());
+		
 		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
 				metaExpedientTasca.getCodi(),
 				metaExpedientTasca.getNom(),
 				metaExpedientTasca.getDescripcio(),
 				metaExpedientTasca.getResponsable(),
 				metaExpedient, 
-				metaExpedientTasca.getDataLimit()).
+				metaExpedientTasca.getDataLimit(),
+				estatCrearTasca,
+				estatFinalitzarTasca).
 				build();
 		return conversioTipusHelper.convertir(
 				metaExpedientTascaRepository.save(entity),
@@ -454,6 +461,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"entitatId=" + entitatId + ", " +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"metaExpedientTasca=" + metaExpedientTasca + ")");
+		
+
+		ExpedientEstatEntity estatCrearTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca());
+		ExpedientEstatEntity estatFinalitzarTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca());
+		
 		MetaExpedientTascaEntity entity = getMetaExpedientTasca(
 				entitatId,
 				metaExpedientId,
@@ -463,7 +475,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientTasca.getNom(),
 				metaExpedientTasca.getDescripcio(),
 				metaExpedientTasca.getResponsable(),
-				metaExpedientTasca.getDataLimit());
+				metaExpedientTasca.getDataLimit(),
+				estatCrearTasca,
+				estatFinalitzarTasca);
 		return conversioTipusHelper.convertir(
 				entity,
 				MetaExpedientTascaDto.class);

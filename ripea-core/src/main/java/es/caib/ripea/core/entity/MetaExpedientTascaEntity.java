@@ -48,12 +48,24 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_limit")
 	private Date dataLimit;
+	@ManyToOne
+	@JoinColumn(name = "estat_crear_tasca_id")
+	private ExpedientEstatEntity estatCrearTasca;
+	@ManyToOne
+	@JoinColumn(name = "estat_finalitzar_tasca_id")
+	private ExpedientEstatEntity estatFinalitzarTasca;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = "ipa_metaexp_metaexptas_fk")
 	private MetaExpedientEntity metaExpedient;
 
+	public ExpedientEstatEntity getEstatCrearTasca() {
+		return estatCrearTasca;
+	}
+	public ExpedientEstatEntity getEstatFinalitzarTasca() {
+		return estatFinalitzarTasca;
+	}
 	public String getCodi() {
 		return codi;
 	}
@@ -81,12 +93,16 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			String nom,
 			String descripcio,
 			String responsable,
-			Date dataLimit) {
+			Date dataLimit,
+			ExpedientEstatEntity estatCrearTasca,
+			ExpedientEstatEntity estatFinalitzarTasca) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.responsable = responsable;
 		this.dataLimit = dataLimit;
+		this.estatCrearTasca = estatCrearTasca;
+		this.estatFinalitzarTasca = estatFinalitzarTasca;
 	}
 	public void updateActiva(
 			boolean activa) {
@@ -99,14 +115,18 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			String descripcio,
 			String responsable,
 			MetaExpedientEntity metaExpedient,
-			Date dataLimit) {
+			Date dataLimit,
+			ExpedientEstatEntity estatCrearTasca,
+			ExpedientEstatEntity estatFinalitzarTasca) {
 		return new Builder(
 				codi,
 				nom,
 				descripcio,
 				responsable,
 				metaExpedient,
-				dataLimit);
+				dataLimit,
+				estatCrearTasca,
+				estatFinalitzarTasca);
 	}
 	public static class Builder {
 		MetaExpedientTascaEntity built;
@@ -116,7 +136,9 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				String descripcio,
 				String responsable,
 				MetaExpedientEntity metaExpedient,
-				Date dataLimit) {
+				Date dataLimit,
+				ExpedientEstatEntity estatCrearTasca,
+				ExpedientEstatEntity estatFinalitzarTasca) {
 			built = new MetaExpedientTascaEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -125,6 +147,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.metaExpedient = metaExpedient;
 			built.activa = true;
 			built.dataLimit = dataLimit;
+			built.estatCrearTasca = estatCrearTasca;
+			built.estatFinalitzarTasca = estatFinalitzarTasca;
 		}
 		public MetaExpedientTascaEntity build() {
 			return built;

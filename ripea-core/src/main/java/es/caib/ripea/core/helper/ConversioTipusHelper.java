@@ -38,6 +38,7 @@ import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -109,6 +110,23 @@ public class ConversioTipusHelper {
 						target.setDataLimit(source.getDataLimit());
 						target.setShouldNotifyAboutDeadline(TascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
 						
+						return target;
+					}
+				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<MetaExpedientTascaEntity, MetaExpedientTascaDto>() {
+					public MetaExpedientTascaDto convert(MetaExpedientTascaEntity source, Type<? extends MetaExpedientTascaDto> destinationClass) {
+						MetaExpedientTascaDto target = new MetaExpedientTascaDto();
+						target.setActiva(source.isActiva());
+						target.setCodi(source.getCodi());
+						target.setDataLimit(source.getDataLimit());
+						target.setDescripcio(source.getDescripcio());
+						target.setEstatIdCrearTasca(source.getEstatCrearTasca() != null ? source.getEstatCrearTasca().getId() : null);
+						target.setEstatIdFinalitzarTasca(source.getEstatFinalitzarTasca() != null ? source.getEstatFinalitzarTasca().getId() : null);
+						target.setId(source.getId());
+						target.setNom(source.getNom());
+						target.setResponsable(source.getResponsable());
 						return target;
 					}
 				});

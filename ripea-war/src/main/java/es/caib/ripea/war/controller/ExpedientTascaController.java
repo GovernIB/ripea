@@ -169,6 +169,20 @@ public class ExpedientTascaController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		if (bindingResult.hasErrors()) {
+			model.addAttribute(
+					"expedientId",
+					expedientId);
+			model.addAttribute(
+					"expedientTascaCommand",
+					expedientTascaCommand);
+			ExpedientDto expedientDto = expedientService.findById(
+					entitatActual.getId(),
+					expedientId);
+			model.addAttribute(
+					"metaexpTasques",
+					expedientTascaService.findAmbMetaExpedient(
+							entitatActual.getId(),
+							expedientDto.getMetaExpedient().getId()));
 			return "expedientTascaForm";
 		}
 

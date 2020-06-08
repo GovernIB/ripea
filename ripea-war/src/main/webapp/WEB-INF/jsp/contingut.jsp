@@ -1738,7 +1738,7 @@ function deselectAll() {
 						</div>
 						<script id="taulaTasquesNouBoton" type="text/x-jsrender">
 						<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
-							<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.id}/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
+							<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.id}/new"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
 						</c:if>	
 					</script>					
 					</c:if>		
