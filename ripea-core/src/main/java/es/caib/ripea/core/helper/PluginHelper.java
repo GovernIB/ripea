@@ -2027,7 +2027,7 @@ public class PluginHelper {
 			String nom,
 			String descripcio,
 			boolean descripcioVisible,
-			String urlReturn) {
+			String urlReturn) throws SistemaExternException {
 		String accioDescripcio = "Iniciant flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesIniciFluxRespostaDto transaccioResponseDto = new PortafirmesIniciFluxRespostaDto();
@@ -2044,7 +2044,7 @@ public class PluginHelper {
 				transaccioResponseDto.setUrlRedireccio(transaccioResponse.getUrlRedireccio());
 			}
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			String errorDescripcio = ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_PFIRMA,
 					accioDescripcio,
