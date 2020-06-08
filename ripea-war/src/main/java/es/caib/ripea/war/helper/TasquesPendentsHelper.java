@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.core.helper.PropertiesHelper;
 
 public class TasquesPendentsHelper {
 
