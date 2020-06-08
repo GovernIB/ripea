@@ -148,7 +148,7 @@ body.loading .rmodal {
 				data: {nom: metaDocumentNom},
 				url: "<c:url value="/modal/metaExpedient/metaDocument/iniciarTransaccio"/>",
 				success: function(transaccioResponse) {
-					if (transaccioResponse != null) {
+					if (transaccioResponse != null && !transaccioResponse.error) {
 						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 						//$("#fluxModal").modal('show');
 						//$("#fluxModal").find(".modal-body").html('<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
@@ -158,10 +158,22 @@ body.loading .rmodal {
 						adjustModalPerFlux();
 						$body = $("body");
 						$body.addClass("loading");
+					} else if (transaccioResponse != null && transaccioResponse.error) {
+						let currentIframe = window.frameElement;
+						var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span></div>';
+						$('form').prev().find('.alert').remove();
+						$('form').prev().prepend(alertDiv);
+						webutilModalAdjustHeight();
 					}
 				},
-				error: function(err) {
-					console.log("Error recuperant la transacció");
+				error: function(error) {
+					if (error != null && error.responseJSON != null) {
+						let currentIframe = window.frameElement;
+						var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + error.responseJSON.message + '</span></div>';
+						$('form').prev().find('.alert').remove();
+						$('form').prev().prepend(alertDiv);
+						webutilModalAdjustHeight();
+					}
 				}
 			});
 		});

@@ -244,17 +244,25 @@ public class MetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
 			Model model) throws UnsupportedEncodingException {
+		String urlReturn;
+		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		String nomCodificat = new String(nom.getBytes(), "UTF-8");
 		String descripcio = getMessage(
 				request, 
 				"document.controller.portafirmes.flux.desc");
+		try {
+			urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
+			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
+					urlReturn,
+					nomCodificat,
+					descripcio,
+					true);
+		} catch (Exception ex) {
+			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
+			transaccioResponse.setError(true);
+			transaccioResponse.setErrorDescripcio(ex.getMessage());
+		}
 		
-		String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
-		PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-				urlReturn,
-				nomCodificat,
-				descripcio,
-				true);
 		return transaccioResponse;
 	}
 
