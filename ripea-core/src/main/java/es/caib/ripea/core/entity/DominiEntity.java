@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.core.entity;
 
@@ -10,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,90 +17,141 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
 /**
- * Classe del model de dades que representa una tasca d'un meta-expedient.
- * 
+ * Classe del model de dades que representa un meta-document.
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(
-		name = "ipa_metaexp_domini",
-		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {"codi", "meta_expedient_id"})
-		})
+@Table(name = "ipa_domini")
 @EntityListeners(AuditingEntityListener.class)
-public class MetaExpedientDominiEntity extends RipeaAuditable<Long> {
+public class DominiEntity extends RipeaAuditable<Long> {
 
-	@Column(name = "codi", length = 64, nullable = false)
+	@Column(name = "codi")
 	private String codi;
-	@Column(name = "nom", length = 256, nullable = false)
+	@Column(name = "nom")
 	private String nom;
-	@Column(name = "descripcio", length = 1024)
+	@Column(name = "descripcio")
 	private String descripcio;
-	
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "meta_expedient_id")
-	@ForeignKey(name = "ipa_metaexp_metaexpdom_fk")
-	private MetaExpedientEntity metaExpedient;
-	
+	@Column(name = "consulta")
+	private String consulta;
+	@Column(name = "cadena")
+	private String cadena;
+	@Column(name = "contrasenya")
+	private String contrasenya;
+
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
-	@ForeignKey(name = "ipa_entitat_metexp_metaedom_fk")
+	@ForeignKey(name = "ipa_entitat_tipus_doc_fk")
 	protected EntitatEntity entitat;
-	
+
 	public String getCodi() {
 		return codi;
 	}
+
+	public void setCodi(String codi) {
+		this.codi = codi;
+	}
+
 	public String getNom() {
 		return nom;
 	}
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
 	public String getDescripcio() {
 		return descripcio;
 	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+
+	public String getConsulta() {
+		return consulta;
+	}
+
+	public void setConsulta(String consulta) {
+		this.consulta = consulta;
+	}
+
+	public String getCadena() {
+		return cadena;
+	}
+
+	public void setCadena(String cadena) {
+		this.cadena = cadena;
+	}
+
+	public String getContrasenya() {
+		return contrasenya;
+	}
+
+	public void setContrasenya(String contrasenya) {
+		this.contrasenya = contrasenya;
+	}
+
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
-	public MetaExpedientEntity getMetaExpedient() {
-		return metaExpedient;
+
+	public void setEntitat(EntitatEntity entitat) {
+		this.entitat = entitat;
 	}
 
 	public void update(
 			String codi,
 			String nom,
-			String descripcio) {
+			String descripcio,
+			String consulta,
+			String cadena,
+			String contrasenya) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
+		this.consulta = consulta;
+		this.cadena = cadena;
+		this.contrasenya = contrasenya;
 	}
-	
+
 	public static Builder getBuilder(
 			String codi,
 			String nom,
 			String descripcio,
-			EntitatEntity entitat,
-			MetaExpedientEntity metaExpedient) {
+			String consulta,
+			String cadena,
+			String contrasenya,
+			EntitatEntity entitat) {
 		return new Builder(
 				codi,
 				nom,
 				descripcio,
-				entitat,
-				metaExpedient);
+				consulta,
+				cadena,
+				contrasenya,
+				entitat);
 	}
 	public static class Builder {
-		MetaExpedientDominiEntity built;
+		DominiEntity built;
 		Builder(
 				String codi,
 				String nom,
 				String descripcio,
-				EntitatEntity entitat,
-				MetaExpedientEntity metaExpedient) {
-			built = new MetaExpedientDominiEntity();
+				String consulta,
+				String cadena,
+				String contrasenya,
+				EntitatEntity entitat) {
+			built = new DominiEntity();
 			built.codi = codi;
 			built.nom = nom;
 			built.descripcio = descripcio;
+			built.consulta = consulta;
+			built.cadena = cadena;
+			built.contrasenya = contrasenya;
 			built.entitat = entitat;
-			built.metaExpedient = metaExpedient;
 		}
-		public MetaExpedientDominiEntity build() {
+		public DominiEntity build() {
 			return built;
 		}
 	}
@@ -111,7 +161,6 @@ public class MetaExpedientDominiEntity extends RipeaAuditable<Long> {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
-		result = prime * result + ((metaExpedient == null) ? 0 : metaExpedient.hashCode());
 		return result;
 	}
 	@Override
@@ -122,19 +171,14 @@ public class MetaExpedientDominiEntity extends RipeaAuditable<Long> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MetaExpedientDominiEntity other = (MetaExpedientDominiEntity) obj;
+		DominiEntity other = (DominiEntity) obj;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;
-		} else if (!codi.equals(other.codi))
-			return false;
-		if (metaExpedient == null) {
-			if (other.metaExpedient != null)
-				return false;
-		} else if (!metaExpedient.equals(other.metaExpedient))
-			return false;
+		}
 		return true;
 	}
-	
-	private static final long serialVersionUID = -5248524362190811653L;
+
+	private static final long serialVersionUID = 1168453230252786190L;
+
 }

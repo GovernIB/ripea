@@ -22,5 +22,6 @@
 	<cache name="municipisAmbNom" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="nivellAdministracio" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="tipusVia" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
-
+	<cache name="connexioDomini" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
+	<cache name="resultatConsultaDominis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 </ehcache>

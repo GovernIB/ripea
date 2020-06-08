@@ -225,6 +225,7 @@ body {
 										<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
 										<li class="divider"></li>
 										<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
+										<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
 										<li class="divider"></li>
 										<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 									</ul>

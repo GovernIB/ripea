@@ -15,5 +15,6 @@ public enum MetaDadaTipusEnumDto {
 	IMPORT,
 	SENCER,
 	FLOTANT,
-	BOOLEA
+	BOOLEA,
+	DOMINI
 }

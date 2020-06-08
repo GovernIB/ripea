@@ -55,7 +55,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.MetaExpedientDominiEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
@@ -66,7 +65,6 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientDominiRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
@@ -89,8 +87,6 @@ public class ExpedientHelper {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private MetaExpedientDominiRepository metaExpedientDominiRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
@@ -123,7 +119,6 @@ public class ExpedientHelper {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats) {
-		MetaExpedientDominiEntity metaExpedientDomini = null;
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
@@ -143,9 +138,9 @@ public class ExpedientHelper {
 				true,
 				false);
 		
-		if (metaExpedientDominiId != null) {
-			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
-		}
+//		if (metaExpedientDominiId != null) {
+//			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
+//		}
 			
 		ContingutEntity contingutPare = null;
 		if (pareId != null) {
@@ -171,7 +166,6 @@ public class ExpedientHelper {
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
 				metaExpedient,
-				metaExpedientDomini,
 				contingutPare,
 				metaExpedient.getEntitat(),
 				"1.0",

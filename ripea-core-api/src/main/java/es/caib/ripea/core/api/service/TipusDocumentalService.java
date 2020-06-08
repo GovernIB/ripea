@@ -13,7 +13,7 @@ import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
- * Declaració dels mètodes per a la gestió de meta-documents.
+ * Declaració dels mètodes per a la gestió dels tipus documentals.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

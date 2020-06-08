@@ -72,7 +72,6 @@ function recuperarDominisMetaExpedient() {
 $(document).ready(function() {
 	$('select#metaNodeId').change(function(event) {
 		refrescarSequencia();
-		recuperarDominisMetaExpedient();
 	});
 	$('select#metaNodeId').trigger('change');
 	
@@ -102,7 +101,6 @@ $(document).ready(function() {
 				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true" labelSize="2"/>
 			</c:otherwise>
 		</c:choose>
-		<rip:inputSelect name="metaNodeDominiId" textKey="contingut.expedient.form.camp.metanodedomini" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<div id="modal-botons" class="well">

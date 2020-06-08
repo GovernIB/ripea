@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 
 /**
  * Declaració dels mètodes per a la gestió de meta-documents.
@@ -30,7 +31,7 @@ public interface PortafirmesFluxService {
 			String urlReturn,
 			String documentNom,
 			String descripcio,
-			boolean isPlantilla);
+			boolean isPlantilla) throws SistemaExternException;
 	
 	/**
 	 * Recupera un flux de firma creat (id)

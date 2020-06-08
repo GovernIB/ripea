@@ -39,7 +39,6 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDominiDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -126,7 +125,6 @@ public class ExpedientController extends BaseUserController {
 				expedientEstatsOptions);
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
-		model.addAttribute("metaExpedientDominisOptions", metaExpedientService.dominiFindByMetaExpedient(entitatActual.getId(), metaExpedientId));
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
 			MissatgesHelper.warning(
@@ -401,18 +399,6 @@ public class ExpedientController extends BaseUserController {
 				any);
 	}
 	
-	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/findMetaExpedientDominis", method = RequestMethod.GET)
-	@ResponseBody
-	public List<MetaExpedientDominiDto> findMetaExpedientDominis(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return metaExpedientService.dominiFindByMetaExpedient(
-				entitatActual.getId(), 
-				metaExpedientId);
-	}
-
 	@RequestMapping(value = "/{expedientId}/agafar", method = RequestMethod.GET)
 	public String agafar(
 			HttpServletRequest request,

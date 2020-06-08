@@ -47,7 +47,8 @@ public class MetaDadaCommand {
 	private String descripcio;
 	private Long entitatId;
 	private Long metaNodeId;
-
+	private String domini;
+	
 	public Long getId() {
 		return id;
 	}
@@ -102,7 +103,12 @@ public class MetaDadaCommand {
 	public void setMetaNodeId(Long metaNodeId) {
 		this.metaNodeId = metaNodeId;
 	}
-
+	public String getDomini() {
+		return domini;
+	}
+	public void setDomini(String domini) {
+		this.domini = domini;
+	}
 	public static List<MetaDadaCommand> toMetaDadaCommands(
 			List<MetaDadaDto> dtos) {
 		List<MetaDadaCommand> commands = new ArrayList<MetaDadaCommand>();

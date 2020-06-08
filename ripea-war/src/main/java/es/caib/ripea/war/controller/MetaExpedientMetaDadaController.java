@@ -3,10 +3,15 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,8 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
@@ -30,12 +40,14 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/metaExpedient")
-public class MetaExpedientMetaDadaController extends BaseAdminController {
+public class MetaExpedientMetaDadaController extends BaseUserController {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private DominiService dominiService;
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
@@ -197,6 +209,47 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 				request,
 				"redirect:../../metaDada",
 				"metadada.controller.esborrat.ok");
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini", method = RequestMethod.GET)
+	@ResponseBody
+	public List<DominiDto> getDominis(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
+		return dominis;
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getDomini(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable String dominiCodi){
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
+		List<ResultatDominiDto> resultatConsulta = new ArrayList<ResultatDominiDto>();
+		try {
+			resultatConsulta = dominiService.getResultDomini(
+					entitatActual.getId(),
+					domini);
+		} catch (DominiException e) {
+			return new ResponseEntity<Error>(new Error(e.getMessage()),HttpStatus.BAD_REQUEST);
+		}
+		
+		return resultatConsulta;
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDadaPermisLectura/domini", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getDominiMetaExpedientPermisLectura(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId){
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		MetaExpedientDto metaExpedientDto = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
+		List<DominiDto> dominis = dominiService.findByMetaNodePermisLecturaAndTipusDomini(entitatActual.getId(), metaExpedientDto);		
+		return dominis;
 	}
 
 }

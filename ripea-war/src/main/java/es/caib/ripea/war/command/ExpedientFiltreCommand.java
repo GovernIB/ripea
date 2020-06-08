@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
@@ -19,7 +20,7 @@ public class ExpedientFiltreCommand {
 
 	private Long arxiuId;
 	private Long metaExpedientId;
-	private Long metaExpedientDominiId;
+	private String metaExpedientDominiCodi;
 	private String nom;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
@@ -31,13 +32,13 @@ public class ExpedientFiltreCommand {
 
 	private Long tipusId;
 	private String interessat;
-	
+	private String metaExpedientDominiValor;
 
-	public Long getMetaExpedientDominiId() {
-		return metaExpedientDominiId;
+	public String getMetaExpedientDominiCodi() {
+		return metaExpedientDominiCodi;
 	}
-	public void setMetaExpedientDominiId(Long metaExpedientDominiId) {
-		this.metaExpedientDominiId = metaExpedientDominiId;
+	public void setMetaExpedientDominiCodi(String metaExpedientDominiCodi) {
+		this.metaExpedientDominiCodi = metaExpedientDominiCodi;
 	}
 	public String getInteressat() {
 		return interessat;
@@ -75,7 +76,6 @@ public class ExpedientFiltreCommand {
 	public void setDataCreacioFi(Date dataCreacioFi) {
 		this.dataCreacioFi = dataCreacioFi;
 	}
-
 	public String getNumero() {
 		return numero;
 	}
@@ -112,7 +112,12 @@ public class ExpedientFiltreCommand {
 	public void setTipusId(Long tipusId) {
 		this.tipusId = tipusId;
 	}
-
+	public String getMetaExpedientDominiValor() {
+		return metaExpedientDominiValor;
+	}
+	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
+		this.metaExpedientDominiValor = metaExpedientDominiValor;
+	}
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,

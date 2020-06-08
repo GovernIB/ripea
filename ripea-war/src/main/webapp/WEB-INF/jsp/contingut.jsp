@@ -325,6 +325,9 @@ ul.interessats {
 .importat.fa.fa-info-circle {
 	color: #02CDA2;
 }
+.dominis ~ span > .selection {
+	width: 100%;
+}
 </style>
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
@@ -887,6 +890,43 @@ function deselectAll() {
 			}
 	);
 }
+
+function recuperarResultatDomini(
+		metaExpedientId,
+		metaDadaCodi,
+		dadaValor) {
+	var multipleUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '"/>';
+	$.ajax({
+		type: 'GET',
+		url: multipleUrl, 
+		success: function(data) {
+			var selDomini = $("#" + metaDadaCodi);
+			selDomini.empty();
+			selDomini.append("<option value=\"\"></option>");
+			if (data) {
+				var existeix = false;
+				var items = [];
+					$.each(data, function(i, val) {
+					if (dadaValor == val.id) {
+						existeix = true;
+ 						selDomini.append("<option value=\"" + val.id + "\" selected>" + val.valor + "</option>");
+					} else {
+						selDomini.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
+					}
+					});
+					if (dadaValor != null && dadaValor != '' && !existeix) {
+						alert("El domini de les metadades s'ha canviat. Revisa les dades de l'expedient.")
+					}
+			}
+			var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6", width: '100%', dropdownAutoWidth : true};
+			selDomini.select2(select2Options);
+		},
+		error: function (error) {
+			if (error != null && error.responseJSON != null)
+				alert(error.responseJSON.message);
+		}
+	});
+}
 </script>
 
 </head>
@@ -918,51 +958,14 @@ function deselectAll() {
 	
 		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- INFORMACIÓ BLOCK (LEFT SIDE OF THE PAGE) ------------------------------------------------------------------------>
-			<div class="col-md-3 col-sm-4" id="colInfo">	
-				<!------------  TASCA INFO  ------------->
-				<c:if test="${isTasca}">
-					<div id="tasca-info" class="well">
-						<h3>
-							<spring:message code="tasca"/>
-						</h3>
-						<dl>	
-							<c:if test="${!empty tasca.dataLimit}">
-								<!---------  Data límit  --------->
-								<dt><spring:message code="tasca.info.dataLimit"/></dt>
-								<dd>
-									<c:choose>
-										<c:when test="${tasca.shouldNotifyAboutDeadline}">
-											<span style="color: red;">
-												<fmt:formatDate value="${tasca.dataLimit}" pattern="dd/MM/yyyy" />
-												<span class="fa fa-clock-o"></span>
-											</span>
-										</c:when>
-										<c:otherwise>
-											<fmt:formatDate value="${tasca.dataLimit}" pattern="dd/MM/yyyy"/>
-										</c:otherwise>
-									</c:choose>
-								</dd>
-							</c:if>
-							<!---------  Data d'inici  --------->
-							<dt><spring:message code="tasca.info.dataInici"/></dt>
-							<dd><fmt:formatDate value="${tasca.dataInici}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-							<!---------  Assignat per  --------->
-							<dt><spring:message code="tasca.info.assignatPer"/></dt>
-							<dd>${tasca.createdBy.nom}</dd>
-							<!---------  Estat  --------->
-							<dt><spring:message code="tasca.info.estat"/></dt>
-							<dd>${tasca.estat}</dd>
-						</dl>
-					</div>
-				</c:if>
-				<!------------  EXPEDIENT INFO  ------------->
+			<div class="col-md-3 col-sm-4" id="colInfo">		
 				<div id="contenidor-info" class="well">
 					<h3>
 						<c:choose>
 							<c:when test="${isTasca}">
-								<span style="width:100%" class="ellipsis" title="${contingut.nom}">
-									${contingut.nom}
-								</span>
+							<span style="width:100%" class="ellipsis" title="${contingut.nom}">
+								${contingut.nom}
+							</span>
 							</c:when>
 							<c:otherwise>
 								<spring:message code="contingut.info.informacio"/>
@@ -979,15 +982,12 @@ function deselectAll() {
 							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
 						</c:if>
 						<c:if test="${contingut.expedient}">
-							<!---------  Tipus d'expedient  --------->
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
-							<!---------  Número  --------->
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.numero}</dd>
-							<!---------  Estat  --------->
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
@@ -998,17 +998,14 @@ function deselectAll() {
 								</c:otherwise>
 							</c:choose>								
 						</c:if>
-						<c:if test="${contingut.expedient or contingut.document}">
-							<c:if test="${contingut.expedient}">
-								<!---------  Data d'obertura  --------->
-								<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
-								<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-								<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-								<dd>${contingut.ntiClasificacionSia}</dd>
-							</c:if>
+					<c:if test="${contingut.expedient or contingut.document}">
+						<c:if test="${contingut.expedient}">
+							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
+							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
+							<dd>${contingut.ntiClasificacionSia}</dd>
 						</c:if>
-					</dl>
-					<!---------  Expedients relacionats  --------->
+					</c:if>
 					<c:if test="${!isTasca && not empty relacionats}">
 						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
 							<spring:message code="contingut.info.relacionats"/>
@@ -1041,40 +1038,32 @@ function deselectAll() {
 		</c:if>
 		<!------------------------------------------------------------------------- CONTINGUT BLOCK (CENTER/RIGHT SIDE OF THE PAGE) ------------------------------------------------------------------------------->
 		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
-			<c:if test="${contingut.expedient && !isTasca && !expedientTancat && contingut.hasEsborranys}">
-				<c:choose>
-					<c:when test="${convertirDefinitiu}">
-						<div id="botons-errors-esborranys" class="esborranys alert well-sm alert-info alert-dismissable">
-							<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
-							<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
-						</div>
-					</c:when>
-					<c:otherwise>
-						<div id="botons-errors-esborranys" class="alert well-sm alert-info alert-dismissable">
-							<span class="fa fa-info-circle"></span>&nbsp;
-							<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
-						</div>
-					</c:otherwise>
-				</c:choose>
-			</c:if>
-			<c:if test="${!isTasca && contingut.node and contingut.alerta}">
-				<div id="botons-errors-alerta" class="alert well-sm alert-warning alert-dismissable">
-					<span class="fa fa-exclamation-circle text-danger"></span>&nbsp;
-					<c:choose>
-						<c:when test="${contingut.expedient}"><spring:message code="contingut.errors.expedient.alertes"/></c:when>
-						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.alertes"/></c:when>
-					</c:choose>
-					<a href="<c:url value="/contingut/${contingut.id}/alertes"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal" data-refresh-tancar="true"><spring:message code="contingut.alertes.consultar"/></a>
-				</div>
-			</c:if>
-			<c:if test="${!isTasca && contingut.node and not contingut.valid}">
+			<c:choose>
+				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys and convertirDefinitiu}">
+					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
+						<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
+						<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
+					</div>
+				</c:when>
+				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys && !convertirDefinitiu}">
+					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
+						<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
+					</div>
+				</c:when>
+			</c:choose>
+			<c:if test="${!isTasca && contingut.node and (not contingut.valid or contingut.alerta)}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
-					<span class="fa fa-exclamation-triangle"></span>&nbsp;
+					<span class="fa fa-exclamation-triangle"></span>
 					<c:choose>
-						<c:when test="${contingut.expedient}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
-						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.validacio"/></c:when>
+						<c:when test="${not contingut.valid and contingut.alerta and contingut.expedient}"><spring:message code="contingut.errors.expedient.dual"/></c:when>
+						<c:when test="${not contingut.valid and not contingut.alerta and contingut.expedient}"><spring:message code="contingut.errors.expedient"/></c:when>
+						<c:when test="${contingut.valid and contingut.alerta and contingut.expedient}"><spring:message code="contingut.errors.expedient.segonpla"/></c:when>
+						
+						<c:when test="${not contingut.valid and contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document.dual"/></c:when>
+						<c:when test="${not contingut.valid and not contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document"/></c:when>
+						<c:when test="${contingut.valid and contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document.segonpla"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
+					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.mesinfo"/></a>
 				</div>
 			</c:if>
 			<!---------------------------------------- TABLIST ------------------------------------------>
@@ -1403,9 +1392,9 @@ function deselectAll() {
 													<td>
 														<c:choose>
 															<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
-																<div class="form-group"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
+																<div class="form-group <c:if test="${metaDada.tipus == 'DOMINI'}">col-xs-12</c:if>"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																	<label class="hidden" for="${metaDada.codi}"></label>
-																	<div>
+																	<div class="controls">
 																		<c:choose>
 																			<c:when test="${metaDada.tipus == 'SENCER'}">
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
@@ -1422,6 +1411,16 @@ function deselectAll() {
 																			<c:when test="${metaDada.tipus == 'BOOLEA'}">
 																				<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
 																			</c:when>
+																			<c:when test="${metaDada.tipus == 'DOMINI'}">
+																			
+																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="false"/>
+																				<script type="text/javascript">
+																				recuperarResultatDomini(
+																						"${contingut.metaNode.id}",
+																						"${metaDada.codi}",
+																						"${dadaValor}");
+																				</script>
+																			</c:when>
 																			<c:otherwise>
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" cssClass="form-control${multipleClass}"></form:input>
 																			</c:otherwise>
@@ -1429,6 +1428,16 @@ function deselectAll() {
 																		<span class="" aria-hidden="true"></span>
 																	</div>
 																</div>
+															</c:when>
+															<c:when test="${expedientTancat && (metaDada.tipus == 'DOMINI')}">
+																<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="false" disabled="true"/>
+																<script type="text/javascript">
+																	recuperarResultatDomini(
+																			"${contingut.metaNode.id}",
+																			"${metaDada.codi}",
+																			"${dadaValor}");
+																	
+																</script>
 															</c:when>
 															<c:otherwise>
 																${dadaValor}
@@ -1696,8 +1705,6 @@ function deselectAll() {
 										<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>								
 										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
-										<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
-										<th data-col-name="dataLimit" data-converter="date"><spring:message code="expedient.tasca.list.columna.dataLimit"/></th>									
 										<th data-col-name="responsable.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable"/></th>								
 										<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
 											<spring:message code="expedient.tasca.list.columna.estat"/>
@@ -1738,7 +1745,7 @@ function deselectAll() {
 						</div>
 						<script id="taulaTasquesNouBoton" type="text/x-jsrender">
 						<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
-							<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.id}/new"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
+							<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.id}/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
 						</c:if>	
 					</script>					
 					</c:if>		

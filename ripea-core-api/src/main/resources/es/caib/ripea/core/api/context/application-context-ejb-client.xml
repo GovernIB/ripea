@@ -95,5 +95,9 @@
 	<jee:local-slsb
 			id="digitalitzacioService"
 			jndi-name="ripea/DigitalitzacioServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.DigitalitzacioService"/>	
+			business-interface="es.caib.ripea.core.api.service.DigitalitzacioService"/>
+	<jee:local-slsb
+			id="dominiService"
+			jndi-name="ripea/DominiServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.DominiService"/>	
 </beans>

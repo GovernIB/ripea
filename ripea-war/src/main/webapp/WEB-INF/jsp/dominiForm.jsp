@@ -5,8 +5,8 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
-	<c:when test="${empty metaExpedientDominiCommand.id}"><c:set var="titol"><spring:message code="metaexpedient.domini.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.domini.form.titol.modificar"/></c:set></c:otherwise>
+	<c:when test="${empty dominiCommand.id}"><c:set var="titol"><spring:message code="domini.form.titol.crear"/></c:set></c:when>
+	<c:otherwise><c:set var="titol"><spring:message code="domini.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -19,15 +19,19 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/domini/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientDominiCommand">
+	<c:set var="formAction"><rip:modalUrl value="/domini/save"/></c:set>
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="dominiCommand">
 		<form:hidden path="id"/>
-		<rip:inputText name="codi" textKey="metaexpedient.domini.form.camp.codi" required="true"/>
-		<rip:inputText name="nom" textKey="metaexpedient.domini.form.camp.nom" required="true"/>
-		<rip:inputTextarea name="descripcio" textKey="metaexpedient.domini.form.camp.descripcio"/>
+		<!--  form:hidden path="entitatId"/-->
+		<rip:inputText name="codi" textKey="domini.form.camp.codi" required="true"/>
+		<rip:inputText name="nom" textKey="domini.form.camp.nom" required="true"/>
+		<rip:inputTextarea name="descripcio" textKey="domini.form.camp.descripcio"/>
+		<rip:inputTextarea name="consulta" textKey="domini.form.camp.consulta" required="true" exemple="domini.consulta.exemple"/>
+		<rip:inputTextarea name="cadena" textKey="domini.form.camp.cadena" required="true" exemple="domini.cadena.exemple"/>
+		<rip:inputText name="contrasenya" textKey="domini.form.camp.contrasenya" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/domini"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/domini"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>
