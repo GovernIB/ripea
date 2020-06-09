@@ -129,6 +129,7 @@
 				<tr>
 					<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
 					<th><spring:message code="contingut.info.nom"/></th>
+					<th><spring:message code="contingut.info.descirpcio"/></th>
 					<th><spring:message code="contingut.info.tipus"/></th>
 					<th><spring:message code="contingut.info.createl"/></th>
 					<th><spring:message code="contingut.info.creatper"/></th>
@@ -179,6 +180,9 @@
 								<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 							</c:if>
 							&nbsp;${fill.nom}
+						</td>
+						<td>
+							&nbsp;${fill.descripcio}
 						</td>
 						<td>
 							<c:choose>
