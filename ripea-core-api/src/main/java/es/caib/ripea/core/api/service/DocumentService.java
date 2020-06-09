@@ -361,7 +361,8 @@ public interface DocumentService {
 	 */
 	public Exception portafirmesCallback(
 			long documentId,
-			PortafirmesCallbackEstatEnumDto estat) throws NotFoundException;
+			PortafirmesCallbackEstatEnumDto estat,
+			String motiuRebuig) throws NotFoundException;
 
 	/**
 	 * Reintenta la custòdia d'un document firmat amb portafirmes que ha donat

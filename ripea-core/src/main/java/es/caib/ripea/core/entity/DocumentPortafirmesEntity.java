@@ -51,7 +51,9 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	private String portafirmesId;
 	@Column(name = "pf_callback_estat")
 	private PortafirmesCallbackEstatEnumDto callbackEstat;
-
+	@Column(name = "pf_motiu_rebuig")
+	private String motiuRebuig;
+	
 	public PortafirmesPrioritatEnumDto getPrioritat() {
 		return prioritat;
 	}
@@ -84,7 +86,9 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	public PortafirmesCallbackEstatEnumDto getCallbackEstat() {
 		return callbackEstat;
 	}
-
+	public String getMotiuRebuig() {
+		return motiuRebuig;
+	}
 	public void updateEnviat(
 			Date enviatData,
 			String portafirmesId) {
@@ -95,6 +99,11 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	public void updateCallbackEstat(
 			PortafirmesCallbackEstatEnumDto callbackEstat) {
 		this.callbackEstat = callbackEstat;
+	}
+	
+	public void updateMotiuRebuig(
+			String motiuRebuig) {
+		this.motiuRebuig = motiuRebuig;
 	}
 
 	public static Builder getBuilder(

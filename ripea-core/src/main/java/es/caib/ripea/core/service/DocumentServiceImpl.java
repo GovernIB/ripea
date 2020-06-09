@@ -401,7 +401,8 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception portafirmesCallback(
 			long portafirmesId,
-			PortafirmesCallbackEstatEnumDto callbackEstat) {
+			PortafirmesCallbackEstatEnumDto callbackEstat,
+			String motiuRebuig) {
 		logger.debug("Processant petició del callback ("
 				+ "portafirmesId=" + portafirmesId + ", "
 				+ "callbackEstat=" + callbackEstat + ")");
@@ -420,6 +421,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 		documentPortafirmes.updateCallbackEstat(callbackEstat);
+		documentPortafirmes.updateMotiuRebuig(motiuRebuig);
 		return documentHelper.portafirmesProcessar(documentPortafirmes);
 	}
 

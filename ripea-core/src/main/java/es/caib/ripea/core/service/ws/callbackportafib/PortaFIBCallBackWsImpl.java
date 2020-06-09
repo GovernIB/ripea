@@ -52,6 +52,7 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 	public void event(PortaFIBEvent event) throws CallBackException {
 		long documentId = event.getSigningRequest().getID();
 		int estat = event.getEventTypeID();
+		String motiuRebuig = null;
 		logger.debug("Rebuda petició al callback de portafirmes (" +
 				"documentId:" + documentId + ", " +
 				"estat:" + estat + ")");
@@ -70,6 +71,10 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 			break;
 		case 70:
 			estatEnum = PortafirmesCallbackEstatEnumDto.REBUTJAT;
+			if (event.getSigningRequest() != null) {
+				logger.debug("Motiu rebuig: " + event.getSigningRequest().getRejectionReason());
+				motiuRebuig = event.getSigningRequest().getRejectionReason();
+			}
 			break;
 		case 80:
 			estatEnum = PortafirmesCallbackEstatEnumDto.PAUSAT;
@@ -89,7 +94,8 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 			try {
 				Exception ex = documentService.portafirmesCallback(
 						documentId,
-						estatEnum);
+						estatEnum,
+						motiuRebuig);
 				if (ex == null) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,

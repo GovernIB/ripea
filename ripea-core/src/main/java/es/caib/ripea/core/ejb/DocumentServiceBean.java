@@ -150,8 +150,9 @@ public class DocumentServiceBean implements DocumentService {
 	@Override
 	public Exception portafirmesCallback(
 			long documentId,
-			PortafirmesCallbackEstatEnumDto estat) {
-		return delegate.portafirmesCallback(documentId, estat);
+			PortafirmesCallbackEstatEnumDto estat,
+			String motiuRebuig) {
+		return delegate.portafirmesCallback(documentId, estat, motiuRebuig);
 	}
 
 	@Override

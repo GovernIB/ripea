@@ -744,7 +744,7 @@ public class DocumentHelper {
 						documentPortafirmes.getDocument(),
 						LogTipusEnumDto.PFIRMA_REBUIG,
 						documentPortafirmes.getPortafirmesId(),
-						null,
+						documentPortafirmes.getMotiuRebuig(),
 						false,
 						false);
 				alertaHelper.crearAlerta(

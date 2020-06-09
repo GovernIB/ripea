@@ -22,7 +22,8 @@ public class DocumentPortafirmesDto extends DocumentEnviamentDto {
 	private String fluxId;
 	private String portafirmesId;
 	private PortafirmesCallbackEstatEnumDto callbackEstat;
-
+	private String motiuRebuig;
+	
 	public PortafirmesPrioritatEnumDto getPrioritat() {
 		return prioritat;
 	}
@@ -78,6 +79,12 @@ public class DocumentPortafirmesDto extends DocumentEnviamentDto {
 		this.callbackEstat = callbackEstat;
 	}
 
+	public String getMotiuRebuig() {
+		return motiuRebuig;
+	}
+	public void setMotiuRebuig(String motiuRebuig) {
+		this.motiuRebuig = motiuRebuig;
+	}
 	@Override
 	public String getDestinatari() {
 		return Arrays.toString(responsables);

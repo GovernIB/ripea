@@ -115,6 +115,7 @@
 						<c:when test="${portafirmes.estat == 'PROCESSAT'}">
 						</c:when>
 						<c:when test="${portafirmes.estat == 'REBUTJAT'}">
+							${portafirmes.motiuRebuig}
 						</c:when>
 						<c:when test="${portafirmes.estat == 'CANCELAT'}">
 							<spring:message code="firma.info.errors.cancelacio"/>

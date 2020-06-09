@@ -43,6 +43,8 @@ public class MCGDwsImpl implements MCGDws {
 			CallbackRequest callbackRequest) {
 		int documentId = callbackRequest.getApplication().getDocument().getId();
 		Integer estat = callbackRequest.getApplication().getDocument().getAttributes().getState();
+		String motiuRebuig = null;
+		
 		logger.debug("Rebuda petició al callback de portafirmes (" +
 				"documentId:" + documentId + ", " +
 				"estat:" + estat + ")");
@@ -64,6 +66,8 @@ public class MCGDwsImpl implements MCGDws {
 			break;
 		case 3:
 			estatEnum = PortafirmesCallbackEstatEnumDto.REBUTJAT;
+			if (callbackRequest.getApplication().getDocument().getSigner().getRejection() != null)
+				motiuRebuig = callbackRequest.getApplication().getDocument().getSigner().getRejection().getDescription();
 			break;
 		default:
 			String errorDescripcio = "No es reconeix el codi d'estat (" + estat + ")";
@@ -80,7 +84,8 @@ public class MCGDwsImpl implements MCGDws {
 			try {
 				Exception ex = documentService.portafirmesCallback(
 						documentId,
-						estatEnum);
+						estatEnum,
+						motiuRebuig);
 				if (ex == null) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,
