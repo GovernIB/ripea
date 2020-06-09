@@ -1677,6 +1677,7 @@ public class ContingutServiceImpl implements ContingutService {
 			creat = documentHelper.crearDocumentDB(
 					documentOrigen.getDocumentTipus(),
 					documentOrigen.getNom(),
+					documentOrigen.getDescripcio(),
 					documentOrigen.getData(),
 					documentOrigen.getDataCaptura(),
 					documentOrigen.getNtiOrgano(),
@@ -1730,6 +1731,7 @@ public class ContingutServiceImpl implements ContingutService {
 			creat = documentHelper.crearDocumentDB(
 					documentOrigen.getDocumentTipus(),
 					documentOrigen.getNom(),
+					documentOrigen.getDescripcio(),
 					documentOrigen.getData(),
 					documentOrigen.getDataCaptura(),
 					documentOrigen.getNtiOrgano(),

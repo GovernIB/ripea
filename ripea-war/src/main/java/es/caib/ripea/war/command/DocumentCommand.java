@@ -72,7 +72,7 @@ public class DocumentCommand extends ContenidorCommand {
 	private String fitxerContentType;
 	private String fitxerNom;
 	private byte[] fitxerContingut;
-
+	private String descripcio;
 
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
@@ -145,6 +145,12 @@ public class DocumentCommand extends ContenidorCommand {
 	}
 	public void setFitxerContingut(byte[] fitxerContingut) {
 		this.fitxerContingut = fitxerContingut;
+	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
 	}
 	/*public Date getDataCaptura() {
 		return dataCaptura;

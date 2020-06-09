@@ -50,6 +50,7 @@ public class DocumentDto extends NodeDto {
 	private boolean errorDarreraNotificacio;
 	private String estatDarreraNotificacio;
 	private boolean errorEnviamentPortafirmes;
+	private String Descripcio;
 	
 	private Long pareId;
 	
@@ -296,6 +297,14 @@ public class DocumentDto extends NodeDto {
 
 	public void setErrorEnviamentPortafirmes(boolean errorEnviamentPortafirmes) {
 		this.errorEnviamentPortafirmes = errorEnviamentPortafirmes;
+	}
+
+	public String getDescripcio() {
+		return Descripcio;
+	}
+
+	public void setDescripcio(String descripcio) {
+		Descripcio = descripcio;
 	}
 
 	public MetaDocumentDto getMetaDocument() {

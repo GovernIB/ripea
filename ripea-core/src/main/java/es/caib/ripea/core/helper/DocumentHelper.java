@@ -253,6 +253,7 @@ public class DocumentHelper {
 		documentEntity.update(
 				metaDocument,
 				document.getNom(),
+				document.getDescripcio(),
 				document.getData(),
 				document.getUbicacio(),
 				documentEntity.getDataCaptura(),
@@ -391,6 +392,7 @@ public class DocumentHelper {
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
 				document.getNom(),
+				document.getDescripcio(),
 				document.getData(),
 				new Date(),
 				expedient.getNtiOrgano(),
@@ -461,6 +463,7 @@ public class DocumentHelper {
 	public DocumentEntity crearDocumentDB(
 			DocumentTipusEnumDto documentTipus,
 			String nom,
+			String descripcio,
 			Date data,
 			Date dataCaptura,
 			String ntiOrgano,
@@ -477,6 +480,7 @@ public class DocumentHelper {
 				documentTipus,
 				DocumentEstatEnumDto.REDACCIO,
 				nom,
+				descripcio,
 				data,
 				dataCaptura,
 				ntiIdDocumentoOrigen,

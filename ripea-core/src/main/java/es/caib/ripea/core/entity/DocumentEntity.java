@@ -95,6 +95,8 @@ public class DocumentEntity extends NodeEntity {
 	private String ntiCsv;
 	@Column(name = "nti_csvreg", length = 512)
 	private String ntiCsvRegulacion;
+	@Column(name = "descripcio", length = 512)
+	protected String descripcio;
 
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	protected Set<DocumentEnviamentEntity> enviaments;
@@ -178,6 +180,10 @@ public class DocumentEntity extends NodeEntity {
 	public String getNtiCsvRegulacion() {
 		return ntiCsvRegulacion;
 	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+
 	public MetaDocumentEntity getMetaDocument() {
 		return (MetaDocumentEntity)getMetaNode();
 	}
@@ -190,6 +196,7 @@ public class DocumentEntity extends NodeEntity {
 	public void update(
 			MetaDocumentEntity metaDocument,
 			String nom,
+			String descripcio,
 			Date data,
 			String ubicacio,
 			Date dataCaptura,
@@ -203,6 +210,7 @@ public class DocumentEntity extends NodeEntity {
 			String ntiCsvRegulacion) {
 		this.metaNode = metaDocument;
 		this.nom = nom;
+		this.descripcio = descripcio;
 		this.data = data;
 		this.ubicacio = ubicacio;
 		this.dataCaptura = dataCaptura;
@@ -274,6 +282,7 @@ public class DocumentEntity extends NodeEntity {
 			DocumentTipusEnumDto documentTipus,
 			DocumentEstatEnumDto estat,
 			String nom,
+			String descripcio,
 			Date data,
 			Date dataCaptura,
 			String ntiIdDocumentoOrigen,
@@ -290,6 +299,7 @@ public class DocumentEntity extends NodeEntity {
 				documentTipus,
 				estat,
 				nom,
+				descripcio,
 				data,
 				dataCaptura,
 				ntiIdDocumentoOrigen,
@@ -309,6 +319,7 @@ public class DocumentEntity extends NodeEntity {
 				DocumentTipusEnumDto documentTipus,
 				DocumentEstatEnumDto estat,
 				String nom,
+				String descripcio,
 				Date data,
 				Date dataCaptura,
 				String ntiIdDocumentoOrigen,
@@ -325,6 +336,7 @@ public class DocumentEntity extends NodeEntity {
 			built.documentTipus = documentTipus;
 			built.estat = estat;
 			built.nom = nom;
+			built.descripcio = descripcio;
 			built.data = data;
 			built.dataCaptura = dataCaptura;
 			built.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;

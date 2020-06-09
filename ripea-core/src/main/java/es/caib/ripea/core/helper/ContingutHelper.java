@@ -224,6 +224,7 @@ public class ContingutHelper {
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
+			dto.setDescripcio(document.getDescripcio());
 			dto.setDocumentTipus(document.getDocumentTipus());
 			dto.setEstat(document.getEstat());
 			dto.setUbicacio(document.getUbicacio());
