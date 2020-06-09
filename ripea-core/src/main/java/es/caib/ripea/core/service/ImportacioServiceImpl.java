@@ -113,6 +113,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
 					tituloDoc != null ? tituloDoc : document.getNom(),
+					null,
 					document.getMetadades().getDataCaptura(),
 					document.getMetadades().getDataCaptura(),
 					//Només hi ha un òrgan
