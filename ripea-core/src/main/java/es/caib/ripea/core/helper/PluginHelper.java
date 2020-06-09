@@ -692,9 +692,12 @@ public class PluginHelper {
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			getArxiuPlugin().expedientTancar(
+			String arxiuUuid = getArxiuPlugin().expedientTancar(
 					expedient.getArxiuUuid());
-			expedient.updateArxiuEsborrat();
+			if (arxiuUuid != null)
+				expedient.updateArxiu(arxiuUuid);
+			else
+				expedient.updateArxiuEsborrat();
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
