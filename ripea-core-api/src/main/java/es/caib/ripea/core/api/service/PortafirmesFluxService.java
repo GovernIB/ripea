@@ -55,10 +55,20 @@ public interface PortafirmesFluxService {
 	/**
 	 * Recupera el detall d'un flux de firma creat anteriorment.
 	 * 
-	 * @param transaccioId
-	 * 				Id de la transacció.
+	 * @param plantillaFluxId
+	 * 				Id de la plantilla.
 	 * @return Informació bàsica del flux de firma.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String idTransaccio);
+	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId);
+	
+	/**
+	 * Recupera una url per mostrar la informació de a
+	 * 
+	 * @param plantillaFluxId
+	 * 				Id de la plantilla.
+	 * @return Informació bàsica del flux de firma.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public String recuperarUrlMostrarPlantilla(String plantillaFluxId);
 }
