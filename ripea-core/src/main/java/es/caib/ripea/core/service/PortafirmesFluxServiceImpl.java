@@ -79,6 +79,16 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 				idioma);
 	}
 	
+	@Override
+	public String recuperarUrlMostrarPlantilla(String plantillaFluxId) {
+		logger.debug("Recuperant url plantilla (" +
+				"plantillaId=" + plantillaFluxId +")");
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		return pluginHelper.portafirmesRecuperarUrlPlantilla(
+				plantillaFluxId, 
+				idioma);
+	}
+	
 	private String generarNomFlux(String documentNom) {		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
 		Date date = new Date();

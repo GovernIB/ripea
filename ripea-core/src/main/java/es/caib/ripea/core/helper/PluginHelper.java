@@ -2291,6 +2291,34 @@ public class PluginHelper {
 		return respostaDto;
 	}
 	
+	public String portafirmesRecuperarUrlPlantilla(
+			String plantillaFluxId,
+			String idioma) {
+		String accioDescripcio = "Recuperant url flux de firma";
+		long t0 = System.currentTimeMillis();
+		String resposta = null;
+		try {
+			resposta = getPortafirmesPlugin().recuperarUrlViewPlantilla(
+					plantillaFluxId,
+					idioma);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return resposta;
+	}
+	
 	public String conversioConvertirPdfArxiuNom(
 			String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);
