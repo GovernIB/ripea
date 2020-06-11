@@ -138,14 +138,40 @@ public interface PortafirmesPlugin {
 	/**
 	 * Recupera el detall d'un flux de firma creat (nom + descripció).
 	 *
-	 * @param idTransaccio
-	 * 				Id de la transacció.
+	 * @param idPlantilla
+	 * 				Id de la plantilla.
 	 * @return la informació del flux de firma.
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
 	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String idTransaccio,
+			String idioma) throws SistemaExternException;
+	
+	/**
+	 * Recupera una url per mostrar la informació de la plantilal de forma gràfica.
+	 *
+	 * @param idPlantilla
+	 * 				Id de la plantilla.
+	 * @return la url de Portafirmes.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public String recuperarUrlViewPlantilla(
+			String idPlantilla,
+			String idioma) throws SistemaExternException;
+	
+	/**
+	 * Recupera una url per editar una plantilla de forma gràfica.
+	 *
+	 * @param idPlantilla
+	 * 				Id de la plantilla.
+	 * @return la url de Portafirmes.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public String recuperarUrlEditPlantilla(
+			String idPlantilla, 
 			String idioma) throws SistemaExternException;
 
 	/**
@@ -156,4 +182,5 @@ public interface PortafirmesPlugin {
 	 */
 	public void tancarTransaccioFlux(
 			String idTransaccio) throws SistemaExternException;
+
 }

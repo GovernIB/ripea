@@ -135,4 +135,16 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String recuperarUrlViewPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String recuperarUrlEditPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

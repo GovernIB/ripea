@@ -234,7 +234,19 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 			throws SistemaExternException {
 		return new PortafirmesFluxInfo();
 	}
-	
+
+	@Override
+	public String recuperarUrlViewPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String recuperarUrlEditPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,
 			String documentTipus,

@@ -60,4 +60,10 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 		return delegate.recuperarDetallFluxFirma(idTransaccio);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public String recuperarUrlMostrarPlantilla(String plantillaFluxId) {
+		return delegate.recuperarUrlMostrarPlantilla(plantillaFluxId);
+	}
+
 }

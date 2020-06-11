@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -693,7 +694,9 @@ public class DocumentController extends BaseUserController {
 			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
 				model.addAttribute("nouFluxDeFirma", true);
 			} else {
+				String urlPlantilla = portafirmesFluxService.recuperarUrlMostrarPlantilla(metaDocument.getPortafirmesFluxId());
 				model.addAttribute("nouFluxDeFirma", false);
+				model.addAttribute("urlPlantilla", urlPlantilla);
 			}
 		} else {
 			model.addAttribute("nouFluxDeFirma", false);
