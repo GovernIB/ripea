@@ -76,7 +76,6 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.SessioHelper;
-import es.caib.ripea.war.helper.TasquesPendentsHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 

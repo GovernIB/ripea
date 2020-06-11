@@ -1,12 +1,7 @@
 package es.caib.ripea.war.helper;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.joda.time.DateTime;
-
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 
 public class TasquesPendentsHelper {

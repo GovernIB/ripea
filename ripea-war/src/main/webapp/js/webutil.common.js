@@ -397,14 +397,12 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	
 	$.fn.webutilInputSuggest = function() {
 		var urlActual = $(this).data('urlInicial');
-		
 		var value = $(this).data('currentValue');
 		var urlInicial = urlActual + "/" + value;
 		var suggestValue = $(this).data('suggestValue');
 		var suggestText = $(this).data('suggestText');
 		var suggestTextAddicional = $(this).data('suggestTextAddicional');
 		var suggest = $(this);
-		
 		if (value != null && value.includes(",")) {
 			var valueArr = value.split(',');
 			valueArr.forEach(function(value) {
@@ -414,6 +412,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 					$.ajax({
 						url: urlInicial,
 						async: false,
+						global: false,
 						success: function(resposta) {
 							suggest.append(
 										$('<option>', {
@@ -421,6 +420,14 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
 											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
 										}));
+						},
+						error: function () {
+							suggest.append(
+									$('<option>', {
+										value: value,
+										text: value,
+										selected: true
+									}));
 						}
 					});
 				} else {
@@ -432,6 +439,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				$.ajax({
 					url: urlInicial,
 					async: false,
+					global: false,
 					success: function(resposta) {
 						if (value == resposta[suggestValue] != false) {
 							suggest.append(
@@ -449,6 +457,14 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 										selected: value == resposta["nif"] ? value == resposta["nif"] : value == resposta["codi"]
 									}));
 						}
+					},
+					error: function () {
+						suggest.append(
+								$('<option>', {
+									value: value,
+									text: value,
+									selected: true
+								}));
 					}
 				});
 			} else {

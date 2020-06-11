@@ -52,8 +52,7 @@ public class AjaxUserController extends BaseUserController {
 			Model model) {
 		return aplicacioService.findUsuariAmbText(text);
 	}
-	
-	
+
 	@RequestMapping(value = "/usuariDades/{codi}", method = RequestMethod.GET)
 	@ResponseBody
 	public UsuariDto getByCodiPluginDadesUsuari(

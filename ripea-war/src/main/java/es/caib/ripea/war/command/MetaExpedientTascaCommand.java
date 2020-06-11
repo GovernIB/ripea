@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.war.command;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.hibernate.validator.constraints.NotEmpty;

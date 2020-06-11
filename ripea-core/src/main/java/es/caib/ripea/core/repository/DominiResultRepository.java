@@ -5,8 +5,6 @@ package es.caib.ripea.core.repository;
 
 import javax.sql.DataSource;
 
-import org.springframework.stereotype.Component;
-
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 
 
