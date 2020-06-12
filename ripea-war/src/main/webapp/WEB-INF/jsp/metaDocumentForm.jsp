@@ -279,9 +279,10 @@ function removeLoading() {
 				<%--rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id"/--%>
 				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<%--div class="flux_portafib"--%>
+				<div class="flux_portafib">
 					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
 					<%-- rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/--%>
+				</div>
 				<div class="flux_simple">
 					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
