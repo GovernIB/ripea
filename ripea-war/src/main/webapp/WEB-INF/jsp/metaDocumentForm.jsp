@@ -178,14 +178,37 @@ body.loading .rmodal {
 			});
 		});
 		
-		//$("#fluxModal").on("show.bs.modal", function () {
-		//	 $(".modal-body").html('<img src="loading.gif" />');
-		//});
-		//$body = $("#fluxModal");
-		//$(document).on({
-		//	ajaxStart: function() { $body.addClass("loading");    },
-		//	ajaxStop: function() { $body.removeClass("loading"); }    
-		//});
+		$.ajax({
+			type: 'GET',
+			dataType: "json",
+			url: "<c:url value="/metaExpedient/metaDocument/flux/plantilles"/>",
+			success: function(data) {
+				var plantillaActual = "${portafirmesFluxSeleccionat}";
+				var selPlantilles = $("#portafirmesFluxId");
+				selPlantilles.empty();
+				selPlantilles.append("<option value=\"\"></option>");
+				if (data) {
+					var items = [];
+					$.each(data, function(i, val) {
+						if (plantillaActual == val.fluxId) {
+							selPlantilles.append("<option value=\"" + val.fluxId + "\" selected>" + val.nom + "</option>");
+						} else {
+							selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						}
+					});
+				}
+				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+				selPlantilles.select2(select2Options);
+			},
+			error: function (error) {
+				console.log(error);
+				var selPlantilles = $("#portafirmesFluxId");
+				selPlantilles.empty();
+				selPlantilles.append("<option value=\"\"></option>");
+				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+				selPlantilles.select2(select2Options);
+			}
+		});
 
 		$('.modal-cancel').on('click', function(){
 			localStorage.removeItem('transaccioId');
@@ -256,9 +279,9 @@ function removeLoading() {
 				<%--rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id"/--%>
 				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<div class="flux_portafib">
-					<rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
-				</div>
+				<%--div class="flux_portafib"--%>
+					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
+					<%-- rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/--%>
 				<div class="flux_simple">
 					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>

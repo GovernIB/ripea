@@ -134,6 +134,17 @@ public interface PortafirmesPlugin {
 	 */
 	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(
 			String idTransaccio) throws SistemaExternException;
+	
+	/**
+	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació.
+	 *
+	 * @param idioma
+	 * 				idioma plantilles.
+	 * @return el id del flux de firma o error.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public List<PortafirmesFluxResposta> recuperarPlantillesDisponibles(String idioma) throws SistemaExternException;
 
 	/**
 	 * Recupera el detall d'un flux de firma creat (nom + descripció).

@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.util.List;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
@@ -64,6 +66,12 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 	@RolesAllowed("tothom")
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId) {
 		return delegate.recuperarUrlMostrarPlantilla(plantillaFluxId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles() {
+		return delegate.recuperarPlantillesDisponibles();
 	}
 
 }

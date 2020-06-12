@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +89,13 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 				plantillaFluxId, 
 				idioma);
 	}
+
+	@Override
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles() {
+		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(idioma);
+	}
 	
 	private String generarNomFlux(String documentNom) {		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
@@ -99,4 +107,5 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(PortafirmesFluxServiceImpl.class);
+
 }

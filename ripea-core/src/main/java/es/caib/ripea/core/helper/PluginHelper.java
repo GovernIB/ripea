@@ -2319,6 +2319,41 @@ public class PluginHelper {
 		return resposta;
 	}
 	
+	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
+			String idioma) {
+		String accioDescripcio = "Recuperant flux de firma";
+		long t0 = System.currentTimeMillis();
+		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
+		try {
+			List<PortafirmesFluxResposta> plantilles = getPortafirmesPlugin().recuperarPlantillesDisponibles(
+					idioma);
+			
+			if (plantilles != null) {
+				for (PortafirmesFluxResposta plantilla : plantilles) {
+					PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
+					resposta.setFluxId(plantilla.getFluxId());
+					resposta.setNom(plantilla.getNom());
+					respostesDto.add(resposta);
+				}
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return respostesDto;
+	}
+	
 	public String conversioConvertirPdfArxiuNom(
 			String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);

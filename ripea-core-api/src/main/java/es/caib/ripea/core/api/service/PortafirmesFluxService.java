@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
@@ -63,12 +65,22 @@ public interface PortafirmesFluxService {
 	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId);
 	
 	/**
+	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació
+	 * 
+	 * @param transaccioId
+	 * 				Id de la transacció.
+	 * @return La el id del flux de firma o error.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles();
+	
+	/**
 	 * Recupera una url per mostrar la informació de a
 	 * 
 	 * @param plantillaFluxId
 	 * 				Id de la plantilla.
 	 * @return Informació bàsica del flux de firma.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId);
 }

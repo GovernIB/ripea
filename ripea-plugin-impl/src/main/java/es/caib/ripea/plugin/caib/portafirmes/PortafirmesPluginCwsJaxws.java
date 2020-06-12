@@ -247,6 +247,12 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 		return null;
 	}
 
+	@Override
+	public List<PortafirmesFluxResposta> recuperarPlantillesDisponibles(String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,
 			String documentTipus,

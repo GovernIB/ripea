@@ -39,9 +39,11 @@ import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleBlock;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleEditFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplate;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateList;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetFlowResultResponse;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetTransactionIdRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleKeyValue;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleReviser;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleSignature;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStartTransactionRequest;
@@ -359,6 +361,26 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			}
 		}
 		return resposta;
+	}
+	
+	@Override
+	public List<PortafirmesFluxResposta> recuperarPlantillesDisponibles(String idioma) throws SistemaExternException {
+		List<PortafirmesFluxResposta> plantilles = new ArrayList<PortafirmesFluxResposta>();
+		try {
+			FlowTemplateSimpleFlowTemplateList resposta = getFluxDeFirmaClient().getAllFlowTemplates(idioma);
+			
+			for (FlowTemplateSimpleKeyValue flowTemplate : resposta.getList()) {
+				PortafirmesFluxResposta plantilla = new PortafirmesFluxResposta();
+				plantilla.setFluxId(flowTemplate.getKey());
+				plantilla.setNom(flowTemplate.getValue());
+				plantilles.add(plantilla);
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut recuperar les plantilles per l'usuari aplicació actual",
+					ex);
+		}
+		return plantilles;
 	}
 
 	public void tancarTransaccioFlux (String idTransaccio) throws SistemaExternException {

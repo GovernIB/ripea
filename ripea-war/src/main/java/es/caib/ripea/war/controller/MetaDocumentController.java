@@ -109,6 +109,7 @@ public class MetaDocumentController extends BaseAdminController {
 		}
 		MetaDocumentCommand command = null;
 		if (metaDocument != null) {
+			model.addAttribute("portafirmesFluxSeleccionat", metaDocument.getPortafirmesFluxId());
 			command = MetaDocumentCommand.asCommand(metaDocument);
 		} else {
 			command = new MetaDocumentCommand();
@@ -295,8 +296,18 @@ public class MetaDocumentController extends BaseAdminController {
 					request,
 					"metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
 			model.addAttribute("fluxId", resposta.getFluxId());
+			model.addAttribute("FluxNom", resposta.getNom());
 		}
 		return "portafirmesModalTancar";
+	}
+	
+	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
+	@ResponseBody
+	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(
+			HttpServletRequest request,
+			Model model) {
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles();
+		return resposta;
 	}
 
 	public void emplenarModelForm(

@@ -147,4 +147,10 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<PortafirmesFluxResposta> recuperarPlantillesDisponibles(String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

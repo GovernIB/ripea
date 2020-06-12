@@ -28,7 +28,8 @@ if (fluxIframe) {
 	let alertDiv;
 	
 	if (idFlux != null && idFlux != '') {
-		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').val(idFlux);
+		//$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').val(idFlux);
+		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').append("<option value=\"" + idFlux + "\" selected>" + FluxNom + "</option>");
 	} else if (FluxError != null && FluxError != '') {
 		alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>';
 	}
