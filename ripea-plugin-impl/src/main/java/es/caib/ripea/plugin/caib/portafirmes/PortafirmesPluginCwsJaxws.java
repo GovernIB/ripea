@@ -236,13 +236,7 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	}
 
 	@Override
-	public String recuperarUrlViewPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String recuperarUrlEditPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
+	public String recuperarUrlViewEditPlantilla(String idPlantilla, String idioma, String urlReturn, boolean edicio) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -253,6 +247,11 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 		return null;
 	}
 
+	@Override
+	public boolean esborrarPlantillaFirma(String idioma, String plantillaFluxId) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,
 			String documentTipus,
@@ -548,5 +547,6 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 			return contentType;
 		}
 	}
+
 
 }

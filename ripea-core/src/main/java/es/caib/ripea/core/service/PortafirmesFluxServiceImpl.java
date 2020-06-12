@@ -82,14 +82,30 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	
 	@Override
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId) {
-		logger.debug("Recuperant url plantilla (" +
+		logger.debug("Recuperant url visualització plantilla (" +
 				"plantillaId=" + plantillaFluxId +")");
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
 		return pluginHelper.portafirmesRecuperarUrlPlantilla(
 				plantillaFluxId, 
-				idioma);
+				idioma,
+				null,
+				false);
 	}
 
+	@Override
+	public String recuperarUrlEdicioPlantilla(
+			String plantillaFluxId,
+			String returnUrl) {
+		logger.debug("Recuperant url edició plantilla (" +
+				"plantillaId=" + plantillaFluxId +")");
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		return pluginHelper.portafirmesRecuperarUrlPlantilla(
+				plantillaFluxId, 
+				idioma,
+				returnUrl,
+				true);
+	}
+	
 	@Override
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles() {
 		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
@@ -97,6 +113,13 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(idioma);
 	}
 	
+	@Override
+	public boolean esborrarPlantilla(String plantillaFluxId) {
+		logger.debug("Esborrant la plantilla amb id=" + plantillaFluxId);
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		return pluginHelper.portafirmesEsborrarPlantillaFirma(idioma, plantillaFluxId);
+	}
+
 	private String generarNomFlux(String documentNom) {		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
 		Date date = new Date();

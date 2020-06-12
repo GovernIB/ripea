@@ -417,11 +417,20 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 
 	@Override
-	public String recuperarUrlViewPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
+	public String recuperarUrlViewEditPlantilla (
+			String idPlantilla, 
+			String idioma,
+			String urlReturn,
+			boolean edicio) throws SistemaExternException {
 		String urlPlantilla;
 		try {
-			FlowTemplateSimpleViewFlowTemplateRequest request = new FlowTemplateSimpleViewFlowTemplateRequest(idioma, idPlantilla);
-			urlPlantilla = getFluxDeFirmaClient().getUrlToViewFlowTemplate(request);
+			if (!edicio) {
+				FlowTemplateSimpleViewFlowTemplateRequest request = new FlowTemplateSimpleViewFlowTemplateRequest(idioma, idPlantilla);
+				urlPlantilla = getFluxDeFirmaClient().getUrlToViewFlowTemplate(request);
+			} else {
+				FlowTemplateSimpleEditFlowTemplateRequest request = new FlowTemplateSimpleEditFlowTemplateRequest(idioma, idPlantilla, urlReturn);
+				urlPlantilla = getFluxDeFirmaClient().getUrlToEditFlowTemplate(request);
+			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut recuperar la url per visualitzar el flux de firma",
@@ -431,17 +440,17 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 	
 	@Override
-	public String recuperarUrlEditPlantilla(String idPlantilla, String idioma) throws SistemaExternException {
-		String urlPlantilla;
+	public boolean esborrarPlantillaFirma(String idioma, String plantillaFluxId) throws SistemaExternException {
+		boolean esborrat = false;
 		try {
-			FlowTemplateSimpleEditFlowTemplateRequest request = new FlowTemplateSimpleEditFlowTemplateRequest();
-			urlPlantilla = getFluxDeFirmaClient().getUrlToEditFlowTemplate(request);
+			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest(idioma, plantillaFluxId);
+			esborrat = getFluxDeFirmaClient().deleteFlowTemplate(request);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"No s'ha pogut recuperar la url per editar el flux de firma",
+					"Hi ha hagut un problema esborrant el flux de firma",
 					ex);
 		}
-		return urlPlantilla;
+		return esborrat;
 	}
 	
 	private FirmaAsyncSimpleSignatureBlock[] recuperarFluxDeFirma(String idTransaccio) throws SistemaExternException {
@@ -851,4 +860,5 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		}
 	}
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PortafirmesPluginPortafib.class);
+
 }

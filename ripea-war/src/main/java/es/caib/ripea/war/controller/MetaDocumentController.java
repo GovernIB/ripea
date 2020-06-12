@@ -244,6 +244,7 @@ public class MetaDocumentController extends BaseAdminController {
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
+			@RequestParam(value="plantillaId", required = false) String plantillaId,
 			Model model) throws UnsupportedEncodingException {
 		String urlReturn;
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
@@ -253,11 +254,19 @@ public class MetaDocumentController extends BaseAdminController {
 				"document.controller.portafirmes.flux.desc");
 		try {
 			urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
-			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-					urlReturn,
-					nomCodificat,
-					descripcio,
-					true);
+			if (plantillaId != null && !plantillaId.isEmpty()) {
+				transaccioResponse = new PortafirmesIniciFluxRespostaDto();
+				String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(
+						plantillaId, 
+						urlReturn);
+				transaccioResponse.setUrlRedireccio(urlEdicio);
+			} else {
+				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
+						urlReturn,
+						nomCodificat,
+						descripcio,
+						true);
+			}
 		} catch (Exception ex) {
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 			transaccioResponse.setError(true);
@@ -301,6 +310,18 @@ public class MetaDocumentController extends BaseAdminController {
 		return "portafirmesModalTancar";
 	}
 	
+	@RequestMapping(value = "/metaDocument/flux/returnurl/", method = RequestMethod.GET)
+	public String transaccioEstat(
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute(
+				"FluxCreat",
+				getMessage(
+				request,
+				"metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
+		return "portafirmesModalTancar";
+	}
+	
 	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(
@@ -308,6 +329,15 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) {
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles();
 		return resposta;
+	}
+	
+	@RequestMapping(value = "/metaDocument/flux/esborrar/{plantillaId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean esborrarPlantilla(
+			HttpServletRequest request,
+			@PathVariable String plantillaId,
+			Model model) {
+		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 
 	public void emplenarModelForm(

@@ -2293,14 +2293,18 @@ public class PluginHelper {
 	
 	public String portafirmesRecuperarUrlPlantilla(
 			String plantillaFluxId,
-			String idioma) {
+			String idioma,
+			String returnUrl,
+			boolean edicio) {
 		String accioDescripcio = "Recuperant url flux de firma";
 		long t0 = System.currentTimeMillis();
 		String resposta = null;
 		try {
-			resposta = getPortafirmesPlugin().recuperarUrlViewPlantilla(
+			resposta = getPortafirmesPlugin().recuperarUrlViewEditPlantilla(
 					plantillaFluxId,
-					idioma);
+					idioma,
+					returnUrl,
+					edicio);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -2352,6 +2356,34 @@ public class PluginHelper {
 					ex);
 		}
 		return respostesDto;
+	}
+	
+	public boolean portafirmesEsborrarPlantillaFirma(
+			String idioma,
+			String plantillaFluxId) {
+		String accioDescripcio = "Esborrant flux de firma";
+		long t0 = System.currentTimeMillis();
+		boolean esborrat;
+		try {
+			esborrat = getPortafirmesPlugin().esborrarPlantillaFirma(
+					idioma,
+					plantillaFluxId);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return esborrat;
 	}
 	
 	public String conversioConvertirPdfArxiuNom(

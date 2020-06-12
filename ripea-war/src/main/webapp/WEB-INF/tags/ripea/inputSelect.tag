@@ -24,9 +24,11 @@
 <%@ attribute name="netejar" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionMinimumResultsForSearch" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
-<%@ attribute name="button" required="false" rtexprvalue="true"%>
+<%@ attribute name="botons" required="false" rtexprvalue="true"%>
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
+<%@ attribute name="deleteMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
+<%@ attribute name="iconDelete" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -40,7 +42,7 @@
 </spring:bind>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
 <c:choose>
-	<c:when test="${not inline && not button}">
+	<c:when test="${not inline && not botons}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="controls col-xs-${campInputSize}">
 			<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-netejar="${netejar}" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}" multiple="${multiple}">
@@ -74,8 +76,9 @@
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>
 	</c:when>
-	<c:when test="${not inline && button}">
+	<c:when test="${not inline && botons}">
 		<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
+		<c:set var="deleteMsg"><spring:message code="${deleteMsg}"/></c:set>
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="controls col-xs-${campInputSize} ">
 		<div class="input-group select2-bootstrap-append">
@@ -107,8 +110,9 @@
 					<c:otherwise><form:options/></c:otherwise>
 				</c:choose>
 			</form:select>
-			<span class="input-group-btn ${campPath}_btn" title="${buttonMsg}">
-				<a class="btn btn-default"><i class="${icon}"></i></a>
+			<span class="input-group-btn">
+				<a class="btn btn-default ${campPath}_btn_edicio" title="${buttonMsg}"><i class="${icon}"></i></a>
+				<a class="btn btn-default ${campPath}_btn_esborrar" title="${deleteMsg}"><i class="${iconDelete}"></i></a>
 			</span>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>

@@ -75,7 +75,17 @@ public interface PortafirmesFluxService {
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles();
 	
 	/**
-	 * Recupera una url per mostrar la informació de a
+	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació
+	 * 
+	 * @param transaccioId
+	 * 				Id de la transacció.
+	 * @return La el id del flux de firma o error.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public boolean esborrarPlantilla(String plantillaFluxId);
+	
+	/**
+	 * Recupera una url per mostrar la informació de una plantilla.
 	 * 
 	 * @param plantillaFluxId
 	 * 				Id de la plantilla.
@@ -83,4 +93,17 @@ public interface PortafirmesFluxService {
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId);
+	
+	/**
+	 * Recupera una url per editar una plantilla creada.
+	 * 
+	 * @param plantillaFluxId
+	 * 				Id de la plantilla.
+	 * @return Informació bàsica del flux de firma.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String recuperarUrlEdicioPlantilla(
+			String plantillaFluxId,
+			String returnUrl);
+	
 }

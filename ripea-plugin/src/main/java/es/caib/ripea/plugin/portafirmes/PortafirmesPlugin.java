@@ -151,6 +151,8 @@ public interface PortafirmesPlugin {
 	 *
 	 * @param idPlantilla
 	 * 				Id de la plantilla.
+	 * @param idioma
+	 * 				Idioma flux.
 	 * @return la informació del flux de firma.
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
@@ -160,30 +162,38 @@ public interface PortafirmesPlugin {
 			String idioma) throws SistemaExternException;
 	
 	/**
-	 * Recupera una url per mostrar la informació de la plantilal de forma gràfica.
+	 * Recupera una url per mostrar/editar la informació de la plantilal de forma gràfica.
 	 *
 	 * @param idPlantilla
 	 * 				Id de la plantilla.
+	 * @param idioma
+	 * 				Idioma plantilla/flux.
+	 * @param edicio
+	 * 		  		Indicar si recuperar url per visualitzar o editar plantilla.
 	 * @return la url de Portafirmes.
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public String recuperarUrlViewPlantilla(
+	public String recuperarUrlViewEditPlantilla(
 			String idPlantilla,
-			String idioma) throws SistemaExternException;
+			String idioma,
+			String urlReturn,
+			boolean edicio) throws SistemaExternException;
 	
 	/**
-	 * Recupera una url per editar una plantilla de forma gràfica.
+	 * Recupera una url per mostrar/editar la informació de la plantilal de forma gràfica.
 	 *
-	 * @param idPlantilla
-	 * 				Id de la plantilla.
-	 * @return la url de Portafirmes.
+	 * @param idioma
+	 * 				Idioma plantilla/flux.
+	 * @param plantillaFluxId
+	 * 		  		Id de la plantilla a esborrar.
+	 * @return true = esborrat / false = no trobada.
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public String recuperarUrlEditPlantilla(
-			String idPlantilla, 
-			String idioma) throws SistemaExternException;
+	public boolean esborrarPlantillaFirma(
+			String idioma,
+			String plantillaFluxId) throws SistemaExternException;
 
 	/**
 	 * Tanca una transacció.
