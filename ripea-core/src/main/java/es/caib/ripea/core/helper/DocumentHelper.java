@@ -111,6 +111,7 @@ public class DocumentHelper {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			Long[] annexosIds,
 			String transaccioId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
@@ -175,6 +176,13 @@ public class DocumentHelper {
 				document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
 				document).build();
+
+		if (annexosIds != null) {
+			for (Long annexId : annexosIds) {
+				DocumentEntity annex = documentRepository.findOne(annexId);
+				documentPortafirmes.addAnnex(annex);
+			}
+		}
 		// Si l'enviament produeix excepcions la retorna
 		SistemaExternException sex = portafirmesEnviar(
 				documentPortafirmes,
@@ -638,7 +646,7 @@ public class DocumentHelper {
 					documentPortafirmes.getResponsables(),
 					documentPortafirmes.getSequenciaTipus(),
 					documentPortafirmes.getFluxId(),
-					null,
+					documentPortafirmes.getAnnexos(),
 					transaccioId);
 			documentPortafirmes.updateEnviat(
 					new Date(),

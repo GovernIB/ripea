@@ -158,6 +158,19 @@ public interface DocumentService {
 	public List<DocumentDto> findAmbExpedientIPermisRead(
 			Long entitatId,
 			Long expedientId) throws NotFoundException;
+	
+	/**
+	 * Consulta els documents d'un expedient.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param document
+	 *            Document del que es volen recuperar els annexos (documents) disponibles
+	 * @return la llistat de documents.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	List<DocumentDto> findAnnexosAmbExpedient(Long entitatId, DocumentDto document);
 
 	/**
 	 * Recupera el contingut d'un document.
@@ -245,6 +258,7 @@ public interface DocumentService {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			Long[] annexosIds,
 			String transaccioId) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
@@ -557,4 +571,5 @@ public interface DocumentService {
 			Long entitatId,
 			Long documentId,
 			DocumentEstatEnumDto nouEstat);
+
 }

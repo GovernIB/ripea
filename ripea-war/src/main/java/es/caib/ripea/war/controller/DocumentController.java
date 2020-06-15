@@ -45,7 +45,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -104,6 +103,10 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId);
 		model.addAttribute("document", document);
+		model.addAttribute("annexos", 
+				documentService.findAnnexosAmbExpedient(
+						entitatActual.getId(), 
+						document));
 		
 		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
 		command.setMotiu(
@@ -181,6 +184,7 @@ public class DocumentController extends BaseUserController {
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
+				command.getAnnexos(),
 				transaccioId);
 		
 		return this.getModalControllerReturnValueSuccess(
@@ -724,6 +728,10 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId);
 		model.addAttribute("document", document);
+		model.addAttribute("annexos", 
+				documentService.findAnnexosAmbExpedient(
+						entitatActual.getId(), 
+						document));
 	}
 
 	private void emplenarModelFirmaClient(

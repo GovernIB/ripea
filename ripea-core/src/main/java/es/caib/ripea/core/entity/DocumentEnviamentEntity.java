@@ -95,8 +95,10 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 			fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "ipa_document_enviament_doc",
-			joinColumns = {@JoinColumn(name = "document_enviament_id")},
-			inverseJoinColumns = {@JoinColumn(name = "document_id")})
+			joinColumns = {
+					@JoinColumn(name = "document_enviament_id", referencedColumnName="id")},
+			inverseJoinColumns = {
+					@JoinColumn(name = "document_id")})
 	@ForeignKey(
 			name = "ipa_docenv_docenvdoc_fk",
 			inverseName = "ipa_document_docenvdoc_fk")

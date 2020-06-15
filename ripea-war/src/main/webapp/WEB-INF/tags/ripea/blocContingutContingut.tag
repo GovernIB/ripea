@@ -182,7 +182,9 @@
 							&nbsp;${fill.nom}
 						</td>
 						<td>
+						<c:if test="${fill.document}">
 							&nbsp;${fill.descripcio}
+						</c:if>
 						</td>
 						<td>
 							<c:choose>

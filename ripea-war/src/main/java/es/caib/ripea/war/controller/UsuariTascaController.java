@@ -748,6 +748,7 @@ public class UsuariTascaController extends BaseUserController {
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
+				command.getAnnexos(),
 				tascaId,
 				transaccioId);
 		return this.getModalControllerReturnValueSuccess(

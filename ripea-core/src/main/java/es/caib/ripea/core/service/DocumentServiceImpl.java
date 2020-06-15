@@ -55,6 +55,7 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -245,6 +246,43 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return dtos;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<DocumentDto> findAnnexosAmbExpedient(
+			Long entitatId,
+			DocumentDto document) {
+		if (document.getExpedientPare() == null)
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"El document seleccionat no disposa d'expedient pare");
+		Long expedientId = document.getExpedientPare().getId();
+		
+		logger.debug("Obtenint els documents (annexos) de l'expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientId=" + expedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				true, 
+				false, 
+				false);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				false);
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndTipus(
+				entitat, 
+				expedient,
+				document.getId());
+		return conversioTipusHelper.convertirList(
+				documents, 
+				DocumentDto.class);
+	}
 
 	@Transactional(readOnly = true)
 	@Override
@@ -349,6 +387,7 @@ public class DocumentServiceImpl implements DocumentService {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			Long[] annexosIds,
 			String transaccioId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
@@ -373,6 +412,7 @@ public class DocumentServiceImpl implements DocumentService {
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
+				annexosIds,
 				transaccioId);
 	}
 

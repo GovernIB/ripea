@@ -124,6 +124,7 @@ public class DocumentServiceBean implements DocumentService {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			Long[] annexosIds,
 			String transaccioId) {
 		delegate.portafirmesEnviar(
 				entitatId,
@@ -134,6 +135,7 @@ public class DocumentServiceBean implements DocumentService {
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
+				annexosIds,
 				transaccioId);
 	}
 
@@ -321,6 +323,12 @@ public class DocumentServiceBean implements DocumentService {
 				entitatId, 
 				documentId, 
 				nouEstat);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<DocumentDto> findAnnexosAmbExpedient(Long entitatId, DocumentDto document) {
+		return delegate.findAnnexosAmbExpedient(entitatId, document);
 	}
 
 }

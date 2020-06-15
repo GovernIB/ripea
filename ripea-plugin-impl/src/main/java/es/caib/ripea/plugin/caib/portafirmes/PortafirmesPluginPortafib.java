@@ -27,6 +27,7 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.ApiFirmaAsyncSimple;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleAnnex;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleExternalSigner;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleFile;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleReviser;
@@ -128,6 +129,19 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				signatureRequest.setLanguageUI("ca");
 				signatureRequest.setLanguageDoc("ca");
 				signatureRequest.setProfileCode(getPerfil());
+				
+				if (annexos != null) {
+					List<FirmaAsyncSimpleAnnex> portafirmesAnnexos = new ArrayList<FirmaAsyncSimpleAnnex>();
+					
+					for (PortafirmesDocument annex : annexos) {
+						FirmaAsyncSimpleAnnex portafirmesAnnex = new FirmaAsyncSimpleAnnex();
+						portafirmesAnnex.setAnnex(toFirmaAsyncSimpleFile(annex));
+						portafirmesAnnex.setAttach(false);
+						portafirmesAnnex.setSign(false);
+						portafirmesAnnexos.add(portafirmesAnnex);
+					}
+					signatureRequest.setAnnexs(portafirmesAnnexos);
+				}
 				FirmaAsyncSimpleSignatureBlock[] signatureBlocks = idTransaccio != null ? recuperarFluxDeFirma(idTransaccio) : toFirmaAsyncSimpleSignatureBlockFromId(plantillaFluxId, "ca");
 
 				signatureRequest.setSignatureBlocks(signatureBlocks);

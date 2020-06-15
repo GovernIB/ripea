@@ -112,7 +112,9 @@
 			</form:select>
 			<span class="input-group-btn">
 				<a class="btn btn-default ${campPath}_btn_edicio" title="${buttonMsg}"><i class="${icon}"></i></a>
-				<a class="btn btn-default ${campPath}_btn_esborrar" title="${deleteMsg}"><i class="${iconDelete}"></i></a>
+				<c:if test="${not empty iconDelete}">
+					<a class="btn btn-default ${campPath}_btn_esborrar" title="${deleteMsg}"><i class="${iconDelete}"></i></a>
+				</c:if>
 			</span>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>

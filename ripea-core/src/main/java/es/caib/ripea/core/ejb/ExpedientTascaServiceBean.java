@@ -179,6 +179,7 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			Long[] annexosIds,
 			Long tascaId,
 			String transaccioId) {
 		delegate.portafirmesEnviar(
@@ -190,6 +191,7 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
+				annexosIds,
 				tascaId,
 				transaccioId);
 	}

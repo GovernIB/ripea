@@ -410,6 +410,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					null,
 					null,
 					null,
+					null,
 					null);
 				
 			emc.updateFinalitzat(new Date());
