@@ -189,11 +189,12 @@ public class ContingutHelper {
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
 			dto.setHasEsborranys(
 					documentHelper.hasFillsEsborranys(expedient));
-			boolean conteDocumentsFirmats = !documentRepository.findByExpedientAndEstat(
-					expedient,
-					DocumentEstatEnumDto.CUSTODIAT).isEmpty();
-			dto.setConteDocumentsFirmats(conteDocumentsFirmats);
-			
+			dto.setConteDocumentsFirmats(
+					documentRepository.countByExpedient(expedient) > 0);
+			dto.setConteDocumentsFirmats(
+					documentRepository.countByExpedientAndEstat(
+							expedient,
+							DocumentEstatEnumDto.CUSTODIAT) > 0);
 			dto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
 			// expedient estat
 			if (expedient.getExpedientEstat() != null) {

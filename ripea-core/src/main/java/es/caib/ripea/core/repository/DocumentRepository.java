@@ -28,7 +28,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 
 	List<DocumentEntity> findByExpedient(ExpedientEntity expedient);
 
-	List<DocumentEntity> findByExpedientAndEstat(
+	int countByExpedient(ExpedientEntity expedient);
+
+	int countByExpedientAndEstat(
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat);
 

@@ -1042,32 +1042,46 @@ function recuperarResultatDomini(
 		</c:if>
 		<!------------------------------------------------------------------------- CONTINGUT BLOCK (CENTER/RIGHT SIDE OF THE PAGE) ------------------------------------------------------------------------------->
 		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
-			<c:choose>
-				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys and convertirDefinitiu}">
-					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
-						<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
-						<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
-					</div>
-				</c:when>
-				<c:when test="${!isTasca && !expedientTancat && contingut.expedient && contingut.hasEsborranys && !convertirDefinitiu}">
-					<div id="botons-errors-validacio" class="esborranys alert well-sm alert-warning alert-dismissable">
-						<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
-					</div>
-				</c:when>
-			</c:choose>
-			<c:if test="${!isTasca && contingut.node and (not contingut.valid or contingut.alerta)}">
-				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
-					<span class="fa fa-exclamation-triangle"></span>
+			<%--c:if test="${contingut.expedient && !isTasca && !expedientTancat && contingut.hasEsborranys}">
+				<c:choose>
+					<c:when test="${convertirDefinitiu}">
+						<div id="botons-errors-esborranys" class="esborranys alert well-sm alert-info alert-dismissable">
+							<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
+							<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
+						</div>
+					</c:when>
+					<c:otherwise>
+						<div id="botons-errors-esborranys" class="alert well-sm alert-info alert-dismissable">
+							<span class="fa fa-info-circle"></span>&nbsp;
+							<spring:message code="contingut.errors.expedient.conte.esborranys.caib"/>
+						</div>
+					</c:otherwise>
+				</c:choose>
+			</c:if--%>
+			<c:if test="${contingut.expedient && !isTasca && !expedientTancat && contingut.hasEsborranys && convertirDefinitiu}">
+				<div id="botons-errors-esborranys" class="esborranys alert well-sm alert-info alert-dismissable">
+					<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
+					<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
+				</div>
+			</c:if>
+			<c:if test="${!isTasca && contingut.node and contingut.alerta}">
+				<div id="botons-errors-alerta" class="alert well-sm alert-warning alert-dismissable">
+					<span class="fa fa-exclamation-circle text-danger"></span>&nbsp;
 					<c:choose>
-						<c:when test="${not contingut.valid and contingut.alerta and contingut.expedient}"><spring:message code="contingut.errors.expedient.dual"/></c:when>
-						<c:when test="${not contingut.valid and not contingut.alerta and contingut.expedient}"><spring:message code="contingut.errors.expedient"/></c:when>
-						<c:when test="${contingut.valid and contingut.alerta and contingut.expedient}"><spring:message code="contingut.errors.expedient.segonpla"/></c:when>
-						
-						<c:when test="${not contingut.valid and contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document.dual"/></c:when>
-						<c:when test="${not contingut.valid and not contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document"/></c:when>
-						<c:when test="${contingut.valid and contingut.alerta and contingut.document}"><spring:message code="contingut.errors.document.segonpla"/></c:when>
+						<c:when test="${contingut.expedient}"><spring:message code="contingut.errors.expedient.alertes"/></c:when>
+						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.alertes"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.mesinfo"/></a>
+					<a href="<c:url value="/contingut/${contingut.id}/alertes"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal" data-refresh-tancar="true"><spring:message code="contingut.alertes.consultar"/></a>
+				</div>
+			</c:if>
+			<c:if test="${!isTasca && contingut.node and not contingut.valid}">
+				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
+					<span class="fa fa-exclamation-triangle"></span>&nbsp;
+					<c:choose>
+						<c:when test="${contingut.expedient}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
+						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.validacio"/></c:when>
+					</c:choose>
+					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
 				</div>
 			</c:if>
 			<!---------------------------------------- TABLIST ------------------------------------------>
