@@ -31,13 +31,13 @@
 		<div class="col-xs-${campInputSize}">
 			<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="autonumeric" data-a-dec="${campSeparadorDecimal}" data-a-sep="${campSeparadorMilers}" data-m-dec="${campNombreDecimal}"/>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
-			<c:if test="${not empty comment}"><p class="comentari col-xs-${12 - labelSize} col-xs-offset-${labelSize}"><spring:message code="${comment}"/></p></c:if>
+			<c:if test="${not empty comment}"><p class="comentari col-xs-${12 - labelSize} col-xs-offset-"><spring:message code="${comment}"/></p></c:if>
 		</div>
 	</c:when>
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
    		<form:input path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" data-toggle="autonumeric" data-a-dec="${campSeparadorDecimal}" data-a-sep="${campSeparadorMilers}" data-m-dec="${campNombreDecimal}"/>
-		<c:if test="${not empty comment}"><p class="comentari col-xs-${12 - labelSize} col-xs-offset-${labelSize}"><spring:message code="${comment}"/></p></c:if>
+		<c:if test="${not empty comment}"><p class="comentari col-xs-${12 - labelSize} col-xs-offset-"><spring:message code="${comment}"/></p></c:if>
 	</c:otherwise>
 </c:choose>
 </div>
