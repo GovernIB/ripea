@@ -134,12 +134,25 @@ public interface PortafirmesPlugin {
 	 */
 	public PortafirmesFluxResposta recuperarFluxDeFirmaByIdTransaccio(
 			String idTransaccio) throws SistemaExternException;
+	
+	/**
+	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació.
+	 *
+	 * @param idioma
+	 * 				idioma plantilles.
+	 * @return el id del flux de firma o error.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public List<PortafirmesFluxResposta> recuperarPlantillesDisponibles(String idioma) throws SistemaExternException;
 
 	/**
 	 * Recupera el detall d'un flux de firma creat (nom + descripció).
 	 *
-	 * @param idTransaccio
-	 * 				Id de la transacció.
+	 * @param idPlantilla
+	 * 				Id de la plantilla.
+	 * @param idioma
+	 * 				Idioma flux.
 	 * @return la informació del flux de firma.
 	 * @throws SistemaExternException
 	 *            Si hi ha hagut algun problema per dur a terme l'acció.
@@ -147,6 +160,40 @@ public interface PortafirmesPlugin {
 	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String idTransaccio,
 			String idioma) throws SistemaExternException;
+	
+	/**
+	 * Recupera una url per mostrar/editar la informació de la plantilal de forma gràfica.
+	 *
+	 * @param idPlantilla
+	 * 				Id de la plantilla.
+	 * @param idioma
+	 * 				Idioma plantilla/flux.
+	 * @param edicio
+	 * 		  		Indicar si recuperar url per visualitzar o editar plantilla.
+	 * @return la url de Portafirmes.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public String recuperarUrlViewEditPlantilla(
+			String idPlantilla,
+			String idioma,
+			String urlReturn,
+			boolean edicio) throws SistemaExternException;
+	
+	/**
+	 * Recupera una url per mostrar/editar la informació de la plantilal de forma gràfica.
+	 *
+	 * @param idioma
+	 * 				Idioma plantilla/flux.
+	 * @param plantillaFluxId
+	 * 		  		Id de la plantilla a esborrar.
+	 * @return true = esborrat / false = no trobada.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public boolean esborrarPlantillaFirma(
+			String idioma,
+			String plantillaFluxId) throws SistemaExternException;
 
 	/**
 	 * Tanca una transacció.
@@ -156,4 +203,5 @@ public interface PortafirmesPlugin {
 	 */
 	public void tancarTransaccioFlux(
 			String idTransaccio) throws SistemaExternException;
+
 }

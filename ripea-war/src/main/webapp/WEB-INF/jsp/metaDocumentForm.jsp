@@ -96,8 +96,15 @@ body.loading .rmodal {
 #fluxModal {
 	margin: 1%;
 }
-.portafirmesFluxId_btn:hover {
+.portafirmesFluxId_btn_edicio:hover {
 	cursor: pointer;
+}
+.flux_disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+}
+.flux_disabled:hover {
+	cursor: not-allowed;
 }
 </style>	
 <script type="text/javascript">
@@ -140,21 +147,18 @@ body.loading .rmodal {
 		
 		$("#portafirmesFluxTipus").trigger('change');
 		
-		$(".portafirmesFluxId_btn").on('click', function(){
+		$(".portafirmesFluxId_btn_edicio").on('click', function(){
 			var metaDocumentNom = '${metaDocumentCommand.nom}';
 			$.ajax({
 				type: 'GET',
 				dataType: "json",
-				data: {nom: metaDocumentNom},
+				data: {nom: metaDocumentNom, plantillaId: $("#portafirmesFluxId").val()},
 				url: "<c:url value="/modal/metaExpedient/metaDocument/iniciarTransaccio"/>",
 				success: function(transaccioResponse) {
 					if (transaccioResponse != null && !transaccioResponse.error) {
 						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-						//$("#fluxModal").modal('show');
-						//$("#fluxModal").find(".modal-body").html('<div class="iframe_container"><iframe class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
 						$('#metaDocumentCommand').addClass("hidden");
 						$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
-						
 						adjustModalPerFlux();
 						$body = $("body");
 						$body.addClass("loading");
@@ -178,14 +182,81 @@ body.loading .rmodal {
 			});
 		});
 		
-		//$("#fluxModal").on("show.bs.modal", function () {
-		//	 $(".modal-body").html('<img src="loading.gif" />');
-		//});
-		//$body = $("#fluxModal");
-		//$(document).on({
-		//	ajaxStart: function() { $body.addClass("loading");    },
-		//	ajaxStop: function() { $body.removeClass("loading"); }    
-		//});
+		$.ajax({
+			type: 'GET',
+			dataType: "json",
+			url: "<c:url value="/metaExpedient/metaDocument/flux/plantilles"/>",
+			success: function(data) {
+				var plantillaActual = "${portafirmesFluxSeleccionat}";
+				var selPlantilles = $("#portafirmesFluxId");
+				selPlantilles.empty();
+				selPlantilles.append("<option value=\"\"></option>");
+				if (data) {
+					var items = [];
+					$.each(data, function(i, val) {
+						items.push({
+							"id": val.fluxId,
+							"text": val.nom
+						});
+						selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+					});
+				}
+				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+				selPlantilles.select2(select2Options);
+				if (plantillaActual != '') {
+					selPlantilles.val(plantillaActual);
+					selPlantilles.change();
+					$(".portafirmesFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.editar"/>");
+				}
+			},
+			error: function (error) {
+				var selPlantilles = $("#portafirmesFluxId");
+				selPlantilles.empty();
+				selPlantilles.append("<option value=\"\"></option>");
+				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+				selPlantilles.select2(select2Options);
+			}
+		});
+		
+		$(".portafirmesFluxId_btn_esborrar").on('click', function () {
+			var portafirmesFluxId = $("#portafirmesFluxId").val();
+			$.ajax({
+				type: 'GET',
+				dataType: "json",
+				url: "<c:url value="/metaExpedient/metaDocument/flux/esborrar/"/>" + portafirmesFluxId,
+				success: function(esborrat) {
+					if (esborrat) {
+						var alertDiv = "<div class='alert alert-success' role='alert'><a class='close' data-dismiss='alert'>×</a><span>" + "<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.ok"/>" + "</span></div>";
+						$('form').prev().find('.alert').remove();
+						$('form').prev().prepend(alertDiv);
+						$("#portafirmesFluxId option[value='" + portafirmesFluxId + "']").remove();
+					} else {
+						var alertDiv = "<div class='alert alert-danger' role='alert'><a class='close' data-dismiss='alert'>×</a><span>" + "<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.ko"/>" + "</span></div>";
+						$('form').prev().find('.alert').remove();
+						$('form').prev().prepend(alertDiv);
+					}
+					webutilModalAdjustHeight();
+				},
+				error: function (error) {
+					var alertDiv = "<div class='alert alert-danger' role='alert'><a class='close' data-dismiss='alert'>×</a><span>" + "<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.ko"/>" + "</span></div>";
+					$('form').prev().find('.alert').remove();
+					$('form').prev().prepend(alertDiv);
+					webutilModalAdjustHeight();		
+				}
+			});
+		});
+		$("#portafirmesFluxId").on('change', function () {
+			var portafirmesFluxId = $(this).val();
+			if(portafirmesFluxId != null && portafirmesFluxId != '') {
+				$(".portafirmesFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.editar"/>");
+				$(".portafirmesFluxId_btn_esborrar").removeClass("flux_disabled");
+			} else {
+				$(".portafirmesFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>");
+				$(".portafirmesFluxId_btn_esborrar").addClass("flux_disabled");
+			}
+		});
+		
+		$("#portafirmesFluxId").trigger('change');
 
 		$('.modal-cancel').on('click', function(){
 			localStorage.removeItem('transaccioId');
@@ -257,7 +328,7 @@ function removeLoading() {
 				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<div class="flux_portafib">
-					<rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" button="true" icon="fa fa-external-link" buttonMsg="metadocument.form.camp.portafirmes.flux.iniciar"/>
+					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" botons="true" icon="fa fa-external-link" iconDelete="fa fa-trash-o" buttonMsg="${buttonTitle}" deleteMsg="metadocument.form.camp.portafirmes.flux.esborrar"/>
 				</div>
 				<div class="flux_simple">
 					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

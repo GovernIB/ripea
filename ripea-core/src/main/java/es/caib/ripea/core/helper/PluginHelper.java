@@ -2291,6 +2291,101 @@ public class PluginHelper {
 		return respostaDto;
 	}
 	
+	public String portafirmesRecuperarUrlPlantilla(
+			String plantillaFluxId,
+			String idioma,
+			String returnUrl,
+			boolean edicio) {
+		String accioDescripcio = "Recuperant url flux de firma";
+		long t0 = System.currentTimeMillis();
+		String resposta = null;
+		try {
+			resposta = getPortafirmesPlugin().recuperarUrlViewEditPlantilla(
+					plantillaFluxId,
+					idioma,
+					returnUrl,
+					edicio);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return resposta;
+	}
+	
+	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
+			String idioma) {
+		String accioDescripcio = "Recuperant flux de firma";
+		long t0 = System.currentTimeMillis();
+		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
+		try {
+			List<PortafirmesFluxResposta> plantilles = getPortafirmesPlugin().recuperarPlantillesDisponibles(
+					idioma);
+			
+			if (plantilles != null) {
+				for (PortafirmesFluxResposta plantilla : plantilles) {
+					PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
+					resposta.setFluxId(plantilla.getFluxId());
+					resposta.setNom(plantilla.getNom());
+					respostesDto.add(resposta);
+				}
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return respostesDto;
+	}
+	
+	public boolean portafirmesEsborrarPlantillaFirma(
+			String idioma,
+			String plantillaFluxId) {
+		String accioDescripcio = "Esborrant flux de firma";
+		long t0 = System.currentTimeMillis();
+		boolean esborrat;
+		try {
+			esborrat = getPortafirmesPlugin().esborrarPlantillaFirma(
+					idioma,
+					plantillaFluxId);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return esborrat;
+	}
+	
 	public String conversioConvertirPdfArxiuNom(
 			String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);

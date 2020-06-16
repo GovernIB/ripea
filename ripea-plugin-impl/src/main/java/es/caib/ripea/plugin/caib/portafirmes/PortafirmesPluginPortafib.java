@@ -37,14 +37,18 @@ import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSigne
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimpleJersey;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleBlock;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleEditFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplate;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateList;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetFlowResultResponse;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleGetTransactionIdRequest;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleKeyValue;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleReviser;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleSignature;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStartTransactionRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStatus;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleViewFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.jersey.ApiFlowTemplateSimpleJersey;
 import org.fundaciobit.apisib.core.exceptions.ApisIBClientException;
 import org.fundaciobit.apisib.core.exceptions.ApisIBServerException;
@@ -358,6 +362,26 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		}
 		return resposta;
 	}
+	
+	@Override
+	public List<PortafirmesFluxResposta> recuperarPlantillesDisponibles(String idioma) throws SistemaExternException {
+		List<PortafirmesFluxResposta> plantilles = new ArrayList<PortafirmesFluxResposta>();
+		try {
+			FlowTemplateSimpleFlowTemplateList resposta = getFluxDeFirmaClient().getAllFlowTemplates(idioma);
+			
+			for (FlowTemplateSimpleKeyValue flowTemplate : resposta.getList()) {
+				PortafirmesFluxResposta plantilla = new PortafirmesFluxResposta();
+				plantilla.setFluxId(flowTemplate.getKey());
+				plantilla.setNom(flowTemplate.getValue());
+				plantilles.add(plantilla);
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut recuperar les plantilles per l'usuari aplicació actual",
+					ex);
+		}
+		return plantilles;
+	}
 
 	public void tancarTransaccioFlux (String idTransaccio) throws SistemaExternException {
 		try {
@@ -375,10 +399,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			String idioma) throws SistemaExternException {
 		PortafirmesFluxInfo info = null;
 		try {
-			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest();
-
-			request.setFlowTemplateId(plantillaFluxId);
-			request.setLanguageUI(idioma);
+			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest(idioma, plantillaFluxId);
 
 			FlowTemplateSimpleFlowTemplate result = getFluxDeFirmaClient().getFlowInfoByFlowTemplateID(request);
 			
@@ -393,6 +414,43 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					ex);
 		}
 		return info;
+	}
+
+	@Override
+	public String recuperarUrlViewEditPlantilla (
+			String idPlantilla, 
+			String idioma,
+			String urlReturn,
+			boolean edicio) throws SistemaExternException {
+		String urlPlantilla;
+		try {
+			if (!edicio) {
+				FlowTemplateSimpleViewFlowTemplateRequest request = new FlowTemplateSimpleViewFlowTemplateRequest(idioma, idPlantilla);
+				urlPlantilla = getFluxDeFirmaClient().getUrlToViewFlowTemplate(request);
+			} else {
+				FlowTemplateSimpleEditFlowTemplateRequest request = new FlowTemplateSimpleEditFlowTemplateRequest(idioma, idPlantilla, urlReturn);
+				urlPlantilla = getFluxDeFirmaClient().getUrlToEditFlowTemplate(request);
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut recuperar la url per visualitzar el flux de firma",
+					ex);
+		}
+		return urlPlantilla;
+	}
+	
+	@Override
+	public boolean esborrarPlantillaFirma(String idioma, String plantillaFluxId) throws SistemaExternException {
+		boolean esborrat = false;
+		try {
+			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest(idioma, plantillaFluxId);
+			esborrat = getFluxDeFirmaClient().deleteFlowTemplate(request);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"Hi ha hagut un problema esborrant el flux de firma",
+					ex);
+		}
+		return esborrat;
 	}
 	
 	private FirmaAsyncSimpleSignatureBlock[] recuperarFluxDeFirma(String idTransaccio) throws SistemaExternException {
@@ -448,7 +506,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		return blocsAsyncs;
 	}
 	
-	private FirmaAsyncSimpleSignatureBlock[] toFirmaAsyncSimpleSignatureBlock(List<FlowTemplateSimpleBlock> blocks) {
+	private FirmaAsyncSimpleSignatureBlock[] toFirmaAsyncSimpleSignatureBlock(List<FlowTemplateSimpleBlock> blocks) throws SistemaExternException {
 		FirmaAsyncSimpleSignatureBlock[] blocsAsyncs = null;
 		int i = 0;
 		
@@ -518,8 +576,8 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					i++;
 				}
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (Exception ex) {
+			throw new SistemaExternException(ex);
 		}
 		return blocsAsyncs;
 	}
@@ -531,10 +589,8 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			String descripcio,
 			boolean descripcioVisible) throws SistemaExternException {
 		String transactionId = null;
-		FlowTemplateSimpleGetTransactionIdRequest transactionRequest;
-
 		try {
-			transactionRequest = new FlowTemplateSimpleGetTransactionIdRequest(
+			FlowTemplateSimpleGetTransactionIdRequest transactionRequest = new FlowTemplateSimpleGetTransactionIdRequest(
 					idioma,
 					isPlantilla,
 					nom,
@@ -556,10 +612,8 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			String idTransaccio,
 			String urlReturn) throws SistemaExternException {
 		String urlRedireccio = null;
-		FlowTemplateSimpleStartTransactionRequest transactionRequest;
-
 		try {
-			transactionRequest = new FlowTemplateSimpleStartTransactionRequest(
+			FlowTemplateSimpleStartTransactionRequest transactionRequest = new FlowTemplateSimpleStartTransactionRequest(
 					idTransaccio,
 					urlReturn);
 
@@ -575,23 +629,23 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 
 	private FlowTemplateSimpleGetFlowResultResponse getFlowTemplateResult(
-			String transactionID) {
+			String transactionID) throws SistemaExternException {
 		FlowTemplateSimpleGetFlowResultResponse result = null;
 
 		try {
 			result = getFluxDeFirmaClient().getFlowTemplateResult(transactionID);
 		} catch (Exception ex) {
-			logger.error(ex.getMessage());
+			throw new SistemaExternException("", ex);
 		}
 		return result;
 	}
 
 	private void closeTransaction(
-			String transactionID) {
+			String transactionID) throws SistemaExternException {
 		try {
 			getFluxDeFirmaClient().closeTransaction(transactionID);
 		} catch (Exception ex) {
-			logger.error(ex.getMessage());
+			throw new SistemaExternException("", ex);
 		}
 	}
 

@@ -243,7 +243,7 @@ public class DominiServiceImpl implements DominiService {
 				false, 
 				false);
 		List<String> dominisCodis = new ArrayList<String>();
-		
+		List<DominiEntity> dominis = new ArrayList<DominiEntity>();
 		//1. trobar metadades de tipus domini d'aquests metaexpedients
 		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeIdAndTipusOrderByOrdreAsc(
 				metaExpedient.getId(), 
@@ -252,9 +252,11 @@ public class DominiServiceImpl implements DominiService {
 		for (MetaDadaEntity metaDadaEntity : metaDades) {
 			dominisCodis.add(metaDadaEntity.getValor());
 		}
-		List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodiInOrderByIdAsc(
-				entitat, 
-				dominisCodis);
+		if (!dominisCodis.isEmpty()) {
+			dominis = dominiRepository.findByEntitatAndCodiInOrderByIdAsc(
+					entitat, 
+					dominisCodis);
+		}
 		return conversioTipusHelper.convertirList(
 				dominis, 
 				DominiDto.class);

@@ -98,6 +98,7 @@ body.loading .rmodal {
 
 <script type="text/javascript">
 $(document).ready(function() {
+	console.log("${urlPlantilla}");
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
 	let fluxPredefinit = ${nouFluxDeFirma};
@@ -119,7 +120,7 @@ $(document).ready(function() {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 					$('.content').addClass("hidden");
 					$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
-					adjustModalPerFlux();
+					adjustModalPerFlux(true);
 					$body = $("body");
 					$body.addClass("loading");
 				} else if (transaccioResponse != null && transaccioResponse.error) {
@@ -144,24 +145,57 @@ $(document).ready(function() {
 					
 });
 
-function adjustModalPerFlux() {
+function adjustModalPerFlux(amagar) {
 	let $iframe = $(window.frameElement);
 	$iframe.css('height', '100%');
 	$iframe.parent().css('height', '600px');
 	$iframe.closest('div.modal-content').css('height',  'auto');
 	$iframe.closest('div.modal-dialog').css({
-		'height':'auto',
+		//'height':'auto',
 		'height': '100%',
 		'margin': '3% auto',
 		'padding': '0'
 	});
-	$iframe.closest('div.modal-lg').css('width', '95%');
-	$iframe.parent().next().addClass('hidden');
+	console.log(amagar);
+	if (amagar) {
+		$iframe.closest('div.modal-lg').css('width', '95%');
+		$iframe.parent().next().addClass('hidden');
+	}
 }	
-	
+
+function adjustModalPerFluxRemove() {
+	let $iframe = $(window.frameElement);
+	let height = localStorage.getItem('currentIframeHeight');
+	$iframe.parent().css('height', 'auto');
+	$iframe.closest('div.modal-content').css('height',  '');
+	$iframe.closest('div.modal-dialog').css({
+		'height':'',
+		'margin': '30px auto',
+		'padding': '0'
+	});
+	$iframe.closest('div.modal-lg').css('width', '900px');
+	localStorage.removeItem('currentIframeHeight');
+}
+
 function removeLoading() {
 	$body = $("body");
 	$body.removeClass("loading");
+}
+
+function mostrarFlux(urlPlantilla) {
+	if ($('.flux_container').html() == '') { //empty
+		$('#eye').toggleClass("fa-eye", false);
+		$('#eye').toggleClass("fa-eye-slash", true);
+		$('#eye').attr('title', "<spring:message code="contenidor.document.portafirmes.boto.hide" />");
+		adjustModalPerFlux(false);
+		$('.flux_container').html('<hr><div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + urlPlantilla + '"></iframe></div>');	
+	} else {
+		$('#eye').toggleClass("fa-eye", true);
+		$('#eye').toggleClass("fa-eye-slash", false);
+		$('#eye').attr('title', "<spring:message code="contenidor.document.portafirmes.boto.show" />");
+		adjustModalPerFluxRemove();
+		$('.flux_container').empty();
+	}
 }
 </script>
 </head>
@@ -209,10 +243,10 @@ function removeLoading() {
 			<div class="form-group">
 				<label class="control-label col-xs-4 fluxInputLabel"><spring:message code="metadocument.form.camp.portafirmes.flux" /> *</label>
 				<c:if test="${!nouFluxDeFirma}">
-					<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /></p>
+					<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /> <a class="btn btn-default btn-xs exemple_boto"  onclick="mostrarFlux('${urlPlantilla}')"><span id="eye" class="fa fa-eye" title="<spring:message code="contenidor.document.portafirmes.boto.show" />"></span></a></p>
 				</c:if>
 				<label class="col-xs-4"></label>
-				<div class="col-xs-8">
+				<div class="col-xs-8" style="margin-top: 3px">
 					<span class='btn btn-flux form-control portafirmesFlux_btn' title="<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>"><spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>  <i class="fa fa-external-link"></i></span>
 				</div>
 			</div>
