@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,7 +25,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name = "ipa_metaexpedient")
+@Table(
+		name = "ipa_metaexpedient",
+		uniqueConstraints = {
+				@UniqueConstraint(name = "ipa_metaexp_entitat_codi_uk", columnNames = {"entitat_id", "codi"})
+		}
+)
 @EntityListeners(AuditingEntityListener.class)
 public class MetaExpedientEntity extends MetaNodeEntity {
 
@@ -36,7 +42,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	private String expressioNumero;
 	@Column(name = "not_activa", nullable = false)
 	private boolean notificacioActiva;
-
 	@ManyToOne(
 			optional = true,
 			fetch = FetchType.EAGER)
@@ -52,7 +57,13 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	
 	@OneToMany(mappedBy = "metaExpedient", cascade = {CascadeType.ALL})
 	protected Set<ExpedientEstatEntity> estats;
-	
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "entitat_id")
+	@ForeignKey(name = "ipa_entitat_metaexp_fk")
+	private EntitatEntity entitatPropia;
+	@Column(name = "codi", length = 64, nullable = false)
+	private String codiPropi;
 
 	public String getClassificacioSia() {
 		return classificacioSia;
@@ -131,6 +142,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			built.tipus = MetaNodeTipusEnum.EXPEDIENT;
 			built.pare = pare;
 			built.notificacioActiva = notificacioActiva;
+			built.codiPropi = codi;
+			built.entitatPropia = entitat;
 		}
 		public Builder expressioNumero(String expressioNumero) {
 			built.expressioNumero = expressioNumero;

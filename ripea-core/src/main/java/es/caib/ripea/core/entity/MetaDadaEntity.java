@@ -26,11 +26,12 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(	name = "ipa_metadada",
+@Table(
+		name = "ipa_metadada",
 		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {
-						"meta_node_id",
-						"codi"})})
+				@UniqueConstraint(name = "ipa_metadada_metanode_codi_uk", columnNames = { "meta_node_id", "codi" })
+		}
+)
 @EntityListeners(AuditingEntityListener.class)
 public class MetaDadaEntity extends RipeaAuditable<Long> {
 

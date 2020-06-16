@@ -64,10 +64,12 @@ CREATE TABLE IPA_METAEXPEDIENT
 (
   ID                 BIGINT                     NOT NULL,
   PARE_ID            bigint,
-  CLASIF_SIA         character varying(30)       NOT NULL,
+  CLASIF_SIA         character varying(30)      NOT NULL,
   SERIE_DOC          character varying(30)      NOT NULL,
   EXPRESSIO_NUMERO   character varying(100),
   NOT_ACTIVA         boolean                    NOT NULL,
+  ENTITAT_ID         bigint                     NOT NULL,
+  CODI               character varying(64)      NOT NULL
 );
 
 
@@ -123,7 +125,8 @@ CREATE TABLE IPA_METADOCUMENT
   NTI_ESTELA 			  character varying(4),
   NTI_TIPDOC 			  character varying(4)     NOT NULL,
   FIRMA_BIOMETRICA 		  BOOLEAN,
-  BIOMETRICA_LECTURA 	  BOOLEAN
+  BIOMETRICA_LECTURA 	  BOOLEAN,
+  CODI                    character varying(64)    NOT NULL
 );
 
 
