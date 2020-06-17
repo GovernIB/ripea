@@ -4,8 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
 <c:choose>
-	<c:when test="${empty documentNotificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
+	<c:when test="${empty documentNotificacionsCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -21,37 +22,54 @@
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
-<script>
-$(document).ready(function() {
-	$('#tipus').val("NOTIFICACIO");
 	
-	$('#tipus').on('change', function() {
-		if ($(this).val() == 'MANUAL') {
-			$('ul.nav-tabs li a[href="#avisofici"]').removeAttr('data-toggle');
-			$('ul.nav-tabs li').addClass('disabled');
-			$('ul.nav-tabs li a[href="#annexos"]').removeAttr('data-toggle');
-			$('ul.nav-tabs li').addClass('disabled');
-			$('select#estat').prop('disabled', false);
-		} else {
-			$('ul.nav-tabs li a[href="#avisofici"]').attr('data-toggle', 'tab');
-			$('ul.nav-tabs li').removeClass('disabled');
-			$('ul.nav-tabs li a[href="#annexos"]').attr('data-toggle', 'tab');
-			$('ul.nav-tabs li').removeClass('disabled');
-			$('select#estat').prop('disabled', true);
-			$('select#estat').val('PENDENT');
-		}
+<style type="text/css">
+
+.title {
+	margin-top: 2%;
+	font-size: larger;
+}
+.title > label {
+	color: #ff9523;
+}
+.title > hr {
+	margin-top: 0%;
+}
+.title-envios {
+	color: #ffffff;
+	margin-top: 1%;
+	font-size: larger;
+}
+.title-envios > hr {
+	margin-top: 0%;
+	height: 0.4px;
+	background-color: #696666;
+}
+
+.title-container {
+	text-align: center;
+	background-color: #696666;
+	width: 12%;
+}
+</style>
+
+<script>
+	$(document).ready(function() {
+		$('#tipus').val("NOTIFICACIO");
+		$('#tipus').trigger('change');
 	});
-	$('#tipus').trigger('change');
-});
+
+
+
 </script>
 </head>
 <body>
 	<c:choose>
-		<c:when test="${empty documentNotificacioCommand.id}"><c:set var="formAction"><rip:modalUrl value="/document/${documentNotificacioCommand.documentId}/notificar"/></c:set></c:when>
-		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/notificacio/${documentNotificacioCommand.id}"/></c:set></c:otherwise>
+		<c:when test="${empty documentNotificacionsCommand.id}"><c:set var="formAction"><rip:modalUrl value="/document/${documentNotificacionsCommand.documentId}/notificar"/></c:set></c:when>
+		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/notificacio/${documentNotificacionsCommand.id}"/></c:set></c:otherwise>
 	</c:choose>
-	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacioCommand" role="form">
-		<c:if test="${empty documentNotificacioCommand.id || documentNotificacioCommand.tipus == 'ELECTRONICA'}">
+	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacionsCommand" role="form">
+		<c:if test="${empty documentNotificacionsCommand.id || documentNotificacionsCommand.tipus == 'ELECTRONICA'}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.form.camp.tab.dades"/></a></li>
 				<%--li role="presentation"><a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="notificacio.form.camp.tab.annexos"/></a></li--%>
@@ -62,29 +80,213 @@ $(document).ready(function() {
 		<rip:inputHidden name="documentId"/>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
+				<!---  TIPUS (NOTIFICACIO / COMUNICACIO) ---->
 				<c:choose>
-					<c:when test="${empty documentNotificacioCommand.id}">
-						<rip:inputSelect name="tipus" textKey="notificacio.form.camp.tipus" optionItems="${notificacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+					<c:when test="${empty documentNotificacionsCommand.id}">
+						<rip:inputSelect labelSize="2" name="tipus" textKey="notificacio.form.camp.tipus" optionItems="${notificacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
 					</c:when>
 					<c:otherwise>
 						<rip:inputHidden name="tipus"/>
 					</c:otherwise>
 				</c:choose>
-				<rip:inputSelect name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-				<rip:inputSelect required="true" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari"/>
-				<rip:inputText name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
-				<rip:inputSelect required="true" name="serveiTipusEnum" optionItems="${serveiTipusEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="notificacio.form.camp.serveiTipus" />
-				<rip:inputTextarea name="observacions" textKey="notificacio.form.camp.descripcio"/>
-				<rip:inputDate name="dataProgramada" textKey="notificacio.form.camp.data.programada" comment="notificacio.form.camp.data.programada.comment"/>
-				<rip:inputDate name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
-				<rip:inputNumber name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
-				<c:if test="${entregaPostal}">
-					<rip:inputCheckbox name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
-				</c:if>
+				<!----  ESTAT   ------->
+				<rip:inputSelect disabled="true" labelSize="2" name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+				<!---  CONCEPTE   ---->
+				<rip:inputText labelSize="2" name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
+				<!---  OBSERVACIONS   --->
+				<rip:inputTextarea labelSize="2" name="observacions" textKey="notificacio.form.camp.descripcio"/>
+				<!----  DATA PROGRAMADA   ----->
+				<rip:inputDate labelSize="2" name="dataProgramada" textKey="notificacio.form.camp.data.programada" comment="notificacio.form.camp.data.programada.comment"/>
+				<!----  DATA CADUCITAT  ------->
+				<rip:inputDate labelSize="2" name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
+				<!---  RETARD  ------->
+				<rip:inputNumber labelSize="2" name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
+
+
+				<!--------------------------------------------------------  ENVIAMENTS  ------------------------------------------------------------>
+				<div class="container-fluid">
+					<div class="title">
+						<span class="fa fa-vcard"></span> <label><spring:message
+								code="notificacio.form.camp.enviaments" /></label>
+						<hr />
+					</div>
+
+					<div class="container-envios">
+						<c:forEach items="${documentNotificacionsCommand.enviaments}" var="enviament"
+							varStatus="status">
+							<c:set var="i" value="${status.index}" />
+							<div class="row enviamentsForm formEnviament enviamentForm_${i}" style="margin-bottom: 30px">
+								<div class="col-md-12">
+									<label class="envio[${i+1}] badge badge-light"><spring:message code="notificacio.form.label.notificacio"/> ${i+1}</label>
+								</div>
+									
+								<!-----------------------------------  TIPUS DE SERVEI  --------------------------------->	
+								<rip:inputSelect labelSize="2" required="true" name="enviaments[${i}].serveiTipusEnum" optionItems="${serveiTipusEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="notificacio.form.camp.serveiTipus" />
+
+
+								<!---------------------------------------  TITULAR  --------------------------------------->	
+								<div class="titular">
+									<div class="col-md-12 title-envios">
+										<div class="title-container">
+											<label><spring:message code="enviament.label.titular"/></label>
+										</div>
+										<hr/>
+									</div>
+									<div class="personaForm">
+										<div>
+											<rip:inputHidden name="enviaments[${i}].titular.id" />
+											<!----  TIPUS INTERESSAT ---->
+											<div class="col-md-6">
+												<rip:inputSelect disabled="true" name="enviaments[${i}].titular.tipus" textKey="interessat.form.camp.tipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+											</div>
+											<!---- NIF ---->
+											<div class="col-md-6">
+												<rip:inputText disabled="true" name="enviaments[${i}].titular.documentNum" textKey="interessat.nifCifDni"/>
+											</div>
+											<!---- NOM / RAÓ SOCIAL ---->
+											<div class="col-md-6">
+												<c:choose>
+												<c:when test="${enviament.titular.tipus=='PERSONA_FISICA'}">
+													<rip:inputText disabled="true" name="enviaments[${i}].titular.nom" textKey="interessat.nomRaoSocial" required="true" />
+												</c:when>
+												<c:when test="${enviament.titular.tipus=='PERSONA_JURIDICA'}">
+													<rip:inputText disabled="true" name="enviaments[${i}].titular.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
+												</c:when>
+												<c:when test="${enviament.titular.tipus=='ADMINISTRACIO'}">
+													<rip:inputText disabled="true" name="enviaments[${i}].titular.organNom" textKey="interessat.nomRaoSocial" required="true" />
+												</c:when>													
+												</c:choose>
+											</div>
+											<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
+												<!---- PRIMER LLINATGE ---->										
+												<div class="col-md-6 llinatge1">
+													<rip:inputText disabled="true" name="enviaments[${i}].titular.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
+												</div>
+												<!---- SEGON LLINATGE ---->
+												<div class="col-md-6 llinatge2">
+													<rip:inputText disabled="true" name="enviaments[${i}].titular.llinatge2" textKey="interessat.form.camp.llinatge2" />
+												</div>
+											</c:if>
+											<!---- EMAIL ---->
+											<div class="col-md-6">
+												<rip:inputText disabled="true" name="enviaments[${i}].titular.email" textKey="interessat.form.camp.email" />
+											</div>
+											<!---- TELÈFON ---->
+											<div class="col-md-6">
+												<rip:inputText disabled="true" name="enviaments[${i}].titular.telefon" textKey="interessat.form.camp.telefon" />
+											</div>
+											<!---- CODI DIR3 ---->
+											<c:if test="${enviament.titular.tipus=='ADMINISTRACIO'}">
+												<div class="col-md-6">
+													<rip:inputText disabled="true" name="enviaments[${i}].titular.organCodi" textKey="interessat.dir3codi" required="true"/>
+												</div>
+											</c:if>
+											<!---- INCAPACITAT ---->
+											<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
+												<div class="col-md-6">
+													<rip:inputCheckbox disabled="true" name="enviaments[${i}].titular.incapacitat" textKey="interessat.form.camp.incapacitat" />
+												</div>
+											</c:if>
+										</div>
+									</div>
+								</div>
+								
+								<!---------------------------------------  DESTINATARI  --------------------------------------->	
+								<c:if test="${not empty enviament.destinatari}">
+									<div class="destinatari">
+										<div class="col-md-12 title-envios">
+											<div class="title-container">
+												<label><spring:message code="enviament.label.destinatari"/></label>
+											</div>
+											<hr/>
+										</div>
+										<div class="personaForm">
+											<div>
+												<rip:inputHidden name="enviaments[${i}].destinatari.id" />
+												<!----  TIPUS INTERESSAT ---->
+												<div class="col-md-6">
+													<rip:inputSelect disabled="true" name="enviaments[${i}].destinatari.tipus" textKey="interessat.form.camp.tipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+												</div>
+												<!---- NIF ---->
+												<div class="col-md-6">
+													<rip:inputText disabled="true" name="enviaments[${i}].destinatari.documentNum" textKey="interessat.nifCifDni"/>
+												</div>
+												<!---- NOM / RAÓ SOCIAL ---->
+												<div class="col-md-6">
+													<c:choose>
+													<c:when test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
+														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.nom" textKey="interessat.nomRaoSocial" required="true" />
+													</c:when>
+													<c:when test="${enviament.destinatari.tipus=='PERSONA_JURIDICA'}">
+														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
+													</c:when>
+													<c:when test="${enviament.destinatari.tipus=='ADMINISTRACIO'}">
+														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.nomRaoSocial" required="true" />
+													</c:when>													
+													</c:choose>
+												</div>
+												<c:if test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
+													<!---- PRIMER LLINATGE ---->										
+													<div class="col-md-6 llinatge1">
+														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
+													</div>
+													
+													<!---- SEGON LLINATGE ---->
+													<div class="col-md-6 llinatge2">
+														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.llinatge2" textKey="interessat.form.camp.llinatge2" />
+													</div>
+												</c:if>
+												<!---- EMAIL ---->
+												<div class="col-md-6">
+													<rip:inputText disabled="true" name="enviaments[${i}].destinatari.email" textKey="interessat.form.camp.email" />
+												</div>
+												
+												<!---- TELÈFON ---->
+												<div class="col-md-6">
+													<rip:inputText disabled="true" name="enviaments[${i}].destinatari.telefon" textKey="interessat.form.camp.telefon" />
+												</div>
+												<!---- CODI DIR3 ---->
+												<c:if test="${enviament.destinatari.tipus=='ADMINISTRACIO'}">
+													<div class="col-md-6">
+														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.dir3codi" required="true"/>
+													</div>
+												</c:if>
+												<!---- INCAPACITAT ---->
+												<c:if test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
+													<div class="col-md-6">
+														<rip:inputCheckbox disabled="true" name="enviaments[${i}].destinatari.incapacitat" textKey="interessat.form.camp.incapacitat" />
+													</div>
+												</c:if>
+											</div>
+										</div>
+									</div>								
+								</c:if>
+								
+								<!-------------------------------------  MÈTODE ENVIO  ----------------------------------->	
+								<div class="metodeEntrega">
+									<div class="col-md-12 title-envios">
+										<div class="title-container entrega">
+											<label><spring:message code="enviament.label.metodeEnvio"/></label>
+										</div>
+										<hr />
+									</div>
+									<div class="col-md-12">
+										<rip:inputCheckbox labelSize="2" name="enviaments[${i}].entregaPostal"
+											textKey="notificacio.form.camp.entregaPostal" />
+									</div>
+								</div>
+								
+							</div>
+						</c:forEach>
+					</div>
+				</div>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="annexos">
-				<rip:inputSelect name="annexos" textKey="notificacio.form.camp.annexos" optionItems="${annexos}" emptyOption="true" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.form.camp.annexos"/>
-			</div>
+			
+			
+			
+<!-- 			<div role="tabpanel" class="tab-pane" id="annexos"> -->
+<%-- 				<rip:inputSelect name="annexos" textKey="notificacio.form.camp.annexos" optionItems="${annexos}" emptyOption="true" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.form.camp.annexos"/> --%>
+<!-- 			</div> -->
 		</div>
 		<c:choose>
 			<c:when test="${empty document}"><c:set var="urlTancar"><c:url value="/contingut/${expedientId}"/></c:set></c:when>
