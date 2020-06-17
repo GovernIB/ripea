@@ -9,8 +9,8 @@
 <head>
 	<title>
 	    <c:choose>
-			<c:when test="${not empty metaDocument}"><spring:message code="metadada.tipdoc.list.titol"/></c:when>
-			<c:otherwise><spring:message code="metadada.tipexp.list.titol"/></c:otherwise>
+			<c:when test="${not empty metaDocument}"><spring:message code="metadada.tipdoc.list.titol"/>: ${metaNodeNom}</c:when>
+			<c:otherwise><spring:message code="metadada.tipexp.list.titol"/>: ${metaNodeNom}</c:otherwise>
 		</c:choose>
 	</title>
 	<meta name="subtitle" content="${metaNodeNom}"/>

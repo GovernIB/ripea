@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="metaexpedient.permis.titol"/></title>
+	<title><spring:message code="metaexpedient.permis.titol"/>: ${metaExpedient.nom}</title>
 	<meta name="subtitle" content="${metaExpedient.nom}"/>
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
