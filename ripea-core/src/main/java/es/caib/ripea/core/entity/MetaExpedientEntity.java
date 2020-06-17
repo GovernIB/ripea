@@ -99,6 +99,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		this.expressioNumero = expressioNumero;
 		this.notificacioActiva = notificacioActiva;
 		this.pare = pare;
+		this.codiPropi = codi;
 	}
 
 	public static Builder getBuilder(
