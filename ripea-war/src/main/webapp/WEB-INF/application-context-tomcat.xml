@@ -23,7 +23,7 @@
 	<import resource="classpath:es/caib/ripea/core/context/application-context-war.xml" />
 	<import resource="classpath:es/caib/ripea/war/context/application-context-security.xml" />
 
-	<wss:binding url="/ws/MCGDws">
+	<!--wss:binding url="/ws/MCGDws">
 		<wss:service>
 			<ws:service bean="#MCGDwsImpl"/>
 		</wss:service>
@@ -32,6 +32,6 @@
 		<wss:service>
 			<ws:service bean="#portaFIBCallBackWsImpl"/>
 		</wss:service>
-	</wss:binding>
+	</wss:binding-->
 
 </beans>

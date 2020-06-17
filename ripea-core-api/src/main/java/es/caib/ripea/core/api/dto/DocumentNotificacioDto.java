@@ -12,6 +12,7 @@ import java.util.Set;
 
 
 
+
 /**
  * Informació d'una notificació d'un document a un ciutadà.
  * 
@@ -33,11 +34,15 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	
 	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();
 	
+	
+	private List<NotificacioEnviamentDto> enviaments = new ArrayList<NotificacioEnviamentDto>();
+	
+	
 	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	
 	private ServeiTipusEnumDto serveiTipusEnum;
 	
-	private Boolean entregaPostal;
+	private boolean entregaPostal;
 	private List<InteressatDto> interessats = new ArrayList<InteressatDto>();
 	
 	private Date registreData;
@@ -46,6 +51,12 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	
 	private boolean ambRegistres;
 	
+	public List<NotificacioEnviamentDto> getEnviaments() {
+		return enviaments;
+	}
+	public void setEnviaments(List<NotificacioEnviamentDto> enviaments) {
+		this.enviaments = enviaments;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -103,10 +114,10 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	public String getDestinatariAmbDocument() {
 		return null;
 	}
-	public Boolean getEntregaPostal() {
+	public boolean getEntregaPostal() {
 		return entregaPostal;
 	}
-	public void setEntregaPostal(Boolean entregaPostal) {
+	public void setEntregaPostal(boolean entregaPostal) {
 		this.entregaPostal = entregaPostal;
 	}
 	public List<Long> getInteressatsIds() {

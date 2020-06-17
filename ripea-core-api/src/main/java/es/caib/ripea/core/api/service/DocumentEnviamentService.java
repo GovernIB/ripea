@@ -28,11 +28,10 @@ public interface DocumentEnviamentService {
 	 *            Atribut id del document.
 	 * @param notificacio
 	 *            Dades de la notificació.
-	 * @return La notificació creada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public DocumentNotificacioDto notificacioCreate(
+	public void notificacioCreate(
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacio) throws NotFoundException;

@@ -11,5 +11,5 @@ package es.caib.ripea.core.api.dto;
 public enum DocumentNotificacioTipusEnumDto {
 	COMUNICACIO,
 	NOTIFICACIO,
-	MANUAL
+	MANUAL // is not used in application now
 }

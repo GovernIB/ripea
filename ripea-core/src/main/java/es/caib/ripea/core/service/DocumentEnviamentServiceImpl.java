@@ -26,8 +26,10 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
+import es.caib.ripea.core.api.dto.NotificacioEnviamentDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -37,6 +39,7 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -46,6 +49,7 @@ import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
@@ -85,6 +89,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private DadesExternesService dadesExternesService;
+	@Autowired
+	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
@@ -144,7 +150,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 
 	@Transactional
 	@Override
-	public DocumentNotificacioDto notificacioCreate(
+	public void notificacioCreate(
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacioDto) {
@@ -159,91 +165,98 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				true);
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, notificacioDto.getTipus());
-		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
+//		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		
-		RespostaEnviar respostaEnviar = new RespostaEnviar();
-		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
-			respostaEnviar = pluginHelper.notificacioEnviar(
-					notificacioDto,
+		for (NotificacioEnviamentDto notificacioEnviamentDto : notificacioDto.getEnviaments()) {
+			
+			InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
+					expedientEntity,
+					notificacioEnviamentDto.getTitular().getId());
+			notificacioDto.setServeiTipusEnum(notificacioEnviamentDto.getServeiTipusEnum());
+			notificacioDto.setEntregaPostal(notificacioEnviamentDto.getEntregaPostal());
+			
+			RespostaEnviar respostaEnviar = new RespostaEnviar();
+//			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
+				respostaEnviar = pluginHelper.notificacioEnviar(
+						notificacioDto,
+						expedientEntity,
+						documentEntity,
+						interessat);
+//			}
+			
+			DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
+					DocumentNotificacioEstatEnumDto.PENDENT,
+					notificacioDto.getAssumpte(),
+					notificacioDto.getTipus(),
+					notificacioDto.getDataProgramada(),
+					notificacioDto.getRetard(),
+					notificacioDto.getDataCaducitat(), 
 					expedientEntity,
 					documentEntity,
-					interessats);
-		}
-		
-		DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
-				DocumentNotificacioEstatEnumDto.PENDENT,
-				notificacioDto.getAssumpte(),
-				notificacioDto.getTipus(),
-				notificacioDto.getDataProgramada(),
-				notificacioDto.getRetard(),
-				notificacioDto.getDataCaducitat(), 
-				expedientEntity,
-				documentEntity,
-				notificacioDto.getServeiTipusEnum(),
-				notificacioDto.getEntregaPostal()).
-				observacions(notificacioDto.getObservacions()).
-				build();
-		
-		documentNotificacioRepository.save(notificacioEntity);
-		
-		for (InteressatEntity interessatEntity : interessats) {
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessatEntity, notificacioEntity).build();
-			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
-		}
-		
-		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
+					notificacioDto.getServeiTipusEnum(),
+					notificacioDto.getEntregaPostal()).
+					observacions(notificacioDto.getObservacions()).
+					build();
 			
-			if (respostaEnviar.isError()) {
-				notificacioEntity.updateEnviatError(
-						respostaEnviar.getErrorDescripcio(),
-						respostaEnviar.getIdentificador());
-			} else {
-				notificacioEntity.updateEnviat(
-						null,
-						respostaEnviar.getEstat(),
-						respostaEnviar.getIdentificador());
-			}
+			documentNotificacioRepository.save(notificacioEntity);
+			
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, notificacioEntity).build();
+			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
+			
+//			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
 
-			for (EnviamentReferencia enviamentReferencia : respostaEnviar.getReferencies()) {
-				for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : notificacioEntity.getDocumentEnviamentInteressats()) {
-					if(documentEnviamentInteressatEntity.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
-						documentEnviamentInteressatEntity.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-						pluginHelper.actualitzarDadesRegistre(documentEnviamentInteressatEntity);
+				if (respostaEnviar.isError()) {
+					notificacioEntity.updateEnviatError(
+							respostaEnviar.getErrorDescripcio(),
+							respostaEnviar.getIdentificador());
+				} else {
+					notificacioEntity.updateEnviat(
+							null,
+							respostaEnviar.getEstat(),
+							respostaEnviar.getIdentificador());
+				}
+
+				for (EnviamentReferencia enviamentReferencia : respostaEnviar.getReferencies()) {
+					for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
+						if(documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
+							documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
+							pluginHelper.actualitzarDadesRegistre(documentEnviamentInteressat);
+						}
 					}
 				}
+//			}
+				
+			
+			DocumentNotificacioDto dto = conversioTipusHelper.convertir(
+					notificacioEntity,
+					DocumentNotificacioDto.class);
+			
+			String destinitariAmbDocument = "";
+			for (InteressatDto interessatDto : dto.getInteressats()) {
+				destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
 			}
+			
+			contingutLogHelper.log(
+					expedientEntity,
+					LogTipusEnumDto.MODIFICACIO,
+					notificacioEntity,
+					LogObjecteTipusEnumDto.NOTIFICACIO,
+					LogTipusEnumDto.ENVIAMENT,
+					destinitariAmbDocument,
+					notificacioEntity.getAssumpte(),
+					false,
+					false);
+			contingutLogHelper.log(
+					documentEntity,
+					LogTipusEnumDto.MODIFICACIO,
+					notificacioEntity,
+					LogObjecteTipusEnumDto.NOTIFICACIO,
+					LogTipusEnumDto.ENVIAMENT,
+					destinitariAmbDocument,
+					notificacioEntity.getAssumpte(),
+					false,
+					false);
 		}
-		
-		DocumentNotificacioDto dto = conversioTipusHelper.convertir(
-				notificacioEntity,
-				DocumentNotificacioDto.class);
-		
-		String destinitariAmbDocument = "";
-		for (InteressatDto interessatDto : dto.getInteressats()) {
-			destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
-		}
-		
-		contingutLogHelper.log(
-				expedientEntity,
-				LogTipusEnumDto.MODIFICACIO,
-				notificacioEntity,
-				LogObjecteTipusEnumDto.NOTIFICACIO,
-				LogTipusEnumDto.ENVIAMENT,
-				destinitariAmbDocument,
-				notificacioEntity.getAssumpte(),
-				false,
-				false);
-		contingutLogHelper.log(
-				documentEntity,
-				LogTipusEnumDto.MODIFICACIO,
-				notificacioEntity,
-				LogObjecteTipusEnumDto.NOTIFICACIO,
-				LogTipusEnumDto.ENVIAMENT,
-				destinitariAmbDocument,
-				notificacioEntity.getAssumpte(),
-				false,
-				false);
-		return dto;
 	}
 
 	@Transactional
@@ -628,7 +641,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				false);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
-		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);
+		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByCreatedDateDesc(expedient);
 		for (DocumentNotificacioEntity notificacio: notificacions) {
 			resposta.add(
 					conversioTipusHelper.convertir(
