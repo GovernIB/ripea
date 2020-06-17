@@ -471,10 +471,11 @@ public class DocumentController extends BaseUserController {
 		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
 			return "redirect:/passarelaModalTancar";
 		} else {
-			return getModalControllerReturnValueSuccess(
+			String response = getModalControllerReturnValueSuccess(
 					request, 
 					"redirect:/contingut/" + documentId,
 					null);
+			return response;
 		}
 	}
 

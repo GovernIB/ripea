@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -31,7 +32,12 @@ import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name = "ipa_metadocument")
+@Table(
+		name = "ipa_metadocument",
+		uniqueConstraints = {
+				@UniqueConstraint(name = "ipa_metadoc_metaexp_codi_uk", columnNames = { "meta_expedient_id", "codi" })
+		}
+)
 @EntityListeners(AuditingEntityListener.class)
 public class MetaDocumentEntity extends MetaNodeEntity {
 
@@ -88,7 +94,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "portafirmes_fluxtip", length = 256)
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
-	
+
+	@Column(name = "codi", length = 64, nullable = false)
+	private String codiPropi;
+
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}

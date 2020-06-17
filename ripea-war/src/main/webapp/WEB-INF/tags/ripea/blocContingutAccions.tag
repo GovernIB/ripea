@@ -91,8 +91,9 @@
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
+						@@${contingut.valid}@@${contingut.conteDocumentsFirmats}@@${(!contingut.hasEsborranys || !convertirDefinitiu)}@@
 						<c:choose>
-							<c:when test="${contingut.valid && !contingut.hasEsborranys && contingut.conteDocumentsFirmats}">
+							<c:when test="${contingut.valid && contingut.conteDocumentsFirmats && (!contingut.hasEsborranys || !convertirDefinitiu)}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>
@@ -226,7 +227,7 @@
 				
 					<%---- Notificar ----%>
 					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
-						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
 					</c:if>
 					
 					<%---- Publicar ----%>

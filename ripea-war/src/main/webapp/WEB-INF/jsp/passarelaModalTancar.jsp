@@ -3,18 +3,21 @@
 <html>
 <head>
 <script>
-let rootIframe = window.frameElement;
-let rootParentIframe = window.parent.frameElement;
-
-if (rootIframe) {
-	rootIframe.parentElement.parentElement.querySelector('button.close').click();
+let parentIframe = window.frameElement;
+let buttonClose;
+if (parentIframe && parentIframe.parentElement && parentIframe.parentElement.parentElement) {
+	buttonClose = rootIframe.parentElement.parentElement.querySelector('button.close');
 }
-
-if (rootParentIframe) {
-	rootParentIframe.parentElement.parentElement.querySelector('button.close').click();
-	//Forçar refresh
-	//let currentHref = window.parent.frameElement.src.substring(0,window.parent.frameElement.src.lastIndexOf("/"));
-	//location.reload(currentHref);;
+if (!buttonClose && window.parent) {
+	let parentParentIframe = window.parent.frameElement;
+	if (parentParentIframe && parentParentIframe.parentElement && parentParentIframe.parentElement.parentElement) {
+		buttonClose = parentParentIframe.parentElement.parentElement.querySelector('button.close');
+	}
+}
+if (buttonClose) {
+	buttonClose.click();
+} else {
+	console.error('No s\'ha pogut trobar el botó per tancar la modal');
 }
 </script>
 </head>

@@ -28,6 +28,12 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 
 	List<DocumentEntity> findByExpedient(ExpedientEntity expedient);
 
+	int countByExpedient(ExpedientEntity expedient);
+
+	int countByExpedientAndEstat(
+			ExpedientEntity expedient,
+			DocumentEstatEnumDto estat);
+
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -41,10 +47,6 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("documentId") Long documentId);
-	
-	List<DocumentEntity> findByExpedientAndEstat(
-			ExpedientEntity expedient,
-			DocumentEstatEnumDto estat);
 
 	List<DocumentEntity> findByExpedientAndEsborrat(
 			ExpedientEntity expedient,

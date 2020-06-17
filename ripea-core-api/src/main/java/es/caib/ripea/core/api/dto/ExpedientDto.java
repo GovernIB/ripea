@@ -35,6 +35,7 @@ public class ExpedientDto extends NodeDto {
 	private String sistraClau;
 	private UsuariDto agafatPer;
 	private String numero;
+	private boolean conteDocuments;
 	private boolean conteDocumentsFirmats;
 	private long numComentaris;
 	private ExpedientEstatDto expedientEstat;
@@ -193,6 +194,12 @@ public class ExpedientDto extends NodeDto {
 	}
 	public void setNumero(String numero) {
 		this.numero = numero;
+	}
+	public boolean isConteDocuments() {
+		return conteDocuments;
+	}
+	public void setConteDocuments(boolean conteDocuments) {
+		this.conteDocuments = conteDocuments;
 	}
 	public boolean isConteDocumentsFirmats() {
 		return conteDocumentsFirmats;

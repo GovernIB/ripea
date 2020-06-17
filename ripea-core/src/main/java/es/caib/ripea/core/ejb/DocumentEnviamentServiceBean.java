@@ -33,11 +33,11 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public DocumentNotificacioDto notificacioCreate(
+	public void notificacioCreate(
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacio) {
-		return delegate.notificacioCreate(
+		 delegate.notificacioCreate(
 				entitatId,
 				documentId,
 				notificacio);

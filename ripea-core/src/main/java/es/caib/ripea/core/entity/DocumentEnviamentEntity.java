@@ -42,14 +42,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table( name = "ipa_document_enviament",
-		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {
-						"expedient_id",
-						"document_id",
-						"assumpte",
-						"enviat_data",
-						"dtype"})})
+@Table( name = "ipa_document_enviament")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {

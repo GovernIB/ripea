@@ -79,6 +79,8 @@ CREATE TABLE IPA_METAEXPEDIENT
   SERIE_DOC          VARCHAR2(30)               NOT NULL,
   EXPRESSIO_NUMERO   VARCHAR2(100),
   NOT_ACTIVA         NUMBER(1)                  NOT NULL,
+  ENTITAT_ID         NUMBER(19)                 NOT NULL,
+  CODI               VARCHAR2(64)               NOT NULL
 );
 
 
@@ -147,7 +149,8 @@ CREATE TABLE IPA_METADOCUMENT
   META_EXPEDIENT_ID       NUMBER(19)            NOT NULL,
   NTI_ORIGEN 			  VARCHAR2(2)           NOT NULL,
   NTI_ESTELA 			  VARCHAR2(4),
-  NTI_TIPDOC 			  VARCHAR2(4)           NOT NULL
+  NTI_TIPDOC 			  VARCHAR2(4)           NOT NULL,
+  CODI                    VARCHAR2(64)          NOT NULL
 );
 
 

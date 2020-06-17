@@ -56,6 +56,7 @@ public class InteressatCommand  {
 	@NotEmpty(groups = {Administracio.class})
 	@Size(max = 9, groups = {Administracio.class}, message = "max.size")
 	protected String organCodi;
+	protected String organNom;
 	
 	@NotNull(groups = {PersonaFisica.class, PersonaJuridica.class})
 	protected InteressatDocumentTipusEnumDto documentTipus;
@@ -288,7 +289,12 @@ public class InteressatCommand  {
 	public void setFiltreArrel(Boolean filtreArrel) {
 		this.filtreArrel = filtreArrel;
 	}
-	
+	public String getOrganNom() {
+		return organNom;
+	}
+	public void setOrganNom(String organNom) {
+		this.organNom = organNom;
+	}
 	public static InteressatCommand asCommand(InteressatDto dto) {
 		InteressatCommand command = ConversioTipusHelper.convertir(
 				dto,

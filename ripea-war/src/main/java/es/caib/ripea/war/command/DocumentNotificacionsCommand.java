@@ -25,7 +25,7 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DocumentNotificacioCommand {
+public class DocumentNotificacionsCommand {
 
 	private Long id;
 	@NotNull(groups = {Create.class})
@@ -41,18 +41,10 @@ public class DocumentNotificacioCommand {
 	private Date dataProgramada;
 	private Integer retard;
 	private Date dataCaducitat;
-	@NotEmpty(groups = {Create.class, Update.class})
-	private List<Long> interessatsIds;
-	
-	@NotNull
-	private ServeiTipusEnumDto serveiTipusEnum;
-	
-	private Boolean entregaPostal;
-	
-
 
 	private List<Long> annexos;
 
+	private List<NotificacioEnviamentCommand> enviaments = new ArrayList<NotificacioEnviamentCommand>();
 
 
 	public Long getId() {
@@ -117,12 +109,12 @@ public class DocumentNotificacioCommand {
 		this.annexos = annexos;
 	}
 
-	public static DocumentNotificacioCommand asCommand(DocumentNotificacioDto dto) {
+	public static DocumentNotificacionsCommand asCommand(DocumentNotificacioDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
-				DocumentNotificacioCommand.class);
+				DocumentNotificacionsCommand.class);
 	}
-	public static DocumentNotificacioDto asDto(DocumentNotificacioCommand command) {
+	public static DocumentNotificacioDto asDto(DocumentNotificacionsCommand command) {
 		DocumentNotificacioDto dto = ConversioTipusHelper.convertir(
 				command,
 				DocumentNotificacioDto.class);
@@ -143,26 +135,11 @@ public class DocumentNotificacioCommand {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	public ServeiTipusEnumDto getServeiTipusEnum() {
-		return serveiTipusEnum;
+	public List<NotificacioEnviamentCommand> getEnviaments() {
+		return enviaments;
 	}
-	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
-		this.serveiTipusEnum = serveiTipusEnum;
-	}
-
-	public List<Long> getInteressatsIds() {
-		return interessatsIds;
-	}
-	public void setInteressatsIds(List<Long> interessatsIds) {
-		this.interessatsIds = interessatsIds;
-	}
-
-
-	public Boolean getEntregaPostal() {
-		return entregaPostal;
-	}
-	public void setEntregaPostal(Boolean entregaPostal) {
-		this.entregaPostal = entregaPostal;
+	public void setEnviaments(List<NotificacioEnviamentCommand> enviaments) {
+		this.enviaments = enviaments;
 	}
 
 

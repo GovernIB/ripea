@@ -9,6 +9,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,7 +61,12 @@ public class AjaxUserController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable String codi,
 			Model model) {
-		return aplicacioService.findUsuariAmbCodiDades(codi);
+		try {
+			return aplicacioService.findUsuariAmbCodiDades(codi);
+		} catch (Exception ex) {
+			logger.error("Error al consultar la informació de l'usuari " + codi, ex);
+			return null;
+		}
 	}
 
 	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET)
@@ -68,7 +75,12 @@ public class AjaxUserController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
-		return aplicacioService.findUsuariAmbTextDades(text);
+		try {
+			return aplicacioService.findUsuariAmbTextDades(text);
+		} catch (Exception ex) {
+			logger.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
+			return new ArrayList<UsuariDto>();
+		}
 	}
 
 	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)
@@ -98,5 +110,7 @@ public class AjaxUserController extends BaseUserController {
 		}
 		return resposta;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(AjaxUserController.class);
 
 }

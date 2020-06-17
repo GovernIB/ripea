@@ -16,6 +16,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.caib.notib.client.NotificacioRestClient;
 import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.ws.notificacio.Certificacio;
@@ -131,6 +133,10 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 					notificacioNotib.getEnviaments().add(enviamentNotib);
 				}
 			}
+
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(notificacioNotib);
+			System.out.println(body);
 
 			//####### ALTA NOTIFICACIO ####################
 			RespostaAlta respostaAlta = getNotificacioService().alta(notificacioNotib);
@@ -305,6 +311,8 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			p = new es.caib.notib.ws.notificacio.Persona();
 			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
 				p.setDir3Codi(persona.getNif());
+				p.setNif(persona.getNif());// valid NIF A04032363
+
 			} else {
 				p.setNif(persona.getNif());
 			}
@@ -348,6 +356,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 					getUrl(),
 					getUsername(),
 					getPassword());
+			clientV2.setServeiDesplegatDamuntJboss(false);
 		}
 		return clientV2;
 	}

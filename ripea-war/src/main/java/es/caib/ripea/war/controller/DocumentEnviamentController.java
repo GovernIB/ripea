@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.distribucio.ws.backofficeintegracio.InteressatTipus;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
@@ -38,6 +39,7 @@ import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -45,13 +47,13 @@ import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.plugin.NotibRepostaException;
-import es.caib.ripea.war.command.DocumentNotificacioCommand;
-import es.caib.ripea.war.command.DocumentNotificacioCommand.Electronica;
+import es.caib.ripea.war.command.DocumentNotificacionsCommand;
 import es.caib.ripea.war.command.DocumentPublicacioCommand;
+import es.caib.ripea.war.command.InteressatCommand;
+import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.ValidationHelper;
 
 /**
  * Controlador per als enviaments dels expedients.
@@ -86,24 +88,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				request,
 				documentId,
 				model);
-		DocumentNotificacioCommand command = new DocumentNotificacioCommand();
-		command.setDocumentId(documentId);
-		Object entrega_postal_sessio = RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_ENTREGA_POSTAL);
 		
-		if (entrega_postal_sessio != null) {
-			boolean entregaPostalHablitada = (boolean)entrega_postal_sessio;
-			model.addAttribute("entregaPostal", entregaPostalHablitada);
-		} else {
-			model.addAttribute("entregaPostal", true);
-		}
-		model.addAttribute(
-				"serveiTipusEstats",
-				EnumHelper.getOptionsForEnum(
-						ServeiTipusEnumDto.class,
-						"notificacio.servei.tipus.enum."));
-		model.addAttribute(command);
 		return "notificacioForm";
 	}
 
@@ -111,15 +96,10 @@ public class DocumentEnviamentController extends BaseUserController {
 	public String notificarPost(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
-			@Validated({DocumentNotificacioCommand.Create.class}) DocumentNotificacioCommand command,
+			@Validated({DocumentNotificacionsCommand.Create.class}) DocumentNotificacionsCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(command.getTipus())) {
-			new ValidationHelper(validator).isValid(
-					command,
-					bindingResult,
-					Electronica.class);
-		}
+
 		if (bindingResult.hasErrors()) {
 			emplenarModelNotificacio(
 					request,
@@ -133,17 +113,12 @@ public class DocumentEnviamentController extends BaseUserController {
 			documentEnviamentService.notificacioCreate(
 					entitatActual.getId(),
 					documentId,
-					DocumentNotificacioCommand.asDto(command));
-			MissatgesHelper.success(
-					request, 
-					getMessage(
-							request,
-							"document.controller.notificacio.ok"));
-			return "redirect:/passarelaModalTancar";
-//			return this.getModalControllerReturnValueSuccess(
-//					request,
-//					"redirect:../../../contingut/" + documentId,
-//					"document.controller.notificacio.ok");
+					DocumentNotificacionsCommand.asDto(command));
+
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + documentId,
+					"document.controller.notificacio.ok");
 
 		} catch (Exception ex) {
 			logger.error(ExceptionUtils.getRootCauseMessage(ex), ex);
@@ -154,14 +129,14 @@ public class DocumentEnviamentController extends BaseUserController {
 			} else {
 				msg = rootCause.getMessage();
 			}
-			MissatgesHelper.error(
-					request,  
+			if (msg == null) {
+				msg = rootCause.toString();
+			}
+
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"",
 					msg);
-			return "redirect:/passarelaModalTancar";
-//			return getModalControllerReturnValueErrorMessageText(
-//					request,
-//					"redirect:../../../contingut/" + documentId,
-//					msg);
 		}
 	}
 
@@ -220,7 +195,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				request,
 				documentId,
 				model);
-		DocumentNotificacioCommand command = DocumentNotificacioCommand.asCommand(
+		DocumentNotificacionsCommand command = DocumentNotificacionsCommand.asCommand(
 				documentEnviamentService.notificacioFindAmbId(
 						entitatActual.getId(),
 						documentId,
@@ -233,7 +208,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@PathVariable Long notificacioId,
-			@Validated({DocumentNotificacioCommand.Update.class}) DocumentNotificacioCommand command,
+			@Validated({DocumentNotificacionsCommand.Update.class}) DocumentNotificacionsCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -247,7 +222,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		documentEnviamentService.notificacioUpdate(
 				entitatActual.getId(),
 				documentId,
-				DocumentNotificacioCommand.asDto(command));
+				DocumentNotificacionsCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + documentId,
@@ -516,20 +491,55 @@ public class DocumentEnviamentController extends BaseUserController {
 						"notificacio.tipus.enum.",
 						new Enum<?>[] {DocumentNotificacioTipusEnumDto.MANUAL}));
 		model.addAttribute(
+				"interessatTipus",
+				EnumHelper.getOptionsForEnum(
+						InteressatTipus.class,
+						"interessat.tipus.enum."));
+		
+		model.addAttribute(
 				"notificacioEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						DocumentEnviamentEstatEnumDto.class,
 						"notificacio.estat.enum.",
 						new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
-		model.addAttribute(
-				"interessats",
-				expedientInteressatService.findByExpedient(
-						entitatActual.getId(),
-						document.getExpedientPare().getId(),
-						true));
+
 		model.addAttribute(
 				"expedientId",
 				document.getExpedientPare().getId());
+		
+		Object entrega_postal_sessio = RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_ENTREGA_POSTAL);
+		if (entrega_postal_sessio != null) {
+			boolean entregaPostalHablitada = (boolean)entrega_postal_sessio;
+			model.addAttribute("entregaPostal", entregaPostalHablitada);
+		} else {
+			model.addAttribute("entregaPostal", true);
+		}
+		model.addAttribute(
+				"serveiTipusEstats",
+				EnumHelper.getOptionsForEnum(
+						ServeiTipusEnumDto.class,
+						"notificacio.servei.tipus.enum."));
+		
+		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
+						entitatActual.getId(),
+						document.getExpedientPare().getId(),
+						true);
+		DocumentNotificacionsCommand command = new DocumentNotificacionsCommand();
+		command.setDocumentId(documentId);
+		for (InteressatDto interessatDto : interessats) {
+			NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
+			
+			notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
+			if (interessatDto.getRepresentant()!=null) {
+				notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
+			}
+			command.getEnviaments().add(notificacioParte);
+		}
+		
+		model.addAttribute(command);
+		
 		return document.getExpedientPare();
 	}
 

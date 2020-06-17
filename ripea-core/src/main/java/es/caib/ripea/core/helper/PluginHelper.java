@@ -173,7 +173,8 @@ public class PluginHelper {
 	private DadesExternesHelper dadesExternesHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
-
+	@Autowired
+	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 
 	public DadesUsuari dadesUsuariFindAmbCodi(
 			String usuariCodi) {
@@ -3059,13 +3060,12 @@ public class PluginHelper {
 			DocumentNotificacioDto notificacioDto,
 			ExpedientEntity expedientEntity,
 			DocumentEntity documentEntity,
-			List<InteressatEntity> interessats) {
-
+			InteressatEntity interessat) {
 
 		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
 		String accioDescripcio = "Enviament d'una notificació electrònica";
 
-		Map<String, String> accioParams = getNotificacioAccioParams(notificacioDto, expedientEntity, documentEntity, interessats);
+		Map<String, String> accioParams = getNotificacioAccioParams(notificacioDto, expedientEntity, documentEntity, interessat);
 
 		long t0 = System.currentTimeMillis();
 		try {
@@ -3110,70 +3110,70 @@ public class PluginHelper {
 
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
-			for(InteressatEntity interessatEntity: interessats) {
+			
 
-				Enviament enviament = new Enviament();
-				enviament.setTitular(convertirAmbPersona(interessatEntity));
+			// ===== INTERESSAT TO ENVIAMENT
+			Enviament enviament = new Enviament();
+			enviament.setTitular(convertirAmbPersona(interessat));
 
-				if (interessatEntity.getIncapacitat() != null && interessatEntity.getIncapacitat() == true) {
-					if (interessatEntity.getRepresentant() != null) {
-						enviament.setDestinataris(Arrays.asList(convertirAmbPersona(interessatEntity.getRepresentant())));
-					}
+//			if (interessat.getIncapacitat() != null && interessat.getIncapacitat() == true) {
+				if (interessat.getRepresentant() != null) {
+					enviament.setDestinataris(Arrays.asList(convertirAmbPersona(interessat.getRepresentant())));
+				}
+//			}
+
+			// ########## ENTREGA POSTAL  ###############
+			if (notificacioDto.getEntregaPostal()) {
+				enviament.setEntregaPostalActiva(true);
+				enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
+				InteressatEntity interessatPerAdresa = interessat;
+				if (interessat.getRepresentant() != null) {
+					interessatPerAdresa = interessat.getRepresentant();
+				}
+				PaisDto pais = dadesExternesHelper.getPaisAmbCodi(
+						interessatPerAdresa.getPais());
+				if (pais == null) {
+					throw new NotFoundException(
+							interessatPerAdresa.getPais(),
+							PaisDto.class);
 				}
 
-				// ########## ENTREGA POSTAL  ###############
-				if (notificacioDto.getEntregaPostal()) {
-					enviament.setEntregaPostalActiva(true);
-					enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
-					InteressatEntity interessatPerAdresa = interessatEntity;
-					if (interessatEntity.getRepresentant() != null) {
-						interessatPerAdresa = interessatEntity.getRepresentant();
-					}
-					PaisDto pais = dadesExternesHelper.getPaisAmbCodi(
-							interessatPerAdresa.getPais());
-					if (pais == null) {
-						throw new NotFoundException(
-								interessatPerAdresa.getPais(),
-								PaisDto.class);
-					}
-
-					ProvinciaDto provincia = dadesExternesHelper.getProvinciaAmbCodi(
-							interessatPerAdresa.getProvincia());
-					if (provincia == null) {
-						throw new NotFoundException(
-								interessatPerAdresa.getProvincia(),
-								ProvinciaDto.class);
-					}
-					MunicipiDto municipi = dadesExternesHelper.getMunicipiAmbCodi(
+				ProvinciaDto provincia = dadesExternesHelper.getProvinciaAmbCodi(
+						interessatPerAdresa.getProvincia());
+				if (provincia == null) {
+					throw new NotFoundException(
 							interessatPerAdresa.getProvincia(),
-							interessatPerAdresa.getMunicipi());
-					if (municipi == null) {
-						throw new NotFoundException(
-								interessatPerAdresa.getMunicipi(),
-								MunicipiDto.class);
-					}
-					enviament.setEntregaPostalLinea1(
-							interessatPerAdresa.getAdresa() + ", " +
-									interessatPerAdresa.getCodiPostal() + ", " +
-									municipi.getNom());
-					enviament.setEntregaPostalLinea2(
-							provincia.getNom() + ", " +
-									pais.getNom());
-
-					enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
-					enviament.setEntregaPostalPaisCodi(interessatPerAdresa.getPais());
-
+							ProvinciaDto.class);
 				}
-				// ########## ENVIAMENT DEH  ###############
-				if (interessatEntity.getEntregaDeh() != null && interessatEntity.getEntregaDeh()) {
-					enviament.setEntregaDehActiva(true);
-					enviament.setEntregaDehObligat(interessatEntity.getEntregaDehObligat());
-					enviament.setEntregaDehProcedimentCodi(
-							metaExpedient.getClassificacioSia());
-					enviament.setEntregaNif(usuari.getNif());
+				MunicipiDto municipi = dadesExternesHelper.getMunicipiAmbCodi(
+						interessatPerAdresa.getProvincia(),
+						interessatPerAdresa.getMunicipi());
+				if (municipi == null) {
+					throw new NotFoundException(
+							interessatPerAdresa.getMunicipi(),
+							MunicipiDto.class);
 				}
-				enviaments.add(enviament);
+				enviament.setEntregaPostalLinea1(
+						interessatPerAdresa.getAdresa() + ", " +
+								interessatPerAdresa.getCodiPostal() + ", " +
+								municipi.getNom());
+				enviament.setEntregaPostalLinea2(
+						provincia.getNom() + ", " +
+								pais.getNom());
+
+				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
+				enviament.setEntregaPostalPaisCodi(interessatPerAdresa.getPais());
+
 			}
+			// ########## ENVIAMENT DEH  ###############
+			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh()) {
+				enviament.setEntregaDehActiva(true);
+				enviament.setEntregaDehObligat(interessat.getEntregaDehObligat());
+				enviament.setEntregaDehProcedimentCodi(
+						metaExpedient.getClassificacioSia());
+				enviament.setEntregaNif(usuari.getNif());
+			}
+			enviaments.add(enviament);
 
 			notificacio.setEnviaments(enviaments);
 
@@ -4103,7 +4103,9 @@ public class PluginHelper {
 		} else if (interessat instanceof InteressatAdministracioEntity) {
 			InteressatAdministracioEntity interessatA = (InteressatAdministracioEntity)interessat;
 			persona.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-			persona.setNom(interessatA.getOrganNom());
+			UnitatOrganitzativaDto unitatOrganitzativaDto = unitatOrganitzativaHelper.findAmbCodi(interessatA.getOrganCodi());
+			persona.setNif(unitatOrganitzativaDto.getNifCif());
+			persona.setNom(unitatOrganitzativaDto.getNom());
 		}
 		persona.setTelefon(interessat.getTelefon());
 		persona.setEmail(interessat.getEmail());
@@ -4653,7 +4655,7 @@ public class PluginHelper {
 	}*/
 
 
-	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, List<InteressatEntity> interessats) {
+	private Map<String, String> getNotificacioAccioParams(DocumentNotificacioDto notificacio, ExpedientEntity expedientEntity, DocumentEntity documentEntity, InteressatEntity interessat) {
 
 		Map<String, String> accioParams = new HashMap<String, String>();
 
@@ -4664,9 +4666,7 @@ public class PluginHelper {
 		accioParams.put("expedientTipusNom", expedientEntity.getMetaNode().getNom());
 		accioParams.put("documentNom", documentEntity.getNom());
 		String intressatsString = "";
-		for (InteressatEntity interessatEntity : interessats) {
-			intressatsString += interessatEntity.getIdentificador();
-		}
+		intressatsString += interessat.getIdentificador();
 		accioParams.put("interessats", intressatsString);
 		if (notificacio.getTipus() != null) {
 			accioParams.put("enviamentTipus", notificacio.getTipus().name());
