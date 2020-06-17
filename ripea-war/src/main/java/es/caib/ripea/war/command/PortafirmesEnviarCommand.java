@@ -38,6 +38,7 @@ public class PortafirmesEnviarCommand {
 	private String portafirmesFluxNom;
 	private String portafirmesFluxDescripcio;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+	private Long[] annexos;
 	
 	public String[] getPortafirmesResponsables() {
 		return portafirmesResponsables;
@@ -85,6 +86,14 @@ public class PortafirmesEnviarCommand {
 
 	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	}
+
+	public Long[] getAnnexos() {
+		return annexos;
+	}
+
+	public void setAnnexos(Long[] annexos) {
+		this.annexos = annexos;
 	}
 
 	public PortafirmesEnviarCommand() {

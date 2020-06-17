@@ -240,6 +240,7 @@ function mostrarFlux(urlPlantilla) {
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSeqtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">
+			<rip:inputSelect name="annexos" textKey="metadocument.form.camp.portafirmes.annexos" optionValueAttribute="id" optionTextAttribute="nom" optionItems="${annexos}" multiple="true"/>
 			<div class="form-group">
 				<label class="control-label col-xs-4 fluxInputLabel"><spring:message code="metadocument.form.camp.portafirmes.flux" /> *</label>
 				<c:if test="${!nouFluxDeFirma}">

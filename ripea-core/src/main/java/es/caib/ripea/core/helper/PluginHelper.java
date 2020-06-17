@@ -1806,7 +1806,7 @@ public class PluginHelper {
 				fluxTipus,
 				fluxId,
 				annexos);
-
+		List<PortafirmesDocument> portafirmesAnnexos = null;
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
 		portafirmesDocument.setTitol(document.getNom());
 		portafirmesDocument.setFirmat(
@@ -1827,6 +1827,22 @@ public class PluginHelper {
 				fitxerConvertit.getNom());
 		portafirmesDocument.setArxiuContingut(
 				fitxerConvertit.getContingut());
+		if (annexos != null && ! annexos.isEmpty()) {
+			portafirmesAnnexos = new ArrayList<PortafirmesDocument>();
+			for (DocumentEntity annex: annexos) {
+				PortafirmesDocument portafirmesAnnex = new PortafirmesDocument();
+				portafirmesAnnex.setTitol(annex.getNom());
+				portafirmesAnnex.setFirmat(false);
+				
+				FitxerDto annexFitxerOriginal = documentHelper.getFitxerAssociat(annex, null);
+				FitxerDto annexFitxerConvertit = this.conversioConvertirPdf(
+						annexFitxerOriginal,
+						null);
+				portafirmesAnnex.setArxiuNom(annexFitxerConvertit.getNom());
+				portafirmesAnnex.setArxiuContingut(annexFitxerConvertit.getContingut());
+				portafirmesAnnexos.add(portafirmesAnnex);
+			}
+		}
 		List<PortafirmesFluxBloc> flux = new ArrayList<PortafirmesFluxBloc>();
 		if (fluxId == null) {
 			if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
@@ -1868,7 +1884,7 @@ public class PluginHelper {
 					dataCaducitatCal.getTime(),
 					flux,
 					fluxId,
-					null,
+					portafirmesAnnexos,
 					false,
 					transaccioId);
 			integracioHelper.addAccioOk(

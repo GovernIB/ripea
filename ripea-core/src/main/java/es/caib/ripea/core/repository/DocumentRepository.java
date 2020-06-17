@@ -34,6 +34,20 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat);
 
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"    c.entitat = :entitat " +
+			"and c.expedient = :expedient "  + 
+			"and c.documentTipus != 2 " +
+			"and c.id != :documentId) ")
+	List<DocumentEntity> findByExpedientAndTipus(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("documentId") Long documentId);
+
 	List<DocumentEntity> findByExpedientAndEsborrat(
 			ExpedientEntity expedient,
 			int esborrat);
@@ -44,6 +58,15 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			MetaNodeEntity metaNode,
 			int esborrat);
+	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"    c.id in (:ids)")
+	public List<DocumentEntity> findDocumentMassiuByIds(
+			@Param("ids") List<Long> ids);
 
 	@Query(	"select " +
 			"    c " +

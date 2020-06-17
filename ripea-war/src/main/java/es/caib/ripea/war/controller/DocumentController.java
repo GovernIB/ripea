@@ -103,6 +103,10 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId);
 		model.addAttribute("document", document);
+		model.addAttribute("annexos", 
+				documentService.findAnnexosAmbExpedient(
+						entitatActual.getId(), 
+						document));
 		
 		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
 		command.setMotiu(
@@ -180,6 +184,7 @@ public class DocumentController extends BaseUserController {
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
+				command.getAnnexos(),
 				transaccioId);
 		
 		return this.getModalControllerReturnValueSuccess(
@@ -724,6 +729,10 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId);
 		model.addAttribute("document", document);
+		model.addAttribute("annexos", 
+				documentService.findAnnexosAmbExpedient(
+						entitatActual.getId(), 
+						document));
 	}
 
 	private void emplenarModelFirmaClient(

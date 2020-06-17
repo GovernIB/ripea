@@ -328,5 +328,22 @@ public class DocumentDto extends NodeDto {
 		copia.setNom(original.getNom());
 		return copia;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentDto other = (DocumentDto) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id)) {
+			return false;
+	 	} else if (id.equals(other.id))
+			return true;
+		return true;
+	}
 
 }
