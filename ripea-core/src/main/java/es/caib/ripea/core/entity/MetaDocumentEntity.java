@@ -199,6 +199,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.firmaBiometricaActiva = firmaBiometricaActiva;
 		this.biometricaLectura = biometricaLectura;
 		this.portafirmesFluxTipus = portafirmesFluxTipus;
+		this.codiPropi = codi;
 	}
 
 	public void updatePlantilla(
@@ -254,6 +255,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.ntiTipoDocumental = ntiTipoDocumental;
 			built.firmaBiometricaActiva = false;
 			built.biometricaLectura = false;
+			built.codiPropi = codi;
 		}
 		
 		public Builder biometricaLectura(boolean biometricaLectura) {

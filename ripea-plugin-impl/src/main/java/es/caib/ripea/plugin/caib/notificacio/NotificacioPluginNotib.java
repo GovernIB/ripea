@@ -73,7 +73,11 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			notificacioNotib.setCaducitat(toXmlGregorianCalendar(notificacio.getCaducitat()));
 			DocumentV2 document = new DocumentV2();
 			document.setArxiuNom(notificacio.getDocumentArxiuNom());
-			document.setContingutBase64(new String(Base64.encodeBase64(notificacio.getDocumentArxiuContingut())));
+			if (notificacio.getDocumentArxiuContingut() != null) {
+				document.setContingutBase64(new String(Base64.encodeBase64(notificacio.getDocumentArxiuContingut())));
+			} else {
+				document.setUuid(notificacio.getDocumentArxiuUuid());
+			}
 			notificacioNotib.setDocument(document);
 			notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
 			notificacioNotib.setUsuariCodi(notificacio.getUsuariCodi());

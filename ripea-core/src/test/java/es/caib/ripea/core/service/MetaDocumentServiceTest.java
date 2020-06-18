@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -43,6 +45,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 	private MetaDocumentService metaDocumentService;
 
 	private EntitatDto entitat;
+	private MetaExpedientDto metaExpedient;
 	private MetaDocumentDto metaDocumentCreate;
 	private MetaDocumentDto metaDocumentUpdate;
 	private PermisDto permisUserRead;
@@ -55,6 +58,14 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		entitat.setNom("Limit Tecnologies");
 		entitat.setCif("00000000T");
 		entitat.setUnitatArrel(CODI_UNITAT_ARREL);
+		metaExpedient = new MetaExpedientDto();
+		metaExpedient.setCodi("TEST1");
+		metaExpedient.setNom("Metaexpedient de test");
+		metaExpedient.setDescripcio("Descripció de test");
+		metaExpedient.setSerieDocumental("1234");
+		metaExpedient.setClassificacioSia("1234");
+		metaExpedient.setNotificacioActiva(false);
+		metaExpedient.setPareId(null);
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
 		PermisDto permisAdminAdmin = new PermisDto();
 		permisAdminAdmin.setAdministration(true);
@@ -106,7 +117,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						assertNotNull(metaDocumentCreat);
 						assertNotNull(metaDocumentCreat.getId());
 						comprovarMetaDocumentCoincideix(
@@ -115,7 +126,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						assertEquals(true, metaDocumentCreat.isActiu());
 					}
 				},
+				"Creació d'un meta-document a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDocumentCreate);
 	}
 
@@ -127,10 +140,11 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						MetaDocumentDto trobat = metaDocumentService.findById(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metaDocumentCreat.getId());
 						assertNotNull(trobat);
 						assertNotNull(trobat.getId());
@@ -139,7 +153,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								trobat);
 					}
 				},
+				"Consulta d'un meta-document a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDocumentCreate);
     }
 
@@ -151,11 +167,12 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						metaDocumentUpdate.setId(metaDocumentCreat.getId());
 						MetaDocumentDto modificat = metaDocumentService.update(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metaDocumentUpdate,
 								null,
 								null,
@@ -171,7 +188,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						assertEquals(true, modificat.isActiu());
 					}
 				},
+				"Modificació d'un meta-document a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDocumentCreate);
 	}
 
@@ -183,10 +202,11 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						MetaDocumentDto esborrat = metaDocumentService.delete(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metaDocumentCreat.getId());
 						comprovarMetaDocumentCoincideix(
 								metaDocumentCreate,
@@ -194,7 +214,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						try {
 							metaDocumentService.findById(
 									entitatCreada.getId(),
-									null, // TODO
+									expedientCreat.getId(),
 									metaDocumentCreat.getId());
 							fail("El meta-document esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
@@ -202,7 +222,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						elementsCreats.remove(metaDocumentCreat);
 					}
 				},
+				"Eliminació d'un meta-document a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDocumentCreate);
 	}
 
@@ -214,10 +236,11 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						MetaDocumentDto desactivat = metaDocumentService.updateActiu(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metaDocumentCreat.getId(),
 								false);
 						assertEquals(
@@ -225,7 +248,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								desactivat.isActiu());
 						MetaDocumentDto activat = metaDocumentService.updateActiu(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metaDocumentCreat.getId(),
 								true);
 						assertEquals(
@@ -233,7 +256,37 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								activat.isActiu());
 					}
 				},
+				"Activació/desactivació d'un meta-document a dins un meta-expedient",
 				entitat,
+				metaExpedient,
+				metaDocumentCreate);
+	}
+
+	@Test
+	public void errorSiCodiDuplicat() {
+		testCreantElements(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(List<Object> elementsCreats) {
+						autenticarUsuari("admin");
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						try {
+							metaDocumentService.create(
+									entitatCreada.getId(),
+									expedientCreat.getId(),
+									metaDocumentCreate,
+									null,
+									null,
+									null);
+						} catch (DataIntegrityViolationException ex) {
+							// Excepció esperada
+						}
+					}
+				},
+				"Verificació de que no es pot crear un meta-document amb el codi duplicat a dins un mateix meta-expedient",
+				entitat,
+				metaExpedient,
 				metaDocumentCreate);
 	}
 

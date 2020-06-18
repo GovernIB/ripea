@@ -126,7 +126,7 @@ public class BaseServiceTest {
 									(MetaExpedientDto) element);
 							elementsCreats.add(metaExpedientCreat);
 							if (((MetaExpedientDto)element).getPermisos() != null) {
-								for (PermisDto permis: ((MetaExpedientDto) element).getPermisos()) {
+								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
 									metaExpedientService.permisUpdate(entitatId,
 											metaExpedientCreat.getId(),
 											permis);
@@ -137,13 +137,13 @@ public class BaseServiceTest {
 							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
 									entitatId,
 									((MetaExpedientDto) elementsCreats.get(1)).getId(),
-									(MetaDocumentDto) element,
+									(MetaDocumentDto)element,
 									null,
 									null,
 									null);
 							elementsCreats.add(metaDocumentCreat);
 							if (((MetaDocumentDto)element).getPermisos() != null) {
-								for (PermisDto permis: ((MetaDocumentDto) element).getPermisos()) {
+								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
 									metaExpedientService.permisUpdate(entitatId,
 											metaDocumentCreat.getId(),
 											permis);
@@ -153,7 +153,7 @@ public class BaseServiceTest {
 						} else if (element instanceof MetaDadaDto) {
 							MetaDadaDto metaDadaCreada = metaDadaService.create(
 									entitatId,
-									((MetaExpedientDto) elementsCreats.get(1)).getId(),
+									((MetaExpedientDto)elementsCreats.get(1)).getId(),
 									(MetaDadaDto) element);
 							elementsCreats.add(metaDadaCreada);
 							id = metaDadaCreada.getId();
@@ -173,7 +173,10 @@ public class BaseServiceTest {
 			logger.error("L'execució del test ha produït una excepció", ex);
 			fail("L'execució del test ha produït una excepció");
 		} finally {
-			Long metaExpedientId = ((MetaExpedientDto)elementsCreats.get(1)).getId();
+			Long metaExpedientId = null;
+			if (elementsCreats.size() > 1) {
+				metaExpedientId = ((MetaExpedientDto)elementsCreats.get(1)).getId();
+			}
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {
 				autenticarUsuari("admin");

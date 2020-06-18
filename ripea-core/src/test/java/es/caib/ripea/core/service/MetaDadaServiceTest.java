@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -42,6 +44,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 	private MetaDadaService metaDadaService;
 
 	private EntitatDto entitat;
+	private MetaExpedientDto metaExpedient;
 	private MetaDadaDto metaDadaCreate;
 	private MetaDadaDto metaDadaUpdate;
 	private PermisDto permisUserRead;
@@ -61,11 +64,20 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 		permisAdminAdmin.setPrincipalNom("admin");
 		permisos.add(permisAdminAdmin);
 		entitat.setPermisos(permisos);
+		metaExpedient = new MetaExpedientDto();
+		metaExpedient.setCodi("TEST1");
+		metaExpedient.setNom("Metaexpedient de test");
+		metaExpedient.setDescripcio("Descripció de test");
+		metaExpedient.setSerieDocumental("1234");
+		metaExpedient.setClassificacioSia("1234");
+		metaExpedient.setNotificacioActiva(false);
+		metaExpedient.setPareId(null);
 		metaDadaCreate = new MetaDadaDto();
 		metaDadaCreate.setCodi("TEST1");
 		metaDadaCreate.setNom("Metadada de test");
 		metaDadaCreate.setDescripcio("Descripció de test");
 		metaDadaCreate.setTipus(MetaDadaTipusEnumDto.TEXT);
+		metaDadaCreate.setMultiplicitat(MultiplicitatEnumDto.M_1);
 		/*metaDadaCreate.setGlobalExpedient(false);
 		metaDadaCreate.setGlobalDocument(false);
 		metaDadaCreate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
@@ -75,6 +87,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 		metaDadaUpdate.setNom("Metadada de test2");
 		metaDadaUpdate.setDescripcio("Descripció de test2");
 		metaDadaUpdate.setTipus(MetaDadaTipusEnumDto.SENCER);
+		metaDadaCreate.setMultiplicitat(MultiplicitatEnumDto.M_0_1);
 		/*metaDadaUpdate.setGlobalExpedient(true);
 		metaDadaUpdate.setGlobalDocument(true);
 		metaDadaUpdate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_1);
@@ -91,7 +104,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
-						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
+						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(2);
 						assertNotNull(metadadaCreada);
 						assertNotNull(metadadaCreada.getId());
 						comprovarMetaDadaCoincideix(
@@ -100,7 +113,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						assertEquals(true, metadadaCreada.isActiva());
 					}
 				},
+				"Creació d'una meta-dada a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
 	}
 
@@ -112,10 +127,11 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(2);
 						MetaDadaDto trobada = metaDadaService.findById(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metadadaCreada.getId());
 						assertNotNull(trobada);
 						assertNotNull(trobada.getId());
@@ -124,7 +140,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 								trobada);
 					}
 				},
+				"Consulta d'una meta-dada a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
     }
 
@@ -136,11 +154,12 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(2);
 						metaDadaUpdate.setId(metadadaCreada.getId());
 						MetaDadaDto modificada = metaDadaService.update(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metaDadaUpdate);
 						assertNotNull(modificada);
 						assertNotNull(modificada.getId());
@@ -153,7 +172,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						assertEquals(true, modificada.isActiva());
 					}
 				},
+				"Modificació d'una meta-dada a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
 	}
 
@@ -165,10 +186,11 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(2);
 						MetaDadaDto esborrada = metaDadaService.delete(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metadadaCreada.getId());
 						comprovarMetaDadaCoincideix(
 								metaDadaCreate,
@@ -176,7 +198,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						try {
 							metaDadaService.findById(
 									entitatCreada.getId(),
-									null, // TODO
+									expedientCreat.getId(),
 									metadadaCreada.getId());
 							fail("La meta-dada esborrada no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
@@ -184,7 +206,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						elementsCreats.remove(metadadaCreada);
 					}
 				},
+				"Eliminació d'una meta-dada de dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
 	}
 
@@ -196,10 +220,11 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(2);
 						MetaDadaDto desactivada = metaDadaService.updateActiva(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metadadaCreada.getId(),
 								false);
 						assertEquals(
@@ -207,7 +232,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 								desactivada.isActiva());
 						MetaDadaDto activada = metaDadaService.updateActiva(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metadadaCreada.getId(),
 								true);
 						assertEquals(
@@ -215,7 +240,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 								activada.isActiva());
 					}
 				},
+				"Activació/desactivació d'una meta-dada a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
 	}
 
@@ -227,21 +254,24 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(1);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaDadaDto metadadaCreada = (MetaDadaDto)elementsCreats.get(2);
 						MetaDadaDto trobada = metaDadaService.findByCodi(
 								entitatCreada.getId(),
-								null, // TODO
+								expedientCreat.getId(),
 								metadadaCreada.getCodi());
 						comprovarMetaDadaCoincideix(
 								metadadaCreada,
 								trobada);
 					}
 				},
+				"Consulta per codi d'una meta-dada a dins un meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
 	}
 
-	@Test(expected = DataIntegrityViolationException.class)
+	@Test
 	public void errorSiCodiDuplicat() {
 		testCreantElements(
 				new TestAmbElementsCreats() {
@@ -249,13 +279,20 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						metaDadaService.create(
-								entitatCreada.getId(),
-								null, // TODO
-								metaDadaCreate);
+						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						try {
+							metaDadaService.create(
+									entitatCreada.getId(),
+									expedientCreat.getId(),
+									metaDadaCreate);
+						} catch (DataIntegrityViolationException ex) {
+							// Excepció esperada
+						}
 					}
 				},
+				"Verificació de que no es pot crear una meta-dada amb el codi duplicat a dins un mateix meta-expedient",
 				entitat,
+				metaExpedient,
 				metaDadaCreate);
 	}
 
@@ -276,6 +313,9 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 		assertEquals(
 				original.getTipus(),
 				perComprovar.getTipus());
+		assertEquals(
+				original.getMultiplicitat(),
+				perComprovar.getMultiplicitat());
 		/*assertEquals(
 				original.isGlobalExpedient(),
 				perComprovar.isGlobalExpedient());

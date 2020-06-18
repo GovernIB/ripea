@@ -61,7 +61,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		entitat.setPermisos(permisos);
 		metaExpedientCreate = new MetaExpedientDto();
 		metaExpedientCreate.setCodi("TEST1");
-		metaExpedientCreate.setNom("Metadocument de test");
+		metaExpedientCreate.setNom("Metaexpedient de test");
 		metaExpedientCreate.setDescripcio("Descripció de test");
 		metaExpedientCreate.setSerieDocumental("1234");
 		metaExpedientCreate.setClassificacioSia("1234");
@@ -79,7 +79,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		metaExpedientCreate.setPareId(null);
 		metaExpedientUpdate = new MetaExpedientDto();
 		metaExpedientUpdate.setCodi("TEST2");
-		metaExpedientUpdate.setNom("Metadocument de test2");
+		metaExpedientUpdate.setNom("Metaexpedient de test2");
 		metaExpedientUpdate.setDescripcio("Descripció de test2");
 		metaExpedientUpdate.setSerieDocumental("12341");
 		metaExpedientUpdate.setClassificacioSia("12342");
@@ -116,6 +116,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						assertEquals(true, metaExpedientCreat.isActiu());
 					}
 				},
+				"Creació d'un meta-expedient",
 				entitat,
 				metaExpedientCreate);
 	}
@@ -139,6 +140,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 								trobat);
 					}
 				},
+				"Consulta d'un meta-expedient",
 				entitat,
 				metaExpedientCreate);
     }
@@ -167,6 +169,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						assertEquals(true, modificat.isActiu());
 					}
 				},
+				"Modificació d'un meta-expedient",
 				entitat,
 				metaExpedientCreate);
 	}
@@ -196,6 +199,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						elementsCreats.remove(metaExpedientCreat);
 					}
 				},
+				"Eliminació d'un meta-expedient",
 				entitat,
 				metaExpedientCreate);
 	}
@@ -225,11 +229,10 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 								activat.isActiu());
 					}
 				},
+				"Activació/desactivació d'un meta-expedient",
 				entitat,
 				metaExpedientCreate);
 	}
-
-
 
 	private void comprovarMetaExpedientCoincideix(
 			MetaExpedientDto original,

@@ -35,6 +35,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -323,6 +324,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								dataCaducitat.getTime(),
 								new String[] {"12345678Z"},
 								MetaDocumentFirmaSequenciaTipusEnumDto.SERIE,
+								MetaDocumentFirmaFluxTipusEnumDto.SIMPLE,
 								null,
 								null,
 								null);

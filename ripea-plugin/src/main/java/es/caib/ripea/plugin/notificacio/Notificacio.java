@@ -27,6 +27,7 @@ public class Notificacio {
 	private Date caducitat;
 	private String documentArxiuNom;
 	private byte[] documentArxiuContingut;
+	private String documentArxiuUuid;
 	private String procedimentCodi;
 	private List<Enviament> enviaments;
 	private String usuariCodi;
@@ -91,6 +92,12 @@ public class Notificacio {
 	}
 	public void setDocumentArxiuContingut(byte[] documentArxiuContingut) {
 		this.documentArxiuContingut = documentArxiuContingut;
+	}
+	public String getDocumentArxiuUuid() {
+		return documentArxiuUuid;
+	}
+	public void setDocumentArxiuUuid(String documentArxiuUuid) {
+		this.documentArxiuUuid = documentArxiuUuid;
 	}
 	public String getProcedimentCodi() {
 		return procedimentCodi;

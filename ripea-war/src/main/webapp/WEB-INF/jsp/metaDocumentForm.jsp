@@ -27,7 +27,7 @@ pageContext.setAttribute(
 %>
 
 <c:choose>
-	<c:when test="${empty metaExpedientCommand.id}"><c:set var="titol"><spring:message code="metadocument.form.titol.crear"/></c:set></c:when>
+	<c:when test="${empty metaDocumentCommand.id}"><c:set var="titol"><spring:message code="metadocument.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="metadocument.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -307,7 +307,7 @@ function removeLoading() {
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio"/>
 				<rip:inputSelect name="multiplicitat" textKey="metadocument.form.camp.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla"/>
+				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>

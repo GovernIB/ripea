@@ -1,10 +1,5 @@
 package es.caib.ripea.war.command;
 
-import java.util.Date;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 
 public class NotificacioEnviamentCommand {

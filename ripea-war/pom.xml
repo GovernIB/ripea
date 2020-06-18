@@ -245,7 +245,7 @@
 				<webjars.classpath>classpath:</webjars.classpath>
 			</properties>
 			<dependencies>
-				<dependency>
+				<!--dependency>
 					<groupId>org.jvnet.jax-ws-commons.spring</groupId>
 					<artifactId>jaxws-spring</artifactId>
 					<version>1.9</version>
@@ -267,7 +267,7 @@
 							<artifactId>spring-web</artifactId>
 						</exclusion>
 					</exclusions>
-				</dependency>
+				</dependency-->
 				<dependency>
 					<groupId>javax.transaction</groupId>
 					<artifactId>jta</artifactId>

@@ -29,7 +29,6 @@ import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NotificacioEnviamentDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -39,7 +38,6 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -49,7 +47,6 @@ import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
@@ -89,8 +86,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private DadesExternesService dadesExternesService;
-	@Autowired
-	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
