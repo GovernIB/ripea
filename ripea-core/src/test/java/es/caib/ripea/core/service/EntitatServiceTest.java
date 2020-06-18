@@ -346,15 +346,18 @@ public class EntitatServiceTest extends BaseServiceTest {
 				entitatCreate);
 	}
 
-	@Test(expected = DataIntegrityViolationException.class)
+	@Test
 	public void errorSiCodiDuplicat() {
 		testCreantElements(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("super");
-						entitatService.create(
-								entitatCreate);
+						try {
+							entitatService.create(entitatCreate);
+						} catch (DataIntegrityViolationException ex) {
+							// Excepció esperada
+						}
 					}
 				},
 				entitatCreate);

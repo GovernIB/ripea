@@ -220,15 +220,8 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 						if (mutlipleCount != 2) {
 							fail("Incorrect creation of multiple dada");
 						}
-
-						
 					}
 				});
 	}
-
-
-    
-
-
 
 }

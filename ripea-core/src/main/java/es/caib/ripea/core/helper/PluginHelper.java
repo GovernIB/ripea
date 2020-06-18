@@ -3098,14 +3098,16 @@ public class PluginHelper {
 				}
 			}
 
-			FitxerDto fitxer = null;
-			if (!documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
-				fitxer =  arxiuDocumentVersioImprimible(documentEntity);
+			if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+				FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+				notificacio.setDocumentArxiuNom(fitxer.getNom());
+				notificacio.setDocumentArxiuContingut(fitxer.getContingut());
 			} else {
-				fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
+				// fitxer = arxiuDocumentVersioImprimible(documentEntity);
+				notificacio.setDocumentArxiuNom(documentEntity.getFitxerNom());
+				notificacio.setDocumentArxiuUuid(documentEntity.getArxiuUuid());
 			}
-			notificacio.setDocumentArxiuNom(fitxer.getNom());
-			notificacio.setDocumentArxiuContingut(fitxer.getContingut());
+			
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
 
 			UsuariDto usuari = aplicacioService.getUsuariActual();

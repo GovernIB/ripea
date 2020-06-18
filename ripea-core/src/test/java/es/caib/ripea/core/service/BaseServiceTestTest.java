@@ -58,7 +58,7 @@ public class BaseServiceTestTest extends BaseServiceTest {
 						entitatId1 = entitat.getId();
 					}
 				},
-				false,
+				"Verificant que l'entitat s'esborra després del test",
 				entitat);
 		autenticarUsuari("super");
 		assertNotNull(entitatId1);

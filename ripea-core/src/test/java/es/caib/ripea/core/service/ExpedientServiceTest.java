@@ -120,7 +120,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						assertEquals(metaExpedient.getSerieDocumental(), argument.getValue().getMetadades().getSerieDocumental());
 						
 					}
-				});
+				},
+				"Modificació d'un expedient");
 	}
 
 	@Test
@@ -160,7 +161,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 									expedientCreat.getId());
 						}
 					}
-				});
+				},
+				"Eliminació reversible d'un expedient");
 	}
 
 	@Test
@@ -188,11 +190,10 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						} catch (NotFoundException expected) {
 						}
 						elementsCreats.remove(expedientCreat);
-						
 //						Mockito.verify(mock, Mockito.times(1)).expedientEsborrar(Mockito.any(String.class));
-						
 					}
-				});
+				},
+				"Eliminació definitiva d'un expedient");
 	}
 
 	@Test
@@ -217,7 +218,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								!alliberat.isAgafat());
 						assertNull(alliberat.getAgafatPer());
 					}
-				});
+				},
+				"Alliberació d'un expedient per un usuari");
 	}
 
     
@@ -246,7 +248,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								agafat.isAgafat());
 						assertEquals("user", agafat.getAgafatPer().getCodi());
 					}
-				});
+				},
+				"Agafar un expedient per un usuari");
 	}
 
 //=========================================================================

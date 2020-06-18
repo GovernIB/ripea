@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -75,9 +74,6 @@ public class DocumentEnviamentController extends BaseUserController {
 	
 	@Autowired
 	private DocumentService documentService;
-
-	@Autowired
-	private Validator validator;
 
 	@RequestMapping(value = "/{documentId}/notificar", method = RequestMethod.GET)
 	public String notificarGet(

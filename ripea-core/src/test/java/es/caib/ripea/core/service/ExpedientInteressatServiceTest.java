@@ -42,29 +42,22 @@ import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/ripea/core/application-context-test.xml"})
 public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
-	
 
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
 
 	InteressatPersonaFisicaDto interessatPersonaFisicaDto;
 	InteressatPersonaFisicaDto representantPersonaFisicaDto;
-	
 	InteressatPersonaJuridicaDto interessatPersonaJuridicaDto;
 	InteressatPersonaJuridicaDto representantPersonaJuridicaDto;
-	
-	InteressatAdministracioDto interessatAdministracioDto; 
-	
+	InteressatAdministracioDto interessatAdministracioDto;
+
 	UnitatsOrganitzativesPlugin mockUnitatsOrganitzatives;
 
-	
 	@Before
 	public void setUp() {
-		
 		super.setUp();
-		
 		configureMockUnitatsOrganitzativesPlugin();
-		
 		// =============================== PERSONA FISICA =====================================
 		interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
 		interessatPersonaFisicaDto.setAdresa("Test adresa 1");
@@ -87,7 +80,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		interessatPersonaFisicaDto.setProvincia("01");
 		interessatPersonaFisicaDto.setTelefon("666111222");
 		interessatPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
-		
 		representantPersonaFisicaDto = new InteressatPersonaFisicaDto();
 		representantPersonaFisicaDto.setAdresa("Test adresa 1 representant");
 		representantPersonaFisicaDto.setCodiPostal("07500");
@@ -106,9 +98,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		representantPersonaFisicaDto.setProvincia("01");
 		representantPersonaFisicaDto.setTelefon("666111222");
 		representantPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
-		
-		
-		
 		// =============================== PERSONA JURIDICA =====================================
 		interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
 		interessatPersonaJuridicaDto.setAdresa("Test adresa 1");
@@ -129,7 +118,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		interessatPersonaJuridicaDto.setProvincia("01");
 		interessatPersonaJuridicaDto.setTelefon("666111222");
 		interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
-		
 		representantPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
 		representantPersonaJuridicaDto.setAdresa("Test adresa 1 representant");
 		representantPersonaJuridicaDto.setCodiPostal("07500");
@@ -146,10 +134,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		representantPersonaJuridicaDto.setProvincia("01");
 		representantPersonaJuridicaDto.setTelefon("666111222");
 		representantPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
-		
-		
 		// =============================== ADMINISTRACIO =====================================
-
 		interessatAdministracioDto = new InteressatAdministracioDto();
 		interessatAdministracioDto.setAdresa("Test adresa 1");
 		interessatAdministracioDto.setCodiPostal("07500");
@@ -169,59 +154,46 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		interessatAdministracioDto.setProvincia("01");
 		interessatAdministracioDto.setTelefon("666111222");
 		interessatAdministracioDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
-		
-		
 	}
 
-
-
 	@Test
-    public void createPersonaFisica() {
+	public void createPersonaFisica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaFisicaDto);	
-
 						assertNotNull(interessatCreat);
 						assertNotNull(interessatCreat.getId());
-
 						comprovarInteressatPersonaFisicaCoincideix(
 								(InteressatPersonaFisicaDto) interessatPersonaFisicaDto,
 								(InteressatPersonaFisicaDto) interessatCreat);
-						
-						
 						Mockito.verify(arxiuPluginMock, Mockito.times(1)).expedientModificar((Mockito.any(Expedient.class)));
 						ArgumentCaptor<Expedient> argument = ArgumentCaptor.forClass(Expedient.class);
 						Mockito.verify(arxiuPluginMock).expedientModificar(argument.capture());
 						assertEquals(interessatPersonaFisicaDto.getDocumentNum(), argument.getValue().getMetadades().getInteressats().get(0));
-
-						
 					}
-				});
+				},
+				"Creació d'un interessat de tipus persona física");
 	}
-	
+
 	@Test
-    public void updatePersonaFisica() {
+	public void updatePersonaFisica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaFisicaDto);	
-
-								
 						interessatPersonaFisicaDto.setId(interessatCreat.getId());
 						interessatPersonaFisicaDto.setLlinatge1("Llinatge1 test modificar");
 						interessatPersonaFisicaDto.setDocumentNum("07933975X");
@@ -229,40 +201,32 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaFisicaDto);
-
 						assertNotNull(interessatModificat);
 						assertNotNull(interessatModificat.getId());
-
 						comprovarInteressatPersonaFisicaCoincideix(
 								(InteressatPersonaFisicaDto) interessatPersonaFisicaDto,
 								(InteressatPersonaFisicaDto) interessatModificat);
-						
-
-						
 					}
-				});
+				},
+				"Modificació d'un interessat de tipus persona física");
 	}
-	
-	
+
 	@Test
-    public void deletePersonaFisica() {
+	public void deletePersonaFisica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaFisicaDto);	
-						
 						expedientInteressatService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId());
-
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
@@ -271,79 +235,68 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						} catch (NotFoundException expected) {
 						}
 					}
-				});
+				},
+				"Eliminació d'un interessat de tipus persona física");
 	}
 
-	
-
-    
 	@Test
-    public void afegirRepresentantPersonaFisica() {
+	public void afegirRepresentantPersonaFisica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaFisicaDto);	
-						
 						InteressatDto representantCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId(),
 								representantPersonaFisicaDto,
 								true);
-
-
 						assertNotNull(representantCreat);
 						assertNotNull(representantCreat.getId());
-
 						comprovarInteressatPersonaFisicaCoincideix(
 								(InteressatPersonaFisicaDto) representantPersonaFisicaDto,
 								(InteressatPersonaFisicaDto) representantCreat);
 					}
-				});
+				},
+				"Afegir un representant a un interessat de tipus persona física");
 	}
-	
+
 	@Test
-    public void modificarRepresentantPersonaFisica() {
+	public void modificarRepresentantPersonaFisica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaFisicaDto);	
-						
 						InteressatDto representantCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId(),
 								representantPersonaFisicaDto,
 								true);
-
-
 						assertNotNull(representantCreat);
 						assertNotNull(representantCreat.getId());
-
 						comprovarInteressatPersonaFisicaCoincideix(
 								(InteressatPersonaFisicaDto) representantPersonaFisicaDto,
 								(InteressatPersonaFisicaDto) representantCreat);
 					}
-				});
+				},
+				"Modificar un representant a un interessat de tipus persona física");
 	}
-	
 
 	@Test
-    public void createPersonaJuridica() {
+	public void createPersonaJuridica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
@@ -372,65 +325,54 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						
 						
 					}
-				});
+				},
+				"Creació d'un interessat de tipus persona jurídica");
 	}
-	
-	
+
 	@Test
-    public void updatePersonaJuridica() {
+	public void updatePersonaJuridica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaJuridicaDto);	
-
-								
 						interessatPersonaJuridicaDto.setId(interessatCreat.getId());
 						interessatPersonaJuridicaDto.setDocumentNum("07933975X");
 						InteressatDto interessatModificat = expedientInteressatService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaJuridicaDto);
-
 						assertNotNull(interessatModificat);
 						assertNotNull(interessatModificat.getId());
-
 						comprovarInteressatPersonaJuridicaCoincideix(
 								(InteressatPersonaJuridicaDto) interessatPersonaJuridicaDto,
 								(InteressatPersonaJuridicaDto) interessatModificat);
-						
-						
-
-						
 					}
-				});
+				},
+				"Modificació d'un interessat de tipus persona jurídica");
 	}
-	
+
 	@Test
-    public void deletePersonaJuridica() {
+	public void deletePersonaJuridica() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatPersonaJuridicaDto);	
-						
 						expedientInteressatService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId());
-
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
@@ -439,33 +381,27 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						} catch (NotFoundException expected) {
 						}
 					}
-				});
+				},
+				"Eliminació d'un interessat de tipus persona jurídica");
 	}
-	
-	
-	
+
 	@Test
-    public void createAdministracio() {
+	public void createAdministracio() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatAdministracioDto);	
-						
 						assertNotNull(interessatCreat);
 						assertNotNull(interessatCreat.getId());
-
 						comprovarInteressatAdministracioCoincideix(
 								(InteressatAdministracioDto) interessatAdministracioDto,
 								(InteressatAdministracioDto) interessatCreat);
-						
-
 						try {
 							Mockito.verify(mockUnitatsOrganitzatives, Mockito.times(1)).findAmbCodi(Mockito.anyString());
 							ArgumentCaptor<String> argument1 = ArgumentCaptor.forClass(String.class);
@@ -475,66 +411,56 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 							e.printStackTrace();
 							fail();
 						}
-						
-						
 					}
-				});
+				},
+				"Creació d'un interessat de tipus administració");
 	}
-	
-	
+
 	@Test
-    public void updateAdministracio() {
+	public void updateAdministracio() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatAdministracioDto);	
-
-								
 						interessatAdministracioDto.setId(interessatCreat.getId());
 						interessatAdministracioDto.setDocumentNum("07933975X");
 						InteressatDto interessatModificat = expedientInteressatService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatAdministracioDto);
-
 						assertNotNull(interessatModificat);
 						assertNotNull(interessatModificat.getId());
-
 						comprovarInteressatAdministracioCoincideix(
 								(InteressatAdministracioDto) interessatAdministracioDto,
 								(InteressatAdministracioDto) interessatModificat);
 						
 					}
-				});
+				},
+				"Modificació d'un interessat de tipus administració");
 	}
-	
-	
+
 	@Test
-    public void deleteAdministracio() {
+	public void deleteAdministracio() {
 		testAmbElementsIExpedient(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatAdministracioDto);	
-						
 						expedientInteressatService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId());
-
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
@@ -543,15 +469,13 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						} catch (NotFoundException expected) {
 						}
 					}
-				});
+				},
+				"Eliminació d'un interessat de tipus administració");
 	}
-	
-	
-	
+
 	private void comprovarInteressatPersonaFisicaCoincideix(
 			InteressatPersonaFisicaDto original,
 			InteressatPersonaFisicaDto perComprovar) {
-
 		assertEquals(original.getAdresa(), perComprovar.getAdresa());
 		assertEquals(original.getCodiPostal(), perComprovar.getCodiPostal());
 		assertEquals(original.getDocumentNum(), perComprovar.getDocumentNum());
@@ -571,14 +495,11 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		assertEquals(original.getProvincia(), perComprovar.getProvincia());
 		assertEquals(original.getTelefon(), perComprovar.getTelefon());
 		assertEquals(original.getTipus(), perComprovar.getTipus());
-
 	}
-	
-	
+
 	private void comprovarInteressatPersonaJuridicaCoincideix(
 			InteressatPersonaJuridicaDto original,
 			InteressatPersonaJuridicaDto perComprovar) {
-
 		assertEquals(original.getAdresa(), perComprovar.getAdresa());
 		assertEquals(original.getCodiPostal(), perComprovar.getCodiPostal());
 		assertEquals(original.getDocumentNum(), perComprovar.getDocumentNum());
@@ -597,13 +518,11 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		assertEquals(original.getProvincia(), perComprovar.getProvincia());
 		assertEquals(original.getTelefon(), perComprovar.getTelefon());
 		assertEquals(original.getTipus(), perComprovar.getTipus());
-
 	}
-	
+
 	private void comprovarInteressatAdministracioCoincideix(
 			InteressatAdministracioDto original,
 			InteressatAdministracioDto perComprovar) {
-
 		assertEquals(original.getAdresa(), perComprovar.getAdresa());
 		assertEquals(original.getCodiPostal(), perComprovar.getCodiPostal());
 		assertEquals(original.getDocumentNum(), perComprovar.getDocumentNum());
@@ -622,13 +541,10 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		assertEquals(original.getProvincia(), perComprovar.getProvincia());
 		assertEquals(original.getTelefon(), perComprovar.getTelefon());
 		assertEquals(original.getTipus(), perComprovar.getTipus());
-
 	}
-	
-	
+
 	private void configureMockUnitatsOrganitzativesPlugin() {
 		mockUnitatsOrganitzatives = Mockito.mock(UnitatsOrganitzativesPlugin.class);
-		
 		UnitatOrganitzativa unitatOrganitzativa = new UnitatOrganitzativa();
 		unitatOrganitzativa.setCodi("A04032369");
 		unitatOrganitzativa.setDenominacio("Consejería de Presidencia, Cultura e Igualdad");
@@ -638,9 +554,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 			e.printStackTrace();
 			fail();
 		}
-
 		pluginHelper.setUnitatsOrganitzativesPlugin(mockUnitatsOrganitzatives);
 	}
-
 
 }
