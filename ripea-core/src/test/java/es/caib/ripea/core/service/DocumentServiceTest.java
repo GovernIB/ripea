@@ -326,7 +326,6 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								MetaDocumentFirmaSequenciaTipusEnumDto.SERIE,
 								MetaDocumentFirmaFluxTipusEnumDto.SIMPLE,
 								null,
-								null,
 								null);
 						DocumentDto documentEnviat = documentService.findById(
 								entitatCreada.getId(),
