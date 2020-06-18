@@ -99,22 +99,22 @@ body.loading .rmodal {
 } 
 </style>
 <script>
-function mostrarDocument(fileName) {
+/*function mostrarDocument(fileName) {
 	$fileinput = $('#arxiu').closest('.fileinput');
 	$fileinput.removeClass('fileinput-new');
 	$fileinput.addClass('fileinput-exists');
 	$('.fileinput-filename', $fileinput).append(fileName);
-}
+}*/
 
 $(document).ready(function() {
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
 	console.log(currentHeight);
 	let rootIframe = window.frameElement;
-	let fileName = "${nomDocument}";
+	/*let fileName = "${nomDocument}";
 	if (fileName !== '') {
 		mostrarDocument(fileName);
-	}
+	}*/
 
 	// METADOCUMENT CHANGE
 	$('#metaNodeId').on('change', function() {
@@ -366,7 +366,7 @@ function removeLoading() {
 		<br/>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="fitxer">
-				<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}"/>
+				<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
 				<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
 				<div id="input-firma" class="hidden">
 					<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>

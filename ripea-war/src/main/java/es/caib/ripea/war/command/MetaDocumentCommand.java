@@ -71,7 +71,8 @@ public class MetaDocumentCommand {
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
-	
+	private String plantillaNom;
+
 	public Long getId() {
 		return id;
 	}
@@ -210,7 +211,13 @@ public class MetaDocumentCommand {
 	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 		this.portafirmesFluxTipus = portafirmesFluxTipus;
 	}
-	
+	public String getPlantillaNom() {
+		return plantillaNom;
+	}
+	public void setPlantillaNom(String plantillaNom) {
+		this.plantillaNom = plantillaNom;
+	}
+
 	public static List<MetaDocumentCommand> toEntitatCommands(
 			List<MetaDocumentDto> dtos) {
 		List<MetaDocumentCommand> commands = new ArrayList<MetaDocumentCommand>();
