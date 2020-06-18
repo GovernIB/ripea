@@ -139,7 +139,7 @@
 			<tbody>
 				<c:forEach var="fill" items="${fills}">
 				<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL') or empty fill.metaNode or fill.metaNode.usuariActualRead}">
-					<tr id="info-fill-${fill.id}" class="element-drag-drop">
+					<tr id="info-fill-${fill.id}" class="element-drag-drop element-draggable ui-draggable <c:if test="${not fill.document}"> element-droppable</c:if>" data-contenidor-id="${fill.id}">
 						
 						<td>
 						<c:if test="${fill.document}">

@@ -10,6 +10,7 @@
 <%@ attribute name="ocultarCarpetes" required="false" rtexprvalue="true"%>
 <%@ attribute name="ocultarDocuments" required="false" rtexprvalue="true"%>
 <%@ attribute name="contingutOrigen" required="true" rtexprvalue="true" type="java.lang.Object"%> <!-- document which we are moving -->
+<%@ attribute name="documentsOrigen" required="false" rtexprvalue="true" type="java.lang.Object"%> <!-- documents which we are moving (multiple) -->
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -22,7 +23,7 @@
 </c:choose>
 <!-- setting parent container of document we are moving  -->
 <c:choose> 
-	<c:when test="${not empty contingutOrigen.pare}"><c:set var="contenidorInicialId" value="${contingutOrigen.pare.id}"/></c:when>
+	<c:when test="${not empty contingutOrigen.pare && empty documentsOrigen}"><c:set var="contenidorInicialId" value="${contingutOrigen.pare.id}"/></c:when>
 	<c:otherwise><c:set var="contenidorInicialId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
@@ -165,7 +166,7 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			if(data.fills){
 				for (var i = 0; i < data.fills.length; i++) {
 					var ocultar = (data.fills[i].expedient && ocultarExpedients) || (data.fills[i].carpeta && ocultarCarpetes) || (data.fills[i].document && ocultarDocuments);
-					if (!ocultar && data.fills[i].id != '${contingutOrigen.id}') {
+					if (!ocultar && data.fills[i].id != '${contingutOrigen.id}' && data.fills[i].documentTipus != 'VIRTUAL') {
 						var htmlIcona = '';
 						if (data.fills[i].expedient)
 							htmlIcona += '<span class="fa fa-briefcase"></span> ';
@@ -212,9 +213,14 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 
 
 function loadFileChooser(campPath, contenidorId) {
+	if (!${moureMateixExpedients}) {
+		var url = '<c:url value="/contenidor/exploraAllWithSameExpedientType/${contenidorBaseId}/"/>' + contenidorId; // returns container with given contenidorId;
+	} else {
+		var url = '<c:url value="/contenidor/exploraAllCurrentExpedient/${contenidorBaseId}/"/>' + contenidorId; // returns container with given contenidorId;
+	}
 	$.ajax({
 		type: "GET",
-		url: '<c:url value="/contenidor/exploraAllWithSameExpedientType/${contenidorBaseId}/"/>' + contenidorId, // returns container with given contenidorId
+		url: url,
 		async: false,
 		timeout: 20000,
 		success: function(dataTable) { //returns container of the given element (it returns the folder in which document is situated and if there is no parent folder it returns expedient)
@@ -230,10 +236,12 @@ function loadFileChooser(campPath, contenidorId) {
 			// SETTING PATH IN THE PANEL HEADER
 			var path = "";
 			if (data.expedient) { // if it is an expedient
+				console.log("expedient: " +  data.expedient);
 				path += '<span class="fa fa-folder-open"></span> ';
 				path += data.nom;
 			
-			} else {  
+			} else { 
+				console.log(data.pathAsStringExploradorAmbNom);
 				path += data.pathAsStringExploradorAmbNom;
 				path = path.replaceAll('#E#', '<span class="fa fa-folder-open"></span> ');
 				path = path.replaceAll('#X#', '<span class="fa fa-folder-open"></span>');

@@ -324,6 +324,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								new String[] {"12345678Z"},
 								MetaDocumentFirmaSequenciaTipusEnumDto.SERIE,
 								null,
+								null,
 								null);
 						DocumentDto documentEnviat = documentService.findById(
 								entitatCreada.getId(),

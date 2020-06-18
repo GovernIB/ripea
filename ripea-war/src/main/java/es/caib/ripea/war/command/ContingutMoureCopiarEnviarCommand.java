@@ -15,8 +15,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class ContingutMoureCopiarEnviarCommand {
 
-	@NotNull
 	protected Long origenId;
+	protected long[] origenIds;
 	@NotNull
 	protected Long destiId;
 	@Size(max=256)
@@ -29,6 +29,12 @@ public class ContingutMoureCopiarEnviarCommand {
 	}
 	public void setOrigenId(Long origenId) {
 		this.origenId = origenId;
+	}
+	public long[] getOrigenIds() {
+		return origenIds;
+	}
+	public void setOrigenIds(long[] origenIds) {
+		this.origenIds = origenIds;
 	}
 	public Long getDestiId() {
 		return destiId;

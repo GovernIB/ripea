@@ -66,8 +66,9 @@
 				</c:when>
 			</c:choose>
 			<c:if test="${not contingut.expedient and !isTasca}">
-				<c:if test="${isMostrarCopiarMoure}">
+				
 					<li><a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-arrows"></span>&nbsp;<spring:message code="comu.boto.moure"/>...</a></li>
+				<c:if test="${isMostrarCopiar}">
 					<li><a href="<c:url value="/contingut/${contingut.id}/copiar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.copiar"/>...</a></li>
 				</c:if>
 				<c:if test="${empty expedientPare}">

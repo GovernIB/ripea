@@ -1283,8 +1283,6 @@ function recuperarResultatDomini(
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
-									</div>
-									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" class="btn-group">
 											<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
 												<span class="fa fa-check-square"></span>
@@ -1293,6 +1291,13 @@ function recuperarResultatDomini(
 											</a> 
 											<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
 												<span class="fa fa-check-square"></span>
+												
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</a>
+										</div>
+										<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group">
+											<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" class="btn btn-default con-mult">
+												<span class="fa fa-arrows"></span>
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>

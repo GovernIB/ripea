@@ -56,6 +56,22 @@ public class CarpetaEntity extends ContingutEntity {
 		}
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CarpetaEntity other = (CarpetaEntity) obj;
+		if (nom == null) {
+			if (other.nom != null)
+				return false;
+		} else if (!nom.equals(other.nom))
+			return false;
+		return true;
+	}
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

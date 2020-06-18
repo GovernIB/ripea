@@ -138,11 +138,11 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			if ($(this).data("netejar") == undefined || $(this).data("netejar"))
 				$(this).val('');
 		});
-		$(this).find('input:radio, input:checkbox').each(function( index ) {
+		$(this).find('input:radio, input:checkbox').each(function() {
 			if ($(this).data("netejar") == undefined || $(this).data("netejar"))
 				$(this).removeAttr('checked').removeAttr('selected');
 		});
-		$(this).find('select.select2-hidden-accessible').each(function( index ) {
+		$(this).find('select.select2-hidden-accessible').each(function() {
 			if ($(this).data("netejar") == undefined || $(this).data("netejar"))
 				if ($(this).data("toggle") == "suggest") {
 					$(this).val(null).trigger("change");

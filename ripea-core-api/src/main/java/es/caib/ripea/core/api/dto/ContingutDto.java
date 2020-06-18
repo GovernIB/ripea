@@ -171,14 +171,27 @@ public abstract class ContingutDto extends AuditoriaDto {
 	}
 	public String getPathAsStringExploradorAmbNom() {
 		if (isExpedient()) {
-			return getPathAsStringExplorador() + " / #X# " + nom;
+			if (getPathAsStringExplorador() != null)
+				return getPathAsStringExplorador() + " / #X# " + nom;
+			else if (expedientPare != null)
+				return "#X# " + expedientPare.getNom() +  " / #X# " + nom;
 		} else if (isCarpeta()) {
-			return getPathAsStringExplorador() + " / #C# " + nom;
+			if (getPathAsStringExplorador() != null)
+				return getPathAsStringExplorador() + " / #C# " + nom;
+			else if (expedientPare != null)
+				return "#X# " + expedientPare.getNom() + " / #C# " + nom;
 		} else if (isDocument()) {
-			return getPathAsStringExplorador() + " / #D# " + nom;
+			if (getPathAsStringExplorador() != null)
+				return getPathAsStringExplorador() + " / #D# " + nom;
+			else if (expedientPare != null)
+				return "#X# " + expedientPare.getNom() +  "/ #D# " + nom;
 		} else {
-			return getPathAsStringExplorador() + " / " + nom;
+			if (getPathAsStringExplorador() != null)
+				return getPathAsStringExplorador() + " / " + nom;
+			else if (expedientPare != null)
+				return "#X# " + expedientPare.getNom() +  "/ " + nom;	
 		}
+		return "/ " + nom;
 	}
 
 	public List<ExpedientDto> getFillsExpedients() {

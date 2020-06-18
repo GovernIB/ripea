@@ -14,12 +14,24 @@
 </head>
 <body>
 	<form:form action="" class="form-horizontal" commandName="contingutMoureCopiarEnviarCommand">
+		<form:hidden path="origenIds"/>
 		<form:hidden path="origenId"/>
 		<rip:inputFixed textKey="contingut.moure.camp.origen">
-			<rip:blocIconaContingut contingut="${contingutOrigen}"/>
-			${contingutOrigen.nom}
+		<c:choose>
+			<c:when test="${not empty documentsOrigen}">
+				<c:forEach items="${documentsOrigen}" var="document" varStatus="status">
+					<rip:blocIconaContingut contingut="${document}"/>
+					${document.nom}<c:if test="${fn:length(documentsOrigen)  > 1 && !status.last}">,</c:if>
+				</c:forEach>
+			</c:when>
+			<c:otherwise>
+				<rip:blocIconaContingut contingut="${contingutOrigen}"/>
+				${contingutOrigen.nom}
+			</c:otherwise>
+		</c:choose>
+			
 		</rip:inputFixed>
-		<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" textKey="contingut.moure.camp.desti" required="true"/>
+		<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" documentsOrigen="${documentsOrigen}" textKey="contingut.moure.camp.desti" required="true"/>
 		
 <%-- 		<rip:inputFileChooser name="destiId" contingutOrigen="${contingutOrigen}" textKey="contingut.moure.camp.desti" required="true"/> --%>
 		<div id="modal-botons" class="well">

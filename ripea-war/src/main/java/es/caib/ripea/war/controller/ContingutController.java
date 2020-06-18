@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.common.primitives.Longs;
+
 import es.caib.ripea.core.api.dto.AlertaDto;
+import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -111,7 +115,7 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isContingutDetail", false);
 		model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
 		model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
-		model.addAttribute("isMostrarCopiarMoure", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
+		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
 		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
 		String mostrarPblicar = aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa");
 		model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(mostrarPblicar != null ? mostrarPblicar : "true"));
@@ -202,12 +206,29 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutOrigenId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		//Moure múltiples documents a carpetes del mateix expedient
+		@SuppressWarnings("unchecked")
+		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		
 		omplirModelPerMoureOCopiarVincular(
 				entitatActual,
 				contingutOrigenId,
+				docsIdx,
 				model);
+		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
+				entitatActual.getId(), 
+				contingutOrigenId, 
+				false, 
+				false);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		command.setOrigenId(contingutOrigenId);
+		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
+			command.setOrigenIds(Longs.toArray(docsIdx));
+		} else {
+			command.setOrigenId(contingutOrigenId);
+		}
+		model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.moure.mateix.expedient")));
 		model.addAttribute(command);
 		return "contingutMoureForm";
 	}
@@ -219,17 +240,32 @@ public class ContingutController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		//Moure múltiples documents a carpetes del mateix expedient
+				@SuppressWarnings("unchecked")
+				Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_SELECCIO);
 		if (bindingResult.hasErrors()) {
 			omplirModelPerMoureOCopiarVincular(
 					entitatActual,
 					contingutOrigenId,
+					docsIdx,
 					model);
 			return "contingutMoureForm";
 		}
-		contingutService.move(
-				entitatActual.getId(),
-				contingutOrigenId,
-				command.getDestiId());
+		if (docsIdx != null && !docsIdx.isEmpty()) {
+			for (Long docIdx : docsIdx) {
+				contingutService.move(
+						entitatActual.getId(),
+						docIdx,
+						command.getDestiId());
+			}
+		} else {
+			contingutService.move(
+					entitatActual.getId(),
+					contingutOrigenId,
+					command.getDestiId());
+		}
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../" + contingutOrigenId,
@@ -266,6 +302,7 @@ public class ContingutController extends BaseUserController {
 		omplirModelPerMoureOCopiarVincular(
 				entitatActual,
 				contingutOrigenId,
+				null,
 				model);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		command.setOrigenId(contingutOrigenId);
@@ -284,6 +321,7 @@ public class ContingutController extends BaseUserController {
 			omplirModelPerMoureOCopiarVincular(
 					entitatActual,
 					contingutOrigenId,
+					null,
 					model);
 			return "contingutCopiarForm";
 		}
@@ -307,6 +345,7 @@ public class ContingutController extends BaseUserController {
 		omplirModelPerMoureOCopiarVincular(
 				entitatActual,
 				contingutOrigenId,
+				null,
 				model);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		command.setOrigenId(contingutOrigenId);
@@ -325,6 +364,7 @@ public class ContingutController extends BaseUserController {
 			omplirModelPerMoureOCopiarVincular(
 					entitatActual,
 					contingutOrigenId,
+					null,
 					model);
 			return "contingutVincularForm";
 		}
@@ -638,12 +678,23 @@ public class ContingutController extends BaseUserController {
 	private void omplirModelPerMoureOCopiarVincular(
 			EntitatDto entitatActual,
 			Long contingutOrigenId,
+			Set<Long> docsIdx,
 			Model model) {
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
 				false);
+		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
+			List<ContingutDto> documentsOrigen = new ArrayList<ContingutDto>();
+			for (Long docIdx : docsIdx) {
+				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false);
+				documentsOrigen.add(contingut);
+			}
+			model.addAttribute(
+					"documentsOrigen",
+					documentsOrigen);
+		}
 		model.addAttribute(
 				"contingutOrigen",
 				contingutOrigen);

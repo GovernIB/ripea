@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.util.List;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
 
 /**
@@ -58,6 +61,12 @@ public class CarpetaServiceBean implements CarpetaService {
 			Long entitatId,
 			Long id) {
 		return delegate.findById(entitatId, id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId) throws NotFoundException {
+		return delegate.findByEntitatAndExpedient(entitatId, expedientId);
 	}
 
 }

@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
@@ -73,5 +75,21 @@ public interface CarpetaService {
 	public CarpetaDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
+	
+	/**
+	 * Consulta una carpeta donat el seu id.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param id
+	 *            Atribut id de la carpeta que es vol trobar.
+	 * @return La carpeta.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<CarpetaDto> findByEntitatAndExpedient(
+			Long entitatId,
+			Long expedientId) throws NotFoundException;
 
 }

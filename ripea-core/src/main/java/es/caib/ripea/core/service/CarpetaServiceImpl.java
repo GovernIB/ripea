@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -12,9 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.CarpetaHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -139,7 +144,27 @@ public class CarpetaServiceImpl implements CarpetaService {
 		return carpetaHelper.toCarpetaDto(carpeta);
 	}
 
-
+	@Transactional
+	@Override
+	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId) throws NotFoundException {
+		logger.debug("Obtenint la carpeta ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientId=" + expedientId + ")");
+		List<CarpetaDto> carpetes = new ArrayList<CarpetaDto>();
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId, 
+				expedientId, 
+				true, 
+				true, 
+				false, 
+				false, 
+				false);
+		List<CarpetaEntity> carpetesEntity = carpetaRepository.findByPare(expedient);
+		for (CarpetaEntity carpetaEntity : carpetesEntity) {
+			carpetes.add(carpetaHelper.toCarpetaDto(carpetaEntity));
+		}
+		return carpetes;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaServiceImpl.class);
 

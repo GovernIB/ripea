@@ -37,7 +37,6 @@ public class ContenidorExploradorController extends BaseUserController {
 	private ExpedientService expedientService;
 
 
-
 	@RequestMapping(value = "/explora/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ContingutDto get1(
@@ -112,10 +111,62 @@ public class ContenidorExploradorController extends BaseUserController {
 				expedientsReplaced.add(contenidor);
 			}
 		}
-
-		
-		
 		return expedientsReplaced;
 	}
 
+	@RequestMapping(value = "/exploraAllCurrentExpedient/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ContingutDto> getAllOfCurrentExpedient(
+			HttpServletRequest request,
+			@PathVariable Long contenidorArrelId,
+			@PathVariable Long contenidorId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutDto contenidor = contenidorService.findAmbIdUser(
+				entitatActual.getId(),
+				contenidorId,
+				true,
+				false);
+		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
+		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), contenidorArrelId);
+		List<ContingutDto> expedientsReplaced = new ArrayList<>();
+		
+		expedientsReplaced.add(expedient);
+		expedientsReplaced.add(contenidor);
+		
+		return expedientsReplaced;
+	}
+//	@RequestMapping(value = "/exploraAllCurrentExpedient/{contenidorArrelId}/{contenidorId}", method = RequestMethod.GET)
+//	@ResponseBody
+//	public List<ContingutDto> getAllOfCurrentExpedient(
+//			HttpServletRequest request,
+//			@PathVariable Long contenidorArrelId,
+//			@PathVariable Long contenidorId,
+//			Model model) {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		ContingutDto contenidor = contenidorService.findAmbIdUser(
+//				entitatActual.getId(),
+//				contenidorId,
+//				true,
+//				false);
+//		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
+//		//Llistar carpetes que pengen de l'expedient
+//		List<CarpetaDto> carpetes = carpetaService.findByEntitatAndExpedient(entitatActual.getId(), contenidorArrelId);
+//		
+//		List<ContingutDto> carpetesReplaced = new ArrayList<ContingutDto>();
+//
+//		if (contenidor.getPare() == null)
+//			carpetesReplaced.add(contenidor);
+//		
+//		for(CarpetaDto carpeta: carpetes) {
+//			if (contenidor.getPare() != null) {
+//				if(!carpeta.getId().equals(contenidor.getPare().getId())){
+//					carpetesReplaced.add(carpeta);
+//				} else {
+//					carpetesReplaced.add(contenidor);
+//				}
+//			}
+//		}
+//		return carpetesReplaced;
+//	}
 }
