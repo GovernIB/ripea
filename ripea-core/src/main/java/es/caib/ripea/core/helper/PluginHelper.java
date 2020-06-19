@@ -1220,7 +1220,7 @@ public class PluginHelper {
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
-							document.getPare().getArxiuUuid(),
+							document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
 							document.getNom(),
 							document.getMetaDocument().getNom(),
 							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,

@@ -91,7 +91,7 @@ public interface DocumentEnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public DocumentNotificacioDto notificacioFindAmbId(
+	public DocumentNotificacioDto notificacioFindAmbIdAndDocument(
 			Long entitatId,
 			Long documentId,
 			Long notificacioId) throws NotFoundException;
@@ -234,6 +234,10 @@ public interface DocumentEnviamentService {
 
 	int enviamentsCount(Long entitatId,
 			Long expedientId);
+
+	DocumentNotificacioDto notificacioFindAmbIdAndExpedient(Long entitatId,
+			Long expedientId,
+			Long notificacioId);
 	
 //	/**
 //	 * Actualitza l'estat de les notificacions pendents de forma periòdica.
