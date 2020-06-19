@@ -69,11 +69,11 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public DocumentNotificacioDto notificacioFindAmbId(
+	public DocumentNotificacioDto notificacioFindAmbIdAndDocument(
 			Long entitatId,
 			Long documentId,
 			Long notificacioId) {
-		return delegate.notificacioFindAmbId(
+		return delegate.notificacioFindAmbIdAndDocument(
 				entitatId,
 				documentId,
 				notificacioId);
@@ -176,6 +176,14 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 	public int enviamentsCount(Long entitatId,
 			Long expedientId) {
 		return delegate.enviamentsCount(entitatId, expedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public DocumentNotificacioDto notificacioFindAmbIdAndExpedient(Long entitatId,
+			Long expedientId,
+			Long notificacioId) {
+		return delegate.notificacioFindAmbIdAndExpedient(entitatId, expedientId, notificacioId);
 	}
 
 }

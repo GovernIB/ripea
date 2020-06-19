@@ -145,7 +145,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"notificacio",
-				documentEnviamentService.notificacioFindAmbId(
+				documentEnviamentService.notificacioFindAmbIdAndDocument(
 						entitatActual.getId(),
 						documentId,
 						notificacioId));
@@ -192,7 +192,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				documentId,
 				model);
 		DocumentNotificacionsCommand command = DocumentNotificacionsCommand.asCommand(
-				documentEnviamentService.notificacioFindAmbId(
+				documentEnviamentService.notificacioFindAmbIdAndDocument(
 						entitatActual.getId(),
 						documentId,
 						notificacioId));

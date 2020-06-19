@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
+import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -787,6 +789,60 @@ public class ExpedientController extends BaseUserController {
 						entitatActual.getId(),
 						expedientId));		
 	}
+	
+	
+
+	
+	@RequestMapping(value = "/{expedientId}/enviaments/{notificacioId}", method = RequestMethod.GET)
+	@ResponseBody
+	public DocumentNotificacioDto enviamentList(
+			HttpServletRequest request, 
+			Model model,
+			@PathVariable Long expedientId,
+			@PathVariable Long notificacioId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentNotificacioDto notificacio = documentEnviamentService.notificacioFindAmbIdAndExpedient(
+				entitatActual.getId(),
+				expedientId,
+				notificacioId);
+		notificacio.setDocument(null); //to prevent circular depndency
+		return notificacio;
+	}
+	
+	@RequestMapping(value = "/{expedientId}/enviamentDetails/{notificacioId}/enviamentInfo/{enviamentId}", method = RequestMethod.GET)
+	public String enviamentInfo(
+			HttpServletRequest request, 
+			@PathVariable Long expedientId,
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		DocumentNotificacioDto documentNotificacioDto = documentEnviamentService.notificacioFindAmbIdAndExpedient(
+				entitatActual.getId(),
+				expedientId,
+				notificacioId);
+		
+		model.addAttribute(
+				"notificacio",
+				documentNotificacioDto);
+		DocumentEnviamentInteressatDto documentEnviamentInteressatDto = documentNotificacioDto.getDocumentEnviamentInteressats().iterator().next();
+		
+		model.addAttribute(
+				"enviament",
+				documentEnviamentInteressatDto);
+		
+		model.addAttribute(
+				"entregaNif",
+				documentNotificacioDto.getCreatedBy().getNif());
+		
+		model.addAttribute(
+				"classificacioSia",
+				expedientService.findById(entitatActual.getId(), expedientId).getMetaExpedient().getClassificacioSia());
+		
+		return "enviamentInfo";
+	}
+	
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

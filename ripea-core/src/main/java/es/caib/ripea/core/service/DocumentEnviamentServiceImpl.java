@@ -389,29 +389,36 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false);
 		return dto;
 	}
-
+	
 	@Transactional(readOnly = true)
 	@Override
-	public DocumentNotificacioDto notificacioFindAmbId(
+	public DocumentNotificacioDto notificacioFindAmbIdAndExpedient(
 			Long entitatId,
-			Long documentId,
+			Long expedientId,
 			Long notificacioId) {
 		logger.debug("Consulta d'una notificació de l'expedient (" +
 				"entitatId=" + entitatId + ", " +
-				"documentId=" + documentId + ", " +
+				"expedientId=" + expedientId + ", " +
 				"notificacioId=" + notificacioId + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
-				documentId,
+				expedientId,
 				false,
-				true);
-		ExpedientEntity expedient = document.getExpedient();
-		if (expedient == null) {
-			throw new ValidationException(
-					documentId,
-					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + documentId + ")");
-		}
+				false,
+				true,
+				false,
+				false);
+		
+		return notificacioFindAmbId(entitatId, expedient, notificacioId);
+
+	}
+	
+	
+	private DocumentNotificacioDto notificacioFindAmbId(
+			Long entitatId,
+			ExpedientEntity expedient,
+			Long notificacioId) {
+		
 		DocumentNotificacioEntity documentNotificacioEntity = entityComprovarHelper.comprovarNotificacio(
 				expedient,
 				null,
@@ -449,6 +456,32 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		}
 		
 		return documentNotificacioDto;
+		
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public DocumentNotificacioDto notificacioFindAmbIdAndDocument(
+			Long entitatId,
+			Long documentId,
+			Long notificacioId) {
+		logger.debug("Consulta d'una notificació de l'expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"documentId=" + documentId + ", " +
+				"notificacioId=" + notificacioId + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				true);
+		ExpedientEntity expedient = document.getExpedient();
+		if (expedient == null) {
+			throw new ValidationException(
+					documentId,
+					DocumentEntity.class,
+					"El document no te cap expedient associat (documentId=" + documentId + ")");
+		}
+		return notificacioFindAmbId(entitatId, expedient, notificacioId);
 	}
 
 	@Transactional

@@ -374,15 +374,15 @@ $(document).ready(function(){
 		<div class="tab-pane" id="registre" role="tabpanel">
 		
 		<c:forEach var="enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
-		<c:set var="registreAnterior" value="${enviament.registreNumeroFormatat}"/>
-		<c:set var="isMateixRegistre" value="true"/>
+			<c:set var="registreAnterior" value="${enviament.registreNumeroFormatat}"/>
+			<c:set var="isMateixRegistre" value="true"/>
 			<c:forEach var="_enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
-			<c:set var="registreActual" value="${_enviament.registreNumeroFormatat}"/>
-				<c:if test="${registreAnterior != registreActual}">
-       				<c:set var="isMateixRegistre" value="false"/>
-        		</c:if>
+				<c:set var="registreActual" value="${_enviament.registreNumeroFormatat}"/>
+					<c:if test="${registreAnterior != registreActual}">
+	       				<c:set var="isMateixRegistre" value="false"/>
+	        		</c:if>
 			</c:forEach>
-			
+				
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<c:choose>
@@ -393,33 +393,31 @@ $(document).ready(function(){
 							<h3 class="panel-title"><spring:message code="notificacio.info.camp.notificacio"/></h3>
 						</c:otherwise>
 					</c:choose>
-					
-					
 				</div>
-					<table class="table table-bordered">
-						<c:if test="${enviament.registreNumeroFormatat != null}">
-							<tbody>
-								<tr>
-									<td><strong><spring:message code="notificacio.info.camp.num.registre"/></strong></td>
-									<td>${enviament.registreNumeroFormatat}</td>
-								</tr>
-								<tr>
-									<td><strong><spring:message code="notificacio.info.camp.data.registre"/></strong></td>
-									<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-								</tr>
-								<tr>
-									<td><strong><spring:message code="notificacio.info.camp.justificant"/></strong></td>
-									<td>
-									<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/${enviament.id}/descarregarJustificant'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
-									<spring:message code="notificacio.info.camp.justificant.boto"/>
-										<span class="fa fa-download"></span>
-									</a>
-									</td>
-								</tr>
-							</tbody>
-						</c:if>
-			 		</table>
-			 	</div>
+				<table class="table table-bordered">
+					<c:if test="${enviament.registreNumeroFormatat != null}">
+						<tbody>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.camp.num.registre"/></strong></td>
+								<td>${enviament.registreNumeroFormatat}</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.camp.data.registre"/></strong></td>
+								<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.camp.justificant"/></strong></td>
+								<td>
+								<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/${enviament.id}/descarregarJustificant'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+								<spring:message code="notificacio.info.camp.justificant.boto"/>
+									<span class="fa fa-download"></span>
+								</a>
+								</td>
+							</tr>
+						</tbody>
+					</c:if>
+		 		</table>
+		 	</div>
 		 </c:forEach>		
 		</div>
 	</div>
