@@ -3155,6 +3155,12 @@ public class PluginHelper {
 							interessatPerAdresa.getMunicipi(),
 							MunicipiDto.class);
 				}
+				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
+				enviament.setEntregaPostalPaisCodi(pais.getAlfa2());
+				enviament.setEntregaPostalProvinciaCodi(
+						provincia.getCodi());
+				enviament.setEntregaPostalMunicipiCodi(
+						provincia.getCodi() + String.format("%04d", Integer.parseInt(municipi.getCodi())));
 				enviament.setEntregaPostalLinea1(
 						interessatPerAdresa.getAdresa() + ", " +
 								interessatPerAdresa.getCodiPostal() + ", " +
@@ -3162,10 +3168,6 @@ public class PluginHelper {
 				enviament.setEntregaPostalLinea2(
 						provincia.getNom() + ", " +
 								pais.getNom());
-
-				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
-				enviament.setEntregaPostalPaisCodi(interessatPerAdresa.getPais());
-
 			}
 			// ########## ENVIAMENT DEH  ###############
 			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh()) {
