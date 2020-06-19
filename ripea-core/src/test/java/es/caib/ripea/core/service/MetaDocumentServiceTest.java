@@ -73,6 +73,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		permisAdminAdmin.setPrincipalNom("admin");
 		permisos.add(permisAdminAdmin);
 		entitat.setPermisos(permisos);
+		
 		metaDocumentCreate = new MetaDocumentDto();
 		metaDocumentCreate.setCodi("TEST1");
 		metaDocumentCreate.setNom("Metadocument de test");
@@ -87,7 +88,8 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentCreate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
 		metaDocumentCreate.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocumentCreate.setPortafirmesCustodiaTipus("1234");
-		metaDocumentCreate.setFirmaPassarelaCustodiaTipus("1234");
+		metaDocumentCreate.setFirmaPassarelaCustodiaTipus("1234");		
+		
 		metaDocumentUpdate = new MetaDocumentDto();
 		metaDocumentUpdate.setCodi("TEST2");
 		metaDocumentUpdate.setNom("Metadocument de test2");
@@ -100,7 +102,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentUpdate.setPortafirmesFluxId("12342");
 		metaDocumentUpdate.setPortafirmesResponsables(new String[] {"00000000T"});
 		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
-		metaDocumentCreate.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
+		metaDocumentUpdate.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocumentUpdate.setPortafirmesCustodiaTipus("12343");
 		metaDocumentUpdate.setFirmaPassarelaCustodiaTipus("12344");
 		metaDocumentUpdate.setFirmaBiometricaActiva(true);
@@ -124,6 +126,8 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								metaDocumentCreate,
 								metaDocumentCreat);
 						assertEquals(true, metaDocumentCreat.isActiu());
+						assertEquals(PLANTILLA_NOM, metaDocumentCreat.getPlantillaNom());
+						assertEquals(PLANTILLA_CONTTYPE, metaDocumentCreat.getPlantillaContentType());
 					}
 				},
 				"Creació d'un meta-document a dins un meta-expedient",
@@ -170,13 +174,14 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						MetaExpedientDto expedientCreat = (MetaExpedientDto)elementsCreats.get(1);
 						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
 						metaDocumentUpdate.setId(metaDocumentCreat.getId());
+
 						MetaDocumentDto modificat = metaDocumentService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								metaDocumentUpdate,
-								null,
-								null,
-								null);
+								"document.pdf",
+								"application/pdf",
+								PLANTILLA_CONTINGUT);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -186,6 +191,8 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								metaDocumentUpdate,
 								modificat);
 						assertEquals(true, modificat.isActiu());
+						assertEquals("document.pdf", modificat.getPlantillaNom());
+						assertEquals("application/pdf", modificat.getPlantillaContentType());
 					}
 				},
 				"Modificació d'un meta-document a dins un meta-expedient",

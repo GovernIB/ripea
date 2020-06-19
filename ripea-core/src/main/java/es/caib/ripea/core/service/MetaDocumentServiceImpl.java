@@ -429,18 +429,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				false,
 				true);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, id);
-		ExpedientEntity expedientSuperior;
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			expedientSuperior = (ExpedientEntity)contingut;
-		} else {
-			expedientSuperior = contingut.getExpedient();
-		}
-		MetaExpedientEntity metaExpedient = expedientSuperior.getMetaExpedient();
-		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				metaExpedient,
-				id);
+		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(entitat, id);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(metaDocumentEntitiy.getPlantillaNom());
 		fitxer.setContentType(metaDocumentEntitiy.getPlantillaContentType());

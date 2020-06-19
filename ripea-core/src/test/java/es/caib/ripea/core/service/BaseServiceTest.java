@@ -44,6 +44,10 @@ public class BaseServiceTest {
 	protected static final String CODI_UNITAT_ARREL = "00000000T";
 	protected static final String CODI_UNITAT_FILLA = "12345678Z";
 
+	protected static final String PLANTILLA_NOM = "image.png";
+	protected static final String PLANTILLA_CONTTYPE = "image/png";
+	protected static final byte[] PLANTILLA_CONTINGUT = new byte[10];
+	
 	@Autowired
 	private UserDetailsService userDetailsService;
 
@@ -138,9 +142,9 @@ public class BaseServiceTest {
 									entitatId,
 									((MetaExpedientDto) elementsCreats.get(1)).getId(),
 									(MetaDocumentDto)element,
-									null,
-									null,
-									null);
+									PLANTILLA_NOM,
+									PLANTILLA_CONTTYPE,
+									PLANTILLA_CONTINGUT);
 							elementsCreats.add(metaDocumentCreat);
 							if (((MetaDocumentDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
