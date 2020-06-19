@@ -80,6 +80,32 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				documentId,
+				false,
+				false);
+		
+		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
+				entitatActual.getId(),
+				document.getExpedientPare().getId(),
+				true);
+		DocumentNotificacionsCommand command = new DocumentNotificacionsCommand();
+		command.setDocumentId(documentId);
+		for (InteressatDto interessatDto : interessats) {
+			NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
+
+			notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
+			if (interessatDto.getRepresentant() != null) {
+				notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
+			}
+			command.getEnviaments().add(notificacioParte);
+		}
+
+		model.addAttribute(command);
+		
 		emplenarModelNotificacio(
 				request,
 				documentId,
@@ -135,6 +161,7 @@ public class DocumentEnviamentController extends BaseUserController {
 					msg);
 		}
 	}
+	
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/info")
 	public String notificacioInfo(
@@ -518,23 +545,7 @@ public class DocumentEnviamentController extends BaseUserController {
 						ServeiTipusEnumDto.class,
 						"notificacio.servei.tipus.enum."));
 		
-		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
-						entitatActual.getId(),
-						document.getExpedientPare().getId(),
-						true);
-		DocumentNotificacionsCommand command = new DocumentNotificacionsCommand();
-		command.setDocumentId(documentId);
-		for (InteressatDto interessatDto : interessats) {
-			NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
-			
-			notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
-			if (interessatDto.getRepresentant()!=null) {
-				notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
-			}
-			command.getEnviaments().add(notificacioParte);
-		}
-		
-		model.addAttribute(command);
+
 		
 		return document.getExpedientPare();
 	}

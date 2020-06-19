@@ -57,6 +57,13 @@
 	$(document).ready(function() {
 		$('#tipus').val("NOTIFICACIO");
 		$('#tipus').trigger('change');
+
+		//select and checkbox elements dont have readonly attribute that allows elements to be greyed out but submitted
+		//in order to send disabled values in POST we need to enable them on submit
+		$('#notificacioForm').on('submit', function () {
+		  $(this).find('select').prop('disabled', false);
+		  $(this).find( ".checkbox input" ).prop('disabled', false);
+		});
 	});
 
 
@@ -138,53 +145,59 @@
 											<!----  TIPUS INTERESSAT ---->
 											<div class="col-md-6">
 												<rip:inputSelect disabled="true" name="enviaments[${i}].titular.tipus" textKey="interessat.form.camp.tipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+												<input type="hidden" name="enviaments[${i}].titular.tipus" />
 											</div>
 											<!---- NIF ---->
 											<div class="col-md-6">
-												<rip:inputText disabled="true" name="enviaments[${i}].titular.documentNum" textKey="interessat.nifCifDni"/>
+												<rip:inputText readonly="true" name="enviaments[${i}].titular.documentNum" textKey="interessat.nifCifDni"/>
 											</div>
 											<!---- NOM / RAÓ SOCIAL ---->
 											<div class="col-md-6">
 												<c:choose>
 												<c:when test="${enviament.titular.tipus=='PERSONA_FISICA'}">
-													<rip:inputText disabled="true" name="enviaments[${i}].titular.nom" textKey="interessat.nomRaoSocial" required="true" />
+													<rip:inputText readonly="true" name="enviaments[${i}].titular.nom" textKey="interessat.nomRaoSocial" required="true" />
 												</c:when>
 												<c:when test="${enviament.titular.tipus=='PERSONA_JURIDICA'}">
-													<rip:inputText disabled="true" name="enviaments[${i}].titular.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
+													<rip:inputText readonly="true" name="enviaments[${i}].titular.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
 												</c:when>
 												<c:when test="${enviament.titular.tipus=='ADMINISTRACIO'}">
-													<rip:inputText disabled="true" name="enviaments[${i}].titular.organNom" textKey="interessat.nomRaoSocial" required="true" />
+													<rip:inputText readonly="true" name="enviaments[${i}].titular.organNom" textKey="interessat.nomRaoSocial" required="true" />
 												</c:when>													
 												</c:choose>
 											</div>
 											<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
 												<!---- PRIMER LLINATGE ---->										
 												<div class="col-md-6 llinatge1">
-													<rip:inputText disabled="true" name="enviaments[${i}].titular.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
+													<rip:inputText readonly="true" name="enviaments[${i}].titular.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
 												</div>
 												<!---- SEGON LLINATGE ---->
 												<div class="col-md-6 llinatge2">
-													<rip:inputText disabled="true" name="enviaments[${i}].titular.llinatge2" textKey="interessat.form.camp.llinatge2" />
+													<rip:inputText readonly="true" name="enviaments[${i}].titular.llinatge2" textKey="interessat.form.camp.llinatge2" />
 												</div>
 											</c:if>
 											<!---- EMAIL ---->
 											<div class="col-md-6">
-												<rip:inputText disabled="true" name="enviaments[${i}].titular.email" textKey="interessat.form.camp.email" />
+												<rip:inputText readonly="true" name="enviaments[${i}].titular.email" textKey="interessat.form.camp.email" />
 											</div>
 											<!---- TELÈFON ---->
 											<div class="col-md-6">
-												<rip:inputText disabled="true" name="enviaments[${i}].titular.telefon" textKey="interessat.form.camp.telefon" />
+												<rip:inputText readonly="true" name="enviaments[${i}].titular.telefon" textKey="interessat.form.camp.telefon" />
 											</div>
 											<!---- CODI DIR3 ---->
 											<c:if test="${enviament.titular.tipus=='ADMINISTRACIO'}">
 												<div class="col-md-6">
-													<rip:inputText disabled="true" name="enviaments[${i}].titular.organCodi" textKey="interessat.dir3codi" required="true"/>
+													<rip:inputText readonly="true" name="enviaments[${i}].titular.organCodi" textKey="interessat.dir3codi" required="true"/>
 												</div>
 											</c:if>
 											<!---- INCAPACITAT ---->
 											<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
 												<div class="col-md-6">
 													<rip:inputCheckbox disabled="true" name="enviaments[${i}].titular.incapacitat" textKey="interessat.form.camp.incapacitat" />
+													<c:if test="${enviament.titular.incapacitat==true && empty enviament.destinatari}">
+														<div class="alert alert-danger">
+															<spring:message code="interessat.form.camp.incapacitat.error.nodestinatari"/>
+														</div>
+													</c:if>
 												</div>
 											</c:if>
 										</div>
@@ -209,46 +222,46 @@
 												</div>
 												<!---- NIF ---->
 												<div class="col-md-6">
-													<rip:inputText disabled="true" name="enviaments[${i}].destinatari.documentNum" textKey="interessat.nifCifDni"/>
+													<rip:inputText readonly="true" name="enviaments[${i}].destinatari.documentNum" textKey="interessat.nifCifDni"/>
 												</div>
 												<!---- NOM / RAÓ SOCIAL ---->
 												<div class="col-md-6">
 													<c:choose>
 													<c:when test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
-														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.nom" textKey="interessat.nomRaoSocial" required="true" />
+														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.nom" textKey="interessat.nomRaoSocial" required="true" />
 													</c:when>
 													<c:when test="${enviament.destinatari.tipus=='PERSONA_JURIDICA'}">
-														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
+														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
 													</c:when>
 													<c:when test="${enviament.destinatari.tipus=='ADMINISTRACIO'}">
-														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.nomRaoSocial" required="true" />
+														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.nomRaoSocial" required="true" />
 													</c:when>													
 													</c:choose>
 												</div>
 												<c:if test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
 													<!---- PRIMER LLINATGE ---->										
 													<div class="col-md-6 llinatge1">
-														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
+														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
 													</div>
 													
 													<!---- SEGON LLINATGE ---->
 													<div class="col-md-6 llinatge2">
-														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.llinatge2" textKey="interessat.form.camp.llinatge2" />
+														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.llinatge2" textKey="interessat.form.camp.llinatge2" />
 													</div>
 												</c:if>
 												<!---- EMAIL ---->
 												<div class="col-md-6">
-													<rip:inputText disabled="true" name="enviaments[${i}].destinatari.email" textKey="interessat.form.camp.email" />
+													<rip:inputText readonly="true" name="enviaments[${i}].destinatari.email" textKey="interessat.form.camp.email" />
 												</div>
 												
 												<!---- TELÈFON ---->
 												<div class="col-md-6">
-													<rip:inputText disabled="true" name="enviaments[${i}].destinatari.telefon" textKey="interessat.form.camp.telefon" />
+													<rip:inputText readonly="true" name="enviaments[${i}].destinatari.telefon" textKey="interessat.form.camp.telefon" />
 												</div>
 												<!---- CODI DIR3 ---->
 												<c:if test="${enviament.destinatari.tipus=='ADMINISTRACIO'}">
 													<div class="col-md-6">
-														<rip:inputText disabled="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.dir3codi" required="true"/>
+														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.dir3codi" required="true"/>
 													</div>
 												</c:if>
 												<!---- INCAPACITAT ---->
@@ -263,19 +276,20 @@
 								</c:if>
 								
 								<!-------------------------------------  MÈTODE ENVIO  ----------------------------------->	
-								<div class="metodeEntrega">
-									<div class="col-md-12 title-envios">
-										<div class="title-container entrega">
-											<label><spring:message code="enviament.label.metodeEnvio"/></label>
+								<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
+									<div class="metodeEntrega">
+										<div class="col-md-12 title-envios">
+											<div class="title-container entrega">
+												<label><spring:message code="enviament.label.metodeEnvio"/></label>
+											</div>
+											<hr />
 										</div>
-										<hr />
+										<div class="col-md-12">
+											<rip:inputCheckbox labelSize="2" name="enviaments[${i}].entregaPostal"
+												textKey="notificacio.form.camp.entregaPostal" />
+										</div>
 									</div>
-									<div class="col-md-12">
-										<rip:inputCheckbox labelSize="2" name="enviaments[${i}].entregaPostal"
-											textKey="notificacio.form.camp.entregaPostal" />
-									</div>
-								</div>
-								
+								</c:if>
 							</div>
 						</c:forEach>
 					</div>
