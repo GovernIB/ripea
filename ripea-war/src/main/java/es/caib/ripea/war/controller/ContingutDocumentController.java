@@ -454,12 +454,11 @@ public class ContingutDocumentController extends BaseUserController {
 					false);
 
 			document = (DocumentDto) contingutDoc;
-			String pdfType = com.google.common.net.MediaType.PDF.toString();
 			//No es possible concatenar els documents que no són pdf
-			if (document.getFitxerContentType() != null && document.getFitxerContentType().equals(pdfType)) {
+			if (document.getFitxerContentType() != null && document.getFitxerContentType().equals("application/pdf")) {
 				if (contingutDoc instanceof DocumentDto 
 						&& (document.isFirmat() || document.isCustodiat() || document.isDefinitiu())
-						|| (document.getFitxerContentType() != null && document.getFitxerContentType().equals(pdfType))) {
+						|| (document.getFitxerContentType() != null && document.getFitxerContentType().equals("application/pdf"))) {
 					documents.add(document);
 				} else {
 					totsFinals = false;
@@ -730,7 +729,6 @@ public class ContingutDocumentController extends BaseUserController {
 						true,
 						false);
 				if (contingut instanceof DocumentDto) {
-					String pdfType = com.google.common.net.MediaType.PDF.toString();
 					DocumentDto document = (DocumentDto) contingut;
 					if ((!document.isFirmat() || document.isCustodiat())
 							&& (document.isFirmat() || !document.isCustodiat())
@@ -738,7 +736,7 @@ public class ContingutDocumentController extends BaseUserController {
 						isTotPdfFirmat = false;
 						break;
 					}
-					if (document.getFitxerContentType() != null && !document.getFitxerContentType().equals(pdfType)) {
+					if (document.getFitxerContentType() != null && !document.getFitxerContentType().equals("application/pdf")) {
 						isTotPdf = false;
 					}
 				}
