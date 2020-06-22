@@ -224,7 +224,7 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				<c:if test="${contingut.estat == 'CUSTODIAT' and !isTasca or contingut.fitxerExtension=='zip'}">
+				<c:if test="${(contingut.estat == 'CUSTODIAT' or contingut.estat == 'DEFINITIU') and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
 					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 

@@ -321,6 +321,9 @@ public class DocumentDto extends NodeDto {
 	public boolean isCustodiat() {
 		return DocumentEstatEnumDto.CUSTODIAT.equals(estat);
 	}
+	public boolean isDefinitiu() {
+		return DocumentEstatEnumDto.DEFINITIU.equals(estat);
+	}
 
 	protected DocumentDto copiarContenidor(ContingutDto original) {
 		DocumentDto copia = new DocumentDto();

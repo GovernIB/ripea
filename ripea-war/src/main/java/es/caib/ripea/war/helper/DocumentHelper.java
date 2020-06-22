@@ -70,7 +70,8 @@ public class DocumentHelper {
 						entry.getValue(),
 						true,
 						false);
-				if (contingut.isDocument() && (((DocumentDto)contingut).isFirmat() || ((DocumentDto)contingut).isCustodiat())) {
+				if (contingut.isDocument() 
+						&& (((DocumentDto)contingut).isFirmat() || ((DocumentDto)contingut).isCustodiat() || (((DocumentDto)contingut).isDefinitiu()))) {
 					fitxer = documentService.descarregarImprimible(
 							entitatActual.getId(),
 							entry.getValue(),

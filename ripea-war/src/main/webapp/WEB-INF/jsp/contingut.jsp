@@ -996,22 +996,29 @@ function enableDisableButton() {
         url: comprovacioUrl,
         dataType: "json",
         data: {docsIdx: docsIdx},
-        success: function (totPdfFirmat) {
-        	if (totPdfFirmat) {
-        		$('.nomaximized').addClass('hidden');
-        		$('.maximized').removeClass('hidden');
+        success: function (resultat) {
+        	console.log(resultat);
+        	if (resultat.isTotPdfFirmat && resultat.isTotPdf) {
+        		$('.nomaximized').addClass('hidden'); //zip
+        		$('.maximized').removeClass('hidden'); //concatenació
+        		$('#notificar-mult').removeClass("disabled");
+        		$('#definitiu-mult').addClass("disabled");
+        	} else if (resultat.isTotPdfFirmat && !resultat.isTotPdf) {
+        		$('.nomaximized').removeClass('hidden'); //zip
+        		$('.maximized').addClass('hidden'); //concatenació
+        		$('#notificar-mult').removeClass("disabled");
+        		$('#definitiu-mult').addClass("disabled");
         	} else {
-        		$('.maximized').addClass('hidden');
-        		$('.nomaximized').removeClass('hidden');
+        		$('#notificar-mult').addClass("disabled");
+        		$('#definitiu-mult').removeClass("disabled");
         	}
         	if (docsIdx.length > 0) {
-				$('.con-mult').removeClass("disabled");
-				//$('.des-mult').removeClass("disabled");
-				//$('.zip-mult').addClass("disabled");
+				$('#descarregar-mult').removeClass("disabled");
+				$('#moure-mult').removeClass("disabled");
 			} else {
-				$('.con-mult').addClass("disabled");
-				//$('.zip-mult').addClass("disabled");
-				//$('.des-mult').addClass("disabled");
+				$('#descarregar-mult').addClass("disabled");
+				$('#notificar-mult').addClass("disabled");
+				$('#moure-mult').addClass("disabled");
 			}
         	$('#contenidor-contingut ').removeClass("disabled");
         	$('#table-documents').removeClass("disabled");
@@ -1430,7 +1437,7 @@ function recuperarResultatDomini(
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
-										<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
 											<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
 												<span class="fa fa-check-square"></span>
 												
@@ -1442,7 +1449,7 @@ function recuperarResultatDomini(
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
-										<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group">
+										<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
 											<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" class="btn btn-default con-mult">
 												<span class="fa fa-arrows"></span>
 												
@@ -1874,6 +1881,7 @@ function recuperarResultatDomini(
 									<tr>
 										<th data-col-name="id" data-visible="false"></th>
 										<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>								
+										<th data-col-name="comentari" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>	
 										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
 										<th data-col-name="responsable.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable"/></th>								

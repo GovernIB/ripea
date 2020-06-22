@@ -73,12 +73,12 @@ $(document).ready(function(){
 			suggestText="nom"
 			required="true"/>				
 		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
+		<rip:inputTextarea name="comentari" textKey="expedient.tasca.form.camp.comentari" required="false"/>
 		<rip:inputTextarea 
 			name="metaExpedientTascaDescripcio" 
 			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
 			disabled="true"
 			required="true"/> 
-
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
  			<a href="<c:url value="/expedientTasca"/>" class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

@@ -424,8 +424,8 @@ public class ContingutDocumentController extends BaseUserController {
 			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
-		boolean totsFirmats = true; 
-		boolean totsDocuments = true;
+		boolean totsFinals = true;
+		boolean totsDocumentsPdf = true;
 		boolean mostrarTextLoading = true;
 		
 		RequestSessionHelper.actualitzarObjecteSessio(
@@ -452,15 +452,21 @@ public class ContingutDocumentController extends BaseUserController {
 					docId,
 					true,
 					false);
-			
-			if (contingutDoc instanceof DocumentDto) {
-				document = (DocumentDto) contingutDoc;
-				if (document.isFirmat() || document.isCustodiat())
+
+			document = (DocumentDto) contingutDoc;
+			String pdfType = com.google.common.net.MediaType.PDF.toString();
+			//No es possible concatenar els documents que no són pdf
+			if (document.getFitxerContentType() != null && document.getFitxerContentType().equals(pdfType)) {
+				if (contingutDoc instanceof DocumentDto 
+						&& (document.isFirmat() || document.isCustodiat() || document.isDefinitiu())
+						|| (document.getFitxerContentType() != null && document.getFitxerContentType().equals(pdfType))) {
 					documents.add(document);
-				else
-					totsFirmats = false;
+				} else {
+					totsFinals = false;
+					break;
+				}
 			} else {
-				totsDocuments = false;
+				totsDocumentsPdf = false;
 				break;
 			}
 		}
@@ -475,8 +481,8 @@ public class ContingutDocumentController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_ORDRE,
 				ordre);
-		
-		if (totsDocuments && totsFirmats) {
+
+		if (totsDocumentsPdf && totsFinals) {
 			model.addAttribute("documents", documents);
 			model.addAttribute("contingut", contingut);
 			boolean entregaPostal = true;
@@ -708,13 +714,14 @@ public class ContingutDocumentController extends BaseUserController {
 	
 	@RequestMapping(value = "/{pareId}/comprovarContingut", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean comprovarContingut(
+	public HashMap<String, Boolean> comprovarContingut(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
 			@RequestParam(value="docsIdx[]", required = false) Long[] docsIdx) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		boolean totPdfFirmat = true;
-		
+		HashMap<String, Boolean> resultat = new HashMap<String, Boolean>();
+		Boolean isTotPdfFirmat = true;
+		Boolean isTotPdf = true;
 		if (docsIdx != null) {
 			for (Long docId: docsIdx) {
 				ContingutDto contingut = contingutService.findAmbIdUser(
@@ -723,18 +730,25 @@ public class ContingutDocumentController extends BaseUserController {
 						true,
 						false);
 				if (contingut instanceof DocumentDto) {
+					String pdfType = com.google.common.net.MediaType.PDF.toString();
 					DocumentDto document = (DocumentDto) contingut;
-					if ((!document.isFirmat() || document.isCustodiat()) 
-							&& (document.isFirmat() || !document.isCustodiat())) {
-						totPdfFirmat = false;
+					if ((!document.isFirmat() || document.isCustodiat())
+							&& (document.isFirmat() || !document.isCustodiat())
+							&& !document.isDefinitiu()) {
+						isTotPdfFirmat = false;
 						break;
+					}
+					if (document.getFitxerContentType() != null && !document.getFitxerContentType().equals(pdfType)) {
+						isTotPdf = false;
 					}
 				}
 			}
 		}
-		return totPdfFirmat;
+		resultat.put("isTotPdf", isTotPdf);
+		resultat.put("isTotPdfFirmat", isTotPdfFirmat);
+		return resultat;
 	}
-	
+
 	@RequestMapping(value = "/{pareId}/comprovarContingut/{contingutId}", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean comprovarContingut(
