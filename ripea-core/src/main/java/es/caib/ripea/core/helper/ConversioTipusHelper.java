@@ -109,7 +109,7 @@ public class ConversioTipusHelper {
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setDataLimit(source.getDataLimit());
 						target.setShouldNotifyAboutDeadline(TascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
-						
+						target.setComentari(source.getComentari());
 						return target;
 					}
 				});

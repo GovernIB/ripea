@@ -20,7 +20,8 @@ public class ExpedientTascaDto {
 	private UsuariDto createdBy;
 	private Date dataLimit;
 	private boolean shouldNotifyAboutDeadline;
-
+	private String comentari;
+	
 	public String getDataLimitString() {
 		if (dataLimit != null) {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -106,6 +107,12 @@ public class ExpedientTascaDto {
 	}
 	public void setShouldNotifyAboutDeadline(boolean shouldNotifyAboutDeadline) {
 		this.shouldNotifyAboutDeadline = shouldNotifyAboutDeadline;
+	}
+	public String getComentari() {
+		return comentari;
+	}
+	public void setComentari(String comentari) {
+		this.comentari = comentari;
 	}
 	
 }

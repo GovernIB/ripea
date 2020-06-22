@@ -69,16 +69,21 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Column(name = "data_limit")
 	private Date dataLimit;
 	
+	@Column(name = "comentari", length = 1024)
+	private String comentari;
+	
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
 			UsuariEntity responsable,
-			Date dataLimit) {
+			Date dataLimit,
+			String comentari) {
 		return new Builder(
 				expedient,
 				metaExpedientTasca,
 				responsable,
-				dataLimit);
+				dataLimit,
+				comentari);
 	}
 	
 	public static class Builder {
@@ -87,7 +92,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
 				UsuariEntity responsable,
-				Date dataLimit) {
+				Date dataLimit,
+				String comentari) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
@@ -95,6 +101,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
+			built.comentari = comentari;
 		}
 		public ExpedientTascaEntity build() {
 			return built;
@@ -144,6 +151,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	
 	public String getMotiuRebuig() {
 		return motiuRebuig;
+	}
+	public String getComentari() {
+		return comentari;
 	}
 
 }

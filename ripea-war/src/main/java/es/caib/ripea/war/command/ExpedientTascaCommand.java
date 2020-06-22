@@ -20,7 +20,7 @@ public class ExpedientTascaCommand {
 	private Date dataInici;
 	private Date dataFi;
 	private Date dataLimit;
-	
+	private String comentari;
 
 	public Date getDataLimit() {
 		return dataLimit;
@@ -58,6 +58,12 @@ public class ExpedientTascaCommand {
 	}
 	public void setDataFi(Date dataFi) {
 		this.dataFi = dataFi;
+	}
+	public String getComentari() {
+		return comentari;
+	}
+	public void setComentari(String comentari) {
+		this.comentari = comentari;
 	}
 	
 	public static ExpedientTascaCommand asCommand(ExpedientTascaDto dto) {
