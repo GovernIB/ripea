@@ -1,0 +1,349 @@
+-- 343
+ALTER TABLE IPA_DOCUMENT_ENVIAMENT DROP CONSTRAINT IPA_DOCENV_MULT_UK DROP INDEX;
+
+-- 350
+ALTER TABLE IPA_EXPEDIENT DROP CONSTRAINT IPA_METAEXPDOM_EXPEDIENT_FK;
+ALTER TABLE IPA_METAEXP_DOMINI DROP CONSTRAINT IPA_METAEXP_DOMINI_PK;
+ALTER TABLE IPA_METAEXP_DOMINI DROP CONSTRAINT IPA_METAEXP_DOMINI_MULT_UK;
+ALTER TABLE IPA_METAEXP_DOMINI DROP CONSTRAINT IPA_METAEXP_METAEXPDOM_FK;
+ALTER TABLE IPA_METAEXP_DOMINI DROP CONSTRAINT IPA_ENTITAT_METEXP_METAEDOM_Fk;
+
+UPDATE IPA_EXPEDIENT SET METAEXPEDIENT_DOMINI_ID = NULL;
+ALTER TABLE IPA_EXPEDIENT DROP COLUMN METAEXPEDIENT_DOMINI_ID;
+DROP TABLE IPA_METAEXP_DOMINI;
+
+CREATE TABLE IPA_DOMINI
+(
+  ID                   NUMBER(19)           NOT NULL,
+  CODI                 VARCHAR2(64)			NOT NULL,
+  NOM                  VARCHAR2(256)	    NOT NULL,
+  DESCRIPCIO           VARCHAR2(256),
+  CONSULTA             VARCHAR2(256)        NOT NULL,
+  CADENA               VARCHAR2(256)        NOT NULL,
+  CONTRASENYA          VARCHAR2(256)        NOT NULL,
+  ENTITAT_ID           NUMBER(19)           NOT NULL,
+  CREATEDDATE          TIMESTAMP(6),
+  CREATEDBY_CODI       VARCHAR2(64),
+  LASTMODIFIEDDATE     TIMESTAMP(6),
+  LASTMODIFIEDBY_CODI  VARCHAR2(64)
+);
+
+
+ALTER TABLE IPA_DOMINI ADD (
+  CONSTRAINT IPA_DOMINI_PK PRIMARY KEY (ID));
+
+ALTER TABLE IPA_DOMINI ADD (
+  CONSTRAINT IPA_ENTITAT_DOMINI_Fk FOREIGN KEY (ENTITAT_ID) 
+    REFERENCES IPA_ENTITAT (ID));
+    
+-- 361
+ALTER TABLE IPA_METAEXP_TASCA
+ADD (
+    ESTAT_CREAR_TASCA_ID NUMBER(19),
+    ESTAT_FINALITZAR_TASCA_ID NUMBER(19)
+);
+ALTER TABLE IPA_METAEXP_TASCA ADD CONSTRAINT IPA_METAEXP_TASCA_CREAR_FK FOREIGN KEY (ESTAT_CREAR_TASCA_ID) REFERENCES IPA_EXPEDIENT_ESTAT;
+ALTER TABLE IPA_METAEXP_TASCA ADD CONSTRAINT IPA_METAEXP_TASCA_FINALI_FK FOREIGN KEY (ESTAT_FINALITZAR_TASCA_ID) REFERENCES IPA_EXPEDIENT_ESTAT;
+
+-- 362
+ ALTER TABLE IPA_METAEXP_TASCA ADD DATA_LIMIT TIMESTAMP(6);
+ ALTER TABLE IPA_EXPEDIENT_TASCA ADD DATA_LIMIT TIMESTAMP(6);
+ 
+ -- 402
+ ALTER TABLE IPA_DOCUMENT_ENVIAMENT ADD PF_MOTIU_REBUIG VARCHAR2(512 CHAR);
+ 
+ -- 429
+ alter table ipa_registre add (temp_solicita varchar2(4000));
+update ipa_registre set temp_solicita = solicita;
+update ipa_registre set solicita = null;  
+alter table ipa_registre modify solicita long;
+alter table ipa_registre modify solicita clob;
+update ipa_registre set solicita=temp_solicita;
+alter table ipa_registre drop column temp_solicita;
+
+
+alter table ipa_registre add (temp_exposa varchar2(4000));
+update ipa_registre set temp_exposa = exposa;
+update ipa_registre set exposa = null;  
+alter table ipa_registre modify exposa long;
+alter table ipa_registre modify exposa clob;
+update ipa_registre set exposa=temp_exposa;
+alter table ipa_registre drop column temp_exposa;
+
+-- 432
+ALTER TABLE IPA_DOCUMENT ADD DESCRIPCIO VARCHAR2(512 CHAR);
+
+-- 434
+ALTER TABLE IPA_EXPEDIENT_TASCA ADD COMENTARI VARCHAR2(1024);
+
+-- 435
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD01',
+    'Resolución',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD02',
+    'Acuerdo',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD03',
+    'Contrato',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD04',
+    'Convenio',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD05',
+    'Declaración',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD06',
+    'Comunicación',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD07',
+    'Notificación',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD08',
+    'Publicación',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD09',
+    'Acuse de recibo',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD10',
+    'Acta',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD11',
+    'Certificado',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD12',
+    'Diligencia',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD13',
+    'Informe',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD14',
+    'Solicitud',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD15',
+    'Denuncia',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD16',
+    'Alegación',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD17',
+    'Recurso',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD18',
+    'Comunicación ciudadano',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD19',
+    'Factura',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD20',
+    'Otros incautados',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+INSERT INTO
+    IPA_TIPUS_DOCUMENTAL(ID,CODI,NOM,ENTITAT_ID,CREATEDBY_CODI,CREATEDDATE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE)
+SELECT
+    ipa_hibernate_seq.NEXTVAL,
+    'TD99',
+    'Otros',
+    1,
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF'),
+    'sqlupdate',
+    to_timestamp(sysdate,'DD/MM/RR HH24:MI:SSXFF')
+FROM dual;
+
+-- 450
+ALTER TABLE IPA_METANODE DROP CONSTRAINT IPA_METANODE_MULT_UK;
+
+ALTER TABLE IPA_METAEXPEDIENT ADD ENTITAT_ID NUMBER(19);
+ALTER TABLE IPA_METAEXPEDIENT ADD CODI VARCHAR2(64 CHAR);
+UPDATE IPA_METAEXPEDIENT MEX SET (ENTITAT_ID, CODI) = (SELECT MEN.ENTITAT_ID, MEN.CODI FROM IPA_METANODE MEN WHERE MEN.ID = MEX.ID);
+ALTER TABLE IPA_METAEXPEDIENT MODIFY ENTITAT_ID NOT NULL;
+ALTER TABLE IPA_METAEXPEDIENT MODIFY CODI NOT NULL;
+
+ALTER TABLE IPA_METADOCUMENT ADD CODI VARCHAR2(64 CHAR);
+UPDATE IPA_METADOCUMENT MED SET (CODI) = (SELECT MEN.CODI FROM IPA_METANODE MEN WHERE MEN.ID = MED.ID);
+ALTER TABLE IPA_METADOCUMENT MODIFY CODI NOT NULL;
+
+ALTER TABLE IPA_METAEXPEDIENT ADD CONSTRAINT IPA_METAEXP_ENTITAT_CODI_UK UNIQUE (ENTITAT_ID, CODI);
+ALTER TABLE IPA_METADOCUMENT ADD CONSTRAINT IPA_METADOC_METAEXP_CODI_UK UNIQUE (META_EXPEDIENT_ID, CODI);
+
+ 
