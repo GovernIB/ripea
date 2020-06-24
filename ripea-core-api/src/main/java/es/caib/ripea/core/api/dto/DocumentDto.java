@@ -64,9 +64,13 @@ public class DocumentDto extends NodeDto {
 	}
 
 	public String getFitxerExtension() {
-		return fitxerNom.substring(
-				fitxerNom.lastIndexOf('.')+1,
-				fitxerNom.length());
+		if (fitxerNom != null) {
+			return fitxerNom.substring(
+					fitxerNom.lastIndexOf('.') + 1,
+					fitxerNom.length());
+		} else {
+			return "";
+		}
 	}
 	
 	public String getFitxerExtensionUpperCase() {
