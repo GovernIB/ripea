@@ -275,10 +275,3 @@
 		</table>
 		<!--<h3 style="opacity: .2; text-align: center; margin-bottom: 3em"><strong><spring:message code="contingut.sense.contingut"/></strong></h3>  -->
 </c:if>
-
-<c:if test="${(contingut.expedient && contingut.estat != 'TANCAT') || contingut.carpeta && contingut.expedientPare.estat != 'TANCAT'}">
-	<div id="drag_container" class="drag_activated">
-		<span class="down fa fa-upload"></span>
-		<p><spring:message code="contingut.drag.info"/></p>
-	</div>
-</c:if>

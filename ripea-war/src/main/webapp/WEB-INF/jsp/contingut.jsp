@@ -1532,7 +1532,16 @@ function recuperarResultatDomini(
 								<img src="../img/loading.gif"/>
 							</div>
 							<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							<c:if test="${isTasca or (expedientAgafatPerUsuariActual and ((contingut.carpeta and contingut.expedientPare.estat != 'TANCAT') or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
+								<div id="drag_container" class="drag_activated">
+									<span class="down fa fa-upload"></span>
+									<p>
+										<spring:message code="contingut.drag.info" />
+									</p>
+								</div>
+							</c:if>
 							<input class="hidden" id="dropped-files" type="file"/>
+							
 						</c:otherwise> 
  					</c:choose> 
 				</div>
