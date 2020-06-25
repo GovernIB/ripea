@@ -351,21 +351,24 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 		return interessatTipusEnumDtoWS;
 	}	
 	
-	
-
-
 	private NotificacioRestClient getNotificacioService() {
+		// If Notib server uses basic authentication set autenticacioBasic=true, if uses form authentication (as in Jboss CAIB) set autenticacioBasic=false
+		String autenticacioBasicString = PropertiesHelper.getProperties().getProperty("es.caib.ripea.notificacio.autenticacioBasic");
+		boolean autenticacioBasic;
+		if (autenticacioBasicString != null) {
+			autenticacioBasic = new Boolean(autenticacioBasicString).booleanValue();
+		} else {
+			autenticacioBasic = false;
+		}
 		if (clientV2 == null) {
-			clientV2 = NotificacioRestClientFactory.getRestClientV2(
+			clientV2 = NotificacioRestClientFactory.getRestClient(
 					getUrl(),
 					getUsername(),
-					getPassword());
-			clientV2.setServeiDesplegatDamuntJboss(false);
+					getPassword(),
+					autenticacioBasic);
 		}
 		return clientV2;
 	}
-	
-	
 
 	private String getUrl() {
 		return PropertiesHelper.getProperties().getProperty(
