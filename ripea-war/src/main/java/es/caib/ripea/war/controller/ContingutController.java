@@ -28,8 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.primitives.Longs;
-
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
@@ -230,7 +228,8 @@ public class ContingutController extends BaseUserController {
 				false);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
-			command.setOrigenIds(Longs.toArray(docsIdx));
+			command.setOrigenIds(
+					docsIdx.toArray(new Long[docsIdx.size()]));
 		} else {
 			command.setOrigenId(contingutOrigenId);
 		}

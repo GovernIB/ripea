@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.distribucio.ws.backofficeintegracio.InteressatTipus;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
@@ -39,6 +38,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -516,7 +516,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		model.addAttribute(
 				"interessatTipus",
 				EnumHelper.getOptionsForEnum(
-						InteressatTipus.class,
+						InteressatTipusEnumDto.class,
 						"interessat.tipus.enum."));
 		
 		model.addAttribute(
