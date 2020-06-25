@@ -6,7 +6,7 @@
 let parentIframe = window.frameElement;
 let buttonClose;
 if (parentIframe && parentIframe.parentElement && parentIframe.parentElement.parentElement) {
-	buttonClose = rootIframe.parentElement.parentElement.querySelector('button.close');
+	buttonClose = parentIframe.parentElement.parentElement.querySelector('button.close');
 }
 if (!buttonClose && window.parent) {
 	let parentParentIframe = window.parent.frameElement;
