@@ -228,7 +228,7 @@
 				
 					<%---- Notificar ----%>
 					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
-						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
 					</c:if>
 					
 					<%---- Publicar ----%>
