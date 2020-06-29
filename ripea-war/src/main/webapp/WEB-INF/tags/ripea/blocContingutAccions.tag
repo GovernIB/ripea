@@ -92,7 +92,6 @@
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
-						@@${contingut.valid}@@${contingut.conteDocumentsFirmats}@@${(!contingut.hasEsborranys || !convertirDefinitiu)}@@
 						<c:choose>
 							<c:when test="${contingut.valid && contingut.conteDocumentsFirmats && (!contingut.hasEsborranys || !convertirDefinitiu)}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
