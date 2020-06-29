@@ -342,7 +342,6 @@ function removeLoading() {
 						suggestText="nom"
 						suggestTextAddicional="nif"
 						required="true"/>
-				
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				</div>					
 				<rip:inputText name="portafirmesCustodiaTipus" textKey="metadocument.form.camp.portafirmes.custodia"/>				

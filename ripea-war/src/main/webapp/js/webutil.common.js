@@ -75,7 +75,9 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	} else {
 		message = "Unknown Error: (" + jqxhr.status + ", " + thrownError + ")";
 	}*/
-	alert(message);
+	if (thrownError !== 'abort') {
+		alert(message);
+	}
 });
 
 (function($) {
@@ -426,7 +428,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 									$('<option>', {
 										value: value,
 										text: value,
-										selected: true
+										selected: false
 									}));
 						}
 					});
@@ -463,7 +465,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 								$('<option>', {
 									value: value,
 									text: value,
-									selected: true
+									selected: false
 								}));
 					}
 				});
@@ -490,12 +492,18 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 							text: (suggestTextAddicional != undefined && item[suggestTextAddicional] != null) ? item[suggestText] + " (" + item[suggestTextAddicional] + ")" : item[suggestText]
 						});
 					}
-					
 					suggest.trigger({type: 'select2:updateOptions'});
-					
 					return {
 						results: results
 					};
+				},
+				error: function () {
+					suggest.append(
+							$('<option>', {
+								value: value,
+								text: value,
+								selected: false
+							}));
 				}
 		    }
 		});
