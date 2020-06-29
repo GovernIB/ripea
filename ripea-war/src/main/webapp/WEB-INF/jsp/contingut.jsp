@@ -333,56 +333,59 @@ ul.interessats {
 	width: 100%;
 }
 </style>
+<!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
-<script type="text/javascript">
-var officeExecAttributes = {
-		id: 'officeExecApplet',
-		code: 'es.caib.ripea.applet.OfficeExecApplet.class',
-		archive: '<c:url value="/applet/ripea-applet.jar"/>',
-		width: 1,
-		height: 1};
-var officeExecParameters = {};
+	<script type="text/javascript">
+	var officeExecAttributes = {
+			id: 'officeExecApplet',
+			code: 'es.caib.ripea.applet.OfficeExecApplet.class',
+			archive: '<c:url value="/applet/ripea-applet.jar"/>',
+			width: 1,
+			height: 1};
+	var officeExecParameters = {};
+	
+	$(document).ready(function() {
+		$('.btn-document-modificar').click(function() {
+			if (typeof officeExecApplet == 'undefined') {
+				var intercepted = '';
+				var dwBackup = document.write;
+				document.write = function(arg) {intercepted += arg};
+				deployJava.runApplet(
+						officeExecAttributes,
+						officeExecParameters,
+						'1.5');
+				document.write = dwBackup;
+				$(document.body).append(intercepted);
+			}
+			if (officeExecApplet.openWithOffice) {
+				officeExecApplet.openWithOffice(this.href)
+				officeExecTimeout = function(){
+					var exitCode = officeExecApplet.getExitValue();
+					if (exitCode == 0) {
+						location.reload(true);
+					} else {
+						setTimeout(officeExecTimeout, 500);
+					}
+				}
+				setTimeout(officeExecTimeout, 500);
+			} else {
+				alert("<spring:message code="contingut.applet.no.trobat"/>");
+			}
+			return false;
+		});
+	});
+	</script>
+</c:if>
 
+
+<script>
+
+var notificacioEnviamentEstats = new Array();
 <c:forEach var="estat" items="${notificacioEnviamentEstats}">
-	notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 </c:forEach>
 
-
-
-$(document).ready(function() {
-	$('.btn-document-modificar').click(function() {
-		if (typeof officeExecApplet == 'undefined') {
-			var intercepted = '';
-			var dwBackup = document.write;
-			document.write = function(arg) {intercepted += arg};
-			deployJava.runApplet(
-					officeExecAttributes,
-					officeExecParameters,
-					'1.5');
-			document.write = dwBackup;
-			$(document.body).append(intercepted);
-		}
-		if (officeExecApplet.openWithOffice) {
-			officeExecApplet.openWithOffice(this.href)
-			officeExecTimeout = function(){
-				var exitCode = officeExecApplet.getExitValue();
-				if (exitCode == 0) {
-					location.reload(true);
-				} else {
-					setTimeout(officeExecTimeout, 500);
-				}
-			}
-			setTimeout(officeExecTimeout, 500);
-		} else {
-			alert("<spring:message code="contingut.applet.no.trobat"/>");
-		}
-		return false;
-	});
-});
-</script>
-</c:if>
-<script>
 var registreTipusText = new Array();
 <c:forEach var="option" items="${registreTipusEnumOptions}">
 registreTipusText["${option.value}"] = "<spring:message code="${option.text}"/>";
