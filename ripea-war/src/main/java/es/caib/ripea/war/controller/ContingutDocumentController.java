@@ -201,8 +201,8 @@ public class ContingutDocumentController extends BaseUserController {
 					null,
 					false,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
+		} catch (ValidationException ex) {
+			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
 					request,
 					command,
@@ -211,8 +211,6 @@ public class ContingutDocumentController extends BaseUserController {
 					model);
 			return "contingutDocumentForm";
 		}
-		
-		
 	}
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
 	public String postUpdate(
@@ -247,8 +245,8 @@ public class ContingutDocumentController extends BaseUserController {
 					null,
 					false,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
+		} catch (ValidationException ex) {
+			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
 					request,
 					command,

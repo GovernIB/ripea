@@ -43,6 +43,7 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
@@ -344,8 +345,8 @@ public class ExpedientController extends BaseUserController {
 					request,
 					"redirect:../expedient",
 					"expedient.controller.creat.ok");
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
+		} catch (ValidationException ex) {
+			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
@@ -378,8 +379,8 @@ public class ExpedientController extends BaseUserController {
 					request,
 					"redirect:../expedient",
 					"expedient.controller.modificat.ok");
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
+		} catch (ValidationException ex) {
+			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));

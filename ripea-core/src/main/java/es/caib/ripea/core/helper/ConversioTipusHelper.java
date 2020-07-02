@@ -77,7 +77,7 @@ public class ConversioTipusHelper {
 						target.setOrdre(source.getOrdre());
 						target.setExecucioMassiva(convertir(source.getExecucioMassiva(), ExecucioMassivaDto.class));
 						if (source.getContingut() instanceof DocumentEntity)
-							target.setContingut(convertir((DocumentEntity)source.getContingut(), DocumentDto.class));
+							target.setDocumentNom(((DocumentEntity)source.getContingut()).getNom());
 						return target;
 					}
 				});
