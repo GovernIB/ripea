@@ -994,40 +994,42 @@ function enableDisableButton() {
 	$('#contenidor-contingut ').addClass("disabled");
 	$('#table-documents').addClass("disabled");
 	$('#loading').removeClass('hidden');
-	$.ajax({
-        type: "GET",
-        url: comprovacioUrl,
-        dataType: "json",
-        data: {docsIdx: docsIdx},
-        success: function (resultat) {
-        	console.log(resultat);
-        	if (resultat.isTotPdfFirmat && resultat.isTotPdf) {
-        		$('.nomaximized').addClass('hidden'); //zip
-        		$('.maximized').removeClass('hidden'); //concatenació
-        		$('#notificar-mult').removeClass("disabled");
-        		$('#definitiu-mult').addClass("disabled");
-        	} else if (resultat.isTotPdfFirmat && !resultat.isTotPdf) {
-        		$('.nomaximized').removeClass('hidden'); //zip
-        		$('.maximized').addClass('hidden'); //concatenació
-        		$('#notificar-mult').removeClass("disabled");
-        		$('#definitiu-mult').addClass("disabled");
-        	} else {
-        		$('#notificar-mult').addClass("disabled");
-        		$('#definitiu-mult').removeClass("disabled");
-        	}
-        	if (docsIdx.length > 0) {
-				$('#descarregar-mult').removeClass("disabled");
-				$('#moure-mult').removeClass("disabled");
-			} else {
-				$('#descarregar-mult').addClass("disabled");
-				$('#notificar-mult').addClass("disabled");
-				$('#moure-mult').addClass("disabled");
+	if (docsIdx != undefined) {
+		$.ajax({
+	        type: "GET",
+	        url: comprovacioUrl,
+	        dataType: "json",
+	        data: {docsIdx: docsIdx},
+	        success: function (resultat) {
+	        	console.log(resultat);
+	        	if (resultat.isTotPdfFirmat && resultat.isTotPdf) {
+	        		$('.nomaximized').addClass('hidden'); //zip
+	        		$('.maximized').removeClass('hidden'); //concatenació
+	        		$('#notificar-mult').removeClass("disabled");
+	        		$('#definitiu-mult').addClass("disabled");
+	        	} else if (resultat.isTotPdfFirmat && !resultat.isTotPdf) {
+	        		$('.nomaximized').removeClass('hidden'); //zip
+	        		$('.maximized').addClass('hidden'); //concatenació
+	        		$('#notificar-mult').removeClass("disabled");
+	        		$('#definitiu-mult').addClass("disabled");
+	        	} else {
+	        		$('#notificar-mult').addClass("disabled");
+	        		$('#definitiu-mult').removeClass("disabled");
+	        	}
+	        	if (docsIdx.length > 0) {
+					$('#descarregar-mult').removeClass("disabled");
+					$('#moure-mult').removeClass("disabled");
+				} else {
+					$('#descarregar-mult').addClass("disabled");
+					$('#notificar-mult').addClass("disabled");
+					$('#moure-mult').addClass("disabled");
+				}
+	        	$('#contenidor-contingut ').removeClass("disabled");
+	        	$('#table-documents').removeClass("disabled");
+	        	$('#loading').addClass('hidden');
 			}
-        	$('#contenidor-contingut ').removeClass("disabled");
-        	$('#table-documents').removeClass("disabled");
-        	$('#loading').addClass('hidden');
-		}
-   });
+	    });
+	}
 }
 
 function selectAll() {

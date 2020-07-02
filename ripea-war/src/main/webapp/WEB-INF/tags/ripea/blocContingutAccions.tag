@@ -139,9 +139,9 @@
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
 				</c:if>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
-					<li><a href="#copy"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
+					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>
-						$('a[href = "#copy"]').click(function(){
+						$('a[href = "#copy_${contingut.id}"]').click(function(){
 							$.get("../document/" + ${contingut.id} + "/urlValidacio", function(data) {
 								var dummy = $('<input>').val(data).appendTo('body').select();
 								document.execCommand("copy");
