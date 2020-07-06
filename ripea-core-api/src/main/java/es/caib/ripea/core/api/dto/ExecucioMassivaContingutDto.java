@@ -27,7 +27,8 @@ public class ExecucioMassivaContingutDto extends AuditoriaDto {
 	private String error;
 	private int ordre;
 	private ExecucioMassivaDto execucioMassiva;
-	private ContingutDto contingut;
+	private String documentNom;
+	//private ContingutDto contingut;
 	
 	public Date getDataInici() {
 		return dataInici;
@@ -82,12 +83,12 @@ public class ExecucioMassivaContingutDto extends AuditoriaDto {
 		this.execucioMassiva = execucioMassiva;
 	}
 
-	public ContingutDto getContingut() {
-		return contingut;
+	public String getDocumentNom() {
+		return documentNom;
 	}
 
-	public void setContingut(ContingutDto contingut) {
-		this.contingut = contingut;
+	public void setDocumentNom(String documentNom) {
+		this.documentNom = documentNom;
 	}
 
 }
