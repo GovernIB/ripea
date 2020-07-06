@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -168,7 +169,7 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		try{
+		try {
 			metaExpedientService.delete(
 					entitatActual.getId(),
 					metaExpedientId);
@@ -176,26 +177,11 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.esborrat.ok");
-		} catch (Exception exc) {
-			if (exc.getCause() != null && exc.getCause().getCause() != null) {
-				String excMsg = exc.getCause().getCause().getMessage();
-				if (excMsg.contains("ORA-02292")) {
-					return getAjaxControllerReturnValueError(
-							request, 
-							"redirect:../../esborrat",
-							"meta.expedient.noespotesborrar");
-				} else {
-					return getAjaxControllerReturnValueErrorMessageText(
-							request, 
-							"redirect:../../esborrat",
-							exc.getCause().getCause().getMessage());
-				}
-			} else {
-				return getAjaxControllerReturnValueErrorMessageText(
-						request, 
-						"redirect:../../metaExpedient",
-						exc.getMessage());
-			}
+		} catch (DataIntegrityViolationException ex) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../esborrat",
+					"metaexpedient.controller.esborrar.error.fk");
 		}
 	}
 

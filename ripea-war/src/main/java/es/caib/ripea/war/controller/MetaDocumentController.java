@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,9 +30,9 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -198,7 +199,7 @@ public class MetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		try{
+		try {
 			metaDocumentService.delete(
 					entitatActual.getId(),
 					metaExpedientId,
@@ -207,26 +208,11 @@ public class MetaDocumentController extends BaseAdminController {
 					request,
 					"redirect:../../metaDocument",
 					"metadocument.controller.esborrat.ok");
-		} catch (Exception exc) {
-			if (exc.getCause() != null && exc.getCause().getCause() != null) {
-				String excMsg = exc.getCause().getCause().getMessage();
-				if (excMsg.contains("ORA-02292")) {
-					return getAjaxControllerReturnValueError(
-							request,
-							"redirect:../../esborrat",
-							"meta.document.noespotesborrar");
-				} else {
-					return getAjaxControllerReturnValueErrorMessageText(
-							request,
-							"redirect:../../esborrat",
-							exc.getCause().getCause().getMessage());
-				}
-			} else {
-				return getAjaxControllerReturnValueErrorMessageText(
-						request,
-						"redirect:../../metaExpedient",
-						exc.getMessage());
-			}
+		} catch (DataIntegrityViolationException ex) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../esborrat",
+					"metadocument.controller.esborrar.error.fk");
 		}
 	}
 
