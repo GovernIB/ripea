@@ -134,6 +134,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
 		usuari.update(
 				dto.getIdioma());
+		usuari.updateRebreEmailsAgrupats(dto.isRebreEmailsAgrupats());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}

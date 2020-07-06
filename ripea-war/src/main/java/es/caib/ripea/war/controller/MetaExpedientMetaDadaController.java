@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -201,14 +202,21 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDadaService.delete(
-				entitatActual.getId(),
-				metaExpedientId,
-				metaDadaId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaDada",
-				"metadada.controller.esborrat.ok");
+		try {
+			metaDadaService.delete(
+					entitatActual.getId(),
+					metaExpedientId,
+					metaDadaId);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../metaDada",
+					"metadada.controller.esborrat.ok");
+		} catch (DataIntegrityViolationException ex) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../esborrat",
+					"metadada.controller.esborrar.error.fk");
+		}
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini", method = RequestMethod.GET)

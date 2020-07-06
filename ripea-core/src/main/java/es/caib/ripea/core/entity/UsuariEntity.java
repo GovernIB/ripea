@@ -53,9 +53,18 @@ public class UsuariEntity implements Serializable {
 	
 	@Version
 	private long version = 0;
+	
+	
+	@Column(name = "emails_agrupats")
+	private boolean rebreEmailsAgrupats = true;
 
 
-
+	public boolean isRebreEmailsAgrupats() {
+		return rebreEmailsAgrupats;
+	}
+	public void updateRebreEmailsAgrupats(boolean rebreEmailsAgrupats) {
+		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
+	}
 	public String getCodi() {
 		return codi;
 	}
@@ -92,6 +101,7 @@ public class UsuariEntity implements Serializable {
 			String idioma) {
 		this.idioma = idioma;
 	}
+
 
 	/**
 	 * Obté el Builder per a crear objectes de tipus Usuari.
