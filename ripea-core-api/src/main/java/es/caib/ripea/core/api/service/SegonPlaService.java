@@ -6,4 +6,8 @@ public interface SegonPlaService {
 
 	void buidarCacheDominis();
 
+	void enviarEmailsPendentsAgrupats();
+
+	void testEmailsAgrupats();
+
 }

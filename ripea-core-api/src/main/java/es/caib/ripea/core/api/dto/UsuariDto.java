@@ -19,7 +19,15 @@ public class UsuariDto implements Serializable {
 	private String email;
 	private String idioma;
 	private String[] rols;
-
+	private boolean rebreEmailsAgrupats;
+	
+	public boolean isRebreEmailsAgrupats() {
+		return rebreEmailsAgrupats;
+	}
+	public void setRebreEmailsAgrupats(
+			boolean rebreEmailsAgrupats) {
+		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
+	}
 	public String getCodi() {
 		return codi;
 	}

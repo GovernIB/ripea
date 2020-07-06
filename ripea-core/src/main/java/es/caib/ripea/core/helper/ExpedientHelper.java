@@ -506,7 +506,7 @@ public class ExpedientHelper {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
-			emailHelper.contingutAgafatSensePermis(
+			emailHelper.contingutAgafatPerAltreUsusari(
 					expedient,
 					usuariOriginal,
 					usuariNou);
