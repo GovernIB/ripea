@@ -4,7 +4,11 @@
 package es.caib.ripea.core.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -13,18 +17,26 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
+import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.TestHelper;
+import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 
@@ -44,6 +56,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private EntitatRepository entitatRepository;
 	@Resource
 	private CacheHelper cacheHelper;
+	@Autowired
+	private JavaMailSender mailSender;
+	@Autowired
+	private EmailHelper emailHelper;
+	@Autowired
+	private TestHelper testHelper;
+	
+	@Autowired
+	private EmailPendentEnviarRepository emailPendentEnviarRepository;
+	
+	
+	private static final String PREFIX_RIPEA = "[RIPEA]";
 
 	/*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -146,6 +170,131 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			logger.error("No s'ha pogut buidar la cache de dominis", ex);
 		}
 	}
+	
+	
+	
+	@Override
+	@Transactional
+//	@Scheduled(fixedDelayString = "5000")
+	public void testEmailsAgrupats() {
+		testHelper.testCanviEstatDocumentPortafirmes();
+		testHelper.testCanviEstatNotificacio();
+
+	}
+	
+
+	
+	
+	@Override
+	@Transactional
+	@Scheduled(cron = "${config:es.caib.ripea.segonpla.email.enviament.agrupat.cron}")
+	public void enviarEmailsPendentsAgrupats() {
+		
+
+		List<EmailPendentEnviarEntity> emailPendentsList = emailPendentEnviarRepository.findByOrderByDestinatariAscEventTipusEnumAsc();
+		
+		// Agrupa per destinataris
+		Map<String, List<EmailPendentEnviarEntity>> emailsPendentsMap = new HashMap<String, List<EmailPendentEnviarEntity>>();
+		for (EmailPendentEnviarEntity contingutEmail : emailPendentsList) {
+			if (emailsPendentsMap.containsKey(contingutEmail.getDestinatari())) {
+				emailsPendentsMap.get(contingutEmail.getDestinatari()).add(contingutEmail);
+			} else {
+				List<EmailPendentEnviarEntity> lContingutEmails = new ArrayList<EmailPendentEnviarEntity>();
+				lContingutEmails.add(contingutEmail);
+				emailsPendentsMap.put(contingutEmail.getDestinatari(), lContingutEmails);
+			}
+		}
+		// Envia i esborra per agrupació
+		for (String email: emailsPendentsMap.keySet()) {
+			
+			emailPendentsList = emailsPendentsMap.get(email);
+			try {
+				enviarEmailsPendentsAgrupats(
+						email, 
+						emailPendentsList);
+				logger.debug("Enviat l'email d'avis de " + emailPendentsList.size() + " moviments agrupats al destinatari " + email);
+				
+			} catch (Exception e) {
+				logger.error("Error enviant l'email d'avis de " + emailPendentsList.size() + " moviments agrupats al destinatari " + email + ": " + e.getMessage());
+				
+				for (EmailPendentEnviarEntity moviment : emailPendentsList) {
+					// remove pending email if it is older that one week
+					Date formattedToday = new Date();
+					Date formattedExpired = moviment.getCreatedDate().toDate();
+					int diffInDays = (int)( (formattedToday.getTime() - formattedExpired.getTime()) / (1000 * 60 * 60 * 24) );
+					if (diffInDays > 7) {
+						emailPendentEnviarRepository.delete(moviment);
+					}
+				}
+			}
+
+		}
+
+	}
+	
+	public void enviarEmailsPendentsAgrupats(
+			String emailDestinatari,
+			List<EmailPendentEnviarEntity> emailPendents) {
+		
+			
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setTo(emailDestinatari);
+		missatge.setFrom(emailPendents.get(0).getRemitent());
+		missatge.setSubject(PREFIX_RIPEA + " Emails agrupats");
+		
+		
+		// Agrupa per event tipus
+		Map<EventTipusEnumDto, List<EmailPendentEnviarEntity>> eventTipos = new HashMap<EventTipusEnumDto, List<EmailPendentEnviarEntity>>();
+		for (EmailPendentEnviarEntity contingutEmail : emailPendents) {
+			if (eventTipos.containsKey(contingutEmail.getEventTipusEnum())) {
+				eventTipos.get(contingutEmail.getEventTipusEnum()).add(contingutEmail);
+			} else {
+				List<EmailPendentEnviarEntity> lContingutEmails = new ArrayList<EmailPendentEnviarEntity>();
+				lContingutEmails.add(contingutEmail);
+				eventTipos.put(contingutEmail.getEventTipusEnum(), lContingutEmails);
+			}
+		}
+		
+		
+		String text = "";
+
+		for (Map.Entry<EventTipusEnumDto, List<EmailPendentEnviarEntity>> entry : eventTipos.entrySet()) {
+
+			String header = "";
+			if (entry.getKey() == EventTipusEnumDto.AGAFAT_ALTRE_USUARI) {
+				header = "Elements de l'escriptori agafats per un altre usuari";
+			} else if (entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES) {
+				header = "Canvi d'estat de documents enviat a portafirmes";
+			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO) {
+				header = "Canvi d'estat de notificacions";
+			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_TASCA) {
+				header =  "Canvi d'estat de tasques";
+			}
+			
+			text += header + "\n";
+			text += "--------------------------------------------------------------------------\n\n";
+
+			for (EmailPendentEnviarEntity emailPendentEnviarEntity : entry.getValue()) {
+				text += emailPendentEnviarEntity.getText() + "\n\n";
+			}
+			text += "\n";
+		}
+		
+
+		missatge.setText(text);
+		
+		mailSender.send(missatge);
+		
+		
+		for (EmailPendentEnviarEntity emailPendent : emailPendents) {
+			emailPendentEnviarRepository.delete(emailPendent);
+		}
+		
+	}
+	
+	
+	
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(
 			SegonPlaServiceImpl.class);

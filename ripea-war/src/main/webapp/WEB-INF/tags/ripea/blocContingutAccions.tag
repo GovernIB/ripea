@@ -227,7 +227,14 @@
 				
 					<%---- Notificar ----%>
 					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
-						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+						<c:choose>
+							<c:when test="${!empty expedientPare.interessats}">
+								<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" ><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+							</c:when>
+							<c:otherwise>
+								<li class="disabled"><a href="#"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+							</c:otherwise>
+						</c:choose>
 					</c:if>
 					
 					<%---- Publicar ----%>

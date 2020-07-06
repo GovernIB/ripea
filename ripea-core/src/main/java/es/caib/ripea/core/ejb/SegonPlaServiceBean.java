@@ -38,4 +38,15 @@ public class SegonPlaServiceBean implements SegonPlaService {
 		delegate.buidarCacheDominis();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void enviarEmailsPendentsAgrupats() {
+		delegate.enviarEmailsPendentsAgrupats();
+	}
+
+	@Override
+	public void testEmailsAgrupats() {
+		delegate.testEmailsAgrupats();
+	}
+
 }

@@ -64,7 +64,21 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	private EntitatEntity entitatPropia;
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;
-
+	
+	
+//  only for testing 
+//	@Column(name = "id", insertable=false, updatable=false)
+//	private Long id;
+//
+//	public Long getId() {
+//		return id;
+//	}
+//	public void setId(
+//			Long id) {
+//		this.id = id;
+//	}
+	
+	
 	public String getClassificacioSia() {
 		return classificacioSia;
 	}
@@ -155,6 +169,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			return built;
 		}
 	}
+	
+
 
 	private static final long serialVersionUID = -2299453443943600172L;
 
