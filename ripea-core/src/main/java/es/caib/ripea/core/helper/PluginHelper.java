@@ -176,6 +176,38 @@ public class PluginHelper {
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 
+	public List<String> rolsUsuariFindAmbCodi(
+			String usuariCodi) {
+		String accioDescripcio = "Consulta rols a partir del codi d'usuari";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("codi", usuariCodi);
+		long t0 = System.currentTimeMillis();
+		try {
+			List<String> rolsDisponibles = getDadesUsuariPlugin().findRolsAmbCodi(
+					usuariCodi);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_USUARIS,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return rolsDisponibles;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_USUARIS,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_USUARIS,
+					errorDescripcio,
+					ex);
+		}
+	}
 	public DadesUsuari dadesUsuariFindAmbCodi(
 			String usuariCodi) {
 		String accioDescripcio = "Consulta d'usuari amb codi";

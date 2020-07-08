@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,6 +49,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
@@ -85,6 +86,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private PluginHelper pluginHelper;
 	
 	private static Map<Long, String> errorsMassiva = new HashMap<Long, String>();
 
@@ -176,10 +179,19 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					return user;
 				}
 			};
+			List<String> rolsUsuariActual = pluginHelper.rolsUsuariFindAmbCodi(user);
+			if (rolsUsuariActual.isEmpty())
+				rolsUsuariActual.add("tothom");
+	
+			List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+			for (String rol : rolsUsuariActual) {
+				SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(rol);
+				authorities.add(simpleGrantedAuthority);
+			}
 			Authentication authentication =  new UsernamePasswordAuthenticationToken(
 					principal, 
 					"N/A",
-					Arrays.asList(new SimpleGrantedAuthority("tothom")));
+					authorities);
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 			if (tipus == ExecucioMassivaTipus.PORTASIGNATURES){
 				enviarPortafirmes(emc);
@@ -298,7 +310,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	}
 
 	@Override
-//	@Scheduled(fixedDelayString = "${config:es.caib.ripea.segonpla.massives.periode.comprovacio}")
+	@Scheduled(fixedDelayString = "${config:es.caib.ripea.segonpla.massives.periode.comprovacio}")
 	public void comprovarExecucionsMassives() {
 		boolean active = true;
 		Long ultimaExecucioMassiva = null;

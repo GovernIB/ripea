@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.plugin.caib.usuari;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import es.caib.ripea.plugin.SistemaExternException;
@@ -16,6 +17,17 @@ import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
  */
 public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 
+
+	@Override
+	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
+		ArrayList<String> rols = new ArrayList<String>();
+		rols.add("IPA_ADMIN");
+		rols.add("IPA_USER");
+		rols.add("IPA_SUPER");
+		return rols;
+	}
+
+	
 	@Override
 	public DadesUsuari findAmbCodi(
 			String usuariCodi) throws SistemaExternException {
