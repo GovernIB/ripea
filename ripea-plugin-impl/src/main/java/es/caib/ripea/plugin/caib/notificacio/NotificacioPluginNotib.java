@@ -221,6 +221,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 	public RespostaConsultaEstatEnviament consultarEnviament(
 			String referencia) throws SistemaExternException {
 		try {
+			
 			es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament respostaConsultaEstat = getNotificacioService().consultaEstatEnviament(referencia);
 
 			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();

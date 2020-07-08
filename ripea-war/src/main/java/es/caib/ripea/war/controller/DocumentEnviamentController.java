@@ -313,7 +313,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long enviamentId) throws IOException {
 
 		writeFileToResponse(
-				"justificant.pdf",
+				"certificacio.pdf",
 				documentService.notificacioConsultarIDescarregarCertificacio(enviamentId),
 				response);
 		return null;

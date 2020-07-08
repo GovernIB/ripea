@@ -752,7 +752,7 @@ public class ContingutServiceImpl implements ContingutService {
 				if (notificacions != null && notificacions.size() > 0) {
 					document.setAmbNotificacions(true);
 					DocumentNotificacioEntity lastNofificacio = notificacions.get(notificacions.size() - 1);
-					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat().name());
+					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "");
 					document.setErrorDarreraNotificacio(lastNofificacio.isError());
 				}
 				if (enviaments != null && enviaments.size() > 0) {
