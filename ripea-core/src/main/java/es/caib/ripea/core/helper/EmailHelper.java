@@ -271,7 +271,7 @@ public class EmailHelper {
 		
 		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
-		String estat = documentNotificacio.getNotificacioEstat().toString();
+		String estat = documentNotificacio.getNotificacioEstat() != null ? documentNotificacio.getNotificacioEstat().toString() : "";
 		String text = 
 				"Informació del document:\n" +
 				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +

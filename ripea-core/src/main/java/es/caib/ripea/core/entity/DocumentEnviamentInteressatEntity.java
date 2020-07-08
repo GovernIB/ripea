@@ -21,8 +21,8 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 
 /**
- * 
- * @author Limit Tecnologies <limit@limit.es>
+ * Enviament Notib
+ * Equivalent to Notib es.caib.notib.core.entity.NotificacioEnviamentEntity
  */
 @Entity
 @Table( name = "ipa_document_enviament_inter")
@@ -45,14 +45,14 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	
 	
 	@Column(name = "not_env_dat_estat", length = 20)
-	private String enviamentDatatEstat;
+	private String enviamentDatatEstat; //Notib: notificaEstat
 	@Column(name = "not_env_dat_data")
-	private Date enviamentDatatData;
+	private Date enviamentDatatData; //Notib: notificaEstatData
 	@Column(name = "not_env_dat_orig", length = 20)
 	private String enviamentDatatOrigen;
 	@Column(name = "not_env_cert_data")
 	@Temporal(TemporalType.DATE)
-	private Date enviamentCertificacioData;
+	private Date enviamentCertificacioData; //Notib: notificaCertificacioData
 	@Column(name = "not_env_cert_orig", length = 20)
 	private String enviamentCertificacioOrigen;
 	

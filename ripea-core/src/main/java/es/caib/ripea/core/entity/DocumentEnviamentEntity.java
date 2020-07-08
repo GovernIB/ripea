@@ -98,10 +98,7 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 	
 	
 	
-	@Column(name = "notificacio_estat")
-	@Enumerated(EnumType.STRING)
-	protected DocumentNotificacioEstatEnumDto notificacioEstat;
-	
+
 	
 	
 	@Version
@@ -110,9 +107,7 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 	public DocumentEnviamentEstatEnumDto getEstat() {
 		return estat;
 	}
-	public DocumentNotificacioEstatEnumDto getNotificacioEstat() {
-		return notificacioEstat;
-	}
+
 	public String getAssumpte() {
 		return assumpte;
 	}
