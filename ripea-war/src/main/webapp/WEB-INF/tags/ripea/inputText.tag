@@ -18,6 +18,7 @@
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
+<%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
 
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -39,12 +40,12 @@
 			<c:choose>
 				<c:when test="${tooltip && not button}">
 					<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" maxlength="${maxlength}"/>
 				</c:when>
 				<c:when test="${button && not tooltip}">
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
 					<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
 					</div>
 				</c:when>
@@ -52,12 +53,12 @@
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
 						<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
-						<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}"/>
+						<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
 						<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}"  readonly="${myReadonly}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}"  readonly="${myReadonly}" />
 				</c:otherwise>
 			</c:choose>
 			
