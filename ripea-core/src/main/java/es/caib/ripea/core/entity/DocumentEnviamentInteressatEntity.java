@@ -21,7 +21,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 
 /**
- * Enviament Notib
+ * Notib Enviament
  * Equivalent to Notib es.caib.notib.core.entity.NotificacioEnviamentEntity
  */
 @Entity

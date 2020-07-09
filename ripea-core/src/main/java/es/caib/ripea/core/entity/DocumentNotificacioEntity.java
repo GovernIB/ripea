@@ -28,7 +28,7 @@ import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 /**
  * Classe del model de dades que representa una notificació d'un document
  * a un dels interessats d'un expedient.
- * Notificacio Notib
+ * Notib Notificacio
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
