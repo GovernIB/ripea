@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
@@ -899,11 +901,18 @@ public class ContingutDocumentController extends BaseUserController {
 
 		Long pareId = commandGeneric == null ? command.getPareId() : commandGeneric.getPareId();
 		if (commandGeneric == null ? command.getId() == null : commandGeneric.getId() == null) {
+			DocumentDto documentDto = commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric);
+			// TODO: DELETE
+			logger.info(" >>>>>>>>> [CREATE DOCUMENT] Command.Metadocument: " + (documentDto.getMetaDocument() == null ? "NULL" : documentDto.getMetaDocument().toString()));
+			// TODO: FI DELETE
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,
-					commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric),
+					documentDto,
 					comprovarMetaExpedient);
+			// TODO: DELETE
+			logger.info(" >>>>>>>>> [CREATE DOCUMENT] Document creat: " + document.toString());
+			// TODO: FI DELETE
 			//Valor per defecte d'algunes metadades
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
 					entitatActual.getId(), 
@@ -1027,4 +1036,6 @@ public class ContingutDocumentController extends BaseUserController {
 				"escanejarActiu",
 				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 
 }

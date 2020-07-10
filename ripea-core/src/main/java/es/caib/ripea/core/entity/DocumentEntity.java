@@ -21,6 +21,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
@@ -84,7 +85,7 @@ public class DocumentEntity extends NodeEntity {
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Column(name = "nti_tipdoc", length = 4, nullable = false)
-	@Enumerated(EnumType.STRING)
+//	@Enumerated(EnumType.STRING)
 	private String ntiTipoDocumental;
 	@Column(name = "nti_idorig", length = 48)
 	private String ntiIdDocumentoOrigen;
@@ -373,6 +374,11 @@ public class DocumentEntity extends NodeEntity {
 		public DocumentEntity build() {
 			return built;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;

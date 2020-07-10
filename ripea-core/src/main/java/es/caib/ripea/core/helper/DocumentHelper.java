@@ -383,11 +383,20 @@ public class DocumentHelper {
 				document.getNom(),
 				null,
 				DocumentEntity.class);
+		// TODO: DELETE
+		logger.info(" >>>>>>>>> [CREATE DOCUMENT] Obtenint domuments de l'expedient amb el mateix metaDocument... ");
+		// TODO: FI DELETE
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
 				expedient,
 				metaDocument,
 				0);
+		// TODO: DELETE
+		logger.info(" >>>>>>>>> [CREATE DOCUMENT] " + documents.size());
+		// TODO: FI DELETE
 		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+			// TODO: DELETE
+			logger.info(" >>>>>>>>> [CREATE DOCUMENT] Error de multiplicitat");
+			// TODO: FI DELETE
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
@@ -397,6 +406,25 @@ public class DocumentHelper {
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 					"expedientId=" + expedient.getId() + ")");
 		}
+		// TODO: DELETE
+		logger.info(" >>>>>>>>> [CREATE DOCUMENT] Creant document DB: [" + 
+				"Tipus:" + document.getDocumentTipus() + ", " +
+				"Nom:" + document.getNom() + ", " +
+				"Descripcio:" + document.getDescripcio() + ", " +
+				"Data:" + document.getData() + ", " +
+				"Data captura:" + new Date() + ", " +
+				"Organ NTI:" + expedient.getNtiOrgano() + ", " +
+				"Origen NTI:" + metaDocument.getNtiOrigen() + ", " +
+				"Estat elaboració NTI:" + document.getNtiEstadoElaboracion() + ", " +
+				"Tipus documental NTI:" + metaDocument.getNtiTipoDocumental() + ", " +
+				"MetaDocument:" + metaDocument.toString() + ", " +
+				"Pare:" + pare + ", " +
+				"Entitat pare:" + (pare.getEntitat() != null ? pare.getEntitat().getNom() : "NULL") + ", " +
+				"Expedient: {" + expedient.getId() + "-" + expedient.getCodi() + expedient.getNom() + "}, " +
+				"Ubicacio:" + document.getUbicacio() + ", " +
+				"Document origen NTI:" + document.getNtiIdDocumentoOrigen() + ", " + 
+				"]");
+		// TODO: FI DELETE
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
 				document.getNom(),
@@ -413,6 +441,9 @@ public class DocumentHelper {
 				expedient,
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen());
+		// TODO: DELETE
+		logger.info(" >>>>>>>>> [CREATE DOCUMENT] Document creat: " + entity.toString());
+		// TODO: FI DELETE
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(document.getFitxerNom());
 		fitxer.setContentType(document.getFitxerContentType());

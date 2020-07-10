@@ -151,12 +151,18 @@ public class DocumentServiceImpl implements DocumentService {
 		ExpedientEntity expedient = pare.getExpedientPare();
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
+			// TODO: DELETE
+			logger.info(" >>>>>>>>> [CREATE DOCUMENT] Document.Metadocument: " + document.getMetaDocument().toString());
+			// TODO: FI DELETE
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					pare.getEntitat(),
 					expedient.getMetaExpedient(),
 					document.getMetaDocument().getId(),
 					true,
 					comprovarMetaExpedient);
+			// TODO: DELETE
+			logger.info(" >>>>>>>>> [CREATE DOCUMENT] MetadocumentEntity: " + metaDocument.toString());
+			// TODO: FI DELETE
 		} else {
 			throw new ValidationException(
 					"<creacio>",

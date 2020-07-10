@@ -6,6 +6,8 @@ package es.caib.ripea.core.api.dto;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /**
  * Informació d'un document.
  * 
@@ -351,6 +353,11 @@ public class DocumentDto extends NodeDto {
 	 	} else if (id.equals(other.id))
 			return true;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 }

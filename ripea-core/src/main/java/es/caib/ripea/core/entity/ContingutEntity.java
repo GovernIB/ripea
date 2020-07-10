@@ -27,6 +27,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -253,6 +254,11 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }
