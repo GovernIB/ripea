@@ -378,7 +378,9 @@ public class DocumentEntity extends NodeEntity {
 	
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "DocumentEntity: [ \n"
+				+ "id" + this.getId() + "\n"
+				+ "ntiTipoDocumental: " + this.getNtiTipoDocumental() + "]";
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;

@@ -357,7 +357,10 @@ public class DocumentDto extends NodeDto {
 	
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "DocumentDto: [ \n"
+					+ "id" + id + "\n"
+					+ "ntiTipoDocumental: " + ntiTipoDocumental + "\n"
+					+ "ntiTipoDocumentalNom: " + ntiTipoDocumentalNom + "]";
 	}
 
 }
