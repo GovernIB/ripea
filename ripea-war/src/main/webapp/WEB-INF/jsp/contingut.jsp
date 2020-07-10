@@ -599,6 +599,19 @@ $(document).ready(function() {
 	});
 	$('form#nodeDades td .form-group').on('clone.multifield', function(event, clon) {
 		$('input', clon).change(nodeDadesInputChange);
+		var url = '<c:url value="/contingutDada/' + $('#contingutId').val() + '/' + $('input', clon).attr('id') + '"/>';
+		$.ajax({
+	        type: "GET",
+	        url: url,
+	        success: function (result) {
+	        	$('input', clon).val(result);
+	        	$('input', clon).trigger("focusout");
+	        }
+	});
+		
+		
+		
+		
 	});
 	if (${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
@@ -1094,6 +1107,7 @@ function recuperarResultatDomini(
 
 </head>
 <body>
+	<input id="contingutId" type="hidden" value="${contingut.id}">
 	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer and !isTasca}">
 		<div class="text-right" data-toggle="botons-titol">
 			<ul class="list-group pull-right">

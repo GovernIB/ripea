@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.entity.DadaEntity;
 import net.sf.cglib.beans.BeanGenerator;
 
 /**
@@ -36,14 +38,14 @@ public class BeanGeneratorHelper {
 			Long entitatId,
 			Long nodeId,
 			List<DadaDto> dades) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		List<MetaDadaDto> contingutMetaDades = metaDadaService.findByNode(
+		List<MetaDadaDto> metaDades = metaDadaService.findByNode(
 				entitatId,
 				nodeId);
-		String[] noms = new String[contingutMetaDades.size()];
-		Class<?>[] tipus = new Class<?>[contingutMetaDades.size()];
-		Object[] valors = (dades != null) ? new Object[contingutMetaDades.size()] : null;
-		for (int i = 0; i < contingutMetaDades.size(); i++) {
-			MetaDadaDto metaDada = contingutMetaDades.get(i);
+		String[] noms = new String[metaDades.size()];
+		Class<?>[] tipus = new Class<?>[metaDades.size()];
+		Object[] valors = (dades != null) ? new Object[metaDades.size()] : null;
+		for (int i = 0; i < metaDades.size(); i++) {
+			MetaDadaDto metaDada = metaDades.get(i);
 			noms[i] = metaDada.getCodi();
 			boolean isMultiple = (MultiplicitatEnumDto.M_0_N.equals(metaDada.getMultiplicitat()) || MultiplicitatEnumDto.M_1_N.equals(metaDada.getMultiplicitat()));
 			List<Object> dadaValors = new ArrayList<Object>();
@@ -54,8 +56,14 @@ public class BeanGeneratorHelper {
 					}
 				}
 			}
+			
+			
 			switch (metaDada.getTipus()) {
 			case BOOLEA:
+				if (dadaValors.isEmpty() && metaDada.getValorBoolea() != null ) {
+					dadaValors.add(metaDada.getValorBoolea());
+				}
+				
 				tipus[i] = (isMultiple) ? Boolean[].class : Boolean.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -65,6 +73,10 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case DATA:
+				if (dadaValors.isEmpty() && metaDada.getValorData() != null ) {
+					dadaValors.add(metaDada.getValorData());
+				}
+				
 				tipus[i] = (isMultiple) ? Date[].class : Date.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -74,6 +86,10 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case FLOTANT:
+				if (dadaValors.isEmpty() && metaDada.getValorFlotant() != null ) {
+					dadaValors.add(metaDada.getValorFlotant());
+				}
+				
 				tipus[i] = (isMultiple) ? Double[].class : Double.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -83,6 +99,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case IMPORT:
+				if (dadaValors.isEmpty() && metaDada.getValorImport() != null ) {
+					dadaValors.add(metaDada.getValorImport());
+				}
 				tipus[i] = (isMultiple) ? BigDecimal[].class : BigDecimal.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -92,6 +111,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case SENCER:
+				if (dadaValors.isEmpty() && metaDada.getValorSencer() != null ) {
+					dadaValors.add(metaDada.getValorSencer());
+				}
 				tipus[i] = (isMultiple) ? Long[].class : Long.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -101,6 +123,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case TEXT:
+				if (dadaValors.isEmpty() && metaDada.getValorString() != null && !metaDada.getValorString().isEmpty()) {
+					dadaValors.add(metaDada.getValorString());
+				}
 				tipus[i] = (isMultiple) ? String[].class : String.class;
 				if (valors != null) {
 					if (isMultiple) 

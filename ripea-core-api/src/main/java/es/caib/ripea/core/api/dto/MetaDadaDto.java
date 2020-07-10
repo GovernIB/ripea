@@ -4,6 +4,8 @@
 package es.caib.ripea.core.api.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -20,11 +22,63 @@ public class MetaDadaDto implements Serializable {
 	private MetaDadaTipusEnumDto tipus;
 	private String descripcio;
 	private MultiplicitatEnumDto multiplicitat;
-	private String valor;
 	private boolean readOnly;
 	private int ordre;
 	private boolean activa;
+	
+	
+	
+	private Long valorSencer;
+	private Double valorFlotant;
+	private BigDecimal valorImport;
+	private Date valorData; 
+	private Boolean valorBoolea;
+	private String valorString;
+	
+	
 
+	public Long getValorSencer() {
+		return valorSencer;
+	}
+	public void setValorSencer(
+			Long valorSencer) {
+		this.valorSencer = valorSencer;
+	}
+	public Double getValorFlotant() {
+		return valorFlotant;
+	}
+	public void setValorFlotant(
+			Double valorFlotant) {
+		this.valorFlotant = valorFlotant;
+	}
+	public BigDecimal getValorImport() {
+		return valorImport;
+	}
+	public void setValorImport(
+			BigDecimal valorImport) {
+		this.valorImport = valorImport;
+	}
+	public Date getValorData() {
+		return valorData;
+	}
+	public void setValorData(
+			Date valorData) {
+		this.valorData = valorData;
+	}
+	public Boolean getValorBoolea() {
+		return valorBoolea;
+	}
+	public void setValorBoolea(
+			Boolean valorBoolea) {
+		this.valorBoolea = valorBoolea;
+	}
+	public String getValorString() {
+		return valorString;
+	}
+	public void setValorString(
+			String valorString) {
+		this.valorString = valorString;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -58,12 +112,7 @@ public class MetaDadaDto implements Serializable {
 	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
 		this.multiplicitat = multiplicitat;
 	}
-	public String getValor() {
-		return valor;
-	}
-	public void setValor(String valor) {
-		this.valor = valor;
-	}
+
 	public boolean isReadOnly() {
 		return readOnly;
 	}

@@ -75,7 +75,7 @@ public class DadaEntity extends RipeaAuditable<Long> {
 	public void update(
 			Object valor,
 			int ordre) {
-		this.valor = getDadaValorPerEmmagatzemar(metaDada, valor);
+		this.valor = getDadaValorPerEmmagatzemar(metaDada.getTipus(), valor);
 		this.ordre = ordre;
 	}
 
@@ -119,7 +119,7 @@ public class DadaEntity extends RipeaAuditable<Long> {
 			built = new DadaEntity();
 			built.metaDada = metaDada;
 			built.node = node;
-			built.valor = getDadaValorPerEmmagatzemar(metaDada, valor);
+			built.valor = getDadaValorPerEmmagatzemar(metaDada.getTipus(), valor);
 			built.ordre = ordre;
 		}
 		public DadaEntity build() {
@@ -164,43 +164,43 @@ public class DadaEntity extends RipeaAuditable<Long> {
 
 
 
-	private static String getDadaValorPerEmmagatzemar(
-			MetaDadaEntity metaDada,
+	public static String getDadaValorPerEmmagatzemar(
+			MetaDadaTipusEnumDto tipus,
 			Object valor) {
 		if (valor == null)
 			return null;
-		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT) || metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+		if (tipus.equals(MetaDadaTipusEnumDto.TEXT) || tipus.equals(MetaDadaTipusEnumDto.DOMINI)) {
 			if (valor instanceof String) {
 				return (String)valor;
 			} else {
 				throw new RuntimeException();
 			}
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DATA)) {
+		} else if (tipus.equals(MetaDadaTipusEnumDto.DATA)) {
 			if (valor instanceof Date) {
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 				return sdf.format((Date)valor);
 			} else {
 				throw new RuntimeException();
 			}
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.SENCER)) {
+		} else if (tipus.equals(MetaDadaTipusEnumDto.SENCER)) {
 			if (valor instanceof Long) {
 				return ((Long)valor).toString();
 			} else {
 				throw new RuntimeException();
 			}
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.FLOTANT)) {
+		} else if (tipus.equals(MetaDadaTipusEnumDto.FLOTANT)) {
 			if (valor instanceof Double) {
 				return ((Double)valor).toString();
 			} else {
 				throw new RuntimeException();
 			}
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.IMPORT)) {
+		} else if (tipus.equals(MetaDadaTipusEnumDto.IMPORT)) {
 			if (valor instanceof BigDecimal) {
 				return ((BigDecimal)valor).toString();
 			} else {
 				throw new RuntimeException();
 			}
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.BOOLEA)) {
+		} else if (tipus.equals(MetaDadaTipusEnumDto.BOOLEA)) {
 			if (valor instanceof Boolean) {
 				return ((Boolean)valor).toString();
 			} else {
@@ -209,28 +209,32 @@ public class DadaEntity extends RipeaAuditable<Long> {
 		}
 		throw new RuntimeException();
 	}
-	private static Object getDadaValorPerRetornar(
+	public static Object getDadaValorPerRetornar(
 			MetaDadaEntity metaDada,
 			String valor) {
-		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT) || metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-			return valor;
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DATA)) {
-			try {
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-				return sdf.parse(valor);
-			} catch (ParseException ex) {
-				throw new RuntimeException(ex);
+		if (valor == null) {
+			return null;
+		} else {
+			if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.TEXT) || metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+				return valor;
+			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DATA)) {
+				try {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					return sdf.parse(valor);
+				} catch (ParseException ex) {
+					throw new RuntimeException(ex);
+				}
+			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.SENCER)) {
+				return new Long(valor);
+			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.FLOTANT)) {
+				return new Double(valor);
+			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.IMPORT)) {
+				return new BigDecimal(valor);
+			} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.BOOLEA)) {
+				return new Boolean(valor);
 			}
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.SENCER)) {
-			return new Long(valor);
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.FLOTANT)) {
-			return new Double(valor);
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.IMPORT)) {
-			return new BigDecimal(valor);
-		} else if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.BOOLEA)) {
-			return new Boolean(valor);
+			throw new RuntimeException();
 		}
-		throw new RuntimeException();
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

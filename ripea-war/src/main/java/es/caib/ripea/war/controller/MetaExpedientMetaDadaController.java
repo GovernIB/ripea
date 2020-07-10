@@ -3,19 +3,28 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -161,6 +170,27 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 					"redirect:metaDada",
 					"metadada.controller.creat.ok");
 		}
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	    binder.registerCustomEditor(
+	    		BigDecimal.class,
+	    		new CustomNumberEditor(
+	    				BigDecimal.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
+	    binder.registerCustomEditor(
+	    		Double.class,
+	    		new CustomNumberEditor(
+	    				Double.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)

@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -244,5 +245,10 @@ public interface MetaDadaService {
 	public List<MetaDadaDto> findByNode(
 			Long entitatId,
 			Long nodeId) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	Long findMetaNodeIdByNodeId(
+			Long entitatId,
+			Long nodeId);
 
 }

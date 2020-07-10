@@ -174,4 +174,14 @@ public class MetaDadaServiceBean implements MetaDadaService {
 				nodeId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public Long findMetaNodeIdByNodeId(
+			Long entitatId,
+			Long nodeId) {
+		return delegate.findMetaNodeIdByNodeId(
+				entitatId,
+				nodeId);
+	}
+
 }

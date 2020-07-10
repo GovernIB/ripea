@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -77,12 +79,28 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 		
 		int ordre = metaDadaRepository.countByMetaNode(metaNode);
 		
+		Object valor = null;
+		if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
+			valor = metaDada.getValorBoolea();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
+			valor = metaDada.getValorData();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
+			valor = metaDada.getValorFlotant();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
+			valor = metaDada.getValorImport();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
+			valor = metaDada.getValorSencer();
+		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+			valor = metaDada.getValorString();
+		}
+		
+		
 		MetaDadaEntity entity = MetaDadaEntity.getBuilder(
 				metaDada.getCodi(),
 				metaDada.getNom(),
 				metaDada.getTipus(),
-				metaDada.getMultiplicitat(),
-				metaDada.getValor(),
+				metaDada.getMultiplicitat(),		
+				valor,
 				metaDada.isReadOnly(),
 				ordre,
 				metaNode).
@@ -115,12 +133,28 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitat,
 				metaNode,
 				metaDada.getId());
+		
+		
+		Object valor = null;
+		if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
+			valor = metaDada.getValorBoolea();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
+			valor = metaDada.getValorData();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
+			valor = metaDada.getValorFlotant();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
+			valor = metaDada.getValorImport();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
+			valor = metaDada.getValorSencer();
+		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+			valor = metaDada.getValorString();
+		}
 		entity.update(
 				metaDada.getCodi(),
 				metaDada.getNom(),
 				metaDada.getTipus(),
 				metaDada.getMultiplicitat(),
-				metaDada.getValor(),
+				valor,
 				metaDada.getDescripcio(),
 				metaDada.isReadOnly());
 		return conversioTipusHelper.convertir(
@@ -352,9 +386,13 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitat,
 				metaNode,
 				id);
-		return conversioTipusHelper.convertir(
+		
+		MetaDadaDto metaDadaDto = conversioTipusHelper.convertir(
 				metaDada,
 				MetaDadaDto.class);
+		
+		
+		return metaDadaDto;
 	}
 
 	@Transactional(readOnly=true)
@@ -463,6 +501,27 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 		return conversioTipusHelper.convertirList(
 				metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(node.getMetaNode()),
 				MetaDadaDto.class);
+	}
+	
+	
+	@Override
+	public Long findMetaNodeIdByNodeId(
+			Long entitatId,
+			Long nodeId) {
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		NodeEntity node = entityComprovarHelper.comprovarNode(
+				entitat,
+				nodeId,
+				false,
+				false,
+				false,
+				false);
+		return node.getMetaNode().getId();
 	}
 
 	/*@Transactional(readOnly=true)

@@ -372,7 +372,7 @@ public class EntityComprovarHelper {
 					nodeId,
 					NodeEntity.class);
 		}
-		if (!entitat.equals(node.getEntitat())) {
+		if (!entitat.getId().equals(node.getEntitat().getId())) {
 			throw new ValidationException(
 					nodeId,
 					NodeEntity.class,

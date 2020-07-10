@@ -69,5 +69,6 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 			MetaDadaTipusEnumDto tipus);
 	List<MetaDadaEntity> findByMetaNodeAndActivaTrueOrderByOrdreAsc(
 			MetaNodeEntity metaNode);
+	
 
 }
