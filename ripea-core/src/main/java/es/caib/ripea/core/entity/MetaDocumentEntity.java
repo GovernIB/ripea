@@ -357,7 +357,12 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "Metadocument: [" +
+				"id: " + this.getId() + ", " +
+				"codi: " + this.codi + ", " +
+				"nom: " + this.nom + ", " +
+				"ntiTipoDocumental: " + this.ntiTipoDocumental + "]";
+//		return ToStringBuilder. reflectionToString(this);
 	}
 	private static final long serialVersionUID = -2299453443943600172L;
 

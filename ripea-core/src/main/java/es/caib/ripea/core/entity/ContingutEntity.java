@@ -256,7 +256,11 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "ContingutEntity: [" +
+				"id: " + this.getId() + ", " +
+				"nom: " + this.nom + ", " +
+				"tipus: " + this.tipus + "]";
+//		return ToStringBuilder.reflectionToString(this);
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;
