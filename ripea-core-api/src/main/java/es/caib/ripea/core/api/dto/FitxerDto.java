@@ -15,6 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class FitxerDto implements Serializable {
 
 	private String nom;
+	private String nomFitxerFirmat;
 	private String contentType;
 	private byte[] contingut;
 	private long tamany;
@@ -37,6 +38,12 @@ public class FitxerDto implements Serializable {
 	}
 	public byte[] getContingut() {
 		return contingut;
+	}
+	public String getNomFitxerFirmat() {
+		return nomFitxerFirmat;
+	}
+	public void setNomFitxerFirmat(String nomFitxerFirmat) {
+		this.nomFitxerFirmat = nomFitxerFirmat;
 	}
 	/*public String getFirmaNom() {
 		return firmaNom;
@@ -80,6 +87,15 @@ public class FitxerDto implements Serializable {
 		int indexPunt = nom.lastIndexOf(".");
 		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
 			return nom.substring(indexPunt + 1);
+		} else {
+			return null;
+		}
+	}
+	
+	public String getExtensioFitxerFirmat() {
+		int indexPunt = nomFitxerFirmat.lastIndexOf(".");
+		if (indexPunt != -1 && indexPunt < nomFitxerFirmat.length() - 1) {
+			return nomFitxerFirmat.substring(indexPunt + 1);
 		} else {
 			return null;
 		}
