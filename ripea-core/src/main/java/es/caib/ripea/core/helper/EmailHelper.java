@@ -155,7 +155,9 @@ public class EmailHelper {
 						"\tDocument nom: " + document.getNom() + "\n" +
 						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
-						"Estat del document:" + estat + "\n";
+						"Estat del document:" + estat + "\n" + 
+						getEnllacExpedient(expedient.getId());
+						
 		
 		List<String> destinatarisAgrupats = new ArrayList<String>();
 		List<String> destinatarisNoAgrupats = new ArrayList<String>();
@@ -218,7 +220,8 @@ public class EmailHelper {
 				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat anterior:" + estatAnterior + "\n" +
-				"Estat actual:" + estat + "\n";
+				"Estat actual:" + estat + "\n" + 
+				getEnllacExpedient(expedient.getId());
 		
 		List<String> destinatarisAgrupats = new ArrayList<String>();
 		List<String> destinatarisNoAgrupats = new ArrayList<String>();
@@ -281,7 +284,8 @@ public class EmailHelper {
 				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat anterior:" + estatAnterior.toString() + "\n" +
-				"Estat actual:" + estat + "\n";
+				"Estat actual:" + estat + "\n" +
+				getEnllacExpedient(expedient.getId());
 		
 		List<String> destinatarisAgrupats = new ArrayList<String>();
 		List<String> destinatarisNoAgrupats = new ArrayList<String>();
@@ -339,7 +343,14 @@ public class EmailHelper {
 
 	}	
 	
-	
+	private String getEnllacExpedient(Long expedientId) {
+		String baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url");
+		String enllacExpedient = "";
+		
+		if (baseUrl != null)
+			enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
+		return enllacExpedient;
+	}
 	
 	private Set<DadesUsuari> getGestors(ExpedientEntity expedient) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();

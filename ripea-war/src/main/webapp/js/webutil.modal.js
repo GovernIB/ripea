@@ -242,6 +242,10 @@
 					}
 				});
 				modalobj.data('modal-configurada', true);
+				modalobj.data({
+							backdrop: 'static',	//no tancar en cas de pitjar defora de la modal
+							keyboard: false //no tancar en cas de pitjar ESC
+						});
 			}
 			$('.modal-body iframe *', modalobj).remove();
 			$('.modal-footer *', modalobj).remove();

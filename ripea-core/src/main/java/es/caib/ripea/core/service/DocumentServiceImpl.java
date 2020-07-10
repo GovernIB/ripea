@@ -966,7 +966,8 @@ public class DocumentServiceImpl implements DocumentService {
 				}
 				DocumentNotificacioEstatEnumDto estatDespres = documentEnviamentInteressatEntity.getNotificacio().getNotificacioEstat();
 				logger.debug("Estat després: " + estatDespres);
-				if (estatAnterior != estatDespres) {
+				if (estatAnterior != estatDespres 
+						&& (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
 					emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 				}
 			}
