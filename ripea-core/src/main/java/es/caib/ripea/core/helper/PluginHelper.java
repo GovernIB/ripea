@@ -1200,6 +1200,7 @@ public class PluginHelper {
 		try {
 			FitxerDto fitxerAmbFirma = new FitxerDto();
 			fitxerAmbFirma.setNom(fitxerPdfFirmat.getNom());
+			fitxerAmbFirma.setNomFitxerFirmat(fitxerPdfFirmat.getNomFitxerFirmat());
 			fitxerAmbFirma.setContingut(fitxerPdfFirmat.getContingut());
 			fitxerAmbFirma.setContentType("application/pdf");
 			List<ArxiuFirmaDto> firmes = null;
@@ -3722,18 +3723,24 @@ public class PluginHelper {
 			boolean enPaper,
 			String serieDocumental) {
 		Document document = new Document();
-
+		String fitxerExtensio = null;
 		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
 		document.setNom(documentNomInArxiu);
 		document.setIdentificador(documentUuid);
 		DocumentMetadades metadades = new DocumentMetadades();
+		if (fitxer != null && fitxer.getNomFitxerFirmat() != null) {
+			fitxerExtensio = fitxer.getExtensioFitxerFirmat();
+		} else if (fitxer != null && fitxer.getNom() != null) {
+			fitxerExtensio = fitxer.getExtensio();
+		}
+		
 		setMetadades(
 				ntiOrigen,
 				ntiIdentificador,
 				ntiDataCaptura,
 				ntiEstatElaboracio,
 				ntiTipusDocumental,
-				fitxer != null ? fitxer.getExtensio() : null,
+				fitxerExtensio,
 				ntiOrgans,
 				serieDocumental,
 				metadades);
