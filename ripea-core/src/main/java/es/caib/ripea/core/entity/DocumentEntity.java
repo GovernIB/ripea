@@ -21,7 +21,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
@@ -378,7 +377,21 @@ public class DocumentEntity extends NodeEntity {
 	
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "DocumentEntity: [" +
+				"node: " + super.toString() + ", " +
+				"id: " + this.getId() + ", " +
+				"nom: " + this.nom + ", " +
+				"descripcio: " + this.descripcio + ", " +
+				"data: " + this.data + ", " +
+				"dataCaptura: " + this.dataCaptura + ", " +
+				"ntiIdDocumentoOrigen: " + this.ntiIdDocumentoOrigen + ", " +
+				"ntiVersion: " + this.ntiVersion + ", " +
+				"ntiIdentificador: " + this.ntiIdentificador + ", " +
+				"ntiOrgano: " + this.ntiOrgano + ", " +
+				"ntiOrigen: " + this.ntiOrigen + ", " +
+				"ntiEstadoElaboracion: " + this.ntiEstadoElaboracion + ", " +
+				"ntiTipoDocumental: " + this.ntiTipoDocumental + ", " +
+				"metanode: " + this.metaNode.toString() + "]";
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;

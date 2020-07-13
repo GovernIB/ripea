@@ -16,7 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -358,6 +357,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Override
 	public String toString() {
 		return "Metadocument: [" +
+				"metanode: " + super.toString() + ", " +
 				"id: " + this.getId() + ", " +
 				"codi: " + this.codi + ", " +
 				"nom: " + this.nom + ", " +

@@ -207,6 +207,18 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "EntitatEntity: [" +
+				"id: " + this.getId() + ", " +
+				"codi: " + this.codi + ", " +
+				"nom: " + this.nom + ", " +
+				"descripcio: " + this.descripcio + ", " +
+				"activa: " + this.activa + ", " +
+				"cif: " + this.cif + ", " +
+				"unitatArrel: " + this.unitatArrel + "]";
+	}
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

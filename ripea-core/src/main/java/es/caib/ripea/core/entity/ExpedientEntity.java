@@ -356,6 +356,20 @@ public class ExpedientEntity extends NodeEntity {
 			return built;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "ExpedientEntity: [" +
+				"node: " + super.toString() + ", " +
+				"id: " + this.getId() + ", " +
+				"codi: " + this.codi + ", " +
+				"tipus: " + this.tipus + ", " +
+				"ntiVersion: " + this.ntiVersion + ", " +
+				"ntiIdentificador: " + this.ntiIdentificador + ", " +
+				"ntiOrgano: " + this.ntiOrgano + ", " +
+				"ntiFechaApertura: " + this.ntiFechaApertura + ", " +
+				"ntiClasificacionSia: " + this.ntiClasificacionSia + "]";
+	}
 
 	private static final long serialVersionUID = -2299453443943600172L;
 
