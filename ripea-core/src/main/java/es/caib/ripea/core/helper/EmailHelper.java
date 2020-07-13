@@ -343,7 +343,11 @@ public class EmailHelper {
 			"tascaId=" + expedientTascaEntity.getId() + ")");
 
 
-		enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior, getGestors(expedientTascaEntity.getExpedient()), false);
+		enviarEmailCanviarEstatTasca(
+				expedientTascaEntity, 
+				estatAnterior, 
+				getGestors(expedientTascaEntity.getExpedient()),
+				false);
 		
 		if (expedientTascaEntity.getResponsable() != null && expedientTascaEntity.getResponsable().getEmail() != null && !expedientTascaEntity.getResponsable().getEmail().isEmpty()) {
 			
@@ -353,43 +357,47 @@ public class EmailHelper {
 	}	
 	
 	private String getEnllacExpedient(Long expedientId) {
-		String baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url");
-		String enllacExpedient = "";
-		
-		if (baseUrl != null)
-			enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
-		return enllacExpedient;
+		String baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url");		
+		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
+		return baseUrl != null ? enllacExpedient : "";
 	}
 	
 	private Set<DadesUsuari> getGestors(
 			ExpedientEntity expedient,
 			String usuariCodi) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
-		List<PermisDto> permisos = permisosHelper.findPermisos(
-				expedient.getMetaNode().getId(),
-				MetaNodeEntity.class);
-		for (PermisDto permis: permisos) {
-			if (permis.isWrite()) {
-				try {
-					if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
-						responsables.add(
-								pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
-					}
-					if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
-						responsables.addAll(
-								pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
-					}
-				} catch (Exception ex) {
-					logger.error(
-							"No s'ha pogut obtenir el gestor de l'expedient(" +
-							"id=" + expedient.getId() + ", " +
-							"nom=" + expedient.getNom() + ", " +
-							"any=" + expedient.getAny() + ", " +
-							"sequencia=" + expedient.getSequencia() + ")",
-							ex);
-				}
-			}
-		}
+		
+		UsuariEntity expedientAgafatPer = expedient.getAgafatPer();
+		
+		responsables.add(pluginHelper.dadesUsuariFindAmbCodi(usuariCodi));
+		
+		if (expedientAgafatPer != null)
+			responsables.add(pluginHelper.dadesUsuariFindAmbCodi(expedientAgafatPer.getCodi()));
+//		List<PermisDto> permisos = permisosHelper.findPermisos(
+//				expedient.getMetaNode().getId(),
+//				MetaNodeEntity.class);
+//		for (PermisDto permis: permisos) {
+//			if (permis.isWrite()) {
+//				try {
+//					if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
+//						responsables.add(
+//								pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
+//					}
+//					if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
+//						responsables.addAll(
+//								pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
+//					}
+//				} catch (Exception ex) {
+//					logger.error(
+//							"No s'ha pogut obtenir el gestor de l'expedient(" +
+//							"id=" + expedient.getId() + ", " +
+//							"nom=" + expedient.getNom() + ", " +
+//							"any=" + expedient.getAny() + ", " +
+//							"sequencia=" + expedient.getSequencia() + ")",
+//							ex);
+//				}
+//			}
+//		}
 		return responsables;
 	}
 	
