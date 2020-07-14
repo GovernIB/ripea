@@ -729,7 +729,7 @@ public class DocumentHelper {
 					}
 				}
 				DocumentEstatEnumDto documentEstatNou = document.getEstat();
-				if (documentEstatAnterior != documentEstatNou) {
+				if (documentEstatAnterior != DocumentEstatEnumDto.CUSTODIAT && (documentEstatAnterior != documentEstatNou)) {
 					alertaHelper.crearAlerta(
 							"La firma del document " + document.getNom() + " ha finalitzat correctament",
 							null,
