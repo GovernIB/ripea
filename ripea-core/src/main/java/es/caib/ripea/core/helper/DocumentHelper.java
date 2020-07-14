@@ -665,6 +665,7 @@ public class DocumentHelper {
 	public Exception portafirmesProcessar(
 			DocumentPortafirmesEntity documentPortafirmes) {
 		DocumentEntity document = documentPortafirmes.getDocument();
+		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
 		if (PortafirmesCallbackEstatEnumDto.FIRMAT.equals(callbackEstat)) {
 			document.updateEstat(
@@ -704,31 +705,37 @@ public class DocumentHelper {
 					fitxer.setNom(document.getFitxerNom());
 					fitxer.setContingut(portafirmesDocument.getArxiuContingut());
 					fitxer.setContentType("application/pdf");
-					documentPortafirmes.updateProcessat(
-							true,
-							new Date());
-					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
-							document,
-							fitxer);
-					document.updateInformacioCustodia(
-							new Date(),
-							custodiaDocumentId,
-							document.getCustodiaCsv());
-					actualitzarVersionsDocument(document);
-					actualitzarInformacioFirma(document);
-					contingutLogHelper.log(
-							documentPortafirmes.getDocument(),
-							LogTipusEnumDto.ARXIU_CUSTODIAT,
-							custodiaDocumentId,
-							null,
-							false,
-							false);
+					// Si no ha estat custodiat
+					if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
+						documentPortafirmes.updateProcessat(
+								true,
+								new Date());
+						String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+								document,
+								fitxer);
+						document.updateInformacioCustodia(
+								new Date(),
+								custodiaDocumentId,
+								document.getCustodiaCsv());
+						actualitzarVersionsDocument(document);
+						actualitzarInformacioFirma(document);
+						contingutLogHelper.log(
+								documentPortafirmes.getDocument(),
+								LogTipusEnumDto.ARXIU_CUSTODIAT,
+								custodiaDocumentId,
+								null,
+								false,
+								false);
+					}
 				}
-				alertaHelper.crearAlerta(
-						"La firma del document " + document.getNom() + " ha finalitzat correctament",
-						null,
-						document.getExpedient().getId());
-				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
+				DocumentEstatEnumDto documentEstatNou = document.getEstat();
+				if (documentEstatAnterior != documentEstatNou) {
+					alertaHelper.crearAlerta(
+							"La firma del document " + document.getNom() + " ha finalitzat correctament",
+							null,
+							document.getExpedient().getId());
+					emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
+				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de portafirmes (" +
 						"id=" + documentPortafirmes.getId() + ", " +

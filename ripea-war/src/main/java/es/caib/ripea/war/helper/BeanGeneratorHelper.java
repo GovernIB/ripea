@@ -15,10 +15,8 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.entity.DadaEntity;
 import net.sf.cglib.beans.BeanGenerator;
 
 /**

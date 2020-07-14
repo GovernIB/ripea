@@ -100,4 +100,8 @@
 			id="dominiService"
 			jndi-name="ripea/DominiServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.DominiService"/>	
+	<jee:local-slsb
+			id="expedientSeguidorService"
+			jndi-name="ripea/ExpedientSeguidorServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ExpedientSeguidorService"/>	
 </beans>

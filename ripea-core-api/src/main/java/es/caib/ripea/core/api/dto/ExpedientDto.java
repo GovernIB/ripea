@@ -47,7 +47,8 @@ public class ExpedientDto extends NodeDto {
 	private boolean tasques;
 	private boolean hasEsborranys;
 	private Set<InteressatDto> interessats;
-	
+	private long numSeguidors;
+	private boolean seguidor;
 //	public String getInteressatsResum() {
 //		String interessatsResum = "";
 //		if (this.getInteressats() != null)
@@ -282,5 +283,17 @@ public class ExpedientDto extends NodeDto {
 	public void setHasEsborranys(boolean hasEsborranys) {
 		this.hasEsborranys = hasEsborranys;
 	}
-
+	public long getNumSeguidors() {
+		return numSeguidors;
+	}
+	public void setNumSeguidors(long numSeguidors) {
+		this.numSeguidors = numSeguidors;
+	}
+	public boolean isSeguidor() {
+		return seguidor;
+	}
+	public void setSeguidor(boolean seguidor) {
+		this.seguidor = seguidor;
+	}
+	
 }

@@ -216,7 +216,12 @@ public class ContingutHelper {
 								new Permission[] {ExtendedPermission.WRITE},
 								auth));
 			}
+			dto.setNumSeguidors(expedient.getSeguidors().size());
 			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
+			if (expedient.getSeguidors().contains(usuariActual)) 
+				dto.setSeguidor(true);
 //			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
 			resposta = dto;
 

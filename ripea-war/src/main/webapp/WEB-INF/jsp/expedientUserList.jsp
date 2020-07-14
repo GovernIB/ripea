@@ -282,6 +282,7 @@ function getCookie(cname) {
 		<thead>
 			<tr>
 				<th data-col-name="usuariActualWrite" data-visible="false"></th>
+				<th data-col-name="seguidor" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
@@ -331,7 +332,16 @@ function getCookie(cname) {
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 					</script>
-				</th>				
+				</th>	
+				<th data-col-name="numSeguidors" data-orderable="false" data-template="#cellSeguidorsTemplate" width="1%">
+					<script id="cellSeguidorsTemplate" type="text/x-jsrender">
+						{{if numSeguidors > 0}}
+							<a href="expedient/{{:id}}/seguidors" data-toggle="modal" data-refresh-tancar="true" data-modal-id="seguidors{{:id}}" class="btn btn-default" title="&nbsp;<spring:message code="comu.boto.followers"/>&nbsp;"><span class="fa fa-lg fa-users"></span>&nbsp;<span class="badge">{{:numSeguidors}}</span></a>
+						{{else}}
+							<a href="expedient/{{:id}}/seguidors" data-toggle="modal" data-refresh-tancar="true" data-modal-id="seguidors{{:id}}" class="btn btn-default disabled"><span class="fa fa-lg fa-users"></span>&nbsp;<span class="badge">{{:numSeguidors}}</span></a>
+						{{/if}}							
+					</script>
+				</th>			
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -348,6 +358,11 @@ function getCookie(cname) {
 											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 										{{/if}}
 									{{/if}}
+								{{/if}}	
+								{{if metaNode.usuariActualWrite && seguidor}}
+									<li><a href="expedient/{{:id}}/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
+								{{else metaNode.usuariActualWrite && !seguidor}}					
+									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
 								{{/if}}
 								{{if metaNode.usuariActualDelete && estat != 'TANCAT'}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>

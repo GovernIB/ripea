@@ -148,6 +148,18 @@ public class ExpedientEntity extends NodeEntity {
 	@ForeignKey(name = "ipa_expestat_expedient_fk")
 	private ExpedientEstatEntity expedientEstat;
 	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "ipa_expedient_seguidor",
+			joinColumns = {
+					@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
+			inverseJoinColumns = {
+					@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")})
+	@ForeignKey(
+			name = "ipa_expedient_expseguidor_fk",
+			inverseName = "ipa_persona_expseguidor_fk")
+	protected List<UsuariEntity> seguidors = new ArrayList<UsuariEntity>();
+	
 	public List<ExpedientTascaEntity> getTasques() {
 		return tasques;
 	}
@@ -219,6 +231,9 @@ public class ExpedientEntity extends NodeEntity {
 	}
 	public List<ExpedientEntity> getRelacionatsPer() {
 		return relacionatsPer;
+	}
+	public List<UsuariEntity> getSeguidors() {
+		return seguidors;
 	}
 	public MetaExpedientEntity getMetaExpedient() {
 		return (MetaExpedientEntity)getMetaNode();
@@ -294,6 +309,14 @@ public class ExpedientEntity extends NodeEntity {
 			if (ie.equals(interessat))
 				it.remove();
 		}
+	}
+
+	public void addSeguidor(UsuariEntity usuariEntity) {
+		seguidors.add(usuariEntity);
+	}
+	
+	public void deleteSeguidor(UsuariEntity usuariEntity) {
+
 	}
 
 	public void addRelacionat(ExpedientEntity relacionat) {
