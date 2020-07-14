@@ -703,6 +703,7 @@ public class DocumentHelper {
 					// actualitza la informació de firma a l'arxiu.
 					FitxerDto fitxer = new FitxerDto();
 					fitxer.setNom(document.getFitxerNom());
+					fitxer.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
 					fitxer.setContingut(portafirmesDocument.getArxiuContingut());
 					fitxer.setContentType("application/pdf");
 					// Si no ha estat custodiat
@@ -822,6 +823,7 @@ public class DocumentHelper {
 					byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
 					
 					fitxer.setNom(viaFirmaDocument.getNomFitxer());
+					fitxer.setNomFitxerFirmat(viaFirmaDocument.getNomFitxer());
 					fitxer.setContingut(contingut);
 					fitxer.setContentType("application/pdf");
 					documentViaFirma.updateProcessat(
