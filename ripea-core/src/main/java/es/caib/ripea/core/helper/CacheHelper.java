@@ -299,6 +299,26 @@ public class CacheHelper {
 	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
 	public void evictFindDominisByConsutla() {
 	}
+	
+	@Cacheable(value = "firmesPendentsPerExpedient", key="#expedient")
+	public int findFirmesPendentsPerExpedient(
+			ExpedientEntity expedient) {
+		return 0;
+	}
+	
+	@CacheEvict(value = "firmesPendentsPerExpedient", allEntries=true)
+	public void evictFirmesPendentsPerExpedient() {
+	}
+	
+	@Cacheable(value = "notificacionsPendentsPerExpedient", key="#expedient")
+	public int findNotificacionsPendentsPerExpedient(
+			ExpedientEntity expedient) {
+		return 0;
+	}
+	
+	@CacheEvict(value = "notificacionsPendentsPerExpedient", allEntries=true)
+	public void evictNotificacionsPendentsPerExpedient() {
+	}
 
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,

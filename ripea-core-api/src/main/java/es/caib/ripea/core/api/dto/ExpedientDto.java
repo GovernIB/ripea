@@ -49,6 +49,8 @@ public class ExpedientDto extends NodeDto {
 	private Set<InteressatDto> interessats;
 	private long numSeguidors;
 	private boolean seguidor;
+	private int estatFirma;
+	private int estatNotificacio;
 //	public String getInteressatsResum() {
 //		String interessatsResum = "";
 //		if (this.getInteressats() != null)
@@ -294,6 +296,18 @@ public class ExpedientDto extends NodeDto {
 	}
 	public void setSeguidor(boolean seguidor) {
 		this.seguidor = seguidor;
+	}
+	public int getEstatFirma() {
+		return estatFirma;
+	}
+	public void setEstatFirma(int estatFirma) {
+		this.estatFirma = estatFirma;
+	}
+	public int getEstatNotificacio() {
+		return estatNotificacio;
+	}
+	public void setEstatNotificacio(int estatNotificacio) {
+		this.estatNotificacio = estatNotificacio;
 	}
 	
 }

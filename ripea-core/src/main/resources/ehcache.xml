@@ -24,4 +24,6 @@
 	<cache name="tipusVia" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="connexioDomini" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 	<cache name="resultatConsultaDominis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
+	<cache name="firmesPendentsPerExpedient" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
+	<cache name="notificacionsPendentsPerExpedient" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 </ehcache>

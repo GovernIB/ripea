@@ -222,6 +222,8 @@ public class ContingutHelper {
 			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
 			if (expedient.getSeguidors().contains(usuariActual)) 
 				dto.setSeguidor(true);
+			dto.setEstatFirma(cacheHelper.findFirmesPendentsPerExpedient(expedient));
+			dto.setEstatFirma(cacheHelper.findNotificacionsPendentsPerExpedient(expedient));
 //			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
 			resposta = dto;
 
