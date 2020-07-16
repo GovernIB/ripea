@@ -6,6 +6,8 @@ package es.caib.ripea.core.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -29,7 +31,7 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			DocumentEntity document,
 			DocumentEnviamentEstatEnumDto[] estat,
 			boolean error);
-
+	
 	/*List<DocumentPortafirmesEntity> findByDocumentAndEstatInOrderByCreatedDateDesc(
 			DocumentEntity document,
 			DocumentEnviamentEstatEnumDto[] estat);*/
@@ -42,4 +44,14 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 	DocumentPortafirmesEntity findByPortafirmesId(
 			String portafirmesId);
 
+	@Query(	"from" +
+			"    DocumentPortafirmesEntity dpe " +
+			"where" +
+			"	dpe.document = :document " +
+			"and" +
+			"	rownum = 1"+
+			"order by" +
+			"	dpe.createdDate desc")
+	DocumentPortafirmesEntity findTopByDocumentOrderByCreatedDateDesc(
+			@Param("document") DocumentEntity document);
 }

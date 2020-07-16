@@ -272,7 +272,7 @@ function getCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="13" 
+		data-default-order="18" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -290,16 +290,24 @@ function getCookie(cname) {
 				<th data-col-name="expedientEstat" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
+				<th data-col-name="errorLastEnviament" data-visible="false"></th>
+				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
+				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
+				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>				
 				<th data-col-name="nom" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 				</th>
-				<th data-col-name="nom" data-template="#cellAvisosTemplate" width="10%">
-					<spring:message code="expedient.list.user.columna.titol"/>
+				<th data-col-name="id" data-template="#cellAvisosTemplate" width="10%">
+					<spring:message code="expedient.list.user.columna.avisos"/>
 					<script id="cellAvisosTemplate" type="text/x-jsrender">
 						{{if !valid}}<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.validacio"/>"></span>{{/if}}
-						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}
+						{{if errorLastEnviament }}<span class="fa fa-pencil-square text-danger" title="<spring:message code="contingut.errors.expedient.enviaments"/>"></span>{{/if}}
+						{{if errorLastNotificacio }}<span class="fa fa-envelope-square text-danger" title="<spring:message code="contingut.errors.expedient.notificacions"/>"></span>{{/if}}
+						{{if ambEnviamentsPendents }}<span class="fa fa-pencil-square text-primary" title="<spring:message code="contingut.pendents.expedient.enviaments"/>"></span>{{/if}}
+						{{if ambNotificacionsPendents }}<span class="fa fa-envelope-square text-primary" title="<spring:message code="contingut.pendents.expedient.notificacions"/>"></span>{{/if}}
+						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}			
 					</script>
 				</th>
 				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>								

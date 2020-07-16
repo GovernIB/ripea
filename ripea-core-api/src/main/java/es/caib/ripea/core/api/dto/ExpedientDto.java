@@ -49,8 +49,10 @@ public class ExpedientDto extends NodeDto {
 	private Set<InteressatDto> interessats;
 	private long numSeguidors;
 	private boolean seguidor;
-	private int estatFirma;
-	private int estatNotificacio;
+	private boolean errorLastEnviament;
+	private boolean errorLastNotificacio;
+	private boolean ambEnviamentsPendents;
+	private boolean ambNotificacionsPendents;
 //	public String getInteressatsResum() {
 //		String interessatsResum = "";
 //		if (this.getInteressats() != null)
@@ -297,17 +299,28 @@ public class ExpedientDto extends NodeDto {
 	public void setSeguidor(boolean seguidor) {
 		this.seguidor = seguidor;
 	}
-	public int getEstatFirma() {
-		return estatFirma;
+	public boolean isErrorLastEnviament() {
+		return errorLastEnviament;
 	}
-	public void setEstatFirma(int estatFirma) {
-		this.estatFirma = estatFirma;
+	public void setErrorLastEnviament(boolean errorLastEnviament) {
+		this.errorLastEnviament = errorLastEnviament;
 	}
-	public int getEstatNotificacio() {
-		return estatNotificacio;
+	public boolean isErrorLastNotificacio() {
+		return errorLastNotificacio;
 	}
-	public void setEstatNotificacio(int estatNotificacio) {
-		this.estatNotificacio = estatNotificacio;
+	public void setErrorLastNotificacio(boolean errorLastNotificacio) {
+		this.errorLastNotificacio = errorLastNotificacio;
 	}
-	
+	public boolean isAmbEnviamentsPendents() {
+		return ambEnviamentsPendents;
+	}
+	public void setAmbEnviamentsPendents(boolean ambEnviamentsPendents) {
+		this.ambEnviamentsPendents = ambEnviamentsPendents;
+	}
+	public boolean isAmbNotificacionsPendents() {
+		return ambNotificacionsPendents;
+	}
+	public void setAmbNotificacionsPendents(boolean ambNotificacionsPendents) {
+		this.ambNotificacionsPendents = ambNotificacionsPendents;
+	}
 }
