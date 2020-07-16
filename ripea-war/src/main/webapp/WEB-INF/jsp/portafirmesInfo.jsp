@@ -12,19 +12,10 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<ul class="nav nav-tabs" role="tablist">
-		<li class="active" role="presentation">
-			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="firma.info.pipella.dades"/></a>
-		</li>
-		<%--li role="presentation">
-			<a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="firma.info.pipella.annexos"/></a>
-		</li--%>
-		<c:if test="${portafirmes.error}">
-			<li role="presentation">
-				<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
-			</li>
-		</c:if>
-	</ul>
+
+	<c:if test="${portafirmes.error}">
+		<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
+	</c:if>
 	<br/>
 	<div class="tab-content">
 		<div class="tab-pane active in" id="dades" role="tabpanel">
@@ -56,7 +47,7 @@
 				</tr>
 				<tr>
 					<td><strong><spring:message code="firma.info.camp.document.tipus"/></strong></td>
-					<td>${portafirmes.documentTipus}</td>
+					<td>${portafirmes.documentTipus}</td> 
 				</tr>
 				<c:if test="${not empty portafirmes.responsables}">
 					<tr>

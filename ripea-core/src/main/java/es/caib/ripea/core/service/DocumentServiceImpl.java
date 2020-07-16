@@ -37,6 +37,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
@@ -66,8 +67,8 @@ import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -500,9 +501,16 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 
-		return documentHelper.portafirmesInfo(
-				entitatId,
-				document);
+		DocumentPortafirmesDto docPortafir = documentHelper.portafirmesInfo(entitatId, document);
+		List<PortafirmesDocumentTipusDto> list = pluginHelper.portafirmesFindDocumentTipus();
+		for (PortafirmesDocumentTipusDto doctipus : list) {
+			if (Long.toString(doctipus.getId()).equals(docPortafir.getDocumentTipus())) {
+				docPortafir.setDocumentTipus(doctipus.getNom());
+				break;
+			}
+		}
+		
+		return docPortafir;
 	}
 	
 	@Transactional
