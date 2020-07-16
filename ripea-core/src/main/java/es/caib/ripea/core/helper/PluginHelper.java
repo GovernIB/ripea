@@ -1860,6 +1860,8 @@ public class PluginHelper {
 				fitxerConvertit.getNom());
 		portafirmesDocument.setArxiuContingut(
 				fitxerConvertit.getContingut());
+		portafirmesDocument.setArxiuUuid(
+				document.getArxiuUuid());
 		if (annexos != null && ! annexos.isEmpty()) {
 			portafirmesAnnexos = new ArrayList<PortafirmesDocument>();
 			for (DocumentEntity annex: annexos) {

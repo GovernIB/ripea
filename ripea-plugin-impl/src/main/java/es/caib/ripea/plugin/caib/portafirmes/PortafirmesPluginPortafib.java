@@ -146,6 +146,9 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 
 				signatureRequest.setSignatureBlocks(signatureBlocks);
 				
+				if (isEnviarUrlExpedientPermitida())
+					signatureRequest.setExpedientUrl(getUrlExpedient() + document.getArxiuUuid());
+				
 				peticioDeFirmaId = getPeticioFirmaAsyncSimpleClient().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
 				//Petició simple
 			} else if (flux != null && ! flux.isEmpty()) {
@@ -834,6 +837,15 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	private String getPerfil() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.portafirmes.portafib.perfil");
+	}
+	private Boolean isEnviarUrlExpedientPermitida() {
+		return Boolean.valueOf(PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.portafirmes.portafib.enviar.url.expedient",
+				"false"));
+	}
+	private String getUrlExpedient() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.portafirmes.portafib.url.expedient");
 	}
 	private class LogMessageHandler implements SOAPHandler<SOAPMessageContext> {
 		public boolean handleMessage(SOAPMessageContext messageContext) {
