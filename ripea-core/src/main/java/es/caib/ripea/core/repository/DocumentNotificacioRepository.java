@@ -39,16 +39,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 	List<DocumentNotificacioEntity> findByDocumentOrderByCreatedDateAsc(
 			DocumentEntity document);
 
-	@Query(	"from" +
-			"    DocumentNotificacioEntity dne " +
-			"where" +
-			"	dne.document = :document " +
-			"and" +
-			"	rownum = 1"+
-			"order by" +
-			"	dne.createdDate desc")
-	DocumentNotificacioEntity findTopByDocumentOrderByCreatedDateDesc(
-			@Param("document") DocumentEntity document);
+	List<DocumentNotificacioEntity> findByDocumentOrderByCreatedDateDesc(DocumentEntity document);
 	
 	List<DocumentNotificacioEntity> findByDocumentAndNotificacioEstatInAndErrorOrderByCreatedDateAsc(
 			DocumentEntity document,

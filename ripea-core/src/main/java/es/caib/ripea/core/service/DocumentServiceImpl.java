@@ -970,6 +970,7 @@ public class DocumentServiceImpl implements DocumentService {
 						&& (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
 					emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 				}
+				cacheHelper.evictNotificacionsPendentsPerExpedient(documentEnviamentInteressatEntity.getNotificacio().getExpedient());
 			}
 			
 		} catch (Exception ex) {

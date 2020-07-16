@@ -187,6 +187,7 @@ public class DocumentHelper {
 		SistemaExternException sex = portafirmesEnviar(
 				documentPortafirmes,
 				transaccioId);
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 		if (sex != null) {
 			throw sex;
 		}
@@ -356,6 +357,7 @@ public class DocumentHelper {
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			portafirmesProcessar(documentPortafirmes);
 		}
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 	}
 	
 	public DocumentDto certificacioToDocumentDto(
@@ -668,6 +670,7 @@ public class DocumentHelper {
 		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
 		if (PortafirmesCallbackEstatEnumDto.FIRMAT.equals(callbackEstat)) {
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			document.updateEstat(
 					DocumentEstatEnumDto.FIRMAT);
 			PortafirmesDocument portafirmesDocument = null;
@@ -680,6 +683,7 @@ public class DocumentHelper {
 						"id=" + documentPortafirmes.getId() + ", " +
 						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 						ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentPortafirmes.updateProcessatError(
@@ -742,6 +746,7 @@ public class DocumentHelper {
 						"id=" + documentPortafirmes.getId() + ", " +
 						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 						ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentPortafirmes.updateProcessatError(
@@ -750,6 +755,7 @@ public class DocumentHelper {
 			}
 		}
 		if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			try {
 				documentPortafirmes.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
@@ -786,6 +792,7 @@ public class DocumentHelper {
 			documentViaFirma.updateEnviat(
 					new Date(),
 					messageCode);
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 		} catch (Exception ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;
@@ -800,6 +807,7 @@ public class DocumentHelper {
 		DocumentEntity document = documentViaFirma.getDocument();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			document.updateEstat(
 					DocumentEstatEnumDto.FIRMAT);
 			ViaFirmaDocument viaFirmaDocument = null;
@@ -809,6 +817,7 @@ public class DocumentHelper {
 						documentViaFirma);
 			} catch (Exception ex) {
 				logger.error("Error al descarregar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentViaFirma.updateProcessatError(
@@ -848,6 +857,7 @@ public class DocumentHelper {
 				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
@@ -858,6 +868,7 @@ public class DocumentHelper {
 		} 
 		if (ViaFirmaCallbackEstatEnumDto.WAITING_CHECK.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				contingutLogHelper.log(
 						documentViaFirma.getDocument(),
 						LogTipusEnumDto.VFIRMA_WAITING_CHECK,
@@ -874,6 +885,7 @@ public class DocumentHelper {
 		
 		if (ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -893,6 +905,7 @@ public class DocumentHelper {
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.ERROR.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -912,6 +925,7 @@ public class DocumentHelper {
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.EXPIRED.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -1042,7 +1056,8 @@ public class DocumentHelper {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");
-
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});

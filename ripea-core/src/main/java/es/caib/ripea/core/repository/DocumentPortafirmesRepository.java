@@ -44,14 +44,10 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 	DocumentPortafirmesEntity findByPortafirmesId(
 			String portafirmesId);
 
-	@Query(	"from" +
-			"    DocumentPortafirmesEntity dpe " +
-			"where" +
-			"	dpe.document = :document " +
-			"and" +
-			"	rownum = 1"+
-			"order by" +
-			"	dpe.createdDate desc")
-	DocumentPortafirmesEntity findTopByDocumentOrderByCreatedDateDesc(
-			@Param("document") DocumentEntity document);
+	List<DocumentPortafirmesEntity> findByDocumentOrderByCreatedDateDesc(DocumentEntity document);
+
+	List<DocumentPortafirmesEntity> findByDocumentAndEstatInAndErrorOrderByCreatedDateAsc(
+			DocumentEntity document,
+			DocumentEnviamentEstatEnumDto[] estat,
+			boolean error);
 }

@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
@@ -86,6 +88,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private DadesExternesService dadesExternesService;
+	@Autowired
+	private CacheHelper cacheHelper;
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
@@ -201,10 +205,12 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 //			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
 
 				if (respostaEnviar.isError()) {
+					cacheHelper.evictNotificacionsAmbErrorPerExpedient(expedientEntity);
 					notificacioEntity.updateEnviatError(
 							respostaEnviar.getErrorDescripcio(),
 							respostaEnviar.getIdentificador());
 				} else {
+					cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 					notificacioEntity.updateEnviat(
 							null,
 							respostaEnviar.getEstat(),

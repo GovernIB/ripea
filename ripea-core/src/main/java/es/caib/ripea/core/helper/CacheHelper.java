@@ -316,10 +316,10 @@ public class CacheHelper {
 		boolean errorLastEnviament = false;
 		for (ContingutEntity contingut : expedient.getFills()) {
 			if (contingut instanceof DocumentEntity) {
-				DocumentPortafirmesEntity lastEnviamentPortafirmes = documentPortafirmesRepository.findTopByDocumentOrderByCreatedDateDesc(
+				List<DocumentPortafirmesEntity> enviamentsPortafirmes = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc(
 						(DocumentEntity) contingut);
 				//Si només hi ha un enviament amb error sortim del bucle
-				if (lastEnviamentPortafirmes != null && lastEnviamentPortafirmes.isError()) {
+				if (enviamentsPortafirmes != null && enviamentsPortafirmes.size() > 0 && enviamentsPortafirmes.get(0).isError()) {
 					errorLastEnviament = true;
 					break;
 				}
@@ -328,8 +328,8 @@ public class CacheHelper {
 		return errorLastEnviament;
 	}
 
-	@CacheEvict(value = "enviamentsPortafirmesAmbErrorPerExpedient", allEntries=true)
-	public void evictEnviamentsPortafirmesAmbErrorPerExpedient() {
+	@CacheEvict(value = "enviamentsPortafirmesAmbErrorPerExpedient", key="#expedient")
+	public void evictEnviamentsPortafirmesAmbErrorPerExpedient(ExpedientEntity expedient) {
 	}
 
 	@Cacheable(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
@@ -338,10 +338,10 @@ public class CacheHelper {
 		boolean errorLastNotificacio = false; //enviaments Portafirmes amb error
 		for (ContingutEntity contingut : expedient.getFills()) {
 			if (contingut instanceof DocumentEntity) {
-				DocumentNotificacioEntity lastNotificacio = documentNotificacioRepository.findTopByDocumentOrderByCreatedDateDesc(
+				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(
 						(DocumentEntity) contingut);
 				//Si només hi ha una notificació amb error sortim del bucle
-				if (lastNotificacio != null && lastNotificacio.isError()) {
+				if (notificacions != null && notificacions.size() > 0 && notificacions.get(0).isError()) {
 					errorLastNotificacio = true;
 					break;
 				}
@@ -350,17 +350,17 @@ public class CacheHelper {
 		return errorLastNotificacio;
 	}
 	
-	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", allEntries=true)
-	public void evictNotificacionsAmbErrorPerExpedient() {
+	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
+	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) {
 	}
 	
 	@Cacheable(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
-	public boolean hasEnviamentsPendentsPerExpedient(
+	public boolean hasEnviamentsPortafirmesPendentsPerExpedient(
 			ExpedientEntity expedient) {
 		boolean hasEnviamentsPortafirmesPendents = false; //enviaments Portafirmes amb error
 		for (ContingutEntity contingut : expedient.getFills()) {
 			if (contingut instanceof DocumentEntity) {
-				List<DocumentPortafirmesEntity> enviamentsPortafirmesPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
+				List<DocumentPortafirmesEntity> enviamentsPortafirmesPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateAsc(
 						(DocumentEntity) contingut,
 						new DocumentEnviamentEstatEnumDto[] {
 								DocumentEnviamentEstatEnumDto.PENDENT,
@@ -377,8 +377,8 @@ public class CacheHelper {
 		return hasEnviamentsPortafirmesPendents;
 	}
 
-	@CacheEvict(value = "enviamentsPortafirmesPendentsPerExpedient", allEntries=true)
-	public void evictEnviamentsPendentsPerExpedient() {
+	@CacheEvict(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
+	public void evictEnviamentsPortafirmesPendentsPerExpedient(ExpedientEntity expedient) {
 	}
 
 	@Cacheable(value = "notificacionsPendentsPerExpedient", key="#expedient")
@@ -406,8 +406,8 @@ public class CacheHelper {
 		return hasNotificacionsPendents;
 	}
 	
-	@CacheEvict(value = "notificacionsPendentsPerExpedient", allEntries=true)
-	public void evictNotificacionsPendentsPerExpedient() {
+	@CacheEvict(value = "notificacionsPendentsPerExpedient", key="#expedient")
+	public void evictNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {
 	}
 
 	private ValidacioErrorDto crearValidacioError(
