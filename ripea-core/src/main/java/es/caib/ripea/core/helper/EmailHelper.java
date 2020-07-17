@@ -138,6 +138,8 @@ public class EmailHelper {
 		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
 				expedient,
 				enviamentCreatedByCodi,
 				null);
@@ -206,6 +208,8 @@ public class EmailHelper {
 		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
 				expedient,
 				notificacioCreatedByCodi,
 				null);
@@ -274,6 +278,8 @@ public class EmailHelper {
 		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
 				expedient,
 				notificacioCreatedByCodi,
 				null);
@@ -343,6 +349,8 @@ public class EmailHelper {
 				expedientTascaEntity, 
 				estatAnterior, 
 				getGestors(
+						true,
+						estatAnterior == null,
 						expedientTascaEntity.getExpedient(),
 						expedientTascaEntity.getCreatedBy().getCodi(),
 						expedientTascaEntity.getResponsable() != null ? expedientTascaEntity.getResponsable().getCodi() : null),
@@ -357,6 +365,8 @@ public class EmailHelper {
 	}
 	
 	private Set<DadesUsuari> getGestors(
+			boolean isTasca,
+			boolean isTascaNova,
 			ExpedientEntity expedient,
 			String createdByCodi,
 			String responsableCodi) {
@@ -366,7 +376,7 @@ public class EmailHelper {
 		if (createdByCodi != null) {
 			//Persona que ha llançat l'enviament / tasca (createdBy)
 			DadesUsuari createdBy = pluginHelper.dadesUsuariFindAmbCodi(createdByCodi);
-			if (createdBy.getEmail() != null && !createdBy.getEmail().isEmpty())
+			if ((!isTasca || (isTasca && isTascaNova)) && createdBy.getEmail() != null && !createdBy.getEmail().isEmpty())
 				responsables.add(createdBy);
 	
 			//Persona responsable tasca
