@@ -16,12 +16,14 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 
 /**
@@ -40,7 +42,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-
+	
 	@Transactional
 	@Override
 	public TipusDocumentalDto create(
@@ -53,6 +55,12 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true,
 				false);
+		if (! suportaMetaDocumentalsAddicionals())
+			throw new ValidationException(
+					"<creacio>",
+					TipusDocumentalService.class,
+					"La versió actual de l'aplicació no suporta la creació de nous tipus documentals");
+		
 		TipusDocumentalEntity entity = TipusDocumentalEntity.getBuilder(
 				tipusDocumental.getCodi(),
 				tipusDocumental.getNom(),
@@ -71,20 +79,30 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		logger.debug("Actualitzant el tipus documental per l'entitat (" +
 				"entitatId=" + entitatId +
 				"tipusDocumentalId=" + tipusDocumental.getId() + ")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		if (! suportaMetaDocumentalsAddicionals())
+			throw new ValidationException(
+					"<creacio>",
+					TipusDocumentalService.class,
+					"La versió actual de l'aplicació no permet la modificació de tipus documentals");
+		
+		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.findOne(tipusDocumental.getId());
 
-		TipusDocumentalEntity entity = tipusDocumentalRepository.findOne(tipusDocumental.getId());
-
-		if (entity == null || !entity.getId().equals(tipusDocumental.getId())) {
+		if (tipusDocumentalEntity == null || !tipusDocumentalEntity.getId().equals(tipusDocumental.getId())) {
 			throw new NotFoundException(
 					tipusDocumental.getId(),
 					TipusDocumentalEntity.class);
 		}
 
-		entity.update(
+		tipusDocumentalEntity.update(
 				tipusDocumental.getCodi(),
 				tipusDocumental.getNom());
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
-				entity,
+				tipusDocumentalEntity,
 				TipusDocumentalDto.class);
 		return dto;
 	}
@@ -97,13 +115,23 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		logger.debug("Esborrant el tipus documental per l'entitat (" +
 				"entitatId=" + entitatId +
 				"tipusDocumentalId=" + id + ")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		if (! suportaMetaDocumentalsAddicionals())
+			throw new ValidationException(
+					"<creacio>",
+					TipusDocumentalService.class,
+					"La versió actual de l'aplicació no permet esborrar tipus documentals");
+		
+		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.findOne(id);
 
-		TipusDocumentalEntity entity = tipusDocumentalRepository.findOne(id);
-
-		tipusDocumentalRepository.delete(entity);
+		tipusDocumentalRepository.delete(tipusDocumentalEntity);
 
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
-				entity,
+				tipusDocumentalEntity,
 				TipusDocumentalDto.class);
 		return dto;
 	}
@@ -171,6 +199,12 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitat);
 		return conversioTipusHelper.convertir(tipusDocumental, TipusDocumentalDto.class);
 	}
+	
+	private boolean suportaMetaDocumentalsAddicionals() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.ripea.arxiu.metadocumental.addicional.actiu");
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(TipusDocumentalServiceImpl.class);
 
 }

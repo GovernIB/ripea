@@ -17,9 +17,11 @@
 
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="tipusDocumental/new" data-toggle="modal" data-datatable-id="tipusdocumental"><span class="fa fa-plus"></span>&nbsp;<spring:message code="tipusdocumental.boto.afegir"/></a>
-	</div>
+	<c:if test="${suportaMetaDocumentalsAddicionals}">
+		<div class="text-right" data-toggle="botons-titol">
+			<a class="btn btn-default" href="tipusDocumental/new" data-toggle="modal" data-datatable-id="tipusdocumental"><span class="fa fa-plus"></span>&nbsp;<spring:message code="tipusdocumental.boto.afegir"/></a>
+		</div>
+	</c:if>
 	<table 
 		id="tipusdocumental"
 		data-toggle="datatable" 
@@ -32,8 +34,9 @@
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="tipusdocumental.columna.codi"/></th>
 				<th data-col-name="nom" data-orderable="false"><spring:message code="tipusdocumental.columna.nom"/></th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
+				<c:if test="${suportaMetaDocumentalsAddicionals}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
@@ -42,7 +45,8 @@
 							</ul>
 						</div>
 					</script>
-				</th>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

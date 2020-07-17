@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.TipusDocumentalCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -33,12 +34,15 @@ public class TipusDocumentalController extends BaseAdminController {
 
 	@Autowired
 	private TipusDocumentalService tipusDocumentalService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
+		model.addAttribute("suportaMetaDocumentalsAddicionals", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.arxiu.metadocumental.addicional.actiu")));
 		return "tipusDocumentalList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
