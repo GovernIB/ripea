@@ -4,7 +4,6 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,8 +19,6 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -32,7 +29,6 @@ import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -51,8 +47,6 @@ public class EmailHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
 	@Autowired
@@ -141,11 +135,12 @@ public class EmailHelper {
 			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
 		
 		DocumentEntity document = documentPortafirmes.getDocument();
-		String enviamentResponsableCodi = documentPortafirmes.getCreatedBy().getCodi();
+		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		Set<DadesUsuari> responsables = getGestors(
 				expedient,
-				enviamentResponsableCodi);
+				enviamentCreatedByCodi,
+				null);
 		
 		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes";
@@ -208,11 +203,12 @@ public class EmailHelper {
 		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (" +
 			"documentNotificacioId=" + documentNotificacio.getId() + ")");
 		DocumentEntity document = documentNotificacio.getDocument();
-		String notificacioResponsableCodi = documentNotificacio.getCreatedBy().getCodi();
+		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		Set<DadesUsuari> responsables = getGestors(
 				expedient,
-				notificacioResponsableCodi);
+				notificacioCreatedByCodi,
+				null);
 		
 		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
@@ -275,11 +271,12 @@ public class EmailHelper {
 			"documentNotificacioId=" + documentNotificacio.getId() + ")");
 		
 		DocumentEntity document = documentNotificacio.getDocument();
-		String notificacioResponsableCodi = documentNotificacio.getCreatedBy().getCodi();
+		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		Set<DadesUsuari> responsables = getGestors(
 				expedient,
-				notificacioResponsableCodi);
+				notificacioCreatedByCodi,
+				null);
 		
 		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
@@ -342,17 +339,14 @@ public class EmailHelper {
 		logger.debug("Enviant correu electrònic per a canvis de tasca (" +
 			"tascaId=" + expedientTascaEntity.getId() + ")");
 
-
 		enviarEmailCanviarEstatTasca(
 				expedientTascaEntity, 
 				estatAnterior, 
-				getGestors(expedientTascaEntity.getExpedient(), null),
+				getGestors(
+						expedientTascaEntity.getExpedient(),
+						expedientTascaEntity.getCreatedBy().getCodi(),
+						expedientTascaEntity.getResponsable() != null ? expedientTascaEntity.getResponsable().getCodi() : null),
 				false);
-		
-		if (expedientTascaEntity.getResponsable() != null && expedientTascaEntity.getResponsable().getEmail() != null && !expedientTascaEntity.getResponsable().getEmail().isEmpty()) {
-			
-			enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior,  new HashSet<DadesUsuari>(Arrays.asList(pluginHelper.dadesUsuariFindAmbCodi((expedientTascaEntity.getResponsable().getCodi())))), true);
-		}
 
 	}	
 	
@@ -364,56 +358,69 @@ public class EmailHelper {
 	
 	private Set<DadesUsuari> getGestors(
 			ExpedientEntity expedient,
-			String enviamentResponsableCodi) {
+			String createdByCodi,
+			String responsableCodi) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
 		UsuariEntity agafatPer = expedient.getAgafatPer();
 		
-		if (enviamentResponsableCodi != null) {
-			//Persona que ha llançat l'enviament
-			responsables.add(pluginHelper.dadesUsuariFindAmbCodi(enviamentResponsableCodi));
+		if (createdByCodi != null) {
+			//Persona que ha llançat l'enviament / tasca (createdBy)
+			DadesUsuari createdBy = pluginHelper.dadesUsuariFindAmbCodi(createdByCodi);
+			if (createdBy.getEmail() != null && !createdBy.getEmail().isEmpty())
+				responsables.add(createdBy);
 	
+			//Persona responsable tasca
+			if (responsableCodi != null) {
+				DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(responsableCodi);
+				if (responsable.getEmail() != null && !responsable.getEmail().isEmpty())
+					responsables.add(responsable);
+			}
+			
 			//Persona que té agafat l'expedient
-			if (agafatPer != null && (!agafatPer.getCodi().equals(enviamentResponsableCodi))) {
-				UsuariEntity propietariExpedient = expedient.getAgafatPer();
-				responsables.add(pluginHelper.dadesUsuariFindAmbCodi(propietariExpedient.getCodi()));
+			if (agafatPer != null && (!agafatPer.getCodi().equals(createdByCodi))) {
+				DadesUsuari propietariExpedient = pluginHelper.dadesUsuariFindAmbCodi(expedient.getAgafatPer().getCodi());
+				if (propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
+					responsables.add(propietariExpedient);
 			}
 			
 			//Seguidors
-			List<UsuariEntity> followers = expedient.getSeguidors();
-			for (UsuariEntity follower : followers) {
-				DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(follower.getCodi());
-				//En cas de no ser la mateixa persona que ha llançat l'enviament o la que te agafat l'expedient
-				if ((agafatPer != null && (!agafatPer.getCodi().equals(follower.getCodi()))) 
-						&& !enviamentResponsableCodi.equals(follower.getCodi()))
-					responsables.add(responsable);
-			}
-		} else {
-			List<PermisDto> permisos = permisosHelper.findPermisos(
-					expedient.getMetaNode().getId(),
-					MetaNodeEntity.class);
-			for (PermisDto permis: permisos) {
-				if (permis.isWrite()) {
-					try {
-						if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
-							responsables.add(
-									pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
-						}
-						if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
-							responsables.addAll(
-									pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
-						}
-					} catch (Exception ex) {
-						logger.error(
-								"No s'ha pogut obtenir el gestor de l'expedient(" +
-								"id=" + expedient.getId() + ", " +
-								"nom=" + expedient.getNom() + ", " +
-								"any=" + expedient.getAny() + ", " +
-								"sequencia=" + expedient.getSequencia() + ")",
-								ex);
-					}
+			List<UsuariEntity> seguidors = expedient.getSeguidors();
+			for (UsuariEntity seguidorEntity : seguidors) {
+				DadesUsuari seguidor = pluginHelper.dadesUsuariFindAmbCodi(seguidorEntity.getCodi());
+				
+				if ((agafatPer != null 
+						&& (!agafatPer.getCodi().equals(seguidor.getCodi()))) //En cas de no ser la mateixa persona que ha llançat l'enviament o la que te agafat l'expedient
+						&& !createdByCodi.equals(seguidor.getCodi())
+						&& (seguidor.getEmail() != null && !seguidor.getEmail().isEmpty())) {
+					responsables.add(seguidor);
 				}
 			}
 		}
+//			List<PermisDto> permisos = permisosHelper.findPermisos(
+//					expedient.getMetaNode().getId(),
+//					MetaNodeEntity.class);
+//			for (PermisDto permis: permisos) {
+//				if (permis.isWrite()) {
+//					try {
+//						if (PrincipalTipusEnumDto.USUARI == permis.getPrincipalTipus()) {
+//							responsables.add(
+//									pluginHelper.dadesUsuariFindAmbCodi(permis.getPrincipalNom()));
+//						}
+//						if (PrincipalTipusEnumDto.ROL == permis.getPrincipalTipus()) {
+//							responsables.addAll(
+//									pluginHelper.dadesUsuariFindAmbGrup(permis.getPrincipalNom()));
+//						}
+//					} catch (Exception ex) {
+//						logger.error(
+//								"No s'ha pogut obtenir el gestor de l'expedient(" +
+//								"id=" + expedient.getId() + ", " +
+//								"nom=" + expedient.getNom() + ", " +
+//								"any=" + expedient.getAny() + ", " +
+//								"sequencia=" + expedient.getSequencia() + ")",
+//								ex);
+//					}
+//				}
+//			}
 		return responsables;
 	}
 	
@@ -429,6 +436,7 @@ public class EmailHelper {
 		String from = getRemitent();
 		String subject;
 		String text;
+		String comentari = expedientTascaEntity.getComentari();
 		TascaEstatEnumDto estat = expedientTascaEntity.getEstat();
 		String rebutjMotiu = "";
 		if (estat == TascaEstatEnumDto.REBUTJADA) {
@@ -445,6 +453,7 @@ public class EmailHelper {
 					"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
 					"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
 					"\tEstat: " + estat + "\n" +
+					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + estat + "\n" : "") +
 					enllacTramitar;
 		} else {
 			subject = PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
@@ -454,6 +463,7 @@ public class EmailHelper {
 							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
 							"\tEstat anterior:" + estatAnterior + "\n" +
 							"\tEstat actual:" + estat + "\n" + 
+							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + estat + "\n" : "") +
 							rebutjMotiu +
 							enllacTramitar;
 		}
