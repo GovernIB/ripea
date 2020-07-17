@@ -1267,9 +1267,6 @@ public class ContingutHelper {
 	
 	
 	public void marcarEsborrat(ContingutEntity contingut) {
-		// TODO: DELETE
-		logger.info(" >>>>>>>>> [DELETE CONTINGUT] Marcar com a esborrat:" + contingut.toString());
-		// TODO: FI DELETE
 		for (ContingutEntity contingutFill: contingut.getFills()) {
 			marcarEsborrat(contingutFill);
 		}

@@ -226,9 +226,6 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
 		
-		// TODO: DELETE
-		logger.info(" >>>>>>>>> [DELETE CONTINGUT] Borrant contingut amb ID:" + contingutId);
-		// TODO: FI DELETE
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -236,10 +233,6 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true);
-		// TODO: DELETE
-		logger.info(" >>>>>>>>> [DELETE CONTINGUT] Es borrarà el contingut :" + contingut.getNom() + "(" + contingut.getTipus() + ")");
-		// TODO: FI DELETE
-		
 
 
 		return contingutHelper.deleteReversible(
