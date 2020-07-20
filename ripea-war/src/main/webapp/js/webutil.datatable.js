@@ -148,6 +148,7 @@
 					}
 				},
 				preDrawCallback: function(settings_) {
+					var currentLenthMenu = settings_._iDisplayLength;
 					if (plugin.settings.botonsTemplate && plugin.settings.botonsTemplate.length > 0) {
 						$.templates("templateNew", $(plugin.settings.botonsTemplate).html());
 						var targetBotons = $('.botons', this.parent());
@@ -161,7 +162,7 @@
 							var label = $('label', $(this));
 							var botons = $('<div class="btn-group"></div>');
 							$('option', label).each(function() {
-								var active = ($(this).val() == plugin.settings.pageLength);
+								var active = (currentLenthMenu != undefined ? ($(this).val() == currentLenthMenu) : ($(this).val() == plugin.settings.pageLength));
 								botons.append('<button value="' + $(this).val() + '" class="btn btn-default' + ((active) ? ' active': '') + '">' + $(this).val() + '</button>')
 							});
 							label.css('display', 'none');

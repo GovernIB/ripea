@@ -245,7 +245,7 @@ body {
 							<c:when test="${isRolActualUsuari}">
 							
 								<%---- Expedients ----%>
-								<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="false" /></c:url>"class="btn btn-primary">
+								<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary">
 										<spring:message code="decorator.menu.expedients"/>
 								</a>
 								
