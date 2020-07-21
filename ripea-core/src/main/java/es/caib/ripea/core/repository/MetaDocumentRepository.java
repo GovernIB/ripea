@@ -32,7 +32,6 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 	List<MetaDocumentEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 	
-	
 	@Query(	"from " +
 			"    MetaDocumentEntity md " +
 			"where " +
@@ -72,4 +71,8 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("esNullEntitat") boolean esNullEntitat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaDocumentTipusGeneric") MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric);
+	
+	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActiva(
+			MetaExpedientEntity metaExpedient,
+			boolean firmaPortafirmesActiva);
 }

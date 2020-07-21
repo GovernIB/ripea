@@ -41,7 +41,7 @@
 			}
 			if (plugin.settings.selectionEnabled) {
 				$('thead tr,tfoot tr', $taula).each(function() {
-					$(this).prepend($('<th>&nbsp;</th>'));
+					$(this).prepend($('<th width="2%">&nbsp;</th>'));
 				});
 				$('tbody tr', $taula).each(function() {
 					$(this).prepend($('<td></td>'));

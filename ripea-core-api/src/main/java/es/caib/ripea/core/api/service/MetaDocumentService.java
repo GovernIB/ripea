@@ -308,5 +308,15 @@ public interface MetaDocumentService {
 			Long entitatId,
 			MetaDocumentTipusGenericEnumDto tipusGeneric);
 
-	
+	/**
+	 * Consulta els meta-documents actius i amb l'opció de Portafirmes activa donat un tipus d'expedient 
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del tipus d'expedient.
+	 * @return La llista de tipus o null si el plugin no suporta la consulta.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId);
 }

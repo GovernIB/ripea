@@ -67,6 +67,13 @@
 			}
 		});
 		
+		$('#tipusDocument').on('change', function() {
+			var tipus = $(this).val();
+			$('thead tr th:nth-child(1)', $('#taulaDades')).each(function() {
+				enableDisableSelection($(this), tipus);
+			});
+		});
+		
 		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
 					accio,
@@ -77,6 +84,15 @@
 			);
 		});
 		$('#taulaDades').on('draw.dt', function () {
+			//after draw tbody
+			$('#tipusDocument').on('change', function() {
+				var tipus = $(this).val();
+				$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function() {
+					enableDisableSelection($(this), tipus);
+				});
+				/* var tableLength = $('#taulaDades').find('tr').length - 1;
+				enableDisableSelection(tipus, tableLength); */
+			});
 			$('#seleccioAll').on('click', function() {
 				$.get(
 						"select",
@@ -98,8 +114,54 @@
 				);
 				return false;
 			});
+
+			$('#tipusDocument').trigger('change');
 		});
+
+		$('#tipusDocument').trigger('change');
 	});
+	
+	function enableDisableSelection($this, tipus) {
+		console.log(tipus);
+		console.log($this);
+	    if (tipus != undefined && tipus != "") {
+	    	$this.removeClass('selection-disabled');
+	    } else {
+	    	$this.addClass('selection-disabled');
+			$.get(
+					"deselect",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taulaDades').webutilDatatable('select-none');
+					}
+				);
+		}
+	}
+	
+	/* function enableDisableSelection(tipus, tableSize) {
+		var $currentTheadElement = $('thead tr:nth-child(' + tableSize + ') th:nth-child(1)');
+		var $currentTbodyElement = $('tbody tr:nth-child(' + tableSize + ') td:nth-child(1)');
+		
+	    if (tipus != undefined && tipus != "") {
+	    	$currentTheadElement.removeClass('selection-disabled');
+	    	$currentTbodyElement.removeClass('selection-disabled');
+	    } else {
+	    	$currentTheadElement.addClass('selection-disabled');
+	    	$currentTbodyElement.addClass('selection-disabled');
+			$.get(
+					"deselect",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taulaDades').webutilDatatable('select-none');
+					}
+				);
+		}
+	    
+	    let nextElement = tableSize - 1;
+	    if (nextElement > 0) {
+	    	enableDisableSelection(tipus, nextElement);
+	    }
+	} */
 </script>
 
 </head>
@@ -163,13 +225,12 @@
 			{{/if}}
 		</div>
 	</script>
-		
 	<table id="taulaDades" 
 		data-toggle="datatable" 
 		data-url="<c:url value="/massiu/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
-		data-default-order="7" 
+		data-default-order="8" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
@@ -180,14 +241,8 @@
 				<th data-col-name="expedient" data-visible="false"></th>
 				<th data-col-name="carpeta" data-visible="false"></th>
 				<th data-col-name="document" data-visible="false"></th>
-				<th data-col-name="tipus" data-orderable="true" width="15%" data-template="#cellTipusTemplate">
-					<spring:message code="accio.massiva.list.column.tipuselement"/>
-					<script id="cellTipusTemplate" type="text/x-jsrender">
-						{{if tipus == 'DOCUMENT'}}
-							<span class="fa fa-file-text-o"></span> <spring:message code="contingut.tipus.enum.DOCUMENT"/>
-						{{/if}}
-					</script>
-				</th>
+				<th data-col-name="metaDocument.id" data-visible="false"></th>
+				<th data-col-name="metaDocument.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
 				<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
 					<spring:message code="accio.massiva.list.column.ubicacio"/>
 					<script id="cellPathTemplate" type="text/x-jsrender">
@@ -201,6 +256,7 @@
 				</th>
 				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
+				<th data-col-name="createdBy.codi" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 <%-- 				<th data-col-name="nomPropietariEscriptoriPare" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th> --%>
 			</tr>
 		</thead>

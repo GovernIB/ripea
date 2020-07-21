@@ -338,7 +338,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
-		metaDocuments = metaDocumentService.findByMetaExpedient(entitatActual.getId(), metaExpedientId);
+		metaDocuments = metaDocumentService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatActual.getId(), metaExpedientId);
 		
 		return metaDocuments;
 	}	

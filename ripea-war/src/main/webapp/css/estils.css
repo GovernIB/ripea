@@ -128,3 +128,8 @@ div.exemple {
 	display: none;
 	margin-top: 2px;
 }
+
+.selection-disabled {
+	pointer-events: none;
+	opacity: .65;
+}

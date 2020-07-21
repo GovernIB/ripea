@@ -606,6 +606,30 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(
+			Long entitatId,
+			Long metaExpedientId) {
+		logger.debug("Consulta dels meta-documents del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
+
+		return conversioTipusHelper.convertirList(
+				metaDocumentRepository.findByMetaExpedientAndFirmaPortafirmesActiva(
+						metaExpedient, 
+						true),
+				MetaDocumentDto.class);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentServiceImpl.class);
 
 }
