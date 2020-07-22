@@ -427,8 +427,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false);
 
-		ExpedientEstatEntity estatCrearTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca());
-		ExpedientEstatEntity estatFinalitzarTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca());
+		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
+		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.findOne(idEstatCrear): null;
+		
+		Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
+		ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.findOne(idEstatFinalitzar) : null;
 		
 		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
 				metaExpedientTasca.getCodi(),
@@ -438,8 +441,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient, 
 				metaExpedientTasca.getDataLimit(),
 				estatCrearTasca,
-				estatFinalitzarTasca).
-				build();
+				estatFinalitzarTasca
+				).build();
 		return conversioTipusHelper.convertir(
 				metaExpedientTascaRepository.save(entity),
 				MetaExpedientTascaDto.class);
