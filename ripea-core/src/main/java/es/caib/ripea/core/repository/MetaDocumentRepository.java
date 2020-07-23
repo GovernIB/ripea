@@ -72,7 +72,11 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaDocumentTipusGeneric") MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric);
 	
-	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActiva(
-			MetaExpedientEntity metaExpedient,
-			boolean firmaPortafirmesActiva);
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where (md.metaExpedient = :metaExpedient) " +
+			"and (md.firmaPortafirmesActiva = 1) "+
+			"and (md.portafirmesResponsables != null or md.portafirmesFluxId != null)")
+	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActivaAmbFluxOResponsable(
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 }

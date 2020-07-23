@@ -255,6 +255,7 @@ public interface DocumentService {
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
+			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,

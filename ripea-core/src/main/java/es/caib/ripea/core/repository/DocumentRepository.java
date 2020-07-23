@@ -97,7 +97,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) " +
 			"and (c.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
-			"				where metaDocument.firmaPortafirmesActiva = 1))")
+			"				where metaDocument.firmaPortafirmesActiva = 1" + 
+			"				and (metaDocument.portafirmesResponsables != null or metaDocument.portafirmesFluxId != null)))")
 	public List<DocumentEntity> findDocumentMassiuByFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullMetaExpedientId") boolean esNullMetaExpedientId,

@@ -6,7 +6,6 @@ package es.caib.ripea.war.controller;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,8 +44,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
@@ -119,8 +116,6 @@ public class DocumentController extends BaseUserController {
 				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
-		
-		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		setFluxPredefinit(
@@ -128,6 +123,7 @@ public class DocumentController extends BaseUserController {
 				model, 
 				command);
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
+		model.addAttribute("isNouEnviament", true);
 		model.addAttribute(command);
 		return "portafirmesForm";
 	}
@@ -139,13 +135,7 @@ public class DocumentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (bindingResult.hasErrors()) {
-			emplenarModelPortafirmes(
-					request,
-					documentId,
-					model);
-			return "portafirmesForm";
-		}
+
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
 				documentId);
@@ -153,6 +143,18 @@ public class DocumentController extends BaseUserController {
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				entitatActual.getId(),
 				document.getMetaDocument().getId());
+		
+		if (bindingResult.hasErrors()) {
+			setFluxPredefinit(
+					metaDocument, 
+					model, 
+					command);
+			emplenarModelPortafirmes(
+					request,
+					documentId,
+					model);
+			return "portafirmesForm";
+		}
 		
 		String transaccioId = null;
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB)) {
@@ -171,8 +173,9 @@ public class DocumentController extends BaseUserController {
 					command);
 			MissatgesHelper.error(
 					request, 
-					"document.controller.portafirmes.flux.ko");
-			model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+					getMessage(
+							request,
+							"document.controller.portafirmes.flux.ko"));
 			return "portafirmesForm";
 		}
 		documentService.portafirmesEnviar(
@@ -181,6 +184,7 @@ public class DocumentController extends BaseUserController {
 				command.getMotiu(),
 				command.getPrioritat(),
 				command.getDataCaducitat(),
+				null,
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
@@ -585,72 +589,72 @@ public class DocumentController extends BaseUserController {
 						documentId);		
 	}
 	
-	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
-	@ResponseBody
-	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
-			HttpServletRequest request,
-			@RequestParam(value="nom", required = false) String nom,
-			Model model) {
-		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
-		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
-		String descripcio = getMessage(
-				request, 
-				"document.controller.portafirmes.flux.desc");
-		
-		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
-		try {
-			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-					urlReturn,
-					nomCodificat,
-					descripcio,
-					false);
-		} catch (Exception ex) {
-			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
-			transaccioResponse.setError(true);
-			transaccioResponse.setErrorDescripcio(ex.getMessage());
-		}
-		return transaccioResponse;
-	}
-	
-	@RequestMapping(value = "/portafirmes/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
-	@ResponseBody
-	public void tancarTransaccio(
-			HttpServletRequest request,
-			@PathVariable String idTransaccio,
-			Model model) {
-		portafirmesFluxService.tancarTransaccio(idTransaccio);
-	}
-
-	@RequestMapping(value = "/portafirmes/flux/returnurl/{transactionId}", method = RequestMethod.GET)
-	public String transaccioEstat(
-			HttpServletRequest request,
-			@PathVariable String transactionId,
-			Model model) {
-		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-
-		if (resposta.isError() && resposta.getEstat() != null) {
-			model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
-		} else {
-			model.addAttribute(
-					"FluxCreat",
-					getMessage(
-					request,
-					"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
-			model.addAttribute(
-					"FluxNom", resposta.getNom());
-			model.addAttribute(
-					"FluxDescripcio", resposta.getDescripcio());
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_TRANSACCIOID,
-					transactionId);
-		}
-		return "portafirmesModalTancar";
-	}
+//	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
+//	@ResponseBody
+//	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
+//			HttpServletRequest request,
+//			@RequestParam(value="nom", required = false) String nom,
+//			Model model) {
+//		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
+//		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
+//		String descripcio = getMessage(
+//				request, 
+//				"document.controller.portafirmes.flux.desc");
+//		
+//		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
+//		try {
+//			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
+//					urlReturn,
+//					nomCodificat,
+//					descripcio,
+//					false);
+//		} catch (Exception ex) {
+//			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
+//			transaccioResponse.setError(true);
+//			transaccioResponse.setErrorDescripcio(ex.getMessage());
+//		}
+//		return transaccioResponse;
+//	}
+//	
+//	@RequestMapping(value = "/portafirmes/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
+//	@ResponseBody
+//	public void tancarTransaccio(
+//			HttpServletRequest request,
+//			@PathVariable String idTransaccio,
+//			Model model) {
+//		portafirmesFluxService.tancarTransaccio(idTransaccio);
+//	}
+//
+//	@RequestMapping(value = "/portafirmes/flux/returnurl/{transactionId}", method = RequestMethod.GET)
+//	public String transaccioEstat(
+//			HttpServletRequest request,
+//			@PathVariable String transactionId,
+//			Model model) {
+//		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
+//
+//		if (resposta.isError() && resposta.getEstat() != null) {
+//			model.addAttribute(
+//						"FluxError",
+//						getMessage(
+//						request,
+//						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+//		} else {
+//			model.addAttribute(
+//					"FluxCreat",
+//					getMessage(
+//					request,
+//					"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+//			model.addAttribute(
+//					"FluxNom", resposta.getNom());
+//			model.addAttribute(
+//					"FluxDescripcio", resposta.getDescripcio());
+//			RequestSessionHelper.actualitzarObjecteSessio(
+//					request,
+//					SESSION_ATTRIBUTE_TRANSACCIOID,
+//					transactionId);
+//		}
+//		return "portafirmesModalTancar";
+//	}
 	
 	@RequestMapping(value = "/{documentId}/urlValidacio", method = RequestMethod.GET)
 	@ResponseBody
@@ -707,6 +711,7 @@ public class DocumentController extends BaseUserController {
 			model.addAttribute("nouFluxDeFirma", false);
 			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
 		}
+		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 	}
 	
 	@InitBinder

@@ -108,6 +108,7 @@ public class DocumentHelper {
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
+			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
@@ -173,7 +174,7 @@ public class DocumentHelper {
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
-				document.getMetaDocument().getPortafirmesFluxId(),
+				portafirmesFluxId != null ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
 				document).build();
 

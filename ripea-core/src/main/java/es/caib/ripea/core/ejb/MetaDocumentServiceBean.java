@@ -210,4 +210,10 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				tipusGeneric);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId) {
+		return delegate.findByMetaExpedientAndFirmaPortafirmesActiva(entitatId, metaExpedientId);
+	}
+
 }

@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity.ExecucioMassivaEstat;
@@ -420,8 +421,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					em.getPrioritat(),
 					em.getDataCaducitat(),
 					null,
-					null,
-					null,
+					((DocumentEntity) contingut).getMetaDocument().getPortafirmesResponsables(),
+					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),
+					((DocumentEntity) contingut).getMetaDocument().getPortafirmesFluxTipus(),
 					null,
 					null);
 				

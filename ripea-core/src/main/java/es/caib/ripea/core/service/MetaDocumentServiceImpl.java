@@ -624,9 +624,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaExpedientId);
 
 		return conversioTipusHelper.convertirList(
-				metaDocumentRepository.findByMetaExpedientAndFirmaPortafirmesActiva(
-						metaExpedient, 
-						true),
+				metaDocumentRepository.findByMetaExpedientAndFirmaPortafirmesActivaAmbFluxOResponsable(
+						metaExpedient),
 				MetaDocumentDto.class);
 	}
 	

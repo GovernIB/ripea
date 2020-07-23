@@ -436,6 +436,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				assumpte,
 				prioritat,
 				dataCaducitat,
+				null,
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
