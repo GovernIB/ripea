@@ -1059,16 +1059,6 @@ public class ContingutHelper {
 					objectClass,
 					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
-//		if (contingutPare != null) {
-//			for (ContingutEntity fill: contingutPare.getFills()) {
-//				if ((!fill.getId().equals(id) && fill.getNom().equals(nom))  ) {
-//					throw new ValidationException(
-//							id,
-//							objectClass,
-//							"Ja existeix un altre contingut amb el mateix nom");
-//				}
-//			}
-//		}
 	}
 
 	public void arxiuPropagarModificacio(

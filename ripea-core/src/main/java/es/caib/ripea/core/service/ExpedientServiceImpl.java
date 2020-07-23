@@ -480,6 +480,53 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true);
 	}
 
+	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
+			Long entitatId,
+			Long metaExpedientId,
+			Long pareId,
+			String nom,
+			int esborrat)
+	{
+		logger.debug("Consultant expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "metaExpedientId=" + metaExpedientId + ", "
+				+ "pareId=" + pareId + ", "
+				+ "nom=" + nom + ", "
+				+ "esborrat=" + esborrat + ")");
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId,
+				false,
+				false,
+				true,
+				false);
+		
+		ContingutEntity contingutPare = null;
+		if (pareId != null) {
+			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					pareId,
+					false,
+					false,
+					true,
+					false);
+		}
+		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
+				metaExpedient,
+				contingutPare,
+				nom,
+				esborrat);
+		return toExpedientDto(
+				expedient,
+				true);
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientDto> findAmbFiltreAdmin(

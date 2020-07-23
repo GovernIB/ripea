@@ -61,7 +61,18 @@ public class ExpedientServiceBean implements ExpedientService {
 				expedientPeticioId,
 				associarInteressats);
 	}
-
+	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
+			Long entitatId,
+			Long metaExpedientId,
+			Long pareId,
+			String nom,
+			int esborrat) {
+		return delegate.findByMetaExpedientAndPareAndNomAndEsborrat(entitatId,
+																	metaExpedientId,
+																	pareId,
+																	nom,
+																	esborrat);
+	}
 	@Override
 	@RolesAllowed("tothom")
 	public ExpedientDto update(
