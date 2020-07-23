@@ -9,12 +9,18 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.CodiMetaExpedientTascaNoRepetit;
 
 /**
  * Command per a les tasques del meta-expedient.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@CodiMetaExpedientTascaNoRepetit(
+		campId = "id",
+		campCodi = "codi",
+		campEntitatId = "entitatId",
+		campMetaExpedientId = "metaExpedientId")
 public class MetaExpedientTascaCommand {
 
 	private Long id;
@@ -30,6 +36,9 @@ public class MetaExpedientTascaCommand {
 	private Long estatIdCrearTasca;
 	private Long estatIdFinalitzarTasca;
 
+	private Long entitatId;
+	private Long metaExpedientId;
+	
 	public Long getId() {
 		return id;
 	}
@@ -96,6 +105,20 @@ public class MetaExpedientTascaCommand {
 	}
 	public void setDataLimit(Date dataLimit) {
 		this.dataLimit = dataLimit;
+	}
+
+	public Long getEntitatId() {
+		return entitatId;
+	}
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
+
+	public Long getMetaExpedientId() {
+		return metaExpedientId;
+	}
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
 	}
 
 	public interface Create {}

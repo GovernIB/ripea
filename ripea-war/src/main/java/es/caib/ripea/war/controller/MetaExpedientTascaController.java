@@ -122,6 +122,9 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			command = MetaExpedientTascaCommand.asCommand(tasca);
 		else
 			command = new MetaExpedientTascaCommand();
+		
+		command.setEntitatId(entitatActual.getId());
+		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
 		return "metaExpedientTascaForm";
 	}
