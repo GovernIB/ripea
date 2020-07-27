@@ -22,8 +22,10 @@ multiplicitatText["${option.value}"] = "<spring:message code="${option.text}"/>"
 </script>
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="../../metaExpedient/${metaExpedient.id}/metaDocument/new" data-toggle="modal" data-datatable-id="metadocuments"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.metadocument.boto.afegir"/></a>
+	<div class="pull-right" data-toggle="botons-titol">
+		<a class="btn btn-default" href="../../metaExpedient/${metaExpedient.id}/metaDocument/new" data-toggle="modal" data-datatable-id="metadocuments">
+			<span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.metadocument.boto.afegir"/>
+		</a>
 	</div>
 	<table id="metadocuments" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/metaDocument/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-ordering="false" class="table table-striped table-bordered">
 		<thead>
