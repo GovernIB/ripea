@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.validation;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -44,17 +46,23 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 		try {
-			final Long id = Long.valueOf(BeanUtils.getProperty(value, campId));
-			final Long metaExpedientId = Long.valueOf(BeanUtils.getProperty(value, campMetaExpedientId));
+			final Long id = getLongProperty(value, campId);
+			final Long metaExpedientId = getLongProperty(value, campMetaExpedientId); 
 			final String nom = BeanUtils.getProperty(value, campNom);
-			final Long entitatId = Long.valueOf(BeanUtils.getProperty(value, campEntitatId));
-			final Long pareId = Long.valueOf(BeanUtils.getProperty(value, campPareId));
+			final Long entitatId = getLongProperty(value, campEntitatId); 
+			final Long pareId = getLongProperty(value, campPareId); 
 
 			ExpedientDto expedient = expedientService.findByMetaExpedientAndPareAndNomAndEsborrat(entitatId, 
 																								  metaExpedientId, 
 																								  pareId, nom, 0);
 			if (expedient != null) {
-				return false;
+				if (id == null) // creant
+				{
+					return false;
+				}else { // editant
+					return id.equals(expedient.getId());
+				}
+				
 			}
         } catch (final Exception ex) {
         	LOGGER.error("Error al validar si el codi d'entitat és únic", ex);
@@ -63,6 +71,11 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
         return true;
 	}
 
+	private static Long getLongProperty(Object instance, String camp) throws NumberFormatException, IllegalAccessException, InvocationTargetException, NoSuchMethodException
+	{
+		return BeanUtils.getProperty(instance, camp) != null ? Long.valueOf(BeanUtils.getProperty(instance, camp)) : null;
+	}
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpedientNomUniqueValidator.class);
 
 }

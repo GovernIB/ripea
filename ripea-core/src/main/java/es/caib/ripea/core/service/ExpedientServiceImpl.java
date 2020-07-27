@@ -479,7 +479,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedient,
 				true);
 	}
-
+	
+	@Transactional(readOnly = true)
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,
 			Long metaExpedientId,
@@ -522,9 +523,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				contingutPare,
 				nom,
 				esborrat);
-		return toExpedientDto(
-				expedient,
-				true);
+		return expedient == null ? null : toExpedientDto(expedient, true);
 	}
 	
 	@Transactional(readOnly = true)
