@@ -176,6 +176,7 @@
 										$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
 										$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
 										$('.modal-body .datatable-dades-carregant').show();
+										$(this).attr('disabled', true);
 										element.click();
 										return false;
 									});
