@@ -305,9 +305,6 @@ public class PluginHelper {
 		}
 	}
 
-
-
-
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
 			String pareCodi) {
 		String accioDescripcio = "Consulta llista d'unitats donat un pare";
@@ -3144,7 +3141,8 @@ public class PluginHelper {
 			}
 			
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
-
+			notificacio.setNumExpedient(expedientEntity.getCodi());
+			
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
 			
@@ -3160,7 +3158,7 @@ public class PluginHelper {
 //			}
 
 			// ########## ENTREGA POSTAL  ###############
-			if (notificacioDto.getEntregaPostal()) {
+			if (notificacioDto.isEntregaPostal()) {
 				enviament.setEntregaPostalActiva(true);
 				enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
 				InteressatEntity interessatPerAdresa = interessat;
@@ -4803,8 +4801,10 @@ public class PluginHelper {
 		}
 		return notificacioPlugin;
 	}
-	private boolean viaFirmaPluginConfiguracioProvada = false;
+	
 	private ViaFirmaPlugin getViaFirmaPlugin() {
+		boolean viaFirmaPluginConfiguracioProvada = false;
+		
 		if (viaFirmaPlugin == null && !viaFirmaPluginConfiguracioProvada) {
 			viaFirmaPluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginViaFirma();

@@ -7,6 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació de referència d'un enviament retornada per Notifica.
  * 
@@ -14,22 +17,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  */
 @JsonAutoDetect
 @XmlRootElement
+@Getter 
+@Setter
 public class EnviamentReferencia {
 
 	private String titularNif;
 	private String referencia;
-
-	public String getTitularNif() {
-		return titularNif;
-	}
-	public void setTitularNif(String titularNif) {
-		this.titularNif = titularNif;
-	}
-	public String getReferencia() {
-		return referencia;
-	}
-	public void setReferencia(String referencia) {
-		this.referencia = referencia;
-	}
-
 }

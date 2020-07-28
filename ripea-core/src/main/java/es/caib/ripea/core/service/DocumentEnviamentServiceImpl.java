@@ -163,7 +163,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, notificacioDto.getTipus());
+		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
+																		  notificacioDto.getTipus());
 //		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		
 		for (NotificacioEnviamentDto notificacioEnviamentDto : notificacioDto.getEnviaments()) {
@@ -193,13 +194,15 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					expedientEntity,
 					documentEntity,
 					notificacioDto.getServeiTipusEnum(),
-					notificacioDto.getEntregaPostal()).
+					notificacioDto.isEntregaPostal()).
 					observacions(notificacioDto.getObservacions()).
 					build();
 			
 			documentNotificacioRepository.save(notificacioEntity);
 			
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, notificacioEntity).build();
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity;
+			documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, 
+																							 notificacioEntity).build();
 			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
 			
 //			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
