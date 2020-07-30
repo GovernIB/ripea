@@ -22,14 +22,6 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 public interface AplicacioService {
 
 	/**
-	 * Obté la versió actual de l'aplicació.
-	 * 
-	 * @return La versió actual.
-	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
-	public String getVersioActual();
-
-	/**
 	 * Processa l'autenticació d'un usuari.
 	 * 
 	 * @throws NotFoundException

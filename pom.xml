@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.caib.ripea</groupId>
 	<artifactId>ripea</artifactId>
-	<version>0.9</version>
+	<version>0.9.74</version>
 	<packaging>pom</packaging>
 	<properties>
 		<github.global.server>github</github.global.server>
@@ -30,9 +30,6 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<build.timestamp>${maven.build.timestamp}</build.timestamp>
-		<version.revision>74.pre4</version.revision>
-		<version.full>${project.version}.${version.revision}</version.full>
 	</properties>
 	<modules>
 		<module>ripea-core</module>

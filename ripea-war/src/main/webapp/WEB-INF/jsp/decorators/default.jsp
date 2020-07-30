@@ -307,7 +307,7 @@ body {
 		</div>
 	</div>
     <div class="container container-foot container-caib">
-    	<div class="pull-left app-version"><p>RIPEA v<rip:versio/></p></div>
+    	<div class="pull-left app-version"><p>RIPEA <rip:versio/></p></div>
         <div class="pull-right govern-footer">
         	<p>
 	        	<img src="<c:url value="/img/uenegroma.png"/>"	     hspace="5" height="50" alt="<spring:message code='decorator.logo.ue'/>" />
