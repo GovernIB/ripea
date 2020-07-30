@@ -403,7 +403,11 @@ var publicacioEstatText = new Array();
 publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/>";
 </c:forEach>
 $(document).ready(function() {
-
+	$("#document-new").click(function(e){
+	    alert("<spring:message code="contingut.document.alerta.max"/>");
+	    e.preventDefault();
+	});
+	
 	var iconaIdx = $('.esborranys > p').text().indexOf('(B)');
 	if (iconaIdx != -1) {
 		var newValidacioTxt = $('.esborranys > p').text().replace('B', '<i class="fa fa-bold" />');
@@ -484,7 +488,7 @@ $(document).ready(function() {
 		window.location.href = $('a:first', $(this).parent()).attr('href');
 	});
 	$('ul.interessats li').hover(function() {
-		$('a', this).removeClass('hidden');
+		$('a', this).removeClass('hidden');contingut
 	},
 	function() {
 		$('a', this).addClass('hidden');
@@ -1132,7 +1136,6 @@ function recuperarResultatDomini(
 		<rip:blocContenidorPath contingut="${contingut}"/>
 	</c:if>
 	<div>
-	
 		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- INFORMACIÓ BLOCK (LEFT SIDE OF THE PAGE) ------------------------------------------------------------------------>
 			<div class="col-md-3 col-sm-4" id="colInfo">		
@@ -1522,7 +1525,11 @@ function recuperarResultatDomini(
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
 											<c:if test="${contingut.crearExpedients and not empty metaExpedients}">
-												<li><a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...</a></li>
+												<li>
+												<a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true">
+													<span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...
+												</a>
+												</li>
 											</c:if>
 											<%---- Document... ----%>
 											<c:choose>
@@ -1530,7 +1537,21 @@ function recuperarResultatDomini(
 													<li><a id="document-new" href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
 												</c:when>
 												<c:otherwise>
-													<li><a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
+													<li>
+													<c:choose>
+  														<c:when test="${empty metaDocumentsLeft}">
+															<a href="#" id="document-new">
+																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+															</a>
+  														</c:when>
+														<c:otherwise>
+	   														<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>"
+															   data-toggle="modal" data-refresh-pagina="true">
+																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+															</a>
+														</c:otherwise>
+													</c:choose>
+													</li>
 												</c:otherwise>
 											</c:choose>
 											<c:if test="${!isTasca}">
