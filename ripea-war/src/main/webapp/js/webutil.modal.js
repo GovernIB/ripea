@@ -15,11 +15,15 @@
 			missatgeLoading: null
 		}
 		var $element = $(element), element = element;
+	
 		var plugin = this;
 		plugin.settings = {}
 		plugin.serverParams = [];
+		
 		plugin.init = function() {
 			plugin.settings = $.extend(defaults, $element.data(), options);
+			plugin.settings.missatgeLoading = $element.data("missatgeloading");
+			
 			$element.click(function(event) {
 				var elementPerEvaluar = $element;
 				if (elementPerEvaluar.prop("tagName") == 'TR' && event.target.tagName != 'TD') {
@@ -46,6 +50,7 @@
 						if (plugin.settings.maximized) {
 							modalData += ' data-maximized="true"';
 						}
+
 						if ($('#' + modalDivId).length == 0 ) {
 							$('body').append(
 								'<div id="' + modalDivId + '"' + modalData + '>' +
