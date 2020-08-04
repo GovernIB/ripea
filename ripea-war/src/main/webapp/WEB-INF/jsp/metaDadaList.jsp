@@ -83,7 +83,7 @@ $(document).ready(function() {
 	</table>
 	<c:choose>
 		<c:when test="${not empty metaDocument}">
-			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/metaDocument"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+			<a href="<c:url value="${header.referer}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 		</c:when>
 		<c:otherwise>
 			<a href="<c:url value="/metaExpedient?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>

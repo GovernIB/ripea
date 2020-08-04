@@ -1,3 +1,6 @@
+/**
+ *
+ */
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
@@ -28,64 +31,75 @@ import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
 
 /**
- * Controlador per al manteniment de meta-documents no asociats a cap
- * meta-expedient.
+ * Controlador per al manteniment de meta-documents asociats a un meta-expedient.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/metaDocument")
-public class MetaDocumentController extends BaseAdminController {
-	
+@RequestMapping("/metaExpedient")
+public class MetaExpedientMetaDocumentController extends BaseAdminController {
+
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-	
 	@Autowired
-	private TipusDocumentalService tipusDocumentalService;
-	
+	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
-	
-	@RequestMapping(method = RequestMethod.GET)
-	public String getAll(
+	@Autowired
+	private TipusDocumentalService tipusDocumentalService;
+
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
+	public String get(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			Model model) {
-		return "metaDocumentList";
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"metaExpedient",
+				metaExpedientService.findById(
+						entitatActual.getId(),
+						metaExpedientId));
+		return "metaExpedientMetaDocument";
 	}
 	
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
-				metaDocumentService.findWithoutMetaExpedient(
+				metaDocumentService.findByMetaExpedient(
 						entitatActual.getId(),
+						metaExpedientId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request)));
 		return dtr;
 	}
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			Model model) {
-		return get(request, null, model);
+		return get(request, metaExpedientId, null, model);
 	}
 	
-	@RequestMapping(value = "/{metaDocumentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -93,7 +107,7 @@ public class MetaDocumentController extends BaseAdminController {
 		if (metaDocumentId != null) {
 			metaDocument = metaDocumentService.findById(
 					entitatActual.getId(),
-					null,
+					metaExpedientId,
 					metaDocumentId);
 		}
 		MetaDocumentCommand command = null;
@@ -104,26 +118,28 @@ public class MetaDocumentController extends BaseAdminController {
 			command = new MetaDocumentCommand();
 		}
 		command.setEntitatId(entitatActual.getId());
+		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
 		emplenarModelForm(request,model);
-		return "metaDocumentForm";
+		return "metaExpedientMetaDocumentForm";
 	}
-
-
-	@RequestMapping(method = RequestMethod.POST)
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@Valid MetaDocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request,model);
-			return "metaDocumentForm";
+			return "metaExpedientMetaDocumentForm";
 		}
 		if (command.getId() != null) {
 			metaDocumentService.update(
 					entitatActual.getId(),
+					metaExpedientId,
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
@@ -135,6 +151,7 @@ public class MetaDocumentController extends BaseAdminController {
 		} else {
 			metaDocumentService.create(
 					entitatActual.getId(),
+					metaExpedientId,
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
@@ -146,16 +163,16 @@ public class MetaDocumentController extends BaseAdminController {
 		}
 	}
 
-
-	@RequestMapping(value = "/{metaDocumentId}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			metaDocumentService.delete(
 					entitatActual.getId(),
-					null,
+					metaExpedientId,
 					metaDocumentId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
@@ -168,50 +185,8 @@ public class MetaDocumentController extends BaseAdminController {
 					"metadocument.controller.esborrar.error.fk");
 		}
 	}
-	
 
-	@RequestMapping(value = "/{metaDocumentId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDocumentService.updateActiu(
-				entitatActual.getId(),
-				null,
-				metaDocumentId,
-				true);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaDocument",
-				"metadocument.controller.activat.ok");
-	}
-	
-	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
-	public String disable(
-			HttpServletRequest request,
-			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDocumentService.updateActiu(
-				entitatActual.getId(),
-				null,
-				metaDocumentId,
-				false);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaDocument",
-				"metadocument.controller.desactivat.ok");
-	}
-
-	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
-	@ResponseBody
-	public List<MetaDocumentDto> findAll(
-			HttpServletRequest request,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return metaDocumentService.findByEntitat(entitatActual.getId());
-	}
-	
-	@RequestMapping(value = "/iniciarTransaccio", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDocument/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
@@ -248,7 +223,7 @@ public class MetaDocumentController extends BaseAdminController {
 		return transaccioResponse;
 	}
 
-	@RequestMapping(value = "/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDocument/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
 	@ResponseBody
 	public void tancarTransaccio(
 			HttpServletRequest request,
@@ -257,7 +232,7 @@ public class MetaDocumentController extends BaseAdminController {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
-	@RequestMapping(value = "/flux/returnurl/{transactionId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDocument/flux/returnurl/{transactionId}", method = RequestMethod.GET)
 	public String transaccioEstat(
 			HttpServletRequest request,
 			@PathVariable String transactionId,
@@ -282,7 +257,7 @@ public class MetaDocumentController extends BaseAdminController {
 		return "portafirmesModalTancar";
 	}
 	
-	@RequestMapping(value = "/flux/returnurl/", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDocument/flux/returnurl/", method = RequestMethod.GET)
 	public String transaccioEstat(
 			HttpServletRequest request,
 			Model model) {
@@ -294,7 +269,7 @@ public class MetaDocumentController extends BaseAdminController {
 		return "portafirmesModalTancar";
 	}
 	
-	@RequestMapping(value = "/flux/plantilles", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(
 			HttpServletRequest request,
@@ -303,7 +278,7 @@ public class MetaDocumentController extends BaseAdminController {
 		return resposta;
 	}
 	
-	@RequestMapping(value = "/flux/esborrar/{plantillaId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDocument/flux/esborrar/{plantillaId}", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean esborrarPlantilla(
 			HttpServletRequest request,
@@ -312,7 +287,7 @@ public class MetaDocumentController extends BaseAdminController {
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 
-	private void emplenarModelForm(
+	public void emplenarModelForm(
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);

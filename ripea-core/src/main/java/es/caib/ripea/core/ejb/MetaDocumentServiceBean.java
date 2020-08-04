@@ -51,6 +51,19 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				plantillaContentType,
 				plantillaContingut);
 	}
+	
+	@Override
+	public MetaDocumentDto create(Long entitatId, 
+			MetaDocumentDto metaDocument, String plantillaNom,
+			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
+		return delegate.create(
+				entitatId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut);
+	}
+
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
@@ -69,7 +82,18 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				plantillaContentType,
 				plantillaContingut);
 	}
-
+	
+	@Override
+	public MetaDocumentDto update(Long entitatId, MetaDocumentDto metaDocument, String plantillaNom,
+			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
+		return delegate.update(
+				entitatId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut);
+	}
+	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto updateActiu(
@@ -132,6 +156,16 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findWithoutMetaExpedient(
+				entitatId,
+				paginacioParams);
+	}
+	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<MetaDocumentDto> findByEntitat(
