@@ -694,6 +694,12 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		// encara es poden afegir segons la multiplicitat.
 		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(
 				expedientSuperior.getMetaExpedient());
+		
+		if (expedientSuperior.getMetaExpedient().isPermetMetadocsGenerals())
+		{
+			metaDocumentsDelMetaExpedient.addAll( metaDocumentRepository.findWithoutMetaExpedient() );		
+		}
+		
 		// Nomes retorna els documents que no s'hagin esborrat
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
 				expedientSuperior,

@@ -19,6 +19,9 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Classe del model de dades que representa un meta-expedient.
  * 
@@ -32,6 +35,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 		}
 )
 @EntityListeners(AuditingEntityListener.class)
+@Getter 
+@Setter
 public class MetaExpedientEntity extends MetaNodeEntity {
 
 	@Column(name = "clasif_sia", length = 30, nullable = false)
@@ -42,6 +47,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	private String expressioNumero;
 	@Column(name = "not_activa", nullable = false)
 	private boolean notificacioActiva;
+	
+	@Column(name = "PERMET_METADOCS_GENERALS", nullable = false)
+	private boolean permetMetadocsGenerals;
+	
 	@ManyToOne(
 			optional = true,
 			fetch = FetchType.EAGER)
@@ -64,37 +73,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	private EntitatEntity entitatPropia;
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;
-	
-	
-//  only for testing 
-//	@Column(name = "id", insertable=false, updatable=false)
-//	private Long id;
-//
-//	public Long getId() {
-//		return id;
-//	}
-//	public void setId(
-//			Long id) {
-//		this.id = id;
-//	}
-	
-	
-	public String getClassificacioSia() {
-		return classificacioSia;
-	}
-	public String getSerieDocumental() {
-		return serieDocumental;
-	}
-	public String getExpressioNumero() {
-		return expressioNumero;
-	}
-	public boolean isNotificacioActiva() {
-		return notificacioActiva;
-	}
-	public MetaExpedientEntity getPare() {
-		return pare;
-	}
 
+	
 	public void update(
 			String codi,
 			String nom,
@@ -103,6 +83,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String serieDocumental,
 			String expressioNumero,
 			boolean notificacioActiva,
+			boolean permetMetadocsGenerals,
 			MetaExpedientEntity pare) {
 		super.update(
 				codi,
@@ -114,6 +95,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		this.notificacioActiva = notificacioActiva;
 		this.pare = pare;
 		this.codiPropi = codi;
+		this.permetMetadocsGenerals = permetMetadocsGenerals;
 	}
 
 	public static Builder getBuilder(
@@ -123,6 +105,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String serieDocumental,
 			String classificacioSia,
 			boolean notificacioActiva,
+			boolean permetMetadocsGenerals,
 			EntitatEntity entitat,
 			MetaExpedientEntity pare) {
 		return new Builder(
@@ -133,7 +116,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				classificacioSia,
 				entitat,
 				pare,
-				notificacioActiva);
+				notificacioActiva,
+				permetMetadocsGenerals);
 	}
 
 	public static class Builder {
@@ -146,7 +130,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				String classificacioSia,
 				EntitatEntity entitat,
 				MetaExpedientEntity pare,
-				boolean notificacioActiva) {
+				boolean notificacioActiva,
+				boolean permetMetadocsGenerals) {
 			built = new MetaExpedientEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -159,6 +144,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			built.notificacioActiva = notificacioActiva;
 			built.codiPropi = codi;
 			built.entitatPropia = entitat;
+			built.permetMetadocsGenerals = permetMetadocsGenerals;
 		}
 		public Builder expressioNumero(String expressioNumero) {
 			built.expressioNumero = expressioNumero;
@@ -170,8 +156,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		}
 	}
 	
-
-
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

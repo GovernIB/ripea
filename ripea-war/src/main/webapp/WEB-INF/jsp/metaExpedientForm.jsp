@@ -36,6 +36,7 @@
 				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
+				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa"/>

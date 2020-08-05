@@ -38,9 +38,7 @@
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
-	
-<%-- 	<meta name="subtitle" content="${serveiPerTitol}"/> --%>
-	
+		
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -403,7 +401,7 @@ var publicacioEstatText = new Array();
 publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/>";
 </c:forEach>
 $(document).ready(function() {
-	$("#document-new").click(function(e){
+	$("#document-new-empty-metadocuments").click(function(e){
 	    alert("<spring:message code="contingut.document.alerta.max"/>");
 	    e.preventDefault();
 	});
@@ -577,7 +575,8 @@ $(document).ready(function() {
 						});
 						$.get(
 								'../ajax/contingutDada/${contingut.id}/count',
-								function (data) {
+								function (data) 
+								<%-- 	<meta name="subtitle" content="${serveiPerTitol}"/> --%>{
 									$('#dades-count').html(data);
 								});
 					} else {
@@ -611,11 +610,7 @@ $(document).ready(function() {
 	        	$('input', clon).val(result);
 	        	$('input', clon).trigger("focusout");
 	        }
-	});
-		
-		
-		
-		
+		});
 	});
 	if (${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
@@ -1540,7 +1535,7 @@ function recuperarResultatDomini(
 													<li>
 													<c:choose>
   														<c:when test="${empty metaDocumentsLeft}">
-															<a href="#" id="document-new">
+															<a href="#" id="document-new-empty-metadocuments">
 																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 															</a>
   														</c:when>

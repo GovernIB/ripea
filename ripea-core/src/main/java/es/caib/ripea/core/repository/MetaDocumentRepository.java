@@ -72,6 +72,11 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("filtre") String filtre,	
 			Sort sort);
 
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.metaExpedient is null ")
+	List<MetaDocumentEntity> findWithoutMetaExpedient();
 	
 	List<MetaDocumentEntity> findByMetaExpedientIdIn(
 			List<Long> metaExpedientIds);

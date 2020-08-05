@@ -101,6 +101,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getSerieDocumental(),
 				metaExpedient.getClassificacioSia(),
 				metaExpedient.isNotificacioActiva(),
+				metaExpedient.isPermetMetadocsGenerals(),
 				entitat,
 				metaExpedientPare).
 				build();
@@ -147,6 +148,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getSerieDocumental(),
 				metaExpedient.getExpressioNumero(),
 				metaExpedient.isNotificacioActiva(),
+				metaExpedient.isPermetMetadocsGenerals(),
 				metaExpedientPare);
 		return conversioTipusHelper.convertir(
 				metaExpedientEntity,
