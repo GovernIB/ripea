@@ -410,18 +410,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 
 		List<InteressatDto> resposta = new ArrayList<InteressatDto>();
 		for (InteressatEntity interessat: interessats) {
-			if (interessat instanceof InteressatPersonaFisicaEntity)
-				resposta.add(conversioTipusHelper.convertir(
-						interessat,
-						InteressatPersonaFisicaDto.class));
-			else if (interessat instanceof InteressatPersonaJuridicaEntity)
-				resposta.add(conversioTipusHelper.convertir(
-						interessat,
-						InteressatPersonaJuridicaDto.class));
-			else if (interessat instanceof InteressatAdministracioEntity)
-				resposta.add(conversioTipusHelper.convertir(
-						interessat,
-						InteressatAdministracioDto.class));
+			resposta.add(conversioTipusHelper.convertir(
+					interessat,
+					InteressatDto.class));
 		}
 		return resposta;
 	}
