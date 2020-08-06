@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,7 @@ import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -161,11 +163,17 @@ public class MetaDocumentController extends BaseAdminController {
 					request,
 					"redirect:../../metaDocument",
 					"metadocument.controller.esborrat.ok");
-		} catch (DataIntegrityViolationException ex) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../esborrat",
-					"metadocument.controller.esborrar.error.fk");
+		} catch (Exception ex) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) || 
+					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metadocument.controller.esborrar.error.fk");
+			else {
+				throw ex;
+			}
+
 		}
 	}
 	

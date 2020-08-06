@@ -20,6 +20,8 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una tasca d'un meta-expedient.
@@ -33,6 +35,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 				@UniqueConstraint(columnNames = {"codi", "meta_expedient_id"})
 		})
 @EntityListeners(AuditingEntityListener.class)
+@Getter @Setter
 public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false)
@@ -59,34 +62,6 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = "ipa_metaexp_metaexptas_fk")
 	private MetaExpedientEntity metaExpedient;
-
-	public ExpedientEstatEntity getEstatCrearTasca() {
-		return estatCrearTasca;
-	}
-	public ExpedientEstatEntity getEstatFinalitzarTasca() {
-		return estatFinalitzarTasca;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public String getResponsable() {
-		return responsable;
-	}
-	public boolean isActiva() {
-		return activa;
-	}
-	public MetaExpedientEntity getMetaExpedient() {
-		return metaExpedient;
-	}
-	public Date getDataLimit() {
-		return dataLimit;
-	}
 	
 	public void update(
 			String codi,

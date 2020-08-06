@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -24,6 +24,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -36,7 +37,7 @@ public class MetaExpedientController extends BaseAdminController {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -177,11 +178,16 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.esborrat.ok");
-		} catch (DataIntegrityViolationException ex) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../esborrat",
-					"metaexpedient.controller.esborrar.error.fk");
+		} catch (Exception ex) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) || 
+					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metaexpedient.controller.esborrar.error.fk");
+			else {
+				throw ex;
+			}
 		}
 	}
 
