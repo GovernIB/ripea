@@ -17,6 +17,8 @@ import javax.persistence.Version;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una Entitat.
@@ -26,6 +28,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @Entity
 @Table(name="ipa_entitat")
 @EntityListeners(AuditingEntityListener.class)
+@Getter @Setter
 public class EntitatEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false, unique = true)
@@ -51,41 +54,6 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	@Column(name = "capsalera_color_lletra", length = 7)
 	private String capsaleraColorLletra;
 	
-	
-	public String getCapsaleraColorLletra() {
-		return capsaleraColorLletra;
-	}
-	public void setCapsaleraColorLletra(String capsaleraColorLletra) {
-		this.capsaleraColorLletra = capsaleraColorLletra;
-	}
-	public String getCapsaleraColorFons() {
-		return capsaleraColorFons;
-	}
-	public void setCapsaleraColorFons(String capsaleraColorFons) {
-		this.capsaleraColorFons = capsaleraColorFons;
-	}
-	public byte[] getLogoImgBytes() {
-		return logoImgBytes;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public String getCif() {
-		return cif;
-	}
-	public String getUnitatArrel() {
-		return unitatArrel;
-	}
-	public boolean isActiva() {
-		return activa;
-	}
-
 	public void update(
 			String codi,
 			String nom,

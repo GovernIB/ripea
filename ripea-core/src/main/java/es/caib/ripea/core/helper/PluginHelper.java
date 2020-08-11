@@ -128,6 +128,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -305,6 +306,43 @@ public class PluginHelper {
 		}
 	}
 
+
+	// UNITATS ORGANITZATIVES
+	// /////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Obtenir organigrama per entitat";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("Codi Dir3 de l'entitat", entitatcodi);
+		Map<String, NodeDir3> organigrama = null;
+		try {
+			organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_UNITATS,
+										accioDescripcio,
+										accioParams,
+										IntegracioAccioTipusEnumDto.ENVIAMENT,
+										System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_UNITATS,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organigrama;
+	}
+	
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
 			String pareCodi) {
 		String accioDescripcio = "Consulta llista d'unitats donat un pare";
@@ -1841,14 +1879,7 @@ public class PluginHelper {
 		portafirmesDocument.setTitol(document.getNom());
 		portafirmesDocument.setFirmat(
 				false);
-		/*String urlCustodia = null;
-		if (portafirmesEnviarDocumentEstampat()) {
-			urlCustodia = arxiuDocumentGenerarUrlPerDocument(document);
-		}
-		FitxerDto fitxerOriginal = documentHelper.getFitxerAssociat(document);
-		FitxerDto fitxerConvertit = conversioConvertirPdfIEstamparUrl(
-				fitxerOriginal,
-				urlCustodia);*/
+
 		FitxerDto fitxerOriginal = documentHelper.getFitxerAssociat(document, null);
 		FitxerDto fitxerConvertit = this.conversioConvertirPdf(
 				fitxerOriginal,

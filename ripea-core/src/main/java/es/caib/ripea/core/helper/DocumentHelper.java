@@ -120,13 +120,6 @@ public class DocumentHelper {
 				"assumpte=" + assumpte + ", " +
 				"prioritat=" + prioritat + ", " +
 				"dataCaducitat=" + dataCaducitat + ")");
-//		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
-//				entitatId,
-//				id,
-//				false,
-//				true,
-//				false,
-//				false);
 		
 		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 			throw new ValidationException(
@@ -153,7 +146,7 @@ public class DocumentHelper {
 						DocumentEnviamentEstatEnumDto.PENDENT,
 						DocumentEnviamentEstatEnumDto.ENVIAT
 				});
-		if (enviamentsPendents.size() > 0) {
+		if (enviamentsPendents.size() > 0) { // TODO: uep aqui
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

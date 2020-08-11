@@ -9,7 +9,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +25,8 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.apache.commons.io.IOUtils;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +36,7 @@ import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
@@ -42,6 +47,38 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
+
+//	private static final String SERVEI_CERCA = "/rest/busqueda/";
+//	private static final String SERVEI_CATALEG = "/rest/catalogo/";
+//	private static final String SERVEI_UNITAT = "/rest/unidad/";
+	private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
+//	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
+	
+	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
+		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
+		try {
+			URL url = new URL(getServiceUrl() + SERVEI_ORGANIGRAMA + "?codigo=" + codiEntitat);
+			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setDoInput(true);
+			httpConnection.setDoOutput(true);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
+			if (response != null && response.length > 0) {
+				NodeDir3 arrel = mapper.readValue(
+					response, 
+					NodeDir3.class);
+				nodeToOrganigrama(arrel, organigrama);
+			}
+			return organigrama;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar l'organigrama de unitats organitzatives via REST (" +
+					"codiEntitat=" + codiEntitat + ")",
+					ex);
+		}
+	}
 
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(String pareCodi) throws SistemaExternException {
@@ -287,5 +324,10 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		}
 		return serviceUrl;
 	}
-
+	private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {
+		organigrama.put(unitat.getCodi(), unitat);
+		if (unitat.getFills() != null)
+			for (NodeDir3 fill: unitat.getFills())
+				nodeToOrganigrama(fill, organigrama);
+	}
 }
