@@ -13,6 +13,9 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 
 
@@ -50,14 +53,34 @@ public class OrganGestorServiceBean implements OrganGestorService{
 	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId, OrganGestorFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public boolean syncDir3OrgansGestors(Long entitatId) {
 		return delegate.syncDir3OrgansGestors(entitatId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<PermisOrganGestorDto> findPermisos(Long entitatId) throws NotFoundException {
+	    return delegate.findPermisos(entitatId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void updatePermis(Long id, PermisDto permis, Long entitatId) throws NotFoundException {
+	    delegate.updatePermis(id, permis, entitatId);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void deletePermis(Long id, Long permisId, Long entitatId) throws NotFoundException {
+	    delegate.deletePermis(id, permisId, entitatId);	    
 	}
 
 }

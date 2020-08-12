@@ -15,12 +15,15 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment de permisos.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class PermisCommand {
 
 	private Long id;
@@ -35,61 +38,6 @@ public class PermisCommand {
 	private boolean administration;
 	private boolean selectAll;
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getPrincipalNom() {
-		return principalNom;
-	}
-	public void setPrincipalNom(String principalNom) {
-		this.principalNom = principalNom;
-	}
-	public PrincipalTipusEnumDto getPrincipalTipus() {
-		return principalTipus;
-	}
-	public void setPrincipalTipus(PrincipalTipusEnumDto principalTipus) {
-		this.principalTipus = principalTipus;
-	}
-	public boolean isRead() {
-		return read;
-	}
-	public void setRead(boolean read) {
-		this.read = read;
-	}
-	public boolean isWrite() {
-		return write;
-	}
-	public void setWrite(boolean write) {
-		this.write = write;
-	}
-	public boolean isCreate() {
-		return create;
-	}
-	public void setCreate(boolean create) {
-		this.create = create;
-	}
-	public boolean isDelete() {
-		return delete;
-	}
-	public void setDelete(boolean delete) {
-		this.delete = delete;
-	}
-	public boolean isAdministration() {
-		return administration;
-	}
-	public void setAdministration(boolean administration) {
-		this.administration = administration;
-	}
-
-	public boolean isSelectAll() {
-		return selectAll;
-	}
-	public void setSelectAll(boolean selectAll) {
-		this.selectAll = selectAll;
-	}
 	public static List<PermisCommand> toPermisCommands(
 			List<PermisDto> dtos) {
 		List<PermisCommand> commands = new ArrayList<PermisCommand>();
@@ -126,5 +74,4 @@ public class PermisCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
 }
