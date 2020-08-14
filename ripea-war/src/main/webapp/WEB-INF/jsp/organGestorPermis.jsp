@@ -54,7 +54,6 @@
  							</ul>
  						</div>
 					</script> 
-<%-- 								<li><a href="permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li> --%>
 				</th>
 			</tr>
 		</thead>

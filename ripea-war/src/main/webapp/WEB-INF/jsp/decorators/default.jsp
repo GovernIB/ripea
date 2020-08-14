@@ -6,12 +6,22 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <%
+
+	pageContext.setAttribute(
+			"sessionOrgansGestors",
+			es.caib.ripea.war.helper.OrganGestorHelper.findOrganGestorsAccessibles(request));
+	pageContext.setAttribute(
+  			"organGestorActual",
+  			es.caib.ripea.war.helper.OrganGestorHelper.getOrganGestorActual(request));
 	pageContext.setAttribute(
 			"sessionEntitats",
 			es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
 	pageContext.setAttribute(
 			"entitatActual",
 			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
+	pageContext.setAttribute(
+  			"requestParameterCanviOrganGestor",
+  			es.caib.ripea.war.helper.OrganGestorHelper.getRequestParameterCanviOrganGestor());
 	pageContext.setAttribute(
 			"requestParameterCanviEntitat",
 			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
@@ -45,6 +55,8 @@
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
+<c:set var="hiHaOrgansGestors" value="${fn:length(sessionOrgansGestors) > 0}"/>
+<c:set var="hiHaMesOrgansGestors" value="${fn:length(sessionOrgansGestors) > 1}"/>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,6 +160,36 @@ body {
 													<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
 												</c:url>
 												<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
+											</c:if>
+										</c:forEach>
+									</ul>
+								</c:if>
+							</li>
+						</c:if>
+						<c:if test="${hiHaOrgansGestors}">
+							<li class="dropdown">
+								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
+								<c:if test="${null != organGestorActual}">
+		         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+		         				</c:if>
+		         				<c:if test="${null == organGestorActual}">
+		         				<span class="fa fa-cubes"></span> Tots <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+		         				</c:if>
+								<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
+								<c:if test="${hiHaMesOrgansGestors}">
+									<ul class="dropdown-menu">
+				         				<c:if test="${null != organGestorActual}">
+				         					<c:url var="urlCanviOrganGestor" value="/index">
+												<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
+											</c:url>
+				         					<li><a href="${urlCanviOrganGestor}">Tots</a></li>
+				         				</c:if>
+										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
+											<c:if test="${og.id != organGestorActual.id}">
+												<c:url var="urlCanviOrganGestor" value="/index">
+													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
+												</c:url>
+												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
 											</c:if>
 										</c:forEach>
 									</ul>

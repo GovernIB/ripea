@@ -22,7 +22,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.OrganGestorService;

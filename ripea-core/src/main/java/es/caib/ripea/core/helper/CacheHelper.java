@@ -4,8 +4,6 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -111,6 +109,7 @@ public class CacheHelper {
 	@Resource
 	private DocumentNotificacioRepository documentNotificacioRepository;
 
+	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
@@ -355,62 +354,25 @@ public class CacheHelper {
 		return errorLastNotificacio;
 	}
 	
-	@Cacheable(value = "organismes", key="#entitatcodi")
-	public List<OrganGestorDto> findOrganismesByEntitat(
-			String entitatcodi) {
-		List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
-		Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
-		if (organigramaDir3 != null) {
-			for (String codi: organigramaDir3.keySet()) {
-				OrganGestorDto organisme = new OrganGestorDto();
-				NodeDir3 node = organigramaDir3.get(codi);
-				organisme.setCodi(node.getCodi());
-				organisme.setNom(node.getDenominacio());
-				organismes.add(organisme);
-				
-			}
-			Collections.sort(organismes, new Comparator<OrganGestorDto>() {
-				@Override
-				public int compare(OrganGestorDto o1, OrganGestorDto o2) {
-					return o1.getCodi().compareTo(o1.getCodi());
-				}
-			});
+	@Cacheable(value = "organismes", key = "#codiDir3")
+	public List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
+	    List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
+	    Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
+	    if (organigramaDir3 != null) {
+		for (String codi : organigramaDir3.keySet()) {
+		    OrganGestorDto organisme = new OrganGestorDto();
+		    NodeDir3 node = organigramaDir3.get(codi);
+		    organisme.setCodi(node.getCodi());
+		    organisme.setNom(node.getDenominacio());
+		    organismes.add(organisme);
+
 		}
-		return organismes;
+	    }
+	    return organismes;
 	}
 	
-	
-	@CacheEvict(value = "organismes", key="#entitatcodi")
-	public void evictFindOrganismesByEntitat(String entitatcodi) { }
-	
-//	@Cacheable(value = "organigrama", key="#entitatcodi")
-//	public Map<String, OrganGestorDto> findOrganigramaByEntitat(String entitatcodi) {
-//		Map<String, OrganGestorDto> organigrama = new HashMap<String, OrganGestorDto>();
-//		Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
-//		if (organigramaDir3 != null) {
-//			for (String organ : organigramaDir3.keySet()) {
-//				organigrama.put(organ, nodeDir3ToOrganisme(organigramaDir3.get(organ)));
-//			}
-//		}
-//		return organigrama;
-//	}
-//	
-//	private OrganGestorDto nodeDir3ToOrganisme(NodeDir3 node) {
-//		OrganGestorDto organisme = new OrganGestorDto();
-//		organisme.setCodi(node.getCodi());
-//		organisme.setNom(node.getDenominacio());
-//		organisme.setPare(node.getSuperior());
-//		List<String> fills = null;
-//		if (node.getFills() != null && !node.getFills().isEmpty()) {
-//			fills = new ArrayList<String>();
-//			for (NodeDir3 fill: node.getFills()) {
-//				fills.add(fill.getCodi());
-//			}
-//		}
-//		organisme.setFills(fills);
-//		
-//		return organisme;
-//	}
+	@CacheEvict(value = "organismes", key="#codiDir3")
+	public void evictFindOrganismesByEntitat(String codiDir3) { }
 	
 	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
 	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) { }

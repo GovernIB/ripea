@@ -39,5 +39,17 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			Pageable paginacio);
 	
 	public OrganGestorEntity findByCodiDir3(String codiDir3);
+	
+	@Query("from " +
+    		 "    OrganGestorEntity og " +
+    		 "where og.codi in (:codis)")
+	public List<OrganGestorEntity> findByCodiDir3List(@Param("codis") List<String> codis);
+	
+
+  @Query( "select og.id " + 
+      "from " +
+      "    OrganGestorEntity og " +
+      "where og.codi in (:codi)")
+  public List<Long> findIdsByCodiDir3List(List<String> codi);
 }
 

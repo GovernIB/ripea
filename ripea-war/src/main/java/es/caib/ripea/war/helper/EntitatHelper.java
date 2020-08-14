@@ -24,8 +24,6 @@ public class EntitatHelper {
 	private static final String REQUEST_ATTRIBUTE_ENTITATS = "EntitatHelper.entitats";
 	private static final String SESSION_ATTRIBUTE_ENTITAT_ACTUAL = "EntitatHelper.entitatActual";
 
-
-
 	public static List<EntitatDto> findEntitatsAccessibles(
 			HttpServletRequest request) {
 		return findEntitatsAccessibles(request, null);
@@ -42,24 +40,23 @@ public class EntitatHelper {
 		}
 		return entitats;
 	}
-	public static void processarCanviEntitats(
-			HttpServletRequest request,
-			EntitatService entitatService) {
-		String canviEntitat = request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT);
-		if (canviEntitat != null && canviEntitat.length() > 0) {
-			LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
-			try {
-				Long canviEntitatId = new Long(canviEntitat);
-				List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
-				for (EntitatDto entitat: entitats) {
-					if (canviEntitatId.equals(entitat.getId())) {
-						canviEntitatActual(request, entitat);
-					}
-				}
-			} catch (NumberFormatException ignored) {
-			}
-		}
-	}
+	
+  public static void processarCanviEntitats(HttpServletRequest request, EntitatService entitatService) {
+      String canviEntitat = request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT);
+      if (canviEntitat != null && canviEntitat.length() > 0) {
+          LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
+          try {
+              Long canviEntitatId = new Long(canviEntitat);
+              List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
+              for (EntitatDto entitat : entitats) {
+                  if (canviEntitatId.equals(entitat.getId())) {
+                      canviEntitatActual(request, entitat);
+                  }
+              }
+          } catch (NumberFormatException ignored) {
+          }
+      }
+  }
 
 	public static EntitatDto getEntitatActual(
 			HttpServletRequest request) {
@@ -80,12 +77,6 @@ public class EntitatHelper {
 		return entitatActual;
 	}
 
-	public static String getRequestParameterCanviEntitat() {
-		return REQUEST_PARAMETER_CANVI_ENTITAT;
-	}
-
-
-
 	private static void canviEntitatActual(
 			HttpServletRequest request,
 			EntitatDto entitatActual) {
@@ -94,6 +85,10 @@ public class EntitatHelper {
 				entitatActual);
 		ExpedientHelper.resetAccesUsuariExpedients(request);
 	}
+
+  public static String getRequestParameterCanviEntitat() {
+      return REQUEST_PARAMETER_CANVI_ENTITAT;
+  }
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatHelper.class);
 

@@ -121,4 +121,21 @@ public interface OrganGestorService {
 			Long id,
 			Long permisId, Long entitatId) throws NotFoundException;
 
+	/**
+	 * Obté un llistat de tots els organs gestors accessibles per a 
+	 * l'usuari actual.
+	 * 
+	 * @return
+	 */
+	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual();
+	
+	/**
+	 * Obté un llistat de tots els organs gestors accessibles per a 
+   * l'organisme amb el codi indicat per paràmetre.
+   * 
+	 * @param codiDir3 Codi de l'organ gestor del que cercam els accessibles.
+	 * @return Llistat de tots els organs gestors accessibles.
+	 */
+	public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3);
+	
 }

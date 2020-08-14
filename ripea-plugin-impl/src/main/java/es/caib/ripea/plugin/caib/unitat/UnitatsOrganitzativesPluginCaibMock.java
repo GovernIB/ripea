@@ -95,7 +95,7 @@ public class UnitatsOrganitzativesPluginCaibMock implements UnitatsOrganitzative
 	}
 
 	@Override
-	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
+	public Map<String, NodeDir3> organigrama(String codiEntitat) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;
 	}

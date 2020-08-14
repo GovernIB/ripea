@@ -310,37 +310,25 @@ public class PluginHelper {
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
-	
-	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
-		long t0 = System.currentTimeMillis();
-		String accioDescripcio = "Obtenir organigrama per entitat";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("Codi Dir3 de l'entitat", entitatcodi);
-		Map<String, NodeDir3> organigrama = null;
-		try {
-			organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
-			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_UNITATS,
-										accioDescripcio,
-										accioParams,
-										IntegracioAccioTipusEnumDto.ENVIAMENT,
-										System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_UNITATS,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
-		}
-	
-		return organigrama;
+	public Map<String, NodeDir3> getOrganigramaOrganGestor(String codiDir3) 
+		throws SistemaExternException {
+	    long t0 = System.currentTimeMillis();
+	    String accioDescripcio = "Obtenir organigrama per entitat";
+	    Map<String, String> accioParams = new HashMap<String, String>();
+	    accioParams.put("Codi Dir3 de l'entitat", codiDir3);
+	    Map<String, NodeDir3> organigrama = null;
+	    try {
+		organigrama = getUnitatsOrganitzativesPlugin().organigrama(codiDir3);
+		integracioHelper.addAccioOk(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams,
+			IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
+	    } catch (Exception ex) {
+		String errorDescripcio = "Error al obtenir l'organigrama per entitat";
+		integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams,
+			IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
+		throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
+	    }
+
+	    return organigrama;
 	}
 	
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
