@@ -7,12 +7,12 @@
 
 <%
 
-	pageContext.setAttribute(
-			"sessionOrgansGestors",
-			es.caib.ripea.war.helper.OrganGestorHelper.findOrganGestorsAccessibles(request));
-	pageContext.setAttribute(
-  			"organGestorActual",
-  			es.caib.ripea.war.helper.OrganGestorHelper.getOrganGestorActual(request));
+// 	pageContext.setAttribute(
+// 			"sessionOrgansGestors",
+// 			es.caib.ripea.war.helper.OrganGestorHelper.findOrganGestorsAccessibles(request));
+// 	pageContext.setAttribute(
+//   			"organGestorActual",
+//   			es.caib.ripea.war.helper.OrganGestorHelper.getOrganGestorActual(request));
 	pageContext.setAttribute(
 			"sessionEntitats",
 			es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
@@ -40,6 +40,9 @@
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
 			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request));
+	pageContext.setAttribute(
+	  			"isRolActualAdministradorOrgan",
+	  			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
 	pageContext.setAttribute(
 			"isRolActualUsuari",
 			es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
@@ -166,36 +169,36 @@ body {
 								</c:if>
 							</li>
 						</c:if>
-						<c:if test="${hiHaOrgansGestors}">
-							<li class="dropdown">
-								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
-								<c:if test="${null != organGestorActual}">
-		         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-		         				</c:if>
-		         				<c:if test="${null == organGestorActual}">
-		         				<span class="fa fa-cubes"></span> Tots <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-		         				</c:if>
-								<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
-								<c:if test="${hiHaMesOrgansGestors}">
-									<ul class="dropdown-menu">
-				         				<c:if test="${null != organGestorActual}">
-				         					<c:url var="urlCanviOrganGestor" value="/index">
-												<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
-											</c:url>
-				         					<li><a href="${urlCanviOrganGestor}">Tots</a></li>
-				         				</c:if>
-										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
-											<c:if test="${og.id != organGestorActual.id}">
-												<c:url var="urlCanviOrganGestor" value="/index">
-													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
-												</c:url>
-												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
-											</c:if>
-										</c:forEach>
-									</ul>
-								</c:if>
-							</li>
-						</c:if>
+<%-- 						<c:if test="${hiHaOrgansGestors}"> --%>
+<!-- 							<li class="dropdown"> -->
+<%-- 								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if> --%>
+<%-- 								<c:if test="${null != organGestorActual}"> --%>
+<%-- 		         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if> --%>
+<%-- 		         				</c:if> --%>
+<%-- 		         				<c:if test="${null == organGestorActual}"> --%>
+<%-- 		         				<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if> --%>
+<%-- 		         				</c:if> --%>
+<%-- 								<c:if test="${hiHaMesOrgansGestors}"></a></c:if> --%>
+<%-- 								<c:if test="${hiHaMesOrgansGestors}"> --%>
+<!-- 									<ul class="dropdown-menu"> -->
+<%-- 				         				<c:if test="${null != organGestorActual}"> --%>
+<%-- 				         					<c:url var="urlCanviOrganGestor" value="/index"> --%>
+<%-- 												<c:param name="${requestParameterCanviOrganGestor}" value="-1"/> --%>
+<%-- 											</c:url> --%>
+<%-- 				         					<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
+<%-- 				         				</c:if> --%>
+<%-- 										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status"> --%>
+<%-- 											<c:if test="${og.id != organGestorActual.id}"> --%>
+<%-- 												<c:url var="urlCanviOrganGestor" value="/index"> --%>
+<%-- 													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/> --%>
+<%-- 												</c:url> --%>
+<%-- 												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li> --%>
+<%-- 											</c:if> --%>
+<%-- 										</c:forEach> --%>
+<!-- 									</ul> -->
+<%-- 								</c:if> --%>
+<!-- 							</li> -->
+<%-- 						</c:if> --%>
 						<li class="dropdown">
 							<c:choose>
 								<c:when test="${fn:length(rolsUsuariActual) > 1}">
@@ -275,6 +278,25 @@ body {
 										<li class="divider"></li>
 										<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li>
+									</ul>
+								</div>
+								<div class="btn-group">
+									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
+									<ul class="dropdown-menu">
+										<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
+										<li>
+											<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
+												<spring:message code="decorator.menu.accions.massives.admin"/>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</c:when>
+							<c:when test="${isRolActualAdministradorOrgan}">
+								<div class="btn-group">
+									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
+									<ul class="dropdown-menu">
+										<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">

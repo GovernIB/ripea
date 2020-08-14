@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -37,6 +39,8 @@ public class MetaExpedientController extends BaseAdminController {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+  @Autowired
+  private OrganGestorService organGestorService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -93,6 +97,9 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findByEntitat(entitatActual.getId()));
+    model.addAttribute(
+            "organsGestors",
+            organGestorService.findByEntitat(entitatActual.getId()));
 		return "metaExpedientForm";
 	}
 	@RequestMapping(method = RequestMethod.POST)
@@ -105,10 +112,14 @@ public class MetaExpedientController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			return "metaExpedientForm";
 		}
+		MetaExpedientDto dto = MetaExpedientCommand.asDto(command);
+		OrganGestorDto organ = new OrganGestorDto();
+    organ.setId(command.getOrganGestorId());
+    dto.setOrganGestor(organ);
 		if (command.getId() != null) {
 			metaExpedientService.update(
 					entitatActual.getId(),
-					MetaExpedientCommand.asDto(command));
+					dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
@@ -116,7 +127,7 @@ public class MetaExpedientController extends BaseAdminController {
 		} else {
 			metaExpedientService.create(
 					entitatActual.getId(),
-					MetaExpedientCommand.asDto(command));
+					dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",

@@ -45,138 +45,135 @@ public class OrganGestorController extends BaseUserController {
     private final static String ORGANS_FILTRE = "organs_filtre";
 
     @Autowired
-    EntitatService entitatService;
+    private EntitatService entitatService;
     @Autowired
-    OrganGestorService organGestorService;
+    private OrganGestorService organGestorService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
-	model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
-	return "organGestor";
+        model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
+        return "organGestor";
     }
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
 
-	OrganGestorFiltreCommand organGestorFiltreCommand = getFiltreCommand(request);
-	PaginaDto<OrganGestorDto> organs = new PaginaDto<OrganGestorDto>();
+        OrganGestorFiltreCommand organGestorFiltreCommand = getFiltreCommand(request);
+        PaginaDto<OrganGestorDto> organs = new PaginaDto<OrganGestorDto>();
 
-	try {
-	    EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+        try {
+            EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
-	    organs = organGestorService.findOrgansGestorsAmbFiltrePaginat(entitat.getId(),
-		    ConversioTipusHelper.convertir(organGestorFiltreCommand, OrganGestorFiltreDto.class),
-		    DatatablesHelper.getPaginacioDtoFromRequest(request));
-	} catch (SecurityException e) {
-	    MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
-	}
-	return DatatablesHelper.getDatatableResponse(request, organs, "codi");
+            organs = organGestorService.findOrgansGestorsAmbFiltrePaginat(entitat.getId(),
+                    ConversioTipusHelper.convertir(organGestorFiltreCommand, OrganGestorFiltreDto.class),
+                    DatatablesHelper.getPaginacioDtoFromRequest(request));
+        } catch (SecurityException e) {
+            MissatgesHelper.error(request,
+                    getMessage(request, "notificacio.controller.entitat.cap.assignada"));
+        }
+        return DatatablesHelper.getDatatableResponse(request, organs, "codi");
     }
 
     @RequestMapping(value = "/sync/dir3", method = RequestMethod.GET)
     public String syncDir3(HttpServletRequest request) {
 
-	EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-	organGestorService.syncDir3OrgansGestors(entitat.getId());
+        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+        organGestorService.syncDir3OrgansGestors(entitat.getId());
 
-	return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
-		"organgestor.controller.update.nom.tots.ok");
+        return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
+                "organgestor.controller.update.nom.tots.ok");
     }
 
     @RequestMapping(value = "/permis", method = RequestMethod.GET)
     public String permisos(HttpServletRequest request, OrganGestorFiltreCommand command, Model model) {
 
-	RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, command);
+        RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, command);
 
-	return "organGestorPermis";
+        return "organGestorPermis";
     }
-    
+
     @RequestMapping(value = "/permis/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse permisDatatable(HttpServletRequest request) {
-	List<PermisOrganGestorDto> permisos = new ArrayList<PermisOrganGestorDto>();
-	try {
-	    EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-	    permisos = organGestorService.findPermisos(entitat.getId());
-	} catch (Exception e) {
-	    MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
-	}
-	return DatatablesHelper.getDatatableResponse(request, permisos, "codi");
+        List<PermisOrganGestorDto> permisos = new ArrayList<PermisOrganGestorDto>();
+        try {
+            EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+            permisos = organGestorService.findPermisos(entitat.getId());
+        } catch (Exception e) {
+            MissatgesHelper.error(request,
+                    getMessage(request, "notificacio.controller.entitat.cap.assignada"));
+        }
+        return DatatablesHelper.getDatatableResponse(request, permisos, "codi");
     }
 
     @RequestMapping(value = "/permis/new", method = RequestMethod.GET)
     public String getNew(HttpServletRequest request, Model model) {
-	return get(request, null, model);
+        return get(request, null, model);
     }
 
     @RequestMapping(value = "/permis/{permisId}", method = RequestMethod.GET)
     public String get(HttpServletRequest request, @PathVariable Long permisId, Model model) {
-	EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-	PermisOrganGestorDto permis = null;
-	if (permisId != null) {
-	    List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitat.getId());
-	    for (PermisOrganGestorDto p : permisos) {
-		if (p.getId().equals(permisId)) {
-		    permis = p;
-		    break;
-		}
-	    }
-	}
-	model.addAttribute("organsGestors", 
-			   organGestorService.findByEntitat(entitat.getId()));
-	if (permis != null)
-	    model.addAttribute(PermisOrganGestorCommand.asCommand(permis));
-	else
-	    model.addAttribute(new PermisOrganGestorCommand());
-	return "organGestorPermisForm";
+        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+        PermisOrganGestorDto permis = null;
+        if (permisId != null) {
+            List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitat.getId());
+            for (PermisOrganGestorDto p : permisos) {
+                if (p.getId().equals(permisId)) {
+                    permis = p;
+                    break;
+                }
+            }
+        }
+        model.addAttribute("organsGestors", organGestorService.findByEntitat(entitat.getId()));
+        if (permis != null)
+            model.addAttribute(PermisOrganGestorCommand.asCommand(permis));
+        else
+            model.addAttribute(new PermisOrganGestorCommand());
+        return "organGestorPermisForm";
     }
 
     @RequestMapping(value = "/permis", method = RequestMethod.POST)
-    public String save(HttpServletRequest request, @Valid PermisOrganGestorCommand command, BindingResult bindingResult,
-	    Model model) {
-	EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-	if (bindingResult.hasErrors()) {
-	    model.addAttribute("organsGestors", 
-		    		organGestorService.findByEntitat(entitat.getId()));
-	    return "organGestorPermisForm";
-	}
-	
-	organGestorService.updatePermis(command.getOrganGestorId(), 
-					PermisOrganGestorCommand.asDto(command),
-					entitat.getId());
-	return getModalControllerReturnValueSuccess(request, "redirect:permis",
-		"organgestor.controller.permis.modificat.ok");
+    public String save(HttpServletRequest request, @Valid PermisOrganGestorCommand command,
+                       BindingResult bindingResult, Model model) {
+        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("organsGestors", organGestorService.findByEntitat(entitat.getId()));
+            return "organGestorPermisForm";
+        }
+
+        organGestorService.updatePermis(command.getOrganGestorId(), PermisOrganGestorCommand.asDto(command),
+                entitat.getId());
+        return getModalControllerReturnValueSuccess(request, "redirect:permis",
+                "organgestor.controller.permis.modificat.ok");
     }
-    
+
     @RequestMapping(value = "/permis/{permisId}/delete", method = RequestMethod.GET)
     public String delete(HttpServletRequest request, @PathVariable Long permisId, Model model) {
-	EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-	PermisOrganGestorDto permis = null;
-	if (permisId != null) {
-	    List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitatActual.getId());
-	    for (PermisOrganGestorDto p : permisos) {
-		if (p.getId().equals(permisId)) {
-		    permis = p;
-		    break;
-		}
-	    }
-	}
-	organGestorService.deletePermis(permis.getOrganGestor().getId(), 
-					permisId, 
-					entitatActual.getId());
-	return getAjaxControllerReturnValueSuccess(request, "redirect:../../permis",
-		"entitat.controller.permis.esborrat.ok");
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        PermisOrganGestorDto permis = null;
+        if (permisId != null) {
+            List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitatActual.getId());
+            for (PermisOrganGestorDto p : permisos) {
+                if (p.getId().equals(permisId)) {
+                    permis = p;
+                    break;
+                }
+            }
+        }
+        organGestorService.deletePermis(permis.getOrganGestor().getId(), permisId, entitatActual.getId());
+        return getAjaxControllerReturnValueSuccess(request, "redirect:../../permis",
+                "entitat.controller.permis.esborrat.ok");
     }
 
     private OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
-	OrganGestorFiltreCommand organGestorFiltreCommand = (OrganGestorFiltreCommand) RequestSessionHelper
-		.obtenirObjecteSessio(request, ORGANS_FILTRE);
-	if (organGestorFiltreCommand == null) {
-	    organGestorFiltreCommand = new OrganGestorFiltreCommand();
-	    RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
-	}
-	return organGestorFiltreCommand;
+        OrganGestorFiltreCommand organGestorFiltreCommand = (OrganGestorFiltreCommand) RequestSessionHelper
+                .obtenirObjecteSessio(request, ORGANS_FILTRE);
+        if (organGestorFiltreCommand == null) {
+            organGestorFiltreCommand = new OrganGestorFiltreCommand();
+            RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
+        }
+        return organGestorFiltreCommand;
     }
 
 }

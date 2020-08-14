@@ -38,8 +38,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			Pageable paginacio);
 	
-	public OrganGestorEntity findByCodiDir3(String codiDir3);
-	
 	@Query("from " +
     		 "    OrganGestorEntity og " +
     		 "where og.codi in (:codis)")

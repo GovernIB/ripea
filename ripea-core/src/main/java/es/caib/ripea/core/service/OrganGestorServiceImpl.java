@@ -59,8 +59,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     private CacheHelper cacheHelper;
     @Autowired
     private PluginHelper pluginHelper;
-    
-    
+
     @Transactional(readOnly = true)
     public List<OrganGestorDto> findAll() {
         List<OrganGestorEntity> organs = organGestorRepository.findAll();
@@ -87,13 +86,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
         List<OrganGestorDto> organismes = cacheHelper.findOrganismesByEntitat(entitat.getUnitatArrel());
         for (OrganGestorDto o : organismes) {
-            OrganGestorEntity organDB = organGestorRepository.findByCodiDir3(o.getCodi());
+            OrganGestorEntity organDB = organGestorRepository.findByCodi(o.getCodi());
             if (organDB == null) { // create it
                 organDB = new OrganGestorEntity();
-                organDB.setCodiDir3(o.getCodi());
                 organDB.setCodi(o.getCodi());
                 organDB.setEntitat(entitat);
                 organDB.setNom(o.getNom());
+                organDB.setPare(o.getPareCodi());
                 organGestorRepository.save(organDB);
 
             } else { // update it
@@ -107,8 +106,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId, OrganGestorFiltreDto filtre,
-            PaginacioParamsDto paginacioParams) {
+    public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
+                                                                       OrganGestorFiltreDto filtre,
+                                                                       PaginacioParamsDto paginacioParams) {
 
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
         Page<OrganGestorEntity> organs = null;
@@ -137,8 +137,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Override
     public List<PermisOrganGestorDto> findPermisos(Long entitatId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        logger.debug("Consulta com a administrador els permisos dels organs gestors de l'entitat (" + 
-                     "id=" + entitatId + ")");
+        logger.debug("Consulta com a administrador els permisos dels organs gestors de l'entitat (" + "id="
+                + entitatId + ")");
 
         entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
 
@@ -170,13 +170,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Override
     public void updatePermis(Long id, PermisDto permis, Long entitatId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        logger.debug("Modificació com a administrador del permis de l'entitat (" + "id=" + id + ", " + "permis="
-                + permis + ")");
+        logger.debug("Modificació com a administrador del permis de l'entitat (" + "id=" + id + ", "
+                + "permis=" + permis + ")");
         boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
                 new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
         if (!esAdministradorEntitat) {
-            logger.error("Aquest usuari no té permisos d'administrador sobre l'entitat (id=" + id + ", usuari="
-                    + auth.getName() + ")");
+            logger.error("Aquest usuari no té permisos d'administrador sobre l'entitat (id=" + id
+                    + ", usuari=" + auth.getName() + ")");
             throw new SecurityException("Sense permisos per a gestionar aquest organ gestor");
         }
         permisosHelper.updatePermis(id, OrganGestorEntity.class, permis);
@@ -186,12 +186,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Override
     public void deletePermis(Long id, Long permisId, Long entitatId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        logger.debug("Eliminació del permis de l'òrgan gestor (" + "id=" + id + ", " + "permisId=" + permisId + ")");
+        logger.debug("Eliminació del permis de l'òrgan gestor (" + "id=" + id + ", " + "permisId=" + permisId
+                + ")");
         boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
                 new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
         if (!esAdministradorEntitat) {
-            logger.error("Aquest usuari no té permisos d'administrador sobre l'òrgan gestor (" + "id=" + id + ", "
-                    + "usuari=" + auth.getName() + ")");
+            logger.error("Aquest usuari no té permisos d'administrador sobre l'òrgan gestor (" + "id=" + id
+                    + ", " + "usuari=" + auth.getName() + ")");
             throw new SecurityException("Sense permisos per administrar aquesta entitat");
         }
         permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
@@ -209,12 +210,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
         // Seleccionam els que tenen permisos d'administració
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        permisosHelper.filterGrantedAny(ids, 
-                                        OrganGestorEntity.class,
-                                        new Permission[] { 
-                                                ExtendedPermission.ADMINISTRATION 
-                                        }, 
-                                        auth);
+        permisosHelper.filterGrantedAny(ids, OrganGestorEntity.class,
+                new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
         return ids;
     }
 
@@ -222,12 +219,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3) {
         Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
         NodeDir3 root = organigramaDir3.get(codiDir3);
-        List<String> children = new ArrayList<String>();
-        
+
         // Si no es troba l'organigrama amb el codi
         if (organigramaDir3.isEmpty()) {
             return new ArrayList<OrganGestorDto>();
         }
+
+        List<String> children = new ArrayList<String>();
         findAllChildren(root, children);
 
         // Identificam tots els organs gestors fills
@@ -235,29 +233,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
         // Seleccionam els que tenen permisos d'administració
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        permisosHelper.filterGrantedAny(
-                organGestors,
-                new ObjectIdentifierExtractor<OrganGestorEntity>() {
-                    public Long getObjectIdentifier(OrganGestorEntity og) {
-                        return og.getId();
-                    }
-                },
-                OrganGestorEntity.class,
-                new Permission[] {
-                    ExtendedPermission.ADMINISTRATION},
-                auth);
+        permisosHelper.filterGrantedAny(organGestors, new ObjectIdentifierExtractor<OrganGestorEntity>() {
+            public Long getObjectIdentifier(OrganGestorEntity og) {
+                return og.getId();
+            }
+        }, OrganGestorEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
         return conversioTipusHelper.convertirList(organGestors, OrganGestorDto.class);
     }
-    
+
     private void findAllChildren(NodeDir3 node, List<String> dst) {
-        if(node.getCodi() != null)
+        if (node.getCodi() != null)
             dst.add(node.getCodi());
         if (node.getFills() != null)
             for (NodeDir3 fill : node.getFills())
                 findAllChildren(fill, dst);
     }
 
-    
     public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
         List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
