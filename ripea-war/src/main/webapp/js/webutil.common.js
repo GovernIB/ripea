@@ -337,15 +337,14 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	$.fn.webutilBotonsTitol = function() {
 		var $heading = $('.panel-heading h2', $(this).closest('.panel'))
 		if ($heading) {
-			$(this).css('position', 'absolute');
-			$(this).css('height', '0');
-			var headingOffset = $heading.offset();
-			var thisOffset = $(this).offset();
-			var margeAcumulat = $(this).children().length * 7 - 6;
-			$(this).css('top', (headingOffset.top - 3) + "px");
-			$(this).css('left', (headingOffset.left + $heading.innerWidth() - $(this).outerWidth() - margeAcumulat) + "px");
+			$heading.wrap( "<div class='row'></div>");
+			
+			$(this).insertAfter($heading);
+			$heading.wrap( "<div class='col-md-10'></div>");
+			$(this).wrap( "<div class='col-md-2'></div>");		
 		}
 	}
+	
 	$.fn.webutilBotonsTitolEval = function() {
 		$('[data-toggle="botons-titol"]', $(this)).each(function() {
 			if (!$(this).attr('data-botons-titol-eval')) {

@@ -32,15 +32,6 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			DocumentEnviamentEstatEnumDto[] estat,
 			boolean error);
 	
-	/*List<DocumentPortafirmesEntity> findByDocumentAndEstatInOrderByCreatedDateDesc(
-			DocumentEntity document,
-			DocumentEnviamentEstatEnumDto[] estat);*/
-
-	/*List<DocumentPortafirmesEntity> findByDocumentOrderByCreatedDateDesc(
-			DocumentEntity document);*/
-
-	
-
 	DocumentPortafirmesEntity findByPortafirmesId(
 			String portafirmesId);
 

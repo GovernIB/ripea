@@ -81,7 +81,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			notificacioNotib.setDocument(document);
 			notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
 			notificacioNotib.setUsuariCodi(notificacio.getUsuariCodi());
-			
+			notificacioNotib.setNumExpedient(notificacio.getNumExpedient());
 			if (notificacio.getEnviaments() != null) {
 				for (Enviament enviament : notificacio.getEnviaments()) {
 					es.caib.notib.ws.notificacio.Enviament enviamentNotib = new es.caib.notib.ws.notificacio.Enviament();
@@ -153,14 +153,15 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			}
 			
 			logger.debug("Es va enviar una notificació [concepte=" + notificacioNotib.getConcepte() + "] RespostaAlta: " + 
-			"error="+respostaAlta.isError() +
-			",errorDescripcio="+respostaAlta.getErrorDescripcio() +
-			",estat="+respostaAlta.getEstat() +
-			",identificador="+respostaAlta.getIdentificador() +
-			",referencies="+referenciesString);
+					 	 "error="+respostaAlta.isError() +
+					 	 ",errorDescripcio="+respostaAlta.getErrorDescripcio() +
+						 ",estat="+respostaAlta.getEstat() +
+						 ",identificador="+respostaAlta.getIdentificador() +
+						 ",referencies="+referenciesString);
 
 			if (respostaAlta.isError() && (respostaAlta.getReferencies() == null || respostaAlta.getReferencies().isEmpty())) {
 				throw new NotibRepostaException(respostaAlta.getErrorDescripcio());
+				
 			} else {
 				RespostaEnviar resposta = new RespostaEnviar();
 				resposta.setEstat(respostaAlta.getEstat() != null ? NotificacioEstat.valueOf(respostaAlta.getEstat().toString()) : null);

@@ -4,6 +4,7 @@
 package es.caib.ripea.plugin.unitat;
 
 import java.util.List;
+import java.util.Map;
 
 import es.caib.ripea.plugin.SistemaExternException;
 
@@ -15,6 +16,17 @@ import es.caib.ripea.plugin.SistemaExternException;
  */
 public interface UnitatsOrganitzativesPlugin {
 
+    /**
+     * Obté l'organigrama complet que conté la unitat organitzativa del codi donat
+     * 
+     * @param codi
+     *            Codi de l'unitat organitzativa que cercam.
+     * @return
+     * @throws SistemaExternException
+     * 		Si es produeix un error al consultar les unitats organitzatives.
+     */
+	public Map<String, NodeDir3> organigrama(String codi) throws SistemaExternException;
+	
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donada
 	 * una unitat pare.

@@ -29,6 +29,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
@@ -40,6 +41,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -71,6 +73,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
 
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
+
 	@Transactional
 	@Override
 	public MetaExpedientDto create(
@@ -101,8 +106,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getSerieDocumental(),
 				metaExpedient.getClassificacioSia(),
 				metaExpedient.isNotificacioActiva(),
+				metaExpedient.isPermetMetadocsGenerals(),
 				entitat,
-				metaExpedientPare).
+				metaExpedientPare,
+				organGestorRepository.findOne(metaExpedient.getOrganGestor().getId())).
 				build();
 		return conversioTipusHelper.convertir(
 				metaExpedientRepository.save(entity),
@@ -147,7 +154,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getSerieDocumental(),
 				metaExpedient.getExpressioNumero(),
 				metaExpedient.isNotificacioActiva(),
-				metaExpedientPare);
+				metaExpedient.isPermetMetadocsGenerals(),
+				metaExpedientPare,
+				organGestorRepository.findOne(metaExpedient.getOrganGestor().getId()));
 		return conversioTipusHelper.convertir(
 				metaExpedientEntity,
 				MetaExpedientDto.class);
@@ -376,6 +385,30 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				new Permission[] {ExtendedPermission.READ});
 	}
 
+	
+	///////////////////////
+	//// CERQUES AMB ORGANS GESTORS
+	///////////////////////
+		
+  public List<MetaExpedientDto> findActiusPerOrganGestor(Long entitatId) {
+      logger.debug("Consulta de meta-expedients de l'entitat (" + "entitatId=" + entitatId + ")");
+      EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+      List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+      
+      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+      permisosHelper.filterGrantedAny(metaExpedients, 
+                                      new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+                                          public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+                                              return metaExpedient.getOrganGestor().getId();
+                                          }
+                                      }, 
+                                      OrganGestorEntity.class, 
+                                      new Permission[] { ExtendedPermission.ADMINISTRATION }, 
+                                      auth);
+      return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
+  }
+	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public long getProximNumeroSequencia(
@@ -427,8 +460,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false);
 
-		ExpedientEstatEntity estatCrearTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca());
-		ExpedientEstatEntity estatFinalitzarTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca());
+		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
+		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.findOne(idEstatCrear): null;
+		
+		Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
+		ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.findOne(idEstatFinalitzar) : null;
 		
 		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
 				metaExpedientTasca.getCodi(),
@@ -438,8 +474,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient, 
 				metaExpedientTasca.getDataLimit(),
 				estatCrearTasca,
-				estatFinalitzarTasca).
-				build();
+				estatFinalitzarTasca
+				).build();
 		return conversioTipusHelper.convertir(
 				metaExpedientTascaRepository.save(entity),
 				MetaExpedientTascaDto.class);
@@ -909,31 +945,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return entity;
 	}
 	
-//	private MetaExpedientDominiEntity getMetaExpedientDomini(
-//			Long entitatId,
-//			Long metaExpedientId,
-//			Long id) {
-//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-//				entitatId,
-//				false,
-//				true,
-//				false);
-//		entityComprovarHelper.comprovarMetaExpedient(
-//				entitat,
-//				metaExpedientId,
-//				false,
-//				false,
-//				false,
-//				false);
-//		MetaExpedientDominiEntity entity = metaExpedientDominiRepository.findOne(id);
-//		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
-//			throw new NotFoundException(
-//					id,
-//					MetaExpedientDominiEntity.class);
-//		}
-//		return entity;
-//	}
-
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);
 
 }

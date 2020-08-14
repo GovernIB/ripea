@@ -6,12 +6,22 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <%
+
+// 	pageContext.setAttribute(
+// 			"sessionOrgansGestors",
+// 			es.caib.ripea.war.helper.OrganGestorHelper.findOrganGestorsAccessibles(request));
+// 	pageContext.setAttribute(
+//   			"organGestorActual",
+//   			es.caib.ripea.war.helper.OrganGestorHelper.getOrganGestorActual(request));
 	pageContext.setAttribute(
 			"sessionEntitats",
 			es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
 	pageContext.setAttribute(
 			"entitatActual",
 			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
+	pageContext.setAttribute(
+  			"requestParameterCanviOrganGestor",
+  			es.caib.ripea.war.helper.OrganGestorHelper.getRequestParameterCanviOrganGestor());
 	pageContext.setAttribute(
 			"requestParameterCanviEntitat",
 			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
@@ -31,6 +41,9 @@
 			"isRolActualAdministrador",
 			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request));
 	pageContext.setAttribute(
+	  			"isRolActualAdministradorOrgan",
+	  			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
+	pageContext.setAttribute(
 			"isRolActualUsuari",
 			es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
 	pageContext.setAttribute(
@@ -45,6 +58,8 @@
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
+<c:set var="hiHaOrgansGestors" value="${fn:length(sessionOrgansGestors) > 0}"/>
+<c:set var="hiHaMesOrgansGestors" value="${fn:length(sessionOrgansGestors) > 1}"/>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,6 +79,8 @@
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+	
+	<script>var requestLocale = '${requestLocale}';</script>
 	<decorator:head />
 <style>
 body {
@@ -152,6 +169,36 @@ body {
 								</c:if>
 							</li>
 						</c:if>
+<%-- 						<c:if test="${hiHaOrgansGestors}"> --%>
+<!-- 							<li class="dropdown"> -->
+<%-- 								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if> --%>
+<%-- 								<c:if test="${null != organGestorActual}"> --%>
+<%-- 		         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if> --%>
+<%-- 		         				</c:if> --%>
+<%-- 		         				<c:if test="${null == organGestorActual}"> --%>
+<%-- 		         				<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if> --%>
+<%-- 		         				</c:if> --%>
+<%-- 								<c:if test="${hiHaMesOrgansGestors}"></a></c:if> --%>
+<%-- 								<c:if test="${hiHaMesOrgansGestors}"> --%>
+<!-- 									<ul class="dropdown-menu"> -->
+<%-- 				         				<c:if test="${null != organGestorActual}"> --%>
+<%-- 				         					<c:url var="urlCanviOrganGestor" value="/index"> --%>
+<%-- 												<c:param name="${requestParameterCanviOrganGestor}" value="-1"/> --%>
+<%-- 											</c:url> --%>
+<%-- 				         					<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
+<%-- 				         				</c:if> --%>
+<%-- 										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status"> --%>
+<%-- 											<c:if test="${og.id != organGestorActual.id}"> --%>
+<%-- 												<c:url var="urlCanviOrganGestor" value="/index"> --%>
+<%-- 													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/> --%>
+<%-- 												</c:url> --%>
+<%-- 												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li> --%>
+<%-- 											</c:if> --%>
+<%-- 										</c:forEach> --%>
+<!-- 									</ul> -->
+<%-- 								</c:if> --%>
+<!-- 							</li> -->
+<%-- 						</c:if> --%>
 						<li class="dropdown">
 							<c:choose>
 								<c:when test="${fn:length(rolsUsuariActual) > 1}">
@@ -219,15 +266,37 @@ body {
 								</div>
 							</c:when>
 							<c:when test="${isRolActualAdministrador}">
+								<a href="<c:url value="/organgestor"/>" class="btn btn-primary"><spring:message code="decorator.menu.organgestor"/></a>
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
 										<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
+										<li><a href="<c:url value="/metaDocument"/>"><spring:message code="decorator.menu.metadocuments"/></a></li>
 										<li class="divider"></li>
 										<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
 										<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
 										<li class="divider"></li>
 										<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
+										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li>
+									</ul>
+								</div>
+								<div class="btn-group">
+									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
+									<ul class="dropdown-menu">
+										<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
+										<li>
+											<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
+												<spring:message code="decorator.menu.accions.massives.admin"/>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</c:when>
+							<c:when test="${isRolActualAdministradorOrgan}">
+								<div class="btn-group">
+									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
+									<ul class="dropdown-menu">
+										<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">
@@ -307,7 +376,7 @@ body {
 		</div>
 	</div>
     <div class="container container-foot container-caib">
-    	<div class="pull-left app-version"><p>RIPEA v<rip:versio/></p></div>
+    	<div class="pull-left app-version"><p>RIPEA <rip:versio/></p></div>
         <div class="pull-right govern-footer">
         	<p>
 	        	<img src="<c:url value="/img/uenegroma.png"/>"	     hspace="5" height="50" alt="<spring:message code='decorator.logo.ue'/>" />

@@ -9,12 +9,23 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.ExpedientNomUnique;
+
+import es.caib.ripea.war.command.ContenidorCommand.Create;
+import es.caib.ripea.war.command.ContenidorCommand.Update;
 
 /**
  * Command per al manteniment d'expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ExpedientNomUnique(
+		groups = {Create.class, Update.class},
+		campId = "id",
+		campMetaExpedientId = "metaNodeId",
+		campNom = "nom",
+		campEntitatId = "entitatId",
+		campPareId = "pareId")
 public class ExpedientCommand extends ContenidorCommand {
 
 	@NotNull(groups = {Create.class})
@@ -84,5 +95,4 @@ public class ExpedientCommand extends ContenidorCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
 }

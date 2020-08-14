@@ -126,6 +126,57 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 	}
 
+
+	@Transactional
+	@Override
+	public MetaDocumentDto create(
+			Long entitatId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut) {
+		logger.debug("Creant un nou meta-document (" +
+				"entitatId=" + entitatId + ", " +
+				"metaDocument=" + metaDocument + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+
+		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
+				entitat,
+				metaDocument.getCodi(),
+				metaDocument.getNom(),
+				metaDocument.getMultiplicitat(),
+				null,
+				metaDocument.getNtiOrigen(),
+				metaDocument.getNtiEstadoElaboracion(),
+				metaDocument.getNtiTipoDocumental()).
+				biometricaLectura(metaDocument.isBiometricaLectura()).
+				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
+				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
+				descripcio(metaDocument.getDescripcio()).
+				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
+				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
+				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
+				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
+				portafirmesCustodiaTipus(metaDocument.getPortafirmesCustodiaTipus()).
+				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
+				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
+				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
+				build();
+		if (plantillaContingut != null) {
+			entity.updatePlantilla(
+					plantillaNom,
+					plantillaContentType,
+					plantillaContingut);
+		}
+		return conversioTipusHelper.convertir(
+				metaDocumentRepository.save(entity),
+				MetaDocumentDto.class);
+	}
+	
 	@Transactional
 	@Override
 	public MetaDocumentDto update(
@@ -180,6 +231,59 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				entity,
 				MetaDocumentDto.class);
 	}
+	
+	
+	@Transactional
+	@Override
+	public MetaDocumentDto update(
+			Long entitatId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut) {
+		logger.debug("Actualitzant meta-document existent (" +
+				"entitatId=" + entitatId + ", " +
+				"metaDocument=" + metaDocument + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false);
+
+		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
+				entitat,
+				metaDocument.getId());
+		
+		entity.update(
+				metaDocument.getCodi(),
+				metaDocument.getNom(),
+				metaDocument.getDescripcio(),
+				metaDocument.getMultiplicitat(),
+				metaDocument.isFirmaPortafirmesActiva(),
+				metaDocument.getPortafirmesDocumentTipus(),
+				metaDocument.getPortafirmesFluxId(),
+				metaDocument.getPortafirmesResponsables(),
+				metaDocument.getPortafirmesSequenciaTipus(),
+				metaDocument.getPortafirmesCustodiaTipus(),
+				metaDocument.isFirmaPassarelaActiva(),
+				metaDocument.getFirmaPassarelaCustodiaTipus(),
+				metaDocument.getNtiOrigen(),
+				metaDocument.getNtiEstadoElaboracion(),
+				metaDocument.getNtiTipoDocumental(),
+				metaDocument.isFirmaBiometricaActiva(),
+				metaDocument.isBiometricaLectura(),
+				metaDocument.getPortafirmesFluxTipus());
+		
+		if (plantillaContingut != null) {
+			entity.updatePlantilla(
+					plantillaNom,
+					plantillaContentType,
+					plantillaContingut);
+		}
+		return conversioTipusHelper.convertir(
+				entity,
+				MetaDocumentDto.class);
+	}
 
 	@Transactional
 	@Override
@@ -197,9 +301,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				true,
 				false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
+		
+		MetaExpedientEntity metaExpedient;
+		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
+															entitat,
+															metaExpedientId);
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				metaExpedient,
@@ -225,9 +331,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				true,
 				false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
+
+		MetaExpedientEntity metaExpedient;
+		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
+															entitat,
+															metaExpedientId);
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				metaExpedient,
@@ -253,13 +361,16 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				true,
 				false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
+		MetaExpedientEntity metaExpedient;
+		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
+															entitat,
+															metaExpedientId);
+		
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				metaExpedient,
 				id);
+		
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
 				metaDocument,
 				MetaDocumentDto.class);
@@ -313,14 +424,25 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				true,
 				false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
+		
+		
+		MetaDocumentEntity entity;
+		if (metaExpedientId != null) {
+			MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+												entitat,
+												metaExpedientId);
+			entity = metaDocumentRepository.findByMetaExpedientAndCodi(
+					metaExpedient,
+					codi);	
+		}
+		else {
+			entity = metaDocumentRepository.findByMetaExpedientAndCodi(
+					codi);	
+		}
+		
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
-				metaDocumentRepository.findByMetaExpedientAndCodi(
-						metaExpedient,
-						codi),
-				MetaDocumentDto.class);
+										entity,
+										MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
 			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
@@ -343,9 +465,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				true,
 				false);
+		
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
+																entitat,
+																metaExpedientId);
 		PaginaDto<MetaDocumentDto> resposta;
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			resposta = paginacioHelper.toPaginaDto(
@@ -371,7 +494,28 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}
 	
-	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
+		logger.debug("Consulta dels meta-documents sense meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"paginacioParams=" + paginacioParams + ")");
+
+		PaginaDto<MetaDocumentDto> resposta;
+			resposta = paginacioHelper.toPaginaDto(
+					metaDocumentRepository.findWithoutMetaExpedient(
+							paginacioParams.getFiltre() == null,
+							paginacioParams.getFiltre(),
+							paginacioHelper.toSpringDataSort(paginacioParams)),
+					MetaDocumentDto.class);
+		metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());
+		metaNodeHelper.omplirPermisosPerMetaNodes(
+				resposta.getContingut(),
+				true);
+		return resposta;
+	}
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -395,9 +539,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 	}
 	
-	
-	
-
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaDocumentDto> findByEntitat(
@@ -553,6 +694,12 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		// encara es poden afegir segons la multiplicitat.
 		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(
 				expedientSuperior.getMetaExpedient());
+		
+		if (expedientSuperior.getMetaExpedient().isPermetMetadocsGenerals())
+		{
+			metaDocumentsDelMetaExpedient.addAll( metaDocumentRepository.findWithoutMetaExpedient() );		
+		}
+		
 		// Nomes retorna els documents que no s'hagin esborrat
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
 				expedientSuperior,

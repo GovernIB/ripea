@@ -157,12 +157,12 @@ public class ExpedientHelper {
 				nom,
 				null,
 				ExpedientEntity.class);
-		comprovarSiExpedientAmbMateixNom(
-				metaExpedient,
-				contingutPare,
-				nom,
-				null,
-				ExpedientEntity.class);
+//		comprovarSiExpedientAmbMateixNom(
+//				metaExpedient,
+//				contingutPare,
+//				nom,
+//				null,
+//				ExpedientEntity.class);
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
 				metaExpedient,
@@ -194,6 +194,7 @@ public class ExpedientHelper {
 						estatInicial.getResponsableCodi());
 			}
 		}
+		
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(
@@ -207,6 +208,7 @@ public class ExpedientHelper {
 						expedientPeticioId);
 			}
 		}
+		
 		contingutLogHelper.logCreacio(
 				expedient,
 				false,
@@ -793,24 +795,24 @@ public class ExpedientHelper {
 		return carpetaId;
 	}
 
-	public void comprovarSiExpedientAmbMateixNom(
-			MetaExpedientEntity metaExpedient,
-			ContingutEntity contingutPare,
-			String nom,
-			Long id,
-			Class<?> objectClass) {
-		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
-				metaExpedient,
-				contingutPare,
-				nom,
-				0);
-		if (expedient != null) {
-			throw new ValidationException(
-					id,
-					objectClass,
-					"Ja existeix un altre expedient amb el mateix tipus i nom");
-		}
-	}
+//	public void comprovarSiExpedientAmbMateixNom(
+//			MetaExpedientEntity metaExpedient,
+//			ContingutEntity contingutPare,
+//			String nom,
+//			Long id,
+//			Class<?> objectClass) {
+//		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
+//				metaExpedient,
+//				contingutPare,
+//				nom,
+//				0);
+//		if (expedient != null) {
+//			throw new ValidationException(
+//					id,
+//					objectClass,
+//					"Ja existeix un altre expedient amb el mateix tipus i nom");
+//		}
+//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 

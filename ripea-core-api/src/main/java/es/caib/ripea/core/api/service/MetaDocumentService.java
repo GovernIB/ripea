@@ -51,6 +51,31 @@ public interface MetaDocumentService {
 			byte[] plantillaContingut) throws NotFoundException;
 
 	/**
+	 * Crea un nou meta-document.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaDocument
+	 *            Informació del meta-document a crear.
+	 * @param plantillaNom
+	 *            Nom de l'arxiu de la plantilla.
+	 * @param plantillaContentType
+	 *            Content type de l'arxiu de la plantilla.
+	 * @param plantillaContingut
+	 *            Contingut de l'arxiu de la plantilla.
+	 * @return El meta-document creat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaDocumentDto create(
+			Long entitatId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut) throws NotFoundException;
+	
+	/**
 	 * Actualitza la informació del meta-document que tengui el mateix
 	 * id que l'especificat per paràmetre.
 	 * 
@@ -79,6 +104,32 @@ public interface MetaDocumentService {
 			String plantillaContentType,
 			byte[] plantillaContingut) throws NotFoundException;
 
+	
+	/**
+	 * Actualitza la informació del meta-document que tengui el mateix
+	 * id que l'especificat per paràmetre.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaDocument
+	 *            Informació del meta-document a modificar.
+	 * @param plantillaNom
+	 *            Nom de l'arxiu de la plantilla.
+	 * @param plantillaContentType
+	 *            Content type de l'arxiu de la plantilla.
+	 * @param plantillaContingut
+	 *            Contingut de l'arxiu de la plantilla.
+	 * @return El meta-document modificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaDocumentDto update(
+			Long entitatId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut) throws NotFoundException;
 	/**
 	 * Marca el meta-document especificada com a activa/inactiva .
 	 * 
@@ -177,6 +228,19 @@ public interface MetaDocumentService {
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
+	/**
+	 * Llistat paginat amb tots els meta-documents sense meta-expedient.
+	 * 
+	 * @param entitatId
+	 *            Id de l'ent
+	 * @param paginacioParams
+	 *            Peràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina de meta-documents.
+	 */
+	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams);
+	
 	/**
 	 * Llistat paginat amb tots els meta-documents de l'entitat.
 	 * 

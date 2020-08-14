@@ -5,8 +5,10 @@ package es.caib.ripea.plugin.caib.unitat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 
@@ -82,6 +84,12 @@ public class UnitatsOrganitzativesPluginMock implements UnitatsOrganitzativesPlu
 	public List<UnitatOrganitzativa> cercaUnitats(String codiUnitat, String denominacioUnitat,
 			Long codiNivellAdministracio, Long codiComunitat, Boolean ambOficines, Boolean esUnitatArrel,
 			Long codiProvincia, String codiLocalitat) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, NodeDir3> organigrama(String codiEntitat) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;
 	}

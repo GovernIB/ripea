@@ -143,6 +143,8 @@ $(document).ready(function() {
 			$('textarea#observacions').val('');
 			$('#pais').val("724");
 			$('#pais').change();
+			$('#provincia').val("07");
+			$('#provincia').change();
  		}
  		netejar = true;
 		var tipusInt = 1;
@@ -531,8 +533,16 @@ function canviVisibilitat(tipus) {
 		<rip:inputText name="raoSocial" textKey="interessat.form.camp.raoSocial" required="true" labelSize="2"/>
 		<!-- FILA: País i província -->
 		<div class="row">
-			<div class="col-xs-6"><rip:inputSelect name="pais" textKey="interessat.form.camp.pais" optionItems="${paisos}" optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" optionMinimumResultsForSearch="6" required="true"/></div>
-			<div class="col-xs-6"><rip:inputSelect name="provincia" textKey="interessat.form.camp.provincia" optionItems="${provincies}" optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" optionMinimumResultsForSearch="6" required="true"/></div>
+			<div class="col-xs-6">
+				<rip:inputSelect name="pais" textKey="interessat.form.camp.pais" optionItems="${paisos}" 
+								 optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" 
+								 optionMinimumResultsForSearch="6" required="true"/>
+			</div>
+			<div class="col-xs-6">
+				<rip:inputSelect name="provincia" textKey="interessat.form.camp.provincia" optionItems="${provincies}" 
+								 optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" 
+								 optionMinimumResultsForSearch="6" required="true"/>
+			</div>
 		</div>
 		<!-- FILA: Municipi i codi postal -->
 		<div class="row">

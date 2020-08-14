@@ -20,6 +20,8 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa un enviament d'una versió
@@ -29,6 +31,7 @@ import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
  */
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Getter @Setter
 public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 
 	@Column(name = "pf_prioritat")
@@ -54,15 +57,6 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	@Column(name = "pf_motiu_rebuig")
 	private String motiuRebuig;
 	
-	public PortafirmesPrioritatEnumDto getPrioritat() {
-		return prioritat;
-	}
-	public Date getCaducitatData() {
-		return caducitatData;
-	}
-	public String getDocumentTipus() {
-		return documentTipus;
-	}
 	public String[] getResponsables() {
 		if (responsables != null) {
 			return responsables.split(",");
@@ -71,24 +65,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 		}
 		
 	}
-	public MetaDocumentFirmaFluxTipusEnumDto getFluxTipus() {
-		return fluxTipus;
-	}
-	public MetaDocumentFirmaSequenciaTipusEnumDto getSequenciaTipus() {
-		return sequenciaTipus;
-	}
-	public String getFluxId() {
-		return fluxId;
-	}
-	public String getPortafirmesId() {
-		return portafirmesId;
-	}
-	public PortafirmesCallbackEstatEnumDto getCallbackEstat() {
-		return callbackEstat;
-	}
-	public String getMotiuRebuig() {
-		return motiuRebuig;
-	}
+
 	public void updateEnviat(
 			Date enviatData,
 			String portafirmesId) {

@@ -47,7 +47,7 @@ $(document).ready(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
 		} else if (tipus == 'DOCUMENT') {
-			$.get("<c:url value="/metaExpedient/metaDocument/findAll"/>")
+			$.get("<c:url value="/metaDocument/findAll"/>")
 			.done(metaNodeRefresh)
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");

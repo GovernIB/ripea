@@ -19,7 +19,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -30,42 +29,34 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/metaExpedient")
+@RequestMapping("/metaDocument")
 public class MetaDocumentMetaDadaController extends BaseAdminController {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
+
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
-				"metaExpedient",
-				metaExpedientService.findById(
-						entitatActual.getId(),
-						metaExpedientId));
-		model.addAttribute(
 				"metaDocument",
 				metaDocumentService.findById(
 						entitatActual.getId(),
-						metaExpedientId,
+						null,
 						metaDocumentId));
 		return "metaDadaList";
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -79,18 +70,16 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		return dtr;
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			Model model) {
-		return get(request, metaExpedientId, metaDocumentId, null, model);
+		return get(request, metaDocumentId, null, model);
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId,
 			Model model) {
@@ -112,10 +101,9 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		model.addAttribute(command);
 		return "metaDadaForm";
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada", method = RequestMethod.POST)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
@@ -145,10 +133,9 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		}
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
 	public String enable(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -162,10 +149,9 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 				"redirect:../../metaDada",
 				"metadada.controller.activada.ok");
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
 	public String disable(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -180,10 +166,9 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 				"metadada.controller.desactivada.ok");
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);

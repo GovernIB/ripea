@@ -54,7 +54,7 @@ public class ContenidorCommand {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom;
+		this.nom = nom.trim();
 	}
 
 	@Override

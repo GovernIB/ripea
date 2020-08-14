@@ -5,6 +5,7 @@ package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -32,6 +33,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
@@ -61,6 +63,7 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -106,6 +109,7 @@ public class CacheHelper {
 	@Resource
 	private DocumentNotificacioRepository documentNotificacioRepository;
 
+	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
@@ -350,9 +354,43 @@ public class CacheHelper {
 		return errorLastNotificacio;
 	}
 	
+  @Cacheable(value = "organismes", key = "#codiDir3")
+  public List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
+      List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
+      Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
+      if (organigramaDir3 != null) {
+          NodeDir3 arrel = organigramaDir3.get(codiDir3);
+          OrganGestorDto organisme = new OrganGestorDto();
+          organisme.setCodi(arrel.getCodi());
+          organisme.setNom(arrel.getDenominacio());
+          organisme.setPareCodi(null);
+          
+          organismes.add(organisme);
+          findOrganismesFills(arrel, organismes);
+      }
+      return organismes;
+  }
+  
+  private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
+  {
+      for (NodeDir3 fill : root.getFills())
+      {
+          OrganGestorDto organisme = new OrganGestorDto();
+          organisme.setCodi(fill.getCodi());
+          organisme.setNom(fill.getDenominacio());
+          organisme.setPareCodi(root.getCodi());
+          
+          organismes.add(organisme);
+          
+          findOrganismesFills(fill, organismes);
+      }
+  }
+  
+	@CacheEvict(value = "organismes", key="#codiDir3")
+	public void evictFindOrganismesByEntitat(String codiDir3) { }
+	
 	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
-	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) {
-	}
+	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) { }
 	
 	@Cacheable(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
 	public boolean hasEnviamentsPortafirmesPendentsPerExpedient(

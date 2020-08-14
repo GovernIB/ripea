@@ -25,6 +25,9 @@
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/tasca/save"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientTascaCommand">
 		<form:hidden path="id"/>
+		<form:hidden path="entitatId"/>
+		<form:hidden path="metaExpedientId"/>
+		
 		<rip:inputText name="codi" textKey="metaexpedient.tasca.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="metaexpedient.tasca.form.camp.nom" required="true"/>
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

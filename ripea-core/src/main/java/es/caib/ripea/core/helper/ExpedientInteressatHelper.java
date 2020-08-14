@@ -169,20 +169,10 @@ public class ExpedientInteressatHelper {
 				null,
 				false,
 				false);
-		if (interessat instanceof InteressatPersonaFisicaDto) {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatPersonaFisicaDto.class);
-		} else if (interessat instanceof InteressatPersonaJuridicaDto) {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatPersonaJuridicaDto.class);
-		} else {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatAdministracioDto.class);
-		}
 		
+		return conversioTipusHelper.convertir(
+							interessatRepository.save(interessatEntity),
+							InteressatDto.class);
 	}
 	
 	

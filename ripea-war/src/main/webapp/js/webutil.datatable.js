@@ -4,7 +4,7 @@
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
 			pageLength: 10,
-			lengthMenu: [10, 20, 50, 100, 250],
+			lengthMenu: [10, 20, 50],
 			infoEnabled: true,
 			infoType: 'botons', // 'botons', 'search'
 			searchEnabled: true,
@@ -76,7 +76,7 @@
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"f>>';
 			else
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"<"botons">>>';
-			var language = window.navigator.userLanguage || window.navigator.language;
+			var language = requestLocale;
 			// Només acceptam es i ca com a llengues //
 			if (language.startsWith("es")) {
 				language = "es";
