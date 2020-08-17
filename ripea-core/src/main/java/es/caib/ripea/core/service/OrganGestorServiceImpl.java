@@ -84,7 +84,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Transactional
     public boolean syncDir3OrgansGestors(Long entitatId) {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-        List<OrganGestorDto> organismes = cacheHelper.findOrganismesByEntitat(entitat.getUnitatArrel());
+        List<OrganGestorDto> organismes = findOrganismesByEntitat(entitat.getUnitatArrel());
         for (OrganGestorDto o : organismes) {
             OrganGestorEntity organDB = organGestorRepository.findByCodi(o.getCodi());
             if (organDB == null) { // create it
@@ -92,18 +92,50 @@ public class OrganGestorServiceImpl implements OrganGestorService {
                 organDB.setCodi(o.getCodi());
                 organDB.setEntitat(entitat);
                 organDB.setNom(o.getNom());
-                organDB.setPare(o.getPareCodi());
+                organDB.setPare(organGestorRepository.findByCodi(o.getPareCodi()));
                 organGestorRepository.save(organDB);
 
             } else { // update it
                 organDB.setNom(o.getNom());
+                organDB.setPare(organGestorRepository.findByCodi(o.getPareCodi()));
                 organGestorRepository.flush();
+                
             }
-
         }
         return true;
     }
 
+    public List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
+        List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
+        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
+        if (organigramaDir3 != null) {
+            NodeDir3 arrel = organigramaDir3.get(codiDir3);
+            OrganGestorDto organisme = new OrganGestorDto();
+            organisme.setCodi(arrel.getCodi());
+            organisme.setNom(arrel.getDenominacio());
+            organisme.setPareCodi(null);
+            
+            organismes.add(organisme);
+            findOrganismesFills(arrel, organismes);
+        }
+        return organismes;
+    }
+    
+    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
+    {
+        for (NodeDir3 fill : root.getFills())
+        {
+            OrganGestorDto organisme = new OrganGestorDto();
+            organisme.setCodi(fill.getCodi());
+            organisme.setNom(fill.getDenominacio());
+            organisme.setPareCodi(root.getCodi());
+            
+            organismes.add(organisme);
+            
+            findOrganismesFills(fill, organismes);
+        }
+    }
+    
     @Override
     @Transactional(readOnly = true)
     public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
@@ -198,68 +230,68 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
     }
 
-    @Cacheable(value = "organismes", key = "#codiDir3")
-    public List<Long> findAllOrganGestorsAccesiblesIds(String codiDir3) {
-        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
-        NodeDir3 root = organigramaDir3.get(codiDir3);
-        List<String> children = new ArrayList<String>();
-        findAllChildren(root, children);
-
-        // Identificam tots els organs gestors fills
-        List<Long> ids = organGestorRepository.findIdsByCodiDir3List(children);
-
-        // Seleccionam els que tenen permisos d'administració
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        permisosHelper.filterGrantedAny(ids, OrganGestorEntity.class,
-                new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
-        return ids;
-    }
-
-    @Cacheable(value = "organismes", key = "#codiDir3")
-    public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3) {
-        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
-        NodeDir3 root = organigramaDir3.get(codiDir3);
-
-        // Si no es troba l'organigrama amb el codi
-        if (organigramaDir3.isEmpty()) {
-            return new ArrayList<OrganGestorDto>();
-        }
-
-        List<String> children = new ArrayList<String>();
-        findAllChildren(root, children);
-
-        // Identificam tots els organs gestors fills
-        List<OrganGestorEntity> organGestors = organGestorRepository.findByCodiDir3List(children);
-
-        // Seleccionam els que tenen permisos d'administració
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        permisosHelper.filterGrantedAny(organGestors, new ObjectIdentifierExtractor<OrganGestorEntity>() {
-            public Long getObjectIdentifier(OrganGestorEntity og) {
-                return og.getId();
-            }
-        }, OrganGestorEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
-        return conversioTipusHelper.convertirList(organGestors, OrganGestorDto.class);
-    }
-
-    private void findAllChildren(NodeDir3 node, List<String> dst) {
-        if (node.getCodi() != null)
-            dst.add(node.getCodi());
-        if (node.getFills() != null)
-            for (NodeDir3 fill : node.getFills())
-                findAllChildren(fill, dst);
-    }
-
-    public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
-        List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<OrganGestorDto> resposta = new ArrayList<OrganGestorDto>();
-        for (EntitatDto entitat : entitatsAccessibles) {
-            List<OrganGestorDto> organs = findAllOrganGestorsAccesibles(entitat.getUnitatArrel());
-            resposta.addAll(organs);
-        }
-
-        return resposta;
-    }
+//    @Cacheable(value = "organismes", key = "#codiDir3")
+//    public List<Long> findAllOrganGestorsAccesiblesIds(String codiDir3) {
+//        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
+//        NodeDir3 root = organigramaDir3.get(codiDir3);
+//        List<String> children = new ArrayList<String>();
+//        findAllChildren(root, children);
+//
+//        // Identificam tots els organs gestors fills
+//        List<Long> ids = organGestorRepository.findIdsByCodiDir3List(children);
+//
+//        // Seleccionam els que tenen permisos d'administració
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        permisosHelper.filterGrantedAny(ids, OrganGestorEntity.class,
+//                new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+//        return ids;
+//    }
+//
+//    @Cacheable(value = "organismes", key = "#codiDir3")
+//    public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3) {
+//        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
+//        NodeDir3 root = organigramaDir3.get(codiDir3);
+//
+//        // Si no es troba l'organigrama amb el codi
+//        if (organigramaDir3.isEmpty()) {
+//            return new ArrayList<OrganGestorDto>();
+//        }
+//
+//        List<String> children = new ArrayList<String>();
+//        findAllChildren(root, children);
+//
+//        // Identificam tots els organs gestors fills
+//        List<OrganGestorEntity> organGestors = organGestorRepository.findByCodiDir3List(children);
+//
+//        // Seleccionam els que tenen permisos d'administració
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        permisosHelper.filterGrantedAny(organGestors, new ObjectIdentifierExtractor<OrganGestorEntity>() {
+//            public Long getObjectIdentifier(OrganGestorEntity og) {
+//                return og.getId();
+//            }
+//        }, OrganGestorEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+//        return conversioTipusHelper.convertirList(organGestors, OrganGestorDto.class);
+//    }
+//
+//    private void findAllChildren(NodeDir3 node, List<String> dst) {
+//        if (node.getCodi() != null)
+//            dst.add(node.getCodi());
+//        if (node.getFills() != null)
+//            for (NodeDir3 fill : node.getFills())
+//                findAllChildren(fill, dst);
+//    }
+//
+//    public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
+//        List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        List<OrganGestorDto> resposta = new ArrayList<OrganGestorDto>();
+//        for (EntitatDto entitat : entitatsAccessibles) {
+//            List<OrganGestorDto> organs = findAllOrganGestorsAccesibles(entitat.getUnitatArrel());
+//            resposta.addAll(organs);
+//        }
+//
+//        return resposta;
+//    }
 
     private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 

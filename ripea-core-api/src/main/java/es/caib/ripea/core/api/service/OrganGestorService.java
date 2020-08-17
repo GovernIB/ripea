@@ -127,7 +127,7 @@ public interface OrganGestorService {
 	 * 
 	 * @return
 	 */
-	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual();
+//	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual();
 	
 	/**
 	 * Obté un llistat de tots els organs gestors accessibles per a 
@@ -136,6 +136,6 @@ public interface OrganGestorService {
 	 * @param codiDir3 Codi de l'organ gestor del que cercam els accessibles.
 	 * @return Llistat de tots els organs gestors accessibles.
 	 */
-	public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3);
+//	public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3);
 	
 }
