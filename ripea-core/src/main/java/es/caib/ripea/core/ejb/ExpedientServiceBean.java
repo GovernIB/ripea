@@ -326,4 +326,20 @@ public class ExpedientServiceBean implements ExpedientService {
 		
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportIndexExpedients(Long entitatId, Collection<Long> expedientIds) throws IOException {
+		return delegate.exportIndexExpedients(
+				entitatId, 
+				expedientIds);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId) throws IOException {
+		return delegate.exportIndexExpedient(
+				entitatId,
+				expedientId);
+	}
+
 }

@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -38,6 +39,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.DocumentService;
 
 /**
@@ -51,7 +53,9 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 
 	@Autowired
 	private DocumentService documentService;
-
+	@Autowired
+	private CarpetaService carpetaService;
+	
 	@Test
     public void create() {
 		testAmbElementsIExpedient(
@@ -569,6 +573,93 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					}
 				},
 				"Tancar expedient");
+	}
+	
+	@Test
+	public void generarIndex() {
+		testAmbElementsIExpedient(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(List<Object> elementsCreats) throws IOException {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						assertNotNull(expedientCreat);
+						CarpetaDto carpetaCreada = carpetaService.create(
+								entitatCreada.getId(), 
+								expedientCreat.getId(), 
+								"Carpeta Test");
+						CarpetaDto subCarpetaCreada = carpetaService.create(
+								entitatCreada.getId(), 
+								carpetaCreada.getId(), 
+								"SubCarpeta Test 1");
+						CarpetaDto subCarpetaCreada2 = carpetaService.create(
+								entitatCreada.getId(), 
+								subCarpetaCreada.getId(), 
+								"SubCarpeta Test 2");
+						
+						for (int i = 0; i < 8; i++) {
+							DocumentDto dto = new DocumentDto();
+							dto.setNom("Test_" + i);
+							dto.setData(new Date());
+							dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+							dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+							dto.setNtiOrigen(NtiOrigenEnumDto.O0);
+							emplenarDocumentArxiu(dto);
+							dto.setFirmaSeparada(false);
+							MetaDocumentDto metaDocument = new MetaDocumentDto();
+							metaDocument.setId(metaDocumentCreat.getId());
+							dto.setMetaNode(metaDocument);
+							DocumentDto documentCreat = null;
+							
+							//Pare = expedient
+							if (i == 0 || i == 1 || i == 2) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										expedientCreat.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+							//Pare = carpeta
+							if (i == 3) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										carpetaCreada.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+							//Pare = sub carpeta
+							if (i == 4 || i == 5) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										subCarpetaCreada.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+							if (i == 6 || i == 7) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										subCarpetaCreada2.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+						}
+						
+						FitxerDto index = expedientService.exportIndexExpedient(
+								entitatCreada.getId(), 
+								expedientCreat.getId());
+						
+						assertNotNull(index);
+						assertNotNull(index.getContingut());
+						assertTrue(index.getContingut().length > 0);
+						
+					}
+				},
+				"Generar índex expedient");
 	}
 
 	private void comprovarExpedientCoincideix(

@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,8 +49,10 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -139,7 +143,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private DocumentHelper documentHelper;
-
+	
 	@Override
 	public ExpedientDto create(
 			Long entitatId,
@@ -1697,7 +1701,181 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return fitxer;
 	}
+	
+	@Override
+	@Transactional
+	public FitxerDto exportIndexExpedient(
+			Long entitatId, 
+			Long expedientId) throws IOException {
+		logger.debug("Exportant índex de l'expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ")");
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId, 
+				expedientId, 
+				false,
+				true,
+				false,
+				false,
+				false);		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+	
+		List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
+				expedient, 
+				0, 
+				new Sort("createdDate"));
+		long num = 0;
+		for (ContingutEntity contingut : continguts) {
+			if (contingut instanceof DocumentEntity) {
+				DocumentEntity document = (DocumentEntity) contingut;
+				FitxerDto fitxer = documentHelper.getFitxerAssociat((DocumentEntity) contingut, null);
+				String nomDocument = ((num += 10) / 10.0) + " " + fitxer.getNom();
+					
+				contingutHelper.crearNovaEntrada(
+						nomDocument,
+						fitxer,
+						zos);
+					if (document.isFirmat()) {
+					String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+					if (documentExportacioEni != null) {
+						FitxerDto exportacioEni = new FitxerDto();
+						exportacioEni.setNom("ENI documents/" + nomDocument + "_exportacio_ENI.xml");
+						exportacioEni.setContentType("application/xml");
+						exportacioEni.setContingut(documentExportacioEni.getBytes());
+						
+						contingutHelper.crearNovaEntrada(
+								exportacioEni.getNom(),
+								exportacioEni,
+								zos);
+					}
+				}
+			}
+			if (contingut instanceof CarpetaEntity) {
+				List<String> estructuraCarpetes = new ArrayList<String>();
+				List<DocumentEntity> documentsCarpetaActual = new ArrayList<DocumentEntity>();
+				ContingutEntity carpetaActual = contingut;
+				while (carpetaActual instanceof CarpetaEntity) {
+					boolean darreraCarpeta = true;
+					estructuraCarpetes.add(carpetaActual.getNom());
+					for (ContingutEntity contingutCarpetaActual : carpetaActual.getFills()) {
+						if (contingutCarpetaActual instanceof CarpetaEntity) {
+							carpetaActual = contingutCarpetaActual;
+							darreraCarpeta = false;
+						} else {
+							documentsCarpetaActual.add((DocumentEntity) contingutCarpetaActual);
+						}
+					}
+					String nomEstructuraCarpetes = "";
+					for (String carpeta : estructuraCarpetes) {
+						nomEstructuraCarpetes += carpeta + "/";
+					}
+					for (DocumentEntity document : documentsCarpetaActual) {
+						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+						num += (document.getNom() == documentsCarpetaActual.get(0).getNom()) ? 10 : 1; // primer document
+						String nomDocument = (num / 10.0) + " " + fitxer.getNom();
+						String nomCarpeta = nomEstructuraCarpetes + nomDocument;
+							contingutHelper.crearNovaEntrada(
+								nomCarpeta, 
+								fitxer, 
+								zos);
+						if (document.isFirmat()) {
+							String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+							if (documentExportacioEni != null) {
+								FitxerDto exportacioEni = new FitxerDto();
+								exportacioEni.setNom("ENI/" + nomDocument + "_exportacio_ENI.xml");
+								exportacioEni.setContentType("application/xml");
+								exportacioEni.setContingut(documentExportacioEni.getBytes());
+								
+								contingutHelper.crearNovaEntrada(
+										exportacioEni.getNom(),
+										exportacioEni,
+										zos);
+							}
+						}
+					}
+					documentsCarpetaActual = new ArrayList<DocumentEntity>();
+					if (darreraCarpeta)
+						break;
+				}
+			}
+		}
+		String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+		if (expedientExportacioEni != null) {
+			FitxerDto exportacioEni = new FitxerDto();
+			exportacioEni.setNom(expedient.getNom() + "_exportacio_ENI.xml");
+			exportacioEni.setContentType("application/xml");
+			exportacioEni.setContingut(expedientExportacioEni.getBytes());
+			contingutHelper.crearNovaEntrada(
+					exportacioEni.getNom(),
+					exportacioEni,
+					zos);
+		}
+		
+		FitxerDto indexDoc = contingutHelper.generarIndex(
+				entitatActual, 
+				expedient);
+		contingutHelper.crearNovaEntrada(
+				indexDoc.getNom(), 
+				indexDoc, 
+				zos);
+		FitxerDto indexPdf = pluginHelper.conversioConvertirPdf(
+				indexDoc, 
+				null);
+		contingutHelper.crearNovaEntrada(
+				indexPdf.getNom(), 
+				indexPdf, 
+				zos);
+		zos.close();
+		
+		FitxerDto resultat = new FitxerDto();
+		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index")  + " " + expedient.getNom() + ".zip");
+		resultat.setContentType("application/zip");
+		resultat.setContingut(baos.toByteArray());
+		
+		return resultat;
+	}
+	
 
+	
+	@Override
+	@Transactional
+	public FitxerDto exportIndexExpedients(
+			Long entitatId, 
+			Collection<Long> expedientIds) throws IOException {
+		logger.debug("Exportant índex dels expedients seleccionats (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientIds=" + expedientIds + ")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		
+		for (Long expedientId : expedientIds) {
+			FitxerDto resultat = exportIndexExpedient(
+					entitatId,
+					expedientId);
+			contingutHelper.crearNovaEntrada(
+					resultat.getNom(), 
+					resultat, 
+					zos);
+		}
+		FitxerDto resultat = new FitxerDto();
+		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
+		resultat.setContentType("application/zip");
+		resultat.setContingut(baos.toByteArray());
+		
+		return resultat;
+	}
+	
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,

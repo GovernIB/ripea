@@ -258,6 +258,7 @@ function getCookie(cname) {
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
+						<li><a href="expedient/generarIndex"><spring:message code="expedient.list.user.generar.index"/></a></li>
 					</ul>
 				</div>
 			</div>

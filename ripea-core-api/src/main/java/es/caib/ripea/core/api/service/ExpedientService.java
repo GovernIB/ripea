@@ -405,5 +405,33 @@ public interface ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats);
 	
-
+	/**
+	 * Genera un índex amb el continut de l'expedient.
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que es vol consultar.
+	 * @return Un document amb l'índex.
+	 * @throws IOException 
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto exportIndexExpedients(
+			Long entitatId, 
+			Collection<Long> expedientIds) throws IOException;
+	
+	/**
+	 * Genera un índex amb el continut de l'expedient.
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que es vol consultar.
+	 * @return Un document amb l'índex.
+	 * @throws IOException 
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto exportIndexExpedient(
+			Long entitatId, 
+			Long expedientId) throws IOException;
 }
