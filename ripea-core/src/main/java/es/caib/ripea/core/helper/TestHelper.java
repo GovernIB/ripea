@@ -8,7 +8,6 @@ import java.util.Date;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -30,31 +29,17 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 	
 @Component
 public class TestHelper {
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
+
 	@Resource
 	private EntitatRepository entitatRepository;
 	@Resource
 	private CacheHelper cacheHelper;
 	@Autowired
-	private JavaMailSender mailSender;
-	@Autowired
 	private EmailHelper emailHelper;
-	
-	@Autowired
-	private EmailPendentEnviarRepository emailPendentEnviarRepository;
-	
-	
-	private static final String PREFIX_RIPEA = "[RIPEA]";
-	
 	
 	public void testCanviEstatDocumentPortafirmes() {
 		

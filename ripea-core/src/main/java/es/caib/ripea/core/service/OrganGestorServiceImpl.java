@@ -260,7 +260,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     
     public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
         List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<OrganGestorDto> resposta = new ArrayList<OrganGestorDto>();
         for (EntitatDto entitat : entitatsAccessibles) {
             List<OrganGestorDto> organs = findAllOrganGestorsAccesibles(entitat.getUnitatArrel());
