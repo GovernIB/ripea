@@ -353,42 +353,7 @@ public class CacheHelper {
 		}
 		return errorLastNotificacio;
 	}
-	
-  @Cacheable(value = "organismes", key = "#codiDir3")
-  public List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
-      List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
-      Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
-      if (organigramaDir3 != null) {
-          NodeDir3 arrel = organigramaDir3.get(codiDir3);
-          OrganGestorDto organisme = new OrganGestorDto();
-          organisme.setCodi(arrel.getCodi());
-          organisme.setNom(arrel.getDenominacio());
-          organisme.setPareCodi(null);
-          
-          organismes.add(organisme);
-          findOrganismesFills(arrel, organismes);
-      }
-      return organismes;
-  }
-  
-  private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
-  {
-      for (NodeDir3 fill : root.getFills())
-      {
-          OrganGestorDto organisme = new OrganGestorDto();
-          organisme.setCodi(fill.getCodi());
-          organisme.setNom(fill.getDenominacio());
-          organisme.setPareCodi(root.getCodi());
-          
-          organismes.add(organisme);
-          
-          findOrganismesFills(fill, organismes);
-      }
-  }
-  
-	@CacheEvict(value = "organismes", key="#codiDir3")
-	public void evictFindOrganismesByEntitat(String codiDir3) { }
-	
+		
 	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
 	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) { }
 	

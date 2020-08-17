@@ -82,17 +82,17 @@ public class OrganGestorServiceBean implements OrganGestorService{
 	public void deletePermis(Long id, Long permisId, Long entitatId) throws NotFoundException {
 	    delegate.deletePermis(id, permisId, entitatId);	    
 	}
-	
-  @Override
-  @RolesAllowed("IPA_ADMIN")
-  public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
-      return delegate.findOrgansGestorsAccessiblesUsuariActual();
-  }
-
-  @Override
-  @RolesAllowed("IPA_ADMIN")
-  public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3)
-  {
-      return delegate.findAllOrganGestorsAccesibles(codiDir3);
-  }
+//	
+//  @Override
+//  @RolesAllowed("IPA_ADMIN")
+//  public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
+//      return delegate.findOrgansGestorsAccessiblesUsuariActual();
+//  }
+//
+//  @Override
+//  @RolesAllowed("IPA_ADMIN")
+//  public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3)
+//  {
+//      return delegate.findAllOrganGestorsAccesibles(codiDir3);
+//  }
 }
