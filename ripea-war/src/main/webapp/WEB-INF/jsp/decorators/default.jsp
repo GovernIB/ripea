@@ -19,9 +19,9 @@
 	pageContext.setAttribute(
 			"entitatActual",
 			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
-	pageContext.setAttribute(
-  			"requestParameterCanviOrganGestor",
-  			es.caib.ripea.war.helper.OrganGestorHelper.getRequestParameterCanviOrganGestor());
+// 	pageContext.setAttribute(
+//   			"requestParameterCanviOrganGestor",
+//   			es.caib.ripea.war.helper.OrganGestorHelper.getRequestParameterCanviOrganGestor());
 	pageContext.setAttribute(
 			"requestParameterCanviEntitat",
 			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());

@@ -93,7 +93,7 @@
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
 						<c:choose>
-							<c:when test="${contingut.valid && contingut.conteDocumentsFirmats && (!contingut.hasEsborranys || !convertirDefinitiu)}">
+							<c:when test="${contingut.valid && (contingut.conteDocumentsFirmats || contingut.hasEsborranys)}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>

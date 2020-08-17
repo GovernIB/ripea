@@ -42,8 +42,9 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @ForeignKey(name = "ipa_entitat_organ_gestor_fk")
     private EntitatEntity entitat;
 
-    @Column(name = "pare_codi", length = 64)
-    private String pare;
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "pare_id")
+    private OrganGestorEntity pare;
 
     private static final long serialVersionUID = 458331024861203562L;
 

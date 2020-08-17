@@ -31,10 +31,10 @@ public class AdministracioDistribuidaInterceptor extends HandlerInterceptorAdapt
 
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
             EntitatHelper.processarCanviEntitats(request, entitatService);
-            OrganGestorHelper.processarCanviOrganGestor(request, organGestorService);
+//            OrganGestorHelper.processarCanviOrganGestor(request, organGestorService);
             
             EntitatHelper.findEntitatsAccessibles(request, entitatService);
-            OrganGestorHelper.findOrganGestorsAccessibles(request, organGestorService);
+//            OrganGestorHelper.findOrganGestorsAccessibles(request, organGestorService);
 
         }
         return true;
