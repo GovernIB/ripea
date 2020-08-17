@@ -23,61 +23,28 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name = "ipa_organ_gestor", 
-	uniqueConstraints = @UniqueConstraint(name="ipa_oge_dir3_uk", columnNames = {"codi_dir3"}))
+@Table(name = "ipa_organ_gestor", uniqueConstraints = @UniqueConstraint(name = "ipa_oge_dir3_uk", columnNames = {
+        "codi" }))
 @EntityListeners(AuditingEntityListener.class)
-@Getter @Setter
+@Getter
+@Setter
 public class OrganGestorEntity extends RipeaAuditable<Long> {
-	
-	@NaturalId
-	@Column(name = "codi", length = 64, nullable = false, unique = true)
-	private String codi;
-	
-	@Column(name = "nom", length = 1000)
-	private String nom;
-	
-	@Column(name = "codi_dir3", length = 9, unique = true)
-	private String codiDir3;
-	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "entitat_id")
-	@ForeignKey(name = "ipa_entitat_organ_gestor_fk")
-	private EntitatEntity entitat;
-	
-//	@Deprecated
-//	public void update(
-//			String nom) {
-//		this.nom = nom;
-//	}
-//	
-//	@Deprecated
-//	public static Builder getBuilder(
-//			String codi,
-//			String nom,
-//			EntitatEntity entitat) {
-//		return new Builder(
-//				codi,
-//				nom,
-//				entitat);
-//	}
-//	
-//	@Deprecated
-//	public static class Builder {
-//		OrganGestorEntity built;
-//		Builder(
-//				String codi,
-//				String nom,
-//				EntitatEntity entitat) {
-//			built = new OrganGestorEntity();
-//			built.codi = codi;
-//			built.nom = nom;
-//			built.entitat = entitat;
-//		}
-//		public OrganGestorEntity build() {
-//			return built;
-//		}
-//	}
-	
-	private static final long serialVersionUID = 458331024861203562L;
+
+    @NaturalId
+    @Column(name = "codi", length = 64, nullable = false, unique = true)
+    private String codi;
+
+    @Column(name = "nom", length = 1000)
+    private String nom;
+
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "entitat_id")
+    @ForeignKey(name = "ipa_entitat_organ_gestor_fk")
+    private EntitatEntity entitat;
+
+    @Column(name = "pare_codi", length = 64)
+    private String pare;
+
+    private static final long serialVersionUID = 458331024861203562L;
 
 }

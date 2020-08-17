@@ -11,12 +11,14 @@ public class PermisOrganGestorCommand extends PermisCommand
     private Long organGestorId;
 
     public static PermisOrganGestorCommand asCommand(PermisOrganGestorDto dto) {
-	PermisOrganGestorCommand permisCommand = ConversioTipusHelper.convertir(dto, PermisOrganGestorCommand.class);
+        PermisOrganGestorCommand permisCommand = ConversioTipusHelper.convertir(dto,
+                PermisOrganGestorCommand.class);
 
-	permisCommand.setSelectAll(false);
-	if (permisCommand.isCreate() && permisCommand.isDelete() && permisCommand.isRead() && permisCommand.isWrite())
-	    permisCommand.setSelectAll(true);
-	permisCommand.setOrganGestorId(dto.getOrganGestor().getId());
-	return permisCommand;
+        permisCommand.setSelectAll(false);
+        if (permisCommand.isCreate() && permisCommand.isDelete() && permisCommand.isRead()
+                && permisCommand.isWrite())
+            permisCommand.setSelectAll(true);
+        permisCommand.setOrganGestorId(dto.getOrganGestor().getId());
+        return permisCommand;
     }
 }

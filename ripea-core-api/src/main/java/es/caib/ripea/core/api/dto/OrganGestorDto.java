@@ -18,17 +18,17 @@ import lombok.Setter;
 public class OrganGestorDto extends AuditoriaDto {
     private Long id;
     private String codi;
-    private String codiDir3;
     private String nom;
     private String entitatId;
+    private String pareCodi;
     private String entitatNom;
     private List<PermisDto> permisos;
 
     public int getPermisosCount() {
-	if (permisos == null)
-	    return 0;
-	else
-	    return permisos.size();
+        if (permisos == null)
+            return 0;
+        else
+            return permisos.size();
     }
 
     private static final long serialVersionUID = -2393511650074099319L;
