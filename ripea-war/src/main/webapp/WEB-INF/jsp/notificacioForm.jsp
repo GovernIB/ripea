@@ -55,6 +55,9 @@
 
 <script>
 	$(document).ready(function() {
+		$('form').on('submit', function(){
+			window.parent.addLoading();
+		});
 		$('#tipus').val("NOTIFICACIO");
 		$('#tipus').trigger('change');
 

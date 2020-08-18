@@ -98,6 +98,10 @@ body.loading .rmodal {
 
 <script type="text/javascript">
 $(document).ready(function() {
+	$('form').on('submit', function(){
+		window.parent.addLoading();
+	});
+	
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
 	let fluxPredefinit = ${nouFluxDeFirma};

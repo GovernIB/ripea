@@ -47,6 +47,25 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 	padding-left: 12px;
 	padding-right: 12px;
 }
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
@@ -90,6 +109,12 @@ $(document).ready(function() {
 		    var colorString = fullClassNameString.substring(11);
 		    $(this).parent().css( "background-color", colorString );	
 		});
+		
+
+		$("a.fileDownload").on("click", function() {
+			$("body").addClass("loading");
+			checkLoadingFinished();
+	    });
 	});
 	if (mostrarMeusExpedients) {
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
@@ -167,6 +192,17 @@ $(document).ready(function() {
 	});
 	$('#metaExpedientId').trigger('change');
 });
+
+function checkLoadingFinished() {
+	var cookieName = "contentLoaded";
+	if (getCookie(cookieName) != "") {
+		$("body").removeClass("loading");
+        removeCookie(cookieName);
+		return;
+	}
+    setTimeout(checkLoadingFinished, 100);
+}
+	
 function setCookie(cname,cvalue) {
 	var exdays = 30;
     var d = new Date();
@@ -188,6 +224,11 @@ function getCookie(cname) {
     }
     return "";
 }
+function removeCookie(cname) {
+    var expires = new Date(0).toUTCString();
+    document.cookie = cname + "=; path=/; expires=" + expires + ";";
+}
+
 </script>
 </head>
 <body>
@@ -246,6 +287,7 @@ function getCookie(cname) {
 			</div>	
 		</div>
 	</form:form>
+	<div class="rmodal"></div>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -258,7 +300,7 @@ function getCookie(cname) {
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
-						<li><a href="expedient/generarIndex"><spring:message code="expedient.list.user.generar.index"/></a></li>
+						<li><a class="fileDownload" href="expedient/generarIndex"><spring:message code="expedient.list.user.generar.index"/></a></li>
 					</ul>
 				</div>
 			</div>

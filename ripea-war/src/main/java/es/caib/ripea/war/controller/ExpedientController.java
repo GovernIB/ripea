@@ -282,7 +282,8 @@ public class ExpedientController extends BaseUserController {
 	}
 	
 	@RequestMapping(value = "/{expedientId}/generarIndex", method = RequestMethod.GET)
-	public String generarIndex(
+	@ResponseBody
+	public void generarIndex(
 			@PathVariable Long expedientId,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
@@ -291,12 +292,12 @@ public class ExpedientController extends BaseUserController {
 			FitxerDto fitxer = expedientService.exportIndexExpedient(
 					entitatActual.getId(),
 					expedientId);
-			
+
+			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 			writeFileToResponse(
 					fitxer.getNom(),
 					fitxer.getContingut(),
 					response);
-			return null;
 	}
 	
 	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)
@@ -320,6 +321,7 @@ public class ExpedientController extends BaseUserController {
 					entitatActual.getId(),
 					seleccio);
 				
+			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 			writeFileToResponse(
 					fitxer.getNom(),
 					fitxer.getContingut(),
