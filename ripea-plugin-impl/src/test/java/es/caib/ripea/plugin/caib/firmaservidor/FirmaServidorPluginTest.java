@@ -27,7 +27,7 @@ public class FirmaServidorPluginTest {
 		PropertiesHelper.getProperties().load(ClassLoader.getSystemResourceAsStream("test.properties"));
 	}
 
-	//@Test
+	@Test
 	public void signarDocumentPortafibCorrecte() throws Throwable {
 		String nom = "";
 		String motiu = "prova signatura";
