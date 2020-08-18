@@ -243,7 +243,21 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				id,
 				permisId);
 	}
+	@Override
+  @RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(Long entitatId,
+                                                        PaginacioParamsDto paginacioParams) {
+	    return delegate.findAmbOrganGestor(entitatId, paginacioParams);
+	    
+	}
 
+	@Override
+  @RolesAllowed("IPA_ADMIN")
+	public boolean hasAnyWithOrganGestor(Long entitatId)
+	{
+	     return delegate.hasAnyWithOrganGestor(entitatId);
+	}
+	
 //	@Override
 //	@RolesAllowed("IPA_ADMIN")
 //	public MetaExpedientDominiDto dominiCreate(

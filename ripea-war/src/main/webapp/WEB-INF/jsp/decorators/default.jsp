@@ -266,7 +266,6 @@ body {
 								</div>
 							</c:when>
 							<c:when test="${isRolActualAdministrador}">
-								<a href="<c:url value="/organgestor"/>" class="btn btn-primary"><spring:message code="decorator.menu.organgestor"/></a>
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
@@ -275,6 +274,7 @@ body {
 										<li class="divider"></li>
 										<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
 										<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
+										<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
 										<li class="divider"></li>
 										<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li>

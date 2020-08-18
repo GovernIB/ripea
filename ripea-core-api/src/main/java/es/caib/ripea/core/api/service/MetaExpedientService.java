@@ -397,6 +397,25 @@ public interface MetaExpedientService {
 			Long permisId) throws NotFoundException;
 	
 	
+
+	 /**
+   * Consulta els meta-expedients d'una entitat que tenen algún organ gestor asociat de forma paginada.
+   * 
+   * @param entitatId
+   *            Id de l'entitat.
+   * @param paginacioParams
+   *            Paràmetres per a dur a terme la paginació del resultats.
+   * @return La pàgina de meta-expedients.
+   * @throws NotFoundException
+   *             Si no s'ha trobat l'objecte amb l'id especificat.
+   */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+  public PaginaDto<MetaExpedientDto> findAmbOrganGestor(Long entitatId,
+                                                        PaginacioParamsDto paginacioParams);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public boolean hasAnyWithOrganGestor(Long entitatId);
+	
 //	/**
 //	 * Crea un domini del meta-expedient.
 //	 * 

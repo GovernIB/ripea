@@ -18,10 +18,8 @@ import es.caib.ripea.war.helper.OrganGestorHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AdministracioDistribuidaInterceptor extends HandlerInterceptorAdapter {
+public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 
-    @Autowired
-    private OrganGestorService organGestorService;
     @Autowired
     private EntitatService entitatService;
     
@@ -31,10 +29,7 @@ public class AdministracioDistribuidaInterceptor extends HandlerInterceptorAdapt
 
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
             EntitatHelper.processarCanviEntitats(request, entitatService);
-//            OrganGestorHelper.processarCanviOrganGestor(request, organGestorService);
-            
             EntitatHelper.findEntitatsAccessibles(request, entitatService);
-//            OrganGestorHelper.findOrganGestorsAccessibles(request, organGestorService);
 
         }
         return true;

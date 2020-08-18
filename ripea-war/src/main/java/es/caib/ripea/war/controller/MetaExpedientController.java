@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -61,11 +63,20 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		PaginaDto<MetaExpedientDto> metaExps = null;
+		if (RolHelper.isRolActualAdministradorOrgan(request)) {
+		    metaExps = metaExpedientService.findAmbOrganGestor(
+                entitatActual.getId(),
+                DatatablesHelper.getPaginacioDtoFromRequest(request));
+		            
+		} else {
+		    metaExps = metaExpedientService.findByEntitat(
+		            entitatActual.getId(),
+		            DatatablesHelper.getPaginacioDtoFromRequest(request));
+		}
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
-				metaExpedientService.findByEntitat(
-						entitatActual.getId(),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+				metaExps,
 				"id");
 		return dtr;
 	}
