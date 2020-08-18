@@ -21,7 +21,6 @@
 	
 <script>
 $(document).ready(function(){
-
 	$('#metaExpedientTascaId').on('change', function() {
 		var metaTascaId = $(this).val();
 		$('#expedientId').select2('val', '', true);
@@ -44,7 +43,6 @@ $(document).ready(function(){
 		}
 	});	
 	$('#metaExpedientTascaId').trigger('change');					
-	
 });
 
 </script>	

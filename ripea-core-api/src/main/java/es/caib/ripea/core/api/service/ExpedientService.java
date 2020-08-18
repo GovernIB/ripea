@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -268,14 +269,19 @@ public interface ExpedientService {
 	 *            Atribut id de l'expedient.
 	 * @param motiu
 	 *            Motiu de la finalització de l'expedient.
+	 * @param documentsPerFirmar
+	 *            Els documents a firmar abans de tancar l'expedient.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws ExpedientTancarSenseDocumentsDefinitiusException
+	 *             Si l'expedient no conté cap document definitiu.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) throws NotFoundException;
+			String motiu,
+			Long[] documentsPerFirmar) throws NotFoundException, ExpedientTancarSenseDocumentsDefinitiusException;
 
 	/**
 	 * Torna a l'estat obert un expedient tancat.

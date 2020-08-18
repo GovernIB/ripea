@@ -158,8 +158,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) {
-		delegate.tancar(entitatId, id, motiu);
+			String motiu,
+			Long[] documentsPerFirmar) {
+		delegate.tancar(entitatId, id, motiu, documentsPerFirmar);
 	}
 
 	@Override

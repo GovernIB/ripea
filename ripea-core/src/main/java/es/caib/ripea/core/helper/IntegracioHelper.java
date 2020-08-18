@@ -50,6 +50,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_VALIDASIG = "VALIDASIG";
 	public static final String INTCODI_NOTIFICACIO = "NOTIFICACIO";
 	public static final String INTCODI_GESDOC = "GESDOC";
+	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	public static final String INTCODI_VIAFIRMA = "VIAFIRMA";
 	public static final String INTCODI_DIGITALITZACIO = "DIGITALITZACIO";
 	

@@ -26,7 +26,10 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
  */
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
-	List<DocumentEntity> findByExpedient(ExpedientEntity expedient);
+	List<DocumentEntity> findByExpedientAndEstatAndEsborrat(
+			ExpedientEntity expedient,
+			DocumentEstatEnumDto estat,
+			int esborrat);
 
 	int countByExpedient(ExpedientEntity expedient);
 

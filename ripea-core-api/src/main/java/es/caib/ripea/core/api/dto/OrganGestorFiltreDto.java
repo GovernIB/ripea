@@ -15,6 +15,4 @@ import lombok.Setter;
 public class OrganGestorFiltreDto extends AuditoriaDto {
 	private String codi;
 	private String nom;
-	
-	private static final long serialVersionUID = -2393511650074099319L;
 }

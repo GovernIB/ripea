@@ -23,7 +23,6 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
-import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
 import es.caib.ripea.war.command.PermisOrganGestorCommand;
@@ -44,8 +43,6 @@ public class OrganGestorController extends BaseUserController {
 
     private final static String ORGANS_FILTRE = "organs_filtre";
 
-    @Autowired
-    private EntitatService entitatService;
     @Autowired
     private OrganGestorService organGestorService;
 
