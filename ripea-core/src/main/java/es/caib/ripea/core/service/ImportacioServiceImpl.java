@@ -110,9 +110,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 					} 
 				}
 			}
+			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')): document.getNom();
 			entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
-					tituloDoc != null ? tituloDoc : document.getNom(),
+					nomDocument,
 					null,
 					document.getMetadades().getDataCaptura(),
 					document.getMetadades().getDataCaptura(),
