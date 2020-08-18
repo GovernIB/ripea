@@ -393,7 +393,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
   public List<MetaExpedientDto> findActiusPerOrganGestor(Long entitatId) {
       logger.debug("Consulta de meta-expedients de l'entitat (" + "entitatId=" + entitatId + ")");
       EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-      List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+      List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);
       
       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
       permisosHelper.filterGrantedAny(metaExpedients, 
@@ -407,8 +407,79 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
                                       auth);
       return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
   }
-	
-	
+  
+  @Transactional(readOnly = true)
+  public List<Long> findIdsAmbOrganGestor(Long entitatId) {
+      logger.debug("Consulta de meta-expedients de l'entitat (" + "entitatId=" + entitatId + ")");
+      EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+      List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);
+      
+      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+      permisosHelper.filterGrantedAny(metaExpedients, 
+                                      new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+                                          public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+                                              if (metaExpedient.getOrganGestor() == null) {
+                                                  return null;
+                                              }
+                                              return metaExpedient.getOrganGestor().getId();
+                                          }
+                                      }, 
+                                      OrganGestorEntity.class, 
+                                      new Permission[] { ExtendedPermission.ADMINISTRATION }, 
+                                      auth);
+      List<Long> ids = new ArrayList<Long>();
+      for (MetaExpedientEntity me :metaExpedients)
+      {
+          ids.add(me.getId());
+      }
+      return ids;
+  }
+
+  @Transactional(readOnly = true)
+  public PaginaDto<MetaExpedientDto> findAmbOrganGestor(Long entitatId,
+                                                              PaginacioParamsDto paginacioParams) {
+      logger.debug("Consulta paginada dels meta-expedients de l'entitat (entitatId=" + entitatId + ")");
+      EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+      
+      List<Long> candidateMetaExpIds = findIdsAmbOrganGestor(entitatId);
+      PaginaDto<MetaExpedientDto> resposta;
+      if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
+          resposta = paginacioHelper.toPaginaDto(
+                  metaExpedientRepository.findByEntitat(entitat, 
+                                                        paginacioParams.getFiltre() == null,
+                                                        paginacioParams.getFiltre(), 
+                                                        candidateMetaExpIds,
+                                                        paginacioHelper.toSpringDataPageable(paginacioParams)),
+                  MetaExpedientDto.class);
+      } else {
+          resposta = paginacioHelper.toPaginaDto(
+                  metaExpedientRepository.findByEntitat(entitat, 
+                                                        paginacioParams.getFiltre() == null,
+                                                        paginacioParams.getFiltre(), 
+                                                        candidateMetaExpIds,
+                                                        paginacioHelper.toSpringDataSort(paginacioParams)),
+                  MetaExpedientDto.class);
+      }
+      metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());
+      omplirMetaDocumentsPerMetaExpedients(resposta.getContingut());
+      metaNodeHelper.omplirPermisosPerMetaNodes(resposta.getContingut(), true);
+
+      for (MetaExpedientDto metaExpedient : resposta.getContingut()) {
+          metaExpedient.setExpedientEstatsCount(expedientEstatRepository
+                  .countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
+          metaExpedient.setExpedientTasquesCount(metaExpedientTascaRepository
+                  .countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
+      }
+      return resposta;
+  }
+  
+  @Transactional(readOnly = true)
+  public boolean hasAnyWithOrganGestor(Long entitatId)
+  {
+      List<Long> candidateMetaExpIds = findIdsAmbOrganGestor(entitatId);   
+      return !candidateMetaExpIds.isEmpty();
+  }
+  
 	@Transactional(readOnly = true)
 	@Override
 	public long getProximNumeroSequencia(

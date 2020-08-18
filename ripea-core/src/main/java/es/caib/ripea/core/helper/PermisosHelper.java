@@ -177,9 +177,11 @@ public class PermisosHelper {
 			Authentication auth) {
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(
-					it.next());
-			if (!isGrantedAny(
+			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (objectIdentifier == null) {
+			    it.remove();
+			}
+			else if (!isGrantedAny(
 					objectIdentifier,
 					clazz,
 					permissions,

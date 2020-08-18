@@ -16,8 +16,14 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
+	<div class="text-right" data-toggle="botons-titol">
+		<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/sync/dir3">
+				<span class="fa fa-refresh"></span>&nbsp; <spring:message code="organgestor.list.boto.actualitzar"/>
+		</a>
+	</div>
 	<table id="permisos" data-toggle="datatable" 
 			data-url="<c:url value="organgestor/datatable"/>" 
+			data-info-type="search" 
 			data-default-order="1" 
 			data-default-dir="asc" 
 			data-botons-template="#botonsTemplate" 
@@ -59,9 +65,7 @@
 	</table>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
-			<a id="organgestor-boto-nou" class="btn btn-warning" href="organgestor/sync/dir3">
-				<span class="fa fa-refresh"></span>&nbsp; <spring:message code="organgestor.list.boto.actualitzar"/>
-			</a>
+			
 		</p>
 	</script>
 </body>

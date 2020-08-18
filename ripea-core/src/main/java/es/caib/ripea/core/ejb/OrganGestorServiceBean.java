@@ -54,9 +54,9 @@ public class OrganGestorServiceBean implements OrganGestorService{
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId, OrganGestorFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, filtre, paginacioParams);
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
+                                                                     PaginacioParamsDto paginacioParams){
+		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, paginacioParams);
 	}
 
 	@Override

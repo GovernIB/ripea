@@ -48,22 +48,18 @@ public class OrganGestorController extends BaseUserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
-        model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
         return "organGestor";
     }
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
-
-        OrganGestorFiltreCommand organGestorFiltreCommand = getFiltreCommand(request);
         PaginaDto<OrganGestorDto> organs = new PaginaDto<OrganGestorDto>();
 
         try {
             EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
             organs = organGestorService.findOrgansGestorsAmbFiltrePaginat(entitat.getId(),
-                    ConversioTipusHelper.convertir(organGestorFiltreCommand, OrganGestorFiltreDto.class),
                     DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request,
@@ -162,15 +158,4 @@ public class OrganGestorController extends BaseUserController {
         return getAjaxControllerReturnValueSuccess(request, "redirect:../../permis",
                 "entitat.controller.permis.esborrat.ok");
     }
-
-    private OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
-        OrganGestorFiltreCommand organGestorFiltreCommand = (OrganGestorFiltreCommand) RequestSessionHelper
-                .obtenirObjecteSessio(request, ORGANS_FILTRE);
-        if (organGestorFiltreCommand == null) {
-            organGestorFiltreCommand = new OrganGestorFiltreCommand();
-            RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
-        }
-        return organGestorFiltreCommand;
-    }
-
 }

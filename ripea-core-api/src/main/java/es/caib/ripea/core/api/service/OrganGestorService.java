@@ -61,8 +61,8 @@ public interface OrganGestorService {
 	 * @return La pàgina amb els organs gestors
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId, OrganGestorFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
+                                                                     PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3

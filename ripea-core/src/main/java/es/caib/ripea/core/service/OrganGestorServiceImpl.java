@@ -131,22 +131,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Override
     @Transactional(readOnly = true)
     public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
-                                                                       OrganGestorFiltreDto filtre,
                                                                        PaginacioParamsDto paginacioParams) {
 
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-        Page<OrganGestorEntity> organs = null;
-        if (filtre == null) {
-            organs = organGestorRepository.findByEntitat(entitat,
-                    paginacioHelper.toSpringDataPageable(paginacioParams));
-        } else {
-            organs = organGestorRepository.findByEntitatAndFiltre(entitat,
-                    filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-                    filtre.getCodi() == null ? "" : filtre.getCodi(),
-                    filtre.getNom() == null || filtre.getNom().isEmpty(),
-                    filtre.getNom() == null ? "" : filtre.getNom(),
-                    paginacioHelper.toSpringDataPageable(paginacioParams));
-        }
+
+        Page<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(entitat,
+                paginacioParams.getFiltre() == null,
+                paginacioParams.getFiltre(),
+                paginacioHelper.toSpringDataPageable(paginacioParams));
+
 
         PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 
