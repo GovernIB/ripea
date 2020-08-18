@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +131,11 @@ public class ContingutHelper {
 	private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired
 	private TipusDocumentalRepository tipusDocumentalRepository;
-
+	@Autowired
+	private IndexHelper indexHelper;
+	@Autowired
+	private MessageHelper messageHelper;
+	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
 		return toContingutDto(
@@ -1254,6 +1260,34 @@ public class ContingutHelper {
 			}
 		}
 		return pathDto;
+	}
+	
+	public FitxerDto generarIndex(
+			EntitatEntity entitatActual, 
+			ExpedientEntity expedient) throws IOException {
+		
+		byte[] indexGenerated = indexHelper.generarIndexPerExpedient(
+					expedient,
+					entitatActual);
+		
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".docx");
+		fitxer.setContentType("application/msword");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+
+	public void crearNovaEntrada(
+			String nom,
+			FitxerDto fitxer,
+			ZipOutputStream zos) throws IOException {
+		ZipEntry entrada = new ZipEntry(nom);
+		entrada.setSize(fitxer.getTamany());
+		zos.putNextEntry(entrada);
+		if (fitxer.getContingut() != null)
+			zos.write(fitxer.getContingut());
+		zos.closeEntry();
 	}
 	
 	public void tractarInteressats(List<RegistreInteressat> interessats) {

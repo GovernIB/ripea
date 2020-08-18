@@ -286,6 +286,53 @@ public class ExpedientController extends BaseUserController {
 			return null;
 		}
 	}
+	
+	@RequestMapping(value = "/{expedientId}/generarIndex", method = RequestMethod.GET)
+	public String generarIndex(
+			@PathVariable Long expedientId,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FitxerDto fitxer = expedientService.exportIndexExpedient(
+					entitatActual.getId(),
+					expedientId);
+			
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
+	}
+	
+	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)
+	public String generarIndexMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:../../expedient";
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FitxerDto fitxer = expedientService.exportIndexExpedients(
+					entitatActual.getId(),
+					seleccio);
+				
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
+		}
+	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String get(
