@@ -46,30 +46,24 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @Controller
 @RequestMapping("/metaDocument")
 public class MetaDocumentController extends BaseAdminController {
-	
+
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-	
 	@Autowired
 	private TipusDocumentalService tipusDocumentalService;
-	
 	@Autowired
 	private AplicacioService aplicacioService;
-	
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
-	public String getAll(
-			HttpServletRequest request,
-			Model model) {
+	public String getAll(HttpServletRequest request, Model model) {
 		return "metaDocumentList";
 	}
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
+	public DatatablesResponse datatable(HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
@@ -78,25 +72,18 @@ public class MetaDocumentController extends BaseAdminController {
 						DatatablesHelper.getPaginacioDtoFromRequest(request)));
 		return dtr;
 	}
+
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String getNew(
-			HttpServletRequest request,
-			Model model) {
+	public String getNew(HttpServletRequest request, Model model) {
 		return get(request, null, model);
 	}
-	
+
 	@RequestMapping(value = "/{metaDocumentId}", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long metaDocumentId,
-			Model model) {
+	public String get(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
-			metaDocument = metaDocumentService.findById(
-					entitatActual.getId(),
-					null,
-					metaDocumentId);
+			metaDocument = metaDocumentService.findById(entitatActual.getId(), null, metaDocumentId);
 		}
 		MetaDocumentCommand command = null;
 		if (metaDocument != null) {
@@ -107,10 +94,9 @@ public class MetaDocumentController extends BaseAdminController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
-		emplenarModelForm(request,model);
+		emplenarModelForm(request, model);
 		return "metaDocumentForm";
 	}
-
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
@@ -120,7 +106,7 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelForm(request,model);
+			emplenarModelForm(request, model);
 			return "metaDocumentForm";
 		}
 		if (command.getId() != null) {
@@ -148,23 +134,17 @@ public class MetaDocumentController extends BaseAdminController {
 		}
 	}
 
-
 	@RequestMapping(value = "/{metaDocumentId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long metaDocumentId) {
+	public String delete(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		try {
-			metaDocumentService.delete(
-					entitatActual.getId(),
-					null,
-					metaDocumentId);
+			metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
 					"metadocument.controller.esborrat.ok");
 		} catch (Exception ex) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) || 
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
 					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
 				return getAjaxControllerReturnValueError(
 						request,
@@ -176,34 +156,21 @@ public class MetaDocumentController extends BaseAdminController {
 
 		}
 	}
-	
 
 	@RequestMapping(value = "/{metaDocumentId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long metaDocumentId) {
+	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		metaDocumentService.updateActiu(
-				entitatActual.getId(),
-				null,
-				metaDocumentId,
-				true);
+		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
 				"metadocument.controller.activat.ok");
 	}
-	
+
 	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
-	public String disable(
-			HttpServletRequest request,
-			@PathVariable Long metaDocumentId) {
+	public String disable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		metaDocumentService.updateActiu(
-				entitatActual.getId(),
-				null,
-				metaDocumentId,
-				false);
+		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
@@ -212,144 +179,103 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
 	@ResponseBody
-	public List<MetaDocumentDto> findAll(
-			HttpServletRequest request,
-			Model model) {
+	public List<MetaDocumentDto> findAll(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		return metaDocumentService.findByEntitat(entitatActual.getId());
 	}
-	
+
 	@RequestMapping(value = "/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
-			@RequestParam(value="nom", required = false) String nom,
-			@RequestParam(value="plantillaId", required = false) String plantillaId,
+			@RequestParam(value = "nom", required = false) String nom,
+			@RequestParam(value = "plantillaId", required = false) String plantillaId,
 			Model model) throws UnsupportedEncodingException {
 		String urlReturn;
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		String nomCodificat = new String(nom.getBytes(), "UTF-8");
-		String descripcio = getMessage(
-				request, 
-				"document.controller.portafirmes.flux.desc");
+		String descripcio = getMessage(request, "document.controller.portafirmes.flux.desc");
 		try {
 			urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
 			if (plantillaId != null && !plantillaId.isEmpty()) {
 				transaccioResponse = new PortafirmesIniciFluxRespostaDto();
-				String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(
-						plantillaId, 
-						urlReturn);
+				String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(plantillaId, urlReturn);
 				transaccioResponse.setUrlRedireccio(urlEdicio);
 			} else {
-				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-						urlReturn,
-						nomCodificat,
-						descripcio,
-						true);
+				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, nomCodificat, descripcio, true);
 			}
 		} catch (Exception ex) {
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 			transaccioResponse.setError(true);
 			transaccioResponse.setErrorDescripcio(ex.getMessage());
 		}
-		
+
 		return transaccioResponse;
 	}
 
 	@RequestMapping(value = "/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
 	@ResponseBody
-	public void tancarTransaccio(
-			HttpServletRequest request,
-			@PathVariable String idTransaccio,
-			Model model) {
+	public void tancarTransaccio(HttpServletRequest request, @PathVariable String idTransaccio, Model model) {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
 	@RequestMapping(value = "/flux/returnurl/{transactionId}", method = RequestMethod.GET)
-	public String transaccioEstat(
-			HttpServletRequest request,
-			@PathVariable String transactionId,
-			Model model) {
+	public String transaccioEstat(HttpServletRequest request, @PathVariable String transactionId, Model model) {
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 
 		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
-						"FluxError",
-						getMessage(
-						request,
-						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+					"FluxError",
+					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
 		} else {
 			model.addAttribute(
 					"FluxCreat",
-					getMessage(
-					request,
-					"metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
+					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
 			model.addAttribute("fluxId", resposta.getFluxId());
 			model.addAttribute("FluxNom", resposta.getNom());
 		}
 		return "portafirmesModalTancar";
 	}
-	
+
 	@RequestMapping(value = "/flux/returnurl/", method = RequestMethod.GET)
-	public String transaccioEstat(
-			HttpServletRequest request,
-			Model model) {
+	public String transaccioEstat(HttpServletRequest request, Model model) {
 		model.addAttribute(
 				"FluxCreat",
-				getMessage(
-				request,
-				"metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
+				getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
 		return "portafirmesModalTancar";
 	}
-	
+
 	@RequestMapping(value = "/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
-	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(
-			HttpServletRequest request,
-			Model model) {
+	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles();
 		return resposta;
 	}
-	
+
 	@RequestMapping(value = "/flux/esborrar/{plantillaId}", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean esborrarPlantilla(
-			HttpServletRequest request,
-			@PathVariable String plantillaId,
-			Model model) {
+	public boolean esborrarPlantilla(HttpServletRequest request, @PathVariable String plantillaId, Model model) {
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 
-	private void emplenarModelForm(
-			HttpServletRequest request,
-			Model model) {
+	private void emplenarModelForm(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
-		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(
-				entitatActual.getId());
-		model.addAttribute(
-				"isPortafirmesDocumentTipusSuportat",
-				new Boolean(tipus != null));
-		model.addAttribute(
-				"portafirmesDocumentTipus",
-				tipus);
-		//Dades nti
+		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
+		model.addAttribute("isPortafirmesDocumentTipusSuportat", new Boolean(tipus != null));
+		model.addAttribute("portafirmesDocumentTipus", tipus);
+		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",
-				EnumHelper.getOptionsForEnum(
-						NtiOrigenEnumDto.class,
-						"document.nti.origen.enum."));
-		model.addAttribute(
-				"ntiTipusDocumentalOptions",
-				tipusDocumental);
+				EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
+		model.addAttribute("ntiTipusDocumentalOptions", tipusDocumental);
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiEstadoElaboracionEnumDto.class,
-						"document.nti.estela.enum."));
-		model.addAttribute("isFirmaBiometrica",
-				Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
-
+				EnumHelper.getOptionsForEnum(DocumentNtiEstadoElaboracionEnumDto.class, "document.nti.estela.enum."));
+		model.addAttribute(
+				"isFirmaBiometrica",
+				Boolean.parseBoolean(
+						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 	}
 
 }

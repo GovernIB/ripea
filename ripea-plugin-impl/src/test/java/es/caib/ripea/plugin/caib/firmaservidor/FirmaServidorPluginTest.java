@@ -79,7 +79,7 @@ public class FirmaServidorPluginTest {
 	 * @throws Throwable 
 	 */
 	private byte[] obtenirContingutPerFirmar() throws Throwable {
-		byte[] contingut = IOUtils.toByteArray(this.getClass().getResourceAsStream("/es/caib/ripea/plugin/caib/firma_test.pdf")); 
+		byte[] contingut = IOUtils.toByteArray(this.getClass().getResourceAsStream("/es/caib/ripea/plugin/caib/firma_servidor_test.pdf")); 
 		return contingut;
 	}
 

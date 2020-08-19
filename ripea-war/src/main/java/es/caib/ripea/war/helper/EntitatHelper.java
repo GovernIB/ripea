@@ -30,10 +30,8 @@ public class EntitatHelper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<EntitatDto> findEntitatsAccessibles(
-			HttpServletRequest request,
-			EntitatService entitatService) {
-		List<EntitatDto> entitats = (List<EntitatDto>) request.getAttribute(REQUEST_ATTRIBUTE_ENTITATS);
+	public static List<EntitatDto> findEntitatsAccessibles(HttpServletRequest request, EntitatService entitatService) {
+		List<EntitatDto> entitats = (List<EntitatDto>)request.getAttribute(REQUEST_ATTRIBUTE_ENTITATS);
 		if (entitats == null && entitatService != null) {
 			entitats = entitatService.findAccessiblesUsuariActual();
 			request.setAttribute(REQUEST_ATTRIBUTE_ENTITATS, entitats);
@@ -41,16 +39,14 @@ public class EntitatHelper {
 		return entitats;
 	}
 
-	public static void processarCanviEntitats(
-			HttpServletRequest request,
-			EntitatService entitatService) {
+	public static void processarCanviEntitats(HttpServletRequest request, EntitatService entitatService) {
 		String canviEntitat = request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT);
 		if (canviEntitat != null && canviEntitat.length() > 0) {
 			LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
 			try {
 				Long canviEntitatId = new Long(canviEntitat);
 				List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
-				for (EntitatDto entitat: entitats) {
+				for (EntitatDto entitat : entitats) {
 					if (canviEntitatId.equals(entitat.getId())) {
 						canviEntitatActual(request, entitat, entitatService);
 					}
@@ -64,11 +60,8 @@ public class EntitatHelper {
 		return getEntitatActual(request, null);
 	}
 
-	public static EntitatDto getEntitatActual(
-			HttpServletRequest request,
-			EntitatService entitatService) {
-		EntitatDto entitatActual = (EntitatDto)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ENTITAT_ACTUAL);
+	public static EntitatDto getEntitatActual(HttpServletRequest request, EntitatService entitatService) {
+		EntitatDto entitatActual = (EntitatDto)request.getSession().getAttribute(SESSION_ATTRIBUTE_ENTITAT_ACTUAL);
 		if (entitatActual == null) {
 			List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
 			if (entitats != null && entitats.size() > 0) {
@@ -94,10 +87,8 @@ public class EntitatHelper {
 			EntitatService entitatService) {
 		request.getSession().setAttribute(SESSION_ATTRIBUTE_ENTITAT_ACTUAL, entitatActual);
 		ExpedientHelper.resetAccesUsuariExpedients(request);
-		Boolean isUsuariAdminOrgan = new Boolean(entitatService.isAdminOrgan(entitatActual.getId())); 
-		request.getSession().setAttribute(
-				SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN,
-				isUsuariAdminOrgan);
+		Boolean isUsuariAdminOrgan = new Boolean(entitatService.isAdminOrgan(entitatActual.getId()));
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN, isUsuariAdminOrgan);
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatHelper.class);

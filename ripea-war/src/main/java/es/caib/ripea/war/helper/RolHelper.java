@@ -73,6 +73,7 @@ public class RolHelper {
 	public static boolean isRolActualAdministradorOrgan(HttpServletRequest request) {
 		return ROLE_ADMIN_ORGAN.equals(getRolActual(request));
 	}
+
 	public static boolean isRolActualUsuari(HttpServletRequest request) {
 		return ROLE_USER.equals(getRolActual(request));
 	}
