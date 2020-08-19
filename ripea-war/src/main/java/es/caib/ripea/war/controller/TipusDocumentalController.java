@@ -41,7 +41,7 @@ public class TipusDocumentalController extends BaseAdminController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		model.addAttribute("suportaMetaDocumentalsAddicionals", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.arxiu.metadocumental.addicional.actiu")));
 		return "tipusDocumentalList";
 	}
@@ -50,7 +50,7 @@ public class TipusDocumentalController extends BaseAdminController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				tipusDocumentalService.findByEntitatPaginat(
@@ -72,7 +72,7 @@ public class TipusDocumentalController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long tipusDocumentalId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		TipusDocumentalDto tipusDocumental = null;
 		if (tipusDocumentalId != null)
 			tipusDocumental = tipusDocumentalService.findById(
@@ -95,7 +95,7 @@ public class TipusDocumentalController extends BaseAdminController {
 			@Valid TipusDocumentalCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			return "tipusDocumentalForm";
 		}
@@ -122,7 +122,7 @@ public class TipusDocumentalController extends BaseAdminController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long tipusDocumentalId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		tipusDocumentalService.delete(
 				entitatActual.getId(),
 				tipusDocumentalId);

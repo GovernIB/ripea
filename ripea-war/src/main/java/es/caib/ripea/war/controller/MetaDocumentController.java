@@ -70,7 +70,7 @@ public class MetaDocumentController extends BaseAdminController {
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDocumentService.findWithoutMetaExpedient(
@@ -90,7 +90,7 @@ public class MetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
 			metaDocument = metaDocumentService.findById(
@@ -118,7 +118,7 @@ public class MetaDocumentController extends BaseAdminController {
 			@Valid MetaDocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request,model);
 			return "metaDocumentForm";
@@ -153,7 +153,7 @@ public class MetaDocumentController extends BaseAdminController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		try {
 			metaDocumentService.delete(
 					entitatActual.getId(),
@@ -182,7 +182,7 @@ public class MetaDocumentController extends BaseAdminController {
 	public String enable(
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaDocumentService.updateActiu(
 				entitatActual.getId(),
 				null,
@@ -198,7 +198,7 @@ public class MetaDocumentController extends BaseAdminController {
 	public String disable(
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaDocumentService.updateActiu(
 				entitatActual.getId(),
 				null,
@@ -215,7 +215,7 @@ public class MetaDocumentController extends BaseAdminController {
 	public List<MetaDocumentDto> findAll(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		return metaDocumentService.findByEntitat(entitatActual.getId());
 	}
 	
@@ -323,7 +323,7 @@ public class MetaDocumentController extends BaseAdminController {
 	private void emplenarModelForm(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(
 				entitatActual.getId());

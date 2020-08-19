@@ -38,7 +38,7 @@ public class AjaxUnitatsController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable String codi,
 			Model model) {
-		getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		UnitatOrganitzativaDto unitat = unitatOrganitzativaService.findByCodi(codi);
 		if (unitat == null) {
 			unitat = new UnitatOrganitzativaDto();
@@ -57,7 +57,7 @@ public class AjaxUnitatsController extends BaseAdminController {
 		List<UnitatOrganitzativaDto> unitatsFiltrades = new ArrayList<UnitatOrganitzativaDto>();
 		
 		if (text != null) {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 			List<UnitatOrganitzativaDto> unitatsEntitat = unitatOrganitzativaService.findByEntitat(entitatActual.getCodi());
 			
 			text = text.toUpperCase();

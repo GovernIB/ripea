@@ -22,12 +22,13 @@ public class LlistaRolsInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	MetaExpedientService metaExpedientService;
-	
+
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-	                         Object handler) throws Exception {
+	public boolean preHandle(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Object handler) throws Exception {
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-			RolHelper.initialize(request, metaExpedientService);
 			RolHelper.processarCanviRols(request);
 		}
 		return true;

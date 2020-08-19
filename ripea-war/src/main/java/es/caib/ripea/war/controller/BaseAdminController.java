@@ -17,13 +17,29 @@ import es.caib.ripea.war.helper.EntitatHelper;
  */
 public class BaseAdminController extends BaseController {
 
-	public EntitatDto getEntitatActualComprovantPermisos(
+	public EntitatDto getEntitatActualComprovantPermisAdminEntitat(
 			HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null)
 			throw new SecurityException("No te cap entitat assignada");
 		if (!entitat.isUsuariActualAdministration())
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
+		return entitat;
+	}
+
+	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOrgan(
+			HttpServletRequest request) {
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		if (entitat == null) {
+			throw new SecurityException("No te cap entitat assignada");
+		}
+		if (!entitat.isUsuariActualAdministration()) {
+			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
+		}
+		// TODO
+		/*if (!entitat.isUsuariActualAdministrationOrgan()) {
+			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
+		}*/
 		return entitat;
 	}
 

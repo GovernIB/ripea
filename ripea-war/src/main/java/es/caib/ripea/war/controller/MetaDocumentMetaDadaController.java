@@ -43,8 +43,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		model.addAttribute(
 				"metaDocument",
 				metaDocumentService.findById(
@@ -59,7 +58,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDadaService.findByMetaNodePaginat(
@@ -83,7 +82,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		MetaDadaDto metaDada = null;
 		if (metaDadaId != null)
 			metaDada = metaDadaService.findById(
@@ -108,7 +107,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			return "metaDadaForm";
 		}
@@ -138,7 +137,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaDocumentId,
@@ -154,7 +153,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaDocumentId,
@@ -171,7 +170,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaDadaService.delete(
 				entitatActual.getId(),
 				metaDocumentId,

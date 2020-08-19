@@ -50,7 +50,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -66,7 +66,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaExpedientService.tascaFindPaginatByMetaExpedient(
@@ -95,7 +95,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long id,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -145,7 +145,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			@Valid MetaExpedientTascaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedient",
@@ -180,7 +180,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long id) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaExpedientService.tascaUpdateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -196,7 +196,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long id) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaExpedientService.tascaUpdateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -213,7 +213,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long id) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		metaExpedientService.tascaDelete(
 				entitatActual.getId(),
 				metaExpedientId,

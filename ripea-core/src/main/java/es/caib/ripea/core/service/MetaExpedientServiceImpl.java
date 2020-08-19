@@ -29,7 +29,6 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
@@ -385,63 +384,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				new Permission[] {ExtendedPermission.READ});
 	}
 
-	
-	///////////////////////
-	//// CERQUES AMB ORGANS GESTORS
-	///////////////////////
-		
-  public List<MetaExpedientDto> findActiusPerOrganGestor(Long entitatId) {
-      logger.debug("Consulta de meta-expedients de l'entitat (" + "entitatId=" + entitatId + ")");
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
       EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-      List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);
-      
-      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-      permisosHelper.filterGrantedAny(metaExpedients, 
-                                      new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-                                          public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-                                              return metaExpedient.getOrganGestor().getId();
-                                          }
-                                      }, 
-                                      OrganGestorEntity.class, 
-                                      new Permission[] { ExtendedPermission.ADMINISTRATION }, 
-                                      auth);
-      return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
-  }
-  
-  @Transactional(readOnly = true)
-  public List<Long> findIdsAmbOrganGestor(Long entitatId) {
-      logger.debug("Consulta de meta-expedients de l'entitat (" + "entitatId=" + entitatId + ")");
-      EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-      List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);
-      
-      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-      permisosHelper.filterGrantedAny(metaExpedients, 
-                                      new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-                                          public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-                                              if (metaExpedient.getOrganGestor() == null) {
-                                                  return null;
-                                              }
-                                              return metaExpedient.getOrganGestor().getId();
-                                          }
-                                      }, 
-                                      OrganGestorEntity.class, 
-                                      new Permission[] { ExtendedPermission.ADMINISTRATION }, 
-                                      auth);
-      List<Long> ids = new ArrayList<Long>();
-      for (MetaExpedientEntity me :metaExpedients)
-      {
-          ids.add(me.getId());
-      }
-      return ids;
-  }
-
-  @Transactional(readOnly = true)
-  public PaginaDto<MetaExpedientDto> findAmbOrganGestor(Long entitatId,
-                                                              PaginacioParamsDto paginacioParams) {
-      logger.debug("Consulta paginada dels meta-expedients de l'entitat (entitatId=" + entitatId + ")");
-      EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-      
-      List<Long> candidateMetaExpIds = findIdsAmbOrganGestor(entitatId);
+      List<Long> candidateMetaExpIds = metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitatId);
       PaginaDto<MetaExpedientDto> resposta;
       if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
           resposta = paginacioHelper.toPaginaDto(
@@ -471,14 +420,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
                   .countByMetaExpedient(metaExpedientRepository.findOne(metaExpedient.getId())));
       }
       return resposta;
-  }
-  
-  @Transactional(readOnly = true)
-  public boolean hasAnyWithOrganGestor(Long entitatId)
-  {
-      List<Long> candidateMetaExpIds = findIdsAmbOrganGestor(entitatId);   
-      return !candidateMetaExpIds.isEmpty();
-  }
+	}
   
 	@Transactional(readOnly = true)
 	@Override

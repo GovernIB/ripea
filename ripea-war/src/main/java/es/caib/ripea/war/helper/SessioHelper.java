@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.EntitatService;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -30,7 +31,8 @@ public class SessioHelper {
 	public static void processarAutenticacio(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			AplicacioService aplicacioService) {
+			AplicacioService aplicacioService,
+			EntitatService entitatService) {
 		if (request.getUserPrincipal() != null && !request.getServletPath().startsWith("/error")) {
 			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(
 					SESSION_ATTRIBUTE_AUTH_PROCESSADA);
@@ -42,10 +44,11 @@ public class SessioHelper {
 				request.getSession().setAttribute(
 						SESSION_ATTRIBUTE_USUARI_ACTUAL,
 						aplicacioService.getUsuariActual());
+				// Forçam el refresc de l'entitat actual i dels permisos d'administració d'òrgan
+				EntitatHelper.getEntitatActual(request, entitatService);
 			}
 			String idioma_usuari = aplicacioService.getUsuariActual().getIdioma();
 			LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-			
 			request.getSession().setAttribute(
 					"SessionHelper.capsaleraLogo", 
 					aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.logo"));
@@ -55,11 +58,9 @@ public class SessioHelper {
 			request.getSession().setAttribute(
 					"SessionHelper.capsaleraColorLletra", 
 					aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.lletra"));
-			
 			request.getSession().setAttribute(
 					SESSION_ATTRIBUTE_IDIOMA_USUARI, 
 					idioma_usuari);
-			
 	        localeResolver.setLocale(
 	        		request, 
 	        		response, 
