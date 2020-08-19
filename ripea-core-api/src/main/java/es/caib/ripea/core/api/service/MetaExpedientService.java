@@ -46,6 +46,8 @@ public interface MetaExpedientService {
 	 *            Id de l'entitat.
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a modificar.
+	 * @param isOrganGestorAdmin 
+	 * 				Especifica si s'està accedind al servei com a administrador d'òrgan gestor
 	 * @return El meta-expedient modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -53,7 +55,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) throws NotFoundException;
+			MetaExpedientDto metaExpedient,
+			boolean isOrganGestorAdmin) throws NotFoundException;
 
 	/**
 	 * Marca el meta-expedient especificat com a actiu/inactiu .
@@ -64,6 +67,8 @@ public interface MetaExpedientService {
 	 *            Atribut id del meta-expedient a modificar.
 	 * @param actiu
 	 *            true si el meta-expedient es vol activar o false en cas contrari.
+	 * @param isOrganGestorAdmin 
+	 * 				Especifica si s'està accedind al servei com a administrador d'òrgan gestor
 	 * @return El meta-expedient modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -72,7 +77,8 @@ public interface MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu) throws NotFoundException;
+			boolean actiu,
+			boolean isOrganGestorAdmin) throws NotFoundException;
 
 	/**
 	 * Esborra el meta-expedient amb el mateix id que l'especificat.
@@ -81,6 +87,8 @@ public interface MetaExpedientService {
 	 *            Id de l'entitat.
 	 * @param id
 	 *            Atribut id del meta-expedient a esborrar.
+	 * @param isOrganGestorAdmin 
+	 * 				Especifica si s'està accedind al servei com a administrador d'òrgan gestor
 	 * @return El meta-expedient esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -89,7 +97,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id,
+			boolean isOrganGestorAdmin) throws NotFoundException;
 
 	/**
 	 * Consulta un meta-expedient donat el seu id.
@@ -407,7 +416,7 @@ public interface MetaExpedientService {
 	  * @throws NotFoundException
 	  *             Si no s'ha trobat l'objecte amb l'id especificat.
 	  */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams);

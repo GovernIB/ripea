@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -77,6 +78,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
        @Param("ids") List<Long> ids,
        Pageable pageable);
     
+	MetaExpedientEntity findByIdAndOrganGestor(Long id, OrganGestorEntity organGestor);
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);

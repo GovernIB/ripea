@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -78,18 +77,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
         List<OrganGestorDto> organismes = findOrganismesByEntitat(entitat.getUnitatArrel());
         for (OrganGestorDto o : organismes) {
-            OrganGestorEntity organDB = organGestorRepository.findByCodi(o.getCodi());
+            OrganGestorEntity organDB = organGestorRepository.findByCodiAndEntitat(o.getCodi(), entitat);
             if (organDB == null) { // create it
                 organDB = new OrganGestorEntity();
                 organDB.setCodi(o.getCodi());
                 organDB.setEntitat(entitat);
                 organDB.setNom(o.getNom());
-                organDB.setPare(organGestorRepository.findByCodi(o.getPareCodi()));
+                organDB.setPare(organGestorRepository.findByCodiAndEntitat(o.getPareCodi(), entitat));
                 organGestorRepository.save(organDB);
 
             } else { // update it
                 organDB.setNom(o.getNom());
-                organDB.setPare(organGestorRepository.findByCodi(o.getPareCodi()));
+                organDB.setPare(organGestorRepository.findByCodiAndEntitat(o.getPareCodi(), entitat));
                 organGestorRepository.flush();
                 
             }

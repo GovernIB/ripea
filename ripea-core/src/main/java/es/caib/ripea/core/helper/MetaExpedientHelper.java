@@ -19,7 +19,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -72,14 +72,19 @@ public class MetaExpedientHelper {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAny(
+		permisosHelper.filterGrantedAnyList(
 				metaExpedients,
-				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-						if (metaExpedient.getOrganGestor() == null) {
-							return null;
+				new ListObjectIdentifiersExtractor<MetaExpedientEntity>() {
+					public List<Long> getObjectIdentifiers (MetaExpedientEntity metaExpedient) {
+						List<Long> ids = new ArrayList<Long>();
+					
+						OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+						while (organGestor != null) {
+							ids.add(organGestor.getId());
+							
+							organGestor = organGestor.getPare();
 						}
-						return metaExpedient.getOrganGestor().getId();
+						return ids;
 					}
 				},
 				OrganGestorEntity.class,

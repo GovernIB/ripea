@@ -23,15 +23,14 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name = "ipa_organ_gestor", uniqueConstraints = @UniqueConstraint(name = "ipa_oge_dir3_uk", columnNames = {
-        "codi" }))
+@Table(name = "ipa_organ_gestor", uniqueConstraints = @UniqueConstraint(name = "ipa_organ_gestor_uk", columnNames = {
+        "codi", "entitat_id" }))
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 public class OrganGestorEntity extends RipeaAuditable<Long> {
 
-    @NaturalId
-    @Column(name = "codi", length = 64, nullable = false, unique = true)
+    @Column(name = "codi", length = 64, nullable = false)
     private String codi;
 
     @Column(name = "nom", length = 1000)
