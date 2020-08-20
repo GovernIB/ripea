@@ -229,15 +229,21 @@ public class DocumentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
-				entitatActual.getId(),
-				documentId);
-		
-		model.addAttribute(
-				"portafirmes",
-				portafirmes);
-		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
+					entitatActual.getId(),
+					documentId);
+			
+			model.addAttribute(
+					"portafirmes",
+					portafirmes);
+		} catch (Exception e) {
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"",
+					e.getMessage());
+			}
 		return "portafirmesInfo";
 	}
 
