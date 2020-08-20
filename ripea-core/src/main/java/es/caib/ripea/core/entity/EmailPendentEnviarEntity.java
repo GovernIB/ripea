@@ -3,23 +3,16 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
 

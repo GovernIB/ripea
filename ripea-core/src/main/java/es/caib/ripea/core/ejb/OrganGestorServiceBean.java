@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -54,9 +53,9 @@ public class OrganGestorServiceBean implements OrganGestorService{
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId, OrganGestorFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, filtre, paginacioParams);
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
+                                                                     PaginacioParamsDto paginacioParams){
+		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, paginacioParams);
 	}
 
 	@Override

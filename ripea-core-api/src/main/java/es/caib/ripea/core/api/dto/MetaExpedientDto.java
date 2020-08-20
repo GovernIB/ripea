@@ -14,6 +14,7 @@ import lombok.Data;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
+@SuppressWarnings("serial")
 public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
     private String classificacioSia;
@@ -59,7 +60,5 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
             return false;
         return true;
     }
-
-    private static final long serialVersionUID = -139254994389509932L;
 
 }

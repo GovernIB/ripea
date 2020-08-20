@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -29,7 +30,6 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	
-	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +
@@ -40,7 +40,19 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Sort sort);
-	
+	  
+  @Query( "from " +
+          "    MetaExpedientEntity me " +
+          "where " +
+          "    me.entitat = :entitat " +
+          "and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) "+ 
+          " and me.id in (:ids)")
+  List<MetaExpedientEntity> findByEntitat(
+      @Param("entitat") EntitatEntity entitat, 
+      @Param("esNullFiltre") boolean esNullFiltre,
+      @Param("filtre") String filtre, 
+      @Param("ids") List<Long> ids,
+      Sort sort);
 	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
@@ -52,8 +64,21 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Pageable pageable);
-	
-	
+
+	@Query( "from " +
+	         "    MetaExpedientEntity me " +
+	         "where " +
+	         "    me.entitat = :entitat " +
+	         " and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) "+ 
+	         " and me.id in (:ids)")
+  Page<MetaExpedientEntity> findByEntitat(
+       @Param("entitat") EntitatEntity entitat, 
+       @Param("esNullFiltre") boolean esNullFiltre,
+       @Param("filtre") String filtre, 
+       @Param("ids") List<Long> ids,
+       Pageable pageable);
+    
+	MetaExpedientEntity findByIdAndOrganGestor(Long id, OrganGestorEntity organGestor);
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);

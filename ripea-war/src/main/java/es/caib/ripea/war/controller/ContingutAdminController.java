@@ -58,7 +58,7 @@ public class ContingutAdminController extends BaseAdminController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		ContingutFiltreCommand filtreCommand = getFiltreCommand(request);
 		model.addAttribute(
 				filtreCommand);
@@ -99,7 +99,7 @@ public class ContingutAdminController extends BaseAdminController {
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		ContingutFiltreCommand filtreCommand = getFiltreCommand(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
@@ -115,7 +115,7 @@ public class ContingutAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		model.addAttribute(
 				"contingut",
 				contingutService.findAmbIdAdmin(
@@ -130,7 +130,7 @@ public class ContingutAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		model.addAttribute(
 				"contingut",
 				contingutService.findAmbIdAdmin(
@@ -167,7 +167,7 @@ public class ContingutAdminController extends BaseAdminController {
 			@PathVariable Long contingutId,
 			@PathVariable Long contingutLogId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		return contingutService.findLogDetallsPerContingutUser(
 				entitatActual.getId(),
 				contingutId,
@@ -180,7 +180,7 @@ public class ContingutAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		try {
 			contingutService.undelete(
 					entitatActual.getId(),
@@ -202,7 +202,7 @@ public class ContingutAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		contingutService.deleteDefinitiu(
 				entitatActual.getId(),
 				contingutId);

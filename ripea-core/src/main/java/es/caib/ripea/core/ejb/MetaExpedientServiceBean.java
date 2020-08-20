@@ -45,8 +45,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) {
-		return delegate.update(entitatId, metaExpedient);
+			MetaExpedientDto metaExpedient,
+			boolean isOrganGestorAdmin) {
+		return delegate.update(entitatId, metaExpedient, isOrganGestorAdmin);
 	}
 
 	@Override
@@ -54,16 +55,18 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu) {
-		return delegate.updateActiu(entitatId, id, actiu);
+			boolean actiu,
+			boolean isOrganGestorAdmin) {
+		return delegate.updateActiu(entitatId, id, actiu, isOrganGestorAdmin);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long metaExpedientId) {
-		return delegate.delete(entitatId, metaExpedientId);
+			Long metaExpedientId,
+			boolean isOrganGestorAdmin) {
+		return delegate.delete(entitatId, metaExpedientId, isOrganGestorAdmin);
 	}
 
 	@Override
@@ -244,74 +247,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				permisId);
 	}
 
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiCreate(
-//			Long entitatId, 
-//			Long metaExpedientId,
-//			MetaExpedientDominiDto metaExpedientTasca) throws NotFoundException {
-//		return delegate.dominiCreate(
-//				entitatId, 
-//				metaExpedientId, 
-//				metaExpedientTasca);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiUpdate(
-//			Long entitatId, 
-//			Long metaExpedientId,
-//			MetaExpedientDominiDto metaExpedientTasca) throws NotFoundException {
-//		return delegate.dominiUpdate(
-//				entitatId,
-//				metaExpedientId, 
-//				metaExpedientTasca);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiDelete(
-//			Long entitatId, 
-//			Long metaExpedientId, 
-//			Long id) throws NotFoundException {
-//		return delegate.dominiDelete(
-//				entitatId, 
-//				metaExpedientId, 
-//				id);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiFindById(
-//			Long entitatId, 
-//			Long metaExpedientId, 
-//			Long id)
-//			throws NotFoundException {
-//		return delegate.dominiFindById(
-//				entitatId, 
-//				metaExpedientId, 
-//				id);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public PaginaDto<MetaExpedientDominiDto> dominiFindPaginatByMetaExpedient(Long entitatId, Long metaExpedientId,
-//			PaginacioParamsDto paginacioParams) throws NotFoundException {
-//		return delegate.dominiFindPaginatByMetaExpedient(
-//				entitatId,
-//				metaExpedientId, 
-//				paginacioParams);
-//	}
-//
-//	@Override
-//	@RolesAllowed("tothom")
-//	public List<MetaExpedientDominiDto> dominiFindByMetaExpedient(
-//			Long entitatId, 
-//			Long metaExpedientId)
-//			throws NotFoundException {
-//		return delegate.dominiFindByMetaExpedient(
-//				entitatId, 
-//				metaExpedientId);
-//	}
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
+	    return delegate.findAmbOrganGestor(entitatId, paginacioParams);
+	}
 
 }

@@ -25,7 +25,6 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -109,6 +108,8 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
+import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -163,6 +164,7 @@ public class PluginHelper {
 	private IValidateSignaturePlugin validaSignaturaPlugin;
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
+	private FirmaServidorPlugin firmaServidorPlugin;
 	private ViaFirmaPlugin viaFirmaPlugin;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
@@ -306,31 +308,29 @@ public class PluginHelper {
 		}
 	}
 
-
 	// UNITATS ORGANITZATIVES
-  // /////////////////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////////
+	public Map<String, NodeDir3> getOrganigramaOrganGestor(String codiDir3) throws SistemaExternException {
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Obtenir organigrama per entitat";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("Codi Dir3 de l'entitat", codiDir3);
+		Map<String, NodeDir3> organigrama = null;
+		try {
+			organigrama = getUnitatsOrganitzativesPlugin().organigrama(codiDir3);
+			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
+			integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
+		}
+		return organigrama;
+	}
 
-  public Map<String, NodeDir3> getOrganigramaOrganGestor(String codiDir3) throws SistemaExternException {
-      long t0 = System.currentTimeMillis();
-      String accioDescripcio = "Obtenir organigrama per entitat";
-      Map<String, String> accioParams = new HashMap<String, String>();
-      accioParams.put("Codi Dir3 de l'entitat", codiDir3);
-      Map<String, NodeDir3> organigrama = null;
-      try {
-          organigrama = getUnitatsOrganitzativesPlugin().organigrama(codiDir3);
-          integracioHelper.addAccioOk(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams,
-                  IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
-      } catch (Exception ex) {
-          String errorDescripcio = "Error al obtenir l'organigrama per entitat";
-          integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams,
-                  IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio,
-                  ex);
-          throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
-      }
-
-      return organigrama;
-  }
-	
 	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
 			String pareCodi) {
 		String accioDescripcio = "Consulta llista d'unitats donat un pare";
@@ -1234,12 +1234,12 @@ public class PluginHelper {
 		}
 	}
 
-	public String arxiuDocumentGuardarPdfFirmat(
+	public String arxiuDocumentGuardarFirmaPades(
 			DocumentEntity document,
 			FitxerDto fitxerPdfFirmat) {
 		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
 		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
-		String accioDescripcio = "Guardar PDF firmat com a document definitiu";
+		String accioDescripcio = "Guardar PDF firmat amb PAdES com a document definitiu";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
@@ -1270,9 +1270,6 @@ public class PluginHelper {
 				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 				firmes = Arrays.asList(firma);
 			}
-
-
-
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
@@ -1301,7 +1298,6 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
-
 			if (getArxiuPlugin().suportaMetadadesNti()) {
 				Document documentDetalls = getArxiuPlugin().documentDetalls(
 						documentModificat.getIdentificador(),
@@ -1311,9 +1307,6 @@ public class PluginHelper {
 						documentDetalls,
 						document);
 			}
-
-
-
 			return document.getId().toString();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1332,12 +1325,13 @@ public class PluginHelper {
 		}
 	}
 
-	/*public String arxiuDocumentGuardarFitxerFirmat(
+	public String arxiuDocumentGuardarFirmaCades(
 			DocumentEntity document,
+			FitxerDto fitxer,
 			List<ArxiuFirmaDto> firmes) {
 		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
 		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
-		String accioDescripcio = "Guardar PDF firmat com a document definitiu";
+		String accioDescripcio = "Guardar document firmat amb CAdES com a document definitiu";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
@@ -1349,12 +1343,16 @@ public class PluginHelper {
 			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
 		}
 		try {
-			getArxiuPlugin().documentCrear(
+			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
+							document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
 							document.getNom(),
-							null,
-							null,
+							document.getMetaDocument().getNom(),
+							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
+							fitxer,
+							true,
+							true,
 							firmes,
 							null,
 							document.getNtiOrigen(),
@@ -1364,8 +1362,7 @@ public class PluginHelper {
 							document.getNtiTipoDocumental(),
 							DocumentEstat.DEFINITIU,
 							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-							serieDocumental),
-					document.getPare().getArxiuUuid());
+							serieDocumental));
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -1374,6 +1371,15 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
+			if (getArxiuPlugin().suportaMetadadesNti()) {
+				Document documentDetalls = getArxiuPlugin().documentDetalls(
+						documentModificat.getIdentificador(),
+						null,
+						false);
+				propagarMetadadesDocument(
+						documentDetalls,
+						document);
+			}
 			return document.getId().toString();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1390,7 +1396,7 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-	}*/
+	}
 
 	public void arxiuDocumentCopiar(
 			DocumentEntity document,
@@ -3477,6 +3483,42 @@ public class PluginHelper {
 		}
 	}
 
+	public byte[] firmaServidorFirmar(
+			DocumentEntity document,
+			FitxerDto fitxer,
+			TipusFirma tipusFirma,
+			String motiu,
+			String idioma) {
+		String accioDescripcio = "Firma en servidor d'un document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		long t0 = System.currentTimeMillis();
+		try {
+			byte[] firmaContingut = getFirmaServidorPlugin().firmar(
+					document.getNom(),
+					motiu,
+					fitxer.getContingut(),
+					tipusFirma,
+					idioma);
+			return firmaContingut;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_FIRMASERV,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_FIRMASERV,
+					errorDescripcio,
+					ex);
+		}
+	}
+
 	public String viaFirmaUpload(
 			DocumentEntity document,
 			DocumentViaFirmaEntity documentViaFirmaEntity) {
@@ -3774,7 +3816,6 @@ public class PluginHelper {
 			boolean enPaper,
 			String serieDocumental) {
 		Document document = new Document();
-		
 		String fitxerExtensio = null;
 		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
 		document.setNom(documentNomInArxiu);
@@ -3785,7 +3826,6 @@ public class PluginHelper {
 		} else if (fitxer != null && fitxer.getNom() != null) {
 			fitxerExtensio = fitxer.getExtensio();
 		}
-		
 		setMetadades(
 				ntiOrigen,
 				ntiIdentificador,
@@ -3839,7 +3879,6 @@ public class PluginHelper {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
 				metadadesAddicionals.put("tipusDocumentNom", tipusDocumentNom);
 				metadadesAddicionals.put("isImportacio", documentImportat);
-				
 				if (firmes != null && ! firmes.isEmpty()) {
 					metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
 				}
@@ -4820,7 +4859,27 @@ public class PluginHelper {
 		}
 		return notificacioPlugin;
 	}
-	
+	private FirmaServidorPlugin getFirmaServidorPlugin() {
+		if (firmaServidorPlugin == null) {
+			String pluginClass = getPropertyPluginFirmaServidor();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_FIRMASERV,
+							"Error al crear la instància del plugin de firma en servidor",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_FIRMASERV,
+						"No està configurada la classe per al plugin de firma en servidor");
+			}
+		}
+		return firmaServidorPlugin;
+	}
 	private ViaFirmaPlugin getViaFirmaPlugin() {
 		boolean viaFirmaPluginConfiguracioProvada = false;
 		
@@ -4888,6 +4947,10 @@ public class PluginHelper {
 	}
 	private String getPropertyPluginGestioDocumental() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.gesdoc.class");
+	}
+	private String getPropertyPluginFirmaServidor() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.firmaservidor.class");
 	}
 	private String getPropertyPluginViaFirma() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.viafirma.class");

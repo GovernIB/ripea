@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
@@ -46,6 +51,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -84,12 +90,14 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 
 /**
  * Implementació dels mètodes per a gestionar expedients.
@@ -109,6 +117,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
 	private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired
+	private DocumentRepository documentRepository;
 	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
@@ -1434,7 +1444,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) {
+			String motiu,
+			Long[] documentsPerFirmar) {
 		logger.debug("Tancant l'expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ","
@@ -1447,11 +1458,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		if (documentHelper.hasFillsEsborranys(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient que contengui esborranys");
-		}
-		if (!documentHelper.hasAnyDocumentDefinitiu(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient sense cap document definitiu");
+		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
+		if (!documentHelper.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
+			throw new ExpedientTancarSenseDocumentsDefinitiusException();
 		}
 		expedient.updateEstat(
 				ExpedientEstatEnumDto.TANCAT,
@@ -1465,6 +1474,54 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 		if (pluginHelper.isArxiuPluginActiu()) {
+			List<DocumentEntity> esborranys = documentRepository.findByExpedientAndEstatAndEsborrat(
+					expedient,
+					DocumentEstatEnumDto.REDACCIO,
+					0);
+			// Firmam els documents seleccionats
+			if (hiHaEsborranysPerFirmar) {
+				for (Long documentPerFirmar: documentsPerFirmar) {
+					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
+					if (document != null) {
+						FitxerDto fitxer = documentHelper.getFitxerAssociat(
+								document,
+								null);
+						byte[] firma = pluginHelper.firmaServidorFirmar(
+								document,
+								fitxer,
+								TipusFirma.CADES,
+								motiu,
+								"ca");
+						ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
+						arxiuFirma.setFitxerNom("firma.cades");
+						arxiuFirma.setContingut(firma);
+						arxiuFirma.setTipusMime("application/octet-stream");
+						arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+						arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+						pluginHelper.arxiuDocumentGuardarFirmaCades(
+								document,
+								fitxer,
+								Arrays.asList(arxiuFirma));
+					} else {
+						throw new NotFoundException(
+								documentPerFirmar,
+								DocumentEntity.class);
+					}
+				}
+			}
+			// Eliminam els documents que no s'han de firmar
+			for (DocumentEntity esborrany: esborranys) {
+				boolean trobat = false;
+				for (Long documentPerFirmarId: documentsPerFirmar) {
+					if (documentPerFirmarId == esborrany.getId()) {
+						trobat = true;
+						break;
+					}
+				}
+				if (!trobat) {
+					documentRepository.delete(esborrany);
+				}
+			}
 			pluginHelper.arxiuExpedientTancar(expedient);
 		}
 	}

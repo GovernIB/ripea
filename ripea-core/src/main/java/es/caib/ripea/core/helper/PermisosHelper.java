@@ -177,9 +177,11 @@ public class PermisosHelper {
 			Authentication auth) {
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(
-					it.next());
-			if (!isGrantedAny(
+			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (objectIdentifier == null) {
+			    it.remove();
+			}
+			else if (!isGrantedAny(
 					objectIdentifier,
 					clazz,
 					permissions,
@@ -188,6 +190,42 @@ public class PermisosHelper {
 		}
 	}
 	
+	  /**
+	   * Filtre un llistat d'identificadors d'objectes amb els que tenen uns
+	   * determinats permisos.
+	   * 
+	   * @param objects             
+	   *            Conjunt d'objectes que volem filtrar. El resultat del
+	   *            mètode és aquesta llista modificada.
+	   * @param objectIdentifierExtractor 
+	   *            Implementació per extreure el identificador dels objectes del parametre objects 
+	   * @param clazz       
+	   *            Classe dels objectes a consular.
+	   * @param permissions Permisos que volem seleccionar
+	   */
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		public void filterGrantedAnyList(
+				Collection<?> objects,
+				ListObjectIdentifiersExtractor objectIdentifierExtractor,
+				Class<?> clazz,
+				Permission[] permissions,
+				Authentication auth) {
+			Iterator<?> it = objects.iterator();
+			while (it.hasNext()) {
+				List<Long> objectIdentifiers = objectIdentifierExtractor.getObjectIdentifiers(it.next());
+				boolean hasPermission = false;
+				for (Long id : objectIdentifiers) {
+					if (isGrantedAny(id, clazz, permissions, auth)) {
+						hasPermission = true;
+						break;
+					}						
+				}
+				if (!hasPermission) {
+					it.remove();
+				}
+				
+			}
+		}
   /**
    * Filtre un llistat d'identificadors d'objectes amb els que tenen qualsevol
    * dels permisos especificats.
@@ -568,6 +606,10 @@ public class PermisosHelper {
 
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);
+	}
+	
+	public interface ListObjectIdentifiersExtractor<T> {
+		public List<Long> getObjectIdentifiers(T object);
 	}
 
 }

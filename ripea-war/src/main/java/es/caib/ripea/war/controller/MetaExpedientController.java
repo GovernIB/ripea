@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -39,54 +41,51 @@ public class MetaExpedientController extends BaseAdminController {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-  @Autowired
-  private OrganGestorService organGestorService;
-	
+	@Autowired
+	private OrganGestorService organGestorService;
+
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
+	public String get(HttpServletRequest request, Model model) {
+		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if(mantenirPaginacio) {
+		if (mantenirPaginacio) {
 			model.addAttribute("mantenirPaginacio", true);
 		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
 		return "metaExpedientList";
 	}
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
-				request,
-				metaExpedientService.findByEntitat(
-						entitatActual.getId(),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
-				"id");
+	public DatatablesResponse datatable(HttpServletRequest request, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		PaginaDto<MetaExpedientDto> metaExps = null;
+		if (RolHelper.isRolActualAdministradorOrgan(request)) {
+			metaExps = metaExpedientService.findAmbOrganGestor(
+					entitatActual.getId(),
+					DatatablesHelper.getPaginacioDtoFromRequest(request));
+
+		} else {
+			metaExps = metaExpedientService.findByEntitat(
+					entitatActual.getId(),
+					DatatablesHelper.getPaginacioDtoFromRequest(request));
+		}
+		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
 		return dtr;
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String getNew(
-			HttpServletRequest request,
-			Model model) {
+	public String getNew(HttpServletRequest request, Model model) {
 		return get(request, null, model);
 	}
+
 	@RequestMapping(value = "/{metaExpedientId}", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public String get(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientDto metaExpedient = null;
 		if (metaExpedientId != null)
-			metaExpedient = metaExpedientService.findById(
-					entitatActual.getId(),
-					metaExpedientId);
+			metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
 		MetaExpedientCommand command = null;
 		if (metaExpedient != null)
 			command = MetaExpedientCommand.asCommand(metaExpedient);
@@ -94,52 +93,43 @@ public class MetaExpedientController extends BaseAdminController {
 			command = new MetaExpedientCommand();
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findByEntitat(entitatActual.getId()));
-    model.addAttribute(
-            "organsGestors",
-            organGestorService.findByEntitat(entitatActual.getId()));
+		model.addAttribute("metaExpedients", metaExpedientService.findByEntitat(entitatActual.getId()));
+		model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
 		return "metaExpedientForm";
 	}
+
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
 			@Valid MetaExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		if (bindingResult.hasErrors()) {
 			return "metaExpedientForm";
 		}
 		MetaExpedientDto dto = MetaExpedientCommand.asDto(command);
 		OrganGestorDto organ = new OrganGestorDto();
-    organ.setId(command.getOrganGestorId());
-    dto.setOrganGestor(organ);
+		organ.setId(command.getOrganGestorId());
+		dto.setOrganGestor(organ);
 		if (command.getId() != null) {
-			metaExpedientService.update(
-					entitatActual.getId(),
-					dto);
+			metaExpedientService.update(entitatActual.getId(), dto, RolHelper.isRolActualAdministradorOrgan(request));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.controller.modificat.ok");
 		} else {
-			metaExpedientService.create(
-					entitatActual.getId(),
-					dto);
+			metaExpedientService.create(entitatActual.getId(), dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.controller.creat.ok");
 		}
 	}
+
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
-	public String getNewAmbPare(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public String getNewAmbPare(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientCommand command = new MetaExpedientCommand();
 		command.setPareId(metaExpedientId);
 		command.setEntitatId(entitatActual.getId());
@@ -148,28 +138,27 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public String enable(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
-				true);
+				true,
+				RolHelper.isRolActualAdministradorOrgan(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
 				"metaexpedient.controller.activat.ok");
 	}
+
 	@RequestMapping(value = "/{metaExpedientId}/disable", method = RequestMethod.GET)
-	public String disable(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public String disable(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
-				false);
+				false,
+				RolHelper.isRolActualAdministradorOrgan(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
@@ -177,20 +166,19 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public String delete(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		try {
 			metaExpedientService.delete(
 					entitatActual.getId(),
-					metaExpedientId);
+					metaExpedientId,
+					RolHelper.isRolActualAdministradorOrgan(request));
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.esborrat.ok");
 		} catch (Exception ex) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) || 
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
 					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
 				return getAjaxControllerReturnValueError(
 						request,
@@ -204,12 +192,9 @@ public class MetaExpedientController extends BaseAdminController {
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
 	@ResponseBody
-	public List<MetaExpedientDto> findAll(
-			HttpServletRequest request,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public List<MetaExpedientDto> findAll(HttpServletRequest request, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
-
 
 }
