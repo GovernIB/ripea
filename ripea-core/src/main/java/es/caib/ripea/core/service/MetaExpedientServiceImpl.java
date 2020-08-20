@@ -181,7 +181,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.isNotificacioActiva(),
 				metaExpedient.isPermetMetadocsGenerals(),
 				metaExpedientPare,
-				organGestorId == null ? null : organGestorRepository.findOne(organGestorId);
+				organGestorId == null ? null : organGestorRepository.findOne(organGestorId));
 		return conversioTipusHelper.convertir(
 				metaExpedientEntity,
 				MetaExpedientDto.class);
