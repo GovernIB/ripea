@@ -69,6 +69,11 @@ public class EntitatHelper {
 				canviEntitatActual(request, entitatActual, entitatService);
 			}
 		}
+		Boolean isUsuariAdminOrgan = (Boolean)request.getSession().getAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN);
+		if (isUsuariAdminOrgan == null && entitatService != null) {
+			isUsuariAdminOrgan = new Boolean(entitatService.isAdminOrgan(entitatActual.getId()));
+			request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN, isUsuariAdminOrgan);
+		}
 		return entitatActual;
 	}
 
@@ -87,8 +92,6 @@ public class EntitatHelper {
 			EntitatService entitatService) {
 		request.getSession().setAttribute(SESSION_ATTRIBUTE_ENTITAT_ACTUAL, entitatActual);
 		ExpedientHelper.resetAccesUsuariExpedients(request);
-		Boolean isUsuariAdminOrgan = new Boolean(entitatService.isAdminOrgan(entitatActual.getId()));
-		request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN, isUsuariAdminOrgan);
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatHelper.class);
