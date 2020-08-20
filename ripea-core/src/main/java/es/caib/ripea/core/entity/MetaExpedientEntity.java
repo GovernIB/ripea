@@ -68,7 +68,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     @Column(name = "codi", length = 64, nullable = false)
     private String codiPropi;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_gestor_id")
     @ForeignKey(name = "ipa_organ_gestor_metaexp_fk")
     private OrganGestorEntity organGestor;
