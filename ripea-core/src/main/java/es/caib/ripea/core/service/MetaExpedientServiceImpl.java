@@ -170,6 +170,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			}
 		}
 
+		Long organGestorId = metaExpedient.getOrganGestor().getId();
 		metaExpedientEntity.update(
 				metaExpedient.getCodi(),
 				metaExpedient.getNom(),
@@ -180,7 +181,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.isNotificacioActiva(),
 				metaExpedient.isPermetMetadocsGenerals(),
 				metaExpedientPare,
-				organGestorRepository.findOne(metaExpedient.getOrganGestor().getId()));
+				organGestorId == null ? null : organGestorRepository.findOne(organGestorId);
 		return conversioTipusHelper.convertir(
 				metaExpedientEntity,
 				MetaExpedientDto.class);
