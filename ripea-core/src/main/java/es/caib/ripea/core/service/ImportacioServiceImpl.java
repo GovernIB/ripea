@@ -133,7 +133,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				entity.updateFitxer(
 						fitxer.getNom(),
 						fitxer.getContentType(),
-						fitxer.getContingut());
+						null);
 			}
 			if (document.getFirmes() != null && !document.getFirmes().isEmpty()) {
 				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);

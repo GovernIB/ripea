@@ -330,6 +330,25 @@ ul.interessats {
 .dominis ~ span > .selection {
 	width: 100%;
 }
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -400,7 +419,13 @@ var publicacioEstatText = new Array();
 <c:forEach var="option" items="${publicacioEstatEnumOptions}">
 publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/>";
 </c:forEach>
+
 $(document).ready(function() {
+	$("a.fileDownload").on("click", function() {
+		$("body").addClass("loading");
+		checkLoadingFinished();
+    });
+	
 	$("#document-new-empty-metadocuments").click(function(e){
 	    alert("<spring:message code="contingut.document.alerta.max"/>");
 	    e.preventDefault();
@@ -913,21 +938,7 @@ $(document).ready(function() {
 			$('table tbody', td).append(tableBody);
 			$('table tbody td').webutilModalEval();
 		});
-	});
-
-
-
-
-
-
-
-
-
-	
-
-
-
-	
+	});	
 });
 
 function getEnviamentsDocument(document) {
@@ -1013,7 +1024,6 @@ function enableDisableButton() {
 	        dataType: "json",
 	        data: {docsIdx: docsIdx},
 	        success: function (resultat) {
-	        	console.log(resultat);
 	        	if (resultat.isTotPdfFirmat && resultat.isTotPdf) {
 	        		$('.nomaximized').addClass('hidden'); //zip
 	        		$('.maximized').removeClass('hidden'); //concatenació
@@ -1102,10 +1112,54 @@ function recuperarResultatDomini(
 		}
 	});
 }
+
+function checkLoadingFinished() {
+	var cookieName = "contentLoaded";
+	if (getCookie(cookieName) != "") {
+		$("body").removeClass("loading");
+        removeCookie(cookieName);
+		return;
+	}
+    setTimeout(checkLoadingFinished, 100);
+}
+
+function setCookie(cname,cvalue) {
+	var exdays = 30;
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function removeCookie(cname) {
+    var expires = new Date(0).toUTCString();
+    document.cookie = cname + "=; path=/; expires=" + expires + ";";
+}
+
+
+function addLoading() {
+	$('body').addClass('loading');
+}
 </script>
 
 </head>
 <body>
+	<div class="rmodal"></div>
 	<input id="contingutId" type="hidden" value="${contingut.id}">
 	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer and !isTasca}">
 		<div class="text-right" data-toggle="botons-titol">
