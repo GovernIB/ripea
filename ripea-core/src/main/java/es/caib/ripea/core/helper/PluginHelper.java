@@ -526,11 +526,15 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
+		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
+		accioParams.put("tipus", metaExpedient.getNom());
+		accioParams.put("classificacio", metaExpedient.getClassificacioSia());
+		accioParams.put("serieDocumental", metaExpedient.getSerieDocumental());
+		String organCodiDir3 = expedient.getEntitat().getUnitatArrel();
+		accioParams.put("organ", organCodiDir3);
+		accioParams.put("estat", expedient.getEstat().name());
 		long t0 = System.currentTimeMillis();
 		try {
-			String organCodiDir3 = expedient.getEntitat().getUnitatArrel();
-			MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 			String classificacio;
 			if (metaExpedient.getClassificacioSia() != null) {
 				classificacio = metaExpedient.getClassificacioSia();
@@ -750,10 +754,9 @@ public class PluginHelper {
 		try {
 			String arxiuUuid = getArxiuPlugin().expedientTancar(
 					expedient.getArxiuUuid());
-			if (arxiuUuid != null)
+			if (arxiuUuid != null) {
 				expedient.updateArxiu(arxiuUuid);
-			else
-				expedient.updateArxiuEsborrat();
+			}
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -1336,39 +1339,32 @@ public class PluginHelper {
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
-
 		String serieDocumental = null;
 		ExpedientEntity expedientSuperior = document.getExpedient();
 		if (expedientSuperior != null) {
 			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
 		}
 		try {
-			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
-					toArxiuDocument(
-							document.getArxiuUuid(),
-							document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
-							document.getNom(),
-							document.getMetaDocument().getNom(),
-							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
-							fitxer,
-							true,
-							true,
-							firmes,
-							null,
-							document.getNtiOrigen(),
-							Arrays.asList(document.getNtiOrgano()),
-							document.getDataCaptura(),
-							document.getNtiEstadoElaboracion(),
-							document.getNtiTipoDocumental(),
-							DocumentEstat.DEFINITIU,
-							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-							serieDocumental));
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
+			Document documentArxiu = toArxiuDocument(
+					document.getArxiuUuid(),
+					document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
+					document.getNom(),
+					document.getMetaDocument().getNom(),
+					document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
+					fitxer,
+					true,
+					true,
+					firmes,
+					null,
+					document.getNtiOrigen(),
+					Arrays.asList(document.getNtiOrgano()),
+					document.getDataCaptura(),
+					document.getNtiEstadoElaboracion(),
+					document.getNtiTipoDocumental(),
+					DocumentEstat.DEFINITIU,
+					DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+					serieDocumental);
+			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(documentArxiu);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
 			if (getArxiuPlugin().suportaMetadadesNti()) {
@@ -1380,6 +1376,12 @@ public class PluginHelper {
 						documentDetalls,
 						document);
 			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
 			return document.getId().toString();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -3859,11 +3861,6 @@ public class PluginHelper {
 				document.setFirmes(Arrays.asList(firma));
 			} else if (firmes != null) {
 				// Firma detached
-				contingut = new DocumentContingut();
-				contingut.setArxiuNom(fitxer.getNom());
-				contingut.setContingut(fitxer.getContingut());
-				contingut.setTipusMime(fitxer.getContentType());
-				document.setContingut(contingut);
 				document.setFirmes(new ArrayList<Firma>());
 				for (ArxiuFirmaDto firmaDto: firmes) {
 					Firma firma = new Firma();
@@ -4383,14 +4380,12 @@ public class PluginHelper {
 		} else if (documentArxiu.getMetadades().getTipusDocumentalAddicional() != null) {
 			ntiTipoDocumental = documentArxiu.getMetadades().getTipusDocumentalAddicional();
 		}
-		
 		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
 		String ntiCsv = null;
 		String ntiCsvRegulacion = null;
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-
 			FirmaTipus firmaTipus = null;
-			for (Firma firma : documentArxiu.getFirmes()) {
+			for (Firma firma: documentArxiu.getFirmes()) {
 				if (firma.getTipus() != FirmaTipus.CSV) {
 					firmaTipus = firma.getTipus();
 					break;
@@ -4425,7 +4420,6 @@ public class PluginHelper {
 				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
 				break;
 			}
-
 			for (Firma firma : documentArxiu.getFirmes()) {
 				if (firma.getTipus() == FirmaTipus.CSV) {
 					ntiCsvRegulacion = firma.getCsvRegulacio();
