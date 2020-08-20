@@ -45,8 +45,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) {
-		return delegate.update(entitatId, metaExpedient);
+			MetaExpedientDto metaExpedient,
+			boolean isOrganGestorAdmin) {
+		return delegate.update(entitatId, metaExpedient, isOrganGestorAdmin);
 	}
 
 	@Override
@@ -54,16 +55,18 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu) {
-		return delegate.updateActiu(entitatId, id, actiu);
+			boolean actiu,
+			boolean isOrganGestorAdmin) {
+		return delegate.updateActiu(entitatId, id, actiu, isOrganGestorAdmin);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long metaExpedientId) {
-		return delegate.delete(entitatId, metaExpedientId);
+			Long metaExpedientId,
+			boolean isOrganGestorAdmin) {
+		return delegate.delete(entitatId, metaExpedientId, isOrganGestorAdmin);
 	}
 
 	@Override

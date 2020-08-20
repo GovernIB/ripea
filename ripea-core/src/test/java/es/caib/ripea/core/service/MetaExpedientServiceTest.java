@@ -157,7 +157,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						metaExpedientUpdate.setId(metaExpedientCreat.getId());
 						MetaExpedientDto modificat = metaExpedientService.update(
 								entitatCreada.getId(),
-								metaExpedientUpdate);
+								metaExpedientUpdate, false);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -185,7 +185,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
 						MetaExpedientDto esborrat = metaExpedientService.delete(
 								entitatCreada.getId(),
-								metaExpedientCreat.getId());
+								metaExpedientCreat.getId(), false);
 						comprovarMetaExpedientCoincideix(
 								metaExpedientCreate,
 								esborrat);
@@ -216,14 +216,14 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						MetaExpedientDto desactivat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
-								false);
+								false, false);
 						assertEquals(
 								false,
 								desactivat.isActiu());
 						MetaExpedientDto activat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
-								true);
+								true, false);
 						assertEquals(
 								true,
 								activat.isActiu());
