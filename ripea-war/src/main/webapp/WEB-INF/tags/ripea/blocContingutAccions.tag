@@ -204,10 +204,10 @@
 						<c:when test="${contingut.valid}">
 							<c:choose>
 								<c:when test="${isTasca}">
-									<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:when>
 								<c:otherwise>
-									<li><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:otherwise>								
 							</c:choose>						
 						</c:when>
