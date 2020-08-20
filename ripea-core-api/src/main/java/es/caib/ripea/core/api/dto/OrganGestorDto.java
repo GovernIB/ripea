@@ -30,6 +30,4 @@ public class OrganGestorDto extends AuditoriaDto {
         else
             return permisos.size();
     }
-
-    private static final long serialVersionUID = -2393511650074099319L;
 }

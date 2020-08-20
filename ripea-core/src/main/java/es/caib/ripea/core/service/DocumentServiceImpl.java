@@ -5,7 +5,6 @@ package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,9 +13,6 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +55,6 @@ import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
@@ -70,7 +65,6 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
@@ -82,7 +76,6 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 
@@ -106,8 +99,6 @@ public class DocumentServiceImpl implements DocumentService {
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
 	@Autowired
 	private ContingutHelper contingutHelper;
 	@Autowired
@@ -213,7 +204,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<DocumentDto> findAmbExpedientIPermisRead(
+	public List<DocumentDto> findAmbExpedient(
 			Long entitatId,
 			Long expedientId) {
 		logger.debug("Obtenint els documents amb permis de lectura de l'expedient ("
@@ -227,19 +218,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false);
-		List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Iterator<DocumentEntity> it = documents.iterator();
-		while (it.hasNext()) {
-			DocumentEntity d = it.next();
-			if (d.getMetaDocument() != null && !permisosHelper.isGrantedAll(
-					d.getMetaDocument().getId(),
-					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth)) {
-				it.remove();
-			}
-		}
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
 			dtos.add(
@@ -247,7 +226,34 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return dtos;
 	}
-	
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<DocumentDto> findAmbExpedientIEstat(
+			Long entitatId,
+			Long expedientId,
+			DocumentEstatEnumDto estat) {
+		logger.debug("Obtenint els documents amb permis de lectura de l'expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ", " +
+				"estat=" + estat + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				false);
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
+		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
+		for (DocumentEntity document: documents) {
+			dtos.add(
+					(DocumentDto)contingutHelper.toContingutDto(document));
+		}
+		return dtos;
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<DocumentDto> findAnnexosAmbExpedient(

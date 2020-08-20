@@ -42,7 +42,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 
 		model.addAttribute(
 				"metaExpedient",
@@ -59,7 +59,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				expedientService.findExpedientEstatByMetaExpedientPaginat(
@@ -88,7 +88,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long estatId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		ExpedientEstatDto estat = null;
 		if (estatId != null) {
 			estat = expedientService.findExpedientEstatById(
@@ -112,7 +112,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			@Valid ExpedientEstatCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 //			emplenarModelFormulari(
 //					request,
@@ -144,7 +144,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long expedientEstatId,
 			@PathVariable int posicio) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		expedientService.moveTo(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -160,7 +160,7 @@ public class ExpedientEstatController extends BaseAdminController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long expedientEstatId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		expedientService.deleteExpedientEstat(
 				entitatActual.getId(),
 				expedientEstatId);

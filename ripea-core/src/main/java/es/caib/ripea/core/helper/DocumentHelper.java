@@ -709,7 +709,7 @@ public class DocumentHelper {
 						documentPortafirmes.updateProcessat(
 								true,
 								new Date());
-						String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+						String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
 								document,
 								fitxer);
 						document.updateInformacioCustodia(
@@ -832,7 +832,7 @@ public class DocumentHelper {
 					documentViaFirma.updateProcessat(
 								true,
 								new Date());
-					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
 							document,
 							fitxer);
 					document.updateInformacioCustodia(
@@ -1190,7 +1190,7 @@ public class DocumentHelper {
 		fitxer.setContentType("application/pdf");
 		document.updateEstat(
 				DocumentEstatEnumDto.CUSTODIAT);
-		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
 				document,
 				fitxer);
 		document.updateInformacioCustodia(

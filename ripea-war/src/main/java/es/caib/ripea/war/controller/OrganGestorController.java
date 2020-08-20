@@ -20,14 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
-import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
 import es.caib.ripea.war.command.PermisOrganGestorCommand;
-import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -45,28 +42,22 @@ public class OrganGestorController extends BaseUserController {
     private final static String ORGANS_FILTRE = "organs_filtre";
 
     @Autowired
-    private EntitatService entitatService;
-    @Autowired
     private OrganGestorService organGestorService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
-        model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
         return "organGestor";
     }
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
-
-        OrganGestorFiltreCommand organGestorFiltreCommand = getFiltreCommand(request);
         PaginaDto<OrganGestorDto> organs = new PaginaDto<OrganGestorDto>();
 
         try {
             EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
             organs = organGestorService.findOrgansGestorsAmbFiltrePaginat(entitat.getId(),
-                    ConversioTipusHelper.convertir(organGestorFiltreCommand, OrganGestorFiltreDto.class),
                     DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request,
@@ -165,15 +156,4 @@ public class OrganGestorController extends BaseUserController {
         return getAjaxControllerReturnValueSuccess(request, "redirect:../../permis",
                 "entitat.controller.permis.esborrat.ok");
     }
-
-    private OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
-        OrganGestorFiltreCommand organGestorFiltreCommand = (OrganGestorFiltreCommand) RequestSessionHelper
-                .obtenirObjecteSessio(request, ORGANS_FILTRE);
-        if (organGestorFiltreCommand == null) {
-            organGestorFiltreCommand = new OrganGestorFiltreCommand();
-            RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
-        }
-        return organGestorFiltreCommand;
-    }
-
 }

@@ -266,7 +266,6 @@ body {
 								</div>
 							</c:when>
 							<c:when test="${isRolActualAdministrador}">
-								<a href="<c:url value="/organgestor"/>" class="btn btn-primary"><spring:message code="decorator.menu.organgestor"/></a>
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
@@ -275,6 +274,7 @@ body {
 										<li class="divider"></li>
 										<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
 										<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
+										<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
 										<li class="divider"></li>
 										<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li>
@@ -297,17 +297,6 @@ body {
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
 										<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
-									</ul>
-								</div>
-								<div class="btn-group">
-									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
-									<ul class="dropdown-menu">
-										<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
-										<li>
-											<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
-												<spring:message code="decorator.menu.accions.massives.admin"/>
-											</a>
-										</li>
 									</ul>
 								</div>
 							</c:when>

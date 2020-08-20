@@ -22,7 +22,7 @@
 	<table 
 		id="entitats" 
 		data-toggle="datatable" 
-		data-url="<c:url value="/entitat/datatable"/>" 
+		data-url="entitat/datatable" 
 		data-search-enabled="false"
 		data-default-order="2" 
 		data-default-dir="asc" 

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
@@ -14,12 +15,54 @@
 <body>
 	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientTancarCommand">
 		<form:hidden path="id"/>
-		<rip:inputFixed textKey="contingut.expedient.tancar.form.camp.expedient">${expedient.nom}</rip:inputFixed>
+		<c:if test="${expedient.hasEsborranys}">
+			<div class="alert well-sm alert-info">
+				<span class="fa fa-info-circle"></span>
+				<spring:message code="contingut.expedient.tancar.esborranys.info"/>
+			</div>
+			<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th><spring:message code="contingut.info.nom"/></th>
+					<th><spring:message code="contingut.info.tipus"/></th>
+					<th><spring:message code="contingut.info.createl"/></th>
+					<th><spring:message code="contingut.info.creatper"/></th>
+					<th width="10%">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach var="esborrany" items="${esborranys}">
+					<tr>
+						<td><rip:blocIconaContingut contingut="${esborrany}"/>&nbsp;${esborrany.nom}</td>
+						<td>${esborrany.metaNode.nom}</td>
+						<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+						<td>${esborrany.createdBy.nom}</td>
+						<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}"/><!--input type="checkbox" name="firmar" value="${esborrany.id}"/--></td>
+					</tr>
+				</c:forEach>
+			</tbody>
+			</table>
+		</c:if>
+		<%--rip:inputFixed textKey="contingut.expedient.tancar.form.camp.expedient">${expedient.nom}</rip:inputFixed--%>
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${expedient.pare.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
+<script>
+setTimeout(() => {
+	$(document).ready(function() {
+		$('button.btn-success', '#modal-botons').on('click', function(event) {
+			let countSeleccionats = $('input[name=documentsPerFirmar]:checked').length;
+			let total = $('input[name=documentsPerFirmar]:checkbox').length;
+			let countNoSeleccionats = total - countSeleccionats;
+			if (countNoSeleccionats) {
+				return confirm("<spring:message code="contingut.expedient.tancar.esborranys.confirm"/>");
+			}
+		});
+	});
+}, 100);
+</script>
 </body>
 </html>

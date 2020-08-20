@@ -11,7 +11,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -19,23 +18,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
-import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -43,10 +37,9 @@ import es.caib.ripea.plugin.unitat.NodeDir3;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
+
     @Autowired
     private EntityComprovarHelper entityComprovarHelper;
-    @Autowired
-    private EntitatService entitatService;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
     @Resource
@@ -55,8 +48,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     private PermisosHelper permisosHelper;
     @Autowired
     private PaginacioHelper paginacioHelper;
-    @Autowired
-    private CacheHelper cacheHelper;
     @Autowired
     private PluginHelper pluginHelper;
 
@@ -86,18 +77,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
         List<OrganGestorDto> organismes = findOrganismesByEntitat(entitat.getUnitatArrel());
         for (OrganGestorDto o : organismes) {
-            OrganGestorEntity organDB = organGestorRepository.findByCodi(o.getCodi());
+            OrganGestorEntity organDB = organGestorRepository.findByCodiAndEntitat(o.getCodi(), entitat);
             if (organDB == null) { // create it
                 organDB = new OrganGestorEntity();
                 organDB.setCodi(o.getCodi());
                 organDB.setEntitat(entitat);
                 organDB.setNom(o.getNom());
-                organDB.setPare(organGestorRepository.findByCodi(o.getPareCodi()));
+                organDB.setPare(organGestorRepository.findByCodiAndEntitat(o.getPareCodi(), entitat));
                 organGestorRepository.save(organDB);
 
             } else { // update it
                 organDB.setNom(o.getNom());
-                organDB.setPare(organGestorRepository.findByCodi(o.getPareCodi()));
+                organDB.setPare(organGestorRepository.findByCodiAndEntitat(o.getPareCodi(), entitat));
                 organGestorRepository.flush();
                 
             }
@@ -139,22 +130,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Override
     @Transactional(readOnly = true)
     public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
-                                                                       OrganGestorFiltreDto filtre,
                                                                        PaginacioParamsDto paginacioParams) {
 
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-        Page<OrganGestorEntity> organs = null;
-        if (filtre == null) {
-            organs = organGestorRepository.findByEntitat(entitat,
-                    paginacioHelper.toSpringDataPageable(paginacioParams));
-        } else {
-            organs = organGestorRepository.findByEntitatAndFiltre(entitat,
-                    filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-                    filtre.getCodi() == null ? "" : filtre.getCodi(),
-                    filtre.getNom() == null || filtre.getNom().isEmpty(),
-                    filtre.getNom() == null ? "" : filtre.getNom(),
-                    paginacioHelper.toSpringDataPageable(paginacioParams));
-        }
+
+        Page<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(entitat,
+                paginacioParams.getFiltre() == null,
+                paginacioParams.getFiltre(),
+                paginacioHelper.toSpringDataPageable(paginacioParams));
+
 
         PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 

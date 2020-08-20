@@ -531,14 +531,6 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						MetaDocumentDto metaDocument = new MetaDocumentDto();
 						metaDocument.setId(metaDocumentCreat.getId());
 						dto.setMetaNode(metaDocument);
-						try {
-							expedientService.tancar(
-									entitatCreada.getId(),
-									expedientCreat.getId(),
-									"Motiu de tancament");
-							fail("No s'ha de poder tancar un expedient sense documents definitius");
-						} catch (ValidationException ignored) {
-						}
 						DocumentDto documentCreat = documentService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -549,8 +541,9 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 							expedientService.tancar(
 									entitatCreada.getId(),
 									expedientCreat.getId(),
-									"Motiu de tancament");
-							fail("No s'ha de poder tancar un expedient amb documents en estat d'esborrany");
+									"Motiu de tancament",
+									null);
+							fail("No s'ha de poder tancar un expedient sense documents definitius");
 						} catch (ValidationException ignored) {
 						}
 						String identificador = documentService.generarIdentificadorFirmaClient(
@@ -564,7 +557,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						expedientService.tancar(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								"Motiu de tancament");
+								"Motiu de tancament",
+								null);
 						ExpedientDto expedientTancat = expedientService.findById(
 								entitatCreada.getId(),
 								expedientCreat.getId());

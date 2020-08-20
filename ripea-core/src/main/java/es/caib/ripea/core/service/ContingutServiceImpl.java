@@ -706,7 +706,6 @@ public class ContingutServiceImpl implements ContingutService {
 		return dto;
 	}
 
-
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -714,7 +713,6 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions) {
-
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
@@ -722,8 +720,6 @@ public class ContingutServiceImpl implements ContingutService {
 				ambVersions,
 				true);
 	}
-
-
 
 	@Transactional(readOnly = true)
 	@Override
@@ -738,7 +734,6 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutId=" + contingutId + ", "
 				+ "ambFills=" + ambFills + ", "
 				+ "ambVersions=" + ambVersions + ")");
-
 		ContingutEntity contingut;
 		if (ambPermisos) {
 			contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
@@ -749,7 +744,7 @@ public class ContingutServiceImpl implements ContingutService {
 		} else {
 			contingut = contingutRepository.findOne(contingutId);
 		}
-		//comprobar si hi ha notificacions del document
+		// Comprovar si hi ha notificacions del document
 		for (ContingutEntity document: contingut.getFills()) {
 			if (document instanceof DocumentEntity) {
 				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
@@ -766,7 +761,6 @@ public class ContingutServiceImpl implements ContingutService {
 				}
 			}
 		}
-
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -776,15 +770,11 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions);
-
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
-
 		return dto;
 	}
-
-
 
 	@Transactional(readOnly = true)
 	@Override

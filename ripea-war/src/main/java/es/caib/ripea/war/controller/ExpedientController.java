@@ -33,7 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -43,10 +45,12 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
@@ -79,6 +83,8 @@ public class ExpedientController extends BaseUserController {
 	private ContingutService contingutService;
 	@Autowired
 	private ExpedientService expedientService;
+	@Autowired
+	private DocumentService documentService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
@@ -541,17 +547,13 @@ public class ExpedientController extends BaseUserController {
 			@PathVariable Long expedientId,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientTancarCommand command = new ExpedientTancarCommand();
 		command.setId(expedientId);
 		model.addAttribute(command);
-		model.addAttribute(
-				"expedient",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						expedientId,
-						true,
-						false));
+		omplirModelTancarExpedient(
+				expedientId,
+				request,
+				model);
 		return "expedientTancarForm";
 	}
 	@RequestMapping(value = "/{expedientId}/tancar", method = RequestMethod.POST)
@@ -564,23 +566,35 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"expedient",
-					contingutService.findAmbIdUser(
-							entitatActual.getId(),
-							expedientId,
-							true,
-							false));
+			omplirModelTancarExpedient(
+					expedientId,
+					request,
+					model);
 			return "expedientTancarForm";
 		}
-		expedientService.tancar(
-				entitatActual.getId(),
-				expedientId,
-				command.getMotiu());
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../contingut/" + expedientId,
-				"expedient.controller.tancar.ok");
+		try {
+			expedientService.tancar(
+					entitatActual.getId(),
+					expedientId,
+					command.getMotiu(),
+					command.getDocumentsPerFirmar());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.controller.tancar.ok");
+		} catch (ExpedientTancarSenseDocumentsDefinitiusException ex) {
+			omplirModelTancarExpedient(
+					expedientId,
+					request,
+					model);
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.tancar.nodefinitius",
+							null));
+			return "expedientTancarForm";
+		}
 	}
 
 	@RequestMapping(value = "/estatValues/{metaExpedientId}", method = RequestMethod.GET)
@@ -933,6 +947,26 @@ public class ExpedientController extends BaseUserController {
 					filtreCommand);
 		}
 		return filtreCommand;
+	}
+
+	private void omplirModelTancarExpedient(
+			Long expedientId,
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = (ExpedientDto)contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				expedientId,
+				true,
+				false);
+		model.addAttribute("expedient", expedient);
+		if (expedient.isHasEsborranys()) {
+			List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(
+					entitatActual.getId(),
+					expedientId,
+					DocumentEstatEnumDto.REDACCIO);
+			model.addAttribute("esborranys", esborranys);
+		}
 	}
 
 }

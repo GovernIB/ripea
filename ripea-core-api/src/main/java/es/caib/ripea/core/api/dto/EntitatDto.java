@@ -29,6 +29,7 @@ public class EntitatDto extends AuditoriaDto {
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
 	private boolean usuariActualAdministration;
+	private boolean usuariActualAdministrationOrgan;
 	
 	private byte[] logoImgBytes;
 	private String capsaleraColorFons;

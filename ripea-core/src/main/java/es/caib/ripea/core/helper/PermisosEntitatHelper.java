@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,17 +32,18 @@ public class PermisosEntitatHelper {
 	@Resource
 	private PermisosHelper permisosHelper;
 
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 
-
-	public void omplirPermisosPerEntitats(
-			List<EntitatDto> entitats,
-			boolean ambLlistaPermisos) {
+	public void omplirPermisosPerEntitats(List<EntitatDto> entitats, boolean ambLlistaPermisos) {
 		// Filtra les entitats per saber els permisos per a l'usuari actual
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		ObjectIdentifierExtractor<EntitatDto> oie = new ObjectIdentifierExtractor<EntitatDto>() {
+
 			public Long getObjectIdentifier(EntitatDto entitat) {
 				return entitat.getId();
 			}
+
 		};
 		List<EntitatDto> entitatsRead = new ArrayList<EntitatDto>();
 		entitatsRead.addAll(entitats);
@@ -49,7 +51,7 @@ public class PermisosEntitatHelper {
 				entitatsRead,
 				oie,
 				EntitatEntity.class,
-				new Permission[] {ExtendedPermission.READ},
+				new Permission[] { ExtendedPermission.READ },
 				auth);
 		List<EntitatDto> entitatsAdministracio = new ArrayList<EntitatDto>();
 		entitatsAdministracio.addAll(entitats);
@@ -57,23 +59,23 @@ public class PermisosEntitatHelper {
 				entitatsAdministracio,
 				oie,
 				EntitatEntity.class,
-				new Permission[] {ExtendedPermission.ADMINISTRATION},
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
 				auth);
-		for (EntitatDto entitat: entitats) {
-			entitat.setUsuariActualRead(
-					entitatsRead.contains(entitat));
-			entitat.setUsuariActualAdministration(
-					entitatsAdministracio.contains(entitat));
+
+		for (EntitatDto entitat : entitats) {
+			entitat.setUsuariActualRead(entitatsRead.contains(entitat));
+			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));
+			entitat.setUsuariActualAdministrationOrgan(
+					!metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitat.getId()).isEmpty()
+					);
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
 			List<Long> ids = new ArrayList<Long>();
-			for (EntitatDto entitat: entitats)
+			for (EntitatDto entitat : entitats)
 				ids.add(entitat.getId());
-			Map<Long, List<PermisDto>> permisos = permisosHelper.findPermisos(
-					ids,
-					EntitatEntity.class);
-			for (EntitatDto entitat: entitats)
+			Map<Long, List<PermisDto>> permisos = permisosHelper.findPermisos(ids, EntitatEntity.class);
+			for (EntitatDto entitat : entitats)
 				entitat.setPermisos(permisos.get(entitat.getId()));
 		}
 	}
@@ -84,14 +86,16 @@ public class PermisosEntitatHelper {
 				permisosHelper.isGrantedAll(
 						entitat.getId(),
 						EntitatEntity.class,
-						new Permission[] {ExtendedPermission.READ},
+						new Permission[] { ExtendedPermission.READ },
 						auth));
 		entitat.setUsuariActualAdministration(
 				permisosHelper.isGrantedAll(
 						entitat.getId(),
 						EntitatEntity.class,
-						new Permission[] {ExtendedPermission.ADMINISTRATION},
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						auth));
+		entitat.setUsuariActualAdministrationOrgan(
+				!metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitat.getId()).isEmpty());
 	}
 
 }

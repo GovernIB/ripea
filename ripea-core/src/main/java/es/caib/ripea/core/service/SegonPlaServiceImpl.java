@@ -33,7 +33,6 @@ import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
-import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.TestHelper;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
@@ -58,8 +57,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private JavaMailSender mailSender;
-	@Autowired
-	private EmailHelper emailHelper;
 	@Autowired
 	private TestHelper testHelper;
 	
