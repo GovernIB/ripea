@@ -1155,6 +1155,10 @@ function removeCookie(cname) {
 function addLoading() {
 	$('body').addClass('loading');
 }
+
+function removeLoading() {
+	$('body').removeClass('loading');
+}
 </script>
 
 </head>
