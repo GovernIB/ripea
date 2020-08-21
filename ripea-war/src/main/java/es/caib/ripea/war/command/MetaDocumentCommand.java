@@ -65,7 +65,7 @@ public class MetaDocumentCommand {
 	private Long metaExpedientId;
 	@NotNull
 	private NtiOrigenEnumDto ntiOrigen;
-	@NotNull
+	@NotEmpty
 	private String ntiTipoDocumental;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;	
 	private boolean firmaBiometricaActiva;
