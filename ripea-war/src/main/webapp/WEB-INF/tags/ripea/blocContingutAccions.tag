@@ -233,7 +233,7 @@
 				<c:if test="${(contingut.estat == 'CUSTODIAT' or contingut.estat == 'DEFINITIU') and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
-					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
+					<c:if test="${expedientPare.metaNode.notificacioActiva}"> 
 						<c:choose>
 							<c:when test="${!empty expedientPare.interessats}">
 								<li>
