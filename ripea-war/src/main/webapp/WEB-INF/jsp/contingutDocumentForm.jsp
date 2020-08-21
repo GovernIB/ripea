@@ -179,10 +179,7 @@ $(document).ready(function() {
 		webutilModalAdjustHeight();
 	});
 
-	
-	if($('#id').val() == '') {
-		$('#metaNodeId').trigger('change');
-	}
+
 	$('input[type=radio][name=origen][value=${documentCommand.origen}]').trigger('change');
 	$('input[type=checkbox][name=ambFirma').trigger('change');
 	$('input[type=radio][name=tipusFirma][value=${documentCommand.tipusFirma}]').trigger('change');
