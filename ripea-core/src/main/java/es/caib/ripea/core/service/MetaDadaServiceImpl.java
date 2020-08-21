@@ -69,11 +69,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"metaDada=" + metaDada + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
 		
 		int ordre = metaDadaRepository.countByMetaNode(metaNode);
@@ -120,11 +116,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"metaDada=" + metaDada + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -161,12 +153,6 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				MetaDadaDto.class);
 	}
 	
-	
-	
-
-	
-
-
 	@Transactional
 	@Override
 	public MetaDadaDto delete(
@@ -177,11 +163,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -207,11 +189,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"metaNodeId=" + metaNodeId + ", " +
 				"id=" + id + "," +
 				"activa=" + activa + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -235,11 +213,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "entitatId=" + entitatId +  ", "
 				+ "metaNodeId=" + metaNodeId +  ", "
 				+ "metaDadaId=" + metaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -263,11 +237,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "entitatId=" + entitatId +  ", "
 				+ "metaNodeId=" + metaNodeId +  ", "
 				+ "metaDadaId=" + metaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -293,11 +263,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "metaNodeId=" + metaNodeId +  ", "
 				+ "metaDadaId=" + metaDadaId +  ", "
 				+ "posicio=" + posicio +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -311,58 +277,6 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				posicio);
 	}
 	
-	
-//	
-//	@Override
-//	@Transactional
-//	public void moveTo(
-//			Long entitatId,
-//			Long metaExpedientId,
-//			Long metaDadaId,
-//			int posicio) throws NotFoundException {
-//		logger.debug("Movent metadada del expedient a la posició especificada ("
-//				+ "entitatId=" + entitatId + ", "
-//				+ "metaDadaId=" + metaDadaId + ", "
-//				+ "posicio=" + posicio + ")");
-//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-//				entitatId,
-//				false,
-//				true,
-//				false);
-//		
-//		MetaDadaEntity metaDada = metaDadaRepository.findOne(metaDadaId);
-//
-//		canviPosicio(
-//				metaDada,
-//				posicio);
-//
-//	}
-//	
-//
-//	
-//	private void canviPosicio(
-//			MetaDadaEntity metaDada,
-//			int posicio) {
-//		List<MetaDadaEntity> metadades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(
-//				metaDada.getMetaNode());
-//		if (posicio >= 0 && posicio < metadades.size()) {
-//			if (posicio < metaDada.getOrdre()) {
-//				for (MetaDadaEntity est: metadades) {
-//					if (est.getOrdre() >= posicio && est.getOrdre() < metaDada.getOrdre()) {
-//						est.updateOrdre(est.getOrdre() + 1);
-//					}
-//				}
-//			} else if (posicio > metaDada.getOrdre()) {
-//				for (MetaDadaEntity est: metadades) {
-//					if (est.getOrdre() > metaDada.getOrdre() && est.getOrdre() <= posicio) {
-//						est.updateOrdre(est.getOrdre() - 1);
-//					}
-//				}
-//			}
-//			metaDada.updateOrdre(posicio);
-//		}
-//	}	
-
 	@Transactional(readOnly=true)
 	@Override
 	public MetaDadaDto findById(
@@ -373,11 +287,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -404,11 +314,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"codi=" + codi + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -427,11 +333,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"paginacioParams=" + paginacioParams + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);

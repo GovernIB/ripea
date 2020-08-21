@@ -17,44 +17,42 @@ import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 
-
 /**
- * Implementació de OrganGestorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
+ * Implementació de OrganGestorService com a EJB que empra una clase delegada
+ * per accedir a la funcionalitat del servei.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Stateless
 @Interceptors(SpringBeanAutowiringInterceptor.class)
-public class OrganGestorServiceBean implements OrganGestorService{
+public class OrganGestorServiceBean implements OrganGestorService {
+
 	@Autowired
 	OrganGestorService delegate;
-	
+
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<OrganGestorDto> findAll()
-	{
+	public List<OrganGestorDto> findAll() {
 		return delegate.findAll();
 	}
-	
+
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public OrganGestorDto findItem(Long id) 
-	{
+	public OrganGestorDto findItem(Long id) {
 		return delegate.findItem(id);
 	}
-	
+
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<OrganGestorDto> findByEntitat(Long entitatId)
-	{
+	public List<OrganGestorDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
-                                                                     PaginacioParamsDto paginacioParams){
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
 		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, paginacioParams);
 	}
 
@@ -67,31 +65,25 @@ public class OrganGestorServiceBean implements OrganGestorService{
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<PermisOrganGestorDto> findPermisos(Long entitatId) throws NotFoundException {
-	    return delegate.findPermisos(entitatId);
+		return delegate.findPermisos(entitatId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public void updatePermis(Long id, PermisDto permis, Long entitatId) throws NotFoundException {
-	    delegate.updatePermis(id, permis, entitatId);
+		delegate.updatePermis(id, permis, entitatId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public void deletePermis(Long id, Long permisId, Long entitatId) throws NotFoundException {
-	    delegate.deletePermis(id, permisId, entitatId);	    
+		delegate.deletePermis(id, permisId, entitatId);
 	}
-//	
-//  @Override
-//  @RolesAllowed("IPA_ADMIN")
-//  public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual() {
-//      return delegate.findOrgansGestorsAccessiblesUsuariActual();
-//  }
-//
-//  @Override
-//  @RolesAllowed("IPA_ADMIN")
-//  public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3)
-//  {
-//      return delegate.findAllOrganGestorsAccesibles(codiDir3);
-//  }
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId) {
+		return delegate.findAccessiblesUsuariActual(entitatId);
+	}
+
 }

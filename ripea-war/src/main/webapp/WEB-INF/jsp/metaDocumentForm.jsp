@@ -310,8 +310,17 @@ function removeLoading() {
 				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
-				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="codi" optionTextAttribute="nom" required="true"/>
+				<rip:inputSelect name="ntiOrigen" emptyOption="true"
+					emptyOptionTextKey="contingut.document.form.camp.nti.cap"
+					textKey="contingut.document.form.camp.nti.origen"
+					optionItems="${ntiOrigenOptions}" optionValueAttribute="value"
+					optionTextKeyAttribute="text" required="true" />
+				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true"
+					emptyOptionTextKey="contingut.document.form.camp.nti.cap"
+					textKey="contingut.document.form.camp.nti.tipdoc"
+					optionItems="${ntiTipusDocumentalOptions}"
+					optionValueAttribute="codi" optionTextAttribute="nom"
+					required="true" />
 				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">

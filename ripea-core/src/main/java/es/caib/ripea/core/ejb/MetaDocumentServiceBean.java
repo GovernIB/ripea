@@ -35,7 +35,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	MetaDocumentService delegate;
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -53,6 +53,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 	
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto create(Long entitatId, 
 			MetaDocumentDto metaDocument, String plantillaNom,
 			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
@@ -66,7 +67,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto update(
 			Long entitatId,
 			Long metaExpedientId,
@@ -84,6 +85,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 	
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto update(Long entitatId, MetaDocumentDto metaDocument, String plantillaNom,
 			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
 		return delegate.update(
@@ -95,7 +97,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -133,7 +135,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto findByCodi(
 			Long entitatId,
 			Long metaExpedientId,
@@ -145,7 +147,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -206,13 +208,13 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
 		return delegate.portafirmesFindDocumentTipus();
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId) {
 		return delegate.findByMetaExpedient(entitatId, metaExpedientId);
 	}

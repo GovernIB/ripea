@@ -56,6 +56,8 @@ public class CodiMetaDocumentNoRepetitValidator implements ConstraintValidator<C
 			}
         } catch (final Exception ex) {
         	LOGGER.error("Error al validar si el codi de meta-document és únic", ex);
+        	System.out.println(ex);
+        	System.out.println(ex.getStackTrace());
         }
         return false;
 	}

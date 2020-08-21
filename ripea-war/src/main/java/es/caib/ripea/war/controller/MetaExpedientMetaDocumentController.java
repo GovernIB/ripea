@@ -61,16 +61,25 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	private TipusDocumentalService tipusDocumentalService;
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
-	public String get(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		model.addAttribute("metaExpedient", metaExpedientService.findById(entitatActual.getId(), metaExpedientId));
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		model.addAttribute(
+				"metaExpedient",
+				metaExpedientService.findById(
+						entitatActual.getId(),
+						metaExpedientId));
 		return "metaExpedientMetaDocument";
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+	public DatatablesResponse datatable(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDocumentService.findByMetaExpedient(
@@ -91,7 +100,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
 			metaDocument = metaDocumentService.findById(entitatActual.getId(), metaExpedientId, metaDocumentId);
@@ -100,8 +109,10 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		if (metaDocument != null) {
 			model.addAttribute("portafirmesFluxSeleccionat", metaDocument.getPortafirmesFluxId());
 			command = MetaDocumentCommand.asCommand(metaDocument);
+			
 		} else {
 			command = new MetaDocumentCommand();
+			
 		}
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
@@ -117,11 +128,12 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@Valid MetaDocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
 			return "metaExpedientMetaDocumentForm";
 		}
+		
 		if (command.getId() != null) {
 			metaDocumentService.update(
 					entitatActual.getId(),
@@ -154,7 +166,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		try {
 			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId);
 			return getAjaxControllerReturnValueSuccess(
@@ -243,8 +255,10 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 
-	public void emplenarModelForm(HttpServletRequest request, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+	public void emplenarModelForm(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
 		model.addAttribute("isPortafirmesDocumentTipusSuportat", new Boolean(tipus != null));

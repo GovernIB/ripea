@@ -41,7 +41,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -95,7 +95,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto update(
 			Long entitatId,
 			Long metaExpedientId,
@@ -145,7 +145,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -203,7 +203,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto findByCodi(
 			Long entitatId,
 			Long metaExpedientId,
@@ -222,7 +222,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -237,6 +237,7 @@ public interface MetaDocumentService {
 	 *            Peràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de meta-documents.
 	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams);
@@ -329,7 +330,7 @@ public interface MetaDocumentService {
 	 * Consulta la llista de tipus de document del plugin de portafirmes.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus();
 	
 	/**
@@ -341,7 +342,7 @@ public interface MetaDocumentService {
 	 *            Id del tipus d'expedient.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId);
 	
 	/**
@@ -381,6 +382,6 @@ public interface MetaDocumentService {
 	 *            Id del tipus d'expedient.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId);
 }
