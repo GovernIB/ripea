@@ -98,8 +98,11 @@ body.loading .rmodal {
 
 <script type="text/javascript">
 $(document).ready(function() {
+	let parentIframe = window.frameElement;
+	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	
 	$('form').on('submit', function(){
-		window.parent.addLoading();
+		window.parent.addLoading(idModal);
 	});
 	
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;

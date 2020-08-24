@@ -13,8 +13,11 @@
 	
 <script type="text/javascript">
 $(document).ready(function() {
+	let parentIframe = window.frameElement;
+	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	
 	$('#btn_cancelar').on('click', function(){
-		window.parent.addLoading();
+		window.parent.addLoading(idModal);
 	});
 });
 </script>

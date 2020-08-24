@@ -1153,8 +1153,10 @@ function removeCookie(cname) {
 }
 
 
-function addLoading() {
-	$('body').addClass('loading');
+function addLoading(idModal) {
+	$('#' + idModal).on('hidden.bs.modal', function () {
+		$('body').addClass('loading');
+	})	
 }
 
 function removeLoading() {
