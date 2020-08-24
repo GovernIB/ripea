@@ -205,7 +205,7 @@ public class BaseServiceTest {
 				} else if (element instanceof MetaExpedientDto) {
 					metaExpedientService.delete(
 							entitatId,
-							((MetaExpedientDto)element).getId(), false);
+							((MetaExpedientDto)element).getId());
 				}
 				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}

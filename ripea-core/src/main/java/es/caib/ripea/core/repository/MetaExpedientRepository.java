@@ -88,7 +88,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
        @Param("ids") List<Long> ids,
        Pageable pageable);
     
-	MetaExpedientEntity findByIdAndOrganGestor(Long id, OrganGestorEntity organGestor);
+//	MetaExpedientEntity findByIdAndOrganGestor(Long id, OrganGestorEntity organGestor);
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);

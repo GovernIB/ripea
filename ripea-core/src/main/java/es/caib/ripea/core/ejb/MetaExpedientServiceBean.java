@@ -45,9 +45,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("tothom")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient,
-			boolean isOrganGestorAdmin) {
-		return delegate.update(entitatId, metaExpedient, isOrganGestorAdmin);
+			MetaExpedientDto metaExpedient) {
+		return delegate.update(entitatId, metaExpedient);
 	}
 
 	@Override
@@ -55,18 +54,16 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu,
-			boolean isOrganGestorAdmin) {
-		return delegate.updateActiu(entitatId, id, actiu, isOrganGestorAdmin);
+			boolean actiu) {
+		return delegate.updateActiu(entitatId, id, actiu);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long metaExpedientId,
-			boolean isOrganGestorAdmin) {
-		return delegate.delete(entitatId, metaExpedientId, isOrganGestorAdmin);
+			Long metaExpedientId) {
+		return delegate.delete(entitatId, metaExpedientId);
 	}
 
 	@Override
@@ -254,5 +251,13 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			PaginacioParamsDto paginacioParams) {
 	    return delegate.findAmbOrganGestor(entitatId, paginacioParams);
 	}
-
+	
+	@Override
+	@RolesAllowed("tothom")
+	public MetaExpedientDto getAndCheckAdminPermission(
+			Long entitatId,
+			Long id) {
+		return delegate.getAndCheckAdminPermission(entitatId,
+				id);
+	}
 }

@@ -119,50 +119,29 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient,
-			boolean isOrganGestorAdmin) {
+			MetaExpedientDto metaExpedient) {
 		logger.debug("Actualitzant meta-expedient existent ("
 				+ "entitatId=" + entitatId + ", "
 				+ "metaExpedient=" + metaExpedient + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedientEntity;
 		MetaExpedientEntity metaExpedientPare = null;
-		if (isOrganGestorAdmin) {
-			metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientPerOrganGestor(
+		metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(
+				entitat,
+				metaExpedient.getId(),
+				false,
+				false,
+				false,
+				false);
+		
+		if (metaExpedient.getPareId() != null) {
+			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedientAdmin(
 					entitat,
-					metaExpedient.getId(),
+					metaExpedient.getPareId(),
 					false,
 					false,
 					false,
 					false);
-			
-			if (metaExpedient.getPareId() != null) {
-				metaExpedientPare = entityComprovarHelper.comprovarMetaExpedientPerOrganGestor(
-						entitat,
-						metaExpedient.getPareId(),
-						false,
-						false,
-						false,
-						false);
-			}
-		}else {
-			metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedient.getId(),
-					false,
-					false,
-					false,
-					false);
-			
-			if (metaExpedient.getPareId() != null) {
-				metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(
-						entitat,
-						metaExpedient.getPareId(),
-						false,
-						false,
-						false,
-						false);
-			}
 		}
 
 		Long organGestorId = metaExpedient.getOrganGestor().getId();
@@ -187,31 +166,19 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu,
-			boolean isOrganGestorAdmin) {
+			boolean actiu) {
 		logger.debug("Actualitzant propietat activa d'un meta-expedient existent ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "actiu=" + actiu + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient;
-		if(isOrganGestorAdmin) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerOrganGestor(
-					entitat,
-					id,
-					false,
-					false,
-					false,
-					false);			
-		}else {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					id,
-					false,
-					false,
-					false,
-					false);
-		}
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
 
 		metaExpedient.updateActiu(actiu);
 		return conversioTipusHelper.convertir(
@@ -223,28 +190,18 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id,
-			boolean isOrganGestorAdmin) {
+			Long id) {
 		logger.debug("Esborrant meta-expedient (id=" + id +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient;
-		if(isOrganGestorAdmin) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerOrganGestor(
-					entitat,
-					id,
-					false,
-					false,
-					false,
-					false);			
-		} else {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					id,
-					false,
-					false,
-					false,
-					false);
-		}
+		metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+
 
 		metaExpedientRepository.delete(metaExpedient);
 		return conversioTipusHelper.convertir(
@@ -262,6 +219,35 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				+ "id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		MetaExpedientDto resposta = conversioTipusHelper.convertir(
+				metaExpedient,
+				MetaExpedientDto.class);
+		if (resposta != null) {
+			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			omplirMetaDocumentsPerMetaExpedient(
+					metaExpedient,
+					resposta);
+		}
+		return resposta;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public MetaExpedientDto getAndCheckAdminPermission(
+			Long entitatId,
+			Long id) {
+		logger.debug("Consulta del meta-expedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(
 				entitat,
 				id,
 				false,

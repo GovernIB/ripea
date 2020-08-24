@@ -231,39 +231,33 @@ public class EntityComprovarHelper {
 		return metaExpedient;
 	}
 
-	public MetaExpedientEntity comprovarMetaExpedientPerOrganGestor(EntitatEntity entitat, Long id,
+	public MetaExpedientEntity comprovarMetaExpedientAdmin(EntitatEntity entitat, Long id,
 	                                                                boolean comprovarPermisRead,
 	                                                                boolean comprovarPermisWrite,
 	                                                                boolean comprovarPermisCreate,
 	                                                                boolean comprovarPermisDelete) {
+
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(entitat, id, comprovarPermisRead, comprovarPermisWrite, comprovarPermisCreate,
 		        									comprovarPermisDelete);
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
+				entitat.getId(),
+				EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				auth);
+		if (esAdministradorEntitat) {
+			return metaExpedient;
+		}
+		
 		if(metaExpedient.getOrganGestor() == null) {
 			throw new ValidationException(id, MetaExpedientEntity.class,
 			        "El meta-expedient no té cap organ gestor asociat (id=" + id + ")");
 		}
-		if (comprovarPermisWrite || comprovarPermisDelete){
-			// Crec que aquesta comprovació no fa falta
-			if (metaExpedientRepository.findByIdAndOrganGestor(id, metaExpedient.getOrganGestor()) == null) {
-				throw new ValidationException(id, MetaExpedientEntity.class,
-				        "El meta-expedient (id=" + id + ") no está associat a cap organ gestor de l'entitat ");
-			}
-			
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			boolean hasPermission = permisosHelper.isGrantedAny(metaExpedient.getOrganGestor().getId(), 
-																OrganGestorEntity.class, 
-																new Permission[] { ExtendedPermission.ADMINISTRATION }, 
-																auth);
-			if (!hasPermission) {
-				if (metaExpedientRepository.findByIdAndOrganGestor(id, metaExpedient.getOrganGestor()) == null) {
-					throw new ValidationException(id, MetaExpedientEntity.class,
-					        "L'entitat (id=" + id
-					                + ") no té permisos per editar els meta-expedients de l'organ gestor (id="
-					                + metaExpedient.getOrganGestor().getId() + ")");
-				}
-			}
-		}
-		
+
+		// si no es administrador d'entitat comprovar si es administrador d'organ gestor
+		comprovarOrganGestor(entitat.getId(), metaExpedient.getOrganGestor().getId());
+	
 		return metaExpedient;
 	}
 
