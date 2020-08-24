@@ -47,6 +47,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
@@ -99,7 +100,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					DocumentEntity.class,
 					"El document no està custodiat");
 		}
-		ExpedientEntity expedient = document.getExpedient();
+		ExpedientEntity expedient = HibernateHelper.deproxy(document.getExpedient());
 		if (expedient == null) {
 			throw new ValidationException(
 					document.getId(),
@@ -483,7 +484,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedient = document.getExpedient();
+		ExpedientEntity expedient = HibernateHelper.deproxy(document.getExpedient());
 		if (expedient == null) {
 			throw new ValidationException(
 					documentId,
