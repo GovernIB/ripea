@@ -107,5 +107,9 @@
 	<jee:local-slsb 
 			id="organGestorService" 
 			jndi-name="ripea/OrganGestorServiceBean/local" 
-			business-interface="es.caib.ripea.core.api.service.OrganGestorService"/>	 	
+			business-interface="es.caib.ripea.core.api.service.OrganGestorService"/>	 
+	<jee:local-slsb 
+			id="ExpedientEstatService" 
+			jndi-name="ripea/ExpedientEstatServiceBean/local" 
+			business-interface="es.caib.ripea.core.api.service.ExpedientEstatService"/>	 		
 </beans>

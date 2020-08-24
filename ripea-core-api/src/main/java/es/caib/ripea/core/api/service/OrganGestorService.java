@@ -122,19 +122,14 @@ public interface OrganGestorService {
 
 	/**
 	 * Obté un llistat de tots els organs gestors accessibles per a 
-	 * l'usuari actual.
+	 * l'usuari actual de l'entitat indicada per paràmetre
 	 * 
+	 * @param entitatId
+	 *            Id de l'entitat actual.
 	 * @return
+	 * 			Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
-//	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuariActual();
-	
-	/**
-	 * Obté un llistat de tots els organs gestors accessibles per a 
-   * l'organisme amb el codi indicat per paràmetre.
-   * 
-	 * @param codiDir3 Codi de l'organ gestor del que cercam els accessibles.
-	 * @return Llistat de tots els organs gestors accessibles.
-	 */
-//	public List<OrganGestorDto> findAllOrganGestorsAccesibles(String codiDir3);
-	
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId);
+		
 }

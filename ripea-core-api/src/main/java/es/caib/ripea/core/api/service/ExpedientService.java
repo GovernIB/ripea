@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -392,34 +391,6 @@ public interface ExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId);
-
-	PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
-			PaginacioParamsDto paginacioParams);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat);
-	
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto moveTo(Long entitatId, Long metaExpedientId, Long expedientEstatId, int posicio)
-			throws NotFoundException;
-	
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId) throws NotFoundException;
-
-	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId);
-
-	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryCreateDocFromAnnex(Long registreAnnexId,

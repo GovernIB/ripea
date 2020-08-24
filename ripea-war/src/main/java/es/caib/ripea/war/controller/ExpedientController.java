@@ -51,6 +51,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
@@ -91,7 +92,9 @@ public class ExpedientController extends BaseUserController {
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
 	private AplicacioService aplicacioService;
-
+	@Autowired
+	private ExpedientEstatService expedientEstatService;
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
@@ -127,7 +130,7 @@ public class ExpedientController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_METAEXP_ID);
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",
@@ -605,7 +608,7 @@ public class ExpedientController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		List<ExpedientEstatDto> estatsFromDatabase = expedientService.findExpedientEstatByMetaExpedient(
+		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
@@ -627,7 +630,7 @@ public class ExpedientController extends BaseUserController {
 					entitatActual.getId(),
 					expedientId);
 		}
-		List<ExpedientEstatDto> expedientEstats = expedientService.findExpedientEstats(
+		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstats(
 				entitatActual.getId(),
 				expedientId);
 		ExpedientEstatDto expedientEstatObert = new ExpedientEstatDto();
@@ -672,7 +675,7 @@ public class ExpedientController extends BaseUserController {
 //					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "expedientEstatsForm";
 		}
-		expedientService.changeEstatOfExpedient(
+		expedientEstatService.changeEstatOfExpedient(
 				entitatActual.getId(),
 				command.getId(),
 				command.getExpedientEstatId()
@@ -725,7 +728,7 @@ public class ExpedientController extends BaseUserController {
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",

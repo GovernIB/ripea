@@ -10,6 +10,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.ripea.core.api.dto.MetaExpedientMetaDocumentDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment de les meta-documents dels
@@ -17,6 +19,7 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class MetaExpedientMetaDocumentCommand {
 
 	private Long id;
@@ -25,33 +28,6 @@ public class MetaExpedientMetaDocumentCommand {
 	@NotNull
 	private MultiplicitatEnumDto multiplicitat;
 	private boolean readOnly;
-
-
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public Long getMetaDocumentId() {
-		return metaDocumentId;
-	}
-	public void setMetaDocumentId(Long metaDocumentId) {
-		this.metaDocumentId = metaDocumentId;
-	}
-	public MultiplicitatEnumDto getMultiplicitat() {
-		return multiplicitat;
-	}
-	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
-		this.multiplicitat = multiplicitat;
-	}
-	public boolean isReadOnly() {
-		return readOnly;
-	}
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
-	}
 
 	public static MetaExpedientMetaDocumentCommand asCommand(MetaExpedientMetaDocumentDto dto) {
 		MetaExpedientMetaDocumentCommand command = ConversioTipusHelper.convertir(

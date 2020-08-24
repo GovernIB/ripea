@@ -41,7 +41,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -55,7 +55,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				metaExpedientService.permisFind(
@@ -77,7 +77,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -109,7 +109,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"entitat",
@@ -134,7 +134,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,

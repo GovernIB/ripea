@@ -91,10 +91,15 @@ public class MetaExpedientController extends BaseAdminController {
 			command = MetaExpedientCommand.asCommand(metaExpedient);
 		else
 			command = new MetaExpedientCommand();
+		command.setRolAdminOrgan(RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
-		model.addAttribute("metaExpedients", metaExpedientService.findByEntitat(entitatActual.getId()));
-		model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
+		if (RolHelper.isRolActualAdministrador(request)) {
+			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
+		}else {
+			model.addAttribute("organsGestors", organGestorService.findAccessiblesUsuariActual(entitatActual.getId()));
+		}
+		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		return "metaExpedientForm";
 	}
 
@@ -106,6 +111,12 @@ public class MetaExpedientController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		if (bindingResult.hasErrors()) {
+			if (RolHelper.isRolActualAdministrador(request)) {
+				model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
+			}else {
+				model.addAttribute("organsGestors", organGestorService.findAccessiblesUsuariActual(entitatActual.getId()));
+			}
+			model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 			return "metaExpedientForm";
 		}
 		MetaExpedientDto dto = MetaExpedientCommand.asDto(command);
@@ -130,10 +141,16 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
 	public String getNewAmbPare(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		MetaExpedientCommand command = new MetaExpedientCommand();
+		MetaExpedientCommand command = new MetaExpedientCommand(RolHelper.isRolActualAdministradorOrgan(request));
 		command.setPareId(metaExpedientId);
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
+		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
+		if (RolHelper.isRolActualAdministrador(request)) {
+			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
+		}else {
+			model.addAttribute("organsGestors", organGestorService.findAccessiblesUsuariActual(entitatActual.getId()));
+		}
 		return "metaExpedientForm";
 	}
 
@@ -193,7 +210,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> findAll(HttpServletRequest request, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 

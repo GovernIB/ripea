@@ -41,6 +41,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
 
 /**
  * Tests per al servei de gestió d'expedients.
@@ -54,7 +55,9 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 	@Autowired
 	private DocumentService documentService;
 	@Autowired
-	private CarpetaService carpetaService;
+	private CarpetaService carpetaService;	
+	@Autowired
+	private ExpedientEstatService expedientEstatService;
 	
 	@Test
     public void create() {
@@ -395,7 +398,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						List<ExpedientEstatDto> estats0 = expedientService.findExpedientEstats(
+						List<ExpedientEstatDto> estats0 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
 								expedientCreat.getId());
 						assertNotNull(estats0);
@@ -405,11 +408,11 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						estatPerCrear.setCodi("TST");
 						estatPerCrear.setNom("Test");
 						estatPerCrear.setMetaExpedientId(metaExpedientCreat.getId());
-						expedientService.createExpedientEstat(
+						expedientEstatService.createExpedientEstat(
 								entitatCreada.getId(),
 								estatPerCrear);
 						autenticarUsuari("user");
-						List<ExpedientEstatDto> estats1 = expedientService.findExpedientEstats(
+						List<ExpedientEstatDto> estats1 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
 								expedientCreat.getId());
 						assertNotNull(estats1);
@@ -417,7 +420,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						ExpedientEstatDto estatCreat = estats1.get(0);
 						assertEquals(estatPerCrear.getCodi(), estatCreat.getCodi());
 						assertEquals(estatPerCrear.getNom(), estatCreat.getNom());
-						ExpedientDto expedientAmbEstat = expedientService.changeEstatOfExpedient(
+						ExpedientDto expedientAmbEstat = expedientEstatService.changeEstatOfExpedient(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								estatCreat.getId());

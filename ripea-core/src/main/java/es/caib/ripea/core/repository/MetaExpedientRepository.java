@@ -34,7 +34,10 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    MetaExpedientEntity me " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) ")
+			"and (:esNullFiltre = true or" +
+			" lower(me.codi) like lower('%'||:filtre||'%') or" +
+			" lower(me.organGestor.nom) like lower('%'||:filtre||'%') or" +
+			" lower(me.nom) like lower('%'||:filtre||'%')) ")
 	List<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullFiltre") boolean esNullFiltre,
@@ -45,8 +48,10 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
           "    MetaExpedientEntity me " +
           "where " +
           "    me.entitat = :entitat " +
-          "and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) "+ 
-          " and me.id in (:ids)")
+  		"and (:esNullFiltre = true or" +
+		" lower(me.codi) like lower('%'||:filtre||'%') or" +
+		" lower(me.nom) like lower('%'||:filtre||'%'))" + 
+        " and me.id in (:ids)")
   List<MetaExpedientEntity> findByEntitat(
       @Param("entitat") EntitatEntity entitat, 
       @Param("esNullFiltre") boolean esNullFiltre,
@@ -58,7 +63,10 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    MetaExpedientEntity me " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) ")
+			"and (:esNullFiltre = true " +
+			"     or lower(me.codi) like lower('%'||:filtre||'%') " +
+			//"     or lower(me.organGestor.nom) like lower('%'||:filtre||'%') " +
+			"     or lower(me.nom) like lower('%'||:filtre||'%')) ")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullFiltre") boolean esNullFiltre,
@@ -69,8 +77,10 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	         "    MetaExpedientEntity me " +
 	         "where " +
 	         "    me.entitat = :entitat " +
-	         " and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) "+ 
-	         " and me.id in (:ids)")
+	   		 " and (:esNullFiltre = true or" +
+			" lower(me.codi) like lower('%'||:filtre||'%') or" +
+			" lower(me.nom) like lower('%'||:filtre||'%'))" + 
+	        " and me.id in (:ids)")
   Page<MetaExpedientEntity> findByEntitat(
        @Param("entitat") EntitatEntity entitat, 
        @Param("esNullFiltre") boolean esNullFiltre,

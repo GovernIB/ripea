@@ -33,7 +33,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto create(
 			Long entitatId,
 			MetaExpedientDto metaExpedient) throws NotFoundException;
@@ -52,7 +52,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient,
@@ -73,7 +73,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
@@ -94,7 +94,7 @@ public interface MetaExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws SQLException 
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto delete(
 			Long entitatId,
 			Long id,
@@ -111,7 +111,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -127,7 +127,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
 			String codi) throws NotFoundException;
@@ -248,7 +248,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -268,7 +268,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -289,7 +289,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientTascaDto tascaUpdateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -309,7 +309,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -328,7 +328,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientTascaDto tascaFindById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -347,7 +347,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -364,7 +364,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -381,7 +381,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
@@ -399,7 +399,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public void permisDelete(
 			Long entitatId,
 			Long id,

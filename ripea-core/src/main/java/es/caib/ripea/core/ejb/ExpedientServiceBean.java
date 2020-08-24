@@ -36,7 +36,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 public class ExpedientServiceBean implements ExpedientService {
 
 	@Autowired
-	ExpedientService delegate;
+	private ExpedientService delegate;
 
 	@Override
 	@RolesAllowed("tothom")
@@ -271,52 +271,6 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId);
 	}
 
-	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findExpedientEstatByMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
-	}
-
-	@Override
-	public ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id) {
-		return delegate.findExpedientEstatById(entitatId, id);
-	}
-
-	@Override
-	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
-		return delegate.createExpedientEstat(entitatId, estat);
-	}
-
-	@Override
-	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
-		return delegate.updateExpedientEstat(entitatId, estat);
-	}
-
-	@Override
-	public ExpedientEstatDto moveTo(Long entitatId, Long metaExpedientId, Long expedientEstatId, int posicio)
-			throws NotFoundException {
-		return delegate.moveTo(entitatId, metaExpedientId, expedientEstatId, posicio);
-	}
-
-	@Override
-	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId) throws NotFoundException {
-		return delegate.deleteExpedientEstat(entitatId, expedientEstatId);
-	}
-
-	@Override
-	public List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId) {
-		return delegate.findExpedientEstats(entitatId, expedientId);
-	}
-
-
-	@Override
-	public ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId) {
-		return delegate.changeEstatOfExpedient(entitatId, expedientId, expedientEstatId);
-	}
-
-	@Override
-	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId) {
-		return delegate.findExpedientEstatByMetaExpedient(entitatId, metaExpedientId);
-	}
 
 	@Override
 	public boolean retryCreateDocFromAnnex(Long registreAnnexId,
@@ -353,5 +307,4 @@ public class ExpedientServiceBean implements ExpedientService {
 				entitatId,
 				expedientId);
 	}
-
 }

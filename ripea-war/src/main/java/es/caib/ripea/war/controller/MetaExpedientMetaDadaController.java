@@ -50,7 +50,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/metaExpedient")
-public class MetaExpedientMetaDadaController extends BaseUserController {
+public class MetaExpedientMetaDadaController extends BaseAdminController {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
@@ -64,8 +64,8 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -79,7 +79,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDadaService.findByMetaNodePaginat(
@@ -97,7 +97,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			@PathVariable Long metaNodeId,
 			@PathVariable Long metaDadaId,
 			@PathVariable int posicio) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		metaDadaService.moveTo(
 				entitatActual.getId(),
 				metaNodeId,
@@ -122,7 +122,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaDadaDto metaDada = null;
 		if (metaDadaId != null)
 			metaDada = metaDadaService.findById(
@@ -147,7 +147,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		if (bindingResult.hasErrors()) {
 			return "metaDadaForm";
 		}
@@ -198,7 +198,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -214,7 +214,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -231,7 +231,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		try {
 			metaDadaService.delete(
 					entitatActual.getId(),
@@ -254,7 +254,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 	public List<DominiDto> getDominis(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
 	}
@@ -265,7 +265,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
 		List<ResultatDominiDto> resultatConsulta = new ArrayList<ResultatDominiDto>();
 		try {
@@ -284,7 +284,7 @@ public class MetaExpedientMetaDadaController extends BaseUserController {
 	public Object getDominiMetaExpedientPermisLectura(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientDto metaExpedientDto = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
 		List<DominiDto> dominis = dominiService.findByMetaNodePermisLecturaAndTipusDomini(entitatActual.getId(), metaExpedientDto);		
 		return dominis;

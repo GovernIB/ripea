@@ -88,8 +88,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false);
+				false,
+				true);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);
@@ -193,8 +193,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false);
+				false,
+				true);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);
@@ -356,11 +356,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				"entitatId=" + entitatId + ", " +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient;
 		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
 															entitat,
@@ -422,8 +418,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false);
+				false,
+				true);
 		
 		
 		MetaDocumentEntity entity;
@@ -460,11 +456,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				"entitatId=" + entitatId + ", " +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"paginacioParams=" + paginacioParams + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 																entitat,

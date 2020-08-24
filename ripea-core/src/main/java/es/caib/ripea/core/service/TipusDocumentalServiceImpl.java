@@ -176,8 +176,8 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false);
+				false,
+				true);
 
 		List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
 

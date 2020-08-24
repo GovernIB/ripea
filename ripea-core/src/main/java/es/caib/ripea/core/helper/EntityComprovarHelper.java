@@ -47,6 +47,7 @@ import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -88,10 +89,12 @@ public class EntityComprovarHelper {
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Resource
 	private DocumentPublicacioRepository documentPublicacioRepository;
-
 	@Resource
 	private PermisosHelper permisosHelper;
-
+	@Resource
+	private OrganGestorRepository organGestorRepository;
+	
+	
 	public EntitatEntity comprovarEntitat(String entitatCodi, boolean comprovarPermisUsuari,
 	                                      boolean comprovarPermisAdmin,
 	                                      boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
@@ -106,6 +109,25 @@ public class EntityComprovarHelper {
 
 	}
 
+	public EntitatEntity comprovarEntitatPerMetaExpedients(Long entitatId) {
+		EntitatEntity entitat = entitatRepository.findOne(entitatId);
+		if (entitat == null) {
+			throw new NotFoundException(entitatId, EntitatEntity.class);
+		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		boolean esAdministradorOLectorEntitat = permisosHelper.isGrantedAny(entitatId,
+		        EntitatEntity.class,
+		        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.READ }, auth);
+		if (!esAdministradorOLectorEntitat) {
+			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
+			        "ADMINISTRATION || READ");
+		}
+		
+		return entitat;
+	}
+	
 	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisUsuari,
 	                                      boolean comprovarPermisAdmin,
 	                                      boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
@@ -140,7 +162,33 @@ public class EntityComprovarHelper {
 		}
 		return entitat;
 	}
-
+	
+	public OrganGestorEntity comprovarOrganGestor(Long entitatId, Long id)
+	{
+		
+		OrganGestorEntity organGestor = organGestorRepository.findOne(id);
+		if (organGestor == null) {
+			throw new NotFoundException(id, OrganGestorEntity.class);
+		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
+		        new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+		if (!esAdministradorEntitat) {
+			boolean esAdministradorOrganGestor = permisosHelper.isGrantedAny(
+					id,
+					OrganGestorEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					auth);
+			if (!esAdministradorOrganGestor) {
+				throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(),
+				        "ADMINISTRATION");
+			}	
+		}
+		
+		return organGestor;
+	}
+	
 	public MetaNodeEntity comprovarMetaNode(EntitatEntity entitat, Long id) {
 		MetaNodeEntity metaNode = metaNodeRepository.findOne(id);
 		if (metaNode == null) {
