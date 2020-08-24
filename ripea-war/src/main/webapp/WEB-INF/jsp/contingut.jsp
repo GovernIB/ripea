@@ -421,6 +421,7 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 </c:forEach>
 
 $(document).ready(function() {
+	removeLoading();
 	$("a.fileDownload").on("click", function() {
 		$("body").addClass("loading");
 		checkLoadingFinished();
