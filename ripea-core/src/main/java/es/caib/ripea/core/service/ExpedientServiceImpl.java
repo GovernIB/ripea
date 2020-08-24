@@ -1438,7 +1438,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
 					if (documentExportacioEni != null) {
 						FitxerDto exportacioEni = new FitxerDto();
-						exportacioEni.setNom("ENI documents/" + nomDocument + "_exportacio_ENI.xml");
+						exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
 						exportacioEni.setContentType("application/xml");
 						exportacioEni.setContingut(documentExportacioEni.getBytes());
 						
@@ -1481,7 +1481,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
 							if (documentExportacioEni != null) {
 								FitxerDto exportacioEni = new FitxerDto();
-								exportacioEni.setNom("ENI/" + nomDocument + "_exportacio_ENI.xml");
+								exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
 								exportacioEni.setContentType("application/xml");
 								exportacioEni.setContingut(documentExportacioEni.getBytes());
 								
