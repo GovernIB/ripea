@@ -66,6 +66,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -80,6 +81,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDocumentService.findByMetaExpedient(
@@ -101,6 +103,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaDocumentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
 			metaDocument = metaDocumentService.findById(entitatActual.getId(), metaExpedientId, metaDocumentId);
@@ -129,6 +132,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
 			return "metaExpedientMetaDocumentForm";
@@ -167,6 +171,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
 			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId);
 			return getAjaxControllerReturnValueSuccess(

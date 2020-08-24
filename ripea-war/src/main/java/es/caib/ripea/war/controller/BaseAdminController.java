@@ -5,7 +5,11 @@ package es.caib.ripea.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.helper.EntitatHelper;
 
 /**
@@ -16,6 +20,9 @@ import es.caib.ripea.war.helper.EntitatHelper;
  */
 public class BaseAdminController extends BaseController {
 
+	@Autowired
+	public MetaExpedientService metaExpedientService;
+	
 	public EntitatDto getEntitatActualComprovantPermisAdminEntitat(HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null)
@@ -49,4 +56,12 @@ public class BaseAdminController extends BaseController {
 		return entitat;
 	}
 
+	protected MetaExpedientDto comprovarAccesMetaExpedient(HttpServletRequest request, Long metaExpedientId) {
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		if (!entitat.isUsuariActualAdministration()) {
+				
+		}	
+		MetaExpedientDto metaExpedient = metaExpedientService.getAndCheckAdminPermission(entitat.getId(), metaExpedientId);
+		return metaExpedient;
+	}
 }

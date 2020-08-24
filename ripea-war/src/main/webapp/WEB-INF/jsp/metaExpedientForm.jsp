@@ -37,7 +37,7 @@
 				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
 				<rip:inputSelect name="organGestorId" textKey="metaexpedient.form.camp.organgestor" 
-								 emptyOption="true" emptyOptionTextKey="organgestor.form.camp.organ.opcio.cap"
+								 emptyOption="${ not isRolAdminOrgan }" emptyOptionTextKey="organgestor.form.camp.organ.opcio.cap"
 								 optionItems="${ organsGestors }" optionValueAttribute="id" optionTextAttribute="nom"
 								 required="${ isRolAdminOrgan }" optionMinimumResultsForSearch="5"/>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>

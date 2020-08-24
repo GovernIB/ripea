@@ -85,7 +85,7 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientDto metaExpedient = null;
 		if (metaExpedientId != null)
-			metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
+			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientCommand command = null;
 		if (metaExpedient != null)
 			command = MetaExpedientCommand.asCommand(metaExpedient);
@@ -110,6 +110,7 @@ public class MetaExpedientController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
 		if (bindingResult.hasErrors()) {
 			if (RolHelper.isRolActualAdministrador(request)) {
 				model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
@@ -124,7 +125,7 @@ public class MetaExpedientController extends BaseAdminController {
 		organ.setId(command.getOrganGestorId());
 		dto.setOrganGestor(organ);
 		if (command.getId() != null) {
-			metaExpedientService.update(entitatActual.getId(), dto, RolHelper.isRolActualAdministradorOrgan(request));
+			metaExpedientService.update(entitatActual.getId(), dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
@@ -141,6 +142,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
 	public String getNewAmbPare(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientCommand command = new MetaExpedientCommand(RolHelper.isRolActualAdministradorOrgan(request));
 		command.setPareId(metaExpedientId);
 		command.setEntitatId(entitatActual.getId());
@@ -157,11 +159,11 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
-				true,
-				RolHelper.isRolActualAdministradorOrgan(request));
+				true);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
@@ -171,11 +173,11 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
-				false,
-				RolHelper.isRolActualAdministradorOrgan(request));
+				false);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
@@ -185,11 +187,11 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
 			metaExpedientService.delete(
 					entitatActual.getId(),
-					metaExpedientId,
-					RolHelper.isRolActualAdministradorOrgan(request));
+					metaExpedientId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaExpedient",

@@ -65,7 +65,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-
+		comprovarAccesMetaExpedient(request, metaExpedientId);
+		
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -80,6 +81,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDadaService.findByMetaNodePaginat(
@@ -123,6 +125,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaDadaId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDadaDto metaDada = null;
 		if (metaDadaId != null)
 			metaDada = metaDadaService.findById(
@@ -148,6 +151,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			return "metaDadaForm";
 		}
@@ -171,27 +175,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 					"metadada.controller.creat.ok");
 		}
 	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	    binder.registerCustomEditor(
-	    		BigDecimal.class,
-	    		new CustomNumberEditor(
-	    				BigDecimal.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
-	    binder.registerCustomEditor(
-	    		Double.class,
-	    		new CustomNumberEditor(
-	    				Double.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
-	}
+
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
 	public String enable(
@@ -199,6 +183,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -215,6 +200,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -232,6 +218,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
 			metaDadaService.delete(
 					entitatActual.getId(),
@@ -255,6 +242,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
 	}
@@ -266,6 +254,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi){
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
 		List<ResultatDominiDto> resultatConsulta = new ArrayList<ResultatDominiDto>();
 		try {
@@ -285,9 +274,30 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId){
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		MetaExpedientDto metaExpedientDto = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
+		MetaExpedientDto metaExpedientDto = comprovarAccesMetaExpedient(request, metaExpedientId);		
 		List<DominiDto> dominis = dominiService.findByMetaNodePermisLecturaAndTipusDomini(entitatActual.getId(), metaExpedientDto);		
 		return dominis;
 	}
 
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	    binder.registerCustomEditor(
+	    		BigDecimal.class,
+	    		new CustomNumberEditor(
+	    				BigDecimal.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
+	    binder.registerCustomEditor(
+	    		Double.class,
+	    		new CustomNumberEditor(
+	    				Double.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
+	}
 }
