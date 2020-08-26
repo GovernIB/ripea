@@ -49,6 +49,7 @@ import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
@@ -266,7 +267,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				ara, 
 				error.length() < 2045 ? error : error.substring(0, 2045));
 		
-		execucioMassivaContingutRepository.save(emc);
+		execucioMassivaContingutRepository.save(HibernateHelper.deproxy(emc));
 	}
 	
 	@Override
