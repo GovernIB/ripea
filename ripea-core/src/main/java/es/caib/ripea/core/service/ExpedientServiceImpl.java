@@ -1427,7 +1427,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		for (ContingutEntity contingut : continguts) {
 			if (contingut instanceof DocumentEntity) {
 				DocumentEntity document = (DocumentEntity) contingut;
-				FitxerDto fitxer = documentHelper.getFitxerAssociat((DocumentEntity) contingut, null);
+				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
 				String nomDocument = ((num += 10) / 10.0) + " " + fitxer.getNom();
 					
 				contingutHelper.crearNovaEntrada(
@@ -1561,6 +1561,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					resultat, 
 					zos);
 		}
+		zos.close();
 		FitxerDto resultat = new FitxerDto();
 		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
 		resultat.setContentType("application/zip");

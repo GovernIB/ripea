@@ -229,7 +229,7 @@
 						<c:choose>
 							<c:when test="${!empty expedientPare.interessats}">
 								<li>
-								<a href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" ><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
+								<a href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
 								</li>
 							</c:when>
 							<c:otherwise>
@@ -288,14 +288,16 @@
 					<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
 				</c:otherwise>
 			</c:choose>	
-			<c:choose>
-				<c:when test="${contingut.hasFills}">
-					<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
-				</c:when>
-				<c:otherwise>
-					<li class="disabled"><a href="#"/><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
-				</c:otherwise>
-			</c:choose>	
+			<c:if test="${contingut.expedient}">
+				<c:choose>
+					<c:when test="${contingut.hasFills}">
+						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
+					</c:when>
+					<c:otherwise>
+						<li class="disabled"><a href="#"/><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
+					</c:otherwise>
+				</c:choose>	
+			</c:if>
 			<c:if test="${contingut.expedient && pluginArxiuActiu}"> 
 				<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 			</c:if>
