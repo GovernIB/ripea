@@ -76,6 +76,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Transactional
     public boolean syncDir3OrgansGestors(Long entitatId) {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+        
+        List<OrganGestorEntity> organismesBDs = organGestorRepository.findByEntitat(entitat);
+        List<Long> processedOrgans = new ArrayList<Long>();
+        
         List<OrganGestorDto> organismes = findOrganismesByEntitat(entitat.getUnitatArrel());
         for (OrganGestorDto o : organismes) {
             OrganGestorEntity organDB = organGestorRepository.findByCodiAndEntitat(o.getCodi(), entitat);
@@ -91,8 +95,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
                 organDB.setNom(o.getNom());
                 organDB.setPare(organGestorRepository.findByCodiAndEntitat(o.getPareCodi(), entitat));
                 organGestorRepository.flush();
-                
+                processedOrgans.add(organDB.getId());    
             }
+            
+        }
+        
+        // Processam els organs gestors que ja no estan a dir3 i tenen instancies a la bbdd
+        for (OrganGestorEntity o : organismesBDs) {
+        	if (! processedOrgans.contains(o.getId())) {
+        		if (o.getMetaExpedients().size() == 0) {
+        			organGestorRepository.delete(o.getId());
+        		} else {
+        			o.setActiu(false);
+                    organGestorRepository.flush();	
+        		}
+        		
+        	}
         }
         return true;
     }
