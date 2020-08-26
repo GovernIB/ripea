@@ -1,15 +1,19 @@
 package es.caib.ripea.core.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
@@ -44,6 +48,18 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @JoinColumn(name = "pare_id")
     private OrganGestorEntity pare;
 
+    @Column(name = "actiu")
+    private boolean actiu;
+    
+    @OneToMany(			
+    		mappedBy = "organGestor",
+			fetch = FetchType.LAZY)
+    private List<MetaExpedientEntity> metaExpedients;
+    
+//    @Formula("count(metaExpedients)")
+//    private int nMetaExpedients;
+        
+    
     private static final long serialVersionUID = 458331024861203562L;
 
 }
