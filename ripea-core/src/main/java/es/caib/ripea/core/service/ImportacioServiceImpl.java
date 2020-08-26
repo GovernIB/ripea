@@ -127,7 +127,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 					contingutPare.getEntitat(),
 					expedientSuperior,
 					null,
-					document.getIdentificador());
+					expedientSuperior.getArxiuUuid());
 		
 			if (fitxer != null) {
 				entity.updateFitxer(
@@ -139,6 +139,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
 			entity.updateArxiu(document.getIdentificador());
+			entity.updateNtiIdentificador(document.getMetadades().getIdentificador());
 			contingutLogHelper.logCreacio(
 					entity,
 					true,
