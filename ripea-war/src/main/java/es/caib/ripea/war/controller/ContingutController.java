@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -51,6 +53,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.service.ContingutServiceImpl;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
@@ -166,6 +169,7 @@ public class ContingutController extends BaseUserController {
 					"contingut.controller.element.esborrat.ok");
 
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					url,
@@ -709,5 +713,6 @@ public class ContingutController extends BaseUserController {
 				contingutOrigen);
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(ContingutController.class);
 
 }
