@@ -18,12 +18,14 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.ValidFormat;
 
 /**
  * Command per a gestionar les notificacions de documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ValidFormat(groups = {DocumentNotificacionsCommand.Create.class, DocumentNotificacionsCommand.Update.class})
 public class DocumentNotificacionsCommand {
 
 	private Long id;
