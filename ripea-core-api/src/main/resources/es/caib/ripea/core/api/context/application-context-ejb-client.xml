@@ -109,7 +109,7 @@
 			jndi-name="ripea/OrganGestorServiceBean/local" 
 			business-interface="es.caib.ripea.core.api.service.OrganGestorService"/>	 
 	<jee:local-slsb 
-			id="ExpedientEstatService" 
+			id="expedientEstatService" 
 			jndi-name="ripea/ExpedientEstatServiceBean/local" 
 			business-interface="es.caib.ripea.core.api.service.ExpedientEstatService"/>	 		
 </beans>

@@ -3,8 +3,11 @@ package es.caib.ripea.core.ejb;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
@@ -13,6 +16,8 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 
+@Stateless
+@Interceptors(SpringBeanAutowiringInterceptor.class)
 public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Autowired
