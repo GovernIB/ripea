@@ -1301,33 +1301,38 @@ public class ContingutHelper {
 	
 	
 	public void marcarEsborrat(ContingutEntity contingut) {
-		for (ContingutEntity contingutFill: contingut.getFills()) {
-			marcarEsborrat(contingutFill);
-		}
-		List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
-				contingut.getPare(),
-				contingut.getNom());
-		// Per evitar errors de restricció única violada hem de
-		// posar al camp esborrat un nombre != 0 i que sigui diferent
-		// dels altres fills esborrats amb el mateix nom.
-		int index = 1;
-		for (ContingutEntity c: continguts) {
-			if (c.getEsborrat() > 0) {
-				if (index < c.getEsborrat()) {
-					break;
-				}
-				index++;
+		
+		if (contingut.getEsborrat() == 0) {
+			
+			for (ContingutEntity contingutFill: contingut.getFills()) {
+				marcarEsborrat(contingutFill);
 			}
+			
+			List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
+					contingut.getPare(),
+					contingut.getNom());
+			// Per evitar errors de restricció única violada hem de
+			// posar al camp esborrat un nombre != 0 i que sigui diferent
+			// dels altres fills esborrats amb el mateix nom.
+			int index = 0;
+			for (ContingutEntity c: continguts) {
+					if (index < c.getEsborrat()) {
+						index = c.getEsborrat();
+					}
+			}
+			contingut.updateEsborrat(index + 1);
+			contingut.updateEsborratData(new Date());
+			contingutLogHelper.log(
+					contingut,
+					LogTipusEnumDto.ELIMINACIO,
+					null,
+					null,
+					true,
+					true);
+			Long pareId = contingut.getPare() != null ? contingut.getPare().getId() : null;
+			logger.debug("Contingut amb id: " + contingut.getId() + " amb pareId: " + pareId + " marcada com esborrat amb num: " + contingut.getEsborrat());
 		}
-		contingut.updateEsborrat(continguts.size() + 1);
-		contingut.updateEsborratData(new Date());
-		contingutLogHelper.log(
-				contingut,
-				LogTipusEnumDto.ELIMINACIO,
-				null,
-				null,
-				true,
-				true);
+
 	}
 
 	/*private Long getCountByContingut(
