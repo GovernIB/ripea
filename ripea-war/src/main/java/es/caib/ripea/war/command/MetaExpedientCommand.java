@@ -75,7 +75,7 @@ public class MetaExpedientCommand {
 
 	public static MetaExpedientCommand asCommand(MetaExpedientDto dto) {
 		MetaExpedientCommand command = ConversioTipusHelper.convertir(dto, MetaExpedientCommand.class);
-		command.setOrganGestorId(dto.getOrganGestor().getId());
+		command.setOrganGestorId(dto.getOrganGestor() != null ? dto.getOrganGestor().getId() : null);
 		return command;
 	}
 
