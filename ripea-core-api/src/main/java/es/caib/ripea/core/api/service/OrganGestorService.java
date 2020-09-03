@@ -68,9 +68,10 @@ public interface OrganGestorService {
 	 * 
 	 * @param entitatId Identificador de l'entitat actual
 	 * @return Indica si la sincronització ha tengut èxit
+	 * @throws Exception 
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public boolean syncDir3OrgansGestors(Long entitatId);
+	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
 	
 
 	/**

@@ -58,7 +58,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public boolean syncDir3OrgansGestors(Long entitatId) {
+	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
 		return delegate.syncDir3OrgansGestors(entitatId);
 	}
 

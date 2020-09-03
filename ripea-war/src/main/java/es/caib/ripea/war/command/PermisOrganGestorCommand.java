@@ -1,5 +1,7 @@
 package es.caib.ripea.war.command;
 
+import javax.validation.constraints.NotNull;
+
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
@@ -8,6 +10,7 @@ import lombok.Setter;
 @Getter @Setter
 public class PermisOrganGestorCommand extends PermisCommand 
 {
+	@NotNull
     private Long organGestorId;
 
     public static PermisOrganGestorCommand asCommand(PermisOrganGestorDto dto) {

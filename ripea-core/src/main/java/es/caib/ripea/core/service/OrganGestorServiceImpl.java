@@ -74,11 +74,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
     @Override
     @Transactional
-    public boolean syncDir3OrgansGestors(Long entitatId) {
+    public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-        
-        List<OrganGestorEntity> organismesBDs = organGestorRepository.findByEntitat(entitat);
-        List<Long> processedOrgans = new ArrayList<Long>();
+		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty())
+		{
+			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
+		}
+		
+		List<OrganGestorEntity> organismesDIR3 = new ArrayList<OrganGestorEntity>();
         
         List<OrganGestorDto> organismes = findOrganismesByEntitat(entitat.getUnitatArrel());
         for (OrganGestorDto o : organismes) {
@@ -93,25 +96,28 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
             } else { // update it
                 organDB.setNom(o.getNom());
+                organDB.setActiu(true);
                 organDB.setPare(organGestorRepository.findByCodiAndEntitat(o.getPareCodi(), entitat));
                 organGestorRepository.flush();
-                processedOrgans.add(organDB.getId());    
+                
             }
             
+            organismesDIR3.add(organDB);
         }
         
         // Processam els organs gestors que ja no estan a dir3 i tenen instancies a la bbdd
-        for (OrganGestorEntity o : organismesBDs) {
-        	if (! processedOrgans.contains(o.getId())) {
-        		if (o.getMetaExpedients().size() == 0) {
-        			organGestorRepository.delete(o.getId());
-        		} else {
-        			o.setActiu(false);
-                    organGestorRepository.flush();	
-        		}
-        		
-        	}
-        }
+        List<OrganGestorEntity> organismesNotInDIR3 = organGestorRepository.findByEntitat(entitat);
+		organismesNotInDIR3.removeAll(organismesDIR3);
+		for (OrganGestorEntity o : organismesNotInDIR3) {
+			if (o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) {
+				organGestorRepository.delete(o.getId());
+				System.out.println("REMOVED: " + o.getNom());
+			} else {
+				o.setActiu(false);
+				organGestorRepository.flush();
+			}
+		}
+
         return true;
     }
 

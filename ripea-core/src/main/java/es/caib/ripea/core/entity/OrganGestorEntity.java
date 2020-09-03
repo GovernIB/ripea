@@ -2,6 +2,7 @@ package es.caib.ripea.core.entity;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -9,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -56,9 +58,18 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 			fetch = FetchType.LAZY)
     private List<MetaExpedientEntity> metaExpedients;
     
-//    @Formula("count(metaExpedients)")
-//    private int nMetaExpedients;
-        
+    @OneToMany(			
+    		mappedBy = "pare",
+			fetch = FetchType.LAZY,
+			cascade= { CascadeType.PERSIST })
+    private List<OrganGestorEntity> fills;        
+    
+    @PreRemove
+    private void preRemove() {
+    	for (OrganGestorEntity fill : this.getFills()) {
+    	    fill.setPare(null);
+    	}
+    }
     
     private static final long serialVersionUID = 458331024861203562L;
 

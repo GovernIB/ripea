@@ -70,7 +70,21 @@ public class OrganGestorController extends BaseUserController {
     public String syncDir3(HttpServletRequest request) {
 
         EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-        organGestorService.syncDir3OrgansGestors(entitat.getId());
+        if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../organgestor",
+					"L'entitat actual no té cap codi DIR3 associat");
+		}
+		try {
+			organGestorService.syncDir3OrgansGestors(entitat.getId());
+			
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../organgestor",
+					e.getMessage());
+		}
 
         return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
                 "organgestor.controller.update.nom.tots.ok");
@@ -95,7 +109,7 @@ public class OrganGestorController extends BaseUserController {
             MissatgesHelper.error(request,
                     getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
-        return DatatablesHelper.getDatatableResponse(request, permisos, "codi");
+        return DatatablesHelper.getDatatableResponse(request, permisos, "id");
     }
 
     @RequestMapping(value = "/permis/new", method = RequestMethod.GET)
