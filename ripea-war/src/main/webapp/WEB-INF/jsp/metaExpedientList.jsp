@@ -82,6 +82,7 @@
 		data-rowhref-template="#rowhrefTemplate" 
 		data-rowhref-toggle="modal"
 		data-save-state="true"
+		data-search-enabled="false"
 		data-mantenir-paginacio="${mantenirPaginacio}">
 		<thead>
 			<tr>
