@@ -21,15 +21,9 @@ import es.caib.ripea.war.command.MetaExpedientCommand;
  */
 public class OrganGestorMetaExpedientNotNullValidator implements ConstraintValidator<OrganGestorMetaExpedientNotNull, MetaExpedientCommand> {
 
-	@Autowired
-	private EntitatService entitatService;
-
-
-
 	@Override
 	public void initialize(final OrganGestorMetaExpedientNotNull constraintAnnotation) {
-//		this.campId = constraintAnnotation.campId();
-//		this.campCodi = constraintAnnotation.campCodi();
+
 	}
 
 	@Override

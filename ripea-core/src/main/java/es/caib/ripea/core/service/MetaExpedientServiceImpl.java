@@ -414,7 +414,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
       EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
       List<Long> candidateMetaExpIds = metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitatId);
       PaginaDto<MetaExpedientDto> resposta;
-      if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
+      if (candidateMetaExpIds.size() == 0) {
+    	  resposta = new PaginaDto<MetaExpedientDto>();
+    	
+      } else if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
           resposta = paginacioHelper.toPaginaDto(
                   metaExpedientRepository.findByEntitat(
 							entitat,

@@ -146,11 +146,6 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		
 		if (bindingResult.hasErrors()) {
-			if (RolHelper.isRolActualAdministrador(request)) {
-				model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
-			}else {
-				model.addAttribute("organsGestors", organGestorService.findAccessiblesUsuariActual(entitatActual.getId()));
-			}
 			model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 			return "metaExpedientForm";
 		}

@@ -45,7 +45,17 @@
 				<c:if test="${required}">*</c:if>
 			</label>
 			<div class="controls col-xs-${campInputSize}">
-				<form:select path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" style="width:100%" data-toggle="suggest" data-netejar="${netejar}" data-placeholder="${placeholderText}" data-minimum-input-length="${minimumInputLength}" data-url-llistat="${urlConsultaLlistat}" data-url-inicial="${urlConsultaInicial}" data-current-value="${campValue}" data-suggest-value="${suggestValue}" data-suggest-text="${suggestText}" data-suggest-text-addicional="${suggestTextAddicional}"/>
+				<form:select path="${campPath}" cssClass="form-control"
+					id="${campPath}" disabled="${disabled}" style="width:100%"
+					data-toggle="suggest" data-netejar="${netejar}"
+					data-placeholder="${placeholderText}"
+					data-minimum-input-length="${minimumInputLength}"
+					data-url-llistat="${urlConsultaLlistat}"
+					data-url-inicial="${urlConsultaInicial}"
+					data-current-value="${campValue}"
+					data-suggest-value="${suggestValue}"
+					data-suggest-text="${suggestText}"
+					data-suggest-text-addicional="${suggestTextAddicional}" />
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 			</div>
 		</div>
