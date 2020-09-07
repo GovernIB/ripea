@@ -29,11 +29,20 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
+			" and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
+	public List<OrganGestorEntity> findByEntitatAndFiltre(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
       " and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
 	public Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-      @Param("esNullFiltre") boolean esNullFiltre,
-      @Param("filtre") String filtre, 
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,
 			Pageable paginacio);
 	
 	@Query("from " +

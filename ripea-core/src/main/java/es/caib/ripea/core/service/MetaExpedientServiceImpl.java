@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -296,6 +297,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public PaginaDto<MetaExpedientDto> findByEntitat(
 			Long entitatId,
+			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		logger.debug("Consulta paginada dels meta-expedients de l'entitat (entitatId=" + entitatId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
@@ -304,16 +306,28 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			resposta = paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
-							paginacioParams.getFiltre() == null || paginacioParams.getFiltre().isEmpty(),
-							paginacioParams.getFiltre(),
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+							filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom(),
+							filtre.getActiu() == null,
+							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+							filtre.getOrganGestorId() == null,
+							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaExpedientDto.class);
 		} else {
 			resposta = paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
-							paginacioParams.getFiltre() == null || paginacioParams.getFiltre().isEmpty(),
-							paginacioParams.getFiltre(),
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+							filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom(),
+							filtre.getActiu() == null,
+							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+							filtre.getOrganGestorId() == null,
+							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaExpedientDto.class);
 		}
@@ -395,25 +409,40 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
 			Long entitatId,
+			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
       EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
       List<Long> candidateMetaExpIds = metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitatId);
       PaginaDto<MetaExpedientDto> resposta;
       if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
           resposta = paginacioHelper.toPaginaDto(
-                  metaExpedientRepository.findByEntitat(entitat, 
-                                                        paginacioParams.getFiltre() == null,
-                                                        paginacioParams.getFiltre(), 
-                                                        candidateMetaExpIds,
-                                                        paginacioHelper.toSpringDataPageable(paginacioParams)),
+                  metaExpedientRepository.findByEntitat(
+							entitat,
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+							filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom(),
+							filtre.getActiu() == null,
+							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+							filtre.getOrganGestorId() == null,
+							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
+                            candidateMetaExpIds,
+                            paginacioHelper.toSpringDataPageable(paginacioParams)),
                   MetaExpedientDto.class);
       } else {
           resposta = paginacioHelper.toPaginaDto(
-                  metaExpedientRepository.findByEntitat(entitat, 
-                                                        paginacioParams.getFiltre() == null,
-                                                        paginacioParams.getFiltre(), 
-                                                        candidateMetaExpIds,
-                                                        paginacioHelper.toSpringDataSort(paginacioParams)),
+					metaExpedientRepository.findByEntitat(
+							entitat,
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+							filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom(),
+							filtre.getActiu() == null,
+							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+							filtre.getOrganGestorId() == null,
+							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
+                            candidateMetaExpIds,
+							paginacioHelper.toSpringDataSort(paginacioParams)),
                   MetaExpedientDto.class);
       }
       metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());

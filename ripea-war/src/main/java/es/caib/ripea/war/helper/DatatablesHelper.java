@@ -24,6 +24,8 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Mètodes d'ajuda per a gestionar datatables.
@@ -337,6 +339,7 @@ public class DatatablesHelper {
 		}
 	}
 
+	@Getter @Setter
 	public static class DatatablesParams {
 		private Integer draw;
 		private Integer start;
@@ -384,84 +387,6 @@ public class DatatablesHelper {
 					break;
 				}
 			}
-		}
-		public Integer getDraw() {
-			return draw;
-		}
-		public void setDraw(Integer draw) {
-			this.draw = draw;
-		}
-		public Integer getStart() {
-			return start;
-		}
-		public void setStart(Integer start) {
-			this.start = start;
-		}
-		public Integer getLength() {
-			return length;
-		}
-		public void setLength(Integer length) {
-			this.length = length;
-		}
-		public String getSearchValue() {
-			return searchValue;
-		}
-		public void setSearchValue(String searchValue) {
-			this.searchValue = searchValue;
-		}
-		public Boolean getSearchRegex() {
-			return searchRegex;
-		}
-		public void setSearchRegex(Boolean searchRegex) {
-			this.searchRegex = searchRegex;
-		}
-		public List<Integer> getOrderColumn() {
-			return orderColumn;
-		}
-		public void setOrderColumn(List<Integer> orderColumn) {
-			this.orderColumn = orderColumn;
-		}
-		public List<String> getOrderDir() {
-			return orderDir;
-		}
-		public void setOrderDir(List<String> orderDir) {
-			this.orderDir = orderDir;
-		}
-		public List<String> getColumnsData() {
-			return columnsData;
-		}
-		public void setColumnsData(List<String> columnsData) {
-			this.columnsData = columnsData;
-		}
-		public List<String> getColumnsName() {
-			return columnsName;
-		}
-		public void setColumnsName(List<String> columnsName) {
-			this.columnsName = columnsName;
-		}
-		public List<Boolean> getColumnsSearchable() {
-			return columnsSearchable;
-		}
-		public void setColumnsSearchable(List<Boolean> columnsSearchable) {
-			this.columnsSearchable = columnsSearchable;
-		}
-		public List<Boolean> getColumnsOrderable() {
-			return columnsOrderable;
-		}
-		public void setColumnsOrderable(List<Boolean> columnsOrderable) {
-			this.columnsOrderable = columnsOrderable;
-		}
-		public List<String> getColumnsSearchValue() {
-			return columnsSearchValue;
-		}
-		public void setColumnsSearchValue(List<String> columnsSearchValue) {
-			this.columnsSearchValue = columnsSearchValue;
-		}
-		public List<Boolean> getColumnsSearchRegex() {
-			return columnsSearchRegex;
-		}
-		public void setColumnsSearchRegex(List<Boolean> columnsSearchRegex) {
-			this.columnsSearchRegex = columnsSearchRegex;
 		}
 	}
 

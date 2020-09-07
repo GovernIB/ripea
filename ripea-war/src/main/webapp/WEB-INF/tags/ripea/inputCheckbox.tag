@@ -12,28 +12,27 @@
 <c:set var="disabled"><c:choose><c:when test="${not empty disabled}">${disabled}</c:when><c:otherwise>false</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
+<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
 <c:choose>
 	<c:when test="${not inline}">
-<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
-	<label class="control-label col-xs-${campLabelSize}" for="${campPath}">
-		<c:choose>
-			<c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when>
-			<c:when test="${not empty text}">${text}</c:when>
-			<c:otherwise>${campPath}</c:otherwise>
-		</c:choose>
-	</label>
-	<div class="controls col-xs-${campInputSize}">
-		<div class="checkbox">
-  			<label>
-				<form:checkbox path="${campPath}" cssClass="span12" id="${campPath}" disabled="${disabled}"/>
-			</label>
+		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">
+			<c:choose>
+				<c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when>
+				<c:when test="${not empty text}">${text}</c:when>
+				<c:otherwise>${campPath}</c:otherwise>
+			</c:choose>
+		</label>
+		<div class="controls col-xs-${campInputSize}">
+			<div class="checkbox">
+	  			<label>
+					<form:checkbox path="${campPath}" cssClass="span12" id="${campPath}" disabled="${disabled}"/>
+				</label>
+			</div>
+			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>
-		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
-	</div>
-</div>
 	</c:when>
 	<c:otherwise>
-		<label class="checkbox">
+		<label class="checkbox-inline">
 			<form:checkbox path="${campPath}" id="${campPath}" disabled="${disabled}"/>
 			<c:choose>
 				<c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when>
@@ -43,3 +42,5 @@
 		</label>
 	</c:otherwise>
 </c:choose>
+</div>
+		

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -88,8 +89,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<MetaExpedientDto> findByEntitat(
 			Long entitatId,
+			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findByEntitat(entitatId, paginacioParams);
+		return delegate.findByEntitat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
@@ -248,8 +250,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("tothom")
 	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
 			Long entitatId,
+			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-	    return delegate.findAmbOrganGestor(entitatId, paginacioParams);
+	    return delegate.findAmbOrganGestor(entitatId, filtre, paginacioParams);
 	}
 	
 	@Override

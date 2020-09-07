@@ -6,11 +6,11 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-pageContext.setAttribute(
-		"expedientEstatsOptdions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
-		"expedient.estat.enum."));
+// pageContext.setAttribute(
+// 		"expedientEstatsOptdions",
+// 		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+// 		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
+// 		"expedient.estat.enum."));
 %>
 <html>
 <head>

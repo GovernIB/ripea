@@ -17,6 +17,24 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+	<c:if test="${not isRolAdminOrgan}">
+		<script type="text/javascript">
+		$(document).ready(function() {
+			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
+			selectOrganGestorContainer.hide();
+			$( "#select-grup-metaexpedient" ).change(function () {
+			    var value = $(this).val();
+			    console.log(value);
+			    if (value == 0){
+			    	selectOrganGestorContainer.hide();
+			    } else if (value == 1) {
+			    	selectOrganGestorContainer.show();
+			    }
+		  	});
+		});
+		</script>
+	</c:if>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
@@ -36,10 +54,28 @@
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
 				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
-				<rip:inputSelect name="organGestorId" textKey="metaexpedient.form.camp.organgestor" 
-								 emptyOption="${ not isRolAdminOrgan }" emptyOptionTextKey="organgestor.form.camp.organ.opcio.cap"
-								 optionItems="${ organsGestors }" optionValueAttribute="id" optionTextAttribute="nom"
-								 required="${ isRolAdminOrgan }" optionMinimumResultsForSearch="5"/>
+				<c:if test="${not isRolAdminOrgan}">
+					<div class="form-group">
+						<label class="control-label col-xs-4" for="select-grup-metaexpedient"><spring:message code="metaexpedient.form.camp.gestor"/></label>
+						<div class="controls col-xs-8">
+						<select id="select-grup-metaexpedient" class="form-control" data-toggle="select2"
+								data-minimumresults="-1">
+							<option value="0"><spring:message code="metaexpedient.form.camp.gestor.entitat"/></option>
+							<option value="1"><spring:message code="metaexpedient.form.camp.gestor.organgestor"/></option>
+						</select>
+						</div>
+					</div>						
+				</c:if>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+ 					name="organGestorId"  
+ 					urlConsultaInicial="${urlConsultaInicial}"
+ 					urlConsultaLlistat="${urlConsultaLlistat}"
+ 					textKey="metaexpedient.form.camp.organgestor"
+ 					suggestValue="id"
+ 					suggestText="nom"
+ 					required="${ isRolAdminOrgan }"/>		 
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
 				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
 			</div>

@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -150,6 +151,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public PaginaDto<MetaExpedientDto> findByEntitat(
 			Long entitatId,
+			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
@@ -410,6 +412,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
 			Long entitatId,
+			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
 	public MetaExpedientDto getAndCheckAdminPermission(

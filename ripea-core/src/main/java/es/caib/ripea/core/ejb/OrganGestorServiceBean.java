@@ -50,6 +50,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
+	public List<OrganGestorDto> findByEntitat(Long entitatId, String filterText) {
+		return delegate.findByEntitat(entitatId, filterText);
+	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) {
@@ -84,6 +90,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@RolesAllowed("tothom")
 	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId) {
 		return delegate.findAccessiblesUsuariActual(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, String filterText) {
+		return delegate.findAccessiblesUsuariActual(entitatId, filterText);
 	}
 
 }

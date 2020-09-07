@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <html>
 <head>
@@ -28,6 +29,47 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
 	</div>
+	<c:url value="metaExpedient/filtrar" var="formAction"/>
+	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="metaExpedientFiltreCommand">
+		<div class="row">
+			<div class="col-md-4">
+				<rip:inputText name="codi" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codi"/>
+			</div>		
+			<div class="col-md-4">
+				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
+			</div>
+			<div class="col-md-4">
+				<rip:inputSelect name="actiu" optionEnum="MetaExpedientActiuEnumDto" 
+								 emptyOption="true" 
+								 placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+ 					name="organGestorId"  
+ 					inline="true"
+ 					urlConsultaInicial="${urlConsultaInicial}"
+ 					urlConsultaLlistat="${urlConsultaLlistat}"
+ 					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
+ 					suggestValue="id"
+ 					suggestText="nom" />
+			</div>
+			<div class="col-md-4"> 
+				<c:if test="${not isRolAdminOrgan}">
+				 	<rip:inputCheckbox name="veureTots" inline="true" textKey="metaexpedient.list.filtre.camp.veure.tots"/>
+				</c:if>
+			</div>
+			<div class="col-md-4 pull-right">
+				<div class="pull-right">
+					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+				</div>
+			</div>
+		</div>
+	</form:form>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
 	<table 
 		id="metaexpedients" 

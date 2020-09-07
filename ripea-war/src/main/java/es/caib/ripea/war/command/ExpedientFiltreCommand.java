@@ -9,12 +9,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al filtre d'expedients dels arxius.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class ExpedientFiltreCommand {
 
 	private Long arxiuId;
@@ -33,90 +36,7 @@ public class ExpedientFiltreCommand {
 	private String interessat;
 	private String metaExpedientDominiValor;
 
-	public String getMetaExpedientDominiCodi() {
-		return metaExpedientDominiCodi;
-	}
-	public void setMetaExpedientDominiCodi(String metaExpedientDominiCodi) {
-		this.metaExpedientDominiCodi = metaExpedientDominiCodi;
-	}
-	public String getInteressat() {
-		return interessat;
-	}
-	public void setInteressat(String interessat) {
-		this.interessat = interessat;
-	}
-	public Long getArxiuId() {
-		return arxiuId;
-	}
-	public void setArxiuId(Long arxiuId) {
-		this.arxiuId = arxiuId;
-	}
-	public Long getMetaExpedientId() {
-		return metaExpedientId;
-	}
-	public void setMetaExpedientId(Long metaExpedientId) {
-		this.metaExpedientId = metaExpedientId;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public Date getDataCreacioInici() {
-		return dataCreacioInici;
-	}
-	public void setDataCreacioInici(Date dataCreacioInici) {
-		this.dataCreacioInici = dataCreacioInici;
-	}
-	public Date getDataCreacioFi() {
-		return dataCreacioFi;
-	}
-	public void setDataCreacioFi(Date dataCreacioFi) {
-		this.dataCreacioFi = dataCreacioFi;
-	}
-	public String getNumero() {
-		return numero;
-	}
-	public void setNumero(String numero) {
-		this.numero = numero;
-	}
-	public Long getExpedientEstatId() {
-		return expedientEstatId;
-	}
-	public void setExpedientEstatId(Long expedientEstatId) {
-		this.expedientEstatId = expedientEstatId;
-	}
-	public Date getDataTancatInici() {
-		return dataTancatInici;
-	}
-	public void setDataTancatInici(Date dataTancatInici) {
-		this.dataTancatInici = dataTancatInici;
-	}
-	public Date getDataTancatFi() {
-		return dataTancatFi;
-	}
-	public void setDataTancatFi(Date dataTancatFi) {
-		this.dataTancatFi = dataTancatFi;
-	}
-	public boolean isMeusExpedients() {
-		return meusExpedients;
-	}
-	public void setMeusExpedients(boolean meusExpedients) {
-		this.meusExpedients = meusExpedients;
-	}
-	public Long getTipusId() {
-		return tipusId;
-	}
-	public void setTipusId(Long tipusId) {
-		this.tipusId = tipusId;
-	}
-	public String getMetaExpedientDominiValor() {
-		return metaExpedientDominiValor;
-	}
-	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
-		this.metaExpedientDominiValor = metaExpedientDominiValor;
-	}
+
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,

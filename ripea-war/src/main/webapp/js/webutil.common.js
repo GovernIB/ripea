@@ -404,39 +404,39 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		var suggestText = $(this).data('suggestText');
 		var suggestTextAddicional = $(this).data('suggestTextAddicional');
 		var suggest = $(this);
-		if (value != null && value.includes(",")) {
-			var valueArr = value.split(',');
-			valueArr.forEach(function(value) {
-				urlInicial = urlActual + "/" + value;
-				// Preselected value
-				if (value) {
-					$.ajax({
-						url: urlInicial,
-						async: false,
-						global: false,
-						success: function(resposta) {
-							suggest.append(
+		if (value != null && typeof value === 'string') {
+			if (value.includes(",")) {
+				var valueArr = value.split(',');
+				valueArr.forEach(function(value) {
+					urlInicial = urlActual + "/" + value;
+					// Preselected value
+					if (value) {
+						$.ajax({
+							url: urlInicial,
+							async: false,
+							global: false,
+							success: function(resposta) {
+								suggest.append(
+											$('<option>', {
+												value: resposta[suggestValue],
+												text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+												selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
+											}));
+							},
+							error: function () {
+								suggest.append(
 										$('<option>', {
-											value: resposta[suggestValue],
-											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
-											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
+											value: value,
+											text: value,
+											selected: false
 										}));
-						},
-						error: function () {
-							suggest.append(
-									$('<option>', {
-										value: value,
-										text: value,
-										selected: false
-									}));
-						}
-					});
-				} else {
-					$(this).empty();
-				}
-			})
-		} else {
-			if (value) {
+							}
+						});
+					} else {
+						$(this).empty();
+					}
+				});
+			} else {
 				$.ajax({
 					url: urlInicial,
 					async: false,
@@ -468,9 +468,32 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 								}));
 					}
 				});
-			} else {
-				$(this).empty();
 			}
+			
+		} else if (value != null && typeof value === 'number') {
+			$.ajax({
+				url: urlActual + "/item/" + value,
+				async: false,
+				global: false,
+				success: function(resposta) {
+					suggest.append(
+							$('<option>', {
+								value: resposta[suggestValue],
+								text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+								selected: true
+							}));
+				},
+				error: function () {
+					suggest.append(
+							$('<option>', {
+								value: value,
+								text: value,
+								selected: false
+							}));
+				}
+			});
+		} else {
+			$(this).empty();
 		}
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),

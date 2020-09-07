@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -25,9 +27,11 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
+import es.caib.ripea.war.command.MetaExpedientFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
 /**
@@ -39,6 +43,8 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/metaExpedient")
 public class MetaExpedientController extends BaseAdminController {
 
+	private static final String SESSION_ATTRIBUTE_FILTRE = "MetaExpedientController.session.filtre";
+	
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
@@ -53,22 +59,54 @@ public class MetaExpedientController extends BaseAdminController {
 		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
+		
+		MetaExpedientFiltreCommand command = getFiltreCommand(request);
+		model.addAttribute(command);
+		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		return "metaExpedientList";
 	}
 
+
+	@RequestMapping(value = "/filtrar", method = RequestMethod.POST)
+	public String post(
+			HttpServletRequest request,
+			@Valid MetaExpedientFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE);
+
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_FILTRE,
+						filtreCommand);
+			}
+		}
+		return "redirect:../metaExpedient";
+	}
+	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		PaginaDto<MetaExpedientDto> metaExps = null;
 		if (RolHelper.isRolActualAdministradorOrgan(request)) {
 			metaExps = metaExpedientService.findAmbOrganGestor(
 					entitatActual.getId(),
+					filtreCommand.asDto(),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		} else {
 			metaExps = metaExpedientService.findByEntitat(
 					entitatActual.getId(),
+					filtreCommand.asDto(),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
@@ -94,11 +132,7 @@ public class MetaExpedientController extends BaseAdminController {
 		command.setRolAdminOrgan(RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
-		if (RolHelper.isRolActualAdministrador(request)) {
-			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
-		}else {
-			model.addAttribute("organsGestors", organGestorService.findAccessiblesUsuariActual(entitatActual.getId()));
-		}
+
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		return "metaExpedientForm";
 	}
@@ -214,6 +248,23 @@ public class MetaExpedientController extends BaseAdminController {
 	public List<MetaExpedientDto> findAll(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		return metaExpedientService.findByEntitat(entitatActual.getId());
+	}
+	
+
+	private MetaExpedientFiltreCommand getFiltreCommand(
+			HttpServletRequest request) {
+		MetaExpedientFiltreCommand filtreCommand = (MetaExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new MetaExpedientFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE,
+					filtreCommand);
+		}
+
+		return filtreCommand;
 	}
 
 }

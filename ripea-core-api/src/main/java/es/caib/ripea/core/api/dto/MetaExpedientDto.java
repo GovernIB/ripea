@@ -7,13 +7,15 @@ import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Informació d'un MetaExpedient.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Data
+@Getter @Setter
 @SuppressWarnings("serial")
 public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
@@ -60,5 +62,16 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
             return false;
         return true;
     }
+    
+//	@Data
+//	public class MetaExpedientFiltreDto {
+//
+//		private String codi;
+//		private String nom;
+//		private Long organGestorId;
+//		private Boolean veureTots = true;
+//		private MetaExpedientActiuEnumDto actiu;
+//
+//	}
 
 }

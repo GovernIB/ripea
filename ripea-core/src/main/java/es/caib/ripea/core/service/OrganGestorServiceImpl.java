@@ -73,11 +73,19 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<OrganGestorDto> findByEntitat(Long entitatId, String filterText) {
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
+				entitat, filterText == null || filterText.isEmpty(), filterText);
+        return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
+    }
+    
+    @Override
     @Transactional
     public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty())
-		{
+		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
 			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
 		}
 		
@@ -119,37 +127,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 
         return true;
-    }
-
-    public List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
-        List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
-        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
-        if (organigramaDir3 != null) {
-            NodeDir3 arrel = organigramaDir3.get(codiDir3);
-            OrganGestorDto organisme = new OrganGestorDto();
-            organisme.setCodi(arrel.getCodi());
-            organisme.setNom(arrel.getDenominacio());
-            organisme.setPareCodi(null);
-            
-            organismes.add(organisme);
-            findOrganismesFills(arrel, organismes);
-        }
-        return organismes;
-    }
-    
-    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
-    {
-        for (NodeDir3 fill : root.getFills())
-        {
-            OrganGestorDto organisme = new OrganGestorDto();
-            organisme.setCodi(fill.getCodi());
-            organisme.setNom(fill.getDenominacio());
-            organisme.setPareCodi(root.getCodi());
-            
-            organismes.add(organisme);
-            
-            findOrganismesFills(fill, organismes);
-        }
     }
     
     @Override
@@ -241,9 +218,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
     @Override
     public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId) {
+       return findAccessiblesUsuariActual(entitatId, null);
+    }
+    
+    @Override
+    public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, String filterText) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-        List<OrganGestorEntity> resposta = organGestorRepository.findByEntitat(entitat);
+		List<OrganGestorEntity> resposta = organGestorRepository.findByEntitatAndFiltre(
+				entitat, filterText == null || filterText.isEmpty(), filterText);
+    	
 		permisosHelper.filterGrantedAnyList(
 				resposta,
 				new ListObjectIdentifiersExtractor<OrganGestorEntity>() {
@@ -262,6 +246,38 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				auth);
 
         return conversioTipusHelper.convertirList(resposta, OrganGestorDto.class);
+    }
+    
+    
+    private List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
+        List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
+        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);
+        if (organigramaDir3 != null) {
+            NodeDir3 arrel = organigramaDir3.get(codiDir3);
+            OrganGestorDto organisme = new OrganGestorDto();
+            organisme.setCodi(arrel.getCodi());
+            organisme.setNom(arrel.getDenominacio());
+            organisme.setPareCodi(null);
+            
+            organismes.add(organisme);
+            findOrganismesFills(arrel, organismes);
+        }
+        return organismes;
+    }
+    
+    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
+    {
+        for (NodeDir3 fill : root.getFills())
+        {
+            OrganGestorDto organisme = new OrganGestorDto();
+            organisme.setCodi(fill.getCodi());
+            organisme.setNom(fill.getDenominacio());
+            organisme.setPareCodi(root.getCodi());
+            
+            organismes.add(organisme);
+            
+            findOrganismesFills(fill, organismes);
+        }
     }
 
     private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
