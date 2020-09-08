@@ -157,8 +157,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaDadaCommand">
+	<form:form action="." method="post" cssClass="form-horizontal" commandName="metaDadaCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaNodeId"/>

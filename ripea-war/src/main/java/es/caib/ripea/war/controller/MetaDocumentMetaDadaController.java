@@ -3,13 +3,23 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +37,10 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  * Controlador per al manteniment de les meta-dades dels meta-expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
+ */
+/*
+ *  TODO: 	Aquesta classe i la classe MetaExpedientMetaDadaController tenen practicament el mateix codi.
+ *  		S'haurien d'unificar en un mateix codi.
  */
 @Controller
 @RequestMapping("/metaDocument")
@@ -139,6 +153,27 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 				request,
 				"redirect:../../metaDada",
 				"metadada.controller.esborrat.ok");
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	    binder.registerCustomEditor(
+	    		BigDecimal.class,
+	    		new CustomNumberEditor(
+	    				BigDecimal.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
+	    binder.registerCustomEditor(
+	    		Double.class,
+	    		new CustomNumberEditor(
+	    				Double.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
 	}
 
 }
