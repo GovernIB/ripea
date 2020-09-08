@@ -116,7 +116,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
-					"entitat",
+					"metaExpedient",
 					metaExpedientService.findById(
 							entitatActual.getId(),
 							metaExpedientId));
