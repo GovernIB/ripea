@@ -413,35 +413,36 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 							MetaExpedientDto.class);
 				}
-			} else {
-				if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
-					resposta = paginacioHelper.toPaginaDto(metaExpedientRepository.findByEntitat(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-							filtre.getCodi(),
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom(),
-							filtre.getActiu() == null,
-							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-							filtre.getOrganGestorId() == null,
-							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-							MetaExpedientDto.class);
-				} else {
-					resposta = paginacioHelper.toPaginaDto(metaExpedientRepository.findByEntitat(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-							filtre.getCodi(),
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom(),
-							filtre.getActiu() == null,
-							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-							filtre.getOrganGestorId() == null,
-							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
-							paginacioHelper.toSpringDataSort(paginacioParams)),
-							MetaExpedientDto.class);
-				}
 			}
+		} else {
+			if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
+				resposta = paginacioHelper.toPaginaDto(metaExpedientRepository.findByEntitat(
+						entitat,
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+						filtre.getCodi(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom(),
+						filtre.getActiu() == null,
+						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+						filtre.getOrganGestorId() == null,
+						filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
+						paginacioHelper.toSpringDataPageable(paginacioParams)),
+						MetaExpedientDto.class);
+			} else {
+				resposta = paginacioHelper.toPaginaDto(metaExpedientRepository.findByEntitat(
+						entitat,
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+						filtre.getCodi(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom(),
+						filtre.getActiu() == null,
+						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+						filtre.getOrganGestorId() == null,
+						filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
+						paginacioHelper.toSpringDataSort(paginacioParams)),
+						MetaExpedientDto.class);
+			}
+
 		}
 
 		metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());

@@ -111,5 +111,9 @@
 	<jee:local-slsb 
 			id="expedientEstatService" 
 			jndi-name="ripea/ExpedientEstatServiceBean/local" 
-			business-interface="es.caib.ripea.core.api.service.ExpedientEstatService"/>	 		
+			business-interface="es.caib.ripea.core.api.service.ExpedientEstatService"/>	 
+	<jee:local-slsb
+			id="grupService"
+			jndi-name="ripea/GrupServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.GrupService"/>		
 </beans>
