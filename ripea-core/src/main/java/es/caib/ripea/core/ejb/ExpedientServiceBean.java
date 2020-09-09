@@ -49,7 +49,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
-			boolean associarInteressats) {
+			boolean associarInteressats,
+			Long grupId) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -59,7 +60,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				sequencia,
 				nom,
 				expedientPeticioId,
-				associarInteressats);
+				associarInteressats,
+				grupId);
 	}
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -137,22 +138,7 @@ public interface MetaExpedientService {
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
-	/**
-	 * Consulta els meta-expedients d'una entitat de forma paginada.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina de meta-expedients.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<MetaExpedientDto> findByEntitat(
-			Long entitatId,
-			MetaExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+
 
 	/**
 	 * Consulta els meta-expedients actius per una entitat pels usuaris admins.
@@ -410,12 +396,19 @@ public interface MetaExpedientService {
 	  *             Si no s'ha trobat l'objecte amb l'id especificat.
 	  */
 	@PreAuthorize("hasRole('tothom')")
-	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
+	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
 			MetaExpedientFiltreDto filtre,
+			boolean isRolActualAdministradorOrgan,
 			PaginacioParamsDto paginacioParams);
 
 	public MetaExpedientDto getAndCheckAdminPermission(
 			Long entitatId,
 			Long id);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<GrupDto> findGrupsAmbMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId);
+
 }

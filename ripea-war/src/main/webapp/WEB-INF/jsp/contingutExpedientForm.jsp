@@ -19,7 +19,7 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 <script type="text/javascript">
 function refrescarSequencia() {
-	let metaExpedientId = $('select#metaNodeId').val();
+	let metaExpedientId = $('#metaNodeId').val();
 	let any = $('input#any').val();
 	if (metaExpedientId != undefined && any != undefined && any != "") {
 		$.ajax({
@@ -69,11 +69,52 @@ function recuperarDominisMetaExpedient() {
 		});
 	}
 }
+
+
+function refrescarGrups() {
+	let metaExpedientId = $('#metaNodeId').val();
+	if (metaExpedientId != undefined && metaExpedientId != "") {
+		
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
+			success: function(data) {
+				$('#gestioAmbGrupsActiva').val(data);
+				if (data) {
+					
+					$.ajax({
+						type: 'GET',
+						url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+						success: function(data) {
+							$('#grupId').closest('.form-group').show();
+							$('#grupId option[value!=""]').remove();
+							for (var i = 0; i < data.length; i++) {
+								$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+							}
+						}
+					});
+					
+				} else {
+					$('#grupId option[value!=""]').remove();
+					$('#grupId').closest('.form-group').hide();
+				}
+
+			}
+		});
+
+		
+		
+
+	}
+}
+
+
 $(document).ready(function() {
 	$('select#metaNodeId').change(function(event) {
 		refrescarSequencia();
+		refrescarGrups();
 	});
-	$('select#metaNodeId').trigger('change');
+	refrescarSequencia();
 	
 	$('input#any').change(function(event) {
 		refrescarSequencia();
@@ -103,6 +144,22 @@ $(document).ready(function() {
 		</c:choose>
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
+		<form:hidden path="gestioAmbGrupsActiva"/>
+		<c:choose>
+			<c:when test="${empty expedientCommand.id}">
+				<c:if test="${expedientCommand.gestioAmbGrupsActiva == true}">
+					<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
+				</c:if>
+			</c:when>
+			<c:otherwise>
+				<c:if test="${!empty expedientCommand.grupId}">
+					<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2" disabled="true"/>
+				</c:if>
+			</c:otherwise>
+		</c:choose>
+				
+		
+		
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

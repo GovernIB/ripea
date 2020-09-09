@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -85,14 +86,6 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.findByEntitatCodi(entitatId, codi);
 	}
 
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<MetaExpedientDto> findByEntitat(
-			Long entitatId,
-			MetaExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findByEntitat(entitatId, filtre, paginacioParams);
-	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
@@ -248,11 +241,18 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<MetaExpedientDto> findAmbOrganGestor(
+	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
 			MetaExpedientFiltreDto filtre,
+			boolean isRolActualAdministradorOrgan,
 			PaginacioParamsDto paginacioParams) {
-	    return delegate.findAmbOrganGestor(entitatId, filtre, paginacioParams);
+
+	    return delegate.findByEntitatOrOrganGestor(
+	    		entitatId,
+	    		filtre,
+	    		isRolActualAdministradorOrgan, 
+	    		paginacioParams);
+
 	}
 	
 	@Override
@@ -260,7 +260,18 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto getAndCheckAdminPermission(
 			Long entitatId,
 			Long id) {
-		return delegate.getAndCheckAdminPermission(entitatId,
+		return delegate.getAndCheckAdminPermission(
+				entitatId,
 				id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<GrupDto> findGrupsAmbMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegate.findGrupsAmbMetaExpedient(
+				entitatId, 
+				metaExpedientId);
 	}
 }

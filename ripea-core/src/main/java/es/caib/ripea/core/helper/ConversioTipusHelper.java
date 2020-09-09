@@ -98,6 +98,20 @@ public class ConversioTipusHelper {
 					}
 				});
 		
+		
+//		mapperFactory.getConverterFactory().registerConverter(
+//		new CustomConverter<GrupEntity, GrupDto>() {
+//			public GrupDto convert(GrupEntity source, Type<? extends GrupDto> destinationClass) {
+//				GrupDto target = new GrupDto();
+//				target.setId(source.getId());
+//				target.setRol(source.getRol());
+//				target.setDescripcio(source.getDescripcio());
+//
+//
+//				return target;
+//			}
+//		});
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientTascaEntity, ExpedientTascaDto>() {
 					public ExpedientTascaDto convert(ExpedientTascaEntity source, Type<? extends ExpedientTascaDto> destinationClass) {

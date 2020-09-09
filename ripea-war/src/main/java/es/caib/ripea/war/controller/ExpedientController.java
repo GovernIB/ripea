@@ -43,6 +43,7 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
@@ -368,9 +369,19 @@ public class ExpedientController extends BaseUserController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
+		
+		List<MetaExpedientDto> metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedients);
+		
+		model.addAttribute(
+				"grups",
+				metaExpedientService.findGrupsAmbMetaExpedient(
+						entitatActual.getId(),
+						expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId()));
+		command.setGestioAmbGrupsActiva(metaExpedients.get(0).isGestioAmbGrupsActiva());
+		
 		return "contingutExpedientForm";
 	}
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
@@ -397,7 +408,8 @@ public class ExpedientController extends BaseUserController {
 					null,
 					command.getNom(),
 					null,
-					false);
+					false,
+					command.getGrupId());
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -444,6 +456,28 @@ public class ExpedientController extends BaseUserController {
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
 		}		
+	}
+	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/grup", method = RequestMethod.GET)
+	@ResponseBody
+	public List<GrupDto> grups(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.findGrupsAmbMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId);
+	}
+	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean gestioAmbGrupsActiva(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.findById(
+				entitatActual.getId(),
+				metaExpedientId).isGestioAmbGrupsActiva();
 	}
 	
 	

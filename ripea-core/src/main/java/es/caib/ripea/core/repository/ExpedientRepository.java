@@ -73,66 +73,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("expedient") ExpedientEntity expedient);
 	
 	
-	@Query(	"from" +
-			"    ExpedientEntity e " +
-			"where " +
-			"    e.esborrat = 0 " +
-			"and e.entitat = :entitat " +
-			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
-			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
-			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
-			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
-			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
-			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
-			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
-			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
-			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
-			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
-			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " + 
-			"and (:esNullInteressat = true " +
-			"		or  e.id in (" +
-			"			select interessat.expedient.id " +
-			"			from InteressatEntity interessat " +	
-			"			where interessat.esRepresentant = false " +
-			"				and (lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
-			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
-			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " + 
-			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0)")
-	Page<ExpedientEntity> findByEntitatAndFiltre(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
-			@Param("esNullMetaNode") boolean esNullMetaNode,
-			@Param("metaNode") MetaNodeEntity metaNode,	
-			@Param("esNullNumero") boolean esNullNumero,
-			@Param("numero") String numero,
-			@Param("esNullNom") boolean esNullNom,
-			@Param("nom") String nom,
-			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
-			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi,
-			@Param("esNullTancatInici") boolean esNullTancatInici,
-			@Param("tancatInici") Date tancatInici,
-			@Param("esNullTancatFi") boolean esNullTancatFi,
-			@Param("tancatFi") Date tancatFi,
-			@Param("esNullEstatEnum") boolean esNullEstatEnum,
-			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
-			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEntity estat,
-			@Param("esNullAgafatPer") boolean esNullAgafatPer,
-			@Param("agafatPer") UsuariEntity agafatPer,
-			@Param("esNullSearch") boolean esNullSearch,
-			@Param("search") String search,
-			@Param("esNullTipusId") boolean esNullTipusId,
-			@Param("tipusId") Long tipusId,
-			@Param("esNullInteressat") boolean esNullInteressat,
-			@Param("interessat") String interessat,	
-			@Param("esNullMetaExpedientDominiValor") boolean esNullMetaExpedientDominiValor,
-			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
-			Pageable pageable);
 	
 	
 	
@@ -155,7 +95,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
-			"and e not in :expedientRelacionats " +
+			"and (:esNullExpedientsToBeExcluded = true or e not in :expedientsToBeExluded) " + 
 			"and (:esNullInteressat = true " +
 			"		or  e.id in (" +
 			"			select interessat.expedient.id " +
@@ -165,7 +105,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select valor from DadaEntity dada where dada.node = e.id) = (:metaExpedientDominiValor)) ")
+			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
+			"and (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser)))) "
+			)
 	Page<ExpedientEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
@@ -193,12 +135,19 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("search") String search,
 			@Param("esNullTipusId") boolean esNullTipusId,
 			@Param("tipusId") Long tipusId,
-			@Param("expedientRelacionats") List<ExpedientEntity> expedientRelacionats,
+			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded, 
+			@Param("expedientsToBeExluded") List<ExpedientEntity> expedientsToBeExluded,
 			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat,
 			@Param("esNullMetaExpedientDominiValor") boolean esNullMetaExpedientDominiValor,
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
+			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
+			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			Pageable pageable);
+	
+	
+	
+	
 
 	@Query(	"select" +
 			"    e.id " +

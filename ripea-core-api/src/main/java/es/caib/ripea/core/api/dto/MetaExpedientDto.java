@@ -27,9 +27,13 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     private int expedientEstatsCount;
     private int expedientTasquesCount;
     private int expedientDominisCount;
+    private int grupsCount;
     private List<MetaDocumentDto> metaDocuments;
     private boolean permetMetadocsGenerals;
     private OrganGestorDto organGestor;
+    
+    private boolean gestioAmbGrupsActiva;
+    
 
     public int getMetaDocumentsCount() {
         if (metaDocuments == null)

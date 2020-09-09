@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -11,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -60,6 +64,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
     protected Set<ExpedientEstatEntity> estats;
+    
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "entitat_id")
@@ -72,10 +77,42 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     @JoinColumn(name = "organ_gestor_id")
     @ForeignKey(name = "ipa_organ_gestor_metaexp_fk")
     private OrganGestorEntity organGestor;
+    
+    @Column(name = "gestio_amb_grups_activa", nullable = false)
+    private boolean gestioAmbGrupsActiva;
+    
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "ipa_metaexpedient_grup",
+			joinColumns = {@JoinColumn(name = "metaexpedient_id", referencedColumnName="id")},
+			inverseJoinColumns = {@JoinColumn(name = "grup_id")})
+	@ForeignKey(
+			name = "ipa_metaexp_metaexpgrup_fk",
+			inverseName = "ipa_grup_metaexpgrup_fk")
+	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
+	
 
-    public void update(String codi, String nom, String descripcio, String classificacioSia,
-                       String serieDocumental, String expressioNumero, boolean notificacioActiva,
-                       boolean permetMetadocsGenerals, MetaExpedientEntity pare, OrganGestorEntity organGestor) {
+	public void addGrup(GrupEntity grup) {
+		grups.add(grup);
+	}
+	
+	public void removeGrup(GrupEntity grup) {
+		grups.remove(grup);
+	}
+
+
+	public void update(
+			String codi,
+			String nom,
+			String descripcio,
+			String classificacioSia,
+			String serieDocumental,
+			String expressioNumero,
+			boolean notificacioActiva,
+			boolean permetMetadocsGenerals,
+			MetaExpedientEntity pare,
+			OrganGestorEntity organGestor,
+			boolean gestioAmbGrupsActiva) {
         super.update(codi, nom, descripcio);
         this.classificacioSia = classificacioSia;
         this.serieDocumental = serieDocumental;
@@ -85,22 +122,50 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.codiPropi = codi;
         this.permetMetadocsGenerals = permetMetadocsGenerals;
         this.organGestor = organGestor;
+        this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
     }
 
-    public static Builder getBuilder(String codi, String nom, String descripcio, String serieDocumental,
-                                     String classificacioSia, boolean notificacioActiva,
-                                     boolean permetMetadocsGenerals, EntitatEntity entitat,
-                                     MetaExpedientEntity pare, OrganGestorEntity organGestor) {
-        return new Builder(codi, nom, descripcio, serieDocumental, classificacioSia, entitat, pare,
-                notificacioActiva, permetMetadocsGenerals, organGestor);
-    }
+	public static Builder getBuilder(
+			String codi,
+			String nom,
+			String descripcio,
+			String serieDocumental,
+			String classificacioSia,
+			boolean notificacioActiva,
+			boolean permetMetadocsGenerals,
+			EntitatEntity entitat,
+			MetaExpedientEntity pare,
+			OrganGestorEntity organGestor,
+			boolean gestioAmbGrupsActiva) {
+		return new Builder(
+				codi,
+				nom,
+				descripcio,
+				serieDocumental,
+				classificacioSia,
+				entitat,
+				pare,
+				notificacioActiva,
+				permetMetadocsGenerals,
+				organGestor,
+				gestioAmbGrupsActiva);
+	}
 
     public static class Builder {
         MetaExpedientEntity built;
 
-        Builder(String codi, String nom, String descripcio, String serieDocumental, String classificacioSia,
-                EntitatEntity entitat, MetaExpedientEntity pare, boolean notificacioActiva,
-                boolean permetMetadocsGenerals, OrganGestorEntity organGestor) {
+		Builder(
+				String codi,
+				String nom,
+				String descripcio,
+				String serieDocumental,
+				String classificacioSia,
+				EntitatEntity entitat,
+				MetaExpedientEntity pare,
+				boolean notificacioActiva,
+				boolean permetMetadocsGenerals,
+				OrganGestorEntity organGestor,
+				boolean gestioAmbGrupsActiva) {
             built = new MetaExpedientEntity();
             built.codi = codi;
             built.nom = nom;
@@ -115,6 +180,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.entitatPropia = entitat;
             built.permetMetadocsGenerals = permetMetadocsGenerals;
             built.organGestor = organGestor;
+            built.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
         }
 
         public Builder expressioNumero(String expressioNumero) {

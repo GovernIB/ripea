@@ -78,6 +78,7 @@
  					required="${ isRolAdminOrgan }"/>		 
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
 				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
+				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa"/>

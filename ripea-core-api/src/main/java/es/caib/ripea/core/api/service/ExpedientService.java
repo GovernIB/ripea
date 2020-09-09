@@ -61,7 +61,8 @@ public interface ExpedientService {
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
-			boolean associarInteressats) throws NotFoundException, ValidationException;
+			boolean associarInteressats,
+			Long grupId) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un expedient.

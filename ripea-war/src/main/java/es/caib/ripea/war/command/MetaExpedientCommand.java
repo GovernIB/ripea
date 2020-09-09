@@ -56,6 +56,10 @@ public class MetaExpedientCommand {
 	private Long entitatId;
 
 	private boolean isRolAdminOrgan;
+	
+    private boolean gestioAmbGrupsActiva;
+	
+    
 
 	public MetaExpedientCommand(boolean isRolOrgan) {
 		this.isRolAdminOrgan = isRolOrgan;

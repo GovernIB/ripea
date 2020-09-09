@@ -53,6 +53,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean errorLastNotificacio;
 	private boolean ambEnviamentsPendents;
 	private boolean ambNotificacionsPendents;
+	private Long grupId;
 //	public String getInteressatsResum() {
 //		String interessatsResum = "";
 //		if (this.getInteressats() != null)
@@ -322,5 +323,11 @@ public class ExpedientDto extends NodeDto {
 	}
 	public void setAmbNotificacionsPendents(boolean ambNotificacionsPendents) {
 		this.ambNotificacionsPendents = ambNotificacionsPendents;
+	}
+	public Long getGrupId() {
+		return grupId;
+	}
+	public void setGrupId(Long grupId) {
+		this.grupId = grupId;
 	}
 }

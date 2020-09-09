@@ -95,6 +95,12 @@
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="gestioAmbGrupsActiva" data-template="#cellGestioAmbGrupsActivaTemplate" width="1%">
+					<spring:message code="metaexpedient.list.columna.gestioAmbGrupsActiva"/>
+					<script id="cellGestioAmbGrupsActivaTemplate" type="text/x-jsrender">
+						{{if gestioAmbGrupsActiva}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>				
 				<th data-col-name="metaDocumentsCount" data-template="#cellMetaDocumentsTemplate" data-orderable="false" width="1%">
 					<script id="cellMetaDocumentsTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/metaDocument" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.documents"/>&nbsp;<span class="badge">{{:metaDocumentsCount}}</span></a>
@@ -113,6 +119,11 @@
 				<th data-col-name="expedientTasquesCount" data-template="#cellTasquesTemplate" data-orderable="false" width="1%">
 					<script id="cellTasquesTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/tasca" class="btn btn-default"><spring:message code="metaexpedient.list.boto.tasques"/>&nbsp;<span class="badge">{{:expedientTasquesCount}}</span></a>
+					</script>
+				</th>
+				<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="1%">
+					<script id="cellGrupsTemplate" type="text/x-jsrender">
+						<a href="metaExpedient/{{:id}}/grup" class="btn btn-default"><spring:message code="metaexpedient.list.boto.grups"/>&nbsp;<span class="badge">{{:grupsCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">

@@ -94,18 +94,22 @@ public class EntityComprovarHelper {
 	@Resource
 	private OrganGestorRepository organGestorRepository;
 	
-	
-	public EntitatEntity comprovarEntitat(String entitatCodi, boolean comprovarPermisUsuari,
-	                                      boolean comprovarPermisAdmin,
-	                                      boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
+	public EntitatEntity comprovarEntitat(
+			String entitatCodi,
+			boolean comprovarPermisUsuari,
+			boolean comprovarPermisAdmin,
+			boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
 
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(entitatCodi);
 
 		if (entitat == null) {
 			throw new NotFoundException(entitatCodi, EntitatEntity.class);
 		}
-		return comprovarEntitat(entitat.getId(), comprovarPermisUsuari, comprovarPermisAdmin,
-		        comprovarPermisUsuariOrAdmin);
+		return comprovarEntitat(
+				entitat.getId(),
+				comprovarPermisUsuari,
+				comprovarPermisAdmin,
+				comprovarPermisUsuariOrAdmin);
 
 	}
 
@@ -128,9 +132,11 @@ public class EntityComprovarHelper {
 		return entitat;
 	}
 	
-	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisUsuari,
-	                                      boolean comprovarPermisAdmin,
-	                                      boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
+	public EntitatEntity comprovarEntitat(
+			Long entitatId,
+			boolean comprovarPermisUsuari,
+			boolean comprovarPermisAdmin,
+			boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
 		EntitatEntity entitat = entitatRepository.findOne(entitatId);
 		if (entitat == null) {
 			throw new NotFoundException(entitatId, EntitatEntity.class);

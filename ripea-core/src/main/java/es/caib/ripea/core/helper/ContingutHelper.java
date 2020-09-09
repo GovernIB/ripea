@@ -59,6 +59,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -74,6 +75,7 @@ import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -103,6 +105,8 @@ public class ContingutHelper {
 	private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired
+	private GrupRepository grupRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
 	@Autowired
@@ -234,6 +238,7 @@ public class ContingutHelper {
 			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
 			dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
 			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			resposta = dto;
 
 		// ##################### DOCUMENT ##################################
@@ -909,12 +914,19 @@ public class ContingutHelper {
 			Date ntiFechaApertura,
 			Integer any,
 			Long sequencia,
-			boolean agafar) {
+			boolean agafar,
+			Long grupId) {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			agafatPer = usuariRepository.getOne(auth.getName());
 		}
+		
+		GrupEntity grupEntity = null;
+		if (grupId != null) {
+			grupEntity = grupRepository.findOne(grupId);
+		}
+		
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
@@ -925,6 +937,7 @@ public class ContingutHelper {
 				ntiFechaApertura,
 				metaExpedient.getClassificacioSia()).
 				agafatPer(agafatPer).
+				grup(grupEntity).
 				build();
 		// Calcula en número del nou expedient
 		long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(

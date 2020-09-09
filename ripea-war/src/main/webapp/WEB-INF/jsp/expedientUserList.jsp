@@ -6,11 +6,11 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-// pageContext.setAttribute(
-// 		"expedientEstatsOptdions",
-// 		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-// 		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
-// 		"expedient.estat.enum."));
+//pageContext.setAttribute(
+//		"expedientEstatsOptdions",
+//		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+//		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
+//		"expedient.estat.enum."));
 %>
 <html>
 <head>
@@ -315,7 +315,7 @@ function removeCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="16" 
+		data-default-order="18" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -428,4 +428,5 @@ function removeCookie(cname) {
 			</tr>
 		</thead>
 	</table>
+
 </body>

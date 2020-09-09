@@ -118,7 +118,8 @@ public class ExpedientHelper {
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
-			boolean associarInteressats) {
+			boolean associarInteressats,
+			Long grupId) {
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
@@ -173,7 +174,8 @@ public class ExpedientHelper {
 				new Date(),
 				any,
 				sequencia,
-				true);
+				true,
+				grupId);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		//find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;

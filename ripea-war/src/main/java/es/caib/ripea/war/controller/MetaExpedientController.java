@@ -97,18 +97,15 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		PaginaDto<MetaExpedientDto> metaExps = null;
-		if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			metaExps = metaExpedientService.findAmbOrganGestor(
-					entitatActual.getId(),
-					filtreCommand.asDto(),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
 
-		} else {
-			metaExps = metaExpedientService.findByEntitat(
-					entitatActual.getId(),
-					filtreCommand.asDto(),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
-		}
+
+		metaExps = metaExpedientService.findByEntitatOrOrganGestor(
+				entitatActual.getId(),
+				filtreCommand.asDto(),
+				RolHelper.isRolActualAdministradorOrgan(request),
+				DatatablesHelper.getPaginacioDtoFromRequest(request));
+
+
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
 		return dtr;
 	}
