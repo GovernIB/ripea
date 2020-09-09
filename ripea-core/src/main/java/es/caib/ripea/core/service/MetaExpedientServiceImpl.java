@@ -426,6 +426,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 						filtre.getOrganGestorId() == null,
 						filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
+						filtre.getVeureTots() != null ? filtre.getVeureTots() : false, 
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 						MetaExpedientDto.class);
 			} else {
@@ -439,6 +440,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 						filtre.getOrganGestorId() == null,
 						filtre.getOrganGestorId() != null ? organGestorRepository.findOne(filtre.getOrganGestorId()) : null,
+						filtre.getVeureTots() != null ? filtre.getVeureTots() : false, 
 						paginacioHelper.toSpringDataSort(paginacioParams)),
 						MetaExpedientDto.class);
 			}

@@ -37,6 +37,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:hideWithoutOrganGestor = true or me.organGestor != null) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
 	List<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
@@ -47,7 +48,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullActiu") boolean esNullActiu,
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
-			@Param("organGestor") OrganGestorEntity organGestor,	
+			@Param("organGestor") OrganGestorEntity organGestor,
+			@Param("hideWithoutOrganGestor") boolean hideWithoutOrganGestor,
 			Sort sort);
 	  
 	@Query( "from " +
@@ -79,6 +81,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:hideWithoutOrganGestor = true or me.organGestor != null) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
@@ -90,6 +93,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
 			@Param("organGestor") OrganGestorEntity organGestor,	
+			@Param("hideWithoutOrganGestor") boolean hideWithoutOrganGestor,
 			Pageable pageable);
 
 	@Query( "from " +
