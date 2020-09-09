@@ -65,11 +65,13 @@ public class GrupServiceBean implements GrupService {
 	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
-			Long metaExpedientId, PaginacioParamsDto paginacioParams)
+			Long metaExpedientId, 
+			PaginacioParamsDto paginacioParams)
 			throws NotFoundException {
 		return delegate.findByEntitatPaginat(
 				entitatId, 
-				null, paginacioParams);
+				metaExpedientId, 
+				paginacioParams);
 	}
 
 	@Override
