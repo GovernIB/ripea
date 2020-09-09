@@ -49,7 +49,8 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
 public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
 
     private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
-
+    private static final String SERVEI_OBTENIR_UNITATS = "/ws/Dir3CaibObtenerUnidades";
+    
     public Map<String, NodeDir3> organigrama(String codi) throws SistemaExternException {
         Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
         try {
@@ -77,7 +78,8 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
     @Override
     public List<UnitatOrganitzativa> findAmbPare(String pareCodi) throws SistemaExternException {
         try {
-            UnidadTF unidadPare = getObtenerUnidadesService().obtenerUnidad(pareCodi, null, null);
+        	Dir3CaibObtenerUnidadesWs service = getObtenerUnidadesService();
+            UnidadTF unidadPare = service.obtenerUnidad(pareCodi, null, null);
             if (unidadPare != null) {
                 List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
                 List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(pareCodi, null,
@@ -161,12 +163,13 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
     private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
         Dir3CaibObtenerUnidadesWs client = null;
-        URL url = new URL(getServiceUrl() + "?wsdl");
+        String urlServei = getServiceUrl() + SERVEI_OBTENIR_UNITATS;
+        URL url = new URL(urlServei + "?wsdl");
         Dir3CaibObtenerUnidadesWsService service = new Dir3CaibObtenerUnidadesWsService(url,
                 new QName("http://unidad.ws.dir3caib.caib.es/", "Dir3CaibObtenerUnidadesWsService"));
         client = service.getDir3CaibObtenerUnidadesWs();
         BindingProvider bp = (BindingProvider) client;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, getServiceUrl());
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, urlServei);
         String username = getServiceUsername();
         if (username != null && !username.isEmpty()) {
             bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, username);

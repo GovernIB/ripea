@@ -513,10 +513,10 @@ function canviVisibilitat(tipus) {
 			</div>
 		</div>
 		<!-- Selector d'administració i botó per obrir filtre -->
-		<div class="row">
-			<div class="col-xs-12 organ"><rip:inputSelect name="organCodi" textKey="interessat.form.camp.organCodi" optionItems="${unitatsOrganitzatives}" optionTextAttribute="denominacio" optionValueAttribute="codi" emptyOption="true" required="true" optionMinimumResultsForSearch="6" labelSize="2"/></div>
+<!-- 		<div class="row"> -->
+			<div class="col-xs-11 organ"><rip:inputSelect name="organCodi" textKey="interessat.form.camp.organCodi" optionItems="${unitatsOrganitzatives}" optionTextAttribute="denominacio" optionValueAttribute="codi" emptyOption="true" required="true" optionMinimumResultsForSearch="6" labelSize="2"/></div>
 			<div class="col-xs-1 organ-btn"><button type="button" class="btn btn-default" data-toggle="collapse" data-target="#organ-filtre"><span class="fa fa-bars"></span></button></div>
-		</div>
+<!-- 		</div> -->
 		<!-- FILA: Document interessat -->
 		<div class="row">
 			<div class="col-xs-6"><rip:inputSelect name="documentTipus" textKey="interessat.form.camp.document.tipus" optionItems="${documentTipusEnumOptions}" optionTextKeyAttribute="text" optionValueAttribute="value" /></div>
