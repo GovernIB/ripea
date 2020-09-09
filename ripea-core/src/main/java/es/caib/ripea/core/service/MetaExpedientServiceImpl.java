@@ -581,9 +581,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"metaExpedientTasca=" + metaExpedientTasca + ")");
 		
 
-		ExpedientEstatEntity estatCrearTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca());
-		ExpedientEstatEntity estatFinalitzarTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca());
-		
+		ExpedientEstatEntity estatCrearTasca = null;
+		if (metaExpedientTasca.getEstatIdCrearTasca() != null) {
+			estatCrearTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca());
+		}
+		ExpedientEstatEntity estatFinalitzarTasca = null;
+		if (metaExpedientTasca.getEstatIdFinalitzarTasca() != null) {
+			estatFinalitzarTasca = expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca());
+		}
+
 		MetaExpedientTascaEntity entity = getMetaExpedientTasca(
 				entitatId,
 				metaExpedientId,
