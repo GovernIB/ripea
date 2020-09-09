@@ -456,7 +456,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null,
 								"Expedient de test2 (" + System.currentTimeMillis() + ")",
 								null,
-								false);
+								false, 
+								null);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),
