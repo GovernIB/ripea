@@ -5,6 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
 <c:set var="expedientPare" value="${contingut.expedientPare}"/>
 <c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
 <c:set var="potModificarContingut" value="${false}"/>
@@ -349,6 +350,49 @@ body.loading {
 body.loading .rmodal {
     display: block;
 }
+
+
+/** SPINNER CREATION **/
+
+.loader {
+  position: relative;
+  text-align: center;
+  margin: 15px auto 35px auto;
+  z-index: 9999;
+  display: block;
+  width: 80px;
+  height: 80px;
+  border: 10px solid rgba(0, 0, 0, .3);
+  border-radius: 50%;
+  border-top-color: #000;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+.loader-txt {
+  p {
+    font-size: 13px;
+    color: #666;
+    small {
+      font-size: 11.5px;
+      color: #999;
+    }
+  }
+}
+
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -576,11 +620,61 @@ $(document).ready(function() {
 		$(this).next().removeClass().addClass('glyphicon glyphicon-pencil form-control-feedback');
 		$(this).attr('title', 'Valor modificat pendent de guardar');
 	}
+	
+	function setCheckboxFalse($checkbox, isDisabled)
+	{
+		var hiddenCheckbox = $checkbox.clone(true);
+		hiddenCheckbox.attr('type', 'hidden');
+		hiddenCheckbox.attr('value', 'false');
+		hiddenCheckbox.removeAttr('data-toggle');
+		hiddenCheckbox.insertAfter($checkbox);
+		if (!isDisabled)
+			hiddenCheckbox.removeAttr('disabled')
+		
+		$checkbox.removeAttr('checked')
+		$checkbox.attr('value', 'false');
+	}
+	
+	function setCheckboxTrue($checkbox)
+	{
+		$checkbox.attr('value', 'true');
+		$checkbox.attr('checked', 'checked');
+		console.log("set to true");
+		console.log($checkbox.next());
+		$checkbox.next().remove();
+	}
+	
+	$('input[data-toggle="checkbox"]', this).each(function() {
+		$(this).attr('type', 'checkbox');
+		var isDisabled = $(this).closest('div.form-group').data('toggle') == "multifield";
+		if($(this).attr('value') == 'true'){
+			$(this).attr('checked', 'checked');
+			
+		}else{
+			setCheckboxFalse($(this), isDisabled);
+		}
+	});
+	
+	$('form#nodeDades').on('change', 'input[data-toggle="checkbox"]', function() {
+		if($(this).attr('value') == 'true'){
+			setCheckboxFalse($(this), false);
+			
+		} else{
+			setCheckboxTrue($(this));
+		}
+		
+	});
+	
+	$('form#nodeDades').on('DOMNodeInserted', 'div[data-multifield-clon="true"]', function () {
+		$(this).find('input').prop('disabled', '');
+	});
+	
 	$('#nodeDades input').change(nodeDadesInputChange);
-	$('form#nodeDades').submit(function() {
+	$('#dades').on('submit', 'form#nodeDades', function() {
+		showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
 		$.post(
 				'../ajax/contingutDada/${contingut.id}/save',
-				$('#nodeDades').serialize(),
+				$(this).serialize(),
 				function (data) {
 					if (data.estatOk) {
 						$('#nodeDades input').each(function() {
@@ -599,12 +693,13 @@ $(document).ready(function() {
 								$(this).removeAttr('title');
 							}
 						});
-						$.get(
-								'../ajax/contingutDada/${contingut.id}/count',
-								function (data) 
-								<%-- 	<meta name="subtitle" content="${serveiPerTitol}"/> --%>{
-									$('#dades-count').html(data);
-								});
+// 						$.get(
+// 								'../ajax/contingutDada/${contingut.id}/count',
+// 								function (data) 
+<%-- 									<meta name="subtitle" content="${serveiPerTitol}"/>{ --%>
+// 									$('#dades-count').html(data);
+// 								});
+						
 					} else {
 						$('#nodeDades input').each(function() {
 							for (var i = 0; i < data.errorsCamps.length; i++) {
@@ -622,7 +717,8 @@ $(document).ready(function() {
 							}
 						});
 					}
-					webutilRefreshMissatges();
+// 					webutilRefreshMissatges();
+					location.reload();
 				});
 		return false;
 	});
@@ -1162,6 +1258,37 @@ function addLoading(idModal) {
 function removeLoading() {
 	$('body').removeClass('loading');
 }
+
+function modalLoading(modalDivId, modalData, message){
+	return  '<div id="' + modalDivId + '"' + modalData + '>' +
+			'	<div class="modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
+			'		<div class="modal-dialog modal-sm" role="document">' +
+		    '			<div class="modal-content" style="border-radius: 0px;box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);">' +
+		    '				<div class="modal-body text-center">' +
+		    '					<div class="loader"></div>' +
+			'					<div clas="loader-txt">' +
+			'						<p>' + message + '</p>' +
+			'					</div>' +
+			'				</div>' +
+		    '			</div>' +
+			'		</div>' +
+			'	</div>' +
+			'</div>';
+}
+function showLoadingModal(message) {
+	var modalDivId = "modalLoading";
+	
+	modalData = "";
+	if ($('#' + modalDivId).length == 0 ) {
+		$('body').append(modalLoading(modalDivId, modalData, message));
+	} 
+	var modalobj = $('#' + modalDivId + ' > div.modal');
+	modalobj.modal({
+	      backdrop: "static", //remove ability to close modal with click
+	      keyboard: false, //remove option to close with keyboard
+	      show: true //Display loader!
+	    });
+}
 </script>
 
 </head>
@@ -1647,7 +1774,7 @@ function removeLoading() {
 						<div class="tab-pane" id="dades">
 							<c:choose>
 								<c:when test="${not empty metaDades}">
-									<form:form onsubmit="window.location.reload();" id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
+									<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
 										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 											<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 										</c:if>
@@ -1666,7 +1793,7 @@ function removeLoading() {
 														<c:set var="dadaValor">${dada.valorMostrar}</c:set>
 													</c:if>
 												</c:forEach>
-												<c:set var="isMultiple" value="${metaDada.multiplicitat == 'M_0_N' or metaNodeMetaDada.multiplicitat == 'M_1_N'}"/>
+												<c:set var="isMultiple" value="${metaDada.multiplicitat == 'M_0_N' or metaDada.multiplicitat == 'M_1_N'}"/>
 												<c:set var="multipleClass" value=""/>
 												<c:if test="${isMultiple}"><c:set var="multipleClass" value=" multiple"/></c:if>
 												<tr>
@@ -1674,7 +1801,7 @@ function removeLoading() {
 													<td>
 														<c:choose>
 															<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
-																<div class="form-group <c:if test="${metaDada.tipus == 'DOMINI'}">col-xs-12</c:if>"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
+																<div class="form-group ${metaDada.tipus == 'DOMINI' ? '' :''}" ${metaDada.tipus == 'DOMINI' ? 'style="width: 100%;margin-bottom: -10px;"' :''} <c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																	<label class="hidden" for="${metaDada.codi}"></label>
 																	<div class="controls">
 																		<c:choose>
@@ -1688,10 +1815,12 @@ function removeLoading() {
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DATA'}">
-																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
+																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" data-a-dec="," data-a-sep="." data-m-dec="2" cssClass="form-control text-right${multipleClass}"></form:input>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'BOOLEA'}">
-																				<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
+																			<label>
+																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="checkbox" data-a-dec="," data-a-sep="." data-m-dec="2" class="${multipleClass}"></form:input>
+																			</label>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DOMINI'}">
 																			

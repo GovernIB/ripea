@@ -284,7 +284,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			} while ($next.length);
 			$puntInsercio.after($clon);
 			var $buttonAfegir = $('<div class="form-group"><button class="btn btn-default"><span class="fa fa-plus"></span></button></div>');
-			$buttonAfegir.css('margin-left', '4px');
+			// $buttonAfegir.css('margin-left', '4px');
 			$clon.after($buttonAfegir);
 			$('button', $buttonAfegir).on('click', function() {
 				multifieldAfegirNouClick();
@@ -307,7 +307,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		if ($multifield.data('nou')) {
 			multifieldAfegirClick = multifieldAfegirNouClick;
 		}
-		var valor = $multifieldInput.val();
+		var valor = $multifieldInput.attr("value");
 		var separador = ',';
 		if (valor && valor.indexOf(separador) != -1) {
 			var parts = valor.split(separador);

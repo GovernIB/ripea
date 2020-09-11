@@ -219,6 +219,9 @@ public class DominiServiceImpl implements DominiService {
 				true,
 				false,
 				false);
+		if (domini == null) {
+			return new ArrayList<ResultatDominiDto>();
+		}
 		JdbcTemplate jdbcTemplate = null;
 		Properties conProps = dominiHelper.getProperties(domini);
 		

@@ -24,6 +24,23 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<style>
+	#metaExpedientFiltreForm {
+		margin-bottom: 15px;
+	}
+	</style>
+	<script type="text/javascript">
+	$(function() {
+	    $("form input").keypress(function (e) {
+	        if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+	            $("#metaExpedientFiltreForm").submit()
+	            return false;
+	        } else {
+	            return true;
+	        }
+	    });
+	});
+	</script>
 </head>
 <body>
 	<div class="text-right" data-toggle="botons-titol">
@@ -65,7 +82,7 @@
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary default"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
 		</div>
