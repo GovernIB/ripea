@@ -105,7 +105,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					false,
 					false);
 		}
-		Long organGestorId = metaExpedient.getOrganGestor().getId();
+		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
 		MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
 				metaExpedient.getCodi(),
 				metaExpedient.getNom(),

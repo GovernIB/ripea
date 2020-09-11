@@ -46,7 +46,6 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -619,7 +618,7 @@ public class ExpedientController extends BaseUserController {
 					request,
 					"redirect:../../contingut/" + expedientId,
 					"expedient.controller.tancar.ok");
-		} catch (ExpedientTancarSenseDocumentsDefinitiusException ex) {
+		} catch (Exception ex) {
 			omplirModelTancarExpedient(
 					expedientId,
 					request,

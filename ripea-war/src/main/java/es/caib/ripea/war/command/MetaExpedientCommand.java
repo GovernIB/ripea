@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
 import es.caib.ripea.war.validation.OrganGestorMetaExpedientNotNull;
@@ -84,7 +85,13 @@ public class MetaExpedientCommand {
 	}
 
 	public static MetaExpedientDto asDto(MetaExpedientCommand command) {
-		return ConversioTipusHelper.convertir(command, MetaExpedientDto.class);
+		MetaExpedientDto dto = ConversioTipusHelper.convertir(command, MetaExpedientDto.class);
+		if (command.getOrganGestorId() != null) {
+			OrganGestorDto organ = new OrganGestorDto();
+			organ.setId(command.getOrganGestorId());
+			dto.setOrganGestor(organ);
+		}
+		return dto;
 	}
 
 }

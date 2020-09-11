@@ -146,10 +146,8 @@ public class MetaExpedientController extends BaseAdminController {
 			model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 			return "metaExpedientForm";
 		}
-		MetaExpedientDto dto = MetaExpedientCommand.asDto(command);
-		OrganGestorDto organ = new OrganGestorDto();
-		organ.setId(command.getOrganGestorId());
-		dto.setOrganGestor(organ);
+		
+		MetaExpedientDto dto = MetaExpedientCommand.asDto(command);		
 		if (command.getId() != null) {
 			metaExpedientService.update(entitatActual.getId(), dto);
 			return getModalControllerReturnValueSuccess(
