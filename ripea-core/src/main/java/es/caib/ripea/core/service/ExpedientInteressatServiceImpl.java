@@ -502,13 +502,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		return conversioTipusHelper.convertirList(
 				interessatRepository.findByFiltrePersonaFisica(
-						nom == null,
+						nom == null || nom.isEmpty(),
 						nom,
-						documentNum == null,
+						documentNum == null || documentNum.isEmpty(),
 						documentNum,
-						llinatge1 == null,
+						llinatge1 == null || llinatge1.isEmpty(),
 						llinatge1,
-						llinatge2 == null,
+						llinatge2 == null || llinatge2.isEmpty(),
 						llinatge2,
 						expedient),
 				InteressatPersonaFisicaDto.class);
@@ -527,9 +527,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		return conversioTipusHelper.convertirList(
 				interessatRepository.findByFiltrePersonaJuridica(
-						documentNum == null,
+						documentNum == null || documentNum.isEmpty(),
 						documentNum,
-						raoSocial == null,
+						raoSocial == null || raoSocial.isEmpty(),
 						raoSocial,
 						expedient),
 				InteressatPersonaJuridicaDto.class);
@@ -545,7 +545,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		List<InteressatAdministracioEntity> administracions = interessatRepository.findByFiltreAdministracio(
-				organCodi == null,
+				organCodi == null || organCodi.isEmpty(),
 				organCodi,
 				expedient);
 		return conversioTipusHelper.convertirList(
