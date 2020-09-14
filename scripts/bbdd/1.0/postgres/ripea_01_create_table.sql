@@ -20,7 +20,7 @@ CREATE TABLE IPA_USUARI
   EMAIL         		character varying(200),
   IDIOMA 				character varying(2) 	 	NOT NULL,
   VERSION       		bigint                      NOT NULL,
-  EMAILS_AGRUPATS BOOLEAN DEFAULT TRUE
+  EMAILS_AGRUPATS 		BOOLEAN DEFAULT TRUE
 );
 
 
@@ -77,15 +77,17 @@ CREATE TABLE IPA_METANODE
 
 CREATE TABLE IPA_METAEXPEDIENT
 (
-  ID                 BIGINT                     NOT NULL,
-  PARE_ID            bigint,
-  CLASIF_SIA         character varying(30)      NOT NULL,
-  SERIE_DOC          character varying(30)      NOT NULL,
-  EXPRESSIO_NUMERO   character varying(100),
-  NOT_ACTIVA         boolean                    NOT NULL,
-  ENTITAT_ID         bigint                     NOT NULL,
-  CODI               character varying(64)      NOT NULL,
-  GESTIO_AMB_GRUPS_ACTIVA BOOLEAN 			    NOT NULL
+  ID                 		BIGINT                     NOT NULL,
+  PARE_ID            		BIGINT,
+  CLASIF_SIA         		character varying(30)      NOT NULL,
+  SERIE_DOC          		character varying(30)      NOT NULL,
+  EXPRESSIO_NUMERO   		character varying(100),
+  NOT_ACTIVA         		boolean                    NOT NULL,
+  ENTITAT_ID         		BIGINT                     NOT NULL,
+  CODI               		character varying(64)      NOT NULL,
+  GESTIO_AMB_GRUPS_ACTIVA 	BOOLEAN 			    NOT NULL,
+  PERMET_METADOCS_GENERALS 	boolean DEFAULT '0' NOT NULL,
+  ORGAN_GESTOR_ID 			BIGINT,
 );
 
 
@@ -738,7 +740,6 @@ CREATE TABLE IPA_METAEXP_DOMINI
   META_EXPEDIENT_ID    NUMBER(19)           NOT NULL
 );
 
-
 CREATE TABLE IPA_GRUP
 (
     ID BIGSERIAL NOT NULL,
@@ -751,9 +752,27 @@ CREATE TABLE IPA_GRUP
     LASTMODIFIEDDATE TIMESTAMP WITHOUT TIME ZONE
 );
 
-
-
 CREATE TABLE IPA_METAEXPEDIENT_GRUP (
   METAEXPEDIENT_ID  BIGSERIAL             NOT NULL,
   GRUP_ID           BIGSERIAL             NOT NULL
+);
+
+CREATE TABLE IPA_ORGAN_GESTOR
+(
+	ID					BIGSERIAL				NOT NULL,
+	CODI				CHARACTER VARYING(64)	NOT NULL,
+	NOM					CHARACTER VARYING(1000)	NOT NULL,
+  	ENTITAT_ID			BIGINT					NOT NULL,
+  	PARE_ID 			BIGINT,
+  	ACTIU 				boolean DEFAULT '1' 	NOT NULL,
+    CREATEDBY_CODI 		CHARACTER VARYING(64),
+    CREATEDDATE 		TIMESTAMP WITHOUT TIME ZONE,
+    LASTMODIFIEDBY_CODI CHARACTER VARYING(64),
+    LASTMODIFIEDDATE 	TIMESTAMP WITHOUT TIME ZONE
+);
+
+CREATE TABLE IPA_EXPEDIENT_SEGUIDOR
+(
+  EXPEDIENT_ID   BIGINT                     NOT NULL,
+  SEGUIDOR_CODI	 CHARACTER VARYING(64)      NOT NULL
 );
