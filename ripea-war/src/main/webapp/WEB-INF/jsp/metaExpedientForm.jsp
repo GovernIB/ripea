@@ -22,14 +22,15 @@
 		<script type="text/javascript">
 		$(document).ready(function() {
 			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
-			selectOrganGestorContainer.hide();
-			$( "#select-grup-metaexpedient" ).change(function () {
-			    var value = $(this).val();
-			    console.log(value);
-			    if (value == 0){
-			    	selectOrganGestorContainer.hide();
-			    } else if (value == 1) {
+// 			selectOrganGestorContainer.hide();
+			$( "#checkbox-metaexpedient-comu" ).change(function () {
+				if(this.checked) {
+					selectOrganGestorContainer.hide();
+					
+			    } else {
 			    	selectOrganGestorContainer.show();
+			    	
+			    	
 			    }
 		  	});
 		});
@@ -56,13 +57,13 @@
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
 				<c:if test="${not isRolAdminOrgan}">
 					<div class="form-group">
-						<label class="control-label col-xs-4" for="select-grup-metaexpedient"><spring:message code="metaexpedient.form.camp.gestor"/></label>
+						<label class="control-label col-xs-4" for="checkbox-metaexpedient-comu"><spring:message code="metaexpedient.form.camp.comu"/></label>
 						<div class="controls col-xs-8">
-						<select id="select-grup-metaexpedient" class="form-control" data-toggle="select2"
-								data-minimumresults="-1">
-							<option value="0"><spring:message code="metaexpedient.form.camp.gestor.entitat"/></option>
-							<option value="1"><spring:message code="metaexpedient.form.camp.gestor.organgestor"/></option>
-						</select>
+							<div class="checkbox">
+						    <label>
+								<input type="checkbox" id="checkbox-metaexpedient-comu" value="1">
+					    	</label>
+					    	</div>
 						</div>
 					</div>						
 				</c:if>
