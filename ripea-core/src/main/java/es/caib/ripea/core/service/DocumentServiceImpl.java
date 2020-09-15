@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -41,6 +42,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.core.api.dto.ViaFirmaRespostaDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -140,6 +142,9 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false);
+		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
 		ExpedientEntity expedient = pare.getExpedientPare();
 		MetaDocumentEntity metaDocument = null;
 		if (document.getMetaDocument() != null) {
@@ -179,6 +184,20 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false);
+		ContingutEntity pare = null;
+		if (documentDto.getPareId() != null) {
+			contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					documentDto.getPareId(),
+					false,
+					false,
+					false,
+					false);	
+		} 
+		
+		if (! checkCarpetaUniqueContraint(documentDto.getNom(), pare, entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
 		return documentHelper.updateDocument(
 				entitatId,
 				documentEntity,
@@ -1085,6 +1104,11 @@ public class DocumentServiceImpl implements DocumentService {
 	private boolean getPropertyGuardarCertificacioExpedient() {
 		return PropertiesHelper.getProperties().getAsBoolean(
 				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
+	}
+	
+	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false) : null;
+		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);

@@ -1348,6 +1348,16 @@ public class ContingutHelper {
 
 	}
 
+	public boolean checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
+		List<ContingutEntity> items = contingutRepository.findByNomAndTipusAndPareAndEntitatAndEsborrat(
+				nom,
+				tipus,
+				pare,
+				entitat,
+				0);
+		return items.size() == 0;
+	}
+	
 	/*private Long getCountByContingut(
 			ContingutEntity contingut,
 			List<Object[]> counts) {
