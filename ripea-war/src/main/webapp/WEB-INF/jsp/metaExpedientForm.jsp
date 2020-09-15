@@ -20,9 +20,9 @@
 	
 	<c:if test="${not isRolAdminOrgan}">
 		<script type="text/javascript">
+		var hasOrganGestor = ${hasOrganGestor};
 		$(document).ready(function() {
 			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
-// 			selectOrganGestorContainer.hide();
 			$( "#checkbox-metaexpedient-comu" ).change(function () {
 				if(this.checked) {
 					selectOrganGestorContainer.hide();
@@ -33,6 +33,10 @@
 			    	
 			    }
 		  	});
+			if (!hasOrganGestor) {
+				$( "#checkbox-metaexpedient-comu" ).prop("checked", true);
+				selectOrganGestorContainer.hide();
+			}
 		});
 		</script>
 	</c:if>
