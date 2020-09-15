@@ -163,13 +163,9 @@
 						var modalBotons = (dataBotons) ? $(dataBotons, $(iframe).contents()) : $(settings.elementBotons, $(iframe).contents());
 						if (modalBotons.length) {
 							$('.modal-footer *', $(this).parent().parent()).remove();
-							var submitClon;
 							$('.btn', modalBotons).each(function() {
 								var element = $(this);
 								var clon = element.clone();
-								if ($(element).attr('type') === 'submit') {
-									submitClon = clon;
-								}
 								if (element.data('elementNoTancar')==true) {
 									clon.on('click', function () {
 									});
@@ -181,21 +177,20 @@
 									});
 								} else {
 									clon.on('click', function () {
+										// When click submit show loading
+										if ($(this).attr('type') === 'submit') {
+											iframe.hide();
+											$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
+											$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
+											$('.modal-body .datatable-dades-carregant').show();
+											$(this).attr('disabled', true);
+										}
 										element.click();
 										return false;
 									});
 								}
 								$('.modal-footer', $(iframe).parent().parent()).append(clon);
 							});
-							if (submitClon) {
-								$(this).closest('form').on('submit', function () {
-									iframe.hide();
-									$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
-									$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
-									$('.modal-body .datatable-dades-carregant').show();
-									$(this).attr('disabled', true);
-								});
-							}
 							modalBotons.hide();
 						}
 						// Evaluar URL del formulari

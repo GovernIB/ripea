@@ -503,7 +503,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    ajax: {
 		    	delay: 500,
 		    	url: function(params){
-					return $(this).data('urlLlistat') + "/" + params.term;
+					return $(this).data('urlLlistat') + "/" + encodeURIComponent(params.term);
 				},
 				processResults: function (data) {
 					results = [];
