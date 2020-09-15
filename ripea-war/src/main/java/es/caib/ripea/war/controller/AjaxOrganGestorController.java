@@ -1,6 +1,8 @@
 package es.caib.ripea.war.controller;
 
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,8 +42,10 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@ResponseBody
 	public List<OrganGestorDto> get(HttpServletRequest request, @PathVariable String text, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		try {
+			text = URLDecoder.decode(request.getRequestURI().split("/")[4], StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException e) { }
 		
-
 		List<OrganGestorDto> organGestorsList;
 		if (RolHelper.isRolActualAdministrador(request)) {
 			organGestorsList = organGestorService.findByEntitat(entitatActual.getId(), text);
