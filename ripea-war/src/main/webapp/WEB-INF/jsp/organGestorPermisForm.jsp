@@ -27,14 +27,20 @@
 </script>
 </head>
 <body>
-<c:set var="formAction"><rip:modalUrl value="/organgestor/permis"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/organgestor/permis"/></c:set>
+	<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
+		<c:set var="formAction"><rip:modalUrl value="/organgestor/${ permisOrganGestorCommand.organGestorId }/permis"/></c:set>
+ 	</c:if>	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisOrganGestorCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect name="organGestorId" textKey="organgestor.form.camp.organ" 
-						 disabled="${not empty permisCommand.id}" emptyOption="true" emptyOptionTextKey="organgestor.form.camp.organ.opcio.cap"
+						 disabled="${not empty permisOrganGestorCommand.organGestorId}" emptyOption="true" emptyOptionTextKey="organgestor.form.camp.organ.opcio.cap"
 						 optionItems="${ organsGestors }" optionValueAttribute="id" optionTextAttribute="nom"
 						 required="true" optionMinimumResultsForSearch="5"/>
-		<rip:inputSelect name="principalTipus" textKey="organgestor.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
+		<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
+			<form:hidden path="organGestorId"/>
+	 	</c:if>					 
+		<rip:inputSelect name="principalTipus" textKey="organgestor.form.camp.tipus" disabled="${not empty permisOrganGestorCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<rip:inputText name="principalNom" required="true" textKey="organgestor.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
 		<rip:inputCheckbox name="administration" textKey="organgestor.form.camp.administracio"/>
 		<div id="modal-botons">

@@ -36,6 +36,14 @@
 				<th data-col-name="nom">
 					<spring:message code="organgestor.list.columna.nom"/>
 				</th>
+				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
+					<script id="cellPermisosTemplate" type="text/x-jsrender">
+						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+					</script>
+				</th>
+				<th data-col-name="permisosCount" data-visible="false">
+					<spring:message code="organgestor.list.columna.nom"/>
+				</th>
 <!-- 				<th data-col-name="administration" data-template="#cellAdministrationTemplate"> -->
 <%-- 					<spring:message code="entitat.permis.columna.administracio"/> --%>
 <!-- 					<script id="cellAdministrationTemplate" type="text/x-jsrender"> -->
