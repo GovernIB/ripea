@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.war.interceptor;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

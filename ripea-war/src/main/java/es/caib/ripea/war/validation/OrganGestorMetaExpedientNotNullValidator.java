@@ -6,11 +6,6 @@ package es.caib.ripea.war.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 
 /**
@@ -34,7 +29,5 @@ public class OrganGestorMetaExpedientNotNullValidator implements ConstraintValid
 		
         return value.getOrganGestorId() != null;
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(OrganGestorMetaExpedientNotNullValidator.class);
 
 }
