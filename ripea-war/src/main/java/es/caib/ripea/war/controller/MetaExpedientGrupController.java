@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.helper.DatatablesHelper;

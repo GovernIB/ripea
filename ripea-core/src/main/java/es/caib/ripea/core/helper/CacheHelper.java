@@ -51,6 +51,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
@@ -105,6 +106,8 @@ public class CacheHelper {
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Resource
 	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Resource
+	private AclSidRepository aclSidRepository;
 
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
@@ -408,6 +411,14 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "notificacionsPendentsPerExpedient", key="#expedient")
 	public void evictNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {
+	}
+
+	@Cacheable(value = "rolsDisponiblesEnAcls")
+	public List<String> rolsDisponiblesEnAcls() {
+		return aclSidRepository.findSidByPrincipalFalse();
+	}
+	@CacheEvict(value = "rolsDisponiblesEnAcls", allEntries = true)
+	public void evictRolsDisponiblesEnAcls() {
 	}
 
 	private ValidacioErrorDto crearValidacioError(

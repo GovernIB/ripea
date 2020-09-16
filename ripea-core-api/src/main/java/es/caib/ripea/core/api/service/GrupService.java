@@ -5,9 +5,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
+/**
+ * Declaració dels mètodes per a gestionar grups.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public interface GrupService {
 
 	/**

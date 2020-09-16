@@ -31,7 +31,6 @@ import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -45,8 +44,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Resource
 	private UsuariRepository usuariRepository;
-	@Resource
-	private AclSidRepository aclSidRepository;
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
@@ -196,7 +193,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
 		logger.debug("Consulta dels rols definits a les ACLs");
-		return aclSidRepository.findSidByPrincipalFalse();
+		return cacheHelper.rolsDisponiblesEnAcls();
+		//return aclSidRepository.findSidByPrincipalFalse();
 	}
 
 	@Override

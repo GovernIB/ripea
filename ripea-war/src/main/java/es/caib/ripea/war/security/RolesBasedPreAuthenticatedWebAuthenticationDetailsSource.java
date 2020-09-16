@@ -34,13 +34,13 @@ public class RolesBasedPreAuthenticatedWebAuthenticationDetailsSource extends J2
 			rolesConfigured = true;
 		}
 		Set<String> j2eeUserRolesList = new HashSet<String>();
-        for (String role: j2eeMappableRoles) {
-        	if (request.isUserInRole(role)) {
-            	j2eeUserRolesList.add(role);
-            }
-        }
-        return j2eeUserRolesList;
-    }
+		for (String role: j2eeMappableRoles) {
+			if (request.isUserInRole(role)) {
+				j2eeUserRolesList.add(role);
+			}
+		}
+		return j2eeUserRolesList;
+	}
 	@Override
 	public void setMappableRolesRetriever(MappableAttributesRetriever mappableAttributesRetriever) {
 		this.mappableAttributesRetriever = mappableAttributesRetriever;

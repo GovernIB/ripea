@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
-import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ExpedientEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -33,8 +32,6 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/expedientEstat")
 public class ExpedientEstatController extends BaseAdminController {
 
-	@Autowired
-	private ExpedientService expedientService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
