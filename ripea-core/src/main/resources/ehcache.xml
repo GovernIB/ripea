@@ -30,4 +30,5 @@
 	<cache name="notificacionsPendentsPerExpedient" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 	<cache name="organismes" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 	<cache name="organigrama" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
+	<cache name="rolsDisponiblesEnAcls" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 </ehcache>
