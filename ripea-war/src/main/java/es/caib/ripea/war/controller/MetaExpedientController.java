@@ -140,7 +140,7 @@ public class MetaExpedientController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		MetaExpedientDto dto = MetaExpedientCommand.asDto(command);
+		MetaExpedientDto dto = command.asDto();
 		if (bindingResult.hasErrors()) {
 			fillFormModel(request, dto, model);
 			return "metaExpedientForm";

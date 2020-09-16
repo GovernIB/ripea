@@ -29,7 +29,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosEntitatHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -60,9 +59,7 @@ public class EntitatServiceImpl implements EntitatService {
 	private PermisosEntitatHelper permisosEntitatHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-
+	
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
@@ -394,9 +391,8 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public boolean isAdminOrgan(Long id) {
-		List<Long> candidateMetaExpIds = metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(id);
-		return !candidateMetaExpIds.isEmpty();
+	public boolean isAdminOrgan(Long id) {		  
+		return permisosEntitatHelper.hasAdminOrganPermission(id);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);

@@ -107,7 +107,7 @@ public interface TipusDocumentalService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<TipusDocumentalDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 

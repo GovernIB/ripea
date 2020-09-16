@@ -165,7 +165,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,

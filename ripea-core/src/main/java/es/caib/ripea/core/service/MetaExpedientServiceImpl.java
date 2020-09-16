@@ -415,6 +415,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				}
 			}
 		} else {
+			// check permis administracio d'entitat
+			entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 			if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 				resposta = paginacioHelper.toPaginaDto(metaExpedientRepository.findByEntitat(
 						entitat,

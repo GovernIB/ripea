@@ -67,7 +67,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
     @Transactional(readOnly = true)
     public List<OrganGestorDto> findByEntitat(Long entitatId) {
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
         List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
         return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
     }

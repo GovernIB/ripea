@@ -83,11 +83,11 @@ public class MetaExpedientCommand {
 		return command;
 	}
 
-	public static MetaExpedientDto asDto(MetaExpedientCommand command) {
-		MetaExpedientDto dto = ConversioTipusHelper.convertir(command, MetaExpedientDto.class);
-		if (command.getOrganGestorId() != null) {
+	public MetaExpedientDto asDto() {
+		MetaExpedientDto dto = ConversioTipusHelper.convertir(this, MetaExpedientDto.class);
+		if (this.getOrganGestorId() != null) {
 			OrganGestorDto organ = new OrganGestorDto();
-			organ.setId(command.getOrganGestorId());
+			organ.setId(this.getOrganGestorId());
 			dto.setOrganGestor(organ);
 		}
 		return dto;

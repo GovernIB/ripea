@@ -71,7 +71,7 @@ public class EntitatHelper {
 		}
 		Boolean isUsuariAdminOrgan = (Boolean)request.getSession().getAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN);
 		if (isUsuariAdminOrgan == null && entitatService != null) {
-			isUsuariAdminOrgan = new Boolean(entitatService.isAdminOrgan(entitatActual.getId()));
+			isUsuariAdminOrgan = entitatActual.isUsuariActualAdministrationOrgan();
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN, isUsuariAdminOrgan);
 		}
 		return entitatActual;

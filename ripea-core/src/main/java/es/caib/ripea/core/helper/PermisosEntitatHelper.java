@@ -16,8 +16,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -31,10 +35,12 @@ public class PermisosEntitatHelper {
 
 	@Resource
 	private PermisosHelper permisosHelper;
-
+	
 	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-
+	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private OrganGestorService organGestorService;
+	
 	public void omplirPermisosPerEntitats(List<EntitatDto> entitats, boolean ambLlistaPermisos) {
 		// Filtra les entitats per saber els permisos per a l'usuari actual
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -65,9 +71,7 @@ public class PermisosEntitatHelper {
 		for (EntitatDto entitat : entitats) {
 			entitat.setUsuariActualRead(entitatsRead.contains(entitat));
 			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));
-			entitat.setUsuariActualAdministrationOrgan(
-					!metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitat.getId()).isEmpty()
-					);
+			entitat.setUsuariActualAdministrationOrgan(hasAdminOrganPermission(entitat.getId()));
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
@@ -94,8 +98,21 @@ public class PermisosEntitatHelper {
 						EntitatEntity.class,
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						auth));
-		entitat.setUsuariActualAdministrationOrgan(
-				!metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(entitat.getId()).isEmpty());
+		entitat.setUsuariActualAdministrationOrgan(hasAdminOrganPermission(entitat.getId()));
+	}
+	
+	public boolean hasAdminOrganPermission(Long entitatId) {
+		List<PermisOrganGestorDto> results = new ArrayList<PermisOrganGestorDto>();
+        List<OrganGestorDto> organs = organGestorService.findByEntitat(entitatId);
+        for (OrganGestorDto o : organs) {
+            List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
+            for (PermisDto p : permisosOrgan) {
+                PermisOrganGestorDto permisOrgan = conversioTipusHelper.convertir(p, PermisOrganGestorDto.class);
+                permisOrgan.setOrganGestor(o);
+                results.add(permisOrgan);
+            }
+        }
+		return !results.isEmpty();
 	}
 
 }

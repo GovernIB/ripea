@@ -35,7 +35,7 @@ public interface OrganGestorService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public OrganGestorDto findItem(Long id) throws NotFoundException;
 	
 	/**
@@ -46,7 +46,7 @@ public interface OrganGestorService {
 	 *            Id de l'entitat.
 	 * @return Llistat dels organs gestors de l'entitat
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<OrganGestorDto> findByEntitat(Long entitatId);
 
 	/**
