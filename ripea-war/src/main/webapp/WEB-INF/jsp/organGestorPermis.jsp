@@ -5,8 +5,13 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="organgestor.permis.titol"/></title>
-	<meta name="subtitle" content="${entitat.nom}"/>
+	<c:set var="pageTitle"><spring:message code="organgestor.permis.titol"/></c:set>
+	<c:if test="${not empty organ}">
+		<c:set var="pageTitle"><spring:message code="organgestor.permis.titol"/>: ${ organ.nom }</c:set>
+		<meta name="subtitle" content="${organ.nom}"/>
+ 	</c:if>
+	<title>${ pageTitle }</title>
+	<meta name="subtitle" content="${organ.nom}"/>
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -19,8 +24,12 @@
 	<div class="text-right" data-toggle="botons-titol">
 		
 	</div>
+	<c:url var="datatableUrl" value="/organgestor/permis/datatable"/>
+	<c:if test="${not empty organ}">
+		<c:url var="datatableUrl" value="/organgestor/${ organ.id }/permis/datatable"/>
+ 	</c:if>
 	<table id="permisos" data-toggle="datatable" 
-			data-url="<c:url value="/organgestor/permis/datatable"/>" 
+			data-url="${ datatableUrl }" 
 			data-default-order="1" 
 			data-default-dir="asc" 
 			data-botons-template="#botonsTemplate" 
@@ -28,22 +37,22 @@
 			style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="organGestor.nom">
-					<spring:message code="organgestor.permis.columna.organ"/>
-				</th>
+<!-- 				<th data-col-name="organGestor.nom"> -->
+<%-- 					<spring:message code="organgestor.permis.columna.organ"/> --%>
+<!-- 				</th> -->
 				<th data-col-name="principalTipus">
 					<spring:message code="organgestor.permis.columna.tipus"/>
 				</th>
 				<th data-col-name="principalNom">
 					<spring:message code="organgestor.permis.columna.principal"/>
 				</th>
-				<th data-col-name="administration" data-template="#cellAdministrationTemplate">
+				<th data-col-name="administration" data-template="#cellAdministrationTemplate" width="5%">
 					<spring:message code="organgestor.permis.columna.administracio"/>
 					<script id="cellAdministrationTemplate" type="text/x-jsrender">
  						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
  						<div class="dropdown"> 
  							<button class="btn btn-primary" data-toggle="dropdown">

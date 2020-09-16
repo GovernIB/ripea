@@ -73,6 +73,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public List<PermisOrganGestorDto> findPermisos(Long entitatId) throws NotFoundException {
 		return delegate.findPermisos(entitatId);
 	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<PermisOrganGestorDto> findPermisos(Long entitatId, Long organId) throws NotFoundException {
+		return delegate.findPermisos(entitatId, organId);
+	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")

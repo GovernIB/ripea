@@ -102,6 +102,20 @@ public interface OrganGestorService {
 	public List<PermisOrganGestorDto> findPermisos(Long entitatId) throws NotFoundException;
 
 	/**
+	 * Consulta els permisos dels distits organs gestors de l'entitat
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual es volen consultar els permisos.
+	 * @param organId
+	 *            Atribut id de l'organ gestor del qual es volen consultar els permisos.
+	 * @return El llistat de permisos.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<PermisOrganGestorDto> findPermisos(Long entitatId, Long organId) throws NotFoundException;
+	
+	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a un organ gestor.
 	 * 
 	 * @param id

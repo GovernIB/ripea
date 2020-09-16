@@ -154,6 +154,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Transactional
     @Override
     public List<PermisOrganGestorDto> findPermisos(Long entitatId) {
+
+        return findPermisos(entitatId, null);
+    }
+
+    @Transactional
+    @Override
+    public List<PermisOrganGestorDto> findPermisos(Long entitatId, Long organId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         logger.debug("Consulta com a administrador els permisos dels organs gestors de l'entitat (" + "id="
                 + entitatId + ")");
@@ -166,7 +173,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         if (!esAdministradorEntitat) {
             return results;
         }
-        List<OrganGestorDto> organs = findByEntitat(entitatId);
+        
+        List<OrganGestorDto> organs;
+        if (organId == null) {
+        	organs = findByEntitat(entitatId);	
+        
+        }else {
+        	organs = new ArrayList<OrganGestorDto>();
+        	organs.add(findItem(organId));
+        }
+        
         for (OrganGestorDto o : organs) {
             List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
             for (PermisDto p : permisosOrgan) {
@@ -183,7 +199,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         }
         return results;
     }
-
+    
     @Transactional
     @Override
     public void updatePermis(Long id, PermisDto permis, Long entitatId) {

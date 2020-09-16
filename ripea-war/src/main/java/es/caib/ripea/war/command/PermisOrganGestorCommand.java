@@ -7,21 +7,30 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
-public class PermisOrganGestorCommand extends PermisCommand 
-{
+@Getter
+@Setter
+public class PermisOrganGestorCommand extends PermisCommand {
+
 	@NotNull
-    private Long organGestorId;
+	private Long organGestorId;
 
-    public static PermisOrganGestorCommand asCommand(PermisOrganGestorDto dto) {
-        PermisOrganGestorCommand permisCommand = ConversioTipusHelper.convertir(dto,
-                PermisOrganGestorCommand.class);
+	public PermisOrganGestorCommand() {
+		super();
+	}
 
-        permisCommand.setSelectAll(false);
-        if (permisCommand.isCreate() && permisCommand.isDelete() && permisCommand.isRead()
-                && permisCommand.isWrite())
-            permisCommand.setSelectAll(true);
-        permisCommand.setOrganGestorId(dto.getOrganGestor().getId());
-        return permisCommand;
-    }
+	public PermisOrganGestorCommand(Long organGestorId) {
+		super();
+		this.organGestorId = organGestorId;
+	}
+
+	public static PermisOrganGestorCommand asCommand(PermisOrganGestorDto dto) {
+		PermisOrganGestorCommand permisCommand = ConversioTipusHelper.convertir(dto, PermisOrganGestorCommand.class);
+
+		permisCommand.setSelectAll(false);
+		if (permisCommand.isCreate() && permisCommand.isDelete() && permisCommand.isRead() && permisCommand.isWrite())
+			permisCommand.setSelectAll(true);
+		permisCommand.setOrganGestorId(dto.getOrganGestor().getId());
+		return permisCommand;
+	}
+
 }
