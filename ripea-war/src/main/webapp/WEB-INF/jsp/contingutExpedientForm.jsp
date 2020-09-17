@@ -74,38 +74,40 @@ function recuperarDominisMetaExpedient() {
 function refrescarGrups() {
 	let metaExpedientId = $('#metaNodeId').val();
 	if (metaExpedientId != undefined && metaExpedientId != "") {
-		
-		$.ajax({
-			type: 'GET',
-			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
-			success: function(data) {
-				$('#gestioAmbGrupsActiva').val(data);
-				if (data) {
-					
-					$.ajax({
-						type: 'GET',
-						url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
-						success: function(data) {
-							$('#grupId').closest('.form-group').show();
-							$('#grupId option[value!=""]').remove();
-							for (var i = 0; i < data.length; i++) {
-								$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+
+		if (id != undefined && id != "") {
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
+				success: function(data) {
+					$('#gestioAmbGrupsActiva').val(data);
+					if (data) {
+						
+						$.ajax({
+							type: 'GET',
+							url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+							success: function(data) {
+								$('#grupId').closest('.form-group').show();
+								$('#grupId option[value!=""]').remove();
+								for (var i = 0; i < data.length; i++) {
+									$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+								}
 							}
-						}
-					});
-					
-				} else {
-					$('#grupId option[value!=""]').remove();
-					$('#grupId').closest('.form-group').hide();
+						});
+						
+					} else {
+						$('#grupId option[value!=""]').remove();
+						$('#grupId').closest('.form-group').hide();
+					}
+	
 				}
-
-			}
-		});
-
-		
-		
-
+			});
+			
+		} else {
+			$('#grupId').prop('disabled', 'disabled');
+		}
 	}
+	
 }
 
 
@@ -115,6 +117,7 @@ $(document).ready(function() {
 		refrescarGrups();
 	});
 	refrescarSequencia();
+	refrescarGrups();
 	
 	$('input#any').change(function(event) {
 		refrescarSequencia();
@@ -145,19 +148,8 @@ $(document).ready(function() {
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<form:hidden path="gestioAmbGrupsActiva"/>
-		<c:choose>
-			<c:when test="${empty expedientCommand.id}">
-				<c:if test="${expedientCommand.gestioAmbGrupsActiva == true}">
-					<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
-				</c:if>
-			</c:when>
-			<c:otherwise>
-				<c:if test="${!empty expedientCommand.grupId}">
-					<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2" disabled="true"/>
-				</c:if>
-			</c:otherwise>
-		</c:choose>
-				
+		
+		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
 		
 		
 		<div id="modal-botons" class="well">
