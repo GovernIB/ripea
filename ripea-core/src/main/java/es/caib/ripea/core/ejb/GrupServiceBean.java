@@ -62,7 +62,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
 			Long metaExpedientId, 

@@ -133,7 +133,7 @@ public class GrupServiceImpl implements GrupService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
+				false,
 				false);
 
 		Page<GrupEntity> page = grupRepository.findByEntitat(

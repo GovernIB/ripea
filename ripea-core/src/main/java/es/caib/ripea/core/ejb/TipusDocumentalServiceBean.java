@@ -75,7 +75,7 @@ public class TipusDocumentalServiceBean implements TipusDocumentalService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<TipusDocumentalDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegate.findByEntitat(entitatId);

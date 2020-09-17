@@ -111,7 +111,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,

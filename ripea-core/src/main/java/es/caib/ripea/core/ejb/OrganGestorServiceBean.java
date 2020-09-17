@@ -37,13 +37,13 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public OrganGestorDto findItem(Long id) {
 		return delegate.findItem(id);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<OrganGestorDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
