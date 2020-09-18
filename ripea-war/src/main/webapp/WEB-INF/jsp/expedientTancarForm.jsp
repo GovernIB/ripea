@@ -10,9 +10,28 @@
 <html>
 <head>
 	<title>${titol}</title>
+<style type="text/css">
+#loadingwrap {
+	position: fixed;
+	width: 100%;
+	height:100%;
+	display: flex;
+	align-items: center;
+	top: 0;
+}
+.loading {
+  display: flex;
+  margin: 0 auto;
+}
+</style>
 	<rip:modalHead/>
 </head>
 <body>
+	<div id="loadingwrap" style="display: none">
+		<div class="loading">
+			<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>
+		</div>
+	</div>
 	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientTancarCommand">
 		<form:hidden path="id"/>
 		<c:if test="${expedient.hasEsborranys}">
@@ -43,10 +62,9 @@
 			</tbody>
 			</table>
 		</c:if>
-		<%--rip:inputFixed textKey="contingut.expedient.tancar.form.camp.expedient">${expedient.nom}</rip:inputFixed--%>
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success" data-noloading="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/></button>
 			<a href="<c:url value="/contingut/${expedient.pare.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
@@ -58,7 +76,13 @@ setTimeout(() => {
 			let total = $('input[name=documentsPerFirmar]:checkbox').length;
 			let countNoSeleccionats = total - countSeleccionats;
 			if (countNoSeleccionats) {
-				return confirm("<spring:message code="contingut.expedient.tancar.esborranys.confirm"/>");
+				if (confirm("<spring:message code="contingut.expedient.tancar.esborranys.confirm"/>")) {
+					$('#loadingwrap').css('display', 'flex');
+					$('form').css('visibility', 'hidden');
+					return true
+				} else {
+					return false;
+				}
 			}
 		});
 	});
