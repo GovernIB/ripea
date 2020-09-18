@@ -182,7 +182,7 @@ public class GrupServiceImpl implements GrupService {
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
+				false,
 				false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
@@ -207,7 +207,7 @@ public class GrupServiceImpl implements GrupService {
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
+				false,
 				false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
