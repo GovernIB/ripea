@@ -11,12 +11,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -61,7 +61,8 @@ public interface ExpedientService {
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
-			boolean associarInteressats) throws NotFoundException, ValidationException;
+			boolean associarInteressats,
+			Long grupId) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un expedient.
@@ -100,6 +101,29 @@ public interface ExpedientService {
 			Long entitatId,
 			Long id) throws NotFoundException;
 
+	/**
+	 * Consulta un expedient donat el seu id.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany l'expedient.
+	 * @param metaExpedientId
+	 *            Atribut id del meta-expedient a partir del qual es vol crear l'expedient.
+	 * @param pareId
+	 *            Contenidor pare a on es vol crear l'expedient. Pot ser null. Si no és
+	 *            null es crearà com a subexpedient d'un expedient superior.
+	 * @param nom
+	 *            Nom de l'expedient cercat            
+	 * @param esborrat
+	 *            Atribut id de l'expedient que es vol trobar.
+	 * @return L'expedient.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
+			Long entitatId,
+			Long metaExpedientId,
+			Long pareId,
+			String nom,
+			int esborrat);
 	/**
 	 * Consulta els expedients segons el filtre.
 	 * 
@@ -245,14 +269,19 @@ public interface ExpedientService {
 	 *            Atribut id de l'expedient.
 	 * @param motiu
 	 *            Motiu de la finalització de l'expedient.
+	 * @param documentsPerFirmar
+	 *            Els documents a firmar abans de tancar l'expedient.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws ExpedientTancarSenseDocumentsDefinitiusException
+	 *             Si l'expedient no conté cap document definitiu.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) throws NotFoundException;
+			String motiu,
+			Long[] documentsPerFirmar) throws NotFoundException, ExpedientTancarSenseDocumentsDefinitiusException;
 
 	/**
 	 * Torna a l'estat obert un expedient tancat.
@@ -364,34 +393,6 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId);
 
-	PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
-			PaginacioParamsDto paginacioParams);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat);
-	
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto moveTo(Long entitatId, Long metaExpedientId, Long expedientEstatId, int posicio)
-			throws NotFoundException;
-	
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId) throws NotFoundException;
-
-	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId);
-
-	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId);
-
-	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId);
-
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryCreateDocFromAnnex(Long registreAnnexId,
 			Long expedientPeticioId);
@@ -405,5 +406,33 @@ public interface ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats);
 	
-
+	/**
+	 * Genera un índex amb el continut de l'expedient.
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que es vol consultar.
+	 * @return Un document amb l'índex.
+	 * @throws IOException 
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto exportIndexExpedients(
+			Long entitatId, 
+			Collection<Long> expedientIds) throws IOException;
+	
+	/**
+	 * Genera un índex amb el continut de l'expedient.
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que es vol consultar.
+	 * @return Un document amb l'índex.
+	 * @throws IOException 
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto exportIndexExpedient(
+			Long entitatId, 
+			Long expedientId) throws IOException;
 }

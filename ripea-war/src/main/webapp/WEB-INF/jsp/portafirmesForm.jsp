@@ -98,7 +98,13 @@ body.loading .rmodal {
 
 <script type="text/javascript">
 $(document).ready(function() {
-	console.log("${urlPlantilla}");
+	let parentIframe = window.frameElement;
+	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	
+	$('form').on('submit', function(){
+		window.parent.addLoading(idModal);
+	});
+	
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
 	let fluxPredefinit = ${nouFluxDeFirma};
@@ -106,6 +112,13 @@ $(document).ready(function() {
 	if (fluxPredefinit != null && fluxPredefinit) {
 		$('form').find('button').addClass('disabled');
 	} 
+
+	let fluxCreat = localStorage.getItem('fluxCreat');
+	if (fluxCreat != null && fluxCreat != "undefined" && !"${isNouEnviament}") {
+		$('.comentari').remove();
+		$(".portafirmesFlux_btn").parent().before(fluxCreat);
+		$('form').find('button').removeClass("disabled");
+	}
 	
 	$(".portafirmesFlux_btn").on('click', function(){		
 		let documentNom = '${document.nom}';
@@ -156,7 +169,6 @@ function adjustModalPerFlux(amagar) {
 		'margin': '3% auto',
 		'padding': '0'
 	});
-	console.log(amagar);
 	if (amagar) {
 		$iframe.closest('div.modal-lg').css('width', '95%');
 		$iframe.parent().next().addClass('hidden');

@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -56,6 +59,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -71,6 +75,7 @@ import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -101,6 +106,8 @@ public class ContingutHelper {
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
+	private GrupRepository grupRepository;
+	@Autowired
 	private AlertaRepository alertaRepository;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
@@ -128,7 +135,11 @@ public class ContingutHelper {
 	private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired
 	private TipusDocumentalRepository tipusDocumentalRepository;
-
+	@Autowired
+	private IndexHelper indexHelper;
+	@Autowired
+	private MessageHelper messageHelper;
+	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
 		return toContingutDto(
@@ -216,8 +227,18 @@ public class ContingutHelper {
 								new Permission[] {ExtendedPermission.WRITE},
 								auth));
 			}
+			dto.setNumSeguidors(expedient.getSeguidors().size());
 			
-//			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
+			if (expedient.getSeguidors().contains(usuariActual)) 
+				dto.setSeguidor(true);
+			dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
+			dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
+			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
+			dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
+			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			resposta = dto;
 
 		// ##################### DOCUMENT ##################################
@@ -893,12 +914,19 @@ public class ContingutHelper {
 			Date ntiFechaApertura,
 			Integer any,
 			Long sequencia,
-			boolean agafar) {
+			boolean agafar,
+			Long grupId) {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			agafatPer = usuariRepository.getOne(auth.getName());
 		}
+		
+		GrupEntity grupEntity = null;
+		if (grupId != null) {
+			grupEntity = grupRepository.findOne(grupId);
+		}
+		
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
@@ -909,6 +937,7 @@ public class ContingutHelper {
 				ntiFechaApertura,
 				metaExpedient.getClassificacioSia()).
 				agafatPer(agafatPer).
+				grup(grupEntity).
 				build();
 		// Calcula en número del nou expedient
 		long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(
@@ -1049,16 +1078,6 @@ public class ContingutHelper {
 					objectClass,
 					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
-//		if (contingutPare != null) {
-//			for (ContingutEntity fill: contingutPare.getFills()) {
-//				if ((!fill.getId().equals(id) && fill.getNom().equals(nom))  ) {
-//					throw new ValidationException(
-//							id,
-//							objectClass,
-//							"Ja existeix un altre contingut amb el mateix nom");
-//				}
-//			}
-//		}
 	}
 
 	public void arxiuPropagarModificacio(
@@ -1256,6 +1275,34 @@ public class ContingutHelper {
 		return pathDto;
 	}
 	
+	public FitxerDto generarIndex(
+			EntitatEntity entitatActual, 
+			ExpedientEntity expedient) throws IOException {
+		
+		byte[] indexGenerated = indexHelper.generarIndexPerExpedient(
+					expedient,
+					entitatActual);
+		
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".docx");
+		fitxer.setContentType("application/msword");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+
+	public void crearNovaEntrada(
+			String nom,
+			FitxerDto fitxer,
+			ZipOutputStream zos) throws IOException {
+		ZipEntry entrada = new ZipEntry(nom);
+		entrada.setSize(fitxer.getTamany());
+		zos.putNextEntry(entrada);
+		if (fitxer.getContingut() != null)
+			zos.write(fitxer.getContingut());
+		zos.closeEntry();
+	}
+	
 	public void tractarInteressats(List<RegistreInteressat> interessats) {
 		ListIterator<RegistreInteressat> iter = interessats.listIterator();
 		while(iter.hasNext()){
@@ -1267,35 +1314,50 @@ public class ContingutHelper {
 	
 	
 	public void marcarEsborrat(ContingutEntity contingut) {
-		for (ContingutEntity contingutFill: contingut.getFills()) {
-			marcarEsborrat(contingutFill);
-		}
-		List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
-				contingut.getPare(),
-				contingut.getNom());
-		// Per evitar errors de restricció única violada hem de
-		// posar al camp esborrat un nombre != 0 i que sigui diferent
-		// dels altres fills esborrats amb el mateix nom.
-		int index = 1;
-		for (ContingutEntity c: continguts) {
-			if (c.getEsborrat() > 0) {
-				if (index < c.getEsborrat()) {
-					break;
-				}
-				index++;
+		
+		if (contingut.getEsborrat() == 0) {
+			
+			for (ContingutEntity contingutFill: contingut.getFills()) {
+				marcarEsborrat(contingutFill);
 			}
+			
+			List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
+					contingut.getPare(),
+					contingut.getNom());
+			// Per evitar errors de restricció única violada hem de
+			// posar al camp esborrat un nombre != 0 i que sigui diferent
+			// dels altres fills esborrats amb el mateix nom.
+			int index = 0;
+			for (ContingutEntity c: continguts) {
+					if (index < c.getEsborrat()) {
+						index = c.getEsborrat();
+					}
+			}
+			contingut.updateEsborrat(index + 1);
+			contingut.updateEsborratData(new Date());
+			contingutLogHelper.log(
+					contingut,
+					LogTipusEnumDto.ELIMINACIO,
+					null,
+					null,
+					true,
+					true);
+			Long pareId = contingut.getPare() != null ? contingut.getPare().getId() : null;
+			logger.debug("Contingut amb id: " + contingut.getId() + " amb pareId: " + pareId + " marcada com esborrat amb num: " + contingut.getEsborrat());
 		}
-		contingut.updateEsborrat(continguts.size() + 1);
-		contingut.updateEsborratData(new Date());
-		contingutLogHelper.log(
-				contingut,
-				LogTipusEnumDto.ELIMINACIO,
-				null,
-				null,
-				true,
-				true);
+
 	}
 
+	public boolean checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
+		List<ContingutEntity> items = contingutRepository.findByNomAndTipusAndPareAndEntitatAndEsborrat(
+				nom,
+				tipus,
+				pare,
+				entitat,
+				0);
+		return items.size() == 0;
+	}
+	
 	/*private Long getCountByContingut(
 			ContingutEntity contingut,
 			List<Object[]> counts) {

@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -38,7 +39,9 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
 
 /**
  * Tests per al servei de gestió d'expedients.
@@ -51,7 +54,11 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 
 	@Autowired
 	private DocumentService documentService;
-
+	@Autowired
+	private CarpetaService carpetaService;	
+	@Autowired
+	private ExpedientEstatService expedientEstatService;
+	
 	@Test
     public void create() {
 		testAmbElementsIExpedient(
@@ -391,7 +398,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
-						List<ExpedientEstatDto> estats0 = expedientService.findExpedientEstats(
+						List<ExpedientEstatDto> estats0 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
 								expedientCreat.getId());
 						assertNotNull(estats0);
@@ -401,11 +408,11 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						estatPerCrear.setCodi("TST");
 						estatPerCrear.setNom("Test");
 						estatPerCrear.setMetaExpedientId(metaExpedientCreat.getId());
-						expedientService.createExpedientEstat(
+						expedientEstatService.createExpedientEstat(
 								entitatCreada.getId(),
 								estatPerCrear);
 						autenticarUsuari("user");
-						List<ExpedientEstatDto> estats1 = expedientService.findExpedientEstats(
+						List<ExpedientEstatDto> estats1 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
 								expedientCreat.getId());
 						assertNotNull(estats1);
@@ -413,7 +420,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						ExpedientEstatDto estatCreat = estats1.get(0);
 						assertEquals(estatPerCrear.getCodi(), estatCreat.getCodi());
 						assertEquals(estatPerCrear.getNom(), estatCreat.getNom());
-						ExpedientDto expedientAmbEstat = expedientService.changeEstatOfExpedient(
+						ExpedientDto expedientAmbEstat = expedientEstatService.changeEstatOfExpedient(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								estatCreat.getId());
@@ -449,7 +456,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null,
 								"Expedient de test2 (" + System.currentTimeMillis() + ")",
 								null,
-								false);
+								false, 
+								null);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),
@@ -527,14 +535,6 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						MetaDocumentDto metaDocument = new MetaDocumentDto();
 						metaDocument.setId(metaDocumentCreat.getId());
 						dto.setMetaNode(metaDocument);
-						try {
-							expedientService.tancar(
-									entitatCreada.getId(),
-									expedientCreat.getId(),
-									"Motiu de tancament");
-							fail("No s'ha de poder tancar un expedient sense documents definitius");
-						} catch (ValidationException ignored) {
-						}
 						DocumentDto documentCreat = documentService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -545,8 +545,9 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 							expedientService.tancar(
 									entitatCreada.getId(),
 									expedientCreat.getId(),
-									"Motiu de tancament");
-							fail("No s'ha de poder tancar un expedient amb documents en estat d'esborrany");
+									"Motiu de tancament",
+									null);
+							fail("No s'ha de poder tancar un expedient sense documents definitius");
 						} catch (ValidationException ignored) {
 						}
 						String identificador = documentService.generarIdentificadorFirmaClient(
@@ -560,7 +561,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						expedientService.tancar(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								"Motiu de tancament");
+								"Motiu de tancament",
+								null);
 						ExpedientDto expedientTancat = expedientService.findById(
 								entitatCreada.getId(),
 								expedientCreat.getId());
@@ -569,6 +571,93 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					}
 				},
 				"Tancar expedient");
+	}
+	
+	@Test
+	public void generarIndex() {
+		testAmbElementsIExpedient(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(List<Object> elementsCreats) throws IOException {
+						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						assertNotNull(expedientCreat);
+						CarpetaDto carpetaCreada = carpetaService.create(
+								entitatCreada.getId(), 
+								expedientCreat.getId(), 
+								"Carpeta Test");
+						CarpetaDto subCarpetaCreada = carpetaService.create(
+								entitatCreada.getId(), 
+								carpetaCreada.getId(), 
+								"SubCarpeta Test 1");
+						CarpetaDto subCarpetaCreada2 = carpetaService.create(
+								entitatCreada.getId(), 
+								subCarpetaCreada.getId(), 
+								"SubCarpeta Test 2");
+						
+						for (int i = 0; i < 8; i++) {
+							DocumentDto dto = new DocumentDto();
+							dto.setNom("Test_" + i);
+							dto.setData(new Date());
+							dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+							dto.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+							dto.setNtiOrigen(NtiOrigenEnumDto.O0);
+							emplenarDocumentArxiu(dto);
+							dto.setFirmaSeparada(false);
+							MetaDocumentDto metaDocument = new MetaDocumentDto();
+							metaDocument.setId(metaDocumentCreat.getId());
+							dto.setMetaNode(metaDocument);
+							DocumentDto documentCreat = null;
+							
+							//Pare = expedient
+							if (i == 0 || i == 1 || i == 2) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										expedientCreat.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+							//Pare = carpeta
+							if (i == 3) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										carpetaCreada.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+							//Pare = sub carpeta
+							if (i == 4 || i == 5) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										subCarpetaCreada.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+							if (i == 6 || i == 7) {
+								documentCreat = documentService.create(
+										entitatCreada.getId(),
+										subCarpetaCreada2.getId(),
+										dto,
+										true);
+								assertNotNull(documentCreat);
+							}
+						}
+						
+						FitxerDto index = expedientService.exportIndexExpedient(
+								entitatCreada.getId(), 
+								expedientCreat.getId());
+						
+						assertNotNull(index);
+						assertNotNull(index.getContingut());
+						assertTrue(index.getContingut().length > 0);
+						
+					}
+				},
+				"Generar índex expedient");
 	}
 
 	private void comprovarExpedientCoincideix(

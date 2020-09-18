@@ -34,7 +34,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
@@ -46,7 +46,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
@@ -58,7 +58,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDadaDto updateActiva(
 			Long entitatId,
 			Long metaNodeId,
@@ -107,7 +107,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
@@ -119,7 +119,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDadaDto findById(
 			Long entitatId,
 			Long metaNodeId,
@@ -131,7 +131,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDadaDto findByCodi(
 			Long entitatId,
 			Long metaNodeId,
@@ -143,7 +143,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PaginaDto<MetaDadaDto> findByMetaNodePaginat(
 			Long entitatId,
 			Long metaNodeId,
@@ -155,7 +155,7 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<MetaDadaDto> findActiveByMetaNode(
 			Long entitatId,
 			Long metaNodeId) {
@@ -170,6 +170,16 @@ public class MetaDadaServiceBean implements MetaDadaService {
 			Long entitatId,
 			Long nodeId) {
 		return delegate.findByNode(
+				entitatId,
+				nodeId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Long findMetaNodeIdByNodeId(
+			Long entitatId,
+			Long nodeId) {
+		return delegate.findMetaNodeIdByNodeId(
 				entitatId,
 				nodeId);
 	}

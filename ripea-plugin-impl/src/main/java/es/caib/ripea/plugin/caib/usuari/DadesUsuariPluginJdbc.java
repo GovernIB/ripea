@@ -29,6 +29,22 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
 public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 
 	@Override
+	public List<String> findRolsAmbCodi(
+			String usuariCodi) throws SistemaExternException {
+		LOGGER.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+		try {
+			return consultaRolsUsuariUnic(
+					getJdbcFiltreRolsCodi(),
+					"codi",
+					usuariCodi);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")",
+					ex);
+		}
+	}
+	
+	@Override
 	public DadesUsuari findAmbCodi(
 			String usuariCodi) throws SistemaExternException {
 		LOGGER.debug("Consulta de les dades de l'usuari (codi=" + usuariCodi + ")");
@@ -130,6 +146,47 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 		}
 		return llistaUsuaris;
 	}
+	
+	private List<String> consultaRolsUsuariUnic(
+			String sqlQuery,
+			String paramName,
+			String paramValue) throws SistemaExternException {
+		List<String> rols = new ArrayList<String>();
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			Context initContext = new InitialContext();
+			DataSource ds = (DataSource)initContext.lookup(getDatasourceJndiName());
+			con = ds.getConnection();
+			if (sqlQuery.contains("?")) {
+				ps = con.prepareStatement(sqlQuery);
+				ps.setString(1, paramValue);
+			} else if (sqlQuery.contains(":" + paramName)) {
+				ps = con.prepareStatement(
+						sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
+			} else {
+				ps = con.prepareStatement(sqlQuery);
+			}
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				rols.add(rs.getString(1));
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException(ex);
+		} finally {
+			try {
+				if (ps != null) ps.close();
+			} catch (Exception ex) {
+				LOGGER.error("Error al tancar el PreparedStatement", ex);
+			}
+			try {
+				if (con != null) con.close();
+			} catch (Exception ex) {
+				LOGGER.error("Error al tancar la connexió", ex);
+			}
+		}
+		return rols;
+	}
 
 	private String getDatasourceJndiName() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.datasource.jndi.name");
@@ -146,7 +203,9 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	private String getJdbcQueryUsuariFiltre() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre");
 	}
-
+	private String getJdbcFiltreRolsCodi() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.rols");
+	}
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);
 
 }

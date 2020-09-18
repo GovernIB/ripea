@@ -10,21 +10,23 @@
 	<title><spring:message code="firma.info.titol"/></title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+	let parentIframe = window.frameElement;
+	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	
+	$('#btn_cancelar').on('click', function(){
+		window.parent.addLoading(idModal);
+	});
+});
+</script>
 </head>
 <body>
-	<ul class="nav nav-tabs" role="tablist">
-		<li class="active" role="presentation">
-			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="firma.info.pipella.dades"/></a>
-		</li>
-		<%--li role="presentation">
-			<a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="firma.info.pipella.annexos"/></a>
-		</li--%>
-		<c:if test="${portafirmes.error}">
-			<li role="presentation">
-				<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
-			</li>
-		</c:if>
-	</ul>
+
+	<c:if test="${portafirmes.error}">
+		<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
+	</c:if>
 	<br/>
 	<div class="tab-content">
 		<div class="tab-pane active in" id="dades" role="tabpanel">
@@ -56,7 +58,7 @@
 				</tr>
 				<tr>
 					<td><strong><spring:message code="firma.info.camp.document.tipus"/></strong></td>
-					<td>${portafirmes.documentTipus}</td>
+					<td>${portafirmes.documentTipus}</td> 
 				</tr>
 				<c:if test="${not empty portafirmes.responsables}">
 					<tr>
@@ -87,10 +89,10 @@
 						<td colspan="2" style="text-align:right">
 						<c:choose>
 							<c:when test="${isTasca}">
-								<a href="<rip:modalUrl value="/usuariTasca/${tascaId}/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
+								<a id="btn_cancelar" href="<rip:modalUrl value="/usuariTasca/${tascaId}/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
 							</c:when>
 							<c:otherwise>
-								<a href="<rip:modalUrl value="/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
+								<a id="btn_cancelar" href="<rip:modalUrl value="/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
 							</c:otherwise>
 						</c:choose>
 						</td>

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,29 +11,25 @@ import es.caib.ripea.war.helper.ContingutEstaticHelper;
 import es.caib.ripea.war.helper.EntitatHelper;
 
 /**
- * Interceptor per a gestionar la llista d'entitats a cada pàgina.
+ * Interceptor per a gestionar la informació comuna de totes les pagines relacionades amb 
+ * l'administració distribuida.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 
-	@Autowired
-	private EntitatService entitatService;
-
-	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) {
-		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-			EntitatHelper.findEntitatsAccessibles(
-					request,
-					entitatService);
-			EntitatHelper.processarCanviEntitats(
-					request,
-					entitatService);
-		}
-		return true;
-	}
-
+    @Autowired
+    private EntitatService entitatService;
+    
+    @Override
+    public boolean preHandle(
+    		HttpServletRequest request,
+    		HttpServletResponse response,
+    		Object handler) throws Exception {
+        if (!ContingutEstaticHelper.isContingutEstatic(request)) {
+            EntitatHelper.processarCanviEntitats(request, entitatService);
+            EntitatHelper.findEntitatsAccessibles(request, entitatService);
+        }
+        return true;
+    }
 }

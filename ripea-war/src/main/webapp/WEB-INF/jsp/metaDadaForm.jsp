@@ -16,15 +16,43 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<rip:modalHead/>
+	
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
+	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/clamp.js"/>"></script>
+	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	
 <script type="text/javascript">
 $(document).ready(function() {
 	$('select#tipus').change(function() {
 		if ($(this).val() == 'DOMINI') {
 			$('#domini').parent().parent().show();
-			let valor = $('#valor').val();
-			$('#valor').parent().parent().hide();
+			let valor = $('#valorString').val();
+			$('#valorString').parent().parent().hide();
+			$('#valorSencer').parent().parent().hide();
+			$('#valorFlotant').parent().parent().hide();
+			$('#valorImport').parent().parent().hide();
+			$('#valorData').parent().parent().hide();
+			$('#valorBoolea').parent().parent().hide();
+			
 			$.ajax({
 				type: 'GET',
 				url: "<c:url value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada/domini"/>",
@@ -51,17 +79,76 @@ $(document).ready(function() {
 					$selOrgan.select2(select2Options);
 				}
 			});
-		} else {
-			$('#valor').parent().parent().show();
+		} else if ($(this).val() == 'BOOLEA') {
+			$('#valorSencer').parent().parent().hide();
+			$('#valorFlotant').parent().parent().hide();
+			$('#valorImport').parent().parent().hide();
+			$('#valorData').parent().parent().hide();
+			$('#valorBoolea').parent().parent().show();
+			$('#valorString').parent().parent().hide();
 			$('#domini').parent().parent().hide();
-		}
+			
+		} else if ($(this).val() == 'DATA') {
+			$('#valorSencer').parent().parent().hide();
+			$('#valorFlotant').parent().parent().hide();
+			$('#valorImport').parent().parent().hide();
+			$('#valorData').parent().parent().show();
+			$('#valorBoolea').parent().parent().hide();
+			$('#valorString').parent().parent().hide();
+			$('#domini').parent().parent().hide();
+			
+		} else if ($(this).val() == 'FLOTANT') {
+			$('#valorSencer').parent().parent().hide();
+			$('#valorFlotant').parent().parent().show();
+			$('#valorImport').parent().parent().hide();
+			$('#valorData').parent().parent().hide();
+			$('#valorBoolea').parent().parent().hide();
+			$('#valorString').parent().parent().hide();
+			$('#domini').parent().parent().hide();
+			
+		} else if ($(this).val() == 'IMPORT') {
+			$('#valorSencer').parent().parent().hide();
+			$('#valorFlotant').parent().parent().hide();
+			$('#valorImport').parent().parent().show();
+			$('#valorData').parent().parent().hide();
+			$('#valorBoolea').parent().parent().hide();
+			$('#valorString').parent().parent().hide();
+			$('#domini').parent().parent().hide();
+			
+		} else if ($(this).val() == 'SENCER') {
+			$('#valorSencer').parent().parent().show();
+			$('#valorFlotant').parent().parent().hide();
+			$('#valorImport').parent().parent().hide();
+			$('#valorData').parent().parent().hide();
+			$('#valorBoolea').parent().parent().hide();
+			$('#valorString').parent().parent().hide();
+			$('#domini').parent().parent().hide();
+			
+		}  else if ($(this).val() == 'TEXT') {
+			$('#valorSencer').parent().parent().hide();
+			$('#valorFlotant').parent().parent().hide();
+			$('#valorImport').parent().parent().hide();
+			$('#valorData').parent().parent().hide();
+			$('#valorBoolea').parent().parent().hide();
+			$('#valorString').parent().parent().show();
+			$('#domini').parent().parent().hide();
+			
+		}	
+
+
+				
+		
 	});
+
+		
+
+
 	$('select#domini').change(function() {
 		var dominiCodiSelected = $(this).val();		
 		var dominiNomSelected = $(this).text();
 		if (dominiCodiSelected != null && dominiCodiSelected != '') {
 			$('#codi').val(dominiCodiSelected);
-			$('#valor').val(dominiCodiSelected);
+			$('#valorString').val(dominiCodiSelected);
 		}
 	});
 	$('select#domini').trigger('change');
@@ -70,8 +157,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDadaCommand.metaNodeId}/metaDada"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaDadaCommand">
+	<form:form action="." method="post" cssClass="form-horizontal" commandName="metaDadaCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaNodeId"/>
@@ -79,7 +165,86 @@ $(document).ready(function() {
 		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true"/>
 		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto"/>
 		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
-		<rip:inputText name="valor" textKey="metadada.form.camp.valor"/>
+		
+		
+		<c:set var="displaySencer"></c:set>
+		<c:if test="${metaDadaCommand.tipus != 'SENCER'}">
+			<c:set var="displaySencer">display:none;</c:set>
+		</c:if>
+		<div class="form-group" style="${displaySencer}">
+			<label class="control-label col-xs-4">
+				<spring:message code="metadada.form.camp.valor"/>
+			</label>
+			<div class="col-xs-8">	
+				<form:input path="valorSencer" id="valorSencer" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
+			</div>		
+		</div>
+
+		<c:set var="displayFlotant"></c:set>
+		<c:if test="${metaDadaCommand.tipus != 'FLOTANT'}">
+			<c:set var="displayFlotant">display:none;</c:set>
+		</c:if>
+		<div class="form-group" style="${displayFlotant}">
+			<label class="control-label col-xs-4">
+				<spring:message code="metadada.form.camp.valor"/>
+			</label>
+			<div class="col-xs-8">	
+				<form:input path="valorFlotant" id="valorFlotant" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+			</div>
+		</div>
+
+		<c:set var="displayImport"></c:set>
+		<c:if test="${metaDadaCommand.tipus != 'IMPORT'}">
+			<c:set var="displayImport">display:none;</c:set>
+		</c:if>
+		<div class="form-group" style="${displayImport}">
+			<label class="control-label col-xs-4">
+				<spring:message code="metadada.form.camp.valor"/>
+			</label>
+			<div class="col-xs-8">	
+				<form:input path="valorImport" id="valorImport" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+			</div>
+		</div>
+		
+		<c:set var="displayData"></c:set>
+		<c:if test="${metaDadaCommand.tipus != 'DATA'}">
+			<c:set var="displayData">display:none;</c:set>
+		</c:if>	
+		<div class="form-group" style="${displayData}">
+			<label class="control-label col-xs-4">
+				<spring:message code="metadada.form.camp.valor"/>
+			</label>
+			<div class="col-xs-8">	
+				<form:input path="valorData" id="valorData" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}" ></form:input>
+			</div>
+		</div>
+
+		<c:set var="displayBoolea"></c:set>
+		<c:if test="${metaDadaCommand.tipus != 'BOOLEA'}">
+			<c:set var="displayBoolea">display:none;</c:set>
+		</c:if>
+		<div class="form-group" style="${displayBoolea}">
+			<label class="control-label col-xs-4">
+				<spring:message code="metadada.form.camp.valor"/>
+			</label>
+			<div class="col-xs-8">	
+				<form:checkbox path="valorBoolea" id="valorBoolea" name="valorBoolea" ></form:checkbox>
+			</div>
+		</div>
+
+		<c:set var="displayString"></c:set>
+		<c:if test="${metaDadaCommand.tipus != 'TEXT' && metaDadaCommand.tipus != 'DOMINI'}">
+			<c:set var="displayString">display:none;</c:set>
+		</c:if>
+		<div class="form-group" style="${displayString}">
+			<label class="control-label col-xs-4" for="valorString">
+				<spring:message code="metadada.form.camp.valor"/>
+			</label>
+			<div class="col-xs-8">	
+				<form:input path="valorString" id="valorString" cssClass="form-control${multipleClass}"></form:input>
+			</div>
+		</div>
+	
 		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini"/>
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
 		<div id="modal-botons">

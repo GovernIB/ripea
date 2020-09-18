@@ -41,7 +41,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -55,7 +56,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				metaExpedientService.permisFind(
@@ -77,7 +79,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -109,10 +112,11 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
-					"entitat",
+					"metaExpedient",
 					metaExpedientService.findById(
 							entitatActual.getId(),
 							metaExpedientId));
@@ -134,7 +138,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,

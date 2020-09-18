@@ -15,11 +15,15 @@
 			missatgeLoading: null
 		}
 		var $element = $(element), element = element;
+	
 		var plugin = this;
 		plugin.settings = {}
 		plugin.serverParams = [];
+		
 		plugin.init = function() {
 			plugin.settings = $.extend(defaults, $element.data(), options);
+			plugin.settings.missatgeLoading = $element.data("missatgeloading");
+			
 			$element.click(function(event) {
 				var elementPerEvaluar = $element;
 				if (elementPerEvaluar.prop("tagName") == 'TR' && event.target.tagName != 'TD') {
@@ -46,6 +50,7 @@
 						if (plugin.settings.maximized) {
 							modalData += ' data-maximized="true"';
 						}
+
 						if ($('#' + modalDivId).length == 0 ) {
 							$('body').append(
 								'<div id="' + modalDivId + '"' + modalData + '>' +
@@ -144,7 +149,7 @@
 						iframe.css('height', '' + settings.height + 'px');
 					iframe.attr("src", settings.contentUrl);
 					iframe.load(function() {
-						//S'oculta l'icone loader
+						// S'oculta l'icona loader
 						$('.modal-body .datatable-dades-carregant').hide();
 						if(!iframe.attr("hidden")){
 							iframe.show();
@@ -158,7 +163,7 @@
 						var modalBotons = (dataBotons) ? $(dataBotons, $(iframe).contents()) : $(settings.elementBotons, $(iframe).contents());
 						if (modalBotons.length) {
 							$('.modal-footer *', $(this).parent().parent()).remove();
-							$('.btn', modalBotons).each(function(index) {
+							$('.btn', modalBotons).each(function() {
 								var element = $(this);
 								var clon = element.clone();
 								if (element.data('elementNoTancar')==true) {
@@ -172,10 +177,14 @@
 									});
 								} else {
 									clon.on('click', function () {
-										iframe.hide();
-										$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
-										$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
-										$('.modal-body .datatable-dades-carregant').show();
+										// When click submit show loading
+										if ($(this).attr('type') === 'submit') {
+											iframe.hide();
+											$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
+											$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
+											$('.modal-body .datatable-dades-carregant').show();
+											$(this).attr('disabled', true);
+										}
 										element.click();
 										return false;
 									});
@@ -242,6 +251,10 @@
 					}
 				});
 				modalobj.data('modal-configurada', true);
+				modalobj.data({
+							backdrop: 'static',	//no tancar en cas de pitjar defora de la modal
+							keyboard: false //no tancar en cas de pitjar ESC
+						});
 			}
 			$('.modal-body iframe *', modalobj).remove();
 			$('.modal-footer *', modalobj).remove();

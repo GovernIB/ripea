@@ -100,4 +100,20 @@
 			id="dominiService"
 			jndi-name="ripea/DominiServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.DominiService"/>	
+	<jee:local-slsb
+			id="expedientSeguidorService"
+			jndi-name="ripea/ExpedientSeguidorServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ExpedientSeguidorService"/>
+	<jee:local-slsb 
+			id="organGestorService" 
+			jndi-name="ripea/OrganGestorServiceBean/local" 
+			business-interface="es.caib.ripea.core.api.service.OrganGestorService"/>	 
+	<jee:local-slsb 
+			id="expedientEstatService" 
+			jndi-name="ripea/ExpedientEstatServiceBean/local" 
+			business-interface="es.caib.ripea.core.api.service.ExpedientEstatService"/>	 
+	<jee:local-slsb
+			id="grupService"
+			jndi-name="ripea/GrupServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.GrupService"/>		
 </beans>

@@ -5,6 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
 <c:set var="expedientPare" value="${contingut.expedientPare}"/>
 <c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
 <c:set var="potModificarContingut" value="${false}"/>
@@ -38,9 +39,7 @@
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
-	
-<%-- 	<meta name="subtitle" content="${serveiPerTitol}"/> --%>
-	
+		
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -332,6 +331,68 @@ ul.interessats {
 .dominis ~ span > .selection {
 	width: 100%;
 }
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
+
+
+/** SPINNER CREATION **/
+
+.loader {
+  position: relative;
+  text-align: center;
+  margin: 15px auto 35px auto;
+  z-index: 9999;
+  display: block;
+  width: 80px;
+  height: 80px;
+  border: 10px solid rgba(0, 0, 0, .3);
+  border-radius: 50%;
+  border-top-color: #000;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+.loader-txt {
+  p {
+    font-size: 13px;
+    color: #666;
+    small {
+      font-size: 11.5px;
+      color: #999;
+    }
+  }
+}
+
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -402,8 +463,19 @@ var publicacioEstatText = new Array();
 <c:forEach var="option" items="${publicacioEstatEnumOptions}">
 publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/>";
 </c:forEach>
-$(document).ready(function() {
 
+$(document).ready(function() {
+	removeLoading();
+	$("a.fileDownload").on("click", function() {
+		$("body").addClass("loading");
+		checkLoadingFinished();
+    });
+	
+	$("#document-new-empty-metadocuments").click(function(e){
+	    alert("<spring:message code="contingut.document.alerta.max"/>");
+	    e.preventDefault();
+	});
+	
 	var iconaIdx = $('.esborranys > p').text().indexOf('(B)');
 	if (iconaIdx != -1) {
 		var newValidacioTxt = $('.esborranys > p').text().replace('B', '<i class="fa fa-bold" />');
@@ -484,7 +556,7 @@ $(document).ready(function() {
 		window.location.href = $('a:first', $(this).parent()).attr('href');
 	});
 	$('ul.interessats li').hover(function() {
-		$('a', this).removeClass('hidden');
+		$('a', this).removeClass('hidden');contingut
 	},
 	function() {
 		$('a', this).addClass('hidden');
@@ -548,11 +620,61 @@ $(document).ready(function() {
 		$(this).next().removeClass().addClass('glyphicon glyphicon-pencil form-control-feedback');
 		$(this).attr('title', 'Valor modificat pendent de guardar');
 	}
+	
+	function setCheckboxFalse($checkbox, isDisabled)
+	{
+		var hiddenCheckbox = $checkbox.clone(true);
+		hiddenCheckbox.attr('type', 'hidden');
+		hiddenCheckbox.attr('value', 'false');
+		hiddenCheckbox.removeAttr('data-toggle');
+		hiddenCheckbox.insertAfter($checkbox);
+		if (!isDisabled)
+			hiddenCheckbox.removeAttr('disabled')
+		
+		$checkbox.removeAttr('checked')
+		$checkbox.attr('value', 'false');
+	}
+	
+	function setCheckboxTrue($checkbox)
+	{
+		$checkbox.attr('value', 'true');
+		$checkbox.attr('checked', 'checked');
+		console.log("set to true");
+		console.log($checkbox.next());
+		$checkbox.next().remove();
+	}
+	
+	$('input[data-toggle="checkbox"]', this).each(function() {
+		$(this).attr('type', 'checkbox');
+		var isDisabled = $(this).closest('div.form-group').data('toggle') == "multifield";
+		if($(this).attr('value') == 'true'){
+			$(this).attr('checked', 'checked');
+			
+		}else{
+			setCheckboxFalse($(this), isDisabled);
+		}
+	});
+	
+	$('form#nodeDades').on('change', 'input[data-toggle="checkbox"]', function() {
+		if($(this).attr('value') == 'true'){
+			setCheckboxFalse($(this), false);
+			
+		} else{
+			setCheckboxTrue($(this));
+		}
+		
+	});
+	
+	$('form#nodeDades').on('DOMNodeInserted', 'div[data-multifield-clon="true"]', function () {
+		$(this).find('input').prop('disabled', '');
+	});
+	
 	$('#nodeDades input').change(nodeDadesInputChange);
-	$('form#nodeDades').submit(function() {
+	$('#dades').on('submit', 'form#nodeDades', function() {
+		showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
 		$.post(
 				'../ajax/contingutDada/${contingut.id}/save',
-				$('#nodeDades').serialize(),
+				$(this).serialize(),
 				function (data) {
 					if (data.estatOk) {
 						$('#nodeDades input').each(function() {
@@ -571,11 +693,13 @@ $(document).ready(function() {
 								$(this).removeAttr('title');
 							}
 						});
-						$.get(
-								'../ajax/contingutDada/${contingut.id}/count',
-								function (data) {
-									$('#dades-count').html(data);
-								});
+// 						$.get(
+// 								'../ajax/contingutDada/${contingut.id}/count',
+// 								function (data) 
+<%-- 									<meta name="subtitle" content="${serveiPerTitol}"/>{ --%>
+// 									$('#dades-count').html(data);
+// 								});
+						
 					} else {
 						$('#nodeDades input').each(function() {
 							for (var i = 0; i < data.errorsCamps.length; i++) {
@@ -593,12 +717,22 @@ $(document).ready(function() {
 							}
 						});
 					}
-					webutilRefreshMissatges();
+// 					webutilRefreshMissatges();
+					location.reload();
 				});
 		return false;
 	});
 	$('form#nodeDades td .form-group').on('clone.multifield', function(event, clon) {
 		$('input', clon).change(nodeDadesInputChange);
+		var url = '<c:url value="/contingutDada/' + $('#contingutId').val() + '/' + $('input', clon).attr('id') + '"/>';
+		$.ajax({
+	        type: "GET",
+	        url: url,
+	        success: function (result) {
+	        	$('input', clon).val(result);
+	        	$('input', clon).trigger("focusout");
+	        }
+		});
 	});
 	if (${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
@@ -901,21 +1035,7 @@ $(document).ready(function() {
 			$('table tbody', td).append(tableBody);
 			$('table tbody td').webutilModalEval();
 		});
-	});
-
-
-
-
-
-
-
-
-
-	
-
-
-
-	
+	});	
 });
 
 function getEnviamentsDocument(document) {
@@ -1001,7 +1121,6 @@ function enableDisableButton() {
 	        dataType: "json",
 	        data: {docsIdx: docsIdx},
 	        success: function (resultat) {
-	        	console.log(resultat);
 	        	if (resultat.isTotPdfFirmat && resultat.isTotPdf) {
 	        		$('.nomaximized').addClass('hidden'); //zip
 	        		$('.maximized').removeClass('hidden'); //concatenació
@@ -1090,10 +1209,92 @@ function recuperarResultatDomini(
 		}
 	});
 }
+
+function checkLoadingFinished() {
+	var cookieName = "contentLoaded";
+	if (getCookie(cookieName) != "") {
+		$("body").removeClass("loading");
+        removeCookie(cookieName);
+		return;
+	}
+    setTimeout(checkLoadingFinished, 100);
+}
+
+function setCookie(cname,cvalue) {
+	var exdays = 30;
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function removeCookie(cname) {
+    var expires = new Date(0).toUTCString();
+    document.cookie = cname + "=; path=/; expires=" + expires + ";";
+}
+
+
+function addLoading(idModal) {
+	$('#' + idModal).on('hidden.bs.modal', function () {
+		$('body').addClass('loading');
+	})	
+}
+
+function removeLoading() {
+	$('body').removeClass('loading');
+}
+
+function modalLoading(modalDivId, modalData, message){
+	return  '<div id="' + modalDivId + '"' + modalData + '>' +
+			'	<div class="modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
+			'		<div class="modal-dialog modal-sm" role="document">' +
+		    '			<div class="modal-content" style="border-radius: 0px;box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);">' +
+		    '				<div class="modal-body text-center">' +
+		    '					<div class="loader"></div>' +
+			'					<div clas="loader-txt">' +
+			'						<p>' + message + '</p>' +
+			'					</div>' +
+			'				</div>' +
+		    '			</div>' +
+			'		</div>' +
+			'	</div>' +
+			'</div>';
+}
+function showLoadingModal(message) {
+	var modalDivId = "modalLoading";
+	
+	modalData = "";
+	if ($('#' + modalDivId).length == 0 ) {
+		$('body').append(modalLoading(modalDivId, modalData, message));
+	} 
+	var modalobj = $('#' + modalDivId + ' > div.modal');
+	modalobj.modal({
+	      backdrop: "static", //remove ability to close modal with click
+	      keyboard: false, //remove option to close with keyboard
+	      show: true //Display loader!
+	    });
+}
 </script>
 
 </head>
 <body>
+	<div class="rmodal"></div>
+	<input id="contingutId" type="hidden" value="${contingut.id}">
 	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer and !isTasca}">
 		<div class="text-right" data-toggle="botons-titol">
 			<ul class="list-group pull-right">
@@ -1118,7 +1319,6 @@ function recuperarResultatDomini(
 		<rip:blocContenidorPath contingut="${contingut}"/>
 	</c:if>
 	<div>
-	
 		<c:if test="${contingut.expedient or contingut.carpeta}">
 			<!------------------------------------------------------------------------- INFORMACIÓ BLOCK (LEFT SIDE OF THE PAGE) ------------------------------------------------------------------------>
 			<div class="col-md-3 col-sm-4" id="colInfo">		
@@ -1508,7 +1708,11 @@ function recuperarResultatDomini(
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 										<ul class="dropdown-menu text-left" role="menu">
 											<c:if test="${contingut.crearExpedients and not empty metaExpedients}">
-												<li><a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...</a></li>
+												<li>
+												<a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true">
+													<span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...
+												</a>
+												</li>
 											</c:if>
 											<%---- Document... ----%>
 											<c:choose>
@@ -1516,7 +1720,21 @@ function recuperarResultatDomini(
 													<li><a id="document-new" href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
 												</c:when>
 												<c:otherwise>
-													<li><a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
+													<li>
+													<c:choose>
+  														<c:when test="${empty metaDocumentsLeft}">
+															<a href="#" id="document-new-empty-metadocuments">
+																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+															</a>
+  														</c:when>
+														<c:otherwise>
+	   														<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>"
+															   data-toggle="modal" data-refresh-pagina="true">
+																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+															</a>
+														</c:otherwise>
+													</c:choose>
+													</li>
 												</c:otherwise>
 											</c:choose>
 											<c:if test="${!isTasca}">
@@ -1556,7 +1774,7 @@ function recuperarResultatDomini(
 						<div class="tab-pane" id="dades">
 							<c:choose>
 								<c:when test="${not empty metaDades}">
-									<form:form onsubmit="window.location.reload();" id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
+									<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
 										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
 											<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 										</c:if>
@@ -1575,7 +1793,7 @@ function recuperarResultatDomini(
 														<c:set var="dadaValor">${dada.valorMostrar}</c:set>
 													</c:if>
 												</c:forEach>
-												<c:set var="isMultiple" value="${metaDada.multiplicitat == 'M_0_N' or metaNodeMetaDada.multiplicitat == 'M_1_N'}"/>
+												<c:set var="isMultiple" value="${metaDada.multiplicitat == 'M_0_N' or metaDada.multiplicitat == 'M_1_N'}"/>
 												<c:set var="multipleClass" value=""/>
 												<c:if test="${isMultiple}"><c:set var="multipleClass" value=" multiple"/></c:if>
 												<tr>
@@ -1583,7 +1801,7 @@ function recuperarResultatDomini(
 													<td>
 														<c:choose>
 															<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
-																<div class="form-group <c:if test="${metaDada.tipus == 'DOMINI'}">col-xs-12</c:if>"<c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
+																<div class="form-group ${metaDada.tipus == 'DOMINI' ? '' :''}" ${metaDada.tipus == 'DOMINI' ? 'style="width: 100%;margin-bottom: -10px;"' :''} <c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																	<label class="hidden" for="${metaDada.codi}"></label>
 																	<div class="controls">
 																		<c:choose>
@@ -1597,10 +1815,12 @@ function recuperarResultatDomini(
 																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DATA'}">
-																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
+																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" data-a-dec="," data-a-sep="." data-m-dec="2" cssClass="form-control text-right${multipleClass}"></form:input>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'BOOLEA'}">
-																				<form:checkbox path="${metaDada.codi}" id="${metaDada.codi}" name="${metaDada.codi}"></form:checkbox>
+																			<label>
+																				<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="checkbox" data-a-dec="," data-a-sep="." data-m-dec="2" class="${multipleClass}"></form:input>
+																			</label>
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DOMINI'}">
 																			

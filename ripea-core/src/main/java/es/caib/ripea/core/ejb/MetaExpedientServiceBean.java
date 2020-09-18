@@ -12,7 +12,9 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -34,7 +36,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	MetaExpedientService delegate;
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientDto create(
 			Long entitatId,
 			MetaExpedientDto metaExpedient) {
@@ -42,7 +44,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient) {
@@ -50,7 +52,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
@@ -59,7 +61,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientDto delete(
 			Long entitatId,
 			Long metaExpedientId) {
@@ -67,7 +69,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) {
@@ -77,20 +79,13 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
 			String codi) {
 		return delegate.findByEntitatCodi(entitatId, codi);
 	}
 
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<MetaExpedientDto> findByEntitat(
-			Long entitatId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findByEntitat(entitatId, paginacioParams);
-	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
@@ -140,7 +135,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -152,7 +147,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -164,7 +159,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientTascaDto tascaUpdateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -178,7 +173,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -190,7 +185,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaExpedientTascaDto tascaFindById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -202,7 +197,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -214,7 +209,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			Long id) {
@@ -224,7 +219,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
@@ -236,7 +231,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public void permisDelete(Long entitatId, Long id, Long permisId) {
 		delegate.permisDelete(
 				entitatId,
@@ -244,74 +239,39 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				permisId);
 	}
 
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiCreate(
-//			Long entitatId, 
-//			Long metaExpedientId,
-//			MetaExpedientDominiDto metaExpedientTasca) throws NotFoundException {
-//		return delegate.dominiCreate(
-//				entitatId, 
-//				metaExpedientId, 
-//				metaExpedientTasca);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiUpdate(
-//			Long entitatId, 
-//			Long metaExpedientId,
-//			MetaExpedientDominiDto metaExpedientTasca) throws NotFoundException {
-//		return delegate.dominiUpdate(
-//				entitatId,
-//				metaExpedientId, 
-//				metaExpedientTasca);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiDelete(
-//			Long entitatId, 
-//			Long metaExpedientId, 
-//			Long id) throws NotFoundException {
-//		return delegate.dominiDelete(
-//				entitatId, 
-//				metaExpedientId, 
-//				id);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public MetaExpedientDominiDto dominiFindById(
-//			Long entitatId, 
-//			Long metaExpedientId, 
-//			Long id)
-//			throws NotFoundException {
-//		return delegate.dominiFindById(
-//				entitatId, 
-//				metaExpedientId, 
-//				id);
-//	}
-//
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public PaginaDto<MetaExpedientDominiDto> dominiFindPaginatByMetaExpedient(Long entitatId, Long metaExpedientId,
-//			PaginacioParamsDto paginacioParams) throws NotFoundException {
-//		return delegate.dominiFindPaginatByMetaExpedient(
-//				entitatId,
-//				metaExpedientId, 
-//				paginacioParams);
-//	}
-//
-//	@Override
-//	@RolesAllowed("tothom")
-//	public List<MetaExpedientDominiDto> dominiFindByMetaExpedient(
-//			Long entitatId, 
-//			Long metaExpedientId)
-//			throws NotFoundException {
-//		return delegate.dominiFindByMetaExpedient(
-//				entitatId, 
-//				metaExpedientId);
-//	}
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
+			Long entitatId,
+			MetaExpedientFiltreDto filtre,
+			boolean isRolActualAdministradorOrgan,
+			PaginacioParamsDto paginacioParams) {
 
+	    return delegate.findByEntitatOrOrganGestor(
+	    		entitatId,
+	    		filtre,
+	    		isRolActualAdministradorOrgan, 
+	    		paginacioParams);
+
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public MetaExpedientDto getAndCheckAdminPermission(
+			Long entitatId,
+			Long id) {
+		return delegate.getAndCheckAdminPermission(
+				entitatId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<GrupDto> findGrupsAmbMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegate.findGrupsAmbMetaExpedient(
+				entitatId, 
+				metaExpedientId);
+	}
 }

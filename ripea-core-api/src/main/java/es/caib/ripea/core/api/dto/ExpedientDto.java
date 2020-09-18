@@ -47,7 +47,13 @@ public class ExpedientDto extends NodeDto {
 	private boolean tasques;
 	private boolean hasEsborranys;
 	private Set<InteressatDto> interessats;
-	
+	private long numSeguidors;
+	private boolean seguidor;
+	private boolean errorLastEnviament;
+	private boolean errorLastNotificacio;
+	private boolean ambEnviamentsPendents;
+	private boolean ambNotificacionsPendents;
+	private Long grupId;
 //	public String getInteressatsResum() {
 //		String interessatsResum = "";
 //		if (this.getInteressats() != null)
@@ -282,5 +288,46 @@ public class ExpedientDto extends NodeDto {
 	public void setHasEsborranys(boolean hasEsborranys) {
 		this.hasEsborranys = hasEsborranys;
 	}
-
+	public long getNumSeguidors() {
+		return numSeguidors;
+	}
+	public void setNumSeguidors(long numSeguidors) {
+		this.numSeguidors = numSeguidors;
+	}
+	public boolean isSeguidor() {
+		return seguidor;
+	}
+	public void setSeguidor(boolean seguidor) {
+		this.seguidor = seguidor;
+	}
+	public boolean isErrorLastEnviament() {
+		return errorLastEnviament;
+	}
+	public void setErrorLastEnviament(boolean errorLastEnviament) {
+		this.errorLastEnviament = errorLastEnviament;
+	}
+	public boolean isErrorLastNotificacio() {
+		return errorLastNotificacio;
+	}
+	public void setErrorLastNotificacio(boolean errorLastNotificacio) {
+		this.errorLastNotificacio = errorLastNotificacio;
+	}
+	public boolean isAmbEnviamentsPendents() {
+		return ambEnviamentsPendents;
+	}
+	public void setAmbEnviamentsPendents(boolean ambEnviamentsPendents) {
+		this.ambEnviamentsPendents = ambEnviamentsPendents;
+	}
+	public boolean isAmbNotificacionsPendents() {
+		return ambNotificacionsPendents;
+	}
+	public void setAmbNotificacionsPendents(boolean ambNotificacionsPendents) {
+		this.ambNotificacionsPendents = ambNotificacionsPendents;
+	}
+	public Long getGrupId() {
+		return grupId;
+	}
+	public void setGrupId(Long grupId) {
+		this.grupId = grupId;
+	}
 }

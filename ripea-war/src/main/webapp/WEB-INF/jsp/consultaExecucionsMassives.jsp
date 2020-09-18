@@ -73,7 +73,7 @@
 		for (var i in continguts) {
 			var contingut = continguts[i];
 			html_cont += '<tr class="' + (contingut.estat == "ESTAT_ERROR" ? ' danger' : '') + '">';
-			html_cont += '<td>' + contingut.contingut.nom + '</td>';
+			html_cont += '<td>' + contingut.documentNom + '</td>';
 			var estat = "";
 			if (contingut.estat == "ESTAT_CANCELAT"){
 				estat = "<span class='fa fa-check-circle'></span><label style='padding-left: 10px'><spring:message code='accio.massiva.estat.ESTAT_CANCELAT'/></label>";

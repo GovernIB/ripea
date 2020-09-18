@@ -154,6 +154,20 @@ public class PermisosHelper {
 				permissions,
 				auth);
 	}
+	
+  /**
+   * Filtre un llistat d'identificadors d'objectes amb els que tenen uns
+   * determinats permisos.
+   * 
+   * @param objects             
+   *            Conjunt d'objectes que volem filtrar. El resultat del
+   *            mètode és aquesta llista modificada.
+   * @param objectIdentifierExtractor 
+   *            Implementació per extreure el identificador dels objectes del parametre objects 
+   * @param clazz       
+   *            Classe dels objectes a consular.
+   * @param permissions Permisos que volem seleccionar
+   */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void filterGrantedAny(
 			Collection<?> objects,
@@ -163,9 +177,11 @@ public class PermisosHelper {
 			Authentication auth) {
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(
-					it.next());
-			if (!isGrantedAny(
+			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (objectIdentifier == null) {
+			    it.remove();
+			}
+			else if (!isGrantedAny(
 					objectIdentifier,
 					clazz,
 					permissions,
@@ -173,6 +189,63 @@ public class PermisosHelper {
 				it.remove();
 		}
 	}
+	
+	  /**
+	   * Filtre un llistat d'identificadors d'objectes amb els que tenen uns
+	   * determinats permisos.
+	   * 
+	   * @param objects             
+	   *            Conjunt d'objectes que volem filtrar. El resultat del
+	   *            mètode és aquesta llista modificada.
+	   * @param objectIdentifierExtractor 
+	   *            Implementació per extreure el identificador dels objectes del parametre objects 
+	   * @param clazz       
+	   *            Classe dels objectes a consular.
+	   * @param permissions Permisos que volem seleccionar
+	   */
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		public void filterGrantedAnyList(
+				Collection<?> objects,
+				ListObjectIdentifiersExtractor objectIdentifierExtractor,
+				Class<?> clazz,
+				Permission[] permissions,
+				Authentication auth) {
+			Iterator<?> it = objects.iterator();
+			while (it.hasNext()) {
+				List<Long> objectIdentifiers = objectIdentifierExtractor.getObjectIdentifiers(it.next());
+				boolean hasPermission = false;
+				for (Long id : objectIdentifiers) {
+					if (isGrantedAny(id, clazz, permissions, auth)) {
+						hasPermission = true;
+						break;
+					}						
+				}
+				if (!hasPermission) {
+					it.remove();
+				}
+				
+			}
+		}
+  /**
+   * Filtre un llistat d'identificadors d'objectes amb els que tenen qualsevol
+   * dels permisos especificats.
+   * 
+   * @param ids         Conjunt d'objectes que volem filtrar. El resultat del
+   *                    mètode és aquesta llista modificada.
+   * @param clazz       Classe dels objectes a consular.
+   * @param permissions Permisos que volem filtrar
+   * @param auth        Autentificació
+   */
+  public void filterGrantedAny(Collection<Long> ids, Class<?> clazz, Permission[] permissions,
+                               Authentication auth) {
+      Iterator<Long> it = ids.iterator();
+      while (it.hasNext()) {
+          Long objectIdentifier = it.next();
+          if (!isGrantedAny(objectIdentifier, clazz, permissions, auth))
+              it.remove();
+      }
+  }
+  
 	public boolean isGrantedAny(
 			Long objectIdentifier,
 			Class<?> clazz,
@@ -190,6 +263,29 @@ public class PermisosHelper {
 		return false;
 	}
 
+  /**
+   * Filtre un llistat d'identificadors d'objectes amb els que tenen tots els permisos especificats.
+   * 
+   * @param ids         Conjunt d'objectes que volem filtrar. El resultat del
+   *                    mètode és aquesta llista modificada.
+   * @param clazz       Classe dels objectes a consular.
+   * @param permissions Permisos que volem filtrar
+   * @param auth        Autentificació
+   */
+  public void filterGrantedAll(Collection<Long> ids, Class<?> clazz, Permission[] permissions,
+                               Authentication auth) {
+      Iterator<Long> it = ids.iterator();
+      while (it.hasNext()) {
+          Long objectIdentifier = it.next();
+          if (!isGrantedAll(
+                  objectIdentifier,
+                  clazz,
+                  permissions,
+                  auth))
+              it.remove();
+      }
+  }
+	
 	public void filterGrantedAll(
 			Collection<? extends AbstractPersistable<Long>> objects,
 			Class<?> clazz,
@@ -258,6 +354,15 @@ public class PermisosHelper {
 		}
 		return findPermisosPerAcl(acl);
 	}
+	
+  /**
+   * Obté tots els permisos d'un conjunt d'objectes.
+   * 
+   * @param objectIdentifiers Conjunt d'objectes que volem consultar.
+   * @param objectClass Classe dels objectes a consular.
+   * @return
+   *  Mapa amb tots els permisos de cada objecte del conjunt consultat.
+   */
 	public Map<Long, List<PermisDto>> findPermisos(
 			List<Long> objectIdentifiers,
 			Class<?> objectClass) {
@@ -499,9 +604,12 @@ public class PermisosHelper {
 	}
 
 
-
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);
+	}
+	
+	public interface ListObjectIdentifiersExtractor<T> {
+		public List<Long> getObjectIdentifiers(T object);
 	}
 
 }

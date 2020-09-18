@@ -59,9 +59,6 @@ public class EntitatServiceImpl implements EntitatService {
 	private PermisosEntitatHelper permisosEntitatHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-
-
-
 	
 	@Transactional
 	@Override
@@ -390,6 +387,12 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				EntitatEntity.class,
 				permisId);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public boolean isAdminOrgan(Long id) {		  
+		return permisosEntitatHelper.hasAdminOrganPermission(id);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);

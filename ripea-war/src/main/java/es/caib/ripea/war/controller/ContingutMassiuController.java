@@ -157,6 +157,16 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
 		model.addAttribute(command);
 		
+		//Flux de firma
+//		MetaDocumentDto metaDocument = metaDocumentService.findById(
+//				entitatActual.getId(), 
+//				filtreCommand.getTipusExpedient(), 
+//				filtreCommand.getTipusDocument());
+//		
+//		setFluxPredefinit(
+//				metaDocument, 
+//				model, 
+//				command);
 		return "enviarPortafirmes";
 	}
 	
@@ -338,7 +348,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
-		metaDocuments = metaDocumentService.findByMetaExpedient(entitatActual.getId(), metaExpedientId);
+		metaDocuments = metaDocumentService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatActual.getId(), metaExpedientId);
 		
 		return metaDocuments;
 	}	
@@ -452,6 +462,25 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 	    				true));
 	}
 
+//	private void setFluxPredefinit(
+//			MetaDocumentDto metaDocument,
+//			Model model,
+//			PortafirmesEnviarCommand command) {
+//		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+//		if (metaDocument.getPortafirmesFluxTipus() != null) {
+//			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+//			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
+//				model.addAttribute("nouFluxDeFirma", true);
+//			} else {
+//				String urlPlantilla = portafirmesFluxService.recuperarUrlMostrarPlantilla(metaDocument.getPortafirmesFluxId());
+//				model.addAttribute("nouFluxDeFirma", false);
+//				model.addAttribute("urlPlantilla", urlPlantilla);
+//			}
+//		} else {
+//			model.addAttribute("nouFluxDeFirma", false);
+//			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+//		}
+//	}
 
 
 	private ContingutMassiuFiltreCommand getFiltreCommand(

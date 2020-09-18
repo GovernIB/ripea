@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,6 +217,10 @@ public class ContingutServiceImpl implements ContingutService {
 		cacheHelper.evictErrorsValidacioPerNode(node);
 	}
 
+	
+
+	
+	
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
@@ -702,7 +707,6 @@ public class ContingutServiceImpl implements ContingutService {
 		return dto;
 	}
 
-
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -710,7 +714,6 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions) {
-
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
@@ -718,8 +721,6 @@ public class ContingutServiceImpl implements ContingutService {
 				ambVersions,
 				true);
 	}
-
-
 
 	@Transactional(readOnly = true)
 	@Override
@@ -734,7 +735,6 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutId=" + contingutId + ", "
 				+ "ambFills=" + ambFills + ", "
 				+ "ambVersions=" + ambVersions + ")");
-
 		ContingutEntity contingut;
 		if (ambPermisos) {
 			contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
@@ -745,24 +745,23 @@ public class ContingutServiceImpl implements ContingutService {
 		} else {
 			contingut = contingutRepository.findOne(contingutId);
 		}
-		//comprobar si hi ha notificacions del document
+		// Comprovar si hi ha notificacions del document
 		for (ContingutEntity document: contingut.getFills()) {
 			if (document instanceof DocumentEntity) {
-				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateAsc((DocumentEntity)document);
-				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocument((DocumentEntity)document);
+				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
+				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
 				if (notificacions != null && notificacions.size() > 0) {
 					document.setAmbNotificacions(true);
-					DocumentNotificacioEntity lastNofificacio = notificacions.get(notificacions.size() - 1);
-					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat().name());
+					DocumentNotificacioEntity lastNofificacio = notificacions.get(0);
+					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "");
 					document.setErrorDarreraNotificacio(lastNofificacio.isError());
 				}
 				if (enviaments != null && enviaments.size() > 0) {
-					DocumentEnviamentEntity lastEnviament = enviaments.get(enviaments.size() - 1);
+					DocumentEnviamentEntity lastEnviament = enviaments.get(0);
 					document.setErrorEnviamentPortafirmes(lastEnviament.isError());
 				}
 			}
 		}
-
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -772,15 +771,11 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions);
-
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
-
 		return dto;
 	}
-
-
 
 	@Transactional(readOnly = true)
 	@Override

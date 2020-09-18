@@ -23,6 +23,11 @@ pre {
 	white-space: pre;
 }
 </style>
+<script type="text/javascript">
+$(document).ready(function() {
+	window.parent.removeLoading();
+});
+</script>
 </head>
 <body>
 	<table class="table table-bordered" style="width:100%">

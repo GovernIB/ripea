@@ -28,6 +28,7 @@ import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 /**
  * Classe del model de dades que representa una notificació d'un document
  * a un dels interessats d'un expedient.
+ * Notib Notificacio
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -81,8 +82,16 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			fetch = FetchType.LAZY,
 			orphanRemoval = true)
 	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
+	
+	
+	@Column(name = "notificacio_estat")
+	@Enumerated(EnumType.STRING)
+	protected DocumentNotificacioEstatEnumDto notificacioEstat;
+	
 
-
+	public DocumentNotificacioEstatEnumDto getNotificacioEstat() {
+		return notificacioEstat;
+	}
 	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
 		return documentEnviamentInteressats;
 	}

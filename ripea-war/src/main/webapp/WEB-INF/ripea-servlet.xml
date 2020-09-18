@@ -24,6 +24,7 @@
 	<!-- JBOSS: <mvc:resources mapping="/webjars/**" location="/META-INF/resources/webjars/"/> -->
 	<mvc:resources mapping="/webjars/**" location="${webjars.classpath}/META-INF/resources/webjars/"/>
 
+
 	<mvc:interceptors>
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>

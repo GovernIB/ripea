@@ -95,16 +95,14 @@ public class BaseController implements MessageSourceAware {
 	}
 	
 	
-	protected String getAjaxControllerReturnValueErrorMessageText(
+	protected String getAjaxControllerReturnValueErrorMessage(
 			HttpServletRequest request,
 			String url,
 			String message) {
 		if (message != null) {
 			MissatgesHelper.error(
 					request, 
-					getMessage(
-							request, 
-							message));
+					message);
 		}
 		if (AjaxHelper.isAjax(request)) {
 			return ajaxUrlOk();

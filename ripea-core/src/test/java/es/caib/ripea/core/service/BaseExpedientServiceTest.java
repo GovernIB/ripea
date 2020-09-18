@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
@@ -122,7 +123,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		metaDocument.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.SERIE);
 		metaDocument.setPortafirmesCustodiaTipus("1234");
 		metaDocument.setFirmaPassarelaCustodiaTipus("1234");
-		metaDocument.setMultiplicitat(MultiplicitatEnumDto.M_1);
+		metaDocument.setMultiplicitat(MultiplicitatEnumDto.M_0_N);
 		metaDocument.setNtiOrigen(NtiOrigenEnumDto.O0);
 		metaDocument.setNtiTipoDocumental("TD99");
 		metaDocument.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
@@ -188,7 +189,8 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 								null,
 								expedientCreate.getNom(),
 								null,
-								false);
+								false,
+								null);
 						try {
 							elementsCreats.add(creat);
 							testAmbExpedientCreat.executar(elementsCreats);
@@ -240,12 +242,17 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		documentContingut.setContingut(fitxer.getContingut());
 		documentContingut.setTamany(fitxer.getTamany());
 		documentArxiuAmbContingut.setContingut(documentContingut);
+		Carpeta carpetaArxiu = new Carpeta();
+		carpetaArxiu.setIdentificador(UUID.randomUUID().toString());
+		carpetaArxiu.setNom("Carpeta arxiu");
+		carpetaArxiu.setVersio("1");
 		Mockito.when(arxiuPluginMock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(expedientArxiu);
 		Mockito.when(arxiuPluginMock.expedientCrear(null)).thenThrow(NullPointerException.class);
 		Mockito.when(arxiuPluginMock.expedientDetalls(Mockito.anyString(), Mockito.nullable(String.class))).thenReturn(expedientArxiu);
 		Mockito.when(arxiuPluginMock.documentCrear(Mockito.any(Document.class), Mockito.anyString())).thenReturn(documentArxiu);
 		Mockito.when(arxiuPluginMock.documentCrear(null, null)).thenThrow(NullPointerException.class);
 		Mockito.when(arxiuPluginMock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
+		Mockito.when(arxiuPluginMock.carpetaCrear(Mockito.any(Carpeta.class), Mockito.anyString())).thenReturn(carpetaArxiu);
 		pluginHelper.setArxiuPlugin(arxiuPluginMock);
 	}
 

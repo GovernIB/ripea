@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,7 +31,6 @@ import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -44,12 +42,8 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	private Properties versionProperties;
-
 	@Resource
 	private UsuariRepository usuariRepository;
-	@Resource
-	private AclSidRepository aclSidRepository;
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
@@ -65,18 +59,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Resource
 	private UsuariHelper usuariHelper;
 
-
-
-	@Override
-	public String getVersioActual() {
-		logger.debug("Obtenint versió actual de l'aplicació");
-		try {
-			return getVersionProperties().getProperty("app.version");
-		} catch (IOException ex) {
-			logger.error("No s'ha pogut llegir el fitxer version.properties", ex);
-			return "???";
-		}
-	}
 
 	@Transactional
 	@Override
@@ -134,6 +116,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
 		usuari.update(
 				dto.getIdioma());
+		usuari.updateRebreEmailsAgrupats(dto.isRebreEmailsAgrupats());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
@@ -210,7 +193,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
 		logger.debug("Consulta dels rols definits a les ACLs");
-		return aclSidRepository.findSidByPrincipalFalse();
+		return cacheHelper.rolsDisponiblesEnAcls();
+		//return aclSidRepository.findSidByPrincipalFalse();
 	}
 
 	@Override
@@ -273,16 +257,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 			dto.setRols(rols);
 		}
 		return dto;
-	}
-
-	private Properties getVersionProperties() throws IOException {
-		if (versionProperties == null) {
-			versionProperties = new Properties();
-			versionProperties.load(
-					getClass().getResourceAsStream(
-							"/es/caib/ripea/core/version/version.properties"));
-		}
-		return versionProperties;
 	}
 
 	private String getIdiomaPerDefecte() {

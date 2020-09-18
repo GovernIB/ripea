@@ -143,6 +143,8 @@ $(document).ready(function() {
 			$('textarea#observacions').val('');
 			$('#pais').val("724");
 			$('#pais').change();
+			$('#provincia').val("07");
+			$('#provincia').change();
  		}
  		netejar = true;
 		var tipusInt = 1;
@@ -511,10 +513,10 @@ function canviVisibilitat(tipus) {
 			</div>
 		</div>
 		<!-- Selector d'administració i botó per obrir filtre -->
-		<div class="row">
-			<div class="col-xs-12 organ"><rip:inputSelect name="organCodi" textKey="interessat.form.camp.organCodi" optionItems="${unitatsOrganitzatives}" optionTextAttribute="denominacio" optionValueAttribute="codi" emptyOption="true" required="true" optionMinimumResultsForSearch="6" labelSize="2"/></div>
+<!-- 		<div class="row"> -->
+			<div class="col-xs-11 organ"><rip:inputSelect name="organCodi" textKey="interessat.form.camp.organCodi" optionItems="${unitatsOrganitzatives}" optionTextAttribute="denominacio" optionValueAttribute="codi" emptyOption="true" required="true" optionMinimumResultsForSearch="6" labelSize="2"/></div>
 			<div class="col-xs-1 organ-btn"><button type="button" class="btn btn-default" data-toggle="collapse" data-target="#organ-filtre"><span class="fa fa-bars"></span></button></div>
-		</div>
+<!-- 		</div> -->
 		<!-- FILA: Document interessat -->
 		<div class="row">
 			<div class="col-xs-6"><rip:inputSelect name="documentTipus" textKey="interessat.form.camp.document.tipus" optionItems="${documentTipusEnumOptions}" optionTextKeyAttribute="text" optionValueAttribute="value" /></div>
@@ -531,8 +533,16 @@ function canviVisibilitat(tipus) {
 		<rip:inputText name="raoSocial" textKey="interessat.form.camp.raoSocial" required="true" labelSize="2"/>
 		<!-- FILA: País i província -->
 		<div class="row">
-			<div class="col-xs-6"><rip:inputSelect name="pais" textKey="interessat.form.camp.pais" optionItems="${paisos}" optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" optionMinimumResultsForSearch="6" required="true"/></div>
-			<div class="col-xs-6"><rip:inputSelect name="provincia" textKey="interessat.form.camp.provincia" optionItems="${provincies}" optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" optionMinimumResultsForSearch="6" required="true"/></div>
+			<div class="col-xs-6">
+				<rip:inputSelect name="pais" textKey="interessat.form.camp.pais" optionItems="${paisos}" 
+								 optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" 
+								 optionMinimumResultsForSearch="6" required="true"/>
+			</div>
+			<div class="col-xs-6">
+				<rip:inputSelect name="provincia" textKey="interessat.form.camp.provincia" optionItems="${provincies}" 
+								 optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" 
+								 optionMinimumResultsForSearch="6" required="true"/>
+			</div>
 		</div>
 		<!-- FILA: Municipi i codi postal -->
 		<div class="row">

@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +41,13 @@ import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
@@ -86,6 +89,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private DadesExternesService dadesExternesService;
+	@Autowired
+	private CacheHelper cacheHelper;
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
@@ -95,7 +100,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					DocumentEntity.class,
 					"El document no està custodiat");
 		}
-		ExpedientEntity expedient = document.getExpedient();
+		ExpedientEntity expedient = HibernateHelper.deproxy(document.getExpedient());
 		if (expedient == null) {
 			throw new ValidationException(
 					document.getId(),
@@ -159,7 +164,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, notificacioDto.getTipus());
+		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
+																		  notificacioDto.getTipus());
 //		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		
 		for (NotificacioEnviamentDto notificacioEnviamentDto : notificacioDto.getEnviaments()) {
@@ -189,22 +195,26 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					expedientEntity,
 					documentEntity,
 					notificacioDto.getServeiTipusEnum(),
-					notificacioDto.getEntregaPostal()).
+					notificacioDto.isEntregaPostal()).
 					observacions(notificacioDto.getObservacions()).
 					build();
 			
 			documentNotificacioRepository.save(notificacioEntity);
 			
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, notificacioEntity).build();
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity;
+			documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, 
+																							 notificacioEntity).build();
 			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
 			
 //			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
 
 				if (respostaEnviar.isError()) {
+					cacheHelper.evictNotificacionsAmbErrorPerExpedient(expedientEntity);
 					notificacioEntity.updateEnviatError(
 							respostaEnviar.getErrorDescripcio(),
 							respostaEnviar.getIdentificador());
 				} else {
+					cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 					notificacioEntity.updateEnviat(
 							null,
 							respostaEnviar.getEstat(),
@@ -474,7 +484,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedient = document.getExpedient();
+		ExpedientEntity expedient = HibernateHelper.deproxy(document.getExpedient());
 		if (expedient == null) {
 			throw new ValidationException(
 					documentId,

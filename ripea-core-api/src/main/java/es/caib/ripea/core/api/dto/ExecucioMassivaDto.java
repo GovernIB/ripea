@@ -29,6 +29,7 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private String motiu;
 	private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
 	private Date dataCaducitat;
+	private String portafirmesFluxId;
 //////////////////////////////////////	
 	
 	private Boolean enviarCorreu;
@@ -91,6 +92,14 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 
 	public void setDataCaducitat(Date dataCaducitat) {
 		this.dataCaducitat = dataCaducitat;
+	}
+
+	public String getPortafirmesFluxId() {
+		return portafirmesFluxId;
+	}
+
+	public void setPortafirmesFluxId(String portafirmesFluxId) {
+		this.portafirmesFluxId = portafirmesFluxId;
 	}
 
 	public Boolean getEnviarCorreu() {

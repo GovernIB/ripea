@@ -19,7 +19,7 @@ public class PortafirmesDocument {
 	private boolean custodiat;
 	private String custodiaId;
 	private String custodiaUrl;
-
+	private String arxiuUuid;
 
 
 	public String getTitol() {
@@ -70,7 +70,13 @@ public class PortafirmesDocument {
 	public void setCustodiaUrl(String custodiaUrl) {
 		this.custodiaUrl = custodiaUrl;
 	}
-
+	public String getArxiuUuid() {
+		return arxiuUuid;
+	}
+	public void setArxiuUuid(String arxiuUuid) {
+		this.arxiuUuid = arxiuUuid;
+	}
+	
 	public String getArxiuExtensio() {
 		int index = arxiuNom.lastIndexOf(".");
 		if (index != -1) {

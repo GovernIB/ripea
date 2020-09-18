@@ -16,7 +16,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -36,7 +35,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 public class ExpedientServiceBean implements ExpedientService {
 
 	@Autowired
-	ExpedientService delegate;
+	private ExpedientService delegate;
 
 	@Override
 	@RolesAllowed("tothom")
@@ -49,7 +48,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
-			boolean associarInteressats) {
+			boolean associarInteressats,
+			Long grupId) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -59,9 +59,21 @@ public class ExpedientServiceBean implements ExpedientService {
 				sequencia,
 				nom,
 				expedientPeticioId,
-				associarInteressats);
+				associarInteressats,
+				grupId);
 	}
-
+	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
+			Long entitatId,
+			Long metaExpedientId,
+			Long pareId,
+			String nom,
+			int esborrat) {
+		return delegate.findByMetaExpedientAndPareAndNomAndEsborrat(entitatId,
+																	metaExpedientId,
+																	pareId,
+																	nom,
+																	esborrat);
+	}
 	@Override
 	@RolesAllowed("tothom")
 	public ExpedientDto update(
@@ -147,8 +159,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	public void tancar(
 			Long entitatId,
 			Long id,
-			String motiu) {
-		delegate.tancar(entitatId, id, motiu);
+			String motiu,
+			Long[] documentsPerFirmar) {
+		delegate.tancar(entitatId, id, motiu, documentsPerFirmar);
 	}
 
 	@Override
@@ -259,52 +272,6 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId);
 	}
 
-	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findExpedientEstatByMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
-	}
-
-	@Override
-	public ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id) {
-		return delegate.findExpedientEstatById(entitatId, id);
-	}
-
-	@Override
-	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
-		return delegate.createExpedientEstat(entitatId, estat);
-	}
-
-	@Override
-	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
-		return delegate.updateExpedientEstat(entitatId, estat);
-	}
-
-	@Override
-	public ExpedientEstatDto moveTo(Long entitatId, Long metaExpedientId, Long expedientEstatId, int posicio)
-			throws NotFoundException {
-		return delegate.moveTo(entitatId, metaExpedientId, expedientEstatId, posicio);
-	}
-
-	@Override
-	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId) throws NotFoundException {
-		return delegate.deleteExpedientEstat(entitatId, expedientEstatId);
-	}
-
-	@Override
-	public List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId) {
-		return delegate.findExpedientEstats(entitatId, expedientId);
-	}
-
-
-	@Override
-	public ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId) {
-		return delegate.changeEstatOfExpedient(entitatId, expedientId, expedientEstatId);
-	}
-
-	@Override
-	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId) {
-		return delegate.findExpedientEstatByMetaExpedient(entitatId, metaExpedientId);
-	}
 
 	@Override
 	public boolean retryCreateDocFromAnnex(Long registreAnnexId,
@@ -326,4 +293,19 @@ public class ExpedientServiceBean implements ExpedientService {
 		
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportIndexExpedients(Long entitatId, Collection<Long> expedientIds) throws IOException {
+		return delegate.exportIndexExpedients(
+				entitatId, 
+				expedientIds);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId) throws IOException {
+		return delegate.exportIndexExpedient(
+				entitatId,
+				expedientId);
+	}
 }

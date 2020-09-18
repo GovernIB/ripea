@@ -6,11 +6,11 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-pageContext.setAttribute(
-		"expedientEstatsOptdions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
-		"expedient.estat.enum."));
+//pageContext.setAttribute(
+//		"expedientEstatsOptdions",
+//		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+//		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
+//		"expedient.estat.enum."));
 %>
 <html>
 <head>
@@ -46,6 +46,25 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 .datepicker{
 	padding-left: 12px;
 	padding-right: 12px;
+}
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
 }
 </style>
 <script>
@@ -90,6 +109,12 @@ $(document).ready(function() {
 		    var colorString = fullClassNameString.substring(11);
 		    $(this).parent().css( "background-color", colorString );	
 		});
+		
+
+		$("a.fileDownload").on("click", function() {
+			$("body").addClass("loading");
+			checkLoadingFinished();
+	    });
 	});
 	if (mostrarMeusExpedients) {
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
@@ -167,6 +192,17 @@ $(document).ready(function() {
 	});
 	$('#metaExpedientId').trigger('change');
 });
+
+function checkLoadingFinished() {
+	var cookieName = "contentLoaded";
+	if (getCookie(cookieName) != "") {
+		$("body").removeClass("loading");
+        removeCookie(cookieName);
+		return;
+	}
+    setTimeout(checkLoadingFinished, 100);
+}
+	
 function setCookie(cname,cvalue) {
 	var exdays = 30;
     var d = new Date();
@@ -188,6 +224,11 @@ function getCookie(cname) {
     }
     return "";
 }
+function removeCookie(cname) {
+    var expires = new Date(0).toUTCString();
+    document.cookie = cname + "=; path=/; expires=" + expires + ";";
+}
+
 </script>
 </head>
 <body>
@@ -246,6 +287,7 @@ function getCookie(cname) {
 			</div>	
 		</div>
 	</form:form>
+	<div class="rmodal"></div>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -258,6 +300,7 @@ function getCookie(cname) {
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
+						<li><a class="fileDownload" href="expedient/generarIndex"><spring:message code="expedient.list.user.generar.index"/></a></li>
 					</ul>
 				</div>
 			</div>
@@ -272,16 +315,18 @@ function getCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="12" 
+		data-default-order="18" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
 		data-selection-enabled="true"
 		data-save-state="true"
+		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="usuariActualWrite" data-visible="false"></th>
+				<th data-col-name="seguidor" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
@@ -289,14 +334,24 @@ function getCookie(cname) {
 				<th data-col-name="expedientEstat" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
+				<th data-col-name="errorLastEnviament" data-visible="false"></th>
+				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
+				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
+				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>				
-				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
+				<th data-col-name="nom" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
-					<script id="cellNomTemplate" type="text/x-jsrender">
+				</th>
+				<th data-col-name="id" data-template="#cellAvisosTemplate" width="10%">
+					<spring:message code="expedient.list.user.columna.avisos"/>
+					<script id="cellAvisosTemplate" type="text/x-jsrender">
 						{{if !valid}}<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.validacio"/>"></span>{{/if}}
-						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}
-						{{:nom}}
+						{{if errorLastEnviament }}<span class="fa fa-pencil-square text-danger" title="<spring:message code="contingut.errors.expedient.enviaments"/>"></span>{{/if}}
+						{{if errorLastNotificacio }}<span class="fa fa-envelope-square text-danger" title="<spring:message code="contingut.errors.expedient.notificacions"/>"></span>{{/if}}
+						{{if ambEnviamentsPendents }}<span class="fa fa-pencil-square text-primary" title="<spring:message code="contingut.pendents.expedient.enviaments"/>"></span>{{/if}}
+						{{if ambNotificacionsPendents }}<span class="fa fa-envelope-square text-primary" title="<spring:message code="contingut.pendents.expedient.notificacions"/>"></span>{{/if}}
+						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}			
 					</script>
 				</th>
 				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
@@ -331,7 +386,16 @@ function getCookie(cname) {
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 					</script>
-				</th>				
+				</th>	
+				<th data-col-name="numSeguidors" data-orderable="false" data-template="#cellSeguidorsTemplate" width="1%">
+					<script id="cellSeguidorsTemplate" type="text/x-jsrender">
+						{{if numSeguidors > 0}}
+							<a href="expedient/{{:id}}/seguidors" data-toggle="modal" data-refresh-tancar="true" data-modal-id="seguidors{{:id}}" class="btn btn-default" title="&nbsp;<spring:message code="comu.boto.followers"/>&nbsp;"><span class="fa fa-lg fa-users"></span>&nbsp;<span class="badge">{{:numSeguidors}}</span></a>
+						{{else}}
+							<a href="expedient/{{:id}}/seguidors" data-toggle="modal" data-refresh-tancar="true" data-modal-id="seguidors{{:id}}" class="btn btn-default disabled"><span class="fa fa-lg fa-users"></span>&nbsp;<span class="badge">{{:numSeguidors}}</span></a>
+						{{/if}}							
+					</script>
+				</th>			
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -348,6 +412,11 @@ function getCookie(cname) {
 											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 										{{/if}}
 									{{/if}}
+								{{/if}}	
+								{{if metaNode.usuariActualWrite && seguidor}}
+									<li><a href="expedient/{{:id}}/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
+								{{else metaNode.usuariActualWrite && !seguidor}}					
+									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
 								{{/if}}
 								{{if metaNode.usuariActualDelete && estat != 'TANCAT'}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
@@ -359,4 +428,5 @@ function getCookie(cname) {
 			</tr>
 		</thead>
 	</table>
+
 </body>

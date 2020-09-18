@@ -17,6 +17,29 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+	<c:if test="${not isRolAdminOrgan}">
+		<script type="text/javascript">
+		var hasOrganGestor = ${hasOrganGestor};
+		$(document).ready(function() {
+			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
+			$( "#checkbox-metaexpedient-comu" ).change(function () {
+				if(this.checked) {
+					selectOrganGestorContainer.hide();
+					
+			    } else {
+			    	selectOrganGestorContainer.show();
+			    	
+			    	
+			    }
+		  	});
+			if (!hasOrganGestor) {
+				$( "#checkbox-metaexpedient-comu" ).prop("checked", true);
+				selectOrganGestorContainer.hide();
+			}
+		});
+		</script>
+	</c:if>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
@@ -27,6 +50,7 @@
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
+		<form:hidden path="RolAdminOrgan"/>
 		<br/>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
@@ -35,7 +59,31 @@
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
 				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
+				<c:if test="${not isRolAdminOrgan}">
+					<div class="form-group">
+						<label class="control-label col-xs-4" for="checkbox-metaexpedient-comu"><spring:message code="metaexpedient.form.camp.comu"/></label>
+						<div class="controls col-xs-8">
+							<div class="checkbox">
+						    <label>
+								<input type="checkbox" id="checkbox-metaexpedient-comu" value="1">
+					    	</label>
+					    	</div>
+						</div>
+					</div>						
+				</c:if>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+ 					name="organGestorId"  
+ 					urlConsultaInicial="${urlConsultaInicial}"
+ 					urlConsultaLlistat="${urlConsultaLlistat}"
+ 					textKey="metaexpedient.form.camp.organgestor"
+ 					suggestValue="id"
+ 					suggestText="nom"
+ 					required="${ isRolAdminOrgan }"/>		 
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
+				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
+				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa"/>

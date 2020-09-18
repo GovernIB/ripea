@@ -55,6 +55,13 @@
 
 <script>
 	$(document).ready(function() {
+		let parentIframe = window.frameElement;
+		let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+		
+		$('form').on('submit', function(){
+			window.parent.addLoading(idModal);
+		});
+		
 		$('#tipus').val("NOTIFICACIO");
 		$('#tipus').trigger('change');
 

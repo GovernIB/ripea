@@ -41,7 +41,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -50,6 +50,31 @@ public interface MetaDocumentService {
 			String plantillaContentType,
 			byte[] plantillaContingut) throws NotFoundException;
 
+	/**
+	 * Crea un nou meta-document.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaDocument
+	 *            Informació del meta-document a crear.
+	 * @param plantillaNom
+	 *            Nom de l'arxiu de la plantilla.
+	 * @param plantillaContentType
+	 *            Content type de l'arxiu de la plantilla.
+	 * @param plantillaContingut
+	 *            Contingut de l'arxiu de la plantilla.
+	 * @return El meta-document creat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaDocumentDto create(
+			Long entitatId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut) throws NotFoundException;
+	
 	/**
 	 * Actualitza la informació del meta-document que tengui el mateix
 	 * id que l'especificat per paràmetre.
@@ -70,7 +95,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto update(
 			Long entitatId,
 			Long metaExpedientId,
@@ -79,6 +104,32 @@ public interface MetaDocumentService {
 			String plantillaContentType,
 			byte[] plantillaContingut) throws NotFoundException;
 
+	
+	/**
+	 * Actualitza la informació del meta-document que tengui el mateix
+	 * id que l'especificat per paràmetre.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaDocument
+	 *            Informació del meta-document a modificar.
+	 * @param plantillaNom
+	 *            Nom de l'arxiu de la plantilla.
+	 * @param plantillaContentType
+	 *            Content type de l'arxiu de la plantilla.
+	 * @param plantillaContingut
+	 *            Contingut de l'arxiu de la plantilla.
+	 * @return El meta-document modificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public MetaDocumentDto update(
+			Long entitatId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut) throws NotFoundException;
 	/**
 	 * Marca el meta-document especificada com a activa/inactiva .
 	 * 
@@ -94,7 +145,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -114,7 +165,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -152,7 +203,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto findByCodi(
 			Long entitatId,
 			Long metaExpedientId,
@@ -171,12 +222,26 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
+	/**
+	 * Llistat paginat amb tots els meta-documents sense meta-expedient.
+	 * 
+	 * @param entitatId
+	 *            Id de l'ent
+	 * @param paginacioParams
+	 *            Peràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina de meta-documents.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams);
+	
 	/**
 	 * Llistat paginat amb tots els meta-documents de l'entitat.
 	 * 
@@ -265,7 +330,7 @@ public interface MetaDocumentService {
 	 * Consulta la llista de tipus de document del plugin de portafirmes.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus();
 	
 	/**
@@ -277,7 +342,7 @@ public interface MetaDocumentService {
 	 *            Id del tipus d'expedient.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId);
 	
 	/**
@@ -308,5 +373,15 @@ public interface MetaDocumentService {
 			Long entitatId,
 			MetaDocumentTipusGenericEnumDto tipusGeneric);
 
-	
+	/**
+	 * Consulta els meta-documents actius i amb l'opció de Portafirmes activa donat un tipus d'expedient 
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del tipus d'expedient.
+	 * @return La llista de tipus o null si el plugin no suporta la consulta.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId);
 }

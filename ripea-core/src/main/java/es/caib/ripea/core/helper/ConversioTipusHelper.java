@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
@@ -27,10 +27,13 @@ import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
@@ -38,6 +41,7 @@ import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
@@ -77,7 +81,7 @@ public class ConversioTipusHelper {
 						target.setOrdre(source.getOrdre());
 						target.setExecucioMassiva(convertir(source.getExecucioMassiva(), ExecucioMassivaDto.class));
 						if (source.getContingut() instanceof DocumentEntity)
-							target.setContingut(convertir((DocumentEntity)source.getContingut(), DocumentDto.class));
+							target.setDocumentNom(((DocumentEntity)source.getContingut()).getNom());
 						return target;
 					}
 				});
@@ -93,6 +97,20 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+		
+//		mapperFactory.getConverterFactory().registerConverter(
+//		new CustomConverter<GrupEntity, GrupDto>() {
+//			public GrupDto convert(GrupEntity source, Type<? extends GrupDto> destinationClass) {
+//				GrupDto target = new GrupDto();
+//				target.setId(source.getId());
+//				target.setRol(source.getRol());
+//				target.setDescripcio(source.getDescripcio());
+//
+//
+//				return target;
+//			}
+//		});
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientTascaEntity, ExpedientTascaDto>() {
@@ -175,6 +193,42 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<MetaDadaEntity, MetaDadaDto>() {
+					public MetaDadaDto convert(MetaDadaEntity source, Type<? extends MetaDadaDto> destinationClass) {
+						MetaDadaDto target = new MetaDadaDto();
+						target.setId(source.getId());
+						target.setCodi(source.getCodi());
+						target.setNom(source.getNom());
+						target.setTipus(source.getTipus());
+						target.setDescripcio(source.getDescripcio());
+						target.setMultiplicitat(source.getMultiplicitat());
+						target.setReadOnly(source.isReadOnly());
+						target.setOrdre(source.getOrdre());
+						target.setActiva(source.isActiva());
+						
+						if (source.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
+							target.setValorBoolea((Boolean) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
+						} else if (source.getTipus()==MetaDadaTipusEnumDto.DATA) {
+							target.setValorData((Date) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
+						} else if (source.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
+							target.setValorFlotant((Double) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
+						} else if (source.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
+							target.setValorImport((BigDecimal)DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
+						} else if (source.getTipus()==MetaDadaTipusEnumDto.SENCER) {
+							target.setValorSencer((Long) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
+						}  else if (source.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+							target.setValorString((String) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
+						}						
+						
+						return target;
+					}
+				});
+		
+		
+		
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<CarpetaEntity, ContingutDto>() {

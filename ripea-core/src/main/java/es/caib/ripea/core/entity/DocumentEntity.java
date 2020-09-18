@@ -29,6 +29,8 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa un document.
@@ -38,6 +40,7 @@ import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 @Entity
 @Table(name = "ipa_document")
 @EntityListeners(AuditingEntityListener.class)
+@Getter @Setter
 public class DocumentEntity extends NodeEntity {
 
 	@Column(name = "tipus", nullable = false)
@@ -103,85 +106,6 @@ public class DocumentEntity extends NodeEntity {
 	
 	public Long getPareId() {
 		return pare.getId();
-	}
-
-	public DocumentTipusEnumDto getDocumentTipus() {
-		return documentTipus;
-	}
-	public DocumentEstatEnumDto getEstat() {
-		return estat;
-	}
-	public String getUbicacio() {
-		return ubicacio;
-	}
-	public EntitatEntity getEntitat() {
-		return entitat;
-	}
-	public ExpedientEntity getExpedient() {
-		return expedient;
-	}
-	public Date getData() {
-		return data;
-	}
-	public Date getDataCaptura() {
-		return dataCaptura;
-	}
-	public Date getCustodiaData() {
-		return custodiaData;
-	}
-	public String getCustodiaId() {
-		return custodiaId;
-	}
-	public String getCustodiaCsv() {
-		return custodiaCsv;
-	}
-	public String getFitxerNom() {
-		return fitxerNom;
-	}
-	public String getFitxerContentType() {
-		return fitxerContentType;
-	}
-	public byte[] getFitxerContingut() {
-		return fitxerContingut;
-	}
-	public String getVersioDarrera() {
-		return versioDarrera;
-	}
-	public int getVersioCount() {
-		return versioCount;
-	}
-	public String getNtiVersion() {
-		return ntiVersion;
-	}
-	public String getNtiIdentificador() {
-		return ntiIdentificador;
-	}
-	public String getNtiOrgano() {
-		return ntiOrgano;
-	}
-	public NtiOrigenEnumDto getNtiOrigen() {
-		return ntiOrigen;
-	}
-	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
-		return ntiEstadoElaboracion;
-	}
-	public String getNtiTipoDocumental() {
-		return ntiTipoDocumental;
-	}
-	public String getNtiIdDocumentoOrigen() {
-		return ntiIdDocumentoOrigen;
-	}
-	public DocumentNtiTipoFirmaEnumDto getNtiTipoFirma() {
-		return ntiTipoFirma;
-	}
-	public String getNtiCsv() {
-		return ntiCsv;
-	}
-	public String getNtiCsvRegulacion() {
-		return ntiCsvRegulacion;
-	}
-	public String getDescripcio() {
-		return descripcio;
 	}
 
 	public MetaDocumentEntity getMetaDocument() {

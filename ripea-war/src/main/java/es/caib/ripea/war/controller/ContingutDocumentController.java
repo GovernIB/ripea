@@ -912,7 +912,6 @@ public class ContingutDocumentController extends BaseUserController {
 			for (MetaDadaDto metadada : metadades) {
 				DadaDto dada = new DadaDto();
 				dada.setMetaDada(metadada);
-				dada.setValor(metadada.getValor());
 				dades.add(dada);
 			}
 			Object dadesCommand = beanGeneratorHelper.generarCommandDadesNode(

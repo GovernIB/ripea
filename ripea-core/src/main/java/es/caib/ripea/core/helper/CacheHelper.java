@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.core.helper;
 
@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ComunitatDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
@@ -37,8 +39,11 @@ import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -46,7 +51,10 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
@@ -61,7 +69,7 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
  * defineixen aquí per evitar la impossibilitat de fer funcionar
  * l'anotació @Cacheable als mètodes privats degut a limitacions
  * AOP.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
@@ -94,6 +102,12 @@ public class CacheHelper {
 	private UsuariRepository usuariRepository;
 	@Resource
 	private ExpedientTascaRepository expedientTascaRepository;
+	@Resource
+	private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Resource
+	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Resource
+	private AclSidRepository aclSidRepository;
 
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
@@ -105,7 +119,7 @@ public class CacheHelper {
 	@CacheEvict(value = "tasquesUsuari", key="#usuariCodi")
 	public void evictCountTasquesPendents(String usuariCodi) {
 	}
-	
+
 
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
@@ -198,7 +212,7 @@ public class CacheHelper {
 		return pluginHelper.dadesUsuariFindAmbCodi(
 				usuariCodi);
 	}
-	
+
 	@CacheEvict(allEntries = true, value = "usuariAmbCodi", key="#usuariCodi")
 	@Scheduled(fixedDelay = 86400000)
 	public void evictUsuariAmbCodi() {
@@ -222,7 +236,7 @@ public class CacheHelper {
 				pluginHelper.dadesExternesPaisosFindAll(),
 				PaisDto.class);
 	}
-	
+
 	@Cacheable(value = "comunitats")
 	public List<ComunitatDto> findComunitats() {
 		return conversioTipusHelper.convertirList(
@@ -280,7 +294,7 @@ public class CacheHelper {
 	@CacheEvict(value = "connexioDomini", allEntries=true)
 	public void evictCreateDominiConnexio() {
 	}
-	
+
 	@Cacheable(value = "resultatConsultaDominis", key="#consulta")
 	public List<ResultatDominiDto> findDominisByConsutla(
 			JdbcTemplate jdbcTemplate,
@@ -298,6 +312,113 @@ public class CacheHelper {
 	}
 	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
 	public void evictFindDominisByConsutla() {
+	}
+
+	@Cacheable(value = "enviamentsPortafirmesAmbErrorPerExpedient", key="#expedient")
+	public boolean hasEnviamentsPortafirmesAmbErrorPerExpedient(
+			ExpedientEntity expedient) {
+		boolean errorLastEnviament = false;
+		for (ContingutEntity contingut : expedient.getFills()) {
+			if (contingut instanceof DocumentEntity) {
+				List<DocumentPortafirmesEntity> enviamentsPortafirmes = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc(
+						(DocumentEntity) contingut);
+				//Si només hi ha un enviament amb error sortim del bucle
+				if (enviamentsPortafirmes != null && enviamentsPortafirmes.size() > 0 && enviamentsPortafirmes.get(0).isError()) {
+					errorLastEnviament = true;
+					break;
+				}
+			}
+		}
+		return errorLastEnviament;
+	}
+
+	@CacheEvict(value = "enviamentsPortafirmesAmbErrorPerExpedient", key="#expedient")
+	public void evictEnviamentsPortafirmesAmbErrorPerExpedient(ExpedientEntity expedient) {
+	}
+
+	@Cacheable(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
+	public boolean hasNotificacionsAmbErrorPerExpedient(
+			ExpedientEntity expedient) {
+		boolean errorLastNotificacio = false; //enviaments Portafirmes amb error
+		for (ContingutEntity contingut : expedient.getFills()) {
+			if (contingut instanceof DocumentEntity) {
+				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(
+						(DocumentEntity) contingut);
+				//Si només hi ha una notificació amb error sortim del bucle
+				if (notificacions != null && notificacions.size() > 0 && notificacions.get(0).isError()) {
+					errorLastNotificacio = true;
+					break;
+				}
+			}
+		}
+		return errorLastNotificacio;
+	}
+		
+	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
+	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) { }
+	
+	@Cacheable(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
+	public boolean hasEnviamentsPortafirmesPendentsPerExpedient(
+			ExpedientEntity expedient) {
+		boolean hasEnviamentsPortafirmesPendents = false; //enviaments Portafirmes amb error
+		for (ContingutEntity contingut : expedient.getFills()) {
+			if (contingut instanceof DocumentEntity) {
+				List<DocumentPortafirmesEntity> enviamentsPortafirmesPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateAsc(
+						(DocumentEntity) contingut,
+						new DocumentEnviamentEstatEnumDto[] {
+								DocumentEnviamentEstatEnumDto.PENDENT,
+								DocumentEnviamentEstatEnumDto.ENVIAT
+						},
+						false);
+				//Si hi ha només un enviament pendent sortim del bucle
+				if (enviamentsPortafirmesPendents != null && enviamentsPortafirmesPendents.size() > 0) {
+					hasEnviamentsPortafirmesPendents = true;
+					break;
+				}
+			}
+		}
+		return hasEnviamentsPortafirmesPendents;
+	}
+
+	@CacheEvict(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
+	public void evictEnviamentsPortafirmesPendentsPerExpedient(ExpedientEntity expedient) {
+	}
+
+	@Cacheable(value = "notificacionsPendentsPerExpedient", key="#expedient")
+	public boolean hasNotificacionsPendentsPerExpedient(
+			ExpedientEntity expedient) {
+		boolean hasNotificacionsPendents = false;
+		for (ContingutEntity contingut : expedient.getFills()) {
+			if (contingut instanceof DocumentEntity) {
+
+				List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentAndNotificacioEstatInAndErrorOrderByCreatedDateAsc(
+						(DocumentEntity) contingut,
+						new DocumentNotificacioEstatEnumDto[] {
+								DocumentNotificacioEstatEnumDto.PENDENT, 
+								DocumentNotificacioEstatEnumDto.ENVIADA, 
+								DocumentNotificacioEstatEnumDto.REGISTRADA
+						},
+						false);
+				//Si hi ha només una notificació pendent sortim del bucle
+				if (notificacionsPendents != null && notificacionsPendents.size() > 0) {
+					hasNotificacionsPendents = true;
+					break;
+				}
+			}
+		}
+		return hasNotificacionsPendents;
+	}
+	
+	@CacheEvict(value = "notificacionsPendentsPerExpedient", key="#expedient")
+	public void evictNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {
+	}
+
+	@Cacheable(value = "rolsDisponiblesEnAcls")
+	public List<String> rolsDisponiblesEnAcls() {
+		return aclSidRepository.findSidByPrincipalFalse();
+	}
+	@CacheEvict(value = "rolsDisponiblesEnAcls", allEntries = true)
+	public void evictRolsDisponiblesEnAcls() {
 	}
 
 	private ValidacioErrorDto crearValidacioError(

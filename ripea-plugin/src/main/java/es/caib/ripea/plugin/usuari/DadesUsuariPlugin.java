@@ -49,4 +49,15 @@ public interface DadesUsuariPlugin {
 	*/
 	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException;
 
+	/**
+	* Retorna una llista amb els rols de l'usuari indicat per paràmetre.
+	*
+	* @param usuariCodi
+	*            Codi de l'usuari que es vol consultar.
+	* @return La llista dels rols relacionats amb l'usuari especificat.
+	* @throws SistemaExternException
+	*            Si es produeix un error al consultar les dades de l'usuari.
+	*/
+	List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException;
+
 }

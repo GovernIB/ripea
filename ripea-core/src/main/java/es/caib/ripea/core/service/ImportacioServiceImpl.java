@@ -110,9 +110,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 					} 
 				}
 			}
+			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')): document.getNom();
 			entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
-					tituloDoc != null ? tituloDoc : document.getNom(),
+					nomDocument,
 					null,
 					document.getMetadades().getDataCaptura(),
 					document.getMetadades().getDataCaptura(),
@@ -126,18 +127,19 @@ public class ImportacioServiceImpl implements ImportacioService {
 					contingutPare.getEntitat(),
 					expedientSuperior,
 					null,
-					document.getIdentificador());
+					expedientSuperior.getArxiuUuid());
 		
 			if (fitxer != null) {
 				entity.updateFitxer(
 						fitxer.getNom(),
 						fitxer.getContentType(),
-						fitxer.getContingut());
+						null);
 			}
 			if (document.getFirmes() != null && !document.getFirmes().isEmpty()) {
 				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
 			entity.updateArxiu(document.getIdentificador());
+			entity.updateNtiIdentificador(document.getMetadades().getIdentificador());
 			contingutLogHelper.logCreacio(
 					entity,
 					true,

@@ -35,7 +35,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	MetaDocumentService delegate;
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -51,9 +51,23 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				plantillaContentType,
 				plantillaContingut);
 	}
-
+	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
+	public MetaDocumentDto create(Long entitatId, 
+			MetaDocumentDto metaDocument, String plantillaNom,
+			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
+		return delegate.create(
+				entitatId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut);
+	}
+
+
+	@Override
+	@RolesAllowed("tothom")
 	public MetaDocumentDto update(
 			Long entitatId,
 			Long metaExpedientId,
@@ -69,9 +83,21 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				plantillaContentType,
 				plantillaContingut);
 	}
-
+	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
+	public MetaDocumentDto update(Long entitatId, MetaDocumentDto metaDocument, String plantillaNom,
+			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
+		return delegate.update(
+				entitatId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -85,7 +111,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -109,7 +135,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public MetaDocumentDto findByCodi(
 			Long entitatId,
 			Long metaExpedientId,
@@ -121,7 +147,7 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -132,6 +158,16 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findWithoutMetaExpedient(
+				entitatId,
+				paginacioParams);
+	}
+	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<MetaDocumentDto> findByEntitat(
@@ -172,13 +208,13 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
 		return delegate.portafirmesFindDocumentTipus();
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId) {
 		return delegate.findByMetaExpedient(entitatId, metaExpedientId);
 	}
@@ -208,6 +244,12 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 		return delegate.findByTipusGeneric(
 				entitatId, 
 				tipusGeneric);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId) {
+		return delegate.findByMetaExpedientAndFirmaPortafirmesActiva(entitatId, metaExpedientId);
 	}
 
 }

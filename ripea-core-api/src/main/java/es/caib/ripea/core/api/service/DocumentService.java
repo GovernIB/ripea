@@ -155,10 +155,28 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public List<DocumentDto> findAmbExpedientIPermisRead(
+	public List<DocumentDto> findAmbExpedient(
 			Long entitatId,
 			Long expedientId) throws NotFoundException;
-	
+
+	/**
+	 * Consulta els documents d'un expedient amb un estat determinat.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param expedientId
+	 *            Atribut id de l'expedient.
+	 * @param estat
+	 *            L'estat dels documents.
+	 * @return la llistat de documents.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	public List<DocumentDto> findAmbExpedientIEstat(
+			Long entitatId,
+			Long expedientId,
+			DocumentEstatEnumDto estat) throws NotFoundException;
+
 	/**
 	 * Consulta els documents d'un expedient.
 	 * 
@@ -255,6 +273,7 @@ public interface DocumentService {
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
+			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,

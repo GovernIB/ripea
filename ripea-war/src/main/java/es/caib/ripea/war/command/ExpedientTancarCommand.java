@@ -18,6 +18,7 @@ public class ExpedientTancarCommand extends ContenidorCommand {
 	protected Long id;
 	@NotEmpty @Size(max=1024)
 	protected String motiu;
+	private Long[] documentsPerFirmar;
 
 	public Long getId() {
 		return id;
@@ -30,6 +31,12 @@ public class ExpedientTancarCommand extends ContenidorCommand {
 	}
 	public void setMotiu(String motiu) {
 		this.motiu = motiu;
+	}
+	public Long[] getDocumentsPerFirmar() {
+		return documentsPerFirmar;
+	}
+	public void setDocumentsPerFirmar(Long[] documentsPerFirmar) {
+		this.documentsPerFirmar = documentsPerFirmar;
 	}
 
 	@Override

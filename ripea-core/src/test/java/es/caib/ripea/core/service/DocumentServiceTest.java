@@ -322,6 +322,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								"Motiu de proves",
 								PortafirmesPrioritatEnumDto.NORMAL,
 								dataCaducitat.getTime(),
+								null, //idPlantillaFlux
 								new String[] {"12345678Z"},
 								MetaDocumentFirmaSequenciaTipusEnumDto.SERIE,
 								MetaDocumentFirmaFluxTipusEnumDto.SIMPLE,

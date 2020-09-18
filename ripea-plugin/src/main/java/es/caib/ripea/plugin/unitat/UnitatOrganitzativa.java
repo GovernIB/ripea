@@ -9,12 +9,16 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'una unitat organitzativa.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter @Setter
 public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrganitzativa> {
 
 	private String codi;
@@ -109,8 +113,6 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 		this.numVia = numVia;
 	}
 	
-	
-
 	public UnitatOrganitzativa(
 			String codi, 
 			String denominacio, 
@@ -165,158 +167,18 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 		this.numVia = numVia;
 	}
 
-	public String getCodi() {
-		return codi;
-	}
 	@JsonProperty("codigo")
 	public void setCodi(String codi) {
 		this.codi = codi;
-	}
-	public String getDenominacio() {
-		return denominacio;
 	}
 	@JsonProperty("denominacion")
 	public void setDenominacio(String denominacio) {
 		this.denominacio = denominacio;
 	}
-	public String getNifCif() {
-		return nifCif;
-	}
-	public void setNifCif(String nifCif) {
-		this.nifCif = nifCif;
-	}
-	public String getNivellAdministracio() {
-		return nivellAdministracio;
-	}
-	public void setNivellAdministracio(String nivellAdministracio) {
-		this.nivellAdministracio = nivellAdministracio;
-	}
-	public String getTipusEntitatPublica() {
-		return tipusEntitatPublica;
-	}
-	public void setTipusEntitatPublica(String tipusEntitatPublica) {
-		this.tipusEntitatPublica = tipusEntitatPublica;
-	}
-	public String getTipusUnitatOrganica() {
-		return tipusUnitatOrganica;
-	}
-	public void setTipusUnitatOrganica(String tipusUnitatOrganica) {
-		this.tipusUnitatOrganica = tipusUnitatOrganica;
-	}
-	public String getPoder() {
-		return poder;
-	}
-	public void setPoder(String poder) {
-		this.poder = poder;
-	}
-	public String getSigles() {
-		return sigles;
-	}
-	public void setSigles(String sigles) {
-		this.sigles = sigles;
-	}
-	public String getCodiUnitatSuperior() {
-		return codiUnitatSuperior;
-	}
-	public void setCodiUnitatSuperior(String codiUnitatSuperior) {
-		this.codiUnitatSuperior = codiUnitatSuperior;
-	}
-	public String getCodiUnitatArrel() {
-		return codiUnitatArrel;
-	}
-	public void setCodiUnitatArrel(String codiUnitatArrel) {
-		this.codiUnitatArrel = codiUnitatArrel;
-	}
-	public Long getNivellJerarquic() {
-		return nivellJerarquic;
-	}
-	public void setNivellJerarquic(Long nivellJerarquic) {
-		this.nivellJerarquic = nivellJerarquic;
-	}
-	public String getEstat() {
-		return estat;
-	}
-	public void setEstat(String estat) {
-		this.estat = estat;
-	}
-	public Date getDataCreacioOficial() {
-		return dataCreacioOficial;
-	}
-	public void setDataCreacioOficial(Date dataCreacioOficial) {
-		this.dataCreacioOficial = dataCreacioOficial;
-	}
-	public Date getDataSupressioOficial() {
-		return dataSupressioOficial;
-	}
-	public void setDataSupressioOficial(Date dataSupressioOficial) {
-		this.dataSupressioOficial = dataSupressioOficial;
-	}
-	public Date getDataExtincioFuncional() {
-		return dataExtincioFuncional;
-	}
-	public void setDataExtincioFuncional(Date dataExtincioFuncional) {
-		this.dataExtincioFuncional = dataExtincioFuncional;
-	}
-	public Date getDataAnulacio() {
-		return dataAnulacio;
-	}
-	public void setDataAnulacio(Date dataAnulacio) {
-		this.dataAnulacio = dataAnulacio;
-	}
-	public String getCodiPais() {
-		return codiPais;
-	}
-	public void setCodiPais(String codiPais) {
-		this.codiPais = codiPais;
-	}
-	public String getCodiComunitat() {
-		return codiComunitat;
-	}
-	public void setCodiComunitat(String codiComunitat) {
-		this.codiComunitat = codiComunitat;
-	}
-	public String getCodiProvincia() {
-		return codiProvincia;
-	}
-	public void setCodiProvincia(String codiProvincia) {
-		this.codiProvincia = codiProvincia;
-	}
-	public String getCodiPostal() {
-		return codiPostal;
-	}
-	public void setCodiPostal(String codiPostal) {
-		this.codiPostal = codiPostal;
-	}
-	public String getNomLocalitat() {
-		return nomLocalitat;
-	}
+
 	@JsonProperty("localidad")
 	public void setNomLocalitat(String nomLocalitat) {
 		this.nomLocalitat = nomLocalitat;
-	}
-	public String getAdressa() {
-		return adressa;
-	}
-	public void setAdressa(String adressa) {
-		this.adressa = adressa;
-	}
-	public Long getTipusVia() {
-		return tipusVia;
-	}
-	public void setTipusVia(Long tipusVia) {
-		this.tipusVia = tipusVia;
-	}
-	public String getNomVia() {
-		return nomVia;
-	}
-	public void setNomVia(String nomVia) {
-		this.nomVia = nomVia;
-	}
-	public String getNumVia() {
-		return numVia;
-	}
-	public void setNumVia(String numVia) {
-		this.numVia = numVia;
 	}
 
 	@Override

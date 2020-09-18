@@ -14,11 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.CarpetaHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -68,7 +71,11 @@ public class CarpetaServiceImpl implements CarpetaService {
 			Long entitatId,
 			Long pareId,
 			String nom) {
-
+		ContingutEntity pare = pareId != null ? contingutRepository.getOne(pareId) : null;			
+		if (! checkCarpetaUniqueContraint(nom, pare, entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
+		
 		return carpetaHelper.create(
 				entitatId,
 				pareId,
@@ -96,9 +103,13 @@ public class CarpetaServiceImpl implements CarpetaService {
 				false,
 				false,
 				false);
+		if (! checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
 		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
 				contingut.getEntitat(),
 				id);
+
 		contingutHelper.comprovarNomValid(
 				carpeta.getPare(),
 				nom,
@@ -166,6 +177,11 @@ public class CarpetaServiceImpl implements CarpetaService {
 		return carpetes;
 	}
 
+	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
+		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.CARPETA);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaServiceImpl.class);
 
 }

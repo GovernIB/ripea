@@ -3,13 +3,23 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,7 +29,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -29,46 +38,30 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+/*
+ *  TODO: 	Aquesta classe i la classe MetaExpedientMetaDadaController tenen practicament el mateix codi.
+ *  		S'haurien d'unificar en un mateix codi.
+ */
 @Controller
-@RequestMapping("/metaExpedient")
+@RequestMapping("/metaDocument")
 public class MetaDocumentMetaDadaController extends BaseAdminController {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
 	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
 	private MetaDocumentService metaDocumentService;
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			@PathVariable Long metaDocumentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		getEntitatActualComprovantPermisos(request);
-		model.addAttribute(
-				"metaExpedient",
-				metaExpedientService.findById(
-						entitatActual.getId(),
-						metaExpedientId));
-		model.addAttribute(
-				"metaDocument",
-				metaDocumentService.findById(
-						entitatActual.getId(),
-						metaExpedientId,
-						metaDocumentId));
+	@RequestMapping(value = "/{metaDocumentId}/metaDada", method = RequestMethod.GET)
+	public String get(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		model.addAttribute("metaDocument", metaDocumentService.findById(entitatActual.getId(), null, metaDocumentId));
 		return "metaDadaList";
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/datatable", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			@PathVariable Long metaDocumentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDadaService.findByMetaNodePaginat(
@@ -79,28 +72,21 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		return dtr;
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/new", method = RequestMethod.GET)
-	public String getNew(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			@PathVariable Long metaDocumentId,
-			Model model) {
-		return get(request, metaExpedientId, metaDocumentId, null, model);
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/new", method = RequestMethod.GET)
+	public String getNew(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
+		return get(request, metaDocumentId, null, model);
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaDadaDto metaDada = null;
 		if (metaDadaId != null)
-			metaDada = metaDadaService.findById(
-					entitatActual.getId(),
-					metaDocumentId,
-					metaDadaId);
+			metaDada = metaDadaService.findById(entitatActual.getId(), metaDocumentId, metaDadaId);
 		MetaDadaCommand command = null;
 		if (metaDada != null) {
 			command = MetaDadaCommand.asCommand(metaDada);
@@ -112,89 +98,82 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		model.addAttribute(command);
 		return "metaDadaForm";
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada", method = RequestMethod.POST)
+
+	@RequestMapping(value = "/{metaDocumentId}/metaDada", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		if (bindingResult.hasErrors()) {
 			return "metaDadaForm";
 		}
 		if (command.getId() != null) {
-			metaDadaService.update(
-					entitatActual.getId(),
-					metaDocumentId,
-					MetaDadaCommand.asDto(command));
+			metaDadaService.update(entitatActual.getId(), metaDocumentId, MetaDadaCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDada",
 					"metadada.controller.modificat.ok");
 		} else {
-			metaDadaService.create(
-					entitatActual.getId(),
-					metaDocumentId,
-					MetaDadaCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:metaDada",
-					"metadada.controller.creat.ok");
+			metaDadaService.create(entitatActual.getId(), metaDocumentId, MetaDadaCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(request, "redirect:metaDada", "metadada.controller.creat.ok");
 		}
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			@PathVariable Long metaDocumentId,
-			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDadaService.updateActiva(
-				entitatActual.getId(),
-				metaDocumentId,
-				metaDadaId,
-				true);
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
+	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId, @PathVariable Long metaDadaId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
 				"metadada.controller.activada.ok");
 	}
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
 	public String disable(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDadaService.updateActiva(
-				entitatActual.getId(),
-				metaDocumentId,
-				metaDadaId,
-				false);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
 				"metadada.controller.desactivada.ok");
 	}
 
-	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			@PathVariable Long metaDocumentId,
-			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		metaDadaService.delete(
-				entitatActual.getId(),
-				metaDocumentId,
-				metaDadaId);
+	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
+	public String delete(HttpServletRequest request, @PathVariable Long metaDocumentId, @PathVariable Long metaDadaId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		metaDadaService.delete(entitatActual.getId(), metaDocumentId, metaDadaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
 				"metadada.controller.esborrat.ok");
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	    binder.registerCustomEditor(
+	    		BigDecimal.class,
+	    		new CustomNumberEditor(
+	    				BigDecimal.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
+	    binder.registerCustomEditor(
+	    		Double.class,
+	    		new CustomNumberEditor(
+	    				Double.class,
+	    				NumberFormat.getInstance(new Locale("es","ES")),
+	    				true));
 	}
 
 }

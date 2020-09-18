@@ -46,6 +46,7 @@ if (fluxIframe) {
 			$comentari.html(text + " <span>" + FluxNom + "</span>");
 			$comentari.css('color', '#3c763d');
 			$comentari.find('span').css('font-weight', 'bold');
+			localStorage.setItem('fluxCreat', $comentari.wrap('<p/>').parent().html());
 		}
 	}
 	$(fluxIframe.parentElement.parentElement).prev().removeClass('hidden');

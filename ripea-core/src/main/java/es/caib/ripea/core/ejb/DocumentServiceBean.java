@@ -81,12 +81,23 @@ public class DocumentServiceBean implements DocumentService {
 	}
 
 	@Override
-	public List<DocumentDto> findAmbExpedientIPermisRead(
+	public List<DocumentDto> findAmbExpedient(
 			Long entitatId,
 			Long expedientId) throws NotFoundException {
-		return delegate.findAmbExpedientIPermisRead(
+		return delegate.findAmbExpedient(
 				entitatId,
 				expedientId);
+	}
+
+	@Override
+	public List<DocumentDto> findAmbExpedientIEstat(
+			Long entitatId,
+			Long expedientId,
+			DocumentEstatEnumDto estat) throws NotFoundException {
+		return delegate.findAmbExpedientIEstat(
+				entitatId,
+				expedientId,
+				estat);
 	}
 
 	@Override
@@ -121,6 +132,7 @@ public class DocumentServiceBean implements DocumentService {
 			String motiu,
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
+			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
@@ -132,6 +144,7 @@ public class DocumentServiceBean implements DocumentService {
 				motiu,
 				prioritat,
 				dataCaducitat,
+				portafirmesFluxId,
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,

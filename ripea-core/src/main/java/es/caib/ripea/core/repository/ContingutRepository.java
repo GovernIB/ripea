@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -38,6 +39,13 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNode") MetaNodeEntity metaNode);
 
+	List<ContingutEntity> findByNomAndTipusAndPareAndEntitatAndEsborrat(
+			String nom,
+			ContingutTipusEnumDto tipus,
+			ContingutEntity pare,
+			EntitatEntity entitat,
+			int esborrat);
+	
 	List<ContingutEntity> findByPareAndEsborrat(
 			ContingutEntity pare,
 			int esborrat,

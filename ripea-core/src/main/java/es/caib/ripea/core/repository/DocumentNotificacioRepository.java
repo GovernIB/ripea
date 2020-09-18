@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
@@ -36,4 +37,10 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 	List<DocumentNotificacioEntity> findByDocumentOrderByCreatedDateAsc(
 			DocumentEntity document);
 
+	List<DocumentNotificacioEntity> findByDocumentOrderByCreatedDateDesc(DocumentEntity document);
+	
+	List<DocumentNotificacioEntity> findByDocumentAndNotificacioEstatInAndErrorOrderByCreatedDateAsc(
+			DocumentEntity document,
+			DocumentNotificacioEstatEnumDto[] estat,
+			boolean error);
 }

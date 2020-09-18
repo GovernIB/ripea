@@ -20,7 +20,7 @@ import es.caib.ripea.plugin.utils.PropertiesHelper;
  */
 public class UnitatsPluginDir3Test {
 
-	private static final String ENDPOINT_ADDRESS = "https://proves.caib.es/dir3caib/ws/Dir3CaibObtenerUnidades";
+	private static final String ENDPOINT_ADDRESS = "http://dev.caib.es/dir3caib";
 	private static final String USERNAME = "$ripea_dir3caib";
 	private static final String PASSWORD = "ripea_dir3caib";
 	private static final String UNITAT_ARREL = "A04019281"; // real:"A04003003";

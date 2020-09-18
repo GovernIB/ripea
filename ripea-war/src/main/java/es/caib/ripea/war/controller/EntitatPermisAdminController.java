@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.List;
@@ -45,7 +42,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 			Model model) {
 		model.addAttribute(
 				"entitat",
-				getEntitatActualComprovantPermisos(request));
+				getEntitatActualComprovantPermisAdminEntitat(request));
 		return "adminPermis";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -53,7 +50,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				entitatService.findPermisAdmin(entitatActual.getId()),
@@ -72,7 +69,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		PermisDto permis = null;
 		if (permisId != null) {
 			List<PermisDto> permisos = entitatService.findPermisAdmin(
@@ -97,7 +94,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			return "adminPermisForm";
 		}
@@ -115,7 +112,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		entitatService.deletePermisAdmin(
 				entitatActual.getId(),
 				permisId);

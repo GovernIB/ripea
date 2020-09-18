@@ -25,14 +25,11 @@ public class RolesBasedMappableAttributesRetriever implements MappableAttributes
 
 	private Set<String> defaultMappableAttributes;
 	private Set<String> mappableAttributes = new HashSet<String>();
-	private long refrescarTimestamp = 0;
-
 	private ApplicationContext applicationContext;
 
-
-
 	public Set<String> getMappableAttributes() {
-		refrescarMappableAttributes();
+		// Aquest mètode es crida cada vegada que un usuari s'autentica
+		refrescarMappableAttributes(true);
 		return mappableAttributes;
 	}
 
@@ -43,26 +40,20 @@ public class RolesBasedMappableAttributesRetriever implements MappableAttributes
 		this.applicationContext = applicationContext;
 	}
 
-
-
-	private void refrescarMappableAttributes() {
-		if (refrescarTimestamp < System.currentTimeMillis()) {
-			LOGGER.debug("Refrescant el llistat de rols per mapejar");
-			mappableAttributes.clear();
-			if (defaultMappableAttributes != null) {
-				mappableAttributes.addAll(defaultMappableAttributes);
-			}
-			try {
-				AplicacioService aplicacioService = applicationContext.getBean(AplicacioService.class);
-				List<String> rolsPermisos = aplicacioService.permisosFindRolsDistinctAll();
-				mappableAttributes.addAll(rolsPermisos);
-				// Refrescam els rols disponibles cada hora
-				refrescarTimestamp = System.currentTimeMillis() + (60 * 60 * 1000);
-				String rolsPerMostrar = Arrays.toString(mappableAttributes.toArray(new String[mappableAttributes.size()]));
-				LOGGER.debug("Rols disponibles: " + rolsPerMostrar);
-			} catch (RuntimeException ex) {
-				throw ex;
-			}
+	private void refrescarMappableAttributes(boolean forceRefresh) {
+		LOGGER.debug("Refrescant el llistat de rols per mapejar");
+		mappableAttributes.clear();
+		if (defaultMappableAttributes != null) {
+			mappableAttributes.addAll(defaultMappableAttributes);
+		}
+		try {
+			AplicacioService aplicacioService = applicationContext.getBean(AplicacioService.class);
+			List<String> rolsPermisos = aplicacioService.permisosFindRolsDistinctAll();
+			mappableAttributes.addAll(rolsPermisos);
+			String rolsPerMostrar = Arrays.toString(mappableAttributes.toArray(new String[mappableAttributes.size()]));
+			LOGGER.debug("Rols disponibles: " + rolsPerMostrar);
+		} catch (RuntimeException ex) {
+			throw ex;
 		}
 	}
 

@@ -38,6 +38,10 @@
 </style>
 <script>
 	$(document).ready(function() {
+		var tipus = $('#tipusDocument').val();
+		$('thead tr th:nth-child(1)', $('#taulaDades')).each(function() {
+			enableDisableSelection($(this), tipus);
+		});
 		
 		$('#tipusExpedient').on('change', function() {
 
@@ -77,6 +81,13 @@
 			);
 		});
 		$('#taulaDades').on('draw.dt', function () {
+			var tipus = $('#tipusDocument').val();
+			$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function() {
+				enableDisableSelection($(this), tipus);
+			});
+
+			updateSelectionForTipusDocument(tipus);
+			
 			$('#seleccioAll').on('click', function() {
 				$.get(
 						"select",
@@ -99,7 +110,44 @@
 				return false;
 			});
 		});
-	});
+		$('#tipusExpedient').trigger('change');
+		$('#tipusDocument').trigger('change');
+});
+
+function enableDisableSelection($this, tipus) {
+    if (tipus != undefined && tipus != "") {
+    	$this.removeClass('selection-disabled');
+    	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
+    } else {
+    	$this.addClass('selection-disabled');
+    	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
+		$.get(
+				"deselect",
+				function(data) {
+					$("#seleccioCount").html(data);
+					$('#taulaDades').webutilDatatable('select-none');
+				}
+			);
+	}
+}
+
+function updateSelectionForTipusDocument(currentTipus) {
+	var tipusInStorage = sessionStorage.getItem('Massiu_tipusDocument', currentTipus);
+
+	if (tipusInStorage != null && tipusInStorage != currentTipus) {
+		$.get(
+				"deselect",
+				function(data) {
+					$("#seleccioCount").html(data);
+					$('#taulaDades').webutilDatatable('select-none');
+					$('#taulaDades').webutilDatatable('refresh');
+				}
+		);
+	}
+
+	var tipusInStorage = sessionStorage.setItem('Massiu_tipusDocument', currentTipus);
+}
+
 </script>
 
 </head>
@@ -169,7 +217,7 @@
 		data-url="<c:url value="/massiu/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
-		data-default-order="7" 
+		data-default-order="8" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
@@ -180,14 +228,7 @@
 				<th data-col-name="expedient" data-visible="false"></th>
 				<th data-col-name="carpeta" data-visible="false"></th>
 				<th data-col-name="document" data-visible="false"></th>
-				<th data-col-name="tipus" data-orderable="true" width="15%" data-template="#cellTipusTemplate">
-					<spring:message code="accio.massiva.list.column.tipuselement"/>
-					<script id="cellTipusTemplate" type="text/x-jsrender">
-						{{if tipus == 'DOCUMENT'}}
-							<span class="fa fa-file-text-o"></span> <spring:message code="contingut.tipus.enum.DOCUMENT"/>
-						{{/if}}
-					</script>
-				</th>
+				<th data-col-name="metaDocument.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
 				<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
 					<spring:message code="accio.massiva.list.column.ubicacio"/>
 					<script id="cellPathTemplate" type="text/x-jsrender">
@@ -201,6 +242,7 @@
 				</th>
 				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
+				<th data-col-name="createdBy.codi" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 <%-- 				<th data-col-name="nomPropietariEscriptoriPare" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th> --%>
 			</tr>
 		</thead>

@@ -19,7 +19,7 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 <script type="text/javascript">
 function refrescarSequencia() {
-	let metaExpedientId = $('select#metaNodeId').val();
+	let metaExpedientId = $('#metaNodeId').val();
 	let any = $('input#any').val();
 	if (metaExpedientId != undefined && any != undefined && any != "") {
 		$.ajax({
@@ -69,11 +69,55 @@ function recuperarDominisMetaExpedient() {
 		});
 	}
 }
+
+
+function refrescarGrups() {
+	let metaExpedientId = $('#metaNodeId').val();
+	if (metaExpedientId != undefined && metaExpedientId != "") {
+
+		if (id != undefined && id != "") {
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
+				success: function(data) {
+					$('#gestioAmbGrupsActiva').val(data);
+					if (data) {
+						
+						$.ajax({
+							type: 'GET',
+							url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+							success: function(data) {
+								$('#grupId').closest('.form-group').show();
+								$('#grupId option[value!=""]').remove();
+								for (var i = 0; i < data.length; i++) {
+									$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+								}
+							}
+						});
+						
+					} else {
+						$('#grupId option[value!=""]').remove();
+						$('#grupId').closest('.form-group').hide();
+					}
+	
+				}
+			});
+			
+		} else {
+			$('#grupId').prop('disabled', 'disabled');
+		}
+	}
+	
+}
+
+
 $(document).ready(function() {
 	$('select#metaNodeId').change(function(event) {
 		refrescarSequencia();
+		refrescarGrups();
 	});
-	$('select#metaNodeId').trigger('change');
+	refrescarSequencia();
+	refrescarGrups();
 	
 	$('input#any').change(function(event) {
 		refrescarSequencia();
@@ -98,11 +142,16 @@ $(document).ready(function() {
 				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" optionMinimumResultsForSearch="0"/>
 			</c:when>
 			<c:otherwise>
-				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" disabled="true" labelSize="2" optionMinimumResultsForSearch="0"/>
+				<form:hidden path="metaNodeId"/>
 			</c:otherwise>
 		</c:choose>
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
+		<form:hidden path="gestioAmbGrupsActiva"/>
+		
+		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
+		
+		
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

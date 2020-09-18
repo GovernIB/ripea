@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9</version>
+		<version>0.9.75.pre2</version>
 	</parent>
 	<artifactId>ripea-core</artifactId>
 	<packaging>ejb</packaging>
@@ -290,12 +290,63 @@
             <artifactId>documents-sdk-java</artifactId>
             <version>3.5.140</version>
         </dependency>
-        <dependency>
-    		<groupId>com.thoughtworks.paranamer</groupId>
-    		<artifactId>paranamer</artifactId>
-    		<version>2.3</version>
+     	<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.15</version>
+		</dependency>
+		<dependency> 
+			<groupId>org.apache.poi</groupId> 
+			<artifactId>poi-ooxml</artifactId> 
+			<version>3.15</version>
+			<exclusions>
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId> 	
+				</exclusion> 
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-scratchpad</artifactId>
+		    <version>3.15</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>ooxml-schemas</artifactId>
+		    <version>1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId> 	
+				</exclusion> 
+			</exclusions>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>apb</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.fundaciobit.plugins</groupId>
+					<artifactId>plugin-arxiu-apb</artifactId>
+					<version>1.0.0</version>
+					<exclusions>
+		        		<exclusion>
+		        			<groupId>org.fundaciobit.plugins</groupId>
+							<artifactId>plugin-arxiu-api</artifactId>
+		        		</exclusion>
+					</exclusions>	
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>

@@ -33,7 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -41,12 +43,15 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
@@ -80,12 +85,16 @@ public class ExpedientController extends BaseUserController {
 	@Autowired
 	private ExpedientService expedientService;
 	@Autowired
+	private DocumentService documentService;
+	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
 	private AplicacioService aplicacioService;
-
+	@Autowired
+	private ExpedientEstatService expedientEstatService;
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
@@ -121,7 +130,7 @@ public class ExpedientController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_METAEXP_ID);
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",
@@ -280,6 +289,55 @@ public class ExpedientController extends BaseUserController {
 			return null;
 		}
 	}
+	
+	@RequestMapping(value = "/{expedientId}/generarIndex", method = RequestMethod.GET)
+	@ResponseBody
+	public void generarIndex(
+			@PathVariable Long expedientId,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FitxerDto fitxer = expedientService.exportIndexExpedient(
+					entitatActual.getId(),
+					expedientId);
+
+			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+	}
+	
+	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)
+	public String generarIndexMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:../../expedient";
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FitxerDto fitxer = expedientService.exportIndexExpedients(
+					entitatActual.getId(),
+					seleccio);
+				
+			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
+		}
+	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String get(
@@ -310,9 +368,19 @@ public class ExpedientController extends BaseUserController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
+		
+		List<MetaExpedientDto> metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedients);
+		
+		model.addAttribute(
+				"grups",
+				metaExpedientService.findGrupsAmbMetaExpedient(
+						entitatActual.getId(),
+						expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId()));
+		command.setGestioAmbGrupsActiva(metaExpedients.get(0).isGestioAmbGrupsActiva());
+		
 		return "contingutExpedientForm";
 	}
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
@@ -339,7 +407,8 @@ public class ExpedientController extends BaseUserController {
 					null,
 					command.getNom(),
 					null,
-					false);
+					false,
+					command.getGrupId());
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -386,6 +455,28 @@ public class ExpedientController extends BaseUserController {
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
 		}		
+	}
+	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/grup", method = RequestMethod.GET)
+	@ResponseBody
+	public List<GrupDto> grups(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.findGrupsAmbMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId);
+	}
+	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean gestioAmbGrupsActiva(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.findById(
+				entitatActual.getId(),
+				metaExpedientId).isGestioAmbGrupsActiva();
 	}
 	
 	
@@ -492,17 +583,13 @@ public class ExpedientController extends BaseUserController {
 			@PathVariable Long expedientId,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientTancarCommand command = new ExpedientTancarCommand();
 		command.setId(expedientId);
 		model.addAttribute(command);
-		model.addAttribute(
-				"expedient",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						expedientId,
-						true,
-						false));
+		omplirModelTancarExpedient(
+				expedientId,
+				request,
+				model);
 		return "expedientTancarForm";
 	}
 	@RequestMapping(value = "/{expedientId}/tancar", method = RequestMethod.POST)
@@ -515,23 +602,35 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"expedient",
-					contingutService.findAmbIdUser(
-							entitatActual.getId(),
-							expedientId,
-							true,
-							false));
+			omplirModelTancarExpedient(
+					expedientId,
+					request,
+					model);
 			return "expedientTancarForm";
 		}
-		expedientService.tancar(
-				entitatActual.getId(),
-				expedientId,
-				command.getMotiu());
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../contingut/" + expedientId,
-				"expedient.controller.tancar.ok");
+		try {
+			expedientService.tancar(
+					entitatActual.getId(),
+					expedientId,
+					command.getMotiu(),
+					command.getDocumentsPerFirmar());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.controller.tancar.ok");
+		} catch (Exception ex) {
+			omplirModelTancarExpedient(
+					expedientId,
+					request,
+					model);
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.tancar.nodefinitius",
+							null));
+			return "expedientTancarForm";
+		}
 	}
 
 	@RequestMapping(value = "/estatValues/{metaExpedientId}", method = RequestMethod.GET)
@@ -542,7 +641,7 @@ public class ExpedientController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		List<ExpedientEstatDto> estatsFromDatabase = expedientService.findExpedientEstatByMetaExpedient(
+		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
@@ -564,7 +663,7 @@ public class ExpedientController extends BaseUserController {
 					entitatActual.getId(),
 					expedientId);
 		}
-		List<ExpedientEstatDto> expedientEstats = expedientService.findExpedientEstats(
+		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstats(
 				entitatActual.getId(),
 				expedientId);
 		ExpedientEstatDto expedientEstatObert = new ExpedientEstatDto();
@@ -609,7 +708,7 @@ public class ExpedientController extends BaseUserController {
 //					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "expedientEstatsForm";
 		}
-		expedientService.changeEstatOfExpedient(
+		expedientEstatService.changeEstatOfExpedient(
 				entitatActual.getId(),
 				command.getId(),
 				command.getExpedientEstatId()
@@ -662,7 +761,7 @@ public class ExpedientController extends BaseUserController {
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",
@@ -884,6 +983,26 @@ public class ExpedientController extends BaseUserController {
 					filtreCommand);
 		}
 		return filtreCommand;
+	}
+
+	private void omplirModelTancarExpedient(
+			Long expedientId,
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = (ExpedientDto)contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				expedientId,
+				true,
+				false);
+		model.addAttribute("expedient", expedient);
+		if (expedient.isHasEsborranys()) {
+			List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(
+					entitatActual.getId(),
+					expedientId,
+					DocumentEstatEnumDto.REDACCIO);
+			model.addAttribute("esborranys", esborranys);
+		}
 	}
 
 }

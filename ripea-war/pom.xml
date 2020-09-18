@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9</version>
+		<version>0.9.75.pre2</version>
 	</parent>
 	<artifactId>ripea-war</artifactId>
 	<packaging>war</packaging>
@@ -121,6 +121,11 @@
 			<version>1.12.0</version>
 		</dependency>
 		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>jquery-ui</artifactId>
+		    <version>1.12.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>bootstrap</artifactId>
 			<version>3.3.6</version>
@@ -227,6 +232,12 @@
 		  <groupId>joda-time</groupId>
 		  <artifactId>joda-time</artifactId>
 		  <version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<profiles>
@@ -443,6 +454,16 @@
 							<filtering>true</filtering>
 						</webResource>
 					</webResources>
+                	<archive>
+	                    <manifestEntries>
+							<Implementation-Version>${project.version}</Implementation-Version>
+	                        <Implementation-Vendor>Govern de les Illes Balears</Implementation-Vendor> 
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
+							<Implementation-SCM-Version>${git.closest.tag.name}</Implementation-SCM-Version>
+	                    </manifestEntries>
+	                </archive>
 				</configuration>
 			</plugin>
 			<!--plugin>

@@ -9,12 +9,17 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Dto amb els paràmetres per a paginar i ordenar els
  * resultats d'una consulta.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class PaginacioParamsDto implements Serializable {
 
 	private int paginaNum;
@@ -23,36 +28,6 @@ public class PaginacioParamsDto implements Serializable {
 	private List<FiltreDto> filtres = new ArrayList<FiltreDto>();
 	private List<OrdreDto> ordres = new ArrayList<OrdreDto>();
 
-	public int getPaginaNum() {
-		return paginaNum;
-	}
-	public void setPaginaNum(int paginaNum) {
-		this.paginaNum = paginaNum;
-	}
-	public int getPaginaTamany() {
-		return paginaTamany;
-	}
-	public void setPaginaTamany(int paginaTamany) {
-		this.paginaTamany = paginaTamany;
-	}
-	public String getFiltre() {
-		return filtre;
-	}
-	public void setFiltre(String filtre) {
-		this.filtre = filtre;
-	}
-	public List<FiltreDto> getFiltres() {
-		return filtres;
-	}
-	public void setFiltres(List<FiltreDto> filtres) {
-		this.filtres = filtres;
-	}
-	public List<OrdreDto> getOrdres() {
-		return ordres;
-	}
-	public void setOrdres(List<OrdreDto> ordres) {
-		this.ordres = ordres;
-	}
 
 	public void afegirFiltre(
 			String camp,

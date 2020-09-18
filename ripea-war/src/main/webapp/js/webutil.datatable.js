@@ -4,7 +4,7 @@
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
 			pageLength: 10,
-			lengthMenu: [10, 20, 50],
+			lengthMenu: [10, 20, 50, 100, 250],
 			infoEnabled: true,
 			infoType: 'botons', // 'botons', 'search'
 			searchEnabled: true,
@@ -41,7 +41,7 @@
 			}
 			if (plugin.settings.selectionEnabled) {
 				$('thead tr,tfoot tr', $taula).each(function() {
-					$(this).prepend($('<th>&nbsp;</th>'));
+					$(this).prepend($('<th width="2%">&nbsp;</th>'));
 				});
 				$('tbody tr', $taula).each(function() {
 					$(this).prepend($('<td></td>'));
@@ -76,7 +76,7 @@
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"f>>';
 			else
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"<"botons">>>';
-			var language = window.navigator.userLanguage || window.navigator.language;
+			var language = requestLocale;
 			// Només acceptam es i ca com a llengues //
 			if (language.startsWith("es")) {
 				language = "es";
@@ -148,6 +148,7 @@
 					}
 				},
 				preDrawCallback: function(settings_) {
+					var currentLenthMenu = settings_._iDisplayLength;
 					if (plugin.settings.botonsTemplate && plugin.settings.botonsTemplate.length > 0) {
 						$.templates("templateNew", $(plugin.settings.botonsTemplate).html());
 						var targetBotons = $('.botons', this.parent());
@@ -161,7 +162,7 @@
 							var label = $('label', $(this));
 							var botons = $('<div class="btn-group"></div>');
 							$('option', label).each(function() {
-								var active = ($(this).val() == plugin.settings.pageLength);
+								var active = (currentLenthMenu != undefined ? ($(this).val() == currentLenthMenu) : ($(this).val() == plugin.settings.pageLength));
 								botons.append('<button value="' + $(this).val() + '" class="btn btn-default' + ((active) ? ' active': '') + '">' + $(this).val() + '</button>')
 							});
 							label.css('display', 'none');

@@ -31,14 +31,6 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Autowired
 	AplicacioService delegate;
-
-
-
-	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public String getVersioActual() {
-		return delegate.getVersioActual();
-	}
 	
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})

@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -29,31 +30,94 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	
-	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) ")
+			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:hideWithoutOrganGestor = true or me.organGestor != null) " +
+			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
 	List<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
-			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre,	
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullActiu") boolean esNullActiu,
+			@Param("actiu") Boolean actiu,
+			@Param("esNullOrganGestor") boolean esNullOrganGestor,
+			@Param("organGestor") OrganGestorEntity organGestor,
+			@Param("hideWithoutOrganGestor") boolean hideWithoutOrganGestor,
 			Sort sort);
-	
-	
+	  
+	@Query( "from " +
+	         "    MetaExpedientEntity me " +
+	         "where " +
+	         "    me.entitat = :entitat " +
+			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
+	        "and me.id in (:ids)")
+	List<MetaExpedientEntity> findByEntitat(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullActiu") boolean esNullActiu,
+			@Param("actiu") Boolean actiu,
+			@Param("esNullOrganGestor") boolean esNullOrganGestor,
+			@Param("organGestor") OrganGestorEntity organGestor,
+			@Param("ids") List<Long> ids,
+			Sort sort);
+
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (:esNullFiltre = true or lower(me.codi) like lower('%'||:filtre||'%') or lower(me.nom) like lower('%'||:filtre||'%')) ")
+			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:hideWithoutOrganGestor = true or me.organGestor != null) " +
+			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
-			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre,	
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullActiu") boolean esNullActiu,
+			@Param("actiu") Boolean actiu,
+			@Param("esNullOrganGestor") boolean esNullOrganGestor,
+			@Param("organGestor") OrganGestorEntity organGestor,	
+			@Param("hideWithoutOrganGestor") boolean hideWithoutOrganGestor,
 			Pageable pageable);
-	
-	
+
+	@Query( "from " +
+	         "    MetaExpedientEntity me " +
+	         "where " +
+	         "    me.entitat = :entitat " +
+			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
+	        "and me.id in (:ids)")
+	Page<MetaExpedientEntity> findByEntitat(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullActiu") boolean esNullActiu,
+			@Param("actiu") Boolean actiu,
+			@Param("esNullOrganGestor") boolean esNullOrganGestor,
+			@Param("organGestor") OrganGestorEntity organGestor,
+			@Param("ids") List<Long> ids,
+			Pageable pageable);
+    
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);

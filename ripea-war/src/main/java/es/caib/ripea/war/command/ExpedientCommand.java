@@ -8,13 +8,26 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.war.command.ContenidorCommand.Create;
+import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.ExpedientGrup;
+import es.caib.ripea.war.validation.ExpedientNomUnique;
 
 /**
  * Command per al manteniment d'expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ExpedientGrup(
+		groups = {Create.class, Update.class})
+@ExpedientNomUnique(
+		groups = {Create.class, Update.class},
+		campId = "id",
+		campMetaExpedientId = "metaNodeId",
+		campNom = "nom",
+		campEntitatId = "entitatId",
+		campPareId = "pareId")
 public class ExpedientCommand extends ContenidorCommand {
 
 	@NotNull(groups = {Create.class})
@@ -24,6 +37,9 @@ public class ExpedientCommand extends ContenidorCommand {
 	private Long sequencia;
 	private Long expedientEstatId;
 	protected Long metaNodeDominiId;
+	private Long grupId;
+
+	private boolean gestioAmbGrupsActiva;
 	
 	public Long getMetaNodeDominiId() {
 		return metaNodeDominiId;
@@ -61,6 +77,12 @@ public class ExpedientCommand extends ContenidorCommand {
 	public void setSequencia(Long sequencia) {
 		this.sequencia = sequencia;
 	}
+	public Long getGrupId() {
+		return grupId;
+	}
+	public void setGrupId(Long grupId) {
+		this.grupId = grupId;
+	}
 
 	public static ExpedientCommand asCommand(ExpedientDto dto) {
 		ExpedientCommand command = ConversioTipusHelper.convertir(
@@ -83,6 +105,12 @@ public class ExpedientCommand extends ContenidorCommand {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+	public boolean isGestioAmbGrupsActiva() {
+		return gestioAmbGrupsActiva;
+	}
+	public void setGestioAmbGrupsActiva(boolean gestioAmbGrupsActiva) {
+		this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
 	}
 
 }

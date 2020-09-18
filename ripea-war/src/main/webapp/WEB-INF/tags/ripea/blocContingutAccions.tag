@@ -87,13 +87,12 @@
 				<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
 				<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-				
 				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
 						<c:choose>
-							<c:when test="${contingut.valid && contingut.conteDocumentsFirmats && (!contingut.hasEsborranys || !convertirDefinitiu)}">
+							<c:when test="${contingut.valid && (contingut.conteDocumentsFirmats || contingut.hasEsborranys)}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>
@@ -197,10 +196,10 @@
 						<c:when test="${contingut.valid}">
 							<c:choose>
 								<c:when test="${isTasca}">
-									<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:when>
 								<c:otherwise>
-									<li><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:otherwise>								
 							</c:choose>						
 						</c:when>
@@ -226,8 +225,17 @@
 				<c:if test="${(contingut.estat == 'CUSTODIAT' or contingut.estat == 'DEFINITIU') and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
-					<c:if test="${contingut.pare.metaNode.notificacioActiva}"> 
-						<li><a href="<c:url value="/document/${contingut.id}/notificar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+					<c:if test="${expedientPare.metaNode.notificacioActiva}"> 
+						<c:choose>
+							<c:when test="${!empty expedientPare.interessats}">
+								<li>
+								<a href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li class="disabled"><a href="#"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+							</c:otherwise>
+						</c:choose>
 					</c:if>
 					
 					<%---- Publicar ----%>
@@ -279,7 +287,17 @@
 				<c:otherwise>
 					<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
 				</c:otherwise>
-			</c:choose>		
+			</c:choose>	
+			<c:if test="${contingut.expedient}">
+				<c:choose>
+					<c:when test="${contingut.hasFills}">
+						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
+					</c:when>
+					<c:otherwise>
+						<li class="disabled"><a href="#"/><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
+					</c:otherwise>
+				</c:choose>	
+			</c:if>
 			<c:if test="${contingut.expedient && pluginArxiuActiu}"> 
 				<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 			</c:if>

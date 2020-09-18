@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -129,6 +130,44 @@ public class ContingutDadaController extends BaseUserController {
 		} else {
 			return 0;
 		}
+	}
+	
+	
+	
+	@RequestMapping(value = "/{contingutId}/{metaDadaCodi}")
+	@ResponseBody
+	public Object getDefaultValueForMetaDada(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@PathVariable String metaDadaCodi) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		Long metaNodeId =  metaDadaService.findMetaNodeIdByNodeId(
+				entitatActual.getId(),
+				contingutId);
+		
+		
+		MetaDadaDto metaDada = metaDadaService.findByCodi(
+				entitatActual.getId(),
+				metaNodeId,
+				metaDadaCodi);	
+		Object valor = null;
+		if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
+			valor = metaDada.getValorBoolea();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
+			valor = metaDada.getValorData();
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			valor = simpleDateFormat.format(valor);
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
+			valor = metaDada.getValorFlotant();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
+			valor = metaDada.getValorImport();
+		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
+			valor = metaDada.getValorSencer();
+		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+			valor = metaDada.getValorString();
+		}
+		return valor;
 	}
 
 

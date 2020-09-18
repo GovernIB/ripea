@@ -123,6 +123,7 @@ public class BaseServiceTest {
 					id = entitatCreada.getId();
 				} else {
 					autenticarUsuari("admin");
+					// TODO
 					if (entitatId != null) {
 						if (element instanceof MetaExpedientDto) {
 							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
@@ -181,6 +182,7 @@ public class BaseServiceTest {
 			if (elementsCreats.size() > 1) {
 				metaExpedientId = ((MetaExpedientDto)elementsCreats.get(1)).getId();
 			}
+			// TODO
 			Collections.reverse(elementsCreats);
 			for (Object element: elementsCreats) {
 				autenticarUsuari("admin");

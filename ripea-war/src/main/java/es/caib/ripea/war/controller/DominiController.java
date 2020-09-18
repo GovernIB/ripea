@@ -38,7 +38,7 @@ public class DominiController extends BaseAdminController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		return "dominiList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -46,7 +46,7 @@ public class DominiController extends BaseAdminController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				dominiService.findByEntitatPaginat(
@@ -68,7 +68,7 @@ public class DominiController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long dominiId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		DominiDto domini = null;
 		if (dominiId != null)
 			domini = dominiService.findById(
@@ -91,7 +91,7 @@ public class DominiController extends BaseAdminController {
 			@Valid DominiCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			return "dominiForm";
 		}
@@ -118,7 +118,7 @@ public class DominiController extends BaseAdminController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long dominiId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		dominiService.delete(
 				entitatActual.getId(),
 				dominiId);

@@ -118,7 +118,8 @@ public class ExpedientHelper {
 			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
-			boolean associarInteressats) {
+			boolean associarInteressats,
+			Long grupId) {
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
@@ -157,12 +158,12 @@ public class ExpedientHelper {
 				nom,
 				null,
 				ExpedientEntity.class);
-		comprovarSiExpedientAmbMateixNom(
-				metaExpedient,
-				contingutPare,
-				nom,
-				null,
-				ExpedientEntity.class);
+//		comprovarSiExpedientAmbMateixNom(
+//				metaExpedient,
+//				contingutPare,
+//				nom,
+//				null,
+//				ExpedientEntity.class);
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
 				metaExpedient,
@@ -173,7 +174,8 @@ public class ExpedientHelper {
 				new Date(),
 				any,
 				sequencia,
-				true);
+				true,
+				grupId);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		//find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;
@@ -194,6 +196,7 @@ public class ExpedientHelper {
 						estatInicial.getResponsableCodi());
 			}
 		}
+		
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(
@@ -207,6 +210,7 @@ public class ExpedientHelper {
 						expedientPeticioId);
 			}
 		}
+		
 		contingutLogHelper.logCreacio(
 				expedient,
 				false,
@@ -506,7 +510,7 @@ public class ExpedientHelper {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
-			emailHelper.contingutAgafatSensePermis(
+			emailHelper.contingutAgafatPerAltreUsusari(
 					expedient,
 					usuariOriginal,
 					usuariNou);
@@ -793,24 +797,24 @@ public class ExpedientHelper {
 		return carpetaId;
 	}
 
-	public void comprovarSiExpedientAmbMateixNom(
-			MetaExpedientEntity metaExpedient,
-			ContingutEntity contingutPare,
-			String nom,
-			Long id,
-			Class<?> objectClass) {
-		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
-				metaExpedient,
-				contingutPare,
-				nom,
-				0);
-		if (expedient != null) {
-			throw new ValidationException(
-					id,
-					objectClass,
-					"Ja existeix un altre expedient amb el mateix tipus i nom");
-		}
-	}
+//	public void comprovarSiExpedientAmbMateixNom(
+//			MetaExpedientEntity metaExpedient,
+//			ContingutEntity contingutPare,
+//			String nom,
+//			Long id,
+//			Class<?> objectClass) {
+//		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
+//				metaExpedient,
+//				contingutPare,
+//				nom,
+//				0);
+//		if (expedient != null) {
+//			throw new ValidationException(
+//					id,
+//					objectClass,
+//					"Ja existeix un altre expedient amb el mateix tipus i nom");
+//		}
+//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 

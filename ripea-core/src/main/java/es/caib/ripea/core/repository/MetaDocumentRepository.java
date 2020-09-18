@@ -29,9 +29,16 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			MetaExpedientEntity metaExpedient,
 			String codi);
 
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.metaExpedient is null " +
+			"and lower(:codi) = lower(md.codi)")
+	MetaDocumentEntity findByMetaExpedientAndCodi(
+			@Param("codi") String codi);
+	
 	List<MetaDocumentEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
-	
 	
 	@Query(	"from " +
 			"    MetaDocumentEntity md " +
@@ -55,7 +62,21 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("filtre") String filtre,	
 			Sort sort);
 	
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.metaExpedient is null " +
+			"and (:esNullFiltre = true or lower(md.codi) like lower('%'||:filtre||'%') or lower(md.nom) like lower('%'||:filtre||'%')) ")
+	List<MetaDocumentEntity> findWithoutMetaExpedient(
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,	
+			Sort sort);
 
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where " +
+			"    md.metaExpedient is null ")
+	List<MetaDocumentEntity> findWithoutMetaExpedient();
 	
 	List<MetaDocumentEntity> findByMetaExpedientIdIn(
 			List<Long> metaExpedientIds);
@@ -72,4 +93,12 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("esNullEntitat") boolean esNullEntitat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaDocumentTipusGeneric") MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric);
+	
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where (md.metaExpedient = :metaExpedient) " +
+			"and (md.firmaPortafirmesActiva = 1) "+
+			"and (md.portafirmesResponsables != null or md.portafirmesFluxId != null)")
+	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActivaAmbFluxOResponsable(
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 }

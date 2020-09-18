@@ -108,6 +108,7 @@ public class DocumentHelper {
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
 			Date dataCaducitat,
+			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
@@ -119,13 +120,6 @@ public class DocumentHelper {
 				"assumpte=" + assumpte + ", " +
 				"prioritat=" + prioritat + ", " +
 				"dataCaducitat=" + dataCaducitat + ")");
-//		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
-//				entitatId,
-//				id,
-//				false,
-//				true,
-//				false,
-//				false);
 		
 		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 			throw new ValidationException(
@@ -152,7 +146,7 @@ public class DocumentHelper {
 						DocumentEnviamentEstatEnumDto.PENDENT,
 						DocumentEnviamentEstatEnumDto.ENVIAT
 				});
-		if (enviamentsPendents.size() > 0) {
+		if (enviamentsPendents.size() > 0) { // TODO: uep aqui
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
@@ -173,7 +167,7 @@ public class DocumentHelper {
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
-				document.getMetaDocument().getPortafirmesFluxId(),
+				portafirmesFluxId != null ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
 				document).build();
 
@@ -187,6 +181,7 @@ public class DocumentHelper {
 		SistemaExternException sex = portafirmesEnviar(
 				documentPortafirmes,
 				transaccioId);
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 		if (sex != null) {
 			throw sex;
 		}
@@ -356,6 +351,7 @@ public class DocumentHelper {
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			portafirmesProcessar(documentPortafirmes);
 		}
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 	}
 	
 	public DocumentDto certificacioToDocumentDto(
@@ -668,6 +664,7 @@ public class DocumentHelper {
 		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
 		if (PortafirmesCallbackEstatEnumDto.FIRMAT.equals(callbackEstat)) {
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			document.updateEstat(
 					DocumentEstatEnumDto.FIRMAT);
 			PortafirmesDocument portafirmesDocument = null;
@@ -680,6 +677,7 @@ public class DocumentHelper {
 						"id=" + documentPortafirmes.getId() + ", " +
 						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 						ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentPortafirmes.updateProcessatError(
@@ -711,7 +709,7 @@ public class DocumentHelper {
 						documentPortafirmes.updateProcessat(
 								true,
 								new Date());
-						String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+						String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
 								document,
 								fitxer);
 						document.updateInformacioCustodia(
@@ -742,6 +740,7 @@ public class DocumentHelper {
 						"id=" + documentPortafirmes.getId() + ", " +
 						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 						ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentPortafirmes.updateProcessatError(
@@ -750,6 +749,7 @@ public class DocumentHelper {
 			}
 		}
 		if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			try {
 				documentPortafirmes.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
@@ -786,6 +786,7 @@ public class DocumentHelper {
 			documentViaFirma.updateEnviat(
 					new Date(),
 					messageCode);
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 		} catch (Exception ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;
@@ -800,6 +801,7 @@ public class DocumentHelper {
 		DocumentEntity document = documentViaFirma.getDocument();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			document.updateEstat(
 					DocumentEstatEnumDto.FIRMAT);
 			ViaFirmaDocument viaFirmaDocument = null;
@@ -809,6 +811,7 @@ public class DocumentHelper {
 						documentViaFirma);
 			} catch (Exception ex) {
 				logger.error("Error al descarregar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentViaFirma.updateProcessatError(
@@ -822,14 +825,14 @@ public class DocumentHelper {
 				if (viaFirmaDocument != null) {
 					byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
 					
-					fitxer.setNom(document.getFitxerNom());
+					fitxer.setNom(viaFirmaDocument.getNomFitxer());
 					fitxer.setNomFitxerFirmat(viaFirmaDocument.getNomFitxer());
 					fitxer.setContingut(contingut);
 					fitxer.setContentType("application/pdf");
 					documentViaFirma.updateProcessat(
 								true,
 								new Date());
-					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
 							document,
 							fitxer);
 					document.updateInformacioCustodia(
@@ -848,6 +851,7 @@ public class DocumentHelper {
 				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
@@ -858,6 +862,7 @@ public class DocumentHelper {
 		} 
 		if (ViaFirmaCallbackEstatEnumDto.WAITING_CHECK.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				contingutLogHelper.log(
 						documentViaFirma.getDocument(),
 						LogTipusEnumDto.VFIRMA_WAITING_CHECK,
@@ -874,6 +879,7 @@ public class DocumentHelper {
 		
 		if (ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -893,6 +899,7 @@ public class DocumentHelper {
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.ERROR.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -912,6 +919,7 @@ public class DocumentHelper {
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.EXPIRED.equals(callbackEstat)) {
 			try {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -1042,7 +1050,8 @@ public class DocumentHelper {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");
-
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -1181,7 +1190,7 @@ public class DocumentHelper {
 		fitxer.setContentType("application/pdf");
 		document.updateEstat(
 				DocumentEstatEnumDto.CUSTODIAT);
-		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarPdfFirmat(
+		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
 				document,
 				fitxer);
 		document.updateInformacioCustodia(

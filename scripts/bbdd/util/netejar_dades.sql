@@ -5,6 +5,7 @@ delete from ipa_document_enviament;
 
 delete from ipa_document;
 delete from ipa_expedient_rel;
+delete from ipa_expedient_seguidor;
 delete from ipa_expedient;
 delete from ipa_carpeta;
 delete from ipa_dada;
@@ -24,11 +25,15 @@ delete from ipa_contingut;
 
 delete from ipa_metaexpedient_metadocument;
 delete from ipa_metaexp_seq;
+delete from ipa_metaexpedient_grup;
 delete from ipa_metaexpedient;
 delete from ipa_metadocument;
 delete from ipa_metanode_metadada;
 delete from ipa_metanode;
 delete from ipa_metadada;
+
+delete from ipa_grup;
+delete from ipa_organ_gestor;
 
 delete from ipa_entitat;
 delete from ipa_usuari;
@@ -37,3 +42,8 @@ delete from ipa_acl_entry;
 delete from ipa_acl_object_identity;
 delete from ipa_acl_class;
 delete from ipa_acl_sid;
+
+
+delete from ipa_email_pendent_enviar;
+
+

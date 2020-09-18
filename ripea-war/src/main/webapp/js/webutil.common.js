@@ -284,7 +284,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			} while ($next.length);
 			$puntInsercio.after($clon);
 			var $buttonAfegir = $('<div class="form-group"><button class="btn btn-default"><span class="fa fa-plus"></span></button></div>');
-			$buttonAfegir.css('margin-left', '4px');
+			// $buttonAfegir.css('margin-left', '4px');
 			$clon.after($buttonAfegir);
 			$('button', $buttonAfegir).on('click', function() {
 				multifieldAfegirNouClick();
@@ -307,7 +307,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		if ($multifield.data('nou')) {
 			multifieldAfegirClick = multifieldAfegirNouClick;
 		}
-		var valor = $multifieldInput.val();
+		var valor = $multifieldInput.attr("value");
 		var separador = ',';
 		if (valor && valor.indexOf(separador) != -1) {
 			var parts = valor.split(separador);
@@ -337,15 +337,14 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	$.fn.webutilBotonsTitol = function() {
 		var $heading = $('.panel-heading h2', $(this).closest('.panel'))
 		if ($heading) {
-			$(this).css('position', 'absolute');
-			$(this).css('height', '0');
-			var headingOffset = $heading.offset();
-			var thisOffset = $(this).offset();
-			var margeAcumulat = $(this).children().length * 7 - 6;
-			$(this).css('top', (headingOffset.top - 3) + "px");
-			$(this).css('left', (headingOffset.left + $heading.innerWidth() - $(this).outerWidth() - margeAcumulat) + "px");
+			$heading.wrap( "<div class='row'></div>");
+			
+			$(this).insertAfter($heading);
+			$heading.wrap( "<div class='col-md-10'></div>");
+			$(this).wrap( "<div class='col-md-2'></div>");		
 		}
 	}
+	
 	$.fn.webutilBotonsTitolEval = function() {
 		$('[data-toggle="botons-titol"]', $(this)).each(function() {
 			if (!$(this).attr('data-botons-titol-eval')) {
@@ -405,39 +404,39 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		var suggestText = $(this).data('suggestText');
 		var suggestTextAddicional = $(this).data('suggestTextAddicional');
 		var suggest = $(this);
-		if (value != null && value.includes(",")) {
-			var valueArr = value.split(',');
-			valueArr.forEach(function(value) {
-				urlInicial = urlActual + "/" + value;
-				// Preselected value
-				if (value) {
-					$.ajax({
-						url: urlInicial,
-						async: false,
-						global: false,
-						success: function(resposta) {
-							suggest.append(
+		if (value != null && typeof value === 'string') {
+			if (value.includes(",")) {
+				var valueArr = value.split(',');
+				valueArr.forEach(function(value) {
+					urlInicial = urlActual + "/" + value;
+					// Preselected value
+					if (value) {
+						$.ajax({
+							url: urlInicial,
+							async: false,
+							global: false,
+							success: function(resposta) {
+								suggest.append(
+											$('<option>', {
+												value: resposta[suggestValue],
+												text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+												selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
+											}));
+							},
+							error: function () {
+								suggest.append(
 										$('<option>', {
-											value: resposta[suggestValue],
-											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
-											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
+											value: value,
+											text: value,
+											selected: false
 										}));
-						},
-						error: function () {
-							suggest.append(
-									$('<option>', {
-										value: value,
-										text: value,
-										selected: false
-									}));
-						}
-					});
-				} else {
-					$(this).empty();
-				}
-			})
-		} else {
-			if (value) {
+							}
+						});
+					} else {
+						$(this).empty();
+					}
+				});
+			} else {
 				$.ajax({
 					url: urlInicial,
 					async: false,
@@ -469,9 +468,32 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 								}));
 					}
 				});
-			} else {
-				$(this).empty();
 			}
+			
+		} else if (value != null && typeof value === 'number') {
+			$.ajax({
+				url: urlActual + "/item/" + value,
+				async: false,
+				global: false,
+				success: function(resposta) {
+					suggest.append(
+							$('<option>', {
+								value: resposta[suggestValue],
+								text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+								selected: true
+							}));
+				},
+				error: function () {
+					suggest.append(
+							$('<option>', {
+								value: value,
+								text: value,
+								selected: false
+							}));
+				}
+			});
+		} else {
+			$(this).empty();
 		}
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
@@ -481,7 +503,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    ajax: {
 		    	delay: 500,
 		    	url: function(params){
-					return $(this).data('urlLlistat') + "/" + params.term;
+					return $(this).data('urlLlistat') + "/" + encodeURIComponent(params.term);
 				},
 				processResults: function (data) {
 					results = [];

@@ -364,7 +364,8 @@ public class ExpedientPeticioController extends BaseUserController {
 					null,
 					command.getNewExpedientTitol(),
 					expedientPeticioDto.getId(),
-					command.isAssociarInteressats());
+					command.isAssociarInteressats(),
+					null);
 			processatOk = expedientDto.isProcessatOk();
 		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 			processatOk = expedientService.incorporar(

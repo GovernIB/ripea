@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -122,7 +124,11 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		
-		
+		model.addAttribute(
+				"metaDocumentsLeft",
+				metaDocumentService.findActiusPerCreacio(
+						entitatActual.getId(),
+						contingutId));
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
 						"notificacio.enviamentEstat.enum."));
@@ -162,6 +168,7 @@ public class ContingutController extends BaseUserController {
 					"contingut.controller.element.esborrat.ok");
 
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					url,
@@ -705,5 +712,6 @@ public class ContingutController extends BaseUserController {
 				contingutOrigen);
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(ContingutController.class);
 
 }

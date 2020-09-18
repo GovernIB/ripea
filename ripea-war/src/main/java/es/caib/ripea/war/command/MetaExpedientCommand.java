@@ -8,128 +8,89 @@ import java.util.List;
 
 import javax.validation.constraints.Size;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
+import es.caib.ripea.war.validation.OrganGestorMetaExpedientNotNull;
+import lombok.Data;
 
 /**
  * Command per al manteniment de meta-expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Data
 @CodiMetaExpedientNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
+@OrganGestorMetaExpedientNotNull
 public class MetaExpedientCommand {
 
 	private Long id;
 
-	@NotEmpty @Size(max = 64)
+	@NotEmpty
+	@Size(max = 64)
 	private String codi;
-	@NotEmpty @Size(max = 256)
+	@NotEmpty
+	@Size(max = 256)
 	private String nom;
-	@Size(max=1024)
+	@Size(max = 1024)
 	private String descripcio;
-	@NotEmpty @Size(max = 30)
+	@NotEmpty
+	@Size(max = 30)
 	private String classificacioSia;
-	@NotEmpty @Size(max = 30)
+	@NotEmpty
+	@Size(max = 30)
 	private String serieDocumental;
 	@Size(max = 100)
 	private String expressioNumero;
+
+	private Long organGestorId;
+
 	private boolean notificacioActiva;
+
+	private boolean permetMetadocsGenerals;
+
 	private Long pareId;
 	private Long entitatId;
 
+	private boolean isRolAdminOrgan;
+	
+    private boolean gestioAmbGrupsActiva;
+	
+    
 
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getClassificacioSia() {
-		return classificacioSia;
-	}
-	public void setClassificacioSia(String classificacioSia) {
-		this.classificacioSia = classificacioSia;
-	}
-	public String getSerieDocumental() {
-		return serieDocumental;
-	}
-	public void setSerieDocumental(String serieDocumental) {
-		this.serieDocumental = serieDocumental;
-	}
-	public String getExpressioNumero() {
-		return expressioNumero;
-	}
-	public void setExpressioNumero(String expressioNumero) {
-		this.expressioNumero = expressioNumero;
-	}
-	public boolean isNotificacioActiva() {
-		return notificacioActiva;
-	}
-	public void setNotificacioActiva(boolean notificacioActiva) {
-		this.notificacioActiva = notificacioActiva;
-	}
-	public Long getPareId() {
-		return pareId;
-	}
-	public void setPareId(Long pareId) {
-		this.pareId = pareId;
-	}
-	public Long getEntitatId() {
-		return entitatId;
-	}
-	public void setEntitatId(Long entitatId) {
-		this.entitatId = entitatId;
+	public MetaExpedientCommand(boolean isRolOrgan) {
+		this.isRolAdminOrgan = isRolOrgan;
 	}
 
-	public static List<MetaExpedientCommand> toEntitatCommands(
-			List<MetaExpedientDto> dtos) {
+	public MetaExpedientCommand() {
+		this.isRolAdminOrgan = true;
+	}
+
+	public static List<MetaExpedientCommand> toEntitatCommands(List<MetaExpedientDto> dtos) {
 		List<MetaExpedientCommand> commands = new ArrayList<MetaExpedientCommand>();
-		for (MetaExpedientDto dto: dtos) {
-			commands.add(
-					ConversioTipusHelper.convertir(
-							dto,
-							MetaExpedientCommand.class));
+		for (MetaExpedientDto dto : dtos) {
+			commands.add(ConversioTipusHelper.convertir(dto, MetaExpedientCommand.class));
 		}
 		return commands;
 	}
 
 	public static MetaExpedientCommand asCommand(MetaExpedientDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				MetaExpedientCommand.class);
-	}
-	public static MetaExpedientDto asDto(MetaExpedientCommand command) {
-		return ConversioTipusHelper.convertir(
-				command,
-				MetaExpedientDto.class);
+		MetaExpedientCommand command = ConversioTipusHelper.convertir(dto, MetaExpedientCommand.class);
+		command.setOrganGestorId(dto.getOrganGestor() != null ? dto.getOrganGestor().getId() : null);
+		return command;
 	}
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+	public MetaExpedientDto asDto() {
+		MetaExpedientDto dto = ConversioTipusHelper.convertir(this, MetaExpedientDto.class);
+		if (this.getOrganGestorId() != null) {
+			OrganGestorDto organ = new OrganGestorDto();
+			organ.setId(this.getOrganGestorId());
+			dto.setOrganGestor(organ);
+		}
+		return dto;
 	}
 
 }
