@@ -75,7 +75,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public void relacionarAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
 			Long id) {
@@ -87,7 +87,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public void desvincularAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
 			Long id) {

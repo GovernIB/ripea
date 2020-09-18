@@ -102,7 +102,7 @@ public interface GrupService {
 	 * @param metaExpedientId
 	 * @param id
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -116,7 +116,7 @@ public interface GrupService {
 	 * @param metaExpedientId
 	 * @param id
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	void desvincularAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,

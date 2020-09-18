@@ -72,5 +72,6 @@
 			<a class="btn btn-default" href="permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.permis.form.titol.crear"/></a>
 		</p>
 	</script>
+		<a href="<c:url value="/organgestor"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 </body>
 </html>
