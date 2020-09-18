@@ -66,6 +66,9 @@ public class IntegracioHelper {
 						INTCODI_PFIRMA));
 		integracions.add(
 				novaIntegracio(
+						INTCODI_FIRMASERV));
+		integracions.add(
+				novaIntegracio(
 						INTCODI_CALLBACK));
 		integracions.add(
 				novaIntegracio(

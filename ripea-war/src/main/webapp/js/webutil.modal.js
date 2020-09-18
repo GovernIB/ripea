@@ -178,7 +178,7 @@
 								} else {
 									clon.on('click', function () {
 										// When click submit show loading
-										if ($(this).attr('type') === 'submit') {
+										if ($(this).attr('type') === 'submit' && !$(this).data('noloading')) {
 											iframe.hide();
 											$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
 											$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
@@ -187,6 +187,9 @@
 										}
 										element.click();
 										return false;
+									});
+									element.on('showloading', function () {
+										console.log('>>> showloading');
 									});
 								}
 								$('.modal-footer', $(iframe).parent().parent()).append(clon);
