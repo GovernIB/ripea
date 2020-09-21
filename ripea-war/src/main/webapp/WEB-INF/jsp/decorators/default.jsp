@@ -6,22 +6,21 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <%
-
-// 	pageContext.setAttribute(
-// 			"sessionOrgansGestors",
-// 			es.caib.ripea.war.helper.OrganGestorHelper.findOrganGestorsAccessibles(request));
-// 	pageContext.setAttribute(
-//   			"organGestorActual",
-//   			es.caib.ripea.war.helper.OrganGestorHelper.getOrganGestorActual(request));
 	pageContext.setAttribute(
 			"sessionEntitats",
 			es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
 	pageContext.setAttribute(
 			"entitatActual",
 			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
-// 	pageContext.setAttribute(
-//   			"requestParameterCanviOrganGestor",
-//   			es.caib.ripea.war.helper.OrganGestorHelper.getRequestParameterCanviOrganGestor());
+	pageContext.setAttribute(
+			"sessionOrgansGestors",
+			es.caib.ripea.war.helper.EntitatHelper.findOrganGestorsAccessibles(request));
+	pageContext.setAttribute(
+			"organGestorActual",
+			es.caib.ripea.war.helper.EntitatHelper.getOrganGestorActual(request));
+	pageContext.setAttribute(
+  			"requestParameterCanviOrganGestor",
+  			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviOrganGestor());
 	pageContext.setAttribute(
 			"requestParameterCanviEntitat",
 			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
@@ -41,8 +40,8 @@
 			"isRolActualAdministrador",
 			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request));
 	pageContext.setAttribute(
-	  			"isRolActualAdministradorOrgan",
-	  			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
+  			"isRolActualAdministradorOrgan",
+  			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
 	pageContext.setAttribute(
 			"isRolActualUsuari",
 			es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
@@ -169,36 +168,6 @@ body {
 								</c:if>
 							</li>
 						</c:if>
-<%-- 						<c:if test="${hiHaOrgansGestors}"> --%>
-<!-- 							<li class="dropdown"> -->
-<%-- 								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if> --%>
-<%-- 								<c:if test="${null != organGestorActual}"> --%>
-<%-- 		         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if> --%>
-<%-- 		         				</c:if> --%>
-<%-- 		         				<c:if test="${null == organGestorActual}"> --%>
-<%-- 		         				<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if> --%>
-<%-- 		         				</c:if> --%>
-<%-- 								<c:if test="${hiHaMesOrgansGestors}"></a></c:if> --%>
-<%-- 								<c:if test="${hiHaMesOrgansGestors}"> --%>
-<!-- 									<ul class="dropdown-menu"> -->
-<%-- 				         				<c:if test="${null != organGestorActual}"> --%>
-<%-- 				         					<c:url var="urlCanviOrganGestor" value="/index"> --%>
-<%-- 												<c:param name="${requestParameterCanviOrganGestor}" value="-1"/> --%>
-<%-- 											</c:url> --%>
-<%-- 				         					<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
-<%-- 				         				</c:if> --%>
-<%-- 										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status"> --%>
-<%-- 											<c:if test="${og.id != organGestorActual.id}"> --%>
-<%-- 												<c:url var="urlCanviOrganGestor" value="/index"> --%>
-<%-- 													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/> --%>
-<%-- 												</c:url> --%>
-<%-- 												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li> --%>
-<%-- 											</c:if> --%>
-<%-- 										</c:forEach> --%>
-<!-- 									</ul> -->
-<%-- 								</c:if> --%>
-<!-- 							</li> -->
-<%-- 						</c:if> --%>
 						<li class="dropdown">
 							<c:choose>
 								<c:when test="${fn:length(rolsUsuariActual) > 1}">
@@ -225,6 +194,36 @@ body {
 								</c:otherwise>
 							</c:choose>
 						</li>
+						<c:if test="${ isRolActualAdministradorOrgan }">
+							<li class="dropdown">
+								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
+								<c:if test="${null != organGestorActual}">
+		         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+		         				</c:if>
+		         				<c:if test="${null == organGestorActual}">
+		         				<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+		         				</c:if>
+								<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
+								<c:if test="${hiHaMesOrgansGestors}">
+									<ul class="dropdown-menu">
+				         				<c:if test="${null != organGestorActual}">
+				         					<c:url var="urlCanviOrganGestor" value="/index">
+												<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
+											</c:url>
+<%-- 				         					<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
+				         				</c:if>
+										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
+											<c:if test="${og.id != organGestorActual.id}">
+												<c:url var="urlCanviOrganGestor" value="/index">
+													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
+												</c:url>
+												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
+											</c:if>
+										</c:forEach>
+									</ul>
+								</c:if>
+							</li>
+						</c:if>
 						<li class="dropdown">
 							<a href="#" data-toggle="dropdown">
 								<span class="fa fa-user"></span>

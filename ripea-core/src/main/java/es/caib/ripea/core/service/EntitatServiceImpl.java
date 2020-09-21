@@ -389,12 +389,6 @@ public class EntitatServiceImpl implements EntitatService {
 				permisId);
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public boolean isAdminOrgan(Long id) {		  
-		return permisosEntitatHelper.hasAdminOrganPermission(id);
-	}
-
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

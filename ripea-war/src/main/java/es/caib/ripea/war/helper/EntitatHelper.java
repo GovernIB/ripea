@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.EntitatService;
 
 /**
@@ -23,7 +24,9 @@ public class EntitatHelper {
 	private static final String REQUEST_PARAMETER_CANVI_ENTITAT = "canviEntitat";
 	private static final String REQUEST_ATTRIBUTE_ENTITATS = "EntitatHelper.entitats";
 	private static final String SESSION_ATTRIBUTE_ENTITAT_ACTUAL = "EntitatHelper.entitatActual";
-	private static final String SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN = "EntitatHelper.isUsuariAdminOrgan";
+	
+	private static final String REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL = "canviOrganGestor";
+	private static final String SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL = "EntitatHelper.organGestorActual";
 
 	public static List<EntitatDto> findEntitatsAccessibles(HttpServletRequest request) {
 		return findEntitatsAccessibles(request, null);
@@ -69,11 +72,6 @@ public class EntitatHelper {
 				canviEntitatActual(request, entitatActual, entitatService);
 			}
 		}
-		Boolean isUsuariAdminOrgan = (Boolean)request.getSession().getAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN);
-		if (isUsuariAdminOrgan == null && entitatService != null) {
-			isUsuariAdminOrgan = entitatActual.isUsuariActualAdministrationOrgan();
-			request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN, isUsuariAdminOrgan);
-		}
 		return entitatActual;
 	}
 
@@ -82,8 +80,8 @@ public class EntitatHelper {
 	}
 
 	public static boolean isUsuariActualAdminOrgan(HttpServletRequest request) {
-		Object isAdmin = request.getSession().getAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL_ADMIN_ORGAN);
-		return isAdmin != null && (Boolean)isAdmin;
+		EntitatDto entitat = getEntitatActual(request);
+		return entitat.isUsuariActualAdministrationOrgan();
 	}
 
 	private static void canviEntitatActual(
@@ -94,6 +92,54 @@ public class EntitatHelper {
 		ExpedientHelper.resetAccesUsuariExpedients(request);
 	}
 
+	////
+	// ORGANS GESTORS
+	////
+	
+	public static List<OrganGestorDto> findOrganGestorsAccessibles(HttpServletRequest request) {
+		EntitatDto entitat = getEntitatActual(request);
+		return entitat.getOrgansGestors();
+	}
+	
+	public static OrganGestorDto getOrganGestorActual(HttpServletRequest request) {
+		OrganGestorDto organGestorActual = (OrganGestorDto)request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL);
+		if (organGestorActual == null) {
+			List<OrganGestorDto> organsGestors = findOrganGestorsAccessibles(request);
+			if (organsGestors != null && organsGestors.size() > 0) {
+				organGestorActual = organsGestors.get(0);
+				setOrganGestorActual(request, organGestorActual);
+			}
+		}
+		return organGestorActual;
+	}
+	
+	public static void processarCanviOrganGestor(HttpServletRequest request) {
+		String canviOrganGestor = request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL);
+		if (canviOrganGestor != null && canviOrganGestor.length() > 0) {
+			LOGGER.debug("Processant canvi òrgan gestor (id=" + canviOrganGestor + ")");
+			try {
+				Long canviOrganGestorId = new Long(canviOrganGestor);
+				List<OrganGestorDto> OrgansGestors = findOrganGestorsAccessibles(request);
+				for (OrganGestorDto organGestor : OrgansGestors) {
+					if (canviOrganGestorId.equals(organGestor.getId())) {
+						setOrganGestorActual(request, organGestor);
+					}
+				}
+			} catch (NumberFormatException ignored) {
+			}
+		}
+	}
+	
+	public static String getRequestParameterCanviOrganGestor() {
+		return REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL;
+	}
+	
+	private static void setOrganGestorActual(
+			HttpServletRequest request,
+			OrganGestorDto organGestorActual) {
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL, organGestorActual);
+	}
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatHelper.class);
 
 }

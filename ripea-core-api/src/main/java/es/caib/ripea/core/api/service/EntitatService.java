@@ -215,15 +215,4 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	EntitatDto findByUnitatArrel(String unitatArrel);
 
-	/**
-	 * Retorna si l'usuari actual te permés administrar algun tipus d'expedient,
-	 * mitjançant permisos d'òrgan, per a l'entitat.
-	 * 
-	 * @param id
-	 *            Atribut id de l'entitat que es vol consultar.
-	 * @return true si és administrador o false en cas contrari.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public boolean isAdminOrgan(Long id);
-
 }

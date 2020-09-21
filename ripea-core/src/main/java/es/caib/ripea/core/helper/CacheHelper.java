@@ -151,6 +151,10 @@ public class CacheHelper {
 	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
 	}
 
+	@CacheEvict(value = "entitatsUsuari", allEntries=true)
+	public void evictEntitatsAccessiblesAllUsuaris() {
+	}
+
 	@Cacheable(value = "errorsValidacioNode", key = "#node.id")
 	public List<ValidacioErrorDto> findErrorsValidacioPerNode(
 			NodeEntity node) {

@@ -398,6 +398,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
+			Long organGestorId,
 			MetaExpedientFiltreDto filtre,
 			boolean isRolActualAdministradorOrgan,
 			PaginacioParamsDto paginacioParams);
