@@ -35,6 +35,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			ContingutEntity pare,
 			String nom,
 			int esborrat);
+	
+	List<ExpedientEntity> findByMetaExpedient(
+			MetaExpedientEntity metaExpedient);
 
 	ExpedientEntity findByEntitatAndMetaNodeAndAnyAndSequencia(
 			EntitatEntity entitat,

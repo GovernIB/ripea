@@ -28,9 +28,11 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -45,6 +47,7 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
@@ -81,6 +84,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private ExpedientRepository expedientRepository;
 
 	@Transactional
 	@Override
@@ -212,12 +217,28 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false);
 
+			
+		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);
+		boolean allEsborats = true;
+		for (ExpedientEntity expedientEntity : expedients) {
+			if (expedientEntity.getEsborrat() == 0) {
+				allEsborats = false;
+			}
+		}
+		if (allEsborats == true && expedients.size() > 0)
+			throw new ExisteixenExpedientsEsborratsException();
 
 		metaExpedientRepository.delete(metaExpedient);
+
 		return conversioTipusHelper.convertir(
 				metaExpedient,
 				MetaExpedientDto.class);
+
+
 	}
+	
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override

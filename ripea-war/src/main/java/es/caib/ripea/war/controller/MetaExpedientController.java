@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
@@ -221,12 +222,17 @@ public class MetaExpedientController extends BaseAdminController {
 					"metaexpedient.controller.esborrat.ok");
 		} catch (Exception ex) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
-					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
+					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
 						"metaexpedient.controller.esborrar.error.fk");
-			else {
+			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsEsborratsException.class)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metaexpedient.controller.esborrar.error.fk.esborrats");
+			} else {
 				throw ex;
 			}
 		}
