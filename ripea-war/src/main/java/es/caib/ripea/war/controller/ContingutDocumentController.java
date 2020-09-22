@@ -899,10 +899,11 @@ public class ContingutDocumentController extends BaseUserController {
 
 		Long pareId = commandGeneric == null ? command.getPareId() : commandGeneric.getPareId();
 		if (commandGeneric == null ? command.getId() == null : commandGeneric.getId() == null) {
+			DocumentDto documentDto = commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric);
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,
-					commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric),
+					documentDto,
 					comprovarMetaExpedient);
 			//Valor per defecte d'algunes metadades
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
@@ -1026,4 +1027,6 @@ public class ContingutDocumentController extends BaseUserController {
 				"escanejarActiu",
 				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
 	}
+	
+//	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 
 }

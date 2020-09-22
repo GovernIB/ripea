@@ -9,11 +9,14 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+import lombok.Getter;
+
 /**
  * Classe del model de dades que representa un SID d'una ACL.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "ipa_acl_sid")
 public class AclSidEntity extends AbstractPersistable<Long> {
@@ -22,15 +25,6 @@ public class AclSidEntity extends AbstractPersistable<Long> {
 	private boolean principal;
 	@Column(name = "sid", length = 100, nullable = false)
 	private String sid;
-
-
-
-	public boolean isPrincipal() {
-		return principal;
-	}
-	public String getSid() {
-		return sid;
-	}
 
 	@Override
 	public int hashCode() {

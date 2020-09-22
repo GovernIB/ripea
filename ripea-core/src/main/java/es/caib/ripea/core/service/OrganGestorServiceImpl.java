@@ -26,6 +26,7 @@ import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -53,8 +54,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Autowired
     private PluginHelper pluginHelper;
     @Autowired
-    private MetaExpedientRepository metaExpedientRepository;
-
+    private CacheHelper cacheHelper;
+    
     @Transactional(readOnly = true)
     public List<OrganGestorDto> findAll() {
         List<OrganGestorEntity> organs = organGestorRepository.findAll();
@@ -166,6 +167,45 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         return paginaOrgans;
     }
 
+
+    @Override
+    public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId) {
+       return findAccessiblesUsuariActual(entitatId, organGestorId, null);
+    }
+    
+    @Transactional
+    @Override
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId, String filterText) {
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    	if (!permisosHelper.isGrantedAny(
+				organGestorId,
+				OrganGestorEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				auth)) {
+			return new ArrayList<OrganGestorDto>();
+		}
+		OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);			
+		List<OrganGestorEntity> organGestorsCanditats = organGestor.getAllChildren();
+		List<OrganGestorEntity> filtrats = organGestorRepository.findByCanditatsAndFiltre(
+				organGestorsCanditats, filterText == null || filterText.isEmpty(), filterText);
+
+        return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
+    }
+    
+    @Override
+    public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId) {
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+				OrganGestorEntity.class,
+				ExtendedPermission.ADMINISTRATION);
+		if (objectsIds.isEmpty()) {
+			return new ArrayList<OrganGestorDto>();
+		}
+		return conversioTipusHelper.convertirList(
+				organGestorRepository.findByEntitatAndIds(entitat, objectsIds),
+				OrganGestorDto.class);		
+    }
+    
     @Transactional
     @Override
     public List<PermisOrganGestorDto> findPermisos(Long entitatId) {
@@ -229,6 +269,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
             throw new SecurityException("Sense permisos per a gestionar aquest organ gestor");
         }
         permisosHelper.updatePermis(id, OrganGestorEntity.class, permis);
+        cacheHelper.evictEntitatsAccessiblesAllUsuaris();
     }
 
     @Transactional
@@ -245,41 +286,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
             throw new SecurityException("Sense permisos per administrar aquesta entitat");
         }
         permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
+        cacheHelper.evictEntitatsAccessiblesAllUsuaris();
     }
 
-    @Override
-    public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId) {
-       return findAccessiblesUsuariActual(entitatId, null);
-    }
-    
-    @Override
-    public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, String filterText) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		List<OrganGestorEntity> resposta = organGestorRepository.findByEntitatAndFiltre(
-				entitat, filterText == null || filterText.isEmpty(), filterText);
-    	
-		permisosHelper.filterGrantedAnyList(
-				resposta,
-				new ListObjectIdentifiersExtractor<OrganGestorEntity>() {
-					public List<Long> getObjectIdentifiers (OrganGestorEntity organGestor) {
-						List<Long> ids = new ArrayList<Long>();
-						while (organGestor != null) {
-							ids.add(organGestor.getId());
-							
-							organGestor = organGestor.getPare();
-						}
-						return ids;
-					}
-				},
-				OrganGestorEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION },
-				auth);
-
-        return conversioTipusHelper.convertirList(resposta, OrganGestorDto.class);
-    }
-    
-    
     private List<OrganGestorDto> findOrganismesByEntitat(String codiDir3) {
         List<OrganGestorDto> organismes = new ArrayList<OrganGestorDto>();
         Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaOrganGestor(codiDir3);

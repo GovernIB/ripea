@@ -28,6 +28,7 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
     		Object handler) throws Exception {
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
             EntitatHelper.processarCanviEntitats(request, entitatService);
+            EntitatHelper.processarCanviOrganGestor(request);
             EntitatHelper.findEntitatsAccessibles(request, entitatService);
         }
         return true;

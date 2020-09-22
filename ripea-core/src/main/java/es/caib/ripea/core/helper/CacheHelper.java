@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -106,7 +107,7 @@ public class CacheHelper {
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Resource
 	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Resource
+	@Autowired
 	private AclSidRepository aclSidRepository;
 
 	
@@ -149,6 +150,10 @@ public class CacheHelper {
 	}
 	@CacheEvict(value = "entitatsUsuari", key="#usuariCodi")
 	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
+	}
+
+	@CacheEvict(value = "entitatsUsuari", allEntries=true)
+	public void evictEntitatsAccessiblesAllUsuaris() {
 	}
 
 	@Cacheable(value = "errorsValidacioNode", key = "#node.id")

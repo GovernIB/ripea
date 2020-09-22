@@ -27,13 +27,18 @@ public class EntitatDto extends AuditoriaDto {
 	private boolean activa;
 
 	private List<PermisDto> permisos;
+	private List<OrganGestorDto> organsGestors;
+	
 	private boolean usuariActualRead;
 	private boolean usuariActualAdministration;
-	private boolean usuariActualAdministrationOrgan;
 	
 	private byte[] logoImgBytes;
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
+	
+	public boolean isUsuariActualAdministrationOrgan() {
+		return organsGestors != null && !organsGestors.isEmpty();
+	}
 	
 	public int getPermisosCount() {
 		if  (permisos == null)

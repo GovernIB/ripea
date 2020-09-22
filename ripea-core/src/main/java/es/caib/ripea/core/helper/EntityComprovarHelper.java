@@ -261,7 +261,7 @@ public class EntityComprovarHelper {
 			        "El meta-expedient no té cap organ gestor asociat (id=" + id + ")");
 		}
 
-		// si no es administrador d'entitat comprovar si es administrador d'organ gestor
+		// si no es administrador d'entitat comprovar si es administrador del seu organ gestor
 		comprovarOrganGestor(entitat.getId(), metaExpedient.getOrganGestor().getId());
 	
 		return metaExpedient;

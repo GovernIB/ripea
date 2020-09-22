@@ -230,6 +230,7 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
+		
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,

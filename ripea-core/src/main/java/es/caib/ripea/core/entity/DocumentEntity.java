@@ -87,7 +87,7 @@ public class DocumentEntity extends NodeEntity {
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Column(name = "nti_tipdoc", length = 4, nullable = false)
-	@Enumerated(EnumType.STRING)
+//	@Enumerated(EnumType.STRING)
 	private String ntiTipoDocumental;
 	@Column(name = "nti_idorig", length = 48)
 	private String ntiIdDocumentoOrigen;
@@ -297,6 +297,25 @@ public class DocumentEntity extends NodeEntity {
 		public DocumentEntity build() {
 			return built;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "DocumentEntity: [" +
+				"node: " + super.toString() + ", " +
+				"id: " + this.getId() + ", " +
+				"nom: " + this.nom + ", " +
+				"descripcio: " + this.descripcio + ", " +
+				"data: " + this.data + ", " +
+				"dataCaptura: " + this.dataCaptura + ", " +
+				"ntiIdDocumentoOrigen: " + this.ntiIdDocumentoOrigen + ", " +
+				"ntiVersion: " + this.ntiVersion + ", " +
+				"ntiIdentificador: " + this.ntiIdentificador + ", " +
+				"ntiOrgano: " + this.ntiOrgano + ", " +
+				"ntiOrigen: " + this.ntiOrigen + ", " +
+				"ntiEstadoElaboracion: " + this.ntiEstadoElaboracion + ", " +
+				"ntiTipoDocumental: " + this.ntiTipoDocumental + ", " +
+				"metanode: " + this.metaNode.toString() + "]";
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;

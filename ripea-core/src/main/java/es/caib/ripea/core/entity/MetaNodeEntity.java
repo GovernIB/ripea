@@ -138,6 +138,19 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "MetaNodeEntity: [" +
+				"id: " + this.getId() + ", " +
+				"codi: " + this.codi + ", " +
+				"nom: " + this.nom + ", " +
+				"descripcio: " + this.descripcio + ", " +
+				"tipus: " + this.tipus + ", " +
+				"actiu: " + this.actiu + ", " +
+				"entitat: " + (this.entitat != null ? this.entitat.toString() : "NULL") + "]";
+//				"metadades: " + this.metadades + "]";
+	}
+	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

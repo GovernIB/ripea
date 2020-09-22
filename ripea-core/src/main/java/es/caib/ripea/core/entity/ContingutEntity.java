@@ -253,6 +253,18 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "ContingutEntity: [" +
+				"id: " + this.getId() + ", " +
+				"nom: " + this.nom + ", " +
+				"tipus: " + this.tipus + ", " +
+				"esborrat: " + this.esborrat + ", " +
+				"expedient: " + (this.expedient != null ? this.expedient.toString() : "NULL") + ", " +
+				"entitat: " + (this.entitat != null ? this.entitat.toString() : "NULL") + ", " +
+				"pare: " + (this.pare != null ? this.pare.toString() : "NULL") + "]";
+	}
+	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

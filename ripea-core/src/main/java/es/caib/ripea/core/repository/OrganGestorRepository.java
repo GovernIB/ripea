@@ -37,6 +37,16 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
+			"where " +
+			"     og in (:canditats) " +
+			" and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
+	public List<OrganGestorEntity> findByCanditatsAndFiltre(
+			@Param("canditats")List<OrganGestorEntity> canditats,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
       " and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
 	public Page<OrganGestorEntity> findByEntitatAndFiltre(
@@ -50,6 +60,12 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
     		 "where og.codi in (:codis)")
 	public List<OrganGestorEntity> findByCodiDir3List(@Param("codis") List<String> codis);
 	
+	@Query("from " +
+   		 "    OrganGestorEntity og " +
+   		 " where " +
+   		 "     (og.entitat = :entitat)" + 
+   		 " 	and og.id in (:ids)")
+	public List<OrganGestorEntity> findByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
 
   @Query( "select og.id " + 
       "from " +

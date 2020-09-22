@@ -1,5 +1,6 @@
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -68,6 +69,20 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     	for (OrganGestorEntity fill : this.getFills()) {
     	    fill.setPare(null);
     	}
+    }
+    
+    public List<OrganGestorEntity> getAllChildren(){
+    	List<OrganGestorEntity> result = new ArrayList<OrganGestorEntity>();
+    	result.add(this);
+    	this.getAllChildren(result);
+    	return result;
+    }
+    
+    public void getAllChildren(List<OrganGestorEntity> result) {
+    	for (OrganGestorEntity fill : this.getFills()) {
+			result.add(fill);
+			fill.getAllChildren(result);
+		} 
     }
     
     private static final long serialVersionUID = 458331024861203562L;

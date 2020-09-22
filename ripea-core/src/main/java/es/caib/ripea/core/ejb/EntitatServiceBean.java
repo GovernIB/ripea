@@ -154,10 +154,4 @@ public class EntitatServiceBean implements EntitatService {
 		return delegate.findByUnitatArrel(unitatArrel);
 	}
 
-	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public boolean isAdminOrgan(Long id) {
-		return delegate.isAdminOrgan(id);
-	}
-
 }

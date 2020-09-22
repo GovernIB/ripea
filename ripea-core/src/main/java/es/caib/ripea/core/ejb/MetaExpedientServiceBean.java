@@ -243,12 +243,14 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("tothom")
 	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
+			Long organGestorId,
 			MetaExpedientFiltreDto filtre,
 			boolean isRolActualAdministradorOrgan,
 			PaginacioParamsDto paginacioParams) {
 
 	    return delegate.findByEntitatOrOrganGestor(
 	    		entitatId,
+	    		organGestorId,
 	    		filtre,
 	    		isRolActualAdministradorOrgan, 
 	    		paginacioParams);
