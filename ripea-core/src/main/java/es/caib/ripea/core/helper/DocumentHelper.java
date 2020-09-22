@@ -764,7 +764,7 @@ public class DocumentHelper {
 						false,
 						false);
 				alertaHelper.crearAlerta(
-						"La firma del document " + document.getNom() + " ha estat rebutjada",
+						"La firma del document " + document.getNom() + " ha estat rebutjada pel següent motiu: " + documentPortafirmes.getMotiuRebuig(),
 						null,
 						document.getExpedient().getId());
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
