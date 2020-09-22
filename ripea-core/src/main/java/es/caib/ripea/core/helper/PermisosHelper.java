@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -52,8 +51,6 @@ public class PermisosHelper {
 	private LookupStrategy lookupStrategy;
 	@Resource
 	private MutableAclService aclService;
-	@Resource
-	private RoleHierarchy roleHierarchy;
 	@Resource
 	private AclSidRepository aclSidRepository;
 	@Resource
@@ -151,27 +148,27 @@ public class PermisosHelper {
 	}
 
 	/**
-	 * Obté els identificadors de tots els objectes de la classe espedificada sobre
-	 * els quals l
+	 * Obté els identificadors de tots els objectes de la classe especificada sobre
+	 * els quals l'usuari actual té permisos
 	 * 
-	 * @param clazz
-	 * @param permission
-	 * @return
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permission Permís que es vol esbrinar si conté
+	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Collection<? extends GrantedAuthority> authorities = roleHierarchy.getReachableGrantedAuthorities(
-				auth.getAuthorities());
-		List<AclSidEntity> sids = new ArrayList<AclSidEntity>(authorities.size() + 1);
+//		Collection<? extends GrantedAuthority> authorities = roleHierarchy.getReachableGrantedAuthorities(
+//				auth.getAuthorities());
+		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 
 		sids.add(aclSidRepository.getUserSid(auth.getName()));
 
-		List<String> rolesNames = new ArrayList<String>(authorities.size());
-		for (GrantedAuthority authority : authorities) {
+		List<String> rolesNames = new ArrayList<String>();
+		for (GrantedAuthority authority : auth.getAuthorities()) {
 			rolesNames.add(authority.getAuthority());
 		}
 		sids.addAll(aclSidRepository.findRolesSid(rolesNames));
-
+		
 		return aclObjectIdentityRepository.findObjectsWithPermissions(clazz.getName(), sids, permission.getMask());
 	}
 
@@ -514,10 +511,7 @@ public class PermisosHelper {
 			Class<?> clazz,
 			Permission[] permissions,
 			Authentication auth) {
-		List<Sid> sids = new ArrayList<Sid>();
-		sids.add(new PrincipalSid(auth.getName()));
-		for (GrantedAuthority ga : auth.getAuthorities())
-			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
+		List<Sid> sids = getAuthSids(auth);
 		boolean[] granted = new boolean[permissions.length];
 		for (int i = 0; i < permissions.length; i++)
 			granted[i] = false;
@@ -538,6 +532,14 @@ public class PermisosHelper {
 		return granted;
 	}
 
+	private List<Sid> getAuthSids(Authentication auth) {
+		List<Sid> sids = new ArrayList<Sid>();
+		sids.add(new PrincipalSid(auth.getName()));
+		for (GrantedAuthority ga : auth.getAuthorities())
+			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
+		return sids;
+	}
+	
 	private Permission[] getPermissionsFromPermis(PermisDto permis) {
 		List<Permission> permissions = new ArrayList<Permission>();
 		if (permis.isRead())

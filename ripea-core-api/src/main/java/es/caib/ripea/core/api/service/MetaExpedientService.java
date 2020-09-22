@@ -110,6 +110,21 @@ public interface MetaExpedientService {
 			Long id) throws NotFoundException;
 
 	/**
+	 * TODO: mirar de fusionar amb findById
+	 * 
+	 * Consulta un metaexpedient comprovant si l'usuari autenticat hi té permisos
+	 * d'administració
+	 * 
+	 * @param entitatId Id de l'entitat.
+	 * @param id        Atribut id del meta-expedient.
+	 * @return El metaexpedient amb l'identificador indicat per paràmetre
+	 * 
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id);
+	
+	/**
 	 * Consulta un meta-expedient donat el seu codi.
 	 * 
 	 * @param entitatId
@@ -402,10 +417,6 @@ public interface MetaExpedientService {
 			MetaExpedientFiltreDto filtre,
 			boolean isRolActualAdministradorOrgan,
 			PaginacioParamsDto paginacioParams);
-
-	public MetaExpedientDto getAndCheckAdminPermission(
-			Long entitatId,
-			Long id);
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<GrupDto> findGrupsAmbMetaExpedient(

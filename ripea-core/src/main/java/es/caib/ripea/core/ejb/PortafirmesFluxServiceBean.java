@@ -69,7 +69,7 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles() {
 		return delegate.recuperarPlantillesDisponibles();
 	}

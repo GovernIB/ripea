@@ -75,6 +75,7 @@ public class CarpetaHelper {
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		} else {
 
+			// TODO: això causa problemes al intentar obtenir el pare d'un metaexpedient sense pare
 			ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 					entitatId,
 					pareId,

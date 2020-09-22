@@ -99,9 +99,9 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			}
 		}
 		if (permis != null)
-			model.addAttribute(PermisCommand.asCommand(permis));
+			model.addAttribute("permisCommand", PermisCommand.asCommand(permis));
 		else
-			model.addAttribute(new PermisCommand());
+			model.addAttribute("permisCommand", new PermisCommand());
 		return "metaExpedientPermisForm";
 	}
 
