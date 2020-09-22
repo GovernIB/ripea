@@ -30,6 +30,7 @@ import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.command.MetaExpedientFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -98,9 +99,9 @@ public class MetaExpedientController extends BaseAdminController {
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		PaginaDto<MetaExpedientDto> metaExps = null;
 
-
 		metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
+				EntitatHelper.getOrganGestorActual(request).getId(),
 				filtreCommand.asDto(),
 				RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
@@ -183,7 +184,11 @@ public class MetaExpedientController extends BaseAdminController {
 		if (RolHelper.isRolActualAdministrador(request)) {
 			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
 		}else {
-			model.addAttribute("organsGestors", organGestorService.findAccessiblesUsuariActual(entitatActual.getId()));
+			model.addAttribute(
+					"organsGestors",
+					organGestorService.findAccessiblesUsuariActual(
+							entitatActual.getId(),
+							EntitatHelper.getOrganGestorActual(request).getId()));
 		}
 		return "metaExpedientForm";
 	}

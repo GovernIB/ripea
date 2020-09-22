@@ -30,6 +30,14 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	
+	@Query( "select " +
+			"	me.id " +
+			"from " +
+	         "    MetaExpedientEntity me " +
+	         "where " +
+	         "  me.organGestor in (:organGestors)")
+	List<Long> findByOrgansGestors(@Param("organGestors") List<OrganGestorEntity> organGestors);
+	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +

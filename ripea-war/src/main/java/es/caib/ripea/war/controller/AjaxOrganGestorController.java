@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
 /**
@@ -47,13 +48,12 @@ public class AjaxOrganGestorController extends BaseAdminController{
 		} catch (UnsupportedEncodingException e) { }
 		
 		List<OrganGestorDto> organGestorsList;
-		if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualUsuari(request)) {
-			organGestorsList = organGestorService.findByEntitat(
-					entitatActual.getId(),
-					text);
-		} else {
+		if (RolHelper.isRolActualAdministrador(request)) {
+			organGestorsList = organGestorService.findByEntitat(entitatActual.getId(), text);
+		}else {
 			organGestorsList = organGestorService.findAccessiblesUsuariActual(
 					entitatActual.getId(),
+					EntitatHelper.getOrganGestorActual(request).getId(),
 					text);
 		}
 		

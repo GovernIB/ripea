@@ -35,9 +35,6 @@ public class PermisosEntitatHelper {
 
 	@Resource
 	private PermisosHelper permisosHelper;
-	
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private OrganGestorService organGestorService;
 	
@@ -70,8 +67,8 @@ public class PermisosEntitatHelper {
 
 		for (EntitatDto entitat : entitats) {
 			entitat.setUsuariActualRead(entitatsRead.contains(entitat));
-			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));
-			entitat.setUsuariActualAdministrationOrgan(hasAdminOrganPermission(entitat.getId()));
+			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));		
+			entitat.setOrgansGestors(organGestorService.findOrganismesEntitatAmbPermis(entitat.getId()));
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
@@ -98,21 +95,6 @@ public class PermisosEntitatHelper {
 						EntitatEntity.class,
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						auth));
-		entitat.setUsuariActualAdministrationOrgan(hasAdminOrganPermission(entitat.getId()));
+		entitat.setOrgansGestors(organGestorService.findOrganismesEntitatAmbPermis(entitat.getId()));
 	}
-	
-	public boolean hasAdminOrganPermission(Long entitatId) {
-		List<PermisOrganGestorDto> results = new ArrayList<PermisOrganGestorDto>();
-        List<OrganGestorDto> organs = organGestorService.findByEntitat(entitatId);
-        for (OrganGestorDto o : organs) {
-            List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
-            for (PermisDto p : permisosOrgan) {
-                PermisOrganGestorDto permisOrgan = conversioTipusHelper.convertir(p, PermisOrganGestorDto.class);
-                permisOrgan.setOrganGestor(o);
-                results.add(permisOrgan);
-            }
-        }
-		return !results.isEmpty();
-	}
-
 }

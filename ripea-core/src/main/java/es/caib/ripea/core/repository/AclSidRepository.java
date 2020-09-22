@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.AclSidEntity;
 
@@ -26,4 +27,18 @@ public interface AclSidRepository extends JpaRepository<AclSidEntity, Long> {
 			"    principal = false")
 	public List<String> findSidByPrincipalFalse();
 
+	@Query(	"from " +
+			"    AclSidEntity " +
+			"where " +
+			"    sid = :name " +
+			"    and principal = true")
+	public AclSidEntity getUserSid(@Param("name") String name);
+
+
+	@Query(	"from " +
+			"    AclSidEntity " +
+			"where " +
+			"     sid in (:name) " +
+			" and principal = false")
+	public List<AclSidEntity> findRolesSid(@Param("name") List<String> name);
 }

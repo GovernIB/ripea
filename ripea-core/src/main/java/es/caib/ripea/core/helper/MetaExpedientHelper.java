@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
@@ -41,13 +40,11 @@ public class MetaExpedientHelper {
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
+	private OrganGestorRepository organGestorRepository;
+	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private PermisosHelper permisosHelper;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
@@ -63,9 +60,7 @@ public class MetaExpedientHelper {
 				metaExpedient,
 				anyExpedient);
 		if (sequencia == null) {
-			sequencia = MetaExpedientSequenciaEntity.getBuilder(
-					anyExpedient,
-					metaExpedient).build();
+			sequencia = MetaExpedientSequenciaEntity.getBuilder(anyExpedient, metaExpedient).build();
 			metaExpedientSequenciaRepository.save(sequencia);
 			return sequencia.getValor();
 		} else if (incrementar) {
@@ -76,33 +71,49 @@ public class MetaExpedientHelper {
 		}
 	}
 
-	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId) {
+	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId, Long organGestorId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAnyList(
-				metaExpedients,
-				new ListObjectIdentifiersExtractor<MetaExpedientEntity>() {
-					public List<Long> getObjectIdentifiers (MetaExpedientEntity metaExpedient) {
-						List<Long> ids = new ArrayList<Long>();
-					
-						OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
-						while (organGestor != null) {
-							ids.add(organGestor.getId());
-							
-							organGestor = organGestor.getPare();
+		if (organGestorId == null) {
+			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);			
+			permisosHelper.filterGrantedAnyList(
+					metaExpedients,
+					new ListObjectIdentifiersExtractor<MetaExpedientEntity>() {
+
+						public List<Long> getObjectIdentifiers(MetaExpedientEntity metaExpedient) {
+							List<Long> ids = new ArrayList<Long>();
+
+							OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+							while (organGestor != null) {
+								ids.add(organGestor.getId());
+
+								organGestor = organGestor.getPare();
+							}
+							return ids;
 						}
-						return ids;
-					}
-				},
-				OrganGestorEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION },
-				auth);
-		List<Long> ids = new ArrayList<Long>();
-		for (MetaExpedientEntity me: metaExpedients) {
-			ids.add(me.getId());
+
+					},
+					OrganGestorEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					auth);
+			List<Long> ids = new ArrayList<Long>();
+			for (MetaExpedientEntity me : metaExpedients) {
+				ids.add(me.getId());
+			}
+			return ids;
+		} else {
+			if (!permisosHelper.isGrantedAny(
+							organGestorId,
+							OrganGestorEntity.class,
+							new Permission[] { ExtendedPermission.ADMINISTRATION },
+							auth)) {
+				return new ArrayList<Long>();
+			}
+			
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);			
+			return metaExpedientRepository.findByOrgansGestors(organGestor.getAllChildren());
 		}
-		return ids;
+
 	}
 	
 	

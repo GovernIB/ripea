@@ -46,6 +46,13 @@ public abstract class NodeEntity extends ContingutEntity {
 		return metaNode;
 	}
 
+	@Override
+	public String toString() {
+		return "NodeEntity: [" +
+				"contingut: " + super.toString() + ", " +
+				"metanode: " + this.metaNode.toString() + "]";
+	}
+	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

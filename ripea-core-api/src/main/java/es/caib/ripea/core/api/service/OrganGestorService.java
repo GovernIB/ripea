@@ -160,13 +160,13 @@ public interface OrganGestorService {
 	 * 			  Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId);
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId);
 		
 	/**
 	 * Obté un llistat de tots els organs gestors accessibles per a 
 	 * l'usuari actual de l'entitat indicada per paràmetre
 	 * Selecciona les que tenen el patró espedificat al parametre de filtre al nom o al codi.
-	 
+	 *
 	 * @param entitatId
 	 *            Id de l'entitat actual.
 	 * @param filterText
@@ -175,6 +175,16 @@ public interface OrganGestorService {
 	 * 		      Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, String filterText);
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId, String filterText);
 
+	/**
+	 * Obté un llistat de tots els organs gestors de l'entitat actual pels quals es té algún permís
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat actual.
+	 * @return
+	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId);
 }
