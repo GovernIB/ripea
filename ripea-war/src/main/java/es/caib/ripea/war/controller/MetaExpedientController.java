@@ -116,7 +116,10 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}", method = RequestMethod.GET)
-	public String get(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientDto metaExpedient = null;
 		if (metaExpedientId != null)
@@ -130,7 +133,12 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
 
-		fillFormModel(request, metaExpedient, model);
+		
+		
+		fillFormModel(
+				request,
+				metaExpedient,
+				model);
 		return "metaExpedientForm";
 	}
 

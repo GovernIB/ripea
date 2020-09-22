@@ -39,6 +39,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
@@ -359,9 +360,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long entitatId) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis CREATE ("
 				+ "entitatId=" + entitatId +  ")");
-		return findActiusAmbEntitatPermis(
-				entitatId, 
-				new Permission[] {ExtendedPermission.CREATE});
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findActiusAmbEntitatPermis(
+						entitatId,
+						new Permission[] { ExtendedPermission.CREATE }),
+				MetaExpedientDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -370,9 +373,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long entitatId) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE ("
 				+ "entitatId=" + entitatId +  ")");
-		return findActiusAmbEntitatPermis(
-				entitatId, 
-				new Permission[] {ExtendedPermission.WRITE});
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findActiusAmbEntitatPermis(
+						entitatId,
+						new Permission[] { ExtendedPermission.WRITE }),
+				MetaExpedientDto.class);
 	}	
 
 	@Transactional(readOnly = true)
@@ -381,9 +386,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long entitatId) {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ ("
 				+ "entitatId=" + entitatId +  ")");
-		return findActiusAmbEntitatPermis(
-				entitatId, 
-				new Permission[] {ExtendedPermission.READ});
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findActiusAmbEntitatPermis(
+						entitatId,
+						new Permission[] { ExtendedPermission.READ }),
+				MetaExpedientDto.class);
 	}
 	
 	
@@ -482,6 +489,26 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		return resposta;
 	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
+			Long entitatId,
+			Long organGestorId) {
+
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findActiusAmbOrganGestorPermisLectura(
+						entitatId,
+						organGestorId),
+				MetaExpedientDto.class);
+
+	}
+	
+	
+	
+	
   
 	@Transactional(readOnly = true)
 	@Override
@@ -828,30 +855,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		dto.setMetaDocuments(metaDocuments);
 	}
 
-	private List<MetaExpedientDto> findActiusAmbEntitatPermis(
-			Long entitatId,
-			Permission[] permisos) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				true);
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuTrueOrderByNomAsc(entitat);
-		permisosHelper.filterGrantedAll(
-				metaExpedients,
-				new ObjectIdentifierExtractor<MetaNodeEntity>() {
-					public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-						return metaNode.getId();
-					}
-				},
-				MetaNodeEntity.class,
-				permisos,
-				auth);
-		return conversioTipusHelper.convertirList(
-				metaExpedients,
-				MetaExpedientDto.class);		
-	}
 
 	private MetaExpedientTascaEntity getMetaExpedientTasca(
 			Long entitatId,

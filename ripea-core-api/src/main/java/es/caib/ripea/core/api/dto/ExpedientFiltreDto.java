@@ -20,6 +20,7 @@ import lombok.Setter;
 @Getter @Setter
 public class ExpedientFiltreDto implements Serializable {
 
+	private Long organGestorId;
 	private Long metaExpedientId;
 	private String metaExpedientDominiCodi;
 	private String nom;

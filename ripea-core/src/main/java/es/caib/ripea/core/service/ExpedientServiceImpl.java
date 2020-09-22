@@ -81,6 +81,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -153,6 +154,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private DocumentHelper documentHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 	
 	@Override
 	public ExpedientDto create(
@@ -542,28 +545,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedient == null ? null : toExpedientDto(expedient, true);
 	}
 	
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<ExpedientDto> findAmbFiltreAdmin(
-			Long entitatId,
-			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consultant els expedients segons el filtre per admins ("
-				+ "entitatId=" + entitatId + ", "
-				+ "filtre=" + filtre + ", "
-				+ "paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
-		return findAmbFiltrePaginat(
-				entitatId,
-				filtre,
-				paginacioParams,
-				true,
-				false);
-	}
 
 	
 	
@@ -712,8 +693,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				filtre,
 				paginacioParams,
-				false,
-				true,
 				expedientId);
 	}
 	
@@ -1583,8 +1562,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				filtre,
 				paginacioParams,
-				accesAdmin,
-				comprovarAccesMetaExpedients,
 				null
 				);
 	}
@@ -1593,13 +1570,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			boolean accesAdmin,
-			boolean comprovarAccesMetaExpedients,
 			Long expedientId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				(!accesAdmin),
-				accesAdmin,
+				true,
+				false,
 				false);
 		MetaExpedientEntity metaExpedient = null;
 		
@@ -1613,23 +1588,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false);
 		}
 		
-		// metaexpedients for each user has read permissions
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
-				entitat);
-		if (comprovarAccesMetaExpedients) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			permisosHelper.filterGrantedAll(
-					metaExpedientsPermesos,
-					new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-						@Override
-						public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-							return metaExpedient.getId();
-						}
-					},
-					MetaNodeEntity.class,
+		List<MetaExpedientEntity> metaExpedientsPermesos;
+		if (filtre.getOrganGestorId() != null) {
+			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganGestorPermis(
+					entitatId,
+					filtre.getOrganGestorId(),
 					new Permission[] {ExtendedPermission.READ},
-					auth);
+					false);
+		} else {
+			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+					entitatId, 
+					new Permission[] {ExtendedPermission.READ},
+					false);
 		}
+		
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			
@@ -1726,7 +1698,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 							paginacioParams,
 							ordenacioMap));
 			
-			
 
 			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
 					paginaExpedients,
@@ -1773,6 +1744,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
+		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
 				entitat);
 		if (comprovarAccesMetaExpedients) {

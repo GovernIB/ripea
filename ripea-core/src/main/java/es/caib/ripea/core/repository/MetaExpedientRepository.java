@@ -119,6 +119,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			Pageable pageable);
     
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
+	List<MetaExpedientEntity> findByOrganGestorAndActiuTrueOrderByNomAsc(OrganGestorEntity organGestorEntity);
+	List<MetaExpedientEntity> findByOrganGestorOrderByNomAsc(OrganGestorEntity organGestorEntity);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
 	

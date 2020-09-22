@@ -94,14 +94,6 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.findById(entitatId, id);
 	}
 
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ExpedientDto> findAmbFiltreAdmin(
-			Long entitatId,
-			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltreAdmin(entitatId, filtre, paginacioParams);
-	}
 
 	@Override
 	@RolesAllowed("tothom")

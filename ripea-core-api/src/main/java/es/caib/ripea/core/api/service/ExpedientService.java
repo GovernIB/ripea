@@ -124,24 +124,6 @@ public interface ExpedientService {
 			Long pareId,
 			String nom,
 			int esborrat);
-	/**
-	 * Consulta els expedients segons el filtre.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat.
-	 * @param filtre
-	 *            Filtre per a la consulta.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb els expedients trobats.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<ExpedientDto> findAmbFiltreAdmin(
-			Long entitatId,
-			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
 	 * Consulta els expedients segons el filtre.

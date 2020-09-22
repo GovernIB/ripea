@@ -274,4 +274,14 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				entitatId, 
 				metaExpedientId);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
+			Long entitatId,
+			Long organGestorId) {
+		return delegate.findActiusAmbOrganGestorPermisLectura(
+				entitatId,
+				organGestorId);
+	}
 }

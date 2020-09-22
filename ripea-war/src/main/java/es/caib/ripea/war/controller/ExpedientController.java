@@ -19,6 +19,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -54,6 +55,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientCommand;
@@ -106,9 +108,19 @@ public class ExpedientController extends BaseUserController {
 		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
+		
+		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitatActual.getId());
+		List<MetaExpedientDto> metaExpedientsPermisLectura;
+		if (filtreCommand.getOrganGestorId() != null) {
+			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
+					entitatActual.getId(),
+					filtreCommand.getOrganGestorId());
+		} else {
+			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+					entitatActual.getId());
+		}
+		
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);
@@ -118,7 +130,7 @@ public class ExpedientController extends BaseUserController {
 				"metaExpedientsPermisCreacio",
 				metaExpedientsPermisCreacio);
 		model.addAttribute(
-				getFiltreCommand(request));
+				filtreCommand);
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -138,7 +150,7 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
-		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
+		if ((metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) && filtreCommand.getOrganGestorId() == null) {
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
@@ -370,6 +382,7 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute(command);
 		
 		List<MetaExpedientDto> metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
+		
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
@@ -467,6 +480,7 @@ public class ExpedientController extends BaseUserController {
 				entitatActual.getId(),
 				metaExpedientId);
 	}
+
 	
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
 	@ResponseBody
@@ -478,6 +492,36 @@ public class ExpedientController extends BaseUserController {
 				entitatActual.getId(),
 				metaExpedientId).isGestioAmbGrupsActiva();
 	}
+	
+	
+	
+	
+	
+	@RequestMapping(value = "/metaExpedient", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> metaExpedients(
+			HttpServletRequest request) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		return metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId());
+	}
+	
+
+	
+	@RequestMapping(value = "/organGestor/{organGestorId}/metaExpedient", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> organGestorMetaExpedients(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		return metaExpedientService.findActiusAmbOrganGestorPermisLectura(
+				entitatActual.getId(),
+				organGestorId);
+	}
+	
+	
 	
 	
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/proximNumeroSequencia/{any}", method = RequestMethod.GET)
@@ -766,7 +810,7 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
-		if (metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) {
+		if ((metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) && filtre.getOrganGestorId() == null) {
 			MissatgesHelper.warning(
 					request, 
 					getMessage(

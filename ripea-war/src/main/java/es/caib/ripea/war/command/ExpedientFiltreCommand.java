@@ -21,6 +21,7 @@ import lombok.Setter;
 public class ExpedientFiltreCommand {
 
 	private Long arxiuId;
+	private Long organGestorId;
 	private Long metaExpedientId;
 	private String metaExpedientDominiCodi;
 	private String nom;

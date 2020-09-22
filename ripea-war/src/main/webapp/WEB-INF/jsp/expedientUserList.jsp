@@ -191,6 +191,44 @@ $(document).ready(function() {
 		}
 	});
 	$('#metaExpedientId').trigger('change');
+
+
+	$('#organGestorId').on('change', function() {
+		var organGestorId = $(this).val();
+
+		if (organGestorId!=null && organGestorId != "") {
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/organGestor"/>/' + organGestorId + '/metaExpedient',
+				success: function(data) {
+		
+					$('#metaExpedientId option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#metaExpedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					}
+				}
+			});
+		} else {
+
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/metaExpedient"/>',
+				success: function(data) {
+					
+					$('#metaExpedientId option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#metaExpedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					}
+				}
+			});
+
+		}
+
+	});
+
+					
+
+	
 });
 
 function checkLoadingFinished() {
@@ -235,6 +273,19 @@ function removeCookie(cname) {
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
 			<div class="col-md-3">
+			
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+ 					name="organGestorId"  
+ 					urlConsultaInicial="${urlConsultaInicial}"
+ 					urlConsultaLlistat="${urlConsultaLlistat}"
+ 					placeholderKey="metaexpedient.form.camp.organgestor"
+ 					suggestValue="id"
+ 					suggestText="nom"
+ 					inline="true"/>	
+			</div>	
+			<div class="col-md-3">
 				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedientsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="expedient.list.user.placeholder.tipusExpedient" inline="true"/>
 			</div>		
 			<div class="col-md-2">
@@ -243,48 +294,44 @@ function removeCookie(cname) {
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="expedient.list.user.placeholder.titol"/>
 			</div>
+
+		</div>
+		<div class="row">
 			<div class="col-md-3">
 				<rip:inputSelect name="expedientEstatId" optionItems="${expedientEstatsOptions}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-9">
-				<div class="row">
-					<div class="col-md-4">
-						<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
-					</div>
-					<div class="col-md-4">
-						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
-					</div>	
-					<div class="col-md-3">
-						<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
-					</div>			
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
-					<div class="col-md-1">
-						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-					</div>						
-				</div>
-				<rip:inputHidden name="meusExpedients"/>
+			<div class="col-md-3">
+				<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
 			</div>
+			<div class="col-md-3">
+				<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
+			</div>	
+			<div class="col-md-3">
+				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
+			</div>			
+		</div>
+		
+		<div class="row">
+			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
+			<div class="col-md-2">
+				<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
+			</div>						
+			<rip:inputHidden name="meusExpedients"/>
+		
+			<div class="col-md-4">
+			<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
+				<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+			</div>
+
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-9">
-				<div class="row">
-					<div class="col-md-4">
-					<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
-						<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
-					</div>
-					<div class="col-md-4">
-						<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
-					</div>
-				</div>
-			</div>	
 		</div>
 	</form:form>
 	<div class="rmodal"></div>

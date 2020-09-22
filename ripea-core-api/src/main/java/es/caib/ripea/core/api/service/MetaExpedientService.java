@@ -411,4 +411,11 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long metaExpedientId);
 
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
+			Long entitatId,
+			Long organGestorId);
+
+
+
 }
