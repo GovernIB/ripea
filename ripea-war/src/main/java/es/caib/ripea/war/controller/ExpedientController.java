@@ -46,6 +46,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -62,6 +63,7 @@ import es.caib.ripea.war.command.ExpedientTancarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -619,17 +621,22 @@ public class ExpedientController extends BaseUserController {
 					"redirect:../../contingut/" + expedientId,
 					"expedient.controller.tancar.ok");
 		} catch (Exception ex) {
-			omplirModelTancarExpedient(
-					expedientId,
-					request,
-					model);
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.tancar.nodefinitius",
-							null));
-			return "expedientTancarForm";
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(
+					ex,
+					ExpedientTancarSenseDocumentsDefinitiusException.class)) {
+				omplirModelTancarExpedient(
+						expedientId,
+						request,
+						model);
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"expedient.controller.tancar.nodefinitius",
+								null));
+				return "expedientTancarForm";
+			}
+			throw ex;			
 		}
 	}
 
