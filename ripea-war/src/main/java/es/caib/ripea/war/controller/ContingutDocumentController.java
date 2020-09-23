@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
@@ -54,6 +55,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -74,6 +76,7 @@ import es.caib.ripea.war.helper.ArxiuTemporalHelper;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DocumentHelper;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -358,25 +361,43 @@ public class ContingutDocumentController extends BaseUserController {
 				true,
 				false);
 		if (contingut instanceof DocumentDto) {
-			FitxerDto fitxer = documentService.descarregar(
-					entitatActual.getId(),
-					documentId,
-					null);
-			writeFileToResponse(
-					fitxer.getNom(),
-					fitxer.getContingut(),
-					response);
-			return null;
+			
+			try {
+				FitxerDto fitxer = documentService.descarregar(entitatActual.getId(),
+						documentId,
+						null);
+				writeFileToResponse(fitxer.getNom(),
+						fitxer.getContingut(),
+						response);
+				return null;
+				
+			} catch (Exception e) {
+				
+				if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundDocumentException.class)) {
+					return getAjaxControllerReturnValueError(
+							request,
+							"redirect:../../",
+							"document.controller.descarregar.error.arxiuNoTrobat");
+				} else {
+					throw e;
+				}
+				
+				
+			}
+			
+			
+		} else {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"document.controller.descarregar.error"));
+			if (contingut.getPare() != null)
+				return "redirect:../../contingut/" + pareId;
+			else
+				return "redirect:../../expedient";
 		}
-		MissatgesHelper.error(
-				request, 
-				getMessage(
-						request, 
-						"document.controller.descarregar.error"));
-		if (contingut.getPare() != null)
-			return "redirect:../../contingut/" + pareId;
-		else
-			return "redirect:../../expedient";
+
 	}
 	
 	@RequestMapping(value = "/{pareId}/descarregarMultiples", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

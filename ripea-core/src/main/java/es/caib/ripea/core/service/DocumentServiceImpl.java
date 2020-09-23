@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
@@ -42,6 +43,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.core.api.dto.ViaFirmaRespostaDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -67,6 +69,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
@@ -373,14 +376,27 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "versio=" + versio + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-				entitatId,
-				id,
-				true,
-				false);
-		return documentHelper.getFitxerAssociat(
-				document,
-				versio);
+		
+		try {
+			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+					entitatId,
+					id,
+					true,
+					false);
+			
+			return documentHelper.getFitxerAssociat(
+					document,
+					versio);
+			
+		} catch (Exception e) {
+
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundException.class)) {
+				throw new ArxiuNotFoundDocumentException();
+			} else {
+				throw e;
+			}
+		}
+
 	}
 
 	@Transactional(readOnly = true)
