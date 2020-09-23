@@ -202,13 +202,14 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param filtre TODO
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
-			Long entitatId) throws NotFoundException;
+			Long entitatId, String filtre) throws NotFoundException;
 
 	/**
 	 * Retorna el pròxim número de seqüència per a un meta-expedient.
@@ -426,8 +427,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
-			Long organGestorId);
-
+			Long organGestorId, String filtre);
 
 
 }

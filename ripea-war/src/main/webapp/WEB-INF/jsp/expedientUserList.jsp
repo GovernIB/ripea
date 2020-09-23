@@ -145,7 +145,7 @@ $(document).ready(function() {
 				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
 			}
 		};
-		if (metaExpedientId != "") {
+		if (metaExpedientId) {
 			$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
 			.done(metaNodeRefresh)
 			.fail(function() {
@@ -161,7 +161,7 @@ $(document).ready(function() {
 				$('#metaExpedientDominiCodi').append('<option value="' + data[i].codi + '">' + data[i].nom + '</option>');
 			}
 		};
-		if (metaExpedientId != "") {
+		if (metaExpedientId) {
 			var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDadaPermisLectura/domini"/>';
 			$.get(multipleUrl)
 			.done(dominisRefresh)
@@ -192,35 +192,17 @@ $(document).ready(function() {
 	});
 	$('#metaExpedientId').trigger('change');
 
+	
 
 	$('#organGestorId').on('change', function() {
 		var organGestorId = $(this).val();
 
-		if (organGestorId!=null && organGestorId != "") {
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/expedient/organGestor"/>/' + organGestorId + '/metaExpedient',
-				success: function(data) {
-		
-					$('#metaExpedientId option[value!=""]').remove();
-					for (var i = 0; i < data.length; i++) {
-						$('#metaExpedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-					}
-				}
-			});
-		} else {
+		$('#metaExpedientId').val('').trigger('change')
 
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/expedient/metaExpedient"/>',
-				success: function(data) {
-					
-					$('#metaExpedientId option[value!=""]').remove();
-					for (var i = 0; i < data.length; i++) {
-						$('#metaExpedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-					}
-				}
-			});
+		if (organGestorId) {
+			$("#metaExpedientId").data('urlParamAddicional', organGestorId);
+		} else {
+			$("#metaExpedientId").data('urlParamAddicional', null);
 
 		}
 
@@ -286,7 +268,19 @@ function removeCookie(cname) {
  					inline="true"/>	
 			</div>	
 			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedientsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="expedient.list.user.placeholder.tipusExpedient" inline="true"/>
+				<c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaInicial"/>
+				<c:url value="/metaexpedientajax/metaexpedients" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+ 					name="metaExpedientId"  
+ 					urlConsultaInicial="${urlConsultaInicial}"
+ 					urlConsultaLlistat="${urlConsultaLlistat}"
+ 					placeholderKey="expedient.list.user.placeholder.tipusExpedient"
+ 					suggestValue="id"
+ 					suggestText="nom"
+ 					suggestTextAddicional="classificacioSia"
+ 					inline="true"
+ 					urlParamAddicional="${expedientFiltreCommand.organGestorId}"
+ 					/>				
 			</div>		
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>

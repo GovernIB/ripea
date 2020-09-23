@@ -113,15 +113,15 @@ public class ExpedientController extends BaseUserController {
 		if (filtreCommand.getOrganGestorId() != null) {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 					entitatActual.getId(),
-					filtreCommand.getOrganGestorId());
+					filtreCommand.getOrganGestorId(), 
+					null);
 		} else {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
-					entitatActual.getId());
+					entitatActual.getId(), 
+					null);
 		}
+
 		
-		model.addAttribute(
-				"metaExpedientsPermisLectura",
-				metaExpedientsPermisLectura);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
 				entitatActual.getId());
 		model.addAttribute(
@@ -502,7 +502,8 @@ public class ExpedientController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		return metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitatActual.getId());
+				entitatActual.getId(), 
+				null);
 	}
 	
 
@@ -516,7 +517,8 @@ public class ExpedientController extends BaseUserController {
 		
 		return metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 				entitatActual.getId(),
-				organGestorId);
+				organGestorId, 
+				null);
 	}
 	
 	
@@ -781,14 +783,16 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerLectura(
-						entitatActual.getId()));
+						entitatActual.getId(), 
+						null));
 		model.addAttribute(
 				"expedientEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						ExpedientEstatEnumDto.class,
 						"expedient.estat.enum."));
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitatActual.getId());
+				entitatActual.getId(), 
+				null);
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);

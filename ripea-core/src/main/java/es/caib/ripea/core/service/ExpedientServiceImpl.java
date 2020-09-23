@@ -1594,12 +1594,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 					entitatId,
 					filtre.getOrganGestorId(),
 					new Permission[] {ExtendedPermission.READ},
-					false);
+					false,
+					null);
 		} else {
 			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
 					entitatId, 
 					new Permission[] {ExtendedPermission.READ},
-					false);
+					false,
+					null);
 		}
 		
 		

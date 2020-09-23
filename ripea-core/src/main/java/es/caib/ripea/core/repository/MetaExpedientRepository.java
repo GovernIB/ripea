@@ -26,8 +26,6 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	MetaExpedientEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 
-	List<MetaExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
-	
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	
 	@Query( "select " +
@@ -125,9 +123,41 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("ids") List<Long> ids,
 			Pageable pageable);
+	
+	
+	
+	
+
+	
+	@Query( "from " +
+	         "    MetaExpedientEntity me " +
+	         "where " +
+	         "    me.entitat = :entitat " +
+			"and me.actiu = true " +
+			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) ")
+	List<MetaExpedientEntity> findByEntitatAndActiuTrueAndFiltreOrderByNomAsc(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre);
+
+
+	@Query( "from " +
+	         "    MetaExpedientEntity me " +
+	         "where " +
+	         "    me.organGestor = :organGestor " +
+			"and me.actiu = true " +
+			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) ")
+	List<MetaExpedientEntity> findByOrganGestorAndActiuAndFiltreTrueOrderByNomAsc(
+			@Param("organGestor") OrganGestorEntity organGestor,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre);
+	
+	
+	List<MetaExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	
     
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
-	List<MetaExpedientEntity> findByOrganGestorAndActiuTrueOrderByNomAsc(OrganGestorEntity organGestorEntity);
+
 	List<MetaExpedientEntity> findByOrganGestorOrderByNomAsc(OrganGestorEntity organGestorEntity);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
