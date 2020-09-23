@@ -54,7 +54,6 @@ import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -63,12 +62,12 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.DocumentFirmaHelper;
+import es.caib.ripea.core.helper.DocumentFirmaHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.ExceptionHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
@@ -76,7 +75,6 @@ import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -95,8 +93,6 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Autowired
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
 	@Autowired
 	private DispositiuEnviamentRepository dispositiuEnviamentRepository;
@@ -109,13 +105,13 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
+	private DocumentFirmaHelper documentFirmaHelper;
+	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
@@ -446,7 +442,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 		
-		documentHelper.portafirmesEnviar(
+		documentFirmaHelper.portafirmesEnviar(
 				entitatId,
 				document,
 				assumpte,
@@ -476,7 +472,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 
-		documentHelper.portafirmesCancelar(
+		documentFirmaHelper.portafirmesCancelar(
 				entitatId,
 				document);
 	}
@@ -490,23 +486,7 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Processant petició del callback ("
 				+ "portafirmesId=" + portafirmesId + ", "
 				+ "callbackEstat=" + callbackEstat + ")");
-		DocumentPortafirmesEntity documentPortafirmes = documentPortafirmesRepository.findByPortafirmesId(
-				new Long(portafirmesId).toString());
-		if (documentPortafirmes == null) {
-			return new NotFoundException(
-					"(portafirmesId=" + portafirmesId + ")",
-					DocumentPortafirmesEntity.class);
-		}
-		contingutLogHelper.log(
-				documentPortafirmes.getDocument(),
-				LogTipusEnumDto.PFIRMA_CALLBACK,
-				documentPortafirmes.getPortafirmesId(),
-				documentPortafirmes.getEstat().name(),
-				false,
-				false);
-		documentPortafirmes.updateCallbackEstat(callbackEstat);
-		documentPortafirmes.updateMotiuRebuig(motiuRebuig);
-		return documentHelper.portafirmesProcessar(documentPortafirmes);
+		return documentFirmaHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig);
 	}
 
 	@Transactional
@@ -524,7 +504,7 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false);
-		documentHelper.portafirmesReintentar(
+		documentFirmaHelper.portafirmesReintentar(
 				entitatId,
 				document);
 
@@ -544,7 +524,7 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 
-		DocumentPortafirmesDto docPortafir = documentHelper.portafirmesInfo(entitatId, document);
+		DocumentPortafirmesDto docPortafir = documentFirmaHelper.portafirmesInfo(entitatId, document);
 		List<PortafirmesDocumentTipusDto> list = pluginHelper.portafirmesFindDocumentTipus();
 		for (PortafirmesDocumentTipusDto doctipus : list) {
 			if (Long.toString(doctipus.getId()).equals(docPortafir.getDocumentTipus())) {
@@ -585,18 +565,7 @@ public class DocumentServiceImpl implements DocumentService {
 					"Aquest document no te enviaments a portafirmes pendents de processar");
 		}
 		DocumentViaFirmaEntity documentPortafirmes = enviamentsPendents.get(0);
-		contingutLogHelper.log(
-				documentPortafirmes.getDocument(),
-				LogTipusEnumDto.VFIRMA_REINTENT,
-				documentPortafirmes.getMessageCode(),
-				documentPortafirmes.getEstat().name(),
-				false,
-				false);
-		if (DocumentEnviamentEstatEnumDto.PENDENT.equals(documentPortafirmes.getEstat())) {
-			documentHelper.viaFirmaEnviar(documentPortafirmes);
-		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
-			documentHelper.viaFirmaProcessar(documentPortafirmes);
-		}
+		documentFirmaHelper.viaFirmaReintentar(documentPortafirmes);
 	}
 
 	@Transactional
@@ -676,18 +645,8 @@ public class DocumentServiceImpl implements DocumentService {
 					document.getExpedient(),
 					document).build();
 			
-			documentHelper.viaFirmaEnviar(documentViaFirma);
-			
-			documentViaFirmaRepository.save(documentViaFirma);
-			document.updateEstat(
-					DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
-			contingutLogHelper.log(
-					document,
-					LogTipusEnumDto.VFIRMA_ENVIAMENT,
-					documentViaFirma.getMessageCode(),
-					documentViaFirma.getEstat().name(),
-					false,
-					false);
+			documentFirmaHelper.viaFirmaEnviar(documentViaFirma);
+		
 		} catch (Exception ex) {
 			logger.error(
 					"Error a l'hora d'enviar el document a viaFirma (" +
@@ -724,17 +683,7 @@ public class DocumentServiceImpl implements DocumentService {
 					"Aquest document no te enviaments a viaFirma pendents");
 		}
 		DocumentViaFirmaEntity documentViaFirma = enviamentsPendents.get(0);
-		documentViaFirma.updateMessageCode(null);
-		documentViaFirma.updateCancelat(new Date());
-		document.updateEstat(
-				DocumentEstatEnumDto.REDACCIO);
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.VFIRMA_CANCELACIO,
-				documentViaFirma.getMessageCode(),
-				documentViaFirma.getEstat().name(),
-				false,
-				false);
+		documentFirmaHelper.viaFirmaCancelar(documentViaFirma);
 	}
 	
 	@Transactional(readOnly = true)
@@ -862,15 +811,7 @@ public class DocumentServiceImpl implements DocumentService {
 					"(messageCode=" + messageCode + ")",
 					DocumentViaFirmaEntity.class);
 		}
-		contingutLogHelper.log(
-				documentViaFirma.getDocument(),
-				LogTipusEnumDto.VFIRMA_CALLBACK,
-				documentViaFirma.getMessageCode(),
-				documentViaFirma.getEstat().name(),
-				false,
-				false);
-		documentViaFirma.updateCallbackEstat(callbackEstat);
-		return documentHelper.viaFirmaProcessar(documentViaFirma);
+		return documentFirmaHelper.viaFirmaCallback(documentViaFirma, callbackEstat);
 	}
 
 	
@@ -906,8 +847,8 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 		try {
-			return documentHelper.firmaClientXifrar(
-					documentHelper.obtainInstanceObjecteFirmaApplet( 
+			return documentFirmaHelper.firmaClientXifrar(
+					documentFirmaHelper.obtainInstanceObjecteFirmaApplet( 
 							new Long(System.currentTimeMillis()),
 							entitatId,
 							id));
@@ -935,9 +876,9 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;
 		try {
-			objecte = documentHelper.firmaAppletDesxifrar(
+			objecte = documentFirmaHelper.firmaAppletDesxifrar(
 					identificador,
-					DocumentHelper.CLAU_SECRETA);
+					DocumentFirmaHelper.CLAU_SECRETA);
 		} catch (Exception ex) {
 			throw new RuntimeException(
 					"Error al desxifrar l'identificador per la firma via applet (" +
@@ -953,7 +894,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false);
 			
-			documentHelper.processarFirmaClient(
+			documentFirmaHelper.processarFirmaClient(
 					identificador,
 					changeExtensioToPdf(arxiuNom),
 					arxiuContingut,
@@ -1091,17 +1032,7 @@ public class DocumentServiceImpl implements DocumentService {
 				documentId,
 				false,
 				true);
-			
-		if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
-			document.updateEstat(nouEstat);
-		}
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.CANVI_ESTAT,
-				nouEstat.name(),
-				null,
-				false,
-				false);
+		documentHelper.actualitzarEstat(document, nouEstat);
 	}
 	
 	private DocumentDto toDocumentDto(

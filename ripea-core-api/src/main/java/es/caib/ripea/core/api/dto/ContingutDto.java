@@ -10,11 +10,16 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'un contingut.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public abstract class ContingutDto extends AuditoriaDto {
 
 	protected Long id;
@@ -32,92 +37,9 @@ public abstract class ContingutDto extends AuditoriaDto {
 	private boolean alerta;
 	private boolean hasFills;
 	protected Date esborratData;
-	
-	
 
-	public Date getEsborratData() {
-		return esborratData;
-	}
-	public void setEsborratData(Date esborratData) {
-		this.esborratData = esborratData;
-	}
-	public boolean isHasFills() {
-		return hasFills;
-	}
-	public void setHasFills(boolean hasFills) {
-		this.hasFills = hasFills;
-	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public List<ContingutDto> getFills() {
-		return fills;
-	}
-	public void setFills(List<ContingutDto> fills) {
-		this.fills = fills;
-	}
-	public List<ContingutDto> getPath() {
-		return path;
-	}
-	public void setPath(List<ContingutDto> path) {
-		this.path = path;
-	}
-	public EntitatDto getEntitat() {
-		return entitat;
-	}
-	public void setExpedientPare(ExpedientDto expedientPare) {
-		this.expedientPare = expedientPare;
-	}
-	public ExpedientDto getExpedientPare() {
-		return expedientPare;
-	}
-	public void setEntitat(EntitatDto entitat) {
-		this.entitat = entitat;
-	}
 	public boolean isEsborrat() {
 		return esborrat > 0;
-	}
-	public void setEsborrat(int esborrat) {
-		this.esborrat = esborrat;
-	}
-	public String getArxiuUuid() {
-		return arxiuUuid;
-	}
-	public void setArxiuUuid(String arxiuUuid) {
-		this.arxiuUuid = arxiuUuid;
-	}
-	public Date getArxiuDataActualitzacio() {
-		return arxiuDataActualitzacio;
-	}
-	public void setArxiuDataActualitzacio(Date arxiuDataActualitzacio) {
-		this.arxiuDataActualitzacio = arxiuDataActualitzacio;
-	}
-	public Date getDarrerMovimentData() {
-		return darrerMovimentData;
-	}
-	public void setDarrerMovimentData(Date darrerMovimentData) {
-		this.darrerMovimentData = darrerMovimentData;
-	}
-	public UsuariDto getDarrerMovimentUsuari() {
-		return darrerMovimentUsuari;
-	}
-	public void setDarrerMovimentUsuari(UsuariDto darrerMovimentUsuari) {
-		this.darrerMovimentUsuari = darrerMovimentUsuari;
-	}
-	public String getDarrerMovimentComentari() {
-		return darrerMovimentComentari;
-	}
-	public void setDarrerMovimentComentari(String darrerMovimentComentari) {
-		this.darrerMovimentComentari = darrerMovimentComentari;
 	}
 
 	public ContingutDto getPare() {
@@ -131,7 +53,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 		if (getPath() == null)
 			return null;
 		StringBuilder pathString = new StringBuilder();
-		for (ContingutDto pathElement: getPath()) {
+		for (ContingutDto pathElement : getPath()) {
 			pathString.append("/");
 			if (pathElement instanceof EscriptoriDto) {
 				if (entitat != null)
@@ -144,14 +66,16 @@ public abstract class ContingutDto extends AuditoriaDto {
 		}
 		return pathString.toString();
 	}
+
 	public String getPathAsStringWebdavAmbNom() {
 		return getPathAsStringWebdav() + "/" + nom;
 	}
+
 	public String getPathAsStringExplorador() {
 		if (getPath() == null)
 			return null;
 		StringBuilder pathString = new StringBuilder();
-		for (ContingutDto pathElement: getPath()) {
+		for (ContingutDto pathElement : getPath()) {
 			if (pathString.length() > 0)
 				pathString.append(" / ");
 			if (pathElement.isEscriptori()) {
@@ -169,12 +93,13 @@ public abstract class ContingutDto extends AuditoriaDto {
 		}
 		return pathString.toString();
 	}
+
 	public String getPathAsStringExploradorAmbNom() {
 		if (isExpedient()) {
 			if (getPathAsStringExplorador() != null)
 				return getPathAsStringExplorador() + " / #X# " + nom;
 			else if (expedientPare != null)
-				return "#X# " + expedientPare.getNom() +  " / #X# " + nom;
+				return "#X# " + expedientPare.getNom() + " / #X# " + nom;
 		} else if (isCarpeta()) {
 			if (getPathAsStringExplorador() != null)
 				return getPathAsStringExplorador() + " / #C# " + nom;
@@ -184,12 +109,12 @@ public abstract class ContingutDto extends AuditoriaDto {
 			if (getPathAsStringExplorador() != null)
 				return getPathAsStringExplorador() + " / #D# " + nom;
 			else if (expedientPare != null)
-				return "#X# " + expedientPare.getNom() +  "/ #D# " + nom;
+				return "#X# " + expedientPare.getNom() + "/ #D# " + nom;
 		} else {
 			if (getPathAsStringExplorador() != null)
 				return getPathAsStringExplorador() + " / " + nom;
 			else if (expedientPare != null)
-				return "#X# " + expedientPare.getNom() +  "/ " + nom;	
+				return "#X# " + expedientPare.getNom() + "/ " + nom;
 		}
 		return "/ " + nom;
 	}
@@ -197,17 +122,18 @@ public abstract class ContingutDto extends AuditoriaDto {
 	public List<ExpedientDto> getFillsExpedients() {
 		List<ExpedientDto> expedients = new ArrayList<ExpedientDto>();
 		if (fills != null) {
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (contenidor instanceof ExpedientDto)
 					expedients.add((ExpedientDto)contenidor);
 			}
 		}
 		return expedients;
 	}
+
 	public List<ContingutDto> getFillsNoExpedients() {
 		List<ContingutDto> noExpedients = new ArrayList<ContingutDto>();
 		if (fills != null) {
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (!(contenidor instanceof ExpedientDto))
 					noExpedients.add(contenidor);
 			}
@@ -218,17 +144,18 @@ public abstract class ContingutDto extends AuditoriaDto {
 	public List<RegistreAnotacioDto> getFillsRegistres() {
 		List<RegistreAnotacioDto> registres = new ArrayList<RegistreAnotacioDto>();
 		if (fills != null) {
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (contenidor instanceof RegistreAnotacioDto)
 					registres.add((RegistreAnotacioDto)contenidor);
 			}
 		}
 		return registres;
 	}
+
 	public List<ContingutDto> getFillsNoRegistres() {
 		List<ContingutDto> noRegistres = new ArrayList<ContingutDto>();
 		if (fills != null) {
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (!(contenidor instanceof RegistreAnotacioDto))
 					noRegistres.add(contenidor);
 			}
@@ -239,53 +166,57 @@ public abstract class ContingutDto extends AuditoriaDto {
 	public int getFillsCount() {
 		return (fills == null) ? 0 : fills.size();
 	}
+
 	public int getFillsExpedientsCount() {
-		if  (fills == null) {
+		if (fills == null) {
 			return 0;
 		} else {
 			int count = 0;
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (contenidor instanceof ExpedientDto)
 					count++;
 			}
 			return count;
 		}
 	}
+
 	public int getFillsNoExpedientsCount() {
-		if  (fills == null) {
+		if (fills == null) {
 			return 0;
 		} else {
 			int count = 0;
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (!(contenidor instanceof ExpedientDto))
 					count++;
 			}
 			return count;
 		}
 	}
+
 	public int getFillsRegistresCount() {
-		if  (fills == null) {
+		if (fills == null) {
 			return 0;
 		} else {
 			int count = 0;
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (contenidor instanceof RegistreAnotacioDto)
 					count++;
 			}
 			return count;
 		}
 	}
+
 	public int getFillsNoRegistresCount() {
-		if  (fills == null) {
+		if (fills == null) {
 			return 0;
 		} else {
 			int count = 0;
-			for (ContingutDto contenidor: fills) {
+			for (ContingutDto contenidor : fills) {
 				if (!(contenidor instanceof RegistreAnotacioDto))
 					count++;
-				//No contar resultat concatenació i zip
-				if (contenidor.isDocument() && 
-						((DocumentDto) contenidor).getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+				// No contar resultat concatenació i zip
+				if (contenidor.isDocument() &&
+						((DocumentDto)contenidor).getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
 					count--;
 				}
 			}
@@ -323,18 +254,23 @@ public abstract class ContingutDto extends AuditoriaDto {
 	public boolean isExpedient() {
 		return this instanceof ExpedientDto;
 	}
+
 	public boolean isDocument() {
 		return this instanceof DocumentDto;
 	}
+
 	public boolean isNode() {
 		return this instanceof NodeDto;
 	}
+
 	public boolean isCarpeta() {
 		return this instanceof CarpetaDto;
 	}
+
 	public boolean isEscriptori() {
 		return this instanceof EscriptoriDto;
 	}
+
 	public boolean isRegistre() {
 		return this instanceof RegistreAnotacioDto;
 	}
@@ -352,14 +288,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 			return null;
 		}
 	}
-	
-	public boolean isAlerta() {
-		return alerta;
-	}
-	public void setAlerta(boolean alerta) {
-		this.alerta = alerta;
-	}
-	
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

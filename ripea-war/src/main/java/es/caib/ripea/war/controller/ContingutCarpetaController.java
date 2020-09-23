@@ -39,8 +39,6 @@ public class ContingutCarpetaController extends BaseUserController {
 	@Autowired
 	private CarpetaService carpetaService;
 
-
-
 	@RequestMapping(value = "/{contingutId}/carpeta/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
