@@ -488,7 +488,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public List<Long> findIdsMassiusAmbFiltre(
+	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException;
 	
@@ -504,7 +504,7 @@ public interface ContingutService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
+	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;

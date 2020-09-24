@@ -11,12 +11,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,8 @@ import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
@@ -82,6 +85,7 @@ import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -95,6 +99,7 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 
@@ -142,6 +147,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 
 	@Transactional
 	@Override
@@ -1452,57 +1459,80 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
+	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-		Long idMetaNode = null;
-		MetaNodeEntity metaNode = null;
-		if (filtre.getTipusElement() == ContingutTipusEnumDto.EXPEDIENT && filtre.getTipusExpedient() != null) {
-			idMetaNode = filtre.getTipusExpedient();
-		} else if (filtre.getTipusElement() == ContingutTipusEnumDto.DOCUMENT && filtre.getTipusDocument() != null) {
-			idMetaNode = filtre.getTipusDocument();
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
 		}
-		if (idMetaNode != null) {
-			metaNode = metaNodeRepository.findOne(idMetaNode);
-			if (metaNode == null) {
-				throw new NotFoundException(
-						idMetaNode,
-						MetaNodeEntity.class);
-			}
+		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitat.getId(),
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false);
 		}
-		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-		List<DocumentEntity> preDocuments = documentRepository.findDocumentMassiuByFiltre(
-				entitat,
-				(filtre.getTipusExpedient() == null),
-				filtre.getTipusExpedient(),
-				(filtre.getExpedientId() == null),
-				filtre.getExpedientId(),
-				(filtre.getTipusDocument() == null),
-				filtre.getTipusDocument(),
-				(filtre.getNom() == null),
-				filtre.getNom(),
-				(dataInici == null),
-				dataInici,
-				(dataFi == null),
-				dataFi,
+		
+		
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					entitat,
+					filtre.getMetaDocumentId());
+		}
+		
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				true);
-		List<Long> docIds = new ArrayList<Long>();
-		for (DocumentEntity document: preDocuments) {
-			docIds.add(document.getId());
-		}
-		if (!docIds.isEmpty()) {
+				null);
+
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
+					entitat,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+	
+	
 			return paginacioHelper.toPaginaDto(
-					documentRepository.findDocumentMassiuByIdsPaginat(
-							docIds,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
+					paginaDocuments,
 					DocumentDto.class,
 					new Converter<DocumentEntity, DocumentDto>() {
 						@Override
@@ -1524,23 +1554,88 @@ public class ContingutServiceImpl implements ContingutService {
 					DocumentDto.class);
 		}
 	}
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Long> findIdsMassiusAmbFiltre(
+	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException {
-		logger.debug("Consultant els ids d'expedient segons el filtre ("
-				+ "entitatId=" + entitatId + ", "
-				+ "filtre=" + filtre + ")");
-		entityComprovarHelper.comprovarEntitat(
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false);
-		return findIdsAmbFiltrePaginat(
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitat.getId(),
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false);
+		}
+		
+		
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					entitat,
+					filtre.getMetaExpedientId());
+		}
+		
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
 				entitatId,
-				filtre);
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			List<Long> idsDocuments = documentRepository.findIdsDocumentsPerFirmaMassiu(
+					entitat,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi);
+	
+	
+			return idsDocuments;
+			
+		} else {
+			return new ArrayList<>();
+		}
+		
+
 	}
 
 	/*private ContingutEntity contingutHelper.comprovarContingutDinsExpedient(
@@ -1611,48 +1706,7 @@ public class ContingutServiceImpl implements ContingutService {
 		return contingut;
 	}*/
 
-	private List<Long> findIdsAmbFiltrePaginat(
-			Long entitatId,
-			ContingutMassiuFiltreDto filtre) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		Long idMetaNode = null;
-		MetaNodeEntity metaNode = null;
-		if (filtre.getTipusElement() == ContingutTipusEnumDto.EXPEDIENT && filtre.getTipusExpedient() != null)
-			idMetaNode = filtre.getTipusExpedient();
-		else if (filtre.getTipusElement() == ContingutTipusEnumDto.DOCUMENT && filtre.getTipusDocument() != null)
-			idMetaNode = filtre.getTipusDocument();
 
-		if (idMetaNode != null) {
-			metaNode = metaNodeRepository.findOne(idMetaNode);
-			if (metaNode == null) {
-				throw new NotFoundException(
-						idMetaNode,
-						MetaNodeEntity.class);
-			}
-		}
-		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-		return documentRepository.findIdMassiuByEntitatAndFiltre(
-				entitat,
-				(filtre.getTipusExpedient() == null),
-				filtre.getTipusExpedient(),
-				(filtre.getExpedientId() == null),
-				filtre.getExpedientId(),
-				(filtre.getTipusDocument() == null),
-				filtre.getTipusDocument(),
-				(filtre.getNom() == null),
-				filtre.getNom(),
-				(dataInici == null),
-				dataInici,
-				(dataFi == null),
-				dataFi,
-				false,
-				true);
-	}
 
 	private ContingutEntity copiarContingut(
 			EntitatEntity entitat,

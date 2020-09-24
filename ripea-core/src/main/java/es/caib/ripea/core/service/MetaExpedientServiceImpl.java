@@ -322,12 +322,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
 			Long entitatId,
-			String filtre) {
+			String filtreNomOrCodiSia) {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
 		return findActiusAmbEntitatPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.READ },
-				filtre);
+				filtreNomOrCodiSia);
 	}
 
 	@Transactional(readOnly = true)
@@ -718,14 +718,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private List<MetaExpedientDto> findActiusAmbEntitatPermis(
 			Long entitatId,
 			Permission[] permisos,
-			String filtre) {
+			String filtreNomOrCodiSia) {
 
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatPermis(
 						entitatId,
 						permisos,
 						true,
-						filtre),
+						filtreNomOrCodiSia),
 				MetaExpedientDto.class);
 	}
 

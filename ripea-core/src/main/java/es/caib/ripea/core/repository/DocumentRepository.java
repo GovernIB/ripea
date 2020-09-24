@@ -83,72 +83,76 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	
 	
 	@Query(	"select " +
-			"    c " +
+			"    d " +
 			"from " +
-			"    DocumentEntity c " +
+			"    DocumentEntity d " +
 			"where " +
-			"    c.entitat = :entitat " +
-			"and c.estat = 0 "  + 
-			"and c.documentTipus != 2 " + 
-			"and c.documentTipus != 3 " +
-			"and (:esNullMetaExpedientId = true or c.expedient.metaNode.id = :metaExpedientId) " +
-			"and (:esNullExpedientId = true or c.expedient.id = :expedientId) " +
-			"and (:esNullMetaDocumentId = true or c.metaNode.id = :metaDocumentId) " +
-			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullDataInici = true or c.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or c.createdDate <= :dataFi) " +
-			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) " +
-			"and (c.metaNode.id in " + 
+			"    d.entitat = :entitat " +
+			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and d.estat = 0 "  + 
+			"and d.esborrat = 0 " + 
+			"and d.documentTipus != 2 and d.documentTipus != 3 " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
+			"and (d.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPortafirmesActiva = 1" + 
 			"				and (metaDocument.portafirmesResponsables != null or metaDocument.portafirmesFluxId != null)))")
-	public List<DocumentEntity> findDocumentMassiuByFiltre(
+	public Page<DocumentEntity> findDocumentsPerFirmaMassiu(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullMetaExpedientId") boolean esNullMetaExpedientId,
-			@Param("metaExpedientId") Long metaExpedientId,
-			@Param("esNullExpedientId") boolean esNullExpedientId,
-			@Param("expedientId") Long expedientId,
-			@Param("esNullMetaDocumentId") boolean esNullMetaDocumentId,
-			@Param("metaDocumentId") Long metaDocumentId,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaDocument") boolean esNullMetaDocument,
+			@Param("metaDocument") MetaNodeEntity metaDocument,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
-			@Param("mostrarEsborrats") boolean mostrarEsborrats,
-			@Param("mostrarNoEsborrats") boolean mostrarNoEsborrats);
+			Pageable pageable);
 	
 	
 	@Query(	"select " +
-			"    c.id " +
+			"    d.id " +
 			"from " +
-			"    DocumentEntity c " +
+			"    DocumentEntity d " +
 			"where " +
-			"    c.entitat = :entitat " +
-			"and c.documentTipus != 2 " + 
-			"and c.documentTipus != 3 " +
-			"and (:esNullTipusExpedient = true or c.expedient.metaNode.id = :tipusExpedientId) " +
-			"and (:esNullExpedient = true or c.expedient.id = :expedientId) " +
-			"and (:esNullTipusDocument = true or c.metaNode.id = :tipusDocumentId) " +
-			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullDataInici = true or c.lastModifiedDate >= :dataInici) " +
-			"and (:esNullDataFi = true or c.lastModifiedDate <= :dataFi) " +
-			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) ")
-	public List<Long> findIdMassiuByEntitatAndFiltre(
+			"    d.entitat = :entitat " +
+			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and d.estat = 0 "  + 
+			"and d.esborrat = 0 " + 
+			"and d.documentTipus != 2 and d.documentTipus != 3 " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
+			"and (d.metaNode.id in " + 
+			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
+			"				where metaDocument.firmaPortafirmesActiva = 1" + 
+			"				and (metaDocument.portafirmesResponsables != null or metaDocument.portafirmesFluxId != null)))")
+	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullTipusExpedient") boolean esNullTipusExpedient,
-			@Param("tipusExpedientId") Long tipusExpedientId,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
 			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedientId") Long expedientId,
-			@Param("esNullTipusDocument") boolean esNullTipusDocument,
-			@Param("tipusDocumentId") Long tipusDocumentId,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaDocument") boolean esNullMetaDocument,
+			@Param("metaDocument") MetaNodeEntity metaDocument,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
-			@Param("mostrarEsborrats") boolean mostrarEsborrats,
-			@Param("mostrarNoEsborrats") boolean mostrarNoEsborrats);
+			@Param("dataFi") Date dataFi);
 }

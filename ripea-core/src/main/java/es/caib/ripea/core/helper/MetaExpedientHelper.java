@@ -176,12 +176,12 @@ public class MetaExpedientHelper {
 	public List<MetaExpedientEntity> findActiusAmbEntitatPermis(
 			Long entitatId,
 			Permission[] permisos,
-			String filtre) {
+			String filtreNomOrCodiSia) {
 		return findAmbEntitatPermis(
 				entitatId,
 				permisos,
 				true,
-				filtre);		
+				filtreNomOrCodiSia);		
 	}
 	
 	
@@ -189,7 +189,7 @@ public class MetaExpedientHelper {
 			Long entitatId,
 			Permission[] permisos,
 			boolean nomesActius,
-			String filtre) {
+			String filtreNomOrCodiSia) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -201,8 +201,8 @@ public class MetaExpedientHelper {
 		if (nomesActius) {
 			metaExpedients = metaExpedientRepository.findByEntitatAndActiuTrueAndFiltreOrderByNomAsc(
 					entitat,
-					filtre == null || "".equals(filtre.trim()),
-					filtre == null ? "" : filtre);
+					filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
+					filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia);
 		} else {
 			metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		}

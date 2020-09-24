@@ -1576,8 +1576,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		MetaExpedientEntity metaExpedient = null;
 		
+		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,

@@ -118,8 +118,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@Override
 	@RolesAllowed("tothom")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
-			Long entitatId, String filtre) {
-		return delegate.findActiusAmbEntitatPerLectura(entitatId, filtre);
+			Long entitatId, String filtreNomOrCodiSia) {
+		return delegate.findActiusAmbEntitatPerLectura(entitatId, filtreNomOrCodiSia);
 	}
 
 	@Override
