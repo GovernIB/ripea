@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
@@ -95,14 +96,14 @@ public class MetaExpedientController extends BaseAdminController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-		PaginaDto<MetaExpedientDto> metaExps = null;
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 
-		metaExps = metaExpedientService.findByEntitatOrOrganGestor(
+		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
+		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
-				EntitatHelper.getOrganGestorActual(request).getId(),
+				organActual == null ? null : organActual.getId(),
 				filtreCommand.asDto(),
-				RolHelper.isRolActualAdministradorOrgan(request),
+				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 
