@@ -5,6 +5,7 @@ package es.caib.ripea.core.helper;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,28 +44,33 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.CarpetaRepository;
+import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
@@ -107,6 +113,10 @@ public class ExpedientHelper {
 	private EmailHelper emailHelper;
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired
+	private MetaDadaRepository metaDadaRepository;
+	@Autowired
+	private DadaRepository dadaRepository;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ExpedientDto create(
@@ -176,6 +186,20 @@ public class ExpedientHelper {
 				sequencia,
 				true,
 				grupId);
+		
+		
+		
+		crearDadesPerDefecte(
+				metaExpedient,
+				expedient);
+
+		
+		
+
+
+		
+		
+		
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		//find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;
@@ -226,6 +250,9 @@ public class ExpedientHelper {
 				null);
 		return dto;
 	}
+	
+	
+	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId) {
@@ -522,6 +549,67 @@ public class ExpedientHelper {
 				null,
 				false,
 				false);
+	}
+	
+	
+	private void crearDadesPerDefecte(MetaExpedientEntity metaExpedient, ExpedientEntity expedient) {
+		
+		
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaExpedient);
+		
+		for (int i = 0; i < metaDades.size(); i++) {
+			
+			if (metaDades.get(i).getValor()!= null && !metaDades.get(i).getValor().isEmpty()) {
+				
+				Object valor;
+				switch (metaDades.get(i).getTipus()) {
+				case BOOLEA:
+					valor = (Boolean) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				case DATA:
+					valor = (Date) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				case FLOTANT:
+					valor = (Double) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				case IMPORT:
+					valor = (BigDecimal) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				case SENCER:
+					valor = (Long) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				case TEXT:
+					valor = (String) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				default:
+					valor = (String) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
+				}
+				
+				DadaEntity dada = DadaEntity.getBuilder(
+						metaDades.get(i),
+						expedient,
+						valor,
+						i).build();
+				
+				dadaRepository.save(dada);
+				contingutLogHelper.log(
+						expedient,
+						LogTipusEnumDto.MODIFICACIO,
+						dada,
+						LogObjecteTipusEnumDto.DADA,
+						LogTipusEnumDto.CREACIO,
+						metaDades.get(i).getCodi(),
+						dada.getValorComString(),
+						false,
+						false);
+				
+			}
+			
+		}
+		
+		
+		
 	}
 
 	private void relateExpedientWithPeticioAndSetAnnexosPendent(

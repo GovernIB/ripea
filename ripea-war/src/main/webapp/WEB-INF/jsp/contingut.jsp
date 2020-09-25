@@ -724,15 +724,15 @@ $(document).ready(function() {
 	});
 	$('form#nodeDades td .form-group').on('clone.multifield', function(event, clon) {
 		$('input', clon).change(nodeDadesInputChange);
-		var url = '<c:url value="/contingutDada/' + $('#contingutId').val() + '/' + $('input', clon).attr('id') + '"/>';
-		$.ajax({
-	        type: "GET",
-	        url: url,
-	        success: function (result) {
-	        	$('input', clon).val(result);
-	        	$('input', clon).trigger("focusout");
-	        }
-		});
+// 		var url = '<c:url value="/contingutDada/' + $('#contingutId').val() + '/' + $('input', clon).attr('id') + '"/>';
+// 		$.ajax({
+// 	        type: "GET",
+// 	        url: url,
+// 	        success: function (result) {
+// 	        	$('input', clon).val(result);
+// 	        	$('input', clon).trigger("focusout");
+// 	        }
+// 		});
 	});
 	if (${pipellaAnotacionsRegistre}) {
 		$('#contingut').removeClass( "active in" );
