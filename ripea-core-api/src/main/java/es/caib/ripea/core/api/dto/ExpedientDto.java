@@ -65,6 +65,10 @@ public class ExpedientDto extends NodeDto {
 	public boolean isAgafat() {
 		return agafatPer != null;
 	}
+	
+	public String getTipusStr() {
+		return this.getMetaNode().getNom() + " - " + this.getMetaExpedient().getClassificacioSia();
+	}
 
 	protected ExpedientDto copiarContenidor(ContingutDto original) {
 		ExpedientDto copia = new ExpedientDto();

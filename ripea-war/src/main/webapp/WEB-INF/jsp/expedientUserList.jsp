@@ -383,7 +383,7 @@ function removeCookie(cname) {
 				<th data-col-name="nom" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 				</th>
-				<th data-col-name="id" data-template="#cellAvisosTemplate" width="10%">
+				<th data-col-name="id" data-template="#cellAvisosTemplate" width="5%">
 					<spring:message code="expedient.list.user.columna.avisos"/>
 					<script id="cellAvisosTemplate" type="text/x-jsrender">
 						{{if !valid}}<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.errors.expedient.validacio"/>"></span>{{/if}}
@@ -394,7 +394,7 @@ function removeCookie(cname) {
 						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}			
 					</script>
 				</th>
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
+				<th data-col-name="tipusStr" width="20%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
