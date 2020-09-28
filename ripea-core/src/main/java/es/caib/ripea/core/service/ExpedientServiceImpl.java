@@ -69,6 +69,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -156,7 +157,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 	
+	@Transactional
 	@Override
 	public ExpedientDto create(
 			Long entitatId,
@@ -169,44 +173,50 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId) {
-		logger.debug("Creant nou expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"pareId=" + pareId + ", " +
-				"any=" + any + ", " +
-				"sequencia=" + sequencia + ", " +
-				"nom=" + nom + ", " +
-				"expedientPeticioId=" + expedientPeticioId +")");
+		logger.debug(
+				"Creant nou expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
+						", " + "pareId=" + pareId + ", " + "any=" + any + ", " + "sequencia=" + sequencia + ", " +
+						"nom=" + nom + ", " + "expedientPeticioId=" + expedientPeticioId + ")");
 		// if expedient comes from distribucio
 		ExpedientPeticioEntity expedientPeticioEntity = null;
 		if (expedientPeticioId != null) {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		}
 		// create expedient in db and in arxiu
-		ExpedientDto expedientDto = expedientHelper.create(
+		ExpedientEntity expedient = expedientHelper.create(
 				entitatId,
 				metaExpedientId,
 				metaExpedientDominiId,
-				pareId,				
+				pareId,
 				any,
 				sequencia,
 				nom,
 				expedientPeticioId,
 				associarInteressats,
 				grupId);
+		contingutLogHelper.logCreacio(expedient, false, false);
+		if (expedient.getAgafatPer() != null) {
+			contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, null, null, false, false);
+		}
+
+		ExpedientDto expedientDto = toExpedientDto(expedient, true);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		boolean processatOk = true;
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 				try {
-					expedientHelper.createDocFromAnnex(
+					DocumentEntity createdDoc = expedientHelper.crearDocFromAnnex(
 							registeAnnexEntity.getId(),
 							expedientPeticioEntity.getId());
+					contingutLogHelper.logCreacio(createdDoc, true, true);
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
-					expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
-					
+					expedientHelper.updateRegistreAnnexError(
+							registeAnnexEntity.getId(),
+							ExceptionUtils.getStackTrace(e));
+
 				}
 			}
 			canviEstatToProcessatPendent(expedientPeticioEntity);
@@ -219,36 +229,29 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	@Override
-	public boolean incorporar(
-			Long entitatId,
-			Long expedientId,
-			Long expedientPeticioId,
-			boolean associarInteressats) {
-		logger.debug("Incorporant a l'expedient existent (" +
-				"entitatId=" + entitatId + ", " +
-				"expedientId=" + expedientId + ", " +
-				"expedientPeticioId=" + expedientPeticioId +  ")");
-
+	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats) {
+		logger.debug(
+				"Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " + "expedientId=" +
+						expedientId + ", " + "expedientPeticioId=" + expedientPeticioId + ")");
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		
-		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
-				expedientPeticioId,
-				expedientId);
-		
+
+		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId);
+
 		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId);
 
 		boolean processatOk = true;
 		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			try {
-				
+
 				boolean throwException1 = false;
-				if(throwException1)
+				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
-				
-				expedientHelper.createDocFromAnnex(
+
+				DocumentEntity createdDoc = expedientHelper.crearDocFromAnnex(
 						registeAnnexEntity.getId(),
 						expedientPeticioEntity.getId());
+				contingutLogHelper.logCreacio(createdDoc, true, true);
 
 			} catch (Exception e) {
 				processatOk = false;
@@ -256,98 +259,82 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
 			}
 		}
-		
+
 		canviEstatToProcessatPendent(expedientPeticioEntity);
-		
+
 		if (processatOk) {
 			notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
-		}	
-		
+		}
+
 		return processatOk;
-	}	
-	
-	
+	}
+
 	public void canviEstatToProcessatPendent(ExpedientPeticioEntity expedientPeticioEntity) {
 
 		expedientPeticioHelper.canviEstatExpedientPeticio(
 				expedientPeticioEntity.getId(),
 				ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
-		
+
 	}
-	
-	
+
 	public void notificarICanviEstatToProcessatNotificat(Long expedientPeticioId) {
-			
-		ExpedientPeticioEntity expedientPeticioEntity  = expedientPeticioRepository.findOne(expedientPeticioId);
+
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 
 		try {
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
-					anotacioRegistreId,
-					Estat.PROCESSADA,
-					"");
-			
+			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
+
 			// change state of expedient peticion to processat and notificat to DISTRIBUCIO
 			expedientPeticioHelper.canviEstatExpedientPeticio(
 					expedientPeticioEntity.getId(),
 					ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT);
-			
+
 		} catch (Exception e) {
-			expedientHelper.updateNotificarError(
-					expedientPeticioEntity.getId(),
-					ExceptionUtils.getStackTrace(e));
-		}	
-		
-	}	
-	
-	
+			expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e));
+		}
+
+	}
+
 	@Override
-	public boolean retryCreateDocFromAnnex(
-			Long registreAnnexId,
-			Long expedientPeticioId) {
-		
+	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
+
 		boolean processatOk = true;
 		try {
-			 expedientHelper.createDocFromAnnex(
-					registreAnnexId,
-					expedientPeticioId);
-			 expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
+			DocumentEntity createdDoc = expedientHelper.crearDocFromAnnex(registreAnnexId, expedientPeticioId);
+			contingutLogHelper.logCreacio(createdDoc, true, true);
+			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {
 			processatOk = false;
 			logger.debug(ExceptionUtils.getStackTrace(e));
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
 		}
-		
+
 		notificarICanviEstatToProcessatNotificat(expedientPeticioId);
 
 		return processatOk;
 	}
-	
-	
+
 	@Override
-	public boolean retryNotificarDistribucio(
-			Long expedientPeticioId) {
-		
+	public boolean retryNotificarDistribucio(Long expedientPeticioId) {
+
 		ExpedientPeticioEntity expedientPeticioEntity = new ExpedientPeticioEntity();
-		
+
 		boolean processatOk = true;
 		try {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			
+
 			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
-		
+
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
-					anotacioRegistreId,
-					Estat.PROCESSADA,
-					"");
+			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
 			expedientPeticioEntity.updateNotificaDistError(null);
-			
+
 		} catch (Exception e) {
 			expedientPeticioEntity.updateNotificaDistError(ExceptionUtils.getStackTrace(e));
 			processatOk = false;
@@ -355,29 +342,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		return processatOk;
 	}
-	
-	
-	
-	
 
 	@Transactional
 	@Override
-	public ExpedientDto update(
-			Long entitatId,
-			Long id,
-			String nom
-			) {
-		logger.debug("Actualitzant dades de l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "nom=" + nom + ")");
-		contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false);
+	public ExpedientDto update(Long entitatId, Long id, String nom) {
+		logger.debug(
+				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
+						nom + ")");
+		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -386,11 +358,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		contingutHelper.comprovarNomValid(
-				expedient.getPare(),
-				nom,
-				id,
-				ExpedientEntity.class);
+		contingutHelper.comprovarNomValid(expedient.getPare(), nom, id, ExpedientEntity.class);
 		String nomOriginal = expedient.getNom();
 		expedient.update(nom);
 		contingutLogHelper.log(
@@ -400,38 +368,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 				null,
 				false,
 				false);
-		ExpedientDto dto = toExpedientDto(
-				expedient,
-				true);
-		contingutHelper.arxiuPropagarModificacio(
-				expedient,
-				null,
-				false,
-				false,
-				null);
+		ExpedientDto dto = toExpedientDto(expedient, true);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
 	}
-	
+
 	@Transactional
 	@Override
-	public ExpedientDto update(
-			Long entitatId,
-			Long id,
-			String nom,
-			int any,
-			Long metaExpedientDominiId
-			) {
-		logger.debug("Actualitzant dades de l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "nom=" + nom + ")");
-		contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false);
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId) {
+		logger.debug(
+				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
+						nom + ")");
+		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -440,11 +388,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		contingutHelper.comprovarNomValid(
-				expedient.getPare(),
-				nom,
-				id,
-				ExpedientEntity.class);
+		contingutHelper.comprovarNomValid(expedient.getPare(), nom, id, ExpedientEntity.class);
 		String nomOriginal = expedient.getNom();
 		expedient.update(nom);
 		contingutLogHelper.log(
@@ -454,38 +398,26 @@ public class ExpedientServiceImpl implements ExpedientService {
 				null,
 				false,
 				false);
-		
+
 		int anyOriginal = expedient.getAny();
 		expedient.updateAny(any);
 		contingutLogHelper.log(
 				expedient,
 				LogTipusEnumDto.MODIFICACIO,
-				(anyOriginal!=(expedient.getAny())) ? String.valueOf(expedient.getAny()) : null,
+				(anyOriginal != (expedient.getAny())) ? String.valueOf(expedient.getAny()) : null,
 				null,
 				false,
 				false);
-		
-		ExpedientDto dto = toExpedientDto(
-				expedient,
-				true);
-		contingutHelper.arxiuPropagarModificacio(
-				expedient,
-				null,
-				false,
-				false,
-				null);
+
+		ExpedientDto dto = toExpedientDto(expedient, true);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
 	}
 
-
 	@Transactional(readOnly = true)
 	@Override
-	public ExpedientDto findById(
-			Long entitatId,
-			Long id) {
-		logger.debug("Obtenint l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
+	public ExpedientDto findById(Long entitatId, Long id) {
+		logger.debug("Obtenint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -494,31 +426,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		return toExpedientDto(
-				expedient,
-				true);
+		return toExpedientDto(expedient, true);
 	}
-	
+
 	@Transactional(readOnly = true)
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,
 			String nom,
-			int esborrat)
-	{
-		logger.debug("Consultant expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaExpedientId=" + metaExpedientId + ", "
-				+ "pareId=" + pareId + ", "
-				+ "nom=" + nom + ", "
-				+ "esborrat=" + esborrat + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+			int esborrat) {
+		logger.debug(
+				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
+						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + ")");
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,
@@ -526,7 +448,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				true,
 				false);
-		
+
 		ContingutEntity contingutPare = null;
 		if (pareId != null) {
 			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -544,24 +466,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 				esborrat);
 		return expedient == null ? null : toExpedientDto(expedient, true);
 	}
-	
 
-	
-	
 	@Transactional
 	@Override
-	public boolean publicarComentariPerExpedient(
-			Long entitatId,
-			Long expedientId,
-			String text) {
-		logger.debug("Obtenint els comentaris pel contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "nodeId=" + expedientId + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				true);
+	public boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text) {
+		logger.debug(
+				"Obtenint els comentaris pel contingut (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
+						")");
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -570,30 +482,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		//truncam a 1024 caracters
+		// truncam a 1024 caracters
 		if (text.length() > 1024)
 			text = text.substring(0, 1024);
-		ExpedientComentariEntity comentari = ExpedientComentariEntity.getBuilder(
-				expedient, 
-				text).build();
+		ExpedientComentariEntity comentari = ExpedientComentariEntity.getBuilder(expedient, text).build();
 		expedientComentariRepository.save(comentari);
 		return true;
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientComentariDto> findComentarisPerContingut(
-			Long entitatId,
-			Long expedientId) {
-		logger.debug("Obtenint els comentaris pel expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "nodeId=" + expedientId + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false, 
-				true);
+	public List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId) {
+		logger.debug(
+				"Obtenint els comentaris pel expedient (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
+						")");
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -602,19 +505,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		
-		List<ExpedientComentariEntity> expcoms = 
-				expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(expedient);
 
-		return conversioTipusHelper.convertirList(
-				expcoms, 
-				ExpedientComentariDto.class);
-	}	
-	
+		List<ExpedientComentariEntity> expcoms = expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(
+				expedient);
+
+		return conversioTipusHelper.convertirList(expcoms, ExpedientComentariDto.class);
+	}
+
 	@Transactional(readOnly = true)
 	@Override
-	public boolean hasWritePermission(
-			Long expedientId) {
+	public boolean hasWritePermission(Long expedientId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 //		if (comprovarPermisRead) {
 //			boolean granted = permisosHelper.isGrantedAll(
@@ -628,49 +528,36 @@ public class ExpedientServiceImpl implements ExpedientService {
 //						+ "usuari=" + auth.getName() + ")");
 //			}
 //		}
-		
+
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-	
+
 		boolean granted = permisosHelper.isGrantedAll(
 				expedient.getMetaExpedient().getId(),
 				MetaNodeEntity.class,
-				new Permission[] {ExtendedPermission.WRITE},
-				auth);	
-		
-		if (!granted && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())){ 
+				new Permission[] { ExtendedPermission.WRITE },
+				auth);
+
+		if (!granted && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())) {
 			granted = true;
 		}
-		
+
 		return granted;
 
 	}
-	
 
-
-	
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consultant els expedients segons el filtre per usuaris ("
-				+ "entitatId=" + entitatId + ", "
-				+ "filtre=" + filtre + ", "
-				+ "paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		return findAmbFiltrePaginat(
-				entitatId,
-				filtre,
-				paginacioParams,
-				false,
-				true);
+		logger.debug(
+				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
+						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, false, true);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
@@ -678,43 +565,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consultant els expedients segons el filtre per usuaris ("
-				+ "entitatId=" + entitatId + ", "
-				+ "filtre=" + filtre + ", "
-				+ "paginacioParams=" + paginacioParams + 
-				"id del expedient relacionat" + expedientId +")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		
-		return findAmbFiltrePaginat(
-				entitatId,
-				filtre,
-				paginacioParams,
-				expedientId);
+		logger.debug(
+				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
+						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
+						"id del expedient relacionat" + expedientId + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId);
 	}
-	
-	
-	
-	
+
 	@Transactional
 	@Override
-	public List<ExpedientDto> findByEntitatAndMetaExpedient(
-			Long entitatId,
-			Long metaExpedientId) {
-		logger.debug("Consultant els expedients("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaExpedientId=" + metaExpedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+	public List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId) {
+		logger.debug(
+				"Consultant els expedients(" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
+						")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		MetaExpedientEntity metaExpedient = null;
-		if (metaExpedientId != null) {						
-			
+		if (metaExpedientId != null) {
+
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					metaExpedientId,
@@ -723,74 +592,57 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		
-		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(
-				entitat, 
-				metaExpedient);
-		
-		
 
-		List<ExpedientDto> expedientsDto = new ArrayList<>(); 
+		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(entitat, metaExpedient);
+
+		List<ExpedientDto> expedientsDto = new ArrayList<>();
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		permisosHelper.isGrantedAll(
 				metaExpedientId,
 				MetaNodeEntity.class,
-				new Permission[] {ExtendedPermission.WRITE},
+				new Permission[] { ExtendedPermission.WRITE },
 				auth);
 
-		
 		// if meta expedient has write permissions add all expedients
-		if(entityComprovarHelper.hasMetaExpedientWritePermissons(metaExpedientId)){
-			
-			for(ContingutEntity exp: expedientsEnt){
-					expedientsDto.add((ExpedientDto)contingutHelper.toContingutDto(
-							exp,
-							true,
-							true,
-							true,
-							false,
-							true,
-							false,
-							false));
-					
-			} 
-		} else { //if not add only expedients having estat with permisions 
-			
-			for(ContingutEntity exp: expedientsEnt){
-				ExpedientEntity expedient = (ExpedientEntity) exp;
-				if (expedient.getExpedientEstat()!=null && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())){
-					expedientsDto.add((ExpedientDto)contingutHelper.toContingutDto(
-							exp,
-							true,
-							true,
-							true,
-							false,
-							true,
-							false,
-							false));
-					}
+		if (entityComprovarHelper.hasMetaExpedientWritePermissons(metaExpedientId)) {
+
+			for (ContingutEntity exp : expedientsEnt) {
+				expedientsDto.add(
+						(ExpedientDto)contingutHelper.toContingutDto(exp, true, true, true, false, true, false, false));
+
+			}
+		} else { // if not add only expedients having estat with permisions
+
+			for (ContingutEntity exp : expedientsEnt) {
+				ExpedientEntity expedient = (ExpedientEntity)exp;
+				if (expedient.getExpedientEstat() != null &&
+						entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())) {
+					expedientsDto.add(
+							(ExpedientDto)contingutHelper.toContingutDto(
+									exp,
+									true,
+									true,
+									true,
+									false,
+									true,
+									false,
+									false));
+				}
 			}
 		}
-		
+
 		return expedientsDto;
 	}
-	
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientSelectorDto> findPerUserAndTipus(
-			Long entitatId,
-			Long metaExpedientId) {
-		logger.debug("Consultant els expedients segons el tipus per usuaris ("
-				+ "entitatId=" + entitatId + ", "
-				+ "metaExpedientId=" + metaExpedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId) {
+		logger.debug(
+				"Consultant els expedients segons el tipus per usuaris (" + "entitatId=" + entitatId + ", " +
+						"metaExpedientId=" + metaExpedientId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
@@ -801,27 +653,23 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
-				entitat);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAll(
-				metaExpedientsPermesos,
-				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-					@Override
-					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-						return metaExpedient.getId();
-					}
-				},
-				MetaNodeEntity.class,
-				new Permission[] {ExtendedPermission.READ},
-				auth);
+		permisosHelper.filterGrantedAll(metaExpedientsPermesos, new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+
+			@Override
+			public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+				return metaExpedient.getId();
+			}
+
+		}, MetaNodeEntity.class, new Permission[] { ExtendedPermission.READ }, auth);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			return conversioTipusHelper.convertirList(
 					expedientRepository.findByEntitatAndMetaExpedientOrderByNomAsc(
-							entitat, 
+							entitat,
 							metaExpedientsPermesos,
 							metaExpedient == null,
-							metaExpedient), 
+							metaExpedient),
 					ExpedientSelectorDto.class);
 		} else {
 			return new ArrayList<ExpedientSelectorDto>();
@@ -830,37 +678,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId,
-			ExpedientFiltreDto filtre) throws NotFoundException {
-		logger.debug("Consultant els ids d'expedient segons el filtre ("
-				+ "entitatId=" + entitatId + ", "
-				+ "filtre=" + filtre + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		return findIdsAmbFiltrePaginat(
-				entitatId,
-				filtre,
-				false,
-				true);
+	public List<Long> findIdsAmbFiltre(Long entitatId, ExpedientFiltreDto filtre) throws NotFoundException {
+		logger.debug(
+				"Consultant els ids d'expedient segons el filtre (" + "entitatId=" + entitatId + ", " + "filtre=" +
+						filtre + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		return findIdsAmbFiltrePaginat(entitatId, filtre, false, true);
 	}
 
 	@Transactional
 	@Override
-	public void agafarUser(
-			Long entitatId,
-			Long id) {
+	public void agafarUser(Long entitatId, Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Agafant l'expedient com a usuari ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "usuari=" + auth.getName() + ")");
-		
-		
-		
+		logger.debug(
+				"Agafant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "usuari=" +
+						auth.getName() + ")");
+
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -869,20 +702,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		
 
-		
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				expedient,
-				false,
-				false,
-				false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + id + ")");
-			throw new ValidationException(
-					id,
-					ExpedientEntity.class,
-					"No es pot agafar un expedient no arrel");
+			throw new ValidationException(id, ExpedientEntity.class, "No es pot agafar un expedient no arrel");
 		}
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
 		UsuariEntity usuariOriginal = expedient.getAgafatPer();
@@ -890,34 +714,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
-			emailHelper.contingutAgafatPerAltreUsusari(
-					expedient,
-					usuariOriginal,
-					usuariNou);
+			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.AGAFAR,
-				null,
-				null,
-				false,
-				false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, null, null, false, false);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
-	public void agafarAdmin(
-			Long entitatId,
-			Long arxiuId,
-			Long id,
-			String usuariCodi) {
-		logger.debug("Agafant l'expedient com a administrador ("
-				+ "entitatId=" + entitatId + ", "
-				+ "arxiuId=" + arxiuId + ", "
-				+ "id=" + id + ", "
-				+ "usuariCodi=" + usuariCodi + ")");
+	public void agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
+		logger.debug(
+				"Agafant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "arxiuId=" + arxiuId +
+						", " + "id=" + id + ", " + "usuariCodi=" + usuariCodi + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -926,16 +733,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				expedient,
-				false,
-				false,
-				false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
 		if (expedientSuperior != null) {
-			throw new ValidationException(
-					id,
-					ExpedientEntity.class,
-					"No es pot agafar un expedient no arrel");
+			throw new ValidationException(id, ExpedientEntity.class, "No es pot agafar un expedient no arrel");
 		}
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
 		UsuariEntity usuariOriginal = expedient.getAgafatPer();
@@ -943,30 +743,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'altre l'usuari que li han pres
-			emailHelper.contingutAgafatPerAltreUsusari(
-					expedient,
-					usuariOriginal,
-					usuariNou);
+			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.AGAFAR,
-				null,
-				null,
-				false,
-				false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, null, null, false, false);
 	}
 
 	@Transactional
 	@Override
-	public void alliberarUser(
-			Long entitatId,
-			Long id) {
+	public void alliberarUser(Long entitatId, Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Alliberant l'expedient com a usuari ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "usuari=" + auth.getName() + ")");
+		logger.debug(
+				"Alliberant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
+						"usuari=" + auth.getName() + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -976,23 +764,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 		expedient.updateAgafatPer(null);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.ALLIBERAR,
-				null,
-				null,
-				false,
-				false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, null, null, false, false);
 	}
 
 	@Transactional
 	@Override
-	public void alliberarAdmin(
-			Long entitatId,
-			Long id) {
-		logger.debug("Alliberant l'expedient com a administrador ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
+	public void alliberarAdmin(Long entitatId, Long id) {
+		logger.debug(
+				"Alliberant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -1002,26 +781,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 		expedient.updateAgafatPer(null);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.ALLIBERAR,
-				null,
-				null,
-				false,
-				false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, null, null, false, false);
 	}
 
 	@Transactional
 	@Override
-	public void tancar(
-			Long entitatId,
-			Long id,
-			String motiu,
-			Long[] documentsPerFirmar) {
-		logger.debug("Tancant l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ","
-				+ "motiu=" + motiu + ")");
+	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar) {
+		logger.debug(
+				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -1034,17 +801,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!documentHelper.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
 			throw new ExpedientTancarSenseDocumentsDefinitiusException();
 		}
-		expedient.updateEstat(
-				ExpedientEstatEnumDto.TANCAT,
-				motiu);
+		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
 		expedient.updateExpedientEstat(null);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.TANCAMENT,
-				null,
-				null,
-				false,
-				false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
 		if (pluginHelper.isArxiuPluginActiu()) {
 			List<DocumentEntity> esborranys = documentRepository.findByExpedientAndEstatAndEsborrat(
 					expedient,
@@ -1052,39 +811,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 					0);
 			// Firmam els documents seleccionats
 			if (hiHaEsborranysPerFirmar) {
-				for (Long documentPerFirmar: documentsPerFirmar) {
+				for (Long documentPerFirmar : documentsPerFirmar) {
 					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
 					if (document != null) {
-						FitxerDto fitxer = documentHelper.getFitxerAssociat(
-								document,
-								null);
-						byte[] firma = pluginHelper.firmaServidorFirmar(
-								document,
-								fitxer,
-								TipusFirma.CADES,
-								motiu,
-								"ca");
-						ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
-						arxiuFirma.setFitxerNom("firma.cades");
-						arxiuFirma.setContingut(firma);
-						arxiuFirma.setTipusMime("application/octet-stream");
-						arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
-						arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
-						pluginHelper.arxiuDocumentGuardarFirmaCades(
-								document,
-								fitxer,
-								Arrays.asList(arxiuFirma));
+						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+						ArxiuFirmaDto arxiuFirma = documentFirmaServidorFirma.firmar(document, fitxer, motiu);
+						pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
 					} else {
-						throw new NotFoundException(
-								documentPerFirmar,
-								DocumentEntity.class);
+						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
 					}
 				}
 			}
 			// Eliminam de l'expedient els esborranys que no s'han firmat
-			for (DocumentEntity esborrany: esborranys) {
+			for (DocumentEntity esborrany : esborranys) {
 				boolean trobat = false;
-				for (Long documentPerFirmarId: documentsPerFirmar) {
+				for (Long documentPerFirmarId : documentsPerFirmar) {
 					if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
 						trobat = true;
 						break;
@@ -1100,12 +841,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void reobrir(
-			Long entitatId,
-			Long id) {
-		logger.debug("Reobrint l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
+	public void reobrir(Long entitatId, Long id) {
+		logger.debug("Reobrint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -1114,16 +851,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		expedient.updateEstat(
-				ExpedientEstatEnumDto.OBERT,
-				null);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.REOBERTURA,
-				null,
-				null,
-				false,
-				false);
+		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
 		if (pluginHelper.isArxiuPluginActiu()) {
 			pluginHelper.arxiuExpedientReobrir(expedient);
 		}
@@ -1132,14 +861,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional
 	@Override
 	@SuppressWarnings("serial")
-	public void relacioCreate(
-			Long entitatId,
-			final Long id,
-			final Long relacionatId) {
-		logger.debug("Relacionant l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "relacionatId=" + relacionatId + ")");
+	public void relacioCreate(Long entitatId, final Long id, final Long relacionatId) {
+		logger.debug(
+				"Relacionant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "relacionatId=" +
+						relacionatId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -1156,7 +881,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		
+
 		boolean alreadyRelatedTo = false;
 		for (ExpedientEntity relacionatPer : toRelate.getRelacionatsAmb()) {
 			if (relacionatPer.getId().equals(expedient.getId())) {
@@ -1169,19 +894,19 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 
 		expedient.addRelacionat(toRelate);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				new Persistable<String>() {
-					@Override
-					public String getId() {
-						return id + "#" + relacionatId;
-					}
-					@Override
-					public boolean isNew() {
-						return false;
-					}
-				},
+		contingutLogHelper.log(expedient, LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+
+			@Override
+			public String getId() {
+				return id + "#" + relacionatId;
+			}
+
+			@Override
+			public boolean isNew() {
+				return false;
+			}
+
+		},
 				LogObjecteTipusEnumDto.RELACIO,
 				LogTipusEnumDto.CREACIO,
 				id.toString(),
@@ -1193,14 +918,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional
 	@Override
 	@SuppressWarnings("serial")
-	public boolean relacioDelete(
-			Long entitatId,
-			final Long id,
-			final Long relacionatId) {
-		logger.debug("Esborrant la relació de l'expedient amb un altre expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ", "
-				+ "relacionatId=" + relacionatId + ")");
+	public boolean relacioDelete(Long entitatId, final Long id, final Long relacionatId) {
+		logger.debug(
+				"Esborrant la relació de l'expedient amb un altre expedient (" + "entitatId=" + entitatId + ", " +
+						"id=" + id + ", " + "relacionatId=" + relacionatId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -1226,19 +947,19 @@ public class ExpedientServiceImpl implements ExpedientService {
 			trobat = false;
 		}
 		if (trobat) {
-			contingutLogHelper.log(
-					expedient,
-					LogTipusEnumDto.MODIFICACIO,
-					new Persistable<String>() {
-						@Override
-						public String getId() {
-							return id + "#" + relacionatId;
-						}
-						@Override
-						public boolean isNew() {
-							return false;
-						}
-					},
+			contingutLogHelper.log(expedient, LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+
+				@Override
+				public String getId() {
+					return id + "#" + relacionatId;
+				}
+
+				@Override
+				public boolean isNew() {
+					return false;
+				}
+
+			},
 					LogObjecteTipusEnumDto.RELACIO,
 					LogTipusEnumDto.ELIMINACIO,
 					id.toString(),
@@ -1251,12 +972,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientDto> relacioFindAmbExpedient(
-			Long entitatId,
-			Long expedientId) {
-		logger.debug("Obtenint la llista d'expedients relacionats (" +
-				"entitatId=" + entitatId + ", " +
-				"expedientId=" + expedientId + ")");
+	public List<ExpedientDto> relacioFindAmbExpedient(Long entitatId, Long expedientId) {
+		logger.debug(
+				"Obtenint la llista d'expedients relacionats (" + "entitatId=" + entitatId + ", " + "expedientId=" +
+						expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -1268,17 +987,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<ExpedientEntity> relacionats = new ArrayList<ExpedientEntity>();
 		relacionats.addAll(expedient.getRelacionatsAmb());
 		relacionats.addAll(expedient.getRelacionatsPer());
-		Collections.sort(
-				relacionats, 
-				new Comparator<ExpedientEntity>() {
-				    @Override
-				    public int compare(ExpedientEntity e1, ExpedientEntity e2) {
-				        return e1.getNom().compareTo(e2.getNom());
-				    }
-				});
+		Collections.sort(relacionats, new Comparator<ExpedientEntity>() {
+
+			@Override
+			public int compare(ExpedientEntity e1, ExpedientEntity e2) {
+				return e1.getNom().compareTo(e2.getNom());
+			}
+
+		});
 		List<ExpedientDto> relacionatsDto = new ArrayList<ExpedientDto>();
-		for (ExpedientEntity e: relacionats)
-			relacionatsDto.add(toExpedientDto(e, false));		
+		for (ExpedientEntity e : relacionats)
+			relacionatsDto.add(toExpedientDto(e, false));
 		return relacionatsDto;
 	}
 
@@ -1289,16 +1008,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long metaExpedientId,
 			Collection<Long> expedientIds,
 			String format) throws IOException {
-		logger.debug("Exportant informació dels expedients (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"expedientIds=" + expedientIds + ", " +
-				"format=" + format + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+		logger.debug(
+				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
+						metaExpedientId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,
@@ -1310,7 +1023,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				metaExpedient.getEntitat(),
 				metaExpedient,
 				expedientIds);
-		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(expedientIds);
+		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
+				expedientIds);
 		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
 		int numColumnes = 5 + metaDades.size();
 		String[] columnes = new String[numColumnes];
@@ -1326,7 +1040,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		List<String[]> files = new ArrayList<String[]>();
 		int dadesIndex = 0;
-		for (ExpedientEntity expedient: expedients) {
+		for (ExpedientEntity expedient : expedients) {
 			String[] fila = new String[numColumnes];
 			fila[0] = expedientHelper.calcularNumero(expedient);
 			fila[1] = expedient.getNom();
@@ -1367,7 +1081,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			fitxer.setContentType("text/csv");
 			StringBuilder sb = new StringBuilder();
 			csvHelper.afegirLinia(sb, columnes, ';');
-			for (String[] fila: files) {
+			for (String[] fila : files) {
 				csvHelper.afegirLinia(sb, fila, ';');
 			}
 			fitxer.setContingut(sb.toString().getBytes());
@@ -1376,58 +1090,46 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return fitxer;
 	}
-	
+
 	@Override
 	@Transactional
-	public FitxerDto exportIndexExpedient(
-			Long entitatId, 
-			Long expedientId) throws IOException {
-		logger.debug("Exportant índex de l'expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"expedientId=" + expedientId + ")");
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
+	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId) throws IOException {
+		logger.debug(
+				"Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId +
+						")");
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
+				expedientId,
+				false,
 				true,
+				false,
 				false,
 				false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId, 
-				expedientId, 
-				false,
-				true,
-				false,
-				false,
-				false);		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
-	
+
 		List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
-				expedient, 
-				0, 
+				expedient,
+				0,
 				new Sort("createdDate"));
 		long num = 0;
 		for (ContingutEntity contingut : continguts) {
 			if (contingut instanceof DocumentEntity) {
-				DocumentEntity document = (DocumentEntity) contingut;
+				DocumentEntity document = (DocumentEntity)contingut;
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
 				String nomDocument = ((num += 10) / 10.0) + " " + fitxer.getNom();
-					
-				contingutHelper.crearNovaEntrada(
-						nomDocument,
-						fitxer,
-						zos);
-					if (document.isFirmat()) {
+
+				contingutHelper.crearNovaEntrada(nomDocument, fitxer, zos);
+				if (document.isFirmat()) {
 					String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
 					if (documentExportacioEni != null) {
 						FitxerDto exportacioEni = new FitxerDto();
 						exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
 						exportacioEni.setContentType("application/xml");
 						exportacioEni.setContingut(documentExportacioEni.getBytes());
-						
-						contingutHelper.crearNovaEntrada(
-								exportacioEni.getNom(),
-								exportacioEni,
-								zos);
+
+						contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 					}
 				}
 			}
@@ -1443,7 +1145,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							carpetaActual = contingutCarpetaActual;
 							darreraCarpeta = false;
 						} else {
-							documentsCarpetaActual.add((DocumentEntity) contingutCarpetaActual);
+							documentsCarpetaActual.add((DocumentEntity)contingutCarpetaActual);
 						}
 					}
 					String nomEstructuraCarpetes = "";
@@ -1452,13 +1154,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 					}
 					for (DocumentEntity document : documentsCarpetaActual) {
 						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						num += (document.getNom() == documentsCarpetaActual.get(0).getNom()) ? 10 : 1; // primer document
+						num += (document.getNom() == documentsCarpetaActual.get(0).getNom()) ? 10 : 1; // primer
+																										// document
 						String nomDocument = (num / 10.0) + " " + fitxer.getNom();
 						String nomCarpeta = nomEstructuraCarpetes + nomDocument;
-							contingutHelper.crearNovaEntrada(
-								nomCarpeta, 
-								fitxer, 
-								zos);
+						contingutHelper.crearNovaEntrada(nomCarpeta, fitxer, zos);
 						if (document.isFirmat()) {
 							String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
 							if (documentExportacioEni != null) {
@@ -1466,11 +1166,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 								exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
 								exportacioEni.setContentType("application/xml");
 								exportacioEni.setContingut(documentExportacioEni.getBytes());
-								
-								contingutHelper.crearNovaEntrada(
-										exportacioEni.getNom(),
-										exportacioEni,
-										zos);
+
+								contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 							}
 						}
 					}
@@ -1486,84 +1183,54 @@ public class ExpedientServiceImpl implements ExpedientService {
 			exportacioEni.setNom(expedient.getNom() + "_exportacio_ENI.xml");
 			exportacioEni.setContentType("application/xml");
 			exportacioEni.setContingut(expedientExportacioEni.getBytes());
-			contingutHelper.crearNovaEntrada(
-					exportacioEni.getNom(),
-					exportacioEni,
-					zos);
+			contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 		}
-		
-		FitxerDto indexDoc = contingutHelper.generarIndex(
-				entitatActual, 
-				expedient);
-		contingutHelper.crearNovaEntrada(
-				indexDoc.getNom(), 
-				indexDoc, 
-				zos);
-		FitxerDto indexPdf = pluginHelper.conversioConvertirPdf(
-				indexDoc, 
-				null);
-		contingutHelper.crearNovaEntrada(
-				indexPdf.getNom(), 
-				indexPdf, 
-				zos);
+
+		FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient);
+		contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
+		FitxerDto indexPdf = pluginHelper.conversioConvertirPdf(indexDoc, null);
+		contingutHelper.crearNovaEntrada(indexPdf.getNom(), indexPdf, zos);
 		zos.close();
-		
+
 		FitxerDto resultat = new FitxerDto();
-		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index")  + " " + expedient.getNom() + ".zip");
+		resultat.setNom(
+				messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".zip");
 		resultat.setContentType("application/zip");
 		resultat.setContingut(baos.toByteArray());
-		
+
 		return resultat;
 	}
-	
 
-	
 	@Override
 	@Transactional
-	public FitxerDto exportIndexExpedients(
-			Long entitatId, 
-			Collection<Long> expedientIds) throws IOException {
-		logger.debug("Exportant índex dels expedients seleccionats (" +
-				"entitatId=" + entitatId + ", " +
-				"expedientIds=" + expedientIds + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+	public FitxerDto exportIndexExpedients(Long entitatId, Collection<Long> expedientIds) throws IOException {
+		logger.debug(
+				"Exportant índex dels expedients seleccionats (" + "entitatId=" + entitatId + ", " + "expedientIds=" +
+						expedientIds + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
-		
+
 		for (Long expedientId : expedientIds) {
-			FitxerDto resultat = exportIndexExpedient(
-					entitatId,
-					expedientId);
-			contingutHelper.crearNovaEntrada(
-					resultat.getNom(), 
-					resultat, 
-					zos);
+			FitxerDto resultat = exportIndexExpedient(entitatId, expedientId);
+			contingutHelper.crearNovaEntrada(resultat.getNom(), resultat, zos);
 		}
 		zos.close();
 		FitxerDto resultat = new FitxerDto();
 		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
 		resultat.setContentType("application/zip");
 		resultat.setContingut(baos.toByteArray());
-		
+
 		return resultat;
 	}
-	
+
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			boolean accesAdmin,
 			boolean comprovarAccesMetaExpedients) {
-		return findAmbFiltrePaginat(
-				entitatId,
-				filtre,
-				paginacioParams,
-				null
-				);
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null);
 	}
 
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
@@ -1571,13 +1238,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			Long expedientId) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		MetaExpedientEntity metaExpedient = null;
+
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
@@ -1587,44 +1250,48 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		
+
 		List<MetaExpedientEntity> metaExpedientsPermesos;
 		if (filtre.getOrganGestorId() != null) {
 			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganGestorPermis(
 					entitatId,
 					filtre.getOrganGestorId(),
+					new Permission[] { ExtendedPermission.READ },
+					false);
 					new Permission[] {ExtendedPermission.READ},
 					false,
 					null);
 		} else {
 			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+					entitatId,
+					new Permission[] { ExtendedPermission.READ },
+					false);
 					entitatId, 
 					new Permission[] {ExtendedPermission.READ},
 					false,
 					null);
 		}
-		
-		
+
 		if (!metaExpedientsPermesos.isEmpty()) {
-			
+
 			UsuariEntity agafatPer = null;
 			if (filtre.isMeusExpedients()) {
 				agafatPer = usuariHelper.getUsuariAutenticat();
 			}
-			
+
 			// estats
 			ExpedientEstatEnumDto chosenEstatEnum = null;
 			ExpedientEstatEntity chosenEstat = null;
 			Long estatId = filtre.getExpedientEstatId();
-			if(estatId != null){
+			if (estatId != null) {
 				if (estatId.intValue() <= 0) { // if estat is 0 or less the given estat is enum
 					int estatIdInt = -estatId.intValue();
 					chosenEstatEnum = ExpedientEstatEnumDto.values()[estatIdInt];
-				} else { //given estat is estat from database
+				} else { // given estat is estat from database
 					chosenEstat = expedientEstatRepository.findOne(estatId);
 				}
 			}
-			
+
 			// relacionar expedient view
 			List<ExpedientEntity> expedientsToBeExluded;
 			boolean esNullExpedientsToBeExcluded = false;
@@ -1646,24 +1313,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 				esNullExpedientsToBeExcluded = true;
 				expedientsToBeExluded = null; // repository does not accept empty list but it accepts null value
 			}
-			
+
 			boolean esNullRolsCurrentUser = false;
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			List<String> rolsCurrentUser = new ArrayList<String>();
-			for (GrantedAuthority ga: auth.getAuthorities())
+			for (GrantedAuthority ga : auth.getAuthorities())
 				rolsCurrentUser.add(ga.getAuthority());
 			if (rolsCurrentUser.isEmpty()) {
 				rolsCurrentUser = null; // repository does not accept empty list but it accepts null value
 				esNullRolsCurrentUser = true;
-			} 
-			
+			}
+
 			Page<ExpedientEntity> paginaExpedients;
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-			ordenacioMap.put("numero", new String[] {"codi", "any", "sequencia"});
+			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
 
 			paginaExpedients = expedientRepository.findByEntitatAndFiltre(
 					entitat,
-					metaExpedientsPermesos, 
+					metaExpedientsPermesos,
 					metaExpedient == null,
 					metaExpedient,
 					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
@@ -1696,33 +1363,26 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					esNullRolsCurrentUser,
 					rolsCurrentUser,
-					paginacioHelper.toSpringDataPageable(
-							paginacioParams,
-							ordenacioMap));
-			
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 
 			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
 					paginaExpedients,
 					ExpedientDto.class,
 					new Converter<ExpedientEntity, ExpedientDto>() {
+
 						@Override
 						public ExpedientDto convert(ExpedientEntity source) {
-							return toExpedientDto(
-									source,
-									true);
+							return toExpedientDto(source, true);
 						}
+
 					});
-			for (ExpedientDto expedient: result) {
-				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(
-						false,
-						expedient.getId()
-						) > 0;
-						expedient.setAlerta(enAlerta);
+			for (ExpedientDto expedient : result) {
+				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(false, expedient.getId()) > 0;
+				expedient.setAlerta(enAlerta);
 			}
 			return result;
 		} else {
-			return paginacioHelper.getPaginaDtoBuida(
-					ExpedientDto.class);
+			return paginacioHelper.getPaginaDtoBuida(ExpedientDto.class);
 		}
 	}
 
@@ -1731,11 +1391,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			boolean accesAdmin,
 			boolean comprovarAccesMetaExpedients) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				(!accesAdmin),
-				accesAdmin,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, (!accesAdmin), accesAdmin, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
@@ -1746,21 +1402,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(
-				entitat);
+
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		if (comprovarAccesMetaExpedients) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			permisosHelper.filterGrantedAll(
 					metaExpedientsPermesos,
 					new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+
 						@Override
 						public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
 							return metaExpedient.getId();
 						}
+
 					},
 					MetaNodeEntity.class,
-					new Permission[] {ExtendedPermission.READ},
+					new Permission[] { ExtendedPermission.READ },
 					auth);
 		}
 		if (!metaExpedientsPermesos.isEmpty()) {
@@ -1790,10 +1447,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 	}
 
-	private ExpedientDto toExpedientDto(
-			ExpedientEntity expedient,
-			boolean ambPathIPermisos) {
-		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
+	private ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
+		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
 				false,
@@ -1802,7 +1457,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ambPathIPermisos,
 				false,
 				false);
-		
+
 		return expedientDto;
 	}
 
