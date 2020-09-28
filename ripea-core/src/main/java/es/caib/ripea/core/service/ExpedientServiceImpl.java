@@ -1257,17 +1257,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 					entitatId,
 					filtre.getOrganGestorId(),
 					new Permission[] { ExtendedPermission.READ },
-					false);
-					new Permission[] {ExtendedPermission.READ},
 					false,
 					null);
 		} else {
 			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
 					entitatId,
 					new Permission[] { ExtendedPermission.READ },
-					false);
-					entitatId, 
-					new Permission[] {ExtendedPermission.READ},
 					false,
 					null);
 		}

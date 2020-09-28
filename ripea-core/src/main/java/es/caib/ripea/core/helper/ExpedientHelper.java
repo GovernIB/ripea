@@ -522,16 +522,16 @@ public class ExpedientHelper {
 						i).build();
 				
 				dadaRepository.save(dada);
-				contingutLogHelper.log(
-						expedient,
-						LogTipusEnumDto.MODIFICACIO,
-						dada,
-						LogObjecteTipusEnumDto.DADA,
-						LogTipusEnumDto.CREACIO,
-						metaDades.get(i).getCodi(),
-						dada.getValorComString(),
-						false,
-						false);
+//				contingutLogHelper.log(
+//						expedient,
+//						LogTipusEnumDto.MODIFICACIO,
+//						dada,
+//						LogObjecteTipusEnumDto.DADA,
+//						LogTipusEnumDto.CREACIO,
+//						metaDades.get(i).getCodi(),
+//						dada.getValorComString(),
+//						false,
+//						false);
 				
 			}
 			
