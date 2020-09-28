@@ -28,6 +28,7 @@
 	<context:annotation-config />
 	<context:component-scan base-package="es.caib.ripea.core.service" />
 	<context:component-scan base-package="es.caib.ripea.core.helper" />
+	<context:component-scan base-package="es.caib.ripea.core.firma" />
 	<context:component-scan base-package="es.caib.ripea.core.aspect" />
 	<jpa:repositories base-package="es.caib.ripea.core.repository" />
 

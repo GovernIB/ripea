@@ -35,14 +35,11 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -302,13 +299,7 @@ public class DocumentHelper {
 				false);
 	}
 		
-	public DocumentDto certificacioToDocumentDto(
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
-			MetaDocumentEntity metaDocument,
-			RespostaConsultaEstatEnviament resposta) {
-		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		return contingutHelper.generarDocumentDto(notificacio, metaDocument, resposta);
-	}
+
 
 	public void actualitzarVersionsDocument(
 			DocumentEntity document) {

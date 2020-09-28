@@ -105,7 +105,6 @@ public class ExpedientHelper {
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ExpedientEntity create(
 			Long entitatId,
 			Long metaExpedientId,

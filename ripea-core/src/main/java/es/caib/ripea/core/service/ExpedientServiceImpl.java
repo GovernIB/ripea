@@ -69,6 +69,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -156,7 +157,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
-
+	@Autowired
+	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	
+	@Transactional
 	@Override
 	public ExpedientDto create(
 			Long entitatId,
@@ -811,18 +815,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
 					if (document != null) {
 						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						byte[] firma = pluginHelper.firmaServidorFirmar(
-								document,
-								fitxer,
-								TipusFirma.CADES,
-								motiu,
-								"ca");
-						ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
-						arxiuFirma.setFitxerNom("firma.cades");
-						arxiuFirma.setContingut(firma);
-						arxiuFirma.setTipusMime("application/octet-stream");
-						arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
-						arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+						ArxiuFirmaDto arxiuFirma = documentFirmaServidorFirma.firmar(document, fitxer, motiu);
 						pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
 					} else {
 						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
