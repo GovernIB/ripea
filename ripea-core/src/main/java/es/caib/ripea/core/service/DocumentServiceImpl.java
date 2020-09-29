@@ -34,6 +34,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -477,6 +478,27 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 
 		documentHelper.portafirmesCancelar(
+				entitatId,
+				document);
+	}
+	
+	@Transactional
+	@Override
+	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
+			Long entitatId,
+			Long documentId) {
+		logger.debug("Enviant document a portafirmes (" +
+				"entitatId=" + entitatId + ", " +
+				"documentId=" + documentId + ")");
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+				entitatId,
+				documentId,
+				false,
+				true,
+				false,
+				false);
+
+		return documentHelper.recuperarBlocksFirmaEnviament(
 				entitatId,
 				document);
 	}

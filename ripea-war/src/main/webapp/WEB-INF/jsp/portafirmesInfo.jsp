@@ -9,6 +9,7 @@
 <head>
 	<title><spring:message code="firma.info.titol"/></title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<rip:modalHead/>
 	
 <script type="text/javascript">
@@ -92,6 +93,7 @@ $(document).ready(function() {
 								<a id="btn_cancelar" href="<rip:modalUrl value="/usuariTasca/${tascaId}/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
 							</c:when>
 							<c:otherwise>
+								<a href="<c:url value="/document/${portafirmes.document.id}/portafirmes/blocks"/>" class="btn btn-default" data-toggle="modal"><spring:message code="firma.info.accio.flux.detall" /></a>
 								<a id="btn_cancelar" href="<rip:modalUrl value="/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
 							</c:otherwise>
 						</c:choose>

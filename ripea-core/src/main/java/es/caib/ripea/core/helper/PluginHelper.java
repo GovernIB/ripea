@@ -70,6 +70,8 @@ import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaisDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
@@ -121,6 +123,8 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
+import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
@@ -2462,6 +2466,53 @@ public class PluginHelper {
 		return esborrat;
 	}
 	
+	public List<PortafirmesBlockDto> portafirmesRecuperarBlocksFirma(
+			String idPlantilla, 
+			String idTransaccio,
+			boolean portafirmesFluxAsync,
+			String portafirmesId,
+			String idioma) {
+		List<PortafirmesBlockDto> blocksDto = null;
+		String accioDescripcio = "Tancant flux de firma";
+		long t0 = System.currentTimeMillis();
+		try {
+			List<PortafirmesBlockInfo> portafirmesBlocks = getPortafirmesPlugin().recuperarBlocksFirmes(
+					idPlantilla, 
+					idTransaccio,
+					portafirmesFluxAsync,
+					new Long(portafirmesId),
+					idioma);
+
+			if (portafirmesBlocks != null) {
+				blocksDto = new ArrayList<PortafirmesBlockDto>();
+				for (PortafirmesBlockInfo portafirmesBlockInfo : portafirmesBlocks) {
+					PortafirmesBlockDto blockDto = new PortafirmesBlockDto();
+					List<PortafirmesBlockInfoDto> signersInfoDto = new ArrayList<PortafirmesBlockInfoDto>();
+					
+					if (portafirmesBlockInfo.getSigners() != null) {
+						for (PortafirmesBlockSignerInfo portafirmesBlockSignerInfo : portafirmesBlockInfo.getSigners()) {
+							PortafirmesBlockInfoDto signerInfoDto = new PortafirmesBlockInfoDto();
+							signerInfoDto.setSignerCodi(portafirmesBlockSignerInfo.getSignerCodi());
+							signerInfoDto.setSignerId(portafirmesBlockSignerInfo.getSignerId());
+							signerInfoDto.setSignerNom(portafirmesBlockSignerInfo.getSignerNom());
+							signersInfoDto.add(signerInfoDto);
+						}
+					}
+					blockDto.setSigners(signersInfoDto);
+					blocksDto.add(blockDto);
+				}
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			this.integracioHelper.addAccioError("PFIRMA", accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0, errorDescripcio, ex);
+
+			throw new SistemaExternException("PFIRMA", errorDescripcio, ex);
+		}
+
+		return blocksDto;
+	}
+
 	public String conversioConvertirPdfArxiuNom(
 			String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);

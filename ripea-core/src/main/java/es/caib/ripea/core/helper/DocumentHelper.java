@@ -49,11 +49,14 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
@@ -64,8 +67,12 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.PortafirmesBlockEntity;
+import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.PortafirmesBlockInfoRepository;
+import es.caib.ripea.core.repository.PortafirmesBlockRepository;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
@@ -101,6 +108,12 @@ public class DocumentHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private AlertaHelper alertaHelper;
+	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
+	private PortafirmesBlockRepository portafirmesBlockRepository;
+	@Autowired
+	private PortafirmesBlockInfoRepository portafirmesBlockInfoRepository;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -195,10 +208,36 @@ public class DocumentHelper {
 				documentPortafirmes.getEstat().name(),
 				false,
 				false);
+		
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		List<PortafirmesBlockDto> portafirmesBlocks = pluginHelper.portafirmesRecuperarBlocksFirma(
+				portafirmesFluxId != null ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
+				transaccioId,
+				portafirmesFluxTipus.equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB),
+				documentPortafirmes.getPortafirmesId(),
+				idioma);
+
+		if (portafirmesBlocks != null) {
+			int i = 1;
+			for (PortafirmesBlockDto portafirmesBlock : portafirmesBlocks) {
+				PortafirmesBlockEntity portafirmesBlockEntity = PortafirmesBlockEntity.getBuilder(
+						documentPortafirmes,
+						i).build();
+	
+				portafirmesBlockRepository.save(portafirmesBlockEntity);
+				for (PortafirmesBlockInfoDto portafirmesBlockInfo : portafirmesBlock.getSigners()) {
+					PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = PortafirmesBlockInfoEntity.getBuilder(
+							portafirmesBlockEntity, 
+							portafirmesBlockInfo.getSignerNom(),
+							portafirmesBlockInfo.getSignerCodi(),
+							portafirmesBlockInfo.getSignerId(),
+							false).build();
+					this.portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
+				}
+				i++;
+			}
+		}
 	}
-	
-	
-	
 
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
@@ -1064,6 +1103,13 @@ public class DocumentHelper {
 		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
 		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			pluginHelper.portafirmesDelete(documentPortafirmes);
+			
+			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			if (portafirmesBlocks != null && !portafirmesBlocks.isEmpty()) {
+				for (PortafirmesBlockEntity portafirmesBlock : portafirmesBlocks) {
+					portafirmesBlockRepository.delete(portafirmesBlock);
+				}
+			}
 		}
 		documentPortafirmes.updateCancelat(new Date());
 		document.updateEstat(
@@ -1075,6 +1121,34 @@ public class DocumentHelper {
 				documentPortafirmes.getEstat().name(),
 				false,
 				false);
+	}
+	
+	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
+			Long entitatId,
+			DocumentEntity document) {
+		logger.debug("Recuperar els blocks de firma d'un enviament a Portafirmes (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + document.getId() + ")");
+		List<PortafirmesBlockDto> portafirmesBlockDto = null;
+		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document,
+				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"Aquest document no te enviaments a portafirmes pendents");
+		}
+		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
+		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
+			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			if (portafirmesBlocks != null) {
+				portafirmesBlockDto = conversioTipusHelper.convertirList(
+							portafirmesBlocks, 
+							PortafirmesBlockDto.class);
+			}
+		}
+		return portafirmesBlockDto;
 	}
 	
 

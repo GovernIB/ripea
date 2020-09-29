@@ -44,6 +44,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
@@ -247,6 +248,19 @@ public class DocumentController extends BaseUserController {
 		return "portafirmesInfo";
 	}
 
+	@RequestMapping(value = "/{documentId}/portafirmes/blocks")
+	public String portafirmesBlocksInfo(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
+				entitatActual.getId(),
+				documentId);
+		model.addAttribute("blocks", documentPortafirmesBlocks);
+		return "portafirmesBlocksInfo";
+	}
+	
 	@RequestMapping(value = "/{documentId}/viafirma/info", method = RequestMethod.GET)
 	public String viaFirmaInfo(
 			HttpServletRequest request,
