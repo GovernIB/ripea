@@ -8,11 +8,16 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'un MetaNode.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class MetaNodeDto implements Serializable {
 
 	protected Long id;
@@ -27,78 +32,15 @@ public class MetaNodeDto implements Serializable {
 	private boolean usuariActualWrite;
 	private boolean usuariActualDelete;
 
-
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public boolean isActiu() {
-		return actiu;
-	}
-	public void setActiu(boolean actiu) {
-		this.actiu = actiu;
-	}
-	public List<PermisDto> getPermisos() {
-		return permisos;
-	}
-	public void setPermisos(List<PermisDto> permisos) {
-		this.permisos = permisos;
-	}
-	public boolean isUsuariActualCreate() {
-		return usuariActualCreate;
-	}
-	public void setUsuariActualCreate(boolean usuariActualCreate) {
-		this.usuariActualCreate = usuariActualCreate;
-	}
-	public boolean isUsuariActualRead() {
-		return usuariActualRead;
-	}
-	public void setUsuariActualRead(boolean usuariActualRead) {
-		this.usuariActualRead = usuariActualRead;
-	}
-	public boolean isUsuariActualWrite() {
-		return usuariActualWrite;
-	}
-	public void setUsuariActualWrite(boolean usuariActualWrite) {
-		this.usuariActualWrite = usuariActualWrite;
-	}
-	public boolean isUsuariActualDelete() {
-		return usuariActualDelete;
-	}
-	public void setUsuariActualDelete(boolean usuariActualDelete) {
-		this.usuariActualDelete = usuariActualDelete;
-	}
-
 	public int getPermisosCount() {
-		if  (permisos == null)
+		if (permisos == null)
 			return 0;
 		else
 			return permisos.size();
 	}
-	
+
 	public String getIdentificador() {
-		return nom + " (" + codi + ")"; 
+		return nom + " (" + codi + ")";
 	}
 
 	@Override
@@ -113,6 +55,7 @@ public class MetaNodeDto implements Serializable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -121,7 +64,7 @@ public class MetaNodeDto implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MetaNodeDto other = (MetaNodeDto) obj;
+		MetaNodeDto other = (MetaNodeDto)obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

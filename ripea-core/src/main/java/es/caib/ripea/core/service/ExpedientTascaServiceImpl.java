@@ -21,6 +21,8 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -37,11 +39,14 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.DocumentHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -88,7 +93,13 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
-
+	@Autowired
+	private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
+	@Autowired
+	private DocumentFirmaAppletHelper documentFirmaAppletHelper;
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
+	
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientTascaDto> findAmbExpedient(
@@ -245,7 +256,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
 		TascaEstatEnumDto estatAnterior = expedientTascaEntity.getEstat();
-				
+		
 		if (tascaEstatEnumDto == TascaEstatEnumDto.REBUTJADA) {
 			expedientTascaEntity.updateRebutjar(motiu);
 		} else {
@@ -259,6 +270,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior);
 		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
+
+		log(expedientTascaEntity, LogTipusEnumDto.CANVI_ESTAT);
 		
 		return conversioTipusHelper.convertir(expedientTascaEntity,
 				ExpedientTascaDto.class);
@@ -318,10 +331,12 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
 		
+		expedientTascaRepository.save(expedientTascaEntity);
+		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
+
 		return conversioTipusHelper.convertir(
-					expedientTascaRepository.save(expedientTascaEntity),
+				expedientTascaEntity,
 					ExpedientTascaDto.class);
-		
 	}	
 
 	@Override
@@ -430,7 +445,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				tascaId,
 				documentId);
 		
-		documentHelper.portafirmesEnviar(
+		documentFirmaPortafirmesHelper.portafirmesEnviar(
 				entitatId,
 				document,
 				assumpte,
@@ -458,7 +473,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				tascaId,
 				documentId);
 
-		return documentHelper.portafirmesInfo(
+		return documentFirmaPortafirmesHelper.portafirmesInfo(
 				entitatId,
 				document);
 	}
@@ -476,7 +491,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				entitatId,
 				tascaId,
 				id);
-		documentHelper.portafirmesReintentar(
+		documentFirmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
 
@@ -496,7 +511,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				tascaId,
 				docuemntId);
 
-		documentHelper.portafirmesCancelar(
+		documentFirmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
 				document);
 	}
@@ -549,8 +564,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				+ "id=" + id + ")");
 		contingutHelper.comprovarContingutPertanyTascaAccesible(entitatId, tascaId, id);
 		try {
-			return documentHelper.firmaClientXifrar(
-					documentHelper.obtainInstanceObjecteFirmaApplet( 
+			return documentFirmaAppletHelper.firmaClientXifrar(
+					documentFirmaAppletHelper.obtainInstanceObjecteFirmaApplet( 
 							new Long(System.currentTimeMillis()),
 							entitatId,
 							id));
@@ -580,9 +595,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;
 		try {
-			objecte = documentHelper.firmaAppletDesxifrar(
+			objecte = documentFirmaAppletHelper.firmaAppletDesxifrar(
 					identificador,
-					DocumentHelper.CLAU_SECRETA);
+					DocumentFirmaAppletHelper.CLAU_SECRETA);
 		} catch (Exception ex) {
 			throw new RuntimeException(
 					"Error al desxifrar l'identificador per la firma via applet (" +
@@ -591,7 +606,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		}
 		if (objecte != null) {
 			DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(objecte.getEntitatId(), tascaId, objecte.getDocumentId());
-			documentHelper.processarFirmaClient(
+			documentFirmaAppletHelper.processarFirmaClient(
 					identificador,
 					arxiuNom,
 					arxiuContingut,
@@ -627,6 +642,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				contingut);
 	}
 
+	private void log (ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
+		contingutLogHelper.log(
+				expedientTascaEntity.getExpedient(),
+				LogTipusEnumDto.MODIFICACIO,
+				expedientTascaEntity,
+				LogObjecteTipusEnumDto.TASCA,
+				tipusLog,
+				expedientTascaEntity.getMetaExpedientTasca().getNom(),
+				expedientTascaEntity.getComentari(),
+				false,
+				false);
+	}
+	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto)contingutHelper.toContingutDto(

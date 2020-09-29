@@ -72,7 +72,7 @@
 	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
 	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
-	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
 	<!-- Llibreria per a compatibilitat amb HTML5 -->
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

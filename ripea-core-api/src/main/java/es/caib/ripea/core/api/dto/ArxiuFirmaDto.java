@@ -5,12 +5,17 @@ package es.caib.ripea.core.api.dto;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació de firma provinent de l'arxiu i detalls provinents
  * del plugin de validació de firma.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class ArxiuFirmaDto {
 
 	private ArxiuFirmaTipusEnumDto tipus;
@@ -21,55 +26,6 @@ public class ArxiuFirmaDto {
 	private String csvRegulacio;
 	private boolean autofirma;
 	private List<ArxiuFirmaDetallDto> detalls;
-
-	public ArxiuFirmaTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public void setTipus(ArxiuFirmaTipusEnumDto tipus) {
-		this.tipus = tipus;
-	}
-	public ArxiuFirmaPerfilEnumDto getPerfil() {
-		return perfil;
-	}
-	public void setPerfil(ArxiuFirmaPerfilEnumDto perfil) {
-		this.perfil = perfil;
-	}
-	public String getFitxerNom() {
-		return fitxerNom;
-	}
-	public void setFitxerNom(String fitxerNom) {
-		this.fitxerNom = fitxerNom;
-	}
-	public byte[] getContingut() {
-		return contingut;
-	}
-	public void setContingut(byte[] contingut) {
-		this.contingut = contingut;
-	}
-	public String getTipusMime() {
-		return tipusMime;
-	}
-	public void setTipusMime(String tipusMime) {
-		this.tipusMime = tipusMime;
-	}
-	public String getCsvRegulacio() {
-		return csvRegulacio;
-	}
-	public void setCsvRegulacio(String csvRegulacio) {
-		this.csvRegulacio = csvRegulacio;
-	}
-	public boolean isAutofirma() {
-		return autofirma;
-	}
-	public void setAutofirma(boolean autofirma) {
-		this.autofirma = autofirma;
-	}
-	public List<ArxiuFirmaDetallDto> getDetalls() {
-		return detalls;
-	}
-	public void setDetalls(List<ArxiuFirmaDetallDto> detalls) {
-		this.detalls = detalls;
-	}
 
 	public String getContingutComString() {
 		if (contingut != null) {

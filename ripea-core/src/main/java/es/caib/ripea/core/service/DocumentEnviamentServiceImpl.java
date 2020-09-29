@@ -45,6 +45,7 @@ import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.DocumentNotificacioHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
@@ -86,66 +87,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
-	DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
-	private DadesExternesService dadesExternesService;
-	@Autowired
-	private CacheHelper cacheHelper;
+	private DocumentNotificacioHelper documentNotificacioHelper;
 	
-	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
-		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"El document no està custodiat");
-		}
-		ExpedientEntity expedient = HibernateHelper.deproxy(document.getExpedient());
-		if (expedient == null) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + document.getId() + ")");
-		}
-		if (	!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioTipus) &&
-				!expedient.getMetaExpedient().isNotificacioActiva()) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"El document pertany a un expedient que no te activades les notificacions electròniques");
-		}
-		return expedient;
-	}
+
 	
-	private List<InteressatEntity> validateInteressatsPerNotificacio(DocumentNotificacioDto notificacio, ExpedientEntity expedient) {
-		
-		List<InteressatEntity> interessats = new ArrayList<>();
-		for (Long interessatId : notificacio.getInteressatsIds()) {
-			
-			InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
-					expedient,
-					interessatId);
-			if (interessat == null) {
-				throw new ValidationException(
-						interessatId,
-						InteressatEntity.class,
-						"L'interessat no existeix o no pertany a l'expedient(" +
-						"expedientId=" + expedient.getId() + ", " +
-						"interessatId=" + interessatId + ")");
-			}
-			if (	!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacio.getTipus()) &&
-					!interessat.isNotificacioAutoritzat()) {
-				throw new ValidationException(
-						interessatId,
-						InteressatEntity.class,
-						"L'interessat no ha donat el consentiment per a les notificacions electròniques (" +
-						"expedientId=" + expedient.getId() + ", " +
-						"interessatId=" + interessatId + ")");
-			}	
-			interessats.add(interessat);		
-		}
-		return interessats;
-	}
+
 	
 
 	@Transactional
@@ -164,104 +112,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
-																		  notificacioDto.getTipus());
-//		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
-		
-		for (NotificacioEnviamentDto notificacioEnviamentDto : notificacioDto.getEnviaments()) {
-			
-			InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
-					expedientEntity,
-					notificacioEnviamentDto.getTitular().getId());
-			notificacioDto.setServeiTipusEnum(notificacioEnviamentDto.getServeiTipusEnum());
-			notificacioDto.setEntregaPostal(notificacioEnviamentDto.getEntregaPostal());
-			
-			RespostaEnviar respostaEnviar = new RespostaEnviar();
-//			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
-				respostaEnviar = pluginHelper.notificacioEnviar(
-						notificacioDto,
-						expedientEntity,
-						documentEntity,
-						interessat);
-//			}
-			
-			DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
-					DocumentNotificacioEstatEnumDto.PENDENT,
-					notificacioDto.getAssumpte(),
-					notificacioDto.getTipus(),
-					notificacioDto.getDataProgramada(),
-					notificacioDto.getRetard(),
-					notificacioDto.getDataCaducitat(), 
-					expedientEntity,
-					documentEntity,
-					notificacioDto.getServeiTipusEnum(),
-					notificacioDto.isEntregaPostal()).
-					observacions(notificacioDto.getObservacions()).
-					build();
-			
-			documentNotificacioRepository.save(notificacioEntity);
-			
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity;
-			documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, 
-																							 notificacioEntity).build();
-			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
-			
-//			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
-
-				if (respostaEnviar.isError()) {
-					cacheHelper.evictNotificacionsAmbErrorPerExpedient(expedientEntity);
-					notificacioEntity.updateEnviatError(
-							respostaEnviar.getErrorDescripcio(),
-							respostaEnviar.getIdentificador());
-				} else {
-					cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
-					notificacioEntity.updateEnviat(
-							null,
-							respostaEnviar.getEstat(),
-							respostaEnviar.getIdentificador());
-				}
-
-				for (EnviamentReferencia enviamentReferencia : respostaEnviar.getReferencies()) {
-					for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
-						if(documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
-							documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-							pluginHelper.actualitzarDadesRegistre(documentEnviamentInteressat);
-						}
-					}
-				}
-//			}
-				
-			
-			DocumentNotificacioDto dto = conversioTipusHelper.convertir(
-					notificacioEntity,
-					DocumentNotificacioDto.class);
-			
-			String destinitariAmbDocument = "";
-			for (InteressatDto interessatDto : dto.getInteressats()) {
-				destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
-			}
-			
-			contingutLogHelper.log(
-					expedientEntity,
-					LogTipusEnumDto.MODIFICACIO,
-					notificacioEntity,
-					LogObjecteTipusEnumDto.NOTIFICACIO,
-					LogTipusEnumDto.ENVIAMENT,
-					destinitariAmbDocument,
-					notificacioEntity.getAssumpte(),
-					false,
-					false);
-			contingutLogHelper.log(
-					documentEntity,
-					LogTipusEnumDto.MODIFICACIO,
-					notificacioEntity,
-					LogObjecteTipusEnumDto.NOTIFICACIO,
-					LogTipusEnumDto.ENVIAMENT,
-					destinitariAmbDocument,
-					notificacioEntity.getAssumpte(),
-					false,
-					false);
-		}
+		documentNotificacioHelper.crear(notificacioDto, documentEntity);
 	}
 
 	@Transactional
@@ -280,65 +131,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedient = document.getExpedient();
-		if (expedient == null) {
-			throw new ValidationException(
-					documentId,
-					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + documentId + ")");
-		}
-		DocumentNotificacioEntity documentNotificacioEntity = entityComprovarHelper.comprovarNotificacio(
-				expedient,
-				null,
-				notificacio.getId());
-		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(documentNotificacioEntity.getTipus())) {
-			throw new ValidationException(
-					notificacio.getId(),
-					DocumentNotificacioEntity.class,
-					"No es pot modificar una notificació amb el tipus " + documentNotificacioEntity.getTipus());
-		}
-		DocumentNotificacioDto documentNotificacioDto = conversioTipusHelper.convertir(documentNotificacioEntity, DocumentNotificacioDto.class);
-		
-		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(
-				documentNotificacioDto,
-				expedient);
-		
-		DocumentNotificacioEstatEnumDto estat = documentNotificacioEntity.getNotificacioEstat();
-		documentNotificacioEntity.update(
-				estat,
-				notificacio.getAssumpte(),
-				notificacio.getObservacions());
-		
-		for (InteressatEntity interessatEntity : interessats) {
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessatEntity, documentNotificacioEntity).build();
-			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
-		}
-		
-		
-		DocumentNotificacioDto dto = conversioTipusHelper.convertir(
-				documentNotificacioEntity,
-				DocumentNotificacioDto.class);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				documentNotificacioEntity,
-				LogObjecteTipusEnumDto.NOTIFICACIO,
-				LogTipusEnumDto.MODIFICACIO,
-				null,
-				null,
-				false,
-				false);
-		contingutLogHelper.log(
-				documentNotificacioEntity.getDocument(),
-				LogTipusEnumDto.MODIFICACIO,
-				documentNotificacioEntity,
-				LogObjecteTipusEnumDto.NOTIFICACIO,
-				LogTipusEnumDto.MODIFICACIO,
-				dto.getDestinatariAmbDocument(),
-				documentNotificacioEntity.getAssumpte(),
-				false,
-				false);
-		return dto;
+
+		return documentNotificacioHelper.update(notificacio, document);
 	}
 
 	@Transactional
@@ -356,48 +150,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		ExpedientEntity expedient = document.getExpedient();
-		if (expedient == null) {
-			throw new ValidationException(
-					documentId,
-					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + documentId + ")");
-		}
-		DocumentNotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
-				expedient,
-				null,
-				notificacioId);
-		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacio.getTipus())) {
-			throw new ValidationException(
-					notificacioId,
-					DocumentNotificacioEntity.class,
-					"No es pot esborrar una notificació que no te el tipus " + DocumentNotificacioTipusEnumDto.MANUAL);
-		}
-		documentNotificacioRepository.delete(notificacio);
-		DocumentNotificacioDto dto = conversioTipusHelper.convertir(
-				notificacio,
-				DocumentNotificacioDto.class);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				notificacio,
-				LogObjecteTipusEnumDto.NOTIFICACIO,
-				LogTipusEnumDto.ELIMINACIO,
-				null,
-				null,
-				false,
-				false);
-		contingutLogHelper.log(
-				notificacio.getDocument(),
-				LogTipusEnumDto.MODIFICACIO,
-				notificacio,
-				LogObjecteTipusEnumDto.NOTIFICACIO,
-				LogTipusEnumDto.ELIMINACIO,
-				dto.getDestinatariAmbDocument(),
-				notificacio.getAssumpte(),
-				false,
-				false);
-		return dto;
+		return documentNotificacioHelper.delete(notificacioId, document);
 	}
 	
 	@Transactional(readOnly = true)
@@ -419,55 +172,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				false);
 		
-		return notificacioFindAmbId(entitatId, expedient, notificacioId);
-
+		return documentNotificacioHelper.findAmbId(entitatId, expedient, notificacioId);
 	}
 	
 	
-	private DocumentNotificacioDto notificacioFindAmbId(
-			Long entitatId,
-			ExpedientEntity expedient,
-			Long notificacioId) {
-		
-		DocumentNotificacioEntity documentNotificacioEntity = entityComprovarHelper.comprovarNotificacio(
-				expedient,
-				null,
-				notificacioId);
-		
-		DocumentNotificacioDto documentNotificacioDto = conversioTipusHelper.convertir(
-				documentNotificacioEntity,
-				DocumentNotificacioDto.class);
-		
-		for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacioEntity.getDocumentEnviamentInteressats()) {
-			documentNotificacioDto.getInteressats().add(
-					conversioTipusHelper.convertir(
-							documentEnviamentInteressatEntity.getInteressat(), 
-							InteressatDto.class));
-		}
 
-		for (DocumentEnviamentInteressatDto documentEnviamentInteressat: documentNotificacioDto.getDocumentEnviamentInteressats()) {
-			String provinciaCodi = documentEnviamentInteressat.getInteressat().getProvincia();
-			
-			for (PaisDto paisDto : dadesExternesService.findPaisos()) {
-				if (paisDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getPais())) {
-					documentEnviamentInteressat.getInteressat().setPaisNom(paisDto.getNom());
-				}
-			}
-			for (ProvinciaDto provinciaDto : dadesExternesService.findProvincies()) {
-				if (provinciaDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getProvincia())) {
-					documentEnviamentInteressat.getInteressat().setProvinciaNom(provinciaDto.getNom());
-				}
-			}
-			for (MunicipiDto municipiDto : dadesExternesService.findMunicipisPerProvincia(provinciaCodi)) {
-				if (municipiDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getMunicipi())) {
-					documentEnviamentInteressat.getInteressat().setMunicipiNom(municipiDto.getNom());
-				}
-			}
-		}
-		
-		return documentNotificacioDto;
-		
-	}
 
 	@Transactional(readOnly = true)
 	@Override
@@ -491,7 +200,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					DocumentEntity.class,
 					"El document no te cap expedient associat (documentId=" + documentId + ")");
 		}
-		return notificacioFindAmbId(entitatId, expedient, notificacioId);
+		return documentNotificacioHelper.findAmbId(entitatId, expedient, notificacioId);
 	}
 
 	@Transactional
@@ -827,6 +536,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 					notificacio.getExpedient().getId());
 		}
 	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentEnviamentServiceImpl.class);
 }

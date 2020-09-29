@@ -19,6 +19,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import lombok.Getter;
+
 /**
  * Classe del model de dades que representa un node.
  * 
@@ -30,6 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class NodeEntity extends ContingutEntity {
 
+	@Getter
 	@ManyToOne(
 			optional = true,
 			fetch = FetchType.EAGER)
@@ -39,12 +42,6 @@ public abstract class NodeEntity extends ContingutEntity {
 
 	@OneToMany(mappedBy = "node", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
 	protected Set<DadaEntity> dades;
-
-
-
-	public MetaNodeEntity getMetaNode() {
-		return metaNode;
-	}
 
 	@Override
 	public String toString() {

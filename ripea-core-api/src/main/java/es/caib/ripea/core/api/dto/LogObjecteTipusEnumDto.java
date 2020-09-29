@@ -19,6 +19,7 @@ public enum LogObjecteTipusEnumDto {
 	BUSTIA,
 	ARXIU,
 	INTERESSAT,
+	TASCA,
 	REGISTRE,
 	RELACIO,
 	NOTIFICACIO,

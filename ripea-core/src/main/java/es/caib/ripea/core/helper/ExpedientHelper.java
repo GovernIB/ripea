@@ -74,7 +74,7 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
- * Mètodes comuns per a la gestió d'expedients. 
+ * Mètodes comuns per a la gestió d'expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -104,8 +104,6 @@ public class ExpedientHelper {
 	@Autowired
 	private ContingutHelper contingutHelper;
 	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
@@ -117,9 +115,10 @@ public class ExpedientHelper {
 	private MetaDadaRepository metaDadaRepository;
 	@Autowired
 	private DadaRepository dadaRepository;
-
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public ExpedientDto create(
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
+	
+	public ExpedientEntity create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
@@ -136,11 +135,7 @@ public class ExpedientHelper {
 					ExpedientEntity.class,
 					"No es pot crear un expedient sense un meta-expedient associat");
 		}
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,
@@ -148,11 +143,11 @@ public class ExpedientHelper {
 				false,
 				true,
 				false);
-		
+
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
 //		}
-			
+
 		ContingutEntity contingutPare = null;
 		if (pareId != null) {
 			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -163,11 +158,7 @@ public class ExpedientHelper {
 					true,
 					false);
 		}
-		contingutHelper.comprovarNomValid(
-				contingutPare,
-				nom,
-				null,
-				ExpedientEntity.class);
+		contingutHelper.comprovarNomValid(contingutPare, nom, null, ExpedientEntity.class);
 //		comprovarSiExpedientAmbMateixNom(
 //				metaExpedient,
 //				contingutPare,
@@ -186,7 +177,7 @@ public class ExpedientHelper {
 				sequencia,
 				true,
 				grupId);
-		
+		contingutLogHelper.logCreacio(expedient, false, false);
 		
 		
 		crearDadesPerDefecte(
@@ -204,51 +195,31 @@ public class ExpedientHelper {
 		//find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;
 		for (ExpedientEstatEntity expedientEstat : expedientEstats) {
-			if (expedientEstat.isInicial()){
+			if (expedientEstat.isInicial()) {
 				estatInicial = expedientEstat;
 			}
 		}
-		//set inicial estat if exists
+		// set inicial estat if exists
 		if (estatInicial != null) {
 			expedient.updateExpedientEstat(estatInicial);
-			
-			//if estat has usuari responsable agafar expedient by this user
-			if (estatInicial.getResponsableCodi()!=null) {
-				agafar(
-						entitatId, 
-						expedient.getId(),
-						estatInicial.getResponsableCodi());
+
+			// if estat has usuari responsable agafar expedient by this user
+			if (estatInicial.getResponsableCodi() != null) {
+				agafar(expedient, estatInicial.getResponsableCodi());
+				
 			}
 		}
-		
+
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
-			relateExpedientWithPeticioAndSetAnnexosPendent(
-					expedientPeticioId,
-					expedient.getId());
-			
+			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
+
 			if (associarInteressats) {
-				associateInteressats(
-						expedient.getId(),
-						entitat.getId(),
-						expedientPeticioId);
+				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId);
 			}
 		}
 		
-		contingutLogHelper.logCreacio(
-				expedient,
-				false,
-				false);
-		ExpedientDto dto = toExpedientDto(
-				expedient,
-				true);
-		contingutHelper.arxiuPropagarModificacio(
-				expedient,
-				null,
-				false,
-				false,
-				null);
-		return dto;
+		return expedient;
 	}
 	
 	
@@ -292,17 +263,13 @@ public class ExpedientHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void updateNotificarError(
-			Long expedientPeticioId,
-			String error) {
+	public void updateNotificarError(Long expedientPeticioId, String error) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateNotificaDistError(error);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void updateRegistreAnnexError(
-			Long registreAnnexId,
-			String error) {
+	public void updateRegistreAnnexError(Long registreAnnexId, String error) {
 		RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		registreAnnexEntity.updateError(error);
 
@@ -310,32 +277,31 @@ public class ExpedientHelper {
 
 	/**
 	 * Creates document from registre annex
+	 * 
 	 * @param registreAnnexId
 	 * @param expedientPeticioId
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void createDocFromAnnex(
-			Long registreAnnexId,
-			Long expedientPeticioId) {
+	public DocumentEntity crearDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity;
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
-		CarpetaEntity carpetaEntity = null; 
+		CarpetaEntity carpetaEntity = null;
 		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
-		logger.debug("Creant carpeta i documents de expedient peticio (" +
-				"expedientId=" + expedientPeticioEntity.getExpedient().getId() + ", " +
-				"registreAnnexId=" + registreAnnexId + ", " +
-				"expedientPeticioId=" + expedientPeticioId + ")");
-		boolean throwException = false;
-		if (throwException)
-			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA!!!!!! ");
-		// ############################## CREATE CARPETA IN DB AND IN ARXIU ##########################################
-		boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+		logger.debug(
+				"Creant carpeta i documents de expedient peticio (" + "expedientId=" +
+						expedientPeticioEntity.getExpedient().getId() + ", " + "registreAnnexId=" + registreAnnexId +
+						", " + "expedientPeticioId=" + expedientPeticioId + ")");
+
+		// ############################## CREATE CARPETA IN DB AND IN ARXIU
+		// ##########################################
+		boolean isCarpetaActive = Boolean.parseBoolean(
+				PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaFromExpPeticio(
@@ -344,10 +310,9 @@ public class ExpedientHelper {
 					expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
-		boolean throwException1 = false;
-		if (throwException1)
-			throw new RuntimeException("EXCEPION BEFORE CREATING DOCUMENT IN DB!!!!!! ");
-		// ############################## CREATE DOCUMENT IN DB ####################################
+
+		// ############################## CREATE DOCUMENT IN DB
+		// ####################################
 		DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
 		contingutHelper.comprovarNomValid(
 				isCarpetaActive ? carpetaEntity : expedientEntity,
@@ -375,37 +340,21 @@ public class ExpedientHelper {
 		fitxer.setContentType(documentDto.getFitxerContentType());
 		fitxer.setContingut(documentDto.getFitxerContingut());
 		if (documentDto.getFitxerContingut() != null) {
-			documentHelper.actualitzarFitxerDocument(
-					docEntity,
-					fitxer);
+			documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
 			if (documentDto.isAmbFirma()) {
-				documentHelper.validaFirmaDocument(
-						docEntity, 
-						fitxer,
-						documentDto.getFirmaContingut());
+				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
 			}
 		} else {
-			docEntity.updateFitxer(
-					fitxer.getNom(),
-					fitxer.getContentType(),
-					fitxer.getContingut());
-			
+			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
+
 		}
+
+		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		
-		docEntity.updateEstat(
-				DocumentEstatEnumDto.CUSTODIAT);
-		
-		contingutLogHelper.logCreacio(
-				docEntity,
-				true,
-				true);
-		boolean throwException2 = false;
-		if(throwException2)
-			throw new RuntimeException("EXCEPION BEFORE MOVING DOCUMENT IN DB!!!!!! ");
-		// ############################## MOVE DOCUMENT IN ARXIU ##########################################
-		// put arxiu uuid of annex 
-		docEntity.updateArxiu(
-				documentDto.getArxiuUuid());
+		// ############################## MOVE DOCUMENT IN ARXIU
+		// ##########################################
+		// put arxiu uuid of annex
+		docEntity.updateArxiu(documentDto.getArxiuUuid());
 		documentRepository.saveAndFlush(docEntity);
 		if (isCarpetaActive) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
@@ -413,18 +362,19 @@ public class ExpedientHelper {
 			String documentUuid = null;
 			if (carpeta.getContinguts() != null) {
 				for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
-					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT && contingutArxiu.getNom().equals(docEntity.getNom())) {
+					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
+							contingutArxiu.getNom().equals(docEntity.getNom())) {
 						documentExistsInArxiu = true;
 						documentUuid = contingutArxiu.getIdentificador();
 					}
 				}
 			}
-			if (documentExistsInArxiu &&
-					carpetaEntity.getArxiuUuid() == null) {
+			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 				carpetaEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuPropagarMoviment(docEntity,
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
+						docEntity,
 						carpetaEntity,
 						expedientEntity.getArxiuUuid());
 				// if document was dispatched, update uuid to new document
@@ -438,18 +388,19 @@ public class ExpedientHelper {
 			String documentUuid = null;
 			if (expedient.getContinguts() != null) {
 				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT && contingutArxiu.getNom().equals(docEntity.getNom())) {
+					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
+							contingutArxiu.getNom().equals(docEntity.getNom())) {
 						documentExistsInArxiu = true;
 						documentUuid = contingutArxiu.getIdentificador();
 					}
 				}
 			}
-			if (documentExistsInArxiu &&
-					carpetaEntity.getArxiuUuid() == null) {
+			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 				expedientEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuPropagarMoviment(docEntity,
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
+						docEntity,
 						expedientEntity,
 						expedientEntity.getArxiuUuid());
 				// if document was dispatched, update uuid to new document
@@ -459,18 +410,45 @@ public class ExpedientHelper {
 			}
 		}
 		// save ntiIdentitficador generated in arxiu in db
-		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
-				docEntity,
-				null,
-				null,
-				true,
-				false);
+		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(docEntity, null, null, true, false);
 		documentDetalls.getMetadades().getIdentificadorOrigen();
 		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
 		documentRepository.save(docEntity);
+		contingutLogHelper.logCreacio(docEntity, true, true);
+		return docEntity;
 	}
-
+	
+	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
+		contingutHelper.comprovarNomValid(expedient.getPare(), nom, expedient.getId(), ExpedientEntity.class);
+		String nomOriginal = expedient.getNom();
+		expedient.update(nom);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(expedient.getNom())) ? expedient.getNom() : null,
+				null,
+				false,
+				false);
+		
+		return expedient;
+	}
+	
+	public ExpedientEntity updateAnyExpedient(ExpedientEntity expedient, int any) {
+		int anyOriginal = expedient.getAny();
+		expedient.updateAny(any);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(anyOriginal != (expedient.getAny())) ? String.valueOf(expedient.getAny()) : null,
+				null,
+				false,
+				false);
+		return expedient;
+	}
+	
+	
 	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
+
 	public String calcularNumero(ExpedientEntity expedient) {
 		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 		String expressioNumero = metaExpedient.getExpressioNumero();
@@ -482,16 +460,14 @@ public class ExpedientHelper {
 			model.put("seq", expedient.getSequencia());
 			model.put("any", expedient.getAny());
 			mustache.execute(writer, model);
-		    writer.flush();
-		    return writer.toString();
+			writer.flush();
+			return writer.toString();
 		} else {
 			return expedient.getCodi() + "/" + expedient.getSequencia() + "/" + expedient.getAny();
 		}
 	}
 
-	public ExpedientDto toExpedientDto(
-			ExpedientEntity expedient,
-			boolean ambPathIPermisos) {
+	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
 		return (ExpedientDto)contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
@@ -503,33 +479,12 @@ public class ExpedientHelper {
 				false);
 	}
 
-	private void agafar(
-			Long entitatId,
-			Long expedientId,
-			String usuariCodi) {
-		logger.debug("Agafant l'expedient com a usuari ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "usuariCodi=" + usuariCodi + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				expedientId,
-				false,
-				false,
-				true,
-				false,
-				false);
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				expedient,
-				false,
-				false,
-				false);
+	public void agafar(ExpedientEntity expedient, String usuariCodi) {
+
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
 		if (expedientSuperior != null) {
-			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
-			throw new ValidationException(
-					expedientId,
-					ExpedientEntity.class,
-					"No es pot agafar un expedient no arrel");
+			logger.error("No es pot agafar un expedient no arrel (id=" + expedient.getId() + ")");
+			throw new ValidationException(expedient.getId(), ExpedientEntity.class, "No es pot agafar un expedient no arrel");
 		}
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
 		UsuariEntity usuariOriginal = expedient.getAgafatPer();
@@ -537,20 +492,16 @@ public class ExpedientHelper {
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
-			emailHelper.contingutAgafatPerAltreUsusari(
-					expedient,
-					usuariOriginal,
-					usuariNou);
+			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.AGAFAR,
-				null,
-				null,
-				false,
-				false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, null, false, false);
 	}
 	
+	public void alliberar(ExpedientEntity expedient) {
+		UsuariEntity prevUserAgafat = expedient.getAgafatPer();
+		expedient.updateAgafatPer(null);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
+	}
 	
 	private void crearDadesPerDefecte(MetaExpedientEntity metaExpedient, ExpedientEntity expedient) {
 		
@@ -607,14 +558,9 @@ public class ExpedientHelper {
 			}
 			
 		}
-		
-		
-		
 	}
 
-	private void relateExpedientWithPeticioAndSetAnnexosPendent(
-			Long expedientPeticioId,
-			Long expedientId) {
+	private void relateExpedientWithPeticioAndSetAnnexosPendent(Long expedientPeticioId, Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateExpedient(expedient);
@@ -623,7 +569,7 @@ public class ExpedientHelper {
 		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			registreAnnex.updateEstat(RegistreAnnexEstatEnumDto.PENDENT);
 		}
-		
+
 	}
 
 	private DocumentDto toDocumentDto(RegistreAnnexEntity registreAnnexEntity) {
@@ -637,10 +583,12 @@ public class ExpedientHelper {
 		document.setDataCaptura(registreAnnexEntity.getNtiFechaCaptura());
 		document.setNtiOrigen(toNtiOrigenEnumDto(registreAnnexEntity.getNtiOrigen()));
 		document.setNtiTipoDocumental(toDocumentNtiTipoDocumentalEnumDto(registreAnnexEntity.getNtiTipoDocumental()));
-		document.setNtiEstadoElaboracion(toDocumentNtiEstadoElaboracionEnumDto(registreAnnexEntity.getNtiEstadoElaboracion()));
+		document.setNtiEstadoElaboracion(
+				toDocumentNtiEstadoElaboracionEnumDto(registreAnnexEntity.getNtiEstadoElaboracion()));
 		document.setFitxerContentType(registreAnnexEntity.getTipusMime());
 		document.setNtiVersion("1.0");
-		String codiDir3 = entitatRepository.findByUnitatArrel(registreAnnexEntity.getRegistre().getEntitatCodi()).getUnitatArrel();
+		String codiDir3 = entitatRepository.findByUnitatArrel(
+				registreAnnexEntity.getRegistre().getEntitatCodi()).getUnitatArrel();
 		document.setNtiOrgano(codiDir3);
 		return document;
 	}
@@ -650,7 +598,8 @@ public class ExpedientHelper {
 		switch (registreInteressatEntity.getTipus()) {
 		case PERSONA_FISICA:
 			InteressatPersonaFisicaDto interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
-			interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaFisicaDto.setDocumentTipus(
+					toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
 			interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
 			interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
@@ -669,7 +618,8 @@ public class ExpedientHelper {
 			break;
 		case PERSONA_JURIDICA:
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
-			interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaJuridicaDto.setDocumentTipus(
+					toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
 			interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
 			interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
@@ -686,7 +636,8 @@ public class ExpedientHelper {
 			break;
 		case ADMINISTRACIO:
 			InteressatAdministracioDto interessatAdministracioDto = new InteressatAdministracioDto();
-			interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatAdministracioDto.setDocumentTipus(
+					toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
 			interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
 			interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
@@ -698,7 +649,7 @@ public class ExpedientHelper {
 			interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
 			interessatAdministracioDto.setNotificacioAutoritzat(false);
 			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-			interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());			
+			interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());
 			interessatDto = interessatAdministracioDto;
 			break;
 		}
@@ -717,13 +668,13 @@ public class ExpedientHelper {
 				break;
 			case PASSAPORT:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.PASSAPORT;
-				break;				
+				break;
 			case NIE:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS;
 				break;
 			case ALTRES:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.ALTRES_DE_PERSONA_FISICA;
-				break;		
+				break;
 			case CODI_ORIGEN:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.CODI_ORIGEN;
 				break;
@@ -747,7 +698,8 @@ public class ExpedientHelper {
 		return ntiOrigenEnumDto;
 	}
 
-	private DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(NtiEstadoElaboracion ntiEstadoElaboracion) {
+	private DocumentNtiEstadoElaboracionEnumDto toDocumentNtiEstadoElaboracionEnumDto(
+			NtiEstadoElaboracion ntiEstadoElaboracion) {
 		DocumentNtiEstadoElaboracionEnumDto documentNtiEstadoElaboracionEnumDto = null;
 		if (ntiEstadoElaboracion != null) {
 			switch (ntiEstadoElaboracion) {
@@ -765,7 +717,7 @@ public class ExpedientHelper {
 				break;
 			case ALTRES:
 				documentNtiEstadoElaboracionEnumDto = DocumentNtiEstadoElaboracionEnumDto.EE99;
-				break;				
+				break;
 			}
 		}
 		return documentNtiEstadoElaboracionEnumDto;
@@ -852,17 +804,18 @@ public class ExpedientHelper {
 			if (contingut instanceof CarpetaEntity && contingut.getNom().equals(nom)) {
 				carpetaExistsInDB = true;
 				carpetaId = contingut.getId();
-				carpetaEntity = (CarpetaEntity) contingut;
+				carpetaEntity = (CarpetaEntity)contingut;
 			}
 		}
 		// check if already exists in arxiu
 		Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
 		boolean carpetaExistsInArxiu = false;
 		String carpetaUuid = null;
-		if (expedient.getContinguts()!=null) {
+		if (expedient.getContinguts() != null) {
 			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
 				String replacedNom = nom.replace("/", "_");
-				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA && contingutArxiu.getNom().equals(replacedNom)) {
+				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
+						contingutArxiu.getNom().equals(replacedNom)) {
 					carpetaExistsInArxiu = true;
 					carpetaUuid = contingutArxiu.getIdentificador();
 				}
@@ -881,7 +834,7 @@ public class ExpedientHelper {
 					carpetaExistsInArxiu,
 					carpetaUuid);
 			carpetaId = carpetaDto.getId();
-		} 
+		}
 		return carpetaId;
 	}
 
