@@ -536,6 +536,7 @@ public class ContingutHelper {
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
+		contingut = HibernateHelper.deproxy(contingut);
 		// Comprova el permís de modificació de l'expedient superior
 		ExpedientEntity expedient = getExpedientSuperior(
 				contingut,
