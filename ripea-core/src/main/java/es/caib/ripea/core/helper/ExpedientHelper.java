@@ -44,6 +44,8 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -113,7 +115,9 @@ public class ExpedientHelper {
 	private MetaDadaRepository metaDadaRepository;
 	@Autowired
 	private DadaRepository dadaRepository;
-
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
+	
 	public ExpedientEntity create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -173,7 +177,7 @@ public class ExpedientHelper {
 				sequencia,
 				true,
 				grupId);
-		
+		contingutLogHelper.logCreacio(expedient, false, false);
 		
 		
 		crearDadesPerDefecte(
@@ -201,7 +205,7 @@ public class ExpedientHelper {
 
 			// if estat has usuari responsable agafar expedient by this user
 			if (estatInicial.getResponsableCodi() != null) {
-				agafar(entitatId, expedient.getId(), estatInicial.getResponsableCodi());
+				agafar(expedient, estatInicial.getResponsableCodi());
 				
 			}
 		}
@@ -214,7 +218,7 @@ public class ExpedientHelper {
 				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId);
 			}
 		}
-
+		
 		return expedient;
 	}
 	
@@ -293,9 +297,7 @@ public class ExpedientHelper {
 				"Creant carpeta i documents de expedient peticio (" + "expedientId=" +
 						expedientPeticioEntity.getExpedient().getId() + ", " + "registreAnnexId=" + registreAnnexId +
 						", " + "expedientPeticioId=" + expedientPeticioId + ")");
-		boolean throwException = false;
-		if (throwException)
-			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA!!!!!! ");
+
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
 		boolean isCarpetaActive = Boolean.parseBoolean(
@@ -308,9 +310,7 @@ public class ExpedientHelper {
 					expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
-		boolean throwException1 = false;
-		if (throwException1)
-			throw new RuntimeException("EXCEPION BEFORE CREATING DOCUMENT IN DB!!!!!! ");
+
 		// ############################## CREATE DOCUMENT IN DB
 		// ####################################
 		DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
@@ -351,9 +351,6 @@ public class ExpedientHelper {
 
 		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		
-		boolean throwException2 = false;
-		if (throwException2)
-			throw new RuntimeException("EXCEPION BEFORE MOVING DOCUMENT IN DB!!!!!! ");
 		// ############################## MOVE DOCUMENT IN ARXIU
 		// ##########################################
 		// put arxiu uuid of annex
@@ -417,9 +414,39 @@ public class ExpedientHelper {
 		documentDetalls.getMetadades().getIdentificadorOrigen();
 		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
 		documentRepository.save(docEntity);
+		contingutLogHelper.logCreacio(docEntity, true, true);
 		return docEntity;
 	}
-
+	
+	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
+		contingutHelper.comprovarNomValid(expedient.getPare(), nom, expedient.getId(), ExpedientEntity.class);
+		String nomOriginal = expedient.getNom();
+		expedient.update(nom);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(expedient.getNom())) ? expedient.getNom() : null,
+				null,
+				false,
+				false);
+		
+		return expedient;
+	}
+	
+	public ExpedientEntity updateAnyExpedient(ExpedientEntity expedient, int any) {
+		int anyOriginal = expedient.getAny();
+		expedient.updateAny(any);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(anyOriginal != (expedient.getAny())) ? String.valueOf(expedient.getAny()) : null,
+				null,
+				false,
+				false);
+		return expedient;
+	}
+	
+	
 	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
 
 	public String calcularNumero(ExpedientEntity expedient) {
@@ -452,22 +479,12 @@ public class ExpedientHelper {
 				false);
 	}
 
-	private void agafar(Long entitatId, Long expedientId, String usuariCodi) {
-		logger.debug(
-				"Agafant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId +
-						", " + "usuariCodi=" + usuariCodi + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				expedientId,
-				false,
-				false,
-				true,
-				false,
-				false);
+	public void agafar(ExpedientEntity expedient, String usuariCodi) {
+
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
 		if (expedientSuperior != null) {
-			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
-			throw new ValidationException(expedientId, ExpedientEntity.class, "No es pot agafar un expedient no arrel");
+			logger.error("No es pot agafar un expedient no arrel (id=" + expedient.getId() + ")");
+			throw new ValidationException(expedient.getId(), ExpedientEntity.class, "No es pot agafar un expedient no arrel");
 		}
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
 		UsuariEntity usuariOriginal = expedient.getAgafatPer();
@@ -477,9 +494,14 @@ public class ExpedientHelper {
 			// Avisa a l'usuari que li han pres
 			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
-		
+		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, null, false, false);
 	}
 	
+	public void alliberar(ExpedientEntity expedient) {
+		UsuariEntity prevUserAgafat = expedient.getAgafatPer();
+		expedient.updateAgafatPer(null);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
+	}
 	
 	private void crearDadesPerDefecte(MetaExpedientEntity metaExpedient, ExpedientEntity expedient) {
 		
@@ -522,23 +544,20 @@ public class ExpedientHelper {
 						i).build();
 				
 				dadaRepository.save(dada);
-//				contingutLogHelper.log(
-//						expedient,
-//						LogTipusEnumDto.MODIFICACIO,
-//						dada,
-//						LogObjecteTipusEnumDto.DADA,
-//						LogTipusEnumDto.CREACIO,
-//						metaDades.get(i).getCodi(),
-//						dada.getValorComString(),
-//						false,
-//						false);
+				contingutLogHelper.log(
+						expedient,
+						LogTipusEnumDto.MODIFICACIO,
+						dada,
+						LogObjecteTipusEnumDto.DADA,
+						LogTipusEnumDto.CREACIO,
+						metaDades.get(i).getCodi(),
+						dada.getValorComString(),
+						false,
+						false);
 				
 			}
 			
 		}
-		
-		
-		
 	}
 
 	private void relateExpedientWithPeticioAndSetAnnexosPendent(Long expedientPeticioId, Long expedientId) {

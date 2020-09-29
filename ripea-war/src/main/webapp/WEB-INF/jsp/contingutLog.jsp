@@ -41,7 +41,7 @@ $(document).ready(function() {
 							$('td.log-info-accio-data', $newTd).text(data.pare.createdDateAmbFormat);
 							$('td.log-info-accio-usuari', $newTd).text(data.pare.createdBy.nom);
 							$('td.log-info-accio-tipus', $newTd).text(logTipusEnumText[data.pare.tipus]);
-							$('td.log-info-accio-objecte', $newTd).text("[" + logObjecteTipusEnumText[data.objecteTipus] + "#" + data.objecteId + "] " /*+ data.objecteNom*/);
+							$('td.log-info-accio-objecte', $newTd).text("[" + logObjecteTipusEnumText[data.objecteTipus] + "#" + data.objecteId + "] - " + data.objecteNom);
 							if (data.param1 !== null || data.param2 !== null) {
 								if (data.pare.param1 !== null)
 									$('td.log-info-accio-param1-valor', $newTd).text(data.pare.param1);

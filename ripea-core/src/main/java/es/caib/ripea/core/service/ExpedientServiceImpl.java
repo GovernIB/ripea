@@ -37,8 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -77,7 +75,6 @@ import es.caib.ripea.core.helper.CsvHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
@@ -99,7 +96,6 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 
 /**
  * Implementació dels mètodes per a gestionar expedients.
@@ -140,8 +136,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
 	private CsvHelper csvHelper;
@@ -152,13 +146,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
 	
 	@Transactional
 	@Override
@@ -194,10 +188,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientPeticioId,
 				associarInteressats,
 				grupId);
-		contingutLogHelper.logCreacio(expedient, false, false);
-		if (expedient.getAgafatPer() != null) {
-			contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, null, null, false, false);
-		}
 
 		ExpedientDto expedientDto = toExpedientDto(expedient, true);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
@@ -206,10 +196,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (expedientPeticioId != null) {
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 				try {
-					DocumentEntity createdDoc = expedientHelper.crearDocFromAnnex(
+					expedientHelper.crearDocFromAnnex(
 							registeAnnexEntity.getId(),
 							expedientPeticioEntity.getId());
-					contingutLogHelper.logCreacio(createdDoc, true, true);
+					
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
@@ -248,10 +238,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 
-				DocumentEntity createdDoc = expedientHelper.crearDocFromAnnex(
+				expedientHelper.crearDocFromAnnex(
 						registeAnnexEntity.getId(),
 						expedientPeticioEntity.getId());
-				contingutLogHelper.logCreacio(createdDoc, true, true);
 
 			} catch (Exception e) {
 				processatOk = false;
@@ -304,8 +293,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		boolean processatOk = true;
 		try {
-			DocumentEntity createdDoc = expedientHelper.crearDocFromAnnex(registreAnnexId, expedientPeticioId);
-			contingutLogHelper.logCreacio(createdDoc, true, true);
+			expedientHelper.crearDocFromAnnex(registreAnnexId, expedientPeticioId);
+
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {
 			processatOk = false;
@@ -358,16 +347,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		contingutHelper.comprovarNomValid(expedient.getPare(), nom, id, ExpedientEntity.class);
-		String nomOriginal = expedient.getNom();
-		expedient.update(nom);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				(!nomOriginal.equals(expedient.getNom())) ? expedient.getNom() : null,
-				null,
-				false,
-				false);
+		
+		expedientHelper.updateNomExpedient(expedient, nom);
+		
 		ExpedientDto dto = toExpedientDto(expedient, true);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
@@ -388,27 +370,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-		contingutHelper.comprovarNomValid(expedient.getPare(), nom, id, ExpedientEntity.class);
-		String nomOriginal = expedient.getNom();
-		expedient.update(nom);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				(!nomOriginal.equals(expedient.getNom())) ? expedient.getNom() : null,
-				null,
-				false,
-				false);
-
-		int anyOriginal = expedient.getAny();
-		expedient.updateAny(any);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				(anyOriginal != (expedient.getAny())) ? String.valueOf(expedient.getAny()) : null,
-				null,
-				false,
-				false);
-
+		expedientHelper.updateNomExpedient(expedient, nom);
+		expedientHelper.updateAnyExpedient(expedient, any);
+		
 		ExpedientDto dto = toExpedientDto(expedient, true);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
@@ -693,7 +657,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Agafant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "usuari=" +
 						auth.getName() + ")");
-
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -702,21 +665,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false);
-
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
-		if (expedientSuperior != null) {
-			logger.error("No es pot agafar un expedient no arrel (id=" + id + ")");
-			throw new ValidationException(id, ExpedientEntity.class, "No es pot agafar un expedient no arrel");
-		}
-		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
-		UsuariEntity usuariOriginal = expedient.getAgafatPer();
-		UsuariEntity usuariNou = usuariHelper.getUsuariAutenticat();
-		expedient.updateAgafatPer(usuariNou);
-		if (usuariOriginal != null) {
-			// Avisa a l'usuari que li han pres
-			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
-		}
-		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, null, null, false, false);
+		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 	}
 
 	@Transactional
@@ -733,19 +682,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
-		if (expedientSuperior != null) {
-			throw new ValidationException(id, ExpedientEntity.class, "No es pot agafar un expedient no arrel");
-		}
-		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
-		UsuariEntity usuariOriginal = expedient.getAgafatPer();
-		UsuariEntity usuariNou = usuariHelper.getUsuariAutenticat();
-		expedient.updateAgafatPer(usuariNou);
-		if (usuariOriginal != null) {
-			// Avisa a l'altre l'usuari que li han pres
-			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
-		}
-		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, null, null, false, false);
+		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 	}
 
 	@Transactional
@@ -763,8 +700,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		expedient.updateAgafatPer(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, null, null, false, false);
+		expedientHelper.alliberar(expedient);
 	}
 
 	@Transactional
@@ -780,8 +716,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		expedient.updateAgafatPer(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, null, null, false, false);
+		expedientHelper.alliberar(expedient);
 	}
 
 	@Transactional
