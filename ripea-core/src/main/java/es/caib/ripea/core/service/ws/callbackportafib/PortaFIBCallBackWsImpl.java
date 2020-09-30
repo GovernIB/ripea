@@ -94,8 +94,13 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 		case 50:
 			estatEnum = PortafirmesCallbackEstatEnumDto.PENDENT;
 			if (event.getActor() != null && event.getActor().getAdministrationID() != null) {
-				PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = portafirmesBlockInfoRepository.findBySignerId(event.getActor().getAdministrationID());
-				portafirmesBlockInfoEntity.updateSigned(true);
+				List<PortafirmesBlockEntity> portafirmesBlocksEntity = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+				if (portafirmesBlocksEntity != null && !portafirmesBlocksEntity.isEmpty()) {
+					PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = portafirmesBlockInfoRepository.findBySignerIdAndPortafirmesBlock(
+							event.getActor().getAdministrationID(),
+							portafirmesBlocksEntity.get(0));
+					portafirmesBlockInfoEntity.updateSigned(true);
+				}
 			}
 			break;
 		case 60:

@@ -137,7 +137,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
-				portafirmesFluxId != null ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
+				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
 				document).build();
 
@@ -162,7 +162,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
 		List<PortafirmesBlockDto> portafirmesBlocks = pluginHelper.portafirmesRecuperarBlocksFirma(
-				portafirmesFluxId != null ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
+				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
 				transaccioId,
 				portafirmesFluxTipus.equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB),
 				documentPortafirmes.getPortafirmesId(),

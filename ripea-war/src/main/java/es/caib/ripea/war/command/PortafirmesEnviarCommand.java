@@ -34,7 +34,7 @@ public class PortafirmesEnviarCommand {
 	private String[] portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 
-	private String portafirmesFluxId;
+	private String portafirmesEnviarFluxId;
 	private String portafirmesFluxNom;
 	private String portafirmesFluxDescripcio;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
@@ -56,12 +56,12 @@ public class PortafirmesEnviarCommand {
 		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
 	}
 
-	public String getPortafirmesFluxId() {
-		return portafirmesFluxId;
+	public String getPortafirmesEnviarFluxId() {
+		return portafirmesEnviarFluxId;
 	}
 
-	public void setPortafirmesFluxId(String portafirmesFluxId) {
-		this.portafirmesFluxId = portafirmesFluxId;
+	public void setPortafirmesEnviarFluxId(String portafirmesEnviarFluxId) {
+		this.portafirmesEnviarFluxId = portafirmesEnviarFluxId;
 	}
 
 	public String getPortafirmesFluxNom() {

@@ -50,6 +50,7 @@ public class PortafirmesFluxController extends BaseUserController {
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
+			@RequestParam(value = "plantillaId", required = false) String plantillaId,
 			Model model) {
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
@@ -59,11 +60,17 @@ public class PortafirmesFluxController extends BaseUserController {
 		
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
 		try {
-			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-					urlReturn,
-					nomCodificat,
-					descripcio,
-					false);
+			if (plantillaId != null && !plantillaId.isEmpty()) {
+				transaccioResponse = new PortafirmesIniciFluxRespostaDto();
+				String urlEdicio = portafirmesFluxService.recuperarUrlMostrarPlantilla(plantillaId);
+				transaccioResponse.setUrlRedireccio(urlEdicio);
+			} else {
+				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
+						urlReturn,
+						nomCodificat,
+						descripcio,
+						false);
+			}
 		} catch (Exception ex) {
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 			transaccioResponse.setError(true);

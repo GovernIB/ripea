@@ -87,7 +87,8 @@
 								contentUrl: webutilUrlAmbPrefix(href, '/modal'),
 								dataTableId: dataTableId,
 								elementRetorn: plugin.settings.elementRetorn,
-								segonaModal: plugin.settings.segonaModal
+								segonaModal: plugin.settings.segonaModal,
+								height: plugin.settings.height
 							});
 							
 						} else {
@@ -103,7 +104,8 @@
 								elementTancarData: plugin.settings.elementTancarData,
 								dataTableId: dataTableId,
 								elementRetorn: plugin.settings.elementRetorn,
-								segonaModal: plugin.settings.segonaModal
+								segonaModal: plugin.settings.segonaModal,
+								height: plugin.settings.height
 							});
 						}
 						$('#' + modalDivId).data('elementRetorn', plugin.settings.elementRetorn);

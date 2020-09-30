@@ -162,8 +162,10 @@ public class DocumentController extends BaseUserController {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		}
 		
-		if ((command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) &&
-				(command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && transaccioId == null)) {
+		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && 
+				(metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()) &&
+				(transaccioId == null || transaccioId.isEmpty()) && 
+				(command.getPortafirmesEnviarFluxId() == null || command.getPortafirmesEnviarFluxId().isEmpty())) {
 			emplenarModelPortafirmes(
 					request,
 					documentId,
@@ -185,12 +187,12 @@ public class DocumentController extends BaseUserController {
 				command.getMotiu(),
 				command.getPrioritat(),
 				command.getDataCaducitat(),
-				null,
+				command.getPortafirmesEnviarFluxId(), //selecció flux
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
 				command.getAnnexos(),
-				transaccioId);
+				transaccioId); //nou flux
 		
 		return this.getModalControllerReturnValueSuccess(
 				request,
