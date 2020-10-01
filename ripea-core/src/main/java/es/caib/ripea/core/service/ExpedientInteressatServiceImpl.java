@@ -553,6 +553,16 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				InteressatAdministracioDto.class);
 	}
 
+	@Override
+	public List<InteressatDto> findByExpedientAndDocumentNum(
+			String documentNum,
+			Long expedientId) throws NotFoundException {
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		return conversioTipusHelper.convertirList(
+				interessatRepository.findByExpedientAndDocumentNum(expedient, documentNum),
+				InteressatDto.class);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatServiceImpl.class);
 
 }

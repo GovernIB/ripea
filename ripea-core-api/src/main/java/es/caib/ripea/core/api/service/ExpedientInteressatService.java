@@ -282,6 +282,21 @@ public interface ExpedientInteressatService {
 			String organCodi,
 			Long expedientId) throws NotFoundException;
 
+	/**
+	 * Consulta l'interessat d'un expedient amb un determinat número de document
+	 * 
+	 * @param documentNum
+	 *            Número del document de l'interessat
+	 * @param expedientId 
+	 * 			  Id del expedient del interessat              
+	 * @return La llista d'interessats trobats.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<InteressatDto> findByExpedientAndDocumentNum(
+			String documentNum,
+			Long expedientId) throws NotFoundException;
 
 
 }

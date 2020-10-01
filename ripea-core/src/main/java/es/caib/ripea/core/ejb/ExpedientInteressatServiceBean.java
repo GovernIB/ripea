@@ -20,8 +20,8 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 
 /**
- * Implementació de InteressatService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
+ * Implementació de InteressatService com a EJB que empra una clase delegada per
+ * accedir a la funcionalitat del servei.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -32,17 +32,12 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 	@Autowired
 	ExpedientInteressatService delegate;
 
-
-
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto create(
-			Long entitatId,
-			Long expedientId,
-			InteressatDto interessat) {
+	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat) {
 		return delegate.create(entitatId, expedientId, interessat);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
 	public InteressatDto create(
@@ -56,70 +51,49 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto update(
-			Long entitatId,
-			Long expedientId,
-			InteressatDto interessat) {
+	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat) {
 		return delegate.update(entitatId, expedientId, interessat);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto update(
-			Long entitatId,
-			Long expedientId,
-			Long interessatId,
-			InteressatDto representant) {
+	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant) {
 		return delegate.update(entitatId, expedientId, interessatId, representant);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public void delete(
-			Long entitatId,
-			Long expedientId,
-			Long interessatId) {
+	public void delete(Long entitatId, Long expedientId, Long interessatId) {
 		delegate.delete(entitatId, expedientId, interessatId);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public void delete(
-			Long entitatId,
-			Long expedientId,
-			Long interessatId,
-			Long representantId) {
+	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId) {
 		delegate.delete(entitatId, expedientId, interessatId, representantId);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto findById(
-			Long id) {
+	public InteressatDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto findRepresentantById(
-			Long interessatId, 
-			Long id) {
+	public InteressatDto findRepresentantById(Long interessatId, Long id) {
 		return delegate.findRepresentantById(interessatId, id);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public long countByExpedient(
-			Long entitatId,
-			Long expedientId) {
+	public long countByExpedient(Long entitatId, Long expedientId) {
 		return delegate.countByExpedient(entitatId, expedientId);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public List<InteressatDto> findAmbDocumentPerNotificacio(
-			Long entitatId,
-			Long documentId) {
+	public List<InteressatDto> findAmbDocumentPerNotificacio(Long entitatId, Long documentId) {
 		return delegate.findAmbDocumentPerNotificacio(entitatId, documentId);
 	}
 
@@ -131,34 +105,22 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 			String llinatge1,
 			String llinatge2,
 			Long expedientId) {
-		return delegate.findByFiltrePersonaFisica(
-				documentNum,
-				nom,
-				llinatge1,
-				llinatge2,
-				expedientId);
+		return delegate.findByFiltrePersonaFisica(documentNum, nom, llinatge1, llinatge2, expedientId);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
 	public List<InteressatPersonaJuridicaDto> findByFiltrePersonaJuridica(
 			String documentNum,
 			String raoSocial,
 			Long expedientId) {
-		return delegate.findByFiltrePersonaJuridica(
-				documentNum, 
-				raoSocial,
-				expedientId);
+		return delegate.findByFiltrePersonaJuridica(documentNum, raoSocial, expedientId);
 	}
-	
+
 	@Override
 	@RolesAllowed("tothom")
-	public List<InteressatAdministracioDto> findByFiltreAdministracio(
-			String organCodi,
-			Long expedientId) {
-		return delegate.findByFiltreAdministracio(
-				organCodi,
-				expedientId);
+	public List<InteressatAdministracioDto> findByFiltreAdministracio(String organCodi, Long expedientId) {
+		return delegate.findByFiltreAdministracio(organCodi, expedientId);
 	}
 
 	@Override
@@ -167,12 +129,15 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 			Long entitatId,
 			Long expedientId,
 			boolean nomesAmbNotificacioActiva) throws NotFoundException {
-		return delegate.findByExpedient(
-				entitatId,
-				expedientId,
-				nomesAmbNotificacioActiva);
+		return delegate.findByExpedient(entitatId, expedientId, nomesAmbNotificacioActiva);
 	}
 
-
+	@Override
+	@RolesAllowed("tothom")
+	public List<InteressatDto> findByExpedientAndDocumentNum(
+			String documentNum,
+			Long expedientId) throws NotFoundException {
+		return delegate.findByExpedientAndDocumentNum(documentNum, expedientId);
+	}
 
 }
