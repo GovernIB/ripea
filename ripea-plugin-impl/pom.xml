@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.76.pre1</version>
+		<version>0.9.76.pre2</version>
 	</parent>
 	<artifactId>ripea-plugin-impl</artifactId>
 	<dependencies>
