@@ -48,12 +48,14 @@ public class AjaxOrganGestorController extends BaseAdminController{
 		} catch (UnsupportedEncodingException e) { }
 		
 		List<OrganGestorDto> organGestorsList;
-		if (RolHelper.isRolActualAdministrador(request)) {
-			organGestorsList = organGestorService.findByEntitat(entitatActual.getId(), text);
-		}else {
+ 		if (RolHelper.isRolActualAdministradorOrgan(request)) {
 			organGestorsList = organGestorService.findAccessiblesUsuariActual(
 					entitatActual.getId(),
 					EntitatHelper.getOrganGestorActual(request).getId(),
+					text);
+		} else {
+			organGestorsList = organGestorService.findByEntitat(
+					entitatActual.getId(),
 					text);
 		}
 		

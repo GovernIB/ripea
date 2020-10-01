@@ -32,6 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un enviament d'un document
@@ -39,6 +40,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table( name = "ipa_document_enviament")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -102,50 +104,6 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 	
 	@Version
 	private long version = 0;
-
-	public DocumentEnviamentEstatEnumDto getEstat() {
-		return estat;
-	}
-
-	public String getAssumpte() {
-		return assumpte;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public Date getEnviatData() {
-		return enviatData;
-	}
-	public Date getProcessatData() {
-		return processatData;
-	}
-	public Date getCancelatData() {
-		return cancelatData;
-	}
-	public boolean isError() {
-		return error;
-	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
-	}
-	public int getIntentNum() {
-		return intentNum;
-	}
-	public Date getIntentData() {
-		return intentData;
-	}
-	public Date getIntentProximData() {
-		return intentProximData;
-	}
-	public ExpedientEntity getExpedient() {
-		return expedient;
-	}
-	public DocumentEntity getDocument() {
-		return document;
-	}
-	public List<DocumentEntity> getAnnexos() {
-		return annexos;
-	}
 
 	public void addAnnex(DocumentEntity annex) {
 		annexos.add(annex);

@@ -46,6 +46,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -62,6 +63,7 @@ import es.caib.ripea.war.command.ExpedientTancarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -113,15 +115,15 @@ public class ExpedientController extends BaseUserController {
 		if (filtreCommand.getOrganGestorId() != null) {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 					entitatActual.getId(),
-					filtreCommand.getOrganGestorId());
+					filtreCommand.getOrganGestorId(), 
+					null);
 		} else {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
-					entitatActual.getId());
+					entitatActual.getId(), 
+					null);
 		}
+
 		
-		model.addAttribute(
-				"metaExpedientsPermisLectura",
-				metaExpedientsPermisLectura);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
 				entitatActual.getId());
 		model.addAttribute(
@@ -502,7 +504,8 @@ public class ExpedientController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		return metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitatActual.getId());
+				entitatActual.getId(), 
+				null);
 	}
 	
 
@@ -516,7 +519,8 @@ public class ExpedientController extends BaseUserController {
 		
 		return metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 				entitatActual.getId(),
-				organGestorId);
+				organGestorId, 
+				null);
 	}
 	
 	
@@ -661,17 +665,22 @@ public class ExpedientController extends BaseUserController {
 					"redirect:../../contingut/" + expedientId,
 					"expedient.controller.tancar.ok");
 		} catch (Exception ex) {
-			omplirModelTancarExpedient(
-					expedientId,
-					request,
-					model);
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.tancar.nodefinitius",
-							null));
-			return "expedientTancarForm";
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(
+					ex,
+					ExpedientTancarSenseDocumentsDefinitiusException.class)) {
+				omplirModelTancarExpedient(
+						expedientId,
+						request,
+						model);
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"expedient.controller.tancar.nodefinitius",
+								null));
+				return "expedientTancarForm";
+			}
+			throw ex;			
 		}
 	}
 
@@ -781,14 +790,16 @@ public class ExpedientController extends BaseUserController {
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerLectura(
-						entitatActual.getId()));
+						entitatActual.getId(), 
+						null));
 		model.addAttribute(
 				"expedientEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						ExpedientEstatEnumDto.class,
 						"expedient.estat.enum."));
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitatActual.getId());
+				entitatActual.getId(), 
+				null);
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);

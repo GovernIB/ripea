@@ -118,8 +118,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@Override
 	@RolesAllowed("tothom")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
-			Long entitatId) {
-		return delegate.findActiusAmbEntitatPerLectura(entitatId);
+			Long entitatId, String filtreNomOrCodiSia) {
+		return delegate.findActiusAmbEntitatPerLectura(entitatId, filtreNomOrCodiSia);
 	}
 
 	@Override
@@ -281,9 +281,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed("tothom")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
-			Long organGestorId) {
+			Long organGestorId, String filtre) {
 		return delegate.findActiusAmbOrganGestorPermisLectura(
 				entitatId,
-				organGestorId);
+				organGestorId, filtre);
 	}
+
 }

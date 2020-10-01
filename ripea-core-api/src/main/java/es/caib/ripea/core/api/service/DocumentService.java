@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -590,5 +591,17 @@ public interface DocumentService {
 			Long entitatId,
 			Long documentId,
 			DocumentEstatEnumDto nouEstat);
+
+	/**
+	 * Recupera els blocks de firma relacionats amb l'enviament d'un document
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param documentId
+	 *            Atribut id del document del que es vol canviar l'estat.
+	 */
+	List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
+			Long entitatId, 
+			Long documentId);
 
 }

@@ -36,6 +36,7 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -103,10 +104,10 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 				filtreCommand);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId()));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-		if (filtreCommand.getTipusExpedient() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getTipusExpedient());
+		if (filtreCommand.getMetaExpedientId() != null)
+			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId());
 		model.addAttribute(
 				"expedients",
 				expedients);
@@ -198,8 +199,8 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-		if (filtreCommand.getTipusExpedient() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getTipusExpedient());
+		if (filtreCommand.getMetaExpedientId() != null)
+			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId());
 		model.addAttribute(
 				"expedients",
 				expedients);
@@ -312,14 +313,20 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 		
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				 contingutService.documentMassiuFindAmbFiltre(
-							entitatActual.getId(), 
-							ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-							DatatablesHelper.getPaginacioDtoFromRequest(request)),
-				 "id",
-				 SESSION_ATTRIBUTE_SELECCIO);
+		
+		
+		try {
+			return DatatablesHelper.getDatatableResponse(
+					request,
+					 contingutService.findDocumentsPerFirmaMassiu(
+								entitatActual.getId(), 
+								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
+								DatatablesHelper.getPaginacioDtoFromRequest(request)),
+					 "id",
+					 SESSION_ATTRIBUTE_SELECCIO);
+		} catch (Exception e) {
+			throw e;
+		}
 		
 	}
 
@@ -380,7 +387,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 			seleccio.addAll(
-					contingutService.findIdsMassiusAmbFiltre(
+					contingutService.findIdsDocumentsPerFirmaMassiu(
 							entitatActual.getId(),
 							ContingutMassiuFiltreCommand.asDto(filtreCommand)));
 		}

@@ -107,6 +107,16 @@ public class DocumentEntity extends NodeEntity {
 	public Long getPareId() {
 		return pare.getId();
 	}
+	
+	public ExpedientEntity getExpedientPare() {
+		ContingutEntity contingutPare = this.pare;
+		while(contingutPare != null && !(contingutPare instanceof ExpedientEntity)) {
+			contingutPare = contingutPare.getPare();
+		}
+		
+		return contingutPare != null ? (ExpedientEntity) contingutPare : null;
+		
+	}
 
 	public MetaDocumentEntity getMetaDocument() {
 		return (MetaDocumentEntity)getMetaNode();

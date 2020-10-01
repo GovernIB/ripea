@@ -124,8 +124,8 @@ public class CarpetaServiceImpl implements CarpetaService {
 				LogTipusEnumDto.MODIFICACIO,
 				(!nomOriginal.equals(carpeta.getNom())) ? carpeta.getNom() : null,
 				null,
-				false,
-				false);
+				true,
+				true);
 		CarpetaDto dto = carpetaHelper.toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,

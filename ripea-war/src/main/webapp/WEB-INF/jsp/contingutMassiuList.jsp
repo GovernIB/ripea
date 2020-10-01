@@ -9,12 +9,11 @@
 <html>
 <head>
 	<title>${titolMassiu}</title>
-	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
-	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
-	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
-	<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/datatables.net-select/1.3.1/js/dataTables.select.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.2.3/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
@@ -38,19 +37,21 @@
 </style>
 <script>
 	$(document).ready(function() {
-		var tipus = $('#tipusDocument').val();
-		$('thead tr th:nth-child(1)', $('#taulaDades')).each(function() {
-			enableDisableSelection($(this), tipus);
-		});
+		var tipus = $('#metaDocumentId').val();
+
 		
-		$('#tipusExpedient').on('change', function() {
+		$('#metaExpedientId').on('change', function() {
 
 			var tipus = $(this).val();
 			
+			$('#expedientId option[value!=""]').remove();
+			$('#expedientId').select2('val', '', true);
+			
+			$('#metaDocumentId option[value!=""]').remove();
+			$('#metaDocumentId').select2('val', '', true);
 			if (tipus != undefined && tipus != "") {
 				$.get("<c:url value="/massiu/expedients/"/>" + tipus).done(function(data){
-					$('#expedientId').select2('val', '', true);
-					$('#expedientId option[value!=""]').remove();
+					
 					for (var i = 0; i < data.length; i++) {
 						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
 					}
@@ -58,12 +59,10 @@
 					alert("<spring:message code="error.jquery.ajax"/>");
 				});
 
-				
 				$.get("<c:url value="/massiu/metaDocuments/"/>" + tipus).done(function(data){
-					$('#tipusDocument').select2('val', '', true);
-					$('#tipusDocument option[value!=""]').remove();
+					
 					for (var i = 0; i < data.length; i++) {
-						$('#tipusDocument').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+						$('#metaDocumentId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
 					}
 				}).fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");
@@ -81,10 +80,8 @@
 			);
 		});
 		$('#taulaDades').on('draw.dt', function () {
-			var tipus = $('#tipusDocument').val();
-			$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function() {
-				enableDisableSelection($(this), tipus);
-			});
+			var tipus = $('#metaDocumentId').val();
+
 
 			updateSelectionForTipusDocument(tipus);
 			
@@ -110,8 +107,8 @@
 				return false;
 			});
 		});
-		$('#tipusExpedient').trigger('change');
-		$('#tipusDocument').trigger('change');
+		$('#metaExpedientId').trigger('change');
+		$('#metaDocumentId').trigger('change');
 });
 
 function enableDisableSelection($this, tipus) {
@@ -152,14 +149,13 @@ function updateSelectionForTipusDocument(currentTipus) {
 
 </head>
 <body>
-	
 	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputSelect name="tipusElement"  optionEnum="ContingutTipusEnumDto" placeholderKey="accio.massiva.list.filtre.tipuselement" emptyOption="true" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarTipusElement}" netejar="${not contingutMassiuFiltreCommand.bloquejarTipusElement}"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputSelect name="tipusExpedient" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaExpedient}"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaExpedient}"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputSelect name="expedientId" optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.expedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
@@ -167,7 +163,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="tipusDocument" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
+				<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
@@ -217,7 +213,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 		data-url="<c:url value="/massiu/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
-		data-default-order="8" 
+		data-default-order="7" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"

@@ -20,9 +20,9 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
 public class ContingutMassiuFiltreCommand {
 
 	private ContingutTipusEnumDto tipusElement;
-	private Long tipusExpedient;
+	private Long metaExpedientId;
 	private Long expedientId;
-	private Long tipusDocument;
+	private Long metaDocumentId;
 	private String metaDada;
 	private String nom;
 	private Date dataInici;
@@ -56,23 +56,23 @@ public class ContingutMassiuFiltreCommand {
 	public void setTipusElement(ContingutTipusEnumDto tipusElement) {
 		this.tipusElement = tipusElement;
 	}
-	public Long getTipusExpedient() {
-		return tipusExpedient;
-	}
-	public void setTipusExpedient(Long tipusExpedient) {
-		this.tipusExpedient = tipusExpedient;
-	}
 	public Long getExpedientId() {
 		return expedientId;
 	}
 	public void setExpedientId(Long expedientId) {
 		this.expedientId = expedientId;
 	}
-	public Long getTipusDocument() {
-		return tipusDocument;
+	public Long getMetaExpedientId() {
+		return metaExpedientId;
 	}
-	public void setTipusDocument(Long tipusDocument) {
-		this.tipusDocument = tipusDocument;
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
+	public Long getMetaDocumentId() {
+		return metaDocumentId;
+	}
+	public void setMetaDocumentId(Long metaDocumentId) {
+		this.metaDocumentId = metaDocumentId;
 	}
 	public String getMetaDada() {
 		return metaDada;

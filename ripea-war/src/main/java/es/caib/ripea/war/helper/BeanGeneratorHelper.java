@@ -58,9 +58,9 @@ public class BeanGeneratorHelper {
 			
 			switch (metaDada.getTipus()) {
 			case BOOLEA:
-				if (dadaValors.isEmpty() && metaDada.getValorBoolea() != null ) {
-					dadaValors.add(metaDada.getValorBoolea());
-				}
+//				if (dadaValors.isEmpty() && metaDada.getValorBoolea() != null ) {
+//					dadaValors.add(metaDada.getValorBoolea());
+//				}
 				
 				tipus[i] = (isMultiple) ? Boolean[].class : Boolean.class;
 				if (valors != null) {
@@ -71,9 +71,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case DATA:
-				if (dadaValors.isEmpty() && metaDada.getValorData() != null ) {
-					dadaValors.add(metaDada.getValorData());
-				}
+//				if (dadaValors.isEmpty() && metaDada.getValorData() != null ) {
+//					dadaValors.add(metaDada.getValorData());
+//				}
 				
 				tipus[i] = (isMultiple) ? Date[].class : Date.class;
 				if (valors != null) {
@@ -84,9 +84,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case FLOTANT:
-				if (dadaValors.isEmpty() && metaDada.getValorFlotant() != null ) {
-					dadaValors.add(metaDada.getValorFlotant());
-				}
+//				if (dadaValors.isEmpty() && metaDada.getValorFlotant() != null ) {
+//					dadaValors.add(metaDada.getValorFlotant());
+//				}
 				
 				tipus[i] = (isMultiple) ? Double[].class : Double.class;
 				if (valors != null) {
@@ -97,9 +97,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case IMPORT:
-				if (dadaValors.isEmpty() && metaDada.getValorImport() != null ) {
-					dadaValors.add(metaDada.getValorImport());
-				}
+//				if (dadaValors.isEmpty() && metaDada.getValorImport() != null ) {
+//					dadaValors.add(metaDada.getValorImport());
+//				}
 				tipus[i] = (isMultiple) ? BigDecimal[].class : BigDecimal.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -109,9 +109,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case SENCER:
-				if (dadaValors.isEmpty() && metaDada.getValorSencer() != null ) {
-					dadaValors.add(metaDada.getValorSencer());
-				}
+//				if (dadaValors.isEmpty() && metaDada.getValorSencer() != null ) {
+//					dadaValors.add(metaDada.getValorSencer());
+//				}
 				tipus[i] = (isMultiple) ? Long[].class : Long.class;
 				if (valors != null) {
 					if (isMultiple) 
@@ -121,9 +121,9 @@ public class BeanGeneratorHelper {
 				}
 				break;
 			case TEXT:
-				if (dadaValors.isEmpty() && metaDada.getValorString() != null && !metaDada.getValorString().isEmpty()) {
-					dadaValors.add(metaDada.getValorString());
-				}
+//				if (dadaValors.isEmpty() && metaDada.getValorString() != null && !metaDada.getValorString().isEmpty()) {
+//					dadaValors.add(metaDada.getValorString());
+//				}
 				tipus[i] = (isMultiple) ? String[].class : String.class;
 				if (valors != null) {
 					if (isMultiple) 

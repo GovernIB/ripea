@@ -181,7 +181,7 @@ public class ContingutLogHelper {
 			emplenarLogDto(log.getPare(), pare);
 			detalls.setPare(pare);
 		}
-//		if (log.getObjecteId() != null) {
+		if (log.getObjecteId() != null) {
 //			String objecteNom = null;
 //			switch (log.getObjecteTipus()) {
 //			case ContingutId:
@@ -228,8 +228,12 @@ public class ContingutLogHelper {
 //				objecteNom = "???" + log.getObjecteTipus().name() + "#" + log.getObjecteId() + "???";
 //				break;
 //			}
-//			detalls.setObjecteNom(objecteNom);
-//		}
+			
+			String objecteNom = null;
+			ContingutEntity c = contingutRepository.findOne(new Long(log.getObjecteId()));
+			objecteNom = c != null ? c.getNom() : "";
+			detalls.setObjecteNom(objecteNom);
+		}
 		return detalls;
 	}
 

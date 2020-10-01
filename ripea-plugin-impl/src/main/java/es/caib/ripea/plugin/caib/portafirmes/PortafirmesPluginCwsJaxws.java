@@ -34,6 +34,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPBinding;
 
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
@@ -252,6 +253,14 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
+			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private UploadRequestDocument getUploadRequestDocument(
 			PortafirmesDocument document,
 			String documentTipus,
@@ -547,6 +556,5 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 			return contentType;
 		}
 	}
-
-
+	
 }

@@ -120,13 +120,15 @@ public class MetaExpedientHelper {
 	
 	public List<MetaExpedientEntity> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
-			Long organGestorId) {
+			Long organGestorId, 
+			String filtre) {
 
 		return findAmbOrganGestorPermis(
 				entitatId,
 				organGestorId,
 				new Permission[] {ExtendedPermission.READ},
-				true);
+				true,
+				filtre);
 		
 
 	}
@@ -136,7 +138,8 @@ public class MetaExpedientHelper {
 			Long entitatId,
 			Long organGestorId,
 			Permission[] permisos,
-			boolean nomesActius) {
+			boolean nomesActius,
+			String filtre) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
@@ -145,7 +148,10 @@ public class MetaExpedientHelper {
 		OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organGestorId);
 		List<MetaExpedientEntity> metaExpedients;
 		if (nomesActius) {
-			metaExpedients = metaExpedientRepository.findByOrganGestorAndActiuTrueOrderByNomAsc(organGestorEntity);
+			metaExpedients = metaExpedientRepository.findByOrganGestorAndActiuAndFiltreTrueOrderByNomAsc(
+					organGestorEntity,
+					filtre == null || "".equals(filtre.trim()),
+					filtre == null ? "" : filtre);
 		} else {
 			metaExpedients = metaExpedientRepository.findByOrganGestorOrderByNomAsc(organGestorEntity);
 		}
@@ -169,18 +175,21 @@ public class MetaExpedientHelper {
 	
 	public List<MetaExpedientEntity> findActiusAmbEntitatPermis(
 			Long entitatId,
-			Permission[] permisos) {
+			Permission[] permisos,
+			String filtreNomOrCodiSia) {
 		return findAmbEntitatPermis(
 				entitatId,
 				permisos,
-				true);		
+				true,
+				filtreNomOrCodiSia);		
 	}
 	
 	
 	public List<MetaExpedientEntity> findAmbEntitatPermis(
 			Long entitatId,
 			Permission[] permisos,
-			boolean nomesActius) {
+			boolean nomesActius,
+			String filtreNomOrCodiSia) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -190,7 +199,10 @@ public class MetaExpedientHelper {
 		
 		List<MetaExpedientEntity> metaExpedients;
 		if (nomesActius) {
-			metaExpedients = metaExpedientRepository.findByEntitatAndActiuTrueOrderByNomAsc(entitat);
+			metaExpedients = metaExpedientRepository.findByEntitatAndActiuTrueAndFiltreOrderByNomAsc(
+					entitat,
+					filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
+					filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia);
 		} else {
 			metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		}

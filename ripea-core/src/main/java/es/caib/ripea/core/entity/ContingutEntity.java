@@ -32,12 +32,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa un contenidor.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 @Entity
 @Table(	name = "ipa_contingut",
 		uniqueConstraints = {
@@ -112,39 +116,10 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@Version
 	private long version = 0;
 
-	public Date getEsborratData() {
-		return esborratData;
-	}
 	public void updateEsborratData(Date esborratData) {
 		this.esborratData = esborratData;
 	}
-	public String getNom() {
-		return nom;
-	}
-	public ContingutTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public ContingutEntity getPare() {
-		return pare;
-	}
-	public Set<ContingutEntity> getFills() {
-		return fills;
-	}
-	public int getEsborrat() {
-		return esborrat;
-	}
-	public String getArxiuUuid() {
-		return arxiuUuid;
-	}
-	public Date getArxiuDataActualitzacio() {
-		return arxiuDataActualitzacio;
-	}
-	public EntitatEntity getEntitat() {
-		return entitat;
-	}
-	public ExpedientEntity getExpedient() {
-		return expedient;
-	}
+
 	public ExpedientEntity getExpedientPare() {
 		if (this instanceof ExpedientEntity) {
 			return (ExpedientEntity) this;
@@ -154,9 +129,6 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	}
 	public ContingutMovimentEntity getDarrerMoviment() {
 		return darrerMoviment;
-	}
-	public List<AlertaEntity> getAlertes() {
-		return alertes;
 	}
 	
 	public void addFill(ContingutEntity fill) {
@@ -178,30 +150,7 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	public void updateDarrerMoviment(ContingutMovimentEntity darrerMoviment) {
 		this.darrerMoviment = darrerMoviment;
 	}
-	public boolean isAmbNotificacions() {
-		return ambNotificacions;
-	}
-	public void setAmbNotificacions(boolean ambNotificacions) {
-		this.ambNotificacions = ambNotificacions;
-	}
-	public boolean isErrorDarreraNotificacio() {
-		return errorDarreraNotificacio;
-	}
-	public void setErrorDarreraNotificacio(boolean errorDarreraNotificacio) {
-		this.errorDarreraNotificacio = errorDarreraNotificacio;
-	}
-	public String getEstatDarreraNotificacio() {
-		return estatDarreraNotificacio;
-	}
-	public void setEstatDarreraNotificacio(String estatDarreraNotificacio) {
-		this.estatDarreraNotificacio = estatDarreraNotificacio;
-	}
-	public boolean isErrorEnviamentPortafirmes() {
-		return errorEnviamentPortafirmes;
-	}
-	public void setErrorEnviamentPortafirmes(boolean errorEnviamentPortafirmes) {
-		this.errorEnviamentPortafirmes = errorEnviamentPortafirmes;
-	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

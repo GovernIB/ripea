@@ -24,6 +24,8 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.plugin.notificacio.NotificacioEstat;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una notificació d'un document
@@ -32,6 +34,8 @@ import es.caib.ripea.plugin.notificacio.NotificacioEstat;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
@@ -48,17 +52,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	private Date dataCaducitat;
 	@Column(name = "not_env_id", length = 100)
 	private String enviamentIdentificador;
-//	@Column(name = "not_env_dat_estat", length = 20)
-//	private String enviamentDatatEstat;
-//	@Column(name = "not_env_dat_data")
-//	private Date enviamentDatatData;
-//	@Column(name = "not_env_dat_orig", length = 20)
-//	private String enviamentDatatOrigen;
-//	@Column(name = "not_env_cert_data")
-//	@Temporal(TemporalType.DATE)
-//	private Date enviamentCertificacioData;
-//	@Column(name = "not_env_cert_orig", length = 20)
-//	private String enviamentCertificacioOrigen;
 	@Column(name = "not_env_cert_arxiuid", length = 50)
 	private String enviamentCertificacioArxiuId;
 	@Enumerated(EnumType.STRING)
@@ -76,7 +69,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@Column(name="not_env_registre_num_formatat", length = 50)
 	private String registreNumeroFormatat;
 	
-	
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -89,54 +81,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	protected DocumentNotificacioEstatEnumDto notificacioEstat;
 	
 
-	public DocumentNotificacioEstatEnumDto getNotificacioEstat() {
-		return notificacioEstat;
-	}
-	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
-		return documentEnviamentInteressats;
-	}
-	public Date getDataProgramada() {
-		return dataProgramada;
-	}
-	public Integer getRetard() {
-		return retard;
-	}
-	public Date getDataCaducitat() {
-		return dataCaducitat;
-	}
-	public String getEnviamentIdentificador() {
-		return enviamentIdentificador;
-	}
-	public String getEnviamentCertificacioArxiuId() {
-		return enviamentCertificacioArxiuId;
-	}
-	public ServeiTipusEnumDto getServeiTipusEnum() {
-		return serveiTipusEnum;
-	}
-	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
-		this.serveiTipusEnum = serveiTipusEnum;
-	}
-	public DocumentNotificacioTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-	public Integer getRegistreNumero() {
-		return registreNumero;
-	}
-	public void setRegistreNumero(Integer registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-	public String getRegistreNumeroFormatat() {
-		return registreNumeroFormatat;
-	}
-	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
-		this.registreNumeroFormatat = registreNumeroFormatat;
-	}
 	public void update(
 			DocumentNotificacioEstatEnumDto notificacioEstat,
 			String assumpte,
@@ -300,13 +244,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			return false;
 		return true;
 	}
-
-	public Boolean getEntregaPostal() {
-		return entregaPostal;
-	}
-
-
-
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

@@ -274,22 +274,22 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<Long> findIdsMassiusAmbFiltre(
+	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre)
 			throws NotFoundException {
-		return delegate.findIdsMassiusAmbFiltre(
+		return delegate.findIdsDocumentsPerFirmaMassiu(
 				entitatId,
 				filtre);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<DocumentDto> documentMassiuFindAmbFiltre(
+	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		return delegate.documentMassiuFindAmbFiltre(
+		return delegate.findDocumentsPerFirmaMassiu(
 				entitatId,
 				filtre,
 				paginacioParams);

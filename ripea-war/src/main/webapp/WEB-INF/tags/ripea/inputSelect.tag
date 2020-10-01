@@ -26,7 +26,6 @@
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="botons" required="false" rtexprvalue="true"%>
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
-<%@ attribute name="deleteMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="iconDelete" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
@@ -110,7 +109,6 @@
 	</c:when>
 	<c:when test="${not inline && botons}">
 		<c:if test="${not empty buttonMsg}"><c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set></c:if>
-		<c:set var="deleteMsg"><spring:message code="${deleteMsg}"/></c:set>
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
 			<div class="input-group select2-bootstrap-append">
@@ -145,7 +143,7 @@
 				<span class="input-group-btn">
 					<a class="btn btn-default ${campPath}_btn_edicio" title="${buttonMsg}"><i class="${icon}"></i></a>
 					<c:if test="${not empty iconDelete}">
-						<a class="btn btn-default ${campPath}_btn_esborrar" title="${deleteMsg}"><i class="${iconDelete}"></i></a>
+						<a class="btn btn-default ${campPath}_btn_esborrar"><i class="${iconDelete}"></i></a>
 					</c:if>
 				</span>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>

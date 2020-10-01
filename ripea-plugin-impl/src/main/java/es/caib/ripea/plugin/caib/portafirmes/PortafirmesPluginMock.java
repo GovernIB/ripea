@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
@@ -152,5 +153,12 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	public boolean esborrarPlantillaFirma(String idioma, String plantillaFluxId) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	@Override
+	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
+			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

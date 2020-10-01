@@ -44,6 +44,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
@@ -161,8 +162,10 @@ public class DocumentController extends BaseUserController {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		}
 		
-		if ((command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) &&
-				(command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && transaccioId == null)) {
+		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && 
+				(metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()) &&
+				(transaccioId == null || transaccioId.isEmpty()) && 
+				(command.getPortafirmesEnviarFluxId() == null || command.getPortafirmesEnviarFluxId().isEmpty())) {
 			emplenarModelPortafirmes(
 					request,
 					documentId,
@@ -184,12 +187,12 @@ public class DocumentController extends BaseUserController {
 				command.getMotiu(),
 				command.getPrioritat(),
 				command.getDataCaducitat(),
-				null,
+				command.getPortafirmesEnviarFluxId(), //selecció flux
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),
 				command.getAnnexos(),
-				transaccioId);
+				transaccioId); //nou flux
 		
 		return this.getModalControllerReturnValueSuccess(
 				request,
@@ -247,6 +250,19 @@ public class DocumentController extends BaseUserController {
 		return "portafirmesInfo";
 	}
 
+	@RequestMapping(value = "/{documentId}/portafirmes/blocks")
+	public String portafirmesBlocksInfo(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
+				entitatActual.getId(),
+				documentId);
+		model.addAttribute("blocks", documentPortafirmesBlocks);
+		return "portafirmesBlocksInfo";
+	}
+	
 	@RequestMapping(value = "/{documentId}/viafirma/info", method = RequestMethod.GET)
 	public String viaFirmaInfo(
 			HttpServletRequest request,

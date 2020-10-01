@@ -76,7 +76,7 @@ body.loading .rmodal {
 #fluxModal {
 	margin: 1%;
 }
-.portafirmesFluxId_btn:hover {
+.portafirmesEnviarFluxId_btn:hover {
 	cursor: pointer;
 }
 .btn-flux {
@@ -94,6 +94,12 @@ body.loading .rmodal {
 	opacity: .65;
 	box-shadow: none;
 }
+.flux_container {
+	margin-top: 7%;
+}
+.espai {
+	height: 20px;
+}
 </style>
 
 <script type="text/javascript">
@@ -107,35 +113,32 @@ $(document).ready(function() {
 	
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
-	let fluxPredefinit = ${nouFluxDeFirma};
+	//let fluxPredefinit = ${nouFluxDeFirma};
 	
-	if (fluxPredefinit != null && fluxPredefinit) {
-		$('form').find('button').addClass('disabled');
-	} 
-
-	let fluxCreat = localStorage.getItem('fluxCreat');
-	if (fluxCreat != null && fluxCreat != "undefined" && !"${isNouEnviament}") {
-		$('.comentari').remove();
-		$(".portafirmesFlux_btn").parent().before(fluxCreat);
-		$('form').find('button').removeClass("disabled");
-	}
+	//if (fluxPredefinit != null && fluxPredefinit) {
+	//	$('#submit').addClass('disabled');
+	//} 
 	
-	$(".portafirmesFlux_btn").on('click', function(){		
+	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function(){		
 		let documentNom = '${document.nom}';
 		$.ajax({
 			type: 'GET',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
-			data: {nom: documentNom},
+			data: {nom: documentNom, plantillaId: $("#portafirmesEnviarFluxId").val()},
 			url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
 			success: function(transaccioResponse, textStatus, XmlHttpRequest) {
 				if (transaccioResponse != null && !transaccioResponse.error) {
-					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-					$('.content').addClass("hidden");
-					$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
-					adjustModalPerFlux(true);
-					$body = $("body");
-					$body.addClass("loading");
+					if ($("#portafirmesEnviarFluxId").val() != null && $("#portafirmesEnviarFluxId").val() != '') {
+						mostrarFluxSeleccionat(transaccioResponse.urlRedireccio);
+					} else {
+						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+						$('.content').addClass("hidden");
+						$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+						adjustModalPerFlux(true);
+						$body = $("body");
+						$body.addClass("loading");
+					}
 				} else if (transaccioResponse != null && transaccioResponse.error) {
 					let currentIframe = window.frameElement;
 					var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span></div>';
@@ -155,7 +158,60 @@ $(document).ready(function() {
 			}
 		});
 	});	
-					
+	
+	$.ajax({
+		type: 'GET',
+		dataType: "json",
+		url: "<c:url value="/metaExpedient/metaDocument/flux/plantilles"/>",
+		success: function(data) {
+			var plantillaActual = "${portafirmesFluxSeleccionat}";
+			var selPlantilles = $("#portafirmesEnviarFluxId");
+			selPlantilles.empty();
+			selPlantilles.append("<option value=\"\"></option>");
+			if (data) {
+				var items = [];
+				$.each(data, function(i, val) {
+					items.push({
+						"id": val.fluxId,
+						"text": val.nom
+					});
+					selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+				});
+			}
+			var select2Options = {
+					theme: 'bootstrap',
+					minimumResultsForSearch: "4"
+				};
+			selPlantilles.select2(select2Options);
+			if (plantillaActual != '') {
+				selPlantilles.val(plantillaActual);
+				selPlantilles.change();
+				$(".portafirmesEnviarFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.editar"/>");
+			}
+		},
+		error: function (error) {
+			var selPlantilles = $("#portafirmesEnviarFluxId");
+			selPlantilles.empty();
+			selPlantilles.append("<option value=\"\"></option>");
+			var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
+			selPlantilles.select2(select2Options);
+		}
+	});
+	$("#portafirmesEnviarFluxId").on('change', function () {
+		var portafirmesEnviarFluxId = $(this).val();
+		console.log(portafirmesEnviarFluxId);
+		if(portafirmesEnviarFluxId != null && portafirmesEnviarFluxId != '') {
+			//$('.portafirmesEnviarFluxId_btn_edicio').addClass('disabled');
+			$(".portafirmesEnviarFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.mostrar"/>");
+		} else {
+			$(".portafirmesEnviarFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>");
+		}
+	});
+						
+	$('.modal-cancel').on('click', function(){
+		localStorage.removeItem('transaccioId');
+	});
+	$("#portafirmesEnviarFluxId").trigger('change');
 });
 
 function adjustModalPerFlux(amagar) {
@@ -209,6 +265,12 @@ function mostrarFlux(urlPlantilla) {
 		$('.flux_container').empty();
 	}
 }
+
+function mostrarFluxSeleccionat(urlPlantilla) {
+	adjustModalPerFlux(false);
+	$('.flux_container').html('<hr><div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + urlPlantilla + '"></iframe></div>');	
+}
+
 </script>
 </head>
 <body>
@@ -253,22 +315,31 @@ function mostrarFlux(urlPlantilla) {
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">
 			<rip:inputSelect name="annexos" textKey="metadocument.form.camp.portafirmes.annexos" optionValueAttribute="id" optionTextAttribute="nom" optionItems="${annexos}" multiple="true"/>
+			<label class="control-label success-label hidden col-xs-4"></label>
+			<rip:inputSelect name="portafirmesEnviarFluxId" textKey="metadocument.form.camp.portafirmes.flux" emptyOption="true" botons="true" icon="fa fa-external-link" />
+			<label class="control-label col-xs-4"></label>
+			<c:if test="${!nouFluxDeFirma}">
+				<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /> <a class="btn btn-default btn-xs exemple_boto"  onclick="mostrarFlux('${urlPlantilla}')"><span id="eye" class="fa fa-eye" title="<spring:message code="contenidor.document.portafirmes.boto.show" />"></span></a></p>
+			</c:if>
+			<%--
 			<div class="form-group">
 				<label class="control-label col-xs-4 fluxInputLabel"><spring:message code="metadocument.form.camp.portafirmes.flux" /> *</label>
 				<c:if test="${!nouFluxDeFirma}">
 					<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /> <a class="btn btn-default btn-xs exemple_boto"  onclick="mostrarFlux('${urlPlantilla}')"><span id="eye" class="fa fa-eye" title="<spring:message code="contenidor.document.portafirmes.boto.show" />"></span></a></p>
 				</c:if>
-				<label class="col-xs-4"></label>
 				<div class="col-xs-8" style="margin-top: 3px">
 					<span class='btn btn-flux form-control portafirmesFlux_btn' title="<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>"><spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>  <i class="fa fa-external-link"></i></span>
 				</div>
 			</div>
+			--%>
 		</c:when>
 		</c:choose>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="s"></span> <spring:message code="contenidor.document.portafirmes.enviar"/></button>
+			<button type="submit" class="btn btn-success"><spring:message code="contenidor.document.portafirmes.enviar"/></button>
 			<a href="<c:url value="/contenidor/${document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
+		
+	<div class="espai"></div>
 	</form:form>
 	<div class="flux_container"></div>
 	<div class="rmodal"></div>

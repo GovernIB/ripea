@@ -16,7 +16,7 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
 <script>
 let fluxIframe = window.frameElement;
 
@@ -32,21 +32,26 @@ if (fluxIframe) {
 		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').append("<option value=\"" + idFlux + "\" selected>" + FluxNom + "</option>");
 	} else if (FluxError != null && FluxError != '') {
 		alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>';
+		if (localStorage.getItem('transaccioId') == null && localStorage.getItem('transaccioId') == '') 
+			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').attr('disabled', false);
 	}
 	if (FluxCreat != null && FluxCreat != '') {
+		//
+		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').attr('disabled', true);
 		alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span>';
 		if ((FluxNom != null && FluxNom != '')) {
 			let $comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
-			if ($comentari.length < 1) {
-				$(fluxIframe.parentElement.parentElement).prev().find('.fluxInputLabel').after('<p class="comentari col-xs-8"></p>');
-			}
 			$comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
 			$comentari.text('');
+			
+			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('form').find('.success-label').removeClass('hidden');
+			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('.form-group').before('<p class="success col-xs-8"></p>');
+			let $success =  $(fluxIframe.parentElement.parentElement).prev().find('.success');
+			
 			var text = '<spring:message code='contingut.document.form.camp.portafirmes.flux.seleccionat'/>';
-			$comentari.html(text + " <span>" + FluxNom + "</span>");
-			$comentari.css('color', '#3c763d');
-			$comentari.find('span').css('font-weight', 'bold');
-			localStorage.setItem('fluxCreat', $comentari.wrap('<p/>').parent().html());
+			$success.html(text + " <span>" + FluxNom + "</span>");
+			$success.css('color', '#3c763d');
+			$success.find('span').css('font-weight', 'bold');
 		}
 	}
 	$(fluxIframe.parentElement.parentElement).prev().removeClass('hidden');

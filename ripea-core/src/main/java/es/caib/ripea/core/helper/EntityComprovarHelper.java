@@ -301,15 +301,23 @@ public class EntityComprovarHelper {
 		return metaDocument;
 	}
 
-	public MetaDocumentEntity comprovarMetaDocument(EntitatEntity entitat, MetaExpedientEntity metaExpedient,
-	                                                Long id, boolean comprovarActiu,
-	                                                boolean comprovarMetaExpedient) {
+	public MetaDocumentEntity comprovarMetaDocument(
+			EntitatEntity entitat,
+			MetaExpedientEntity metaExpedient,
+			Long id,
+			boolean comprovarActiu,
+			boolean comprovarMetaExpedient) {
 		MetaDocumentEntity metaDocument;
 
 		if (comprovarMetaExpedient) {
-			metaDocument = comprovarMetaDocument(entitat, metaExpedient, id);
+			metaDocument = comprovarMetaDocument(
+					entitat,
+					metaExpedient,
+					id);
 		} else {
-			metaDocument = comprovarMetaDocument(entitat, id);
+			metaDocument = comprovarMetaDocument(
+					entitat,
+					id);
 		}
 		if (comprovarActiu) {
 			if (!metaDocument.isActiu()) {
@@ -376,10 +384,14 @@ public class EntityComprovarHelper {
 		return carpeta;
 	}
 
-	public ExpedientEntity comprovarExpedient(Long entitatId, Long expedientId,
-	                                          boolean comprovarAgafatPerUsuariActual,
-	                                          boolean comprovarPermisRead, boolean comprovarPermisWrite,
-	                                          boolean comprovarPermisCreate, boolean comprovarPermisDelete) {
+	public ExpedientEntity comprovarExpedient(
+			Long entitatId,
+			Long expedientId,
+			boolean comprovarAgafatPerUsuariActual,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete) {
 		EntitatEntity entitat = comprovarEntitat(entitatId, true, false, false);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {

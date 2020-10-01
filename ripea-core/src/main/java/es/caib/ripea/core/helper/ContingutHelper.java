@@ -536,36 +536,38 @@ public class ContingutHelper {
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
+		contingut = HibernateHelper.deproxy(contingut);
 		// Comprova el permís de modificació de l'expedient superior
 		ExpedientEntity expedient = getExpedientSuperior(
 				contingut,
 				true,
 				false,
 				true);
-		if (expedient != null) {
-			// Comprova que l'usuari actual te agafat l'expedient
-			UsuariEntity agafatPer = expedient.getAgafatPer();
-			if (agafatPer != null) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				if (!auth.getName().equals(agafatPer.getCodi())) {
-					throw new ValidationException(
-							contingutId,
-							ContingutEntity.class,
-							"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
-							"usuariActualCodi=" + auth.getName() + ")");
-				}
-			} else {
-				throw new ValidationException(
-						contingutId,
-						ContingutEntity.class,
-						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
-			}
-		} else {
+		if (expedient == null) {
 			throw new ValidationException(
 					contingutId,
 					ContingutEntity.class,
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
+		
+		// Comprova que l'usuari actual te agafat l'expedient
+		UsuariEntity agafatPer = expedient.getAgafatPer();
+		if (agafatPer == null) {
+			throw new ValidationException(
+					contingutId,
+					ContingutEntity.class,
+					"L'expedient al qual pertany el contingut no està agafat per cap usuari");
+		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!auth.getName().equals(agafatPer.getCodi())) {
+			throw new ValidationException(
+					contingutId,
+					ContingutEntity.class,
+					"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
+					"usuariActualCodi=" + auth.getName() + ")");
+		}
+		
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			if(comprovarPermisWrite){
 				ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
@@ -715,7 +717,6 @@ public class ContingutHelper {
 			// Elimina contingut a l'arxiu
 			arxiuPropagarEliminacio(contingut);
 		}
-
 		return dto;
 	}
 	

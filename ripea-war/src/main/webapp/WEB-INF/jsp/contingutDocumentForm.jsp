@@ -99,12 +99,12 @@ body.loading .rmodal {
 } 
 </style>
 <script>
-/*function mostrarDocument(fileName) {
+function mostrarDocument(fileName) {
 	$fileinput = $('#arxiu').closest('.fileinput');
 	$fileinput.removeClass('fileinput-new');
 	$fileinput.addClass('fileinput-exists');
 	$('.fileinput-filename', $fileinput).append(fileName);
-}*/
+}
 
 $(document).ready(function() {
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;

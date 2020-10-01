@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -342,6 +343,12 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public List<DocumentDto> findAnnexosAmbExpedient(Long entitatId, DocumentDto document) {
 		return delegate.findAnnexosAmbExpedient(entitatId, document);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(Long entitatId, Long documentId) {
+		return delegate.recuperarBlocksFirmaEnviament(entitatId, documentId);
 	}
 
 }
