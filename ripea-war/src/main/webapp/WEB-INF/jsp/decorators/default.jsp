@@ -244,6 +244,12 @@ body {
 										<spring:message code="decorator.menu.configuracio.user"/>
 									</a>
 								</li>
+								<li>
+									<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
+									   rel="noopener noreferrer" target="_blank">
+										<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
+									</a>
+								</li>
 							</ul>
 						</li>
 					</ul>
@@ -329,11 +335,7 @@ body {
 										</c:if>
 									</ul>
 								</div>
-								<a class="btn btn-success"
-									href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
-									rel="noopener noreferrer" target="_blank">
-									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
-								</a>
+
 							</c:when>
 						</c:choose>
 						<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">
