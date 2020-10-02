@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ExpedientEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -161,9 +163,15 @@ public class ExpedientEstatController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long expedientEstatId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		expedientEstatService.deleteExpedientEstat(
-				entitatActual.getId(),
-				expedientEstatId);
+		try {
+			expedientEstatService.deleteExpedientEstat(
+					entitatActual.getId(),
+					expedientEstatId);
+		}catch (Exception e) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class))
+				return getAjaxControllerReturnValueError(request, "redirect:expedientEstat", 
+						"expedient.estat.controller.esborrat.error.restriccio");
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:expedientEstat",
