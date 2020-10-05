@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa el registre d'una acció
@@ -27,6 +28,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "ipa_cont_log")
 @EntityListeners(AuditingEntityListener.class)
@@ -39,6 +41,7 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 //	@ForeignKey(name = "ipa_contingut_contlog_fk")
 	@Column(name = "contingut_id")
 	protected Long contingutId;
+	
 	@Column(name = "objecte_id", length = 64)
 	private String objecteId;
 	@Column(name = "objecte_tipus")
@@ -57,36 +60,6 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "pare_id")
 	@ForeignKey(name = "ipa_pare_contlog_fk")
 	protected ContingutLogEntity pare;
-
-
-
-	public LogTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public Long getContingutId() {
-		return contingutId;
-	}
-	public ContingutMovimentEntity getContingutMoviment() {
-		return contingutMoviment;
-	}
-	public String getObjecteId() {
-		return objecteId;
-	}
-	public LogObjecteTipusEnumDto getObjecteTipus() {
-		return objecteTipus;
-	}
-	public LogTipusEnumDto getObjecteLogTipus() {
-		return objecteLogTipus;
-	}
-	public String getParam1() {
-		return param1;
-	}
-	public String getParam2() {
-		return param2;
-	}
-	public ContingutLogEntity getPare() {
-		return pare;
-	}
 
 	public void updateParams(
 			String param1,

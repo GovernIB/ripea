@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -37,6 +38,18 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat);
 
+
+	@Query(	" SELECT " +
+			"    count(d) " +
+			" FROM " +
+			"    DocumentEntity d JOIN d.notificacions n " +
+			" WHERE " +
+			"        d.expedient = :expedient " +
+			"    AND n.notificacioEstat IN :estat ")
+	long countByExpedientAndNotificacionsNotificacioEstatIn(
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("estat") DocumentNotificacioEstatEnumDto[] estats);
+	
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -155,4 +168,5 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
+
 }

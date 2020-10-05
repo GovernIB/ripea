@@ -4,13 +4,18 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.support.RequestContext;
 
 import es.caib.ripea.war.helper.AjaxHelper;
@@ -225,4 +230,12 @@ public class BaseController implements MessageSourceAware {
 		this.messageSource = messageSource;
 	}
 
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(
+	    		Date.class,
+	    		new CustomDateEditor(
+	    				new SimpleDateFormat("dd/MM/yyyy"),
+	    				true));
+	}
 }

@@ -216,19 +216,47 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaNode") MetaNodeEntity metaNode);
 	
 	
+//	@Query(	"select" +
+//			"    e " +
+//			"from" +
+//			"    ExpedientEntity e " +
+//			"where " +
+//			"    e.entitat = :entitat " +
+//			"and e.metaNode = :metaNode "
+//			+ "and e != :expedient)")
+//	List<ExpedientEntity> findByEntitatAndMetaExpedientWithoutGivenExp(
+//			@Param("entitat") EntitatEntity entitat,
+//			@Param("metaNode") MetaNodeEntity metaNode,
+//			@Param("expedient") ExpedientEntity expedient);
+	
+	
 	@Query(	"select" +
-			"    e " +
+			"    count(e) " +
 			"from" +
 			"    ExpedientEntity e " +
 			"where " +
-			"    e.entitat = :entitat " +
-			"and e.metaNode = :metaNode "
-			+ "and e != :expedient)")
-	List<ExpedientEntity> findByEntitatAndMetaExpedientWithoutGivenExp(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNode") MetaNodeEntity metaNode,
-			@Param("expedient") ExpedientEntity expedient);
+			"   e.alertes IS EMPTY " +
+			"and e.metaNode = :metaNode ")
+	int findByMetaExpedientAndAlertesEmpty(
+			@Param("metaNode") MetaNodeEntity metaNode);
 	
+	@Query(	"select" +
+			"    count(e) " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"   e.alertes IS NOT EMPTY " +
+			"and e.metaNode = :metaNode ")
+	int findByMetaExpedientAndAlertesNotEmpty(
+			@Param("metaNode") MetaNodeEntity metaNode);
 	
-	
+//	@Query(	"select" +
+//			"    count(e) " +
+//			"from" +
+//			"    ExpedientEntity e " +
+//			"where " +
+//			"   e.alertes IS EMPTY " +
+//			"and e.metaNode = :metaNode ")
+//	int findByMetaExpedientAndValid(
+//			@Param("metaNode") MetaNodeEntity metaNode);
 }

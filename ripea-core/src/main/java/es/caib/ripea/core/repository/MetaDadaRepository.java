@@ -27,9 +27,7 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 	MetaDadaEntity findByMetaNodeAndCodi(
 			MetaNodeEntity metaNode,
 			String codi);
-	
-	
-	
+		
 	@Query(	"from " +
 			"    MetaDadaEntity md " +
 			"where " +

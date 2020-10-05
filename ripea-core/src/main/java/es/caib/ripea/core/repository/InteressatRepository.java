@@ -14,6 +14,7 @@ import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -144,5 +145,18 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullOrganCodi") boolean esNullOrganCodi,
 			@Param("organCodi") String organCodi,
 			@Param("expedient") ExpedientEntity expedient);
+	
+	@Query(	  "select "
+			+ "    inter.documentNum "
+			+ "from "
+			+ "    MetaExpedientEntity me, ExpedientEntity e JOIN e.interessats inter"
+			+ " WHERE "
+			+ "        e.metaExpedient = me "
+			+ "    AND me = :metaExpedient "
+			+ "group by "
+			+ "    inter.documentNum ")
+	List<String> findAllDocumentNumbers(
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient
+			);
 	
 }
