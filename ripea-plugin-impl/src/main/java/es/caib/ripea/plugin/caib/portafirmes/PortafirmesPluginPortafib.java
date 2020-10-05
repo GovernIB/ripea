@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -507,6 +508,15 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		List<PortafirmesBlockInfo> portafirmesBlocks = null;
 		try {
 			if (blocks != null) {
+				Collections.sort(blocks, new Comparator<BlocDeFirmesWs>() {
+					@Override
+					public int compare(BlocDeFirmesWs o1, BlocDeFirmesWs o2) {
+						if (o1.getOrdre() < o2.getOrdre())
+							return -1;
+						else
+							return 1;
+					}
+				});
 				portafirmesBlocks = new ArrayList<PortafirmesBlockInfo>();
 				for (BlocDeFirmesWs blocDeFirmesWs : blocks) {
 					PortafirmesBlockInfo portafirmesBlock = new PortafirmesBlockInfo();
