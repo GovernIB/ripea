@@ -23,6 +23,9 @@ import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
  */
 public interface InteressatRepository extends JpaRepository<InteressatEntity, Long> {
 
+	List<InteressatEntity> findByExpedientAndDocumentNum(
+			ExpedientEntity expedient, String documentNum);
+	
 	@Query(	  "select "
 			+ "    inter "
 			+ "from "

@@ -546,6 +546,15 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		List<PortafirmesBlockInfo> portafirmesBlocks = null;
 		try {
 			if (blocks != null) {
+				Collections.sort(blocks, new Comparator<FlowTemplateSimpleBlock>() {
+					@Override
+					public int compare(FlowTemplateSimpleBlock o1, FlowTemplateSimpleBlock o2) {
+						if (o1.getOrder() < o2.getOrder())
+							return -1;
+						else
+							return 1;
+					}
+				});
 				portafirmesBlocks = new ArrayList<PortafirmesBlockInfo>();
 				for (FlowTemplateSimpleBlock flowTemplateSimpleBlock : blocks) {
 					PortafirmesBlockInfo portafirmesBlock = new PortafirmesBlockInfo();

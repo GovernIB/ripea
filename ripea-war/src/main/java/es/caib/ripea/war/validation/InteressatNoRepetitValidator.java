@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
@@ -41,36 +42,9 @@ public class InteressatNoRepetitValidator implements ConstraintValidator<Interes
 		try {
 			
 			InteressatCommand interessat = (InteressatCommand)value;
+			List<InteressatDto> interessats = expedientInteressatService.findByExpedientAndDocumentNum(interessat.getDocumentNum(), interessat.getExpedientId());
+			return interessats.isEmpty();
 			
-			final Long id = interessat.getId();
-			if (id != null)
-				return true;
-			final InteressatTipusEnumDto tipus = interessat.getTipus();
-			
-			boolean existeix;
-			if (InteressatTipusEnumDto.PERSONA_FISICA.equals(tipus)) {
-				List<InteressatPersonaFisicaDto> interessats = expedientInteressatService.findByFiltrePersonaFisica(
-						interessat.getDocumentNum(), 
-						interessat.getNom(), 
-						interessat.getLlinatge1(), 
-						interessat.getLlinatge2(),
-						interessat.getExpedientId());
-				existeix = interessats.size() > 0;
-			} else if (InteressatTipusEnumDto.PERSONA_JURIDICA.equals(tipus)) {
-				List<InteressatPersonaJuridicaDto> interessats = expedientInteressatService.findByFiltrePersonaJuridica(
-						interessat.getDocumentNum(),
-						interessat.getRaoSocial(),
-						interessat.getExpedientId());
-				existeix = interessats.size() > 0;
-			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(tipus)) {
-				List<InteressatAdministracioDto> interessats = expedientInteressatService.findByFiltreAdministracio(
-						interessat.getOrganCodi(),
-						interessat.getExpedientId());
-				existeix = interessats.size() > 0;
-			} else {
-				throw new RuntimeException("No s'ha pogut comprovar si l'interessat ja està donat d'alta: tipus desconegut");
-			}
-			return !existeix;
 		} catch (final Exception ex) {
         	LOGGER.error("Error al comprovar si l'interessat ja està donat d'alta", ex);
         	return false;
