@@ -31,6 +31,12 @@
 	justify-content: center;
 }
 
+.table_container_full {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
 .blocks_container {
 	width: 50%;
 	display: flex;
@@ -153,7 +159,7 @@ $(document).ready(function() {
 		<div class="tab-content">
 			<div class="tab-pane active in" id="dades" role="tabpanel">
 				<div class="portafirmes_container">
-					<div class="table_container">
+					<div class="${not empty blocks ? 'table_container' : 'table_container_full'}">
 						<table class="table table-striped table-bordered">
 						<tbody>
 							<tr>
@@ -211,48 +217,50 @@ $(document).ready(function() {
 						</tbody>
 						</table>
 					</div>
-					<div class="blocks_container">
-						<div class="signers_container">
-							<div class="block_start_end"><spring:message code="firma.info.accio.flux.inici"/></div>
-							<i class="block_arrow fa fa-ellipsis-v"></i>
-							<c:forEach items="${blocks}" var="block" varStatus="status">
-								<div class="block_container">
-									<c:forEach items="${block.signers}" var="signer">
-										<div class="signer_container signed_${signer.signed}">
-											<c:choose>
-												<c:when test="${not emptysigner.signerNom}">
-														${signer.signerNom} (${signer.signerCodi})
-												</c:when>
-												<c:otherwise>
-													${signer.signerCodi}
-												</c:otherwise>
-											</c:choose><br>
-											${signer.signerId}
-										</div>
-									</c:forEach>
-								</div>
-								<c:if test="${!status.last}">
-									<i class="block_arrow fa fa-arrow-down"></i>
-								</c:if>
-							</c:forEach>
-							<i class="block_arrow fa fa-ellipsis-v"></i>
-							<div class="block_start_end"><spring:message code="firma.info.accio.flux.final"/></div>
-						</div>
-						<div class="leyenda">
-							<div class="leyenda_title"><span><spring:message code="firma.info.accio.flux.llegenda"/></span></div>
-							<div class="leyenda_container">
-								<div class="leyenda_block">
-									<div></div><span><spring:message code="firma.info.accio.flux.bloc"/></span>
-								</div>
-								<div class="leyenda_pendent">
-									<div></div><span><spring:message code="firma.info.accio.flux.firma.pendent"/></span>
-								</div>
-								<div class="leyenda_firmat">
-									<div></div><span><spring:message code="firma.info.accio.flux.firma.finalitzada"/></span>
+					<c:if test="${not empty blocks}">
+						<div class="blocks_container">
+							<div class="signers_container">
+								<div class="block_start_end"><spring:message code="firma.info.accio.flux.inici"/></div>
+								<i class="block_arrow fa fa-ellipsis-v"></i>
+								<c:forEach items="${blocks}" var="block" varStatus="status">
+									<div class="block_container">
+										<c:forEach items="${block.signers}" var="signer">
+											<div class="signer_container signed_${signer.signed}">
+												<c:choose>
+													<c:when test="${not emptysigner.signerNom}">
+															${signer.signerNom} (${signer.signerCodi})
+													</c:when>
+													<c:otherwise>
+														${signer.signerCodi}
+													</c:otherwise>
+												</c:choose><br>
+												${signer.signerId}
+											</div>
+										</c:forEach>
+									</div>
+									<c:if test="${!status.last}">
+										<i class="block_arrow fa fa-arrow-down"></i>
+									</c:if>
+								</c:forEach>
+								<i class="block_arrow fa fa-ellipsis-v"></i>
+								<div class="block_start_end"><spring:message code="firma.info.accio.flux.final"/></div>
+							</div>
+							<div class="leyenda">
+								<div class="leyenda_title"><span><spring:message code="firma.info.accio.flux.llegenda"/></span></div>
+								<div class="leyenda_container">
+									<div class="leyenda_block">
+										<div></div><span><spring:message code="firma.info.accio.flux.bloc"/></span>
+									</div>
+									<div class="leyenda_pendent">
+										<div></div><span><spring:message code="firma.info.accio.flux.firma.pendent"/></span>
+									</div>
+									<div class="leyenda_firmat">
+										<div></div><span><spring:message code="firma.info.accio.flux.firma.finalitzada"/></span>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					</c:if>
 				</div>
 				<div class="buttons_container">
 					<c:if test="${portafirmes.estat == 'ENVIAT'}">
