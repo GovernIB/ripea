@@ -20,7 +20,7 @@ public class PortafirmesDocument {
 	private String custodiaId;
 	private String custodiaUrl;
 	private String arxiuUuid;
-
+	private String expedientUuid;
 
 	public String getTitol() {
 		return titol;
@@ -75,6 +75,12 @@ public class PortafirmesDocument {
 	}
 	public void setArxiuUuid(String arxiuUuid) {
 		this.arxiuUuid = arxiuUuid;
+	}
+	public String getExpedientUuid() {
+		return expedientUuid;
+	}
+	public void setExpedientUuid(String expedientUuid) {
+		this.expedientUuid = expedientUuid;
 	}
 	
 	public String getArxiuExtensio() {

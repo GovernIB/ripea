@@ -153,7 +153,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				signatureRequest.setSignatureBlocks(signatureBlocks);
 				
 				if (isEnviarUrlExpedientPermitida())
-					signatureRequest.setExpedientUrl(getUrlExpedient() + document.getArxiuUuid());
+					signatureRequest.setExpedientUrl(getUrlExpedient() + document.getExpedientUuid());
 				
 				peticioDeFirmaId = getPeticioFirmaAsyncSimpleClient().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
 				//Petició simple

@@ -1876,6 +1876,7 @@ public class PluginHelper {
 				annexos);
 		List<PortafirmesDocument> portafirmesAnnexos = null;
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
+		portafirmesDocument.setExpedientUuid(document.getExpedient().getArxiuUuid());
 		portafirmesDocument.setTitol(document.getNom());
 		portafirmesDocument.setFirmat(
 				false);
