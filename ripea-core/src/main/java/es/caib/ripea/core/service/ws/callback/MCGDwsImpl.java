@@ -59,7 +59,7 @@ public class MCGDwsImpl implements MCGDws {
 			estatEnum = PortafirmesCallbackEstatEnumDto.PAUSAT;
 			break;
 		case 1:
-			estatEnum = PortafirmesCallbackEstatEnumDto.PENDENT;
+			estatEnum = PortafirmesCallbackEstatEnumDto.INICIAT;
 			break;
 		case 2:
 			estatEnum = PortafirmesCallbackEstatEnumDto.FIRMAT;
@@ -82,10 +82,15 @@ public class MCGDwsImpl implements MCGDws {
 		}
 		if (estatEnum != null) {
 			try {
+				String administrationId = null;
+				if (callbackRequest.getApplication().getDocument() != null && callbackRequest.getApplication().getDocument().getSigner() != null)
+					administrationId = callbackRequest.getApplication().getDocument().getSigner().getId();
+				
 				Exception ex = documentService.portafirmesCallback(
 						documentId,
 						estatEnum,
-						motiuRebuig);
+						motiuRebuig,
+						administrationId);
 				if (ex == null) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,

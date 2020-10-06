@@ -28,23 +28,20 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un interessat.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(	name = "ipa_interessat",
 		uniqueConstraints = {
 				@UniqueConstraint(columnNames = {
 						"expedient_id",
-						"document_num",
-						"nom",
-						"llinatge1",
-						"llinatge2",
-						"rao_social",
-						"organ_codi"})})
+						"document_num"})})
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class InteressatEntity extends RipeaAuditable<Long> {
@@ -138,54 +135,6 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@Transient
 	private String municipiNom;
 
-	public Set<DocumentEnviamentInteressatEntity> getDocumentEnviamentInteressats() {
-		return documentEnviamentInteressats;
-	}
-	public InteressatDocumentTipusEnumDto getDocumentTipus() {
-		return documentTipus;
-	}
-	public String getDocumentNum() {
-		return documentNum;
-	}
-	public String getPais() {
-		return pais;
-	}
-	public String getProvincia() {
-		return provincia;
-	}
-	public String getMunicipi() {
-		return municipi;
-	}
-	public String getAdresa() {
-		return adresa;
-	}
-	public String getCodiPostal() {
-		return codiPostal;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public String getTelefon() {
-		return telefon;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public InteressatIdiomaEnumDto getPreferenciaIdioma() {
-		return preferenciaIdioma;
-	}
-	public boolean isNotificacioAutoritzat() {
-		return notificacioAutoritzat;
-	}
-	public boolean isEsRepresentant() {
-		return esRepresentant;
-	}
-	public ExpedientEntity getExpedient() {
-		return expedient;
-	}
-	public InteressatEntity getRepresentant() {
-		return representant;
-	}
 	public Long getRepresentantId() {
 		Long representantId = null;
 		if (representant != null) {
@@ -200,15 +149,11 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		}
 		return representantIdentificador;
 	}
-	public Boolean getEntregaDeh() {
-		return entregaDeh;
-	}
+
 	public void updateEntregaDeh(Boolean entregaDeh) {
 		this.entregaDeh = entregaDeh;
 	}
-	public Boolean getEntregaDehObligat() {
-		return entregaDehObligat;
-	}
+
 	public void updateEntregaDehObligat(Boolean entregaDehObligat) {
 		this.entregaDehObligat = entregaDehObligat;
 	}
@@ -219,26 +164,18 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	public void updateRepresentant(InteressatEntity representant) {
 		this.representant = representant;
 	}
-	public Boolean getIncapacitat() {
-		return incapacitat != null ? incapacitat : false;
-	}
-	public String getPaisNom() {
-		return paisNom;
-	}
 	public void setPaisNom(String paisNom) {
 		this.paisNom = paisNom;
-	}
-	public String getProvinciaNom() {
-		return provinciaNom;
 	}
 	public void setProvinciaNom(String provinciaNom) {
 		this.provinciaNom = provinciaNom;
 	}
-	public String getMunicipiNom() {
-		return municipiNom;
-	}
 	public void setMunicipiNom(String municipiNom) {
 		this.municipiNom = municipiNom;
+	}
+	
+	public Boolean getIncapacitat() {
+		return incapacitat != null ? incapacitat : false;
 	}
 	public abstract String getIdentificador();
 

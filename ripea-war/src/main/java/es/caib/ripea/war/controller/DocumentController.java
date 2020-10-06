@@ -237,10 +237,15 @@ public class DocumentController extends BaseUserController {
 			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
 					entitatActual.getId(),
 					documentId);
-			
+			List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
+					entitatActual.getId(),
+					documentId);
 			model.addAttribute(
 					"portafirmes",
 					portafirmes);
+			model.addAttribute(
+					"blocks", 
+					documentPortafirmesBlocks);
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
@@ -248,19 +253,6 @@ public class DocumentController extends BaseUserController {
 					e.getMessage());
 			}
 		return "portafirmesInfo";
-	}
-
-	@RequestMapping(value = "/{documentId}/portafirmes/blocks")
-	public String portafirmesBlocksInfo(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
-				entitatActual.getId(),
-				documentId);
-		model.addAttribute("blocks", documentPortafirmesBlocks);
-		return "portafirmesBlocksInfo";
 	}
 	
 	@RequestMapping(value = "/{documentId}/viafirma/info", method = RequestMethod.GET)

@@ -43,6 +43,8 @@ if (fluxIframe) {
 			let $comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
 			$comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
 			$comentari.text('');
+			//if flux success text exists
+			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('.form-group').prev('p').remove();
 			
 			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('form').find('.success-label').removeClass('hidden');
 			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('.form-group').before('<p class="success col-xs-8"></p>');

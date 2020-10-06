@@ -388,6 +388,8 @@ public interface DocumentService {
 	 *            Atribut id del document del portafirmes.
 	 * @param estat
 	 *            Nou estat del document.
+	 * @param administrationId
+	 * 			  Identificador de la persona que ha firmat
 	 * @return null si tot ha anat bé o una excepció si s'ha produit algun error
 	 *            al processar el document firmat.
 	 * @throws NotFoundException
@@ -396,7 +398,8 @@ public interface DocumentService {
 	public Exception portafirmesCallback(
 			long documentId,
 			PortafirmesCallbackEstatEnumDto estat,
-			String motiuRebuig) throws NotFoundException;
+			String motiuRebuig,
+			String administrationId) throws NotFoundException;
 
 	/**
 	 * Reintenta la custòdia d'un document firmat amb portafirmes que ha donat

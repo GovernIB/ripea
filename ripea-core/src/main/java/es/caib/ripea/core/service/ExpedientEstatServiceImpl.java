@@ -331,6 +331,9 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "expedientEstatId=" + expedientEstatId + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		ExpedientEstatEntity entity = expedientEstatRepository.findOne(expedientEstatId);
+		if (!entity.getExpedients().isEmpty()) {
+			throw new ValidationException("");
+		}
 		expedientEstatRepository.delete(entity);
 		return conversioTipusHelper.convertir(
 				entity,

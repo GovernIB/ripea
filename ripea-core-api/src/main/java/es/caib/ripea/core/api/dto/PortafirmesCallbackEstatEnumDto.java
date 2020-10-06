@@ -11,7 +11,8 @@ package es.caib.ripea.core.api.dto;
  */
 public enum PortafirmesCallbackEstatEnumDto {
 	PAUSAT,
-	PENDENT,
+	INICIAT,
 	FIRMAT,
-	REBUTJAT
+	REBUTJAT,
+	PARCIAL
 }
