@@ -59,7 +59,7 @@ public class MCGDwsImpl implements MCGDws {
 			estatEnum = PortafirmesCallbackEstatEnumDto.PAUSAT;
 			break;
 		case 1:
-			estatEnum = PortafirmesCallbackEstatEnumDto.PENDENT;
+			estatEnum = PortafirmesCallbackEstatEnumDto.INICIAT;
 			break;
 		case 2:
 			estatEnum = PortafirmesCallbackEstatEnumDto.FIRMAT;

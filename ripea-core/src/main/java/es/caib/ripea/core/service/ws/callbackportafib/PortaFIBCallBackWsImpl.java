@@ -73,7 +73,6 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("documentId", new Long(documentId).toString());
 		accioParams.put("estat", new Integer(estat).toString());
-		
 		DocumentPortafirmesEntity documentPortafirmes = documentPortafirmesRepository.findByPortafirmesId(
 				new Long(documentId).toString());
 		if (documentPortafirmes == null) {
@@ -87,12 +86,13 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 					accioParams, 
 					ex);
 		}
-		
 		PortafirmesCallbackEstatEnumDto estatEnum;
 		switch (estat) {
 		case 0:
+			estatEnum = PortafirmesCallbackEstatEnumDto.INICIAT;
+			break;
 		case 50:
-			estatEnum = PortafirmesCallbackEstatEnumDto.PENDENT;
+			estatEnum = PortafirmesCallbackEstatEnumDto.PARCIAL;
 			if (event.getActor() != null && event.getActor().getAdministrationID() != null) {
 				List<PortafirmesBlockEntity> portafirmesBlocksEntity = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
 				if (portafirmesBlocksEntity != null && !portafirmesBlocksEntity.isEmpty()) {
@@ -124,7 +124,6 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 				logger.debug("Motiu rebuig: " + event.getSigningRequest().getRejectionReason());
 				motiuRebuig = event.getSigningRequest().getRejectionReason();
 			}
-			
 			portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
 			if (portafirmesBlocks != null) {
 				for (PortafirmesBlockEntity portafirmesBlock : portafirmesBlocks) {

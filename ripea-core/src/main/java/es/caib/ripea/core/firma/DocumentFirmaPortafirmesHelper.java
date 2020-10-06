@@ -451,7 +451,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 		return portafirmesBlockDto;
 	}
-	
+
 	public Exception portafirmesCallback(
 			long portafirmesId,
 			PortafirmesCallbackEstatEnumDto callbackEstat,
@@ -467,10 +467,18 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentPortafirmesEntity.class);
 		}
 		logAll(documentPortafirmes, LogTipusEnumDto.PFIRMA_CALLBACK);
-		documentPortafirmes.updateCallbackEstat(callbackEstat);
-		documentPortafirmes.updateMotiuRebuig(motiuRebuig);
-		return portafirmesProcessar(documentPortafirmes);
-	}	
+		// Només actualitzam el estat si l'estat del document a base de dades no és un
+		// estat final (FIRMAT o REBUTJAT).
+		boolean estatFinal = documentPortafirmes.getCallbackEstat() == PortafirmesCallbackEstatEnumDto.FIRMAT || documentPortafirmes.getCallbackEstat() == PortafirmesCallbackEstatEnumDto.REBUTJAT;
+		if (!estatFinal) {
+			documentPortafirmes.updateCallbackEstat(callbackEstat);
+			documentPortafirmes.updateMotiuRebuig(motiuRebuig);
+			return portafirmesProcessar(documentPortafirmes);
+		} else {
+			return null;
+		}
+	}
+
 
 
 	/**

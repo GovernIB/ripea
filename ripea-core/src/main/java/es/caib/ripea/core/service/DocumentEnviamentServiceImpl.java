@@ -6,7 +6,6 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,32 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NotificacioEnviamentDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
-import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
@@ -54,8 +40,6 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
-import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
-import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 
 /**
  * Implementació dels mètodes per a gestionar els enviaments
