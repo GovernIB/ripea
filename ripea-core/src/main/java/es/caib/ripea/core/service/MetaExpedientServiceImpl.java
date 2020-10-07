@@ -310,10 +310,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId) {
-		logger.debug(
-				"Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId +
-						")");
-		return findActiusAmbEntitatPermis(entitatId, new Permission[] { ExtendedPermission.WRITE }, null);
+		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
+		return findActiusAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				null);
 	}
 
 	@Transactional(readOnly = true)

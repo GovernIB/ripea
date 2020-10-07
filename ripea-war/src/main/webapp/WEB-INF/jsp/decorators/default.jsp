@@ -333,6 +333,7 @@ body {
 										<c:if test="${convertirDefinitiu}">
 										<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
 										</c:if>
+										<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 									</ul>
 								</div>
 

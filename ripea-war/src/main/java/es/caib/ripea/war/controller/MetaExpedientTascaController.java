@@ -113,7 +113,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			model.addAttribute(tasca);
 		}
 		
-		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstatByMetaExpedient(
+		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstatsByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
 		
