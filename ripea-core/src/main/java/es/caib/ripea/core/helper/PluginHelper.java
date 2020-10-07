@@ -182,6 +182,8 @@ public class PluginHelper {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	public List<String> rolsUsuariFindAmbCodi(
 			String usuariCodi) {
@@ -3220,7 +3222,7 @@ public class PluginHelper {
 			}
 			
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
-			notificacio.setNumExpedient(expedientEntity.getCodi());
+			notificacio.setNumExpedient(expedientHelper.calcularNumero(expedientEntity));
 			
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
