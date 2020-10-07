@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
@@ -216,18 +217,68 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaNode") MetaNodeEntity metaNode);
 	
 	
-	@Query(	"select" +
+
+	
+	
+	
+	@Query(	"select " +
 			"    e " +
-			"from" +
+			"from " +
 			"    ExpedientEntity e " +
 			"where " +
 			"    e.entitat = :entitat " +
-			"and e.metaNode = :metaNode "
-			+ "and e != :expedient)")
-	List<ExpedientEntity> findByEntitatAndMetaExpedientWithoutGivenExp(
+			"and e.esborrat = 0 " +
+			"and e.estat = 0 " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and e.esborrat = 0 " + 
+			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
+	public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNode") MetaNodeEntity metaNode,
-			@Param("expedient") ExpedientEntity expedient);
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			Pageable pageable);
+	
+	
+	
+	
+	@Query(	"select " +
+			"    e.id " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
+			"and e.estat = 0 " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and e.esborrat = 0 " + 
+			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
+	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi);
+	
+	
+	
 	
 	
 	

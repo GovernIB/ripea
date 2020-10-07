@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -39,6 +40,17 @@ public interface ExpedientEstatService {
 	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId);
 
 	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId);
+	List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(Long entitatId, Long metaExpedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	List<Long> findIdsExpedientsPerCanviEstatMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException;
 
 }

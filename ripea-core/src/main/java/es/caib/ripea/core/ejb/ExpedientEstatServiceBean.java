@@ -9,6 +9,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -79,8 +80,30 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(Long entitatId, Long metaExpedientId) {
-		return delegate.findExpedientEstatByMetaExpedient(entitatId, metaExpedientId);
+	public List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(Long entitatId, Long metaExpedientId) {
+		return delegate.findExpedientEstatsByMetaExpedient(entitatId, metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		return delegate.findExpedientsPerCanviEstatMassiu(
+				entitatId,
+				filtre,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+		return delegate.findIdsExpedientsPerCanviEstatMassiu(
+				entitatId,
+				filtre);
 	}
 
 }
