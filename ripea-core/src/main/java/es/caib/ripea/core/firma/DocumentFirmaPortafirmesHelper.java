@@ -183,7 +183,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							portafirmesBlockInfo.getSignerCodi(),
 							portafirmesBlockInfo.getSignerId(),
 							false).build();
-					this.portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
+					portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
 				}
 				i++;
 			}
