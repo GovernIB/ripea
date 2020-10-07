@@ -228,7 +228,7 @@ $(document).ready(function() {
 											<div class="signer_container signed_${signer.signed}">
 												<c:choose>
 													<c:when test="${not emptysigner.signerNom}">
-															${signer.signerNom} (${signer.signerCodi})
+															${signer.signerNom} <c:if test="${signer.signerCodi != ' '}">(${signer.signerCodi})</c:if>
 													</c:when>
 													<c:otherwise>
 														${signer.signerCodi}
