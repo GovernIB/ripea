@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
@@ -1257,7 +1258,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Page<ExpedientEntity> paginaExpedients;
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
-
+			ordenacioMap.put("tipusStr", new String[] { "metaExpedient.nom", "metaExpedient.classificacioSia" });
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
+			
 			paginaExpedients = expedientRepository.findByEntitatAndFiltre(
 					entitat,
 					metaExpedientsPermesos,
@@ -1293,7 +1296,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					esNullRolsCurrentUser,
 					rolsCurrentUser,
-					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+					pageable);
 
 			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
 					paginaExpedients,

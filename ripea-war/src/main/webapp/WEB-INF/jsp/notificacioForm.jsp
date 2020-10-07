@@ -5,6 +5,14 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<%
+pageContext.setAttribute(
+		"interessatsTipusEnum",
+		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+				 es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class,
+				"interessat.tipus.enum."));
+
+%>
 <c:choose>
 	<c:when test="${empty documentNotificacionsCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
@@ -54,26 +62,281 @@
 </style>
 
 <script>
-	$(document).ready(function() {
-		let parentIframe = window.frameElement;
-		let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
-		
-		$('form').on('submit', function(){
-			window.parent.addLoading(idModal);
-		});
-		
-		$('#tipus').val("NOTIFICACIO");
-		$('#tipus').trigger('change');
+var interessatTipusEnum = [];
+<c:forEach var="tipus" items="${interessatsTipusEnum}">
+	interessatTipusEnum["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+</c:forEach>
 
-		//select and checkbox elements dont have readonly attribute that allows elements to be greyed out but submitted
-		//in order to send disabled values in POST we need to enable them on submit
-		$('#notificacioForm').on('submit', function () {
-		  $(this).find('select').prop('disabled', false);
-		  $(this).find( ".checkbox input" ).prop('disabled', false);
-		});
+$(document).ready(function() {
+	let parentIframe = window.frameElement;
+	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	
+	$('form').on('submit', function(){
+		window.parent.addLoading(idModal);
 	});
+	
+	$('#tipus').val("NOTIFICACIO");
+	$('#tipus').trigger('change');
 
+	//select and checkbox elements dont have readonly attribute that allows elements to be greyed out but submitted
+	//in order to send disabled values in POST we need to enable them on submit
+	$('#notificacioForm').on('submit', function () {
+	  $(this).find('select').prop('disabled', false);
+	  $(this).find( ".checkbox input" ).prop('disabled', false);
+	});
+	
+	$('#interessatsIds').on("change", function (e) {
+		var interessatsSelected = $(this).val();
+		var notificacions = eval(${notificacions});
+		var notificacionsSeleccionades = [];
+		$(notificacions).each(function(index, notificacio) {
+			//if selected
+			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
+	    		notificacionsSeleccionades.push(notificacio);
+			}
+	    });
 
+		mostrarNotificacions(notificacionsSeleccionades);
+	});
+	$('#interessatsIds').trigger('change');
+});
+
+function mostrarNotificacions(notificacions) {
+	var notificacions_container = document.getElementById('container-envios');
+	$(notificacions_container).empty();
+	var notificacio_div = "";
+	$(notificacions).each(function(index, notificacio) {
+		var numCurrentNotificacio = index + 1;
+		notificacio_div += '\
+			<div class="row enviamentsForm formEnviament" style="margin-bottom: 30px"> \
+				<div class="col-md-12"> \
+					<label class="badge badge-light"><spring:message code="notificacio.form.label.notificacio"/> ' + numCurrentNotificacio + '</label> \
+				</div> \
+				<div class="titular"> \
+				<div class="col-md-12 title-envios"> \
+					<div class="title-container"> \
+						<label><spring:message code="enviament.label.titular"/></label> \
+					</div> \
+					<hr/> \
+				</div> \
+				<div class="personaForm"> \
+						<!----  TIPUS INTERESSAT ----> \
+						<div class="col-md-6"> \
+							<div class="form-group"> \
+								<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.tipus"><spring:message code="interessat.form.camp.tipus"/></label> \
+								<div class="controls col-xs-8"> \
+									<select disabled="true" id="enviaments[#num_notificacio#].titular.tipus" name="enviaments[#num_notificacio#].titular.tipus" class="form-control interessat" style="width:100%"> \
+										<option value="' + notificacio.titular.tipus + '">' + interessatTipusEnum[notificacio.titular.tipus] + '</option> \
+									</select> \
+								</div> \
+							</div> \
+						</div> \
+						<!----  NUM. DOCUMENT ----> \
+						<div class="col-md-6"> \
+							<div class="form-group"> \
+								<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.documentNum"><spring:message code="interessat.nifCifDni"/></label> \
+								<div class="col-xs-8"> \
+									<input disabled="true" id="enviaments[#num_notificacio#].titular.documentNum" name="enviaments[#num_notificacio#].titular.documentNum" class="form-control " type="text" value="' + (notificacio.titular.documentNum != null ? notificacio.titular.documentNum : "") +'"> \
+								</div> \
+							</div> \
+						</div> \
+						<!---- NOM / RAÓ SOCIAL ----> \
+						<div class="col-md-6"> \
+							<div class="form-group"> ' +
+								getTipusInteressat(notificacio.titular) + 
+							'</div> \
+						</div>' + 
+						checkIfPersonaFisica(notificacio.titular) +
+						'<!---- EMAIL ----> \
+						<div class="col-md-6"> \
+							<div class="form-group"> \
+								<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.email1"><spring:message code="interessat.form.camp.email"/></label> \
+								<div class="col-xs-8"> \
+									<input disabled="true" id="enviaments[#num_notificacio#].titular.email1" name="enviaments[#num_notificacio#].titular.email1" class="form-control " type="text" value="' + (notificacio.titular.email != null ? notificacio.titular.email : "") +'"> \
+								</div> \
+							</div> \
+						</div> \
+						<!---- TELÈFON ----> \
+						<div class="col-md-6"> \
+							<div class="form-group"> \
+								<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.telefon"><spring:message code="interessat.form.camp.telefon"/></label> \
+								<div class="col-xs-8"> \
+									<input disabled="true" id="enviaments[#num_notificacio#].titular.telefon" name="enviaments[#num_notificacio#].titular.telefon" class="form-control " type="text" value="' + (notificacio.titular.telefon != null ? notificacio.titular.telefon : "") +'"> \
+								</div> \
+							</div> \
+						</div>' +
+						checkIfAdministracio(notificacio.titular) +
+						checkIfPersonafisicaIncapacitat(notificacio) +
+				'</div> \
+			</div>' +
+			setDestinatari(notificacio) +
+		'</div>';
+			
+		notificacio_div = replaceAll(notificacio_div, "#num_notificacio#", index);
+	});
+	$(notificacions_container).append(notificacio_div);
+}
+
+function setDestinatari(notificacio) {
+	if (notificacio.destinatari != null) {
+		return '<!---------------------------------------  DESTINATARI  ---------------------------------------> \
+				<div class="destinatari"> \
+					<div class="col-md-12 title-envios"> \
+						<div class="title-container"> \
+							<label><spring:message code="enviament.label.destinatari"/></label> \
+						</div> \
+						<hr/> \
+					</div> \
+					<div class="personaForm"> \
+							<!----  TIPUS INTERESSAT ----> \
+							<div class="col-md-6"> \
+								<div class="form-group"> \
+									<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].destinatari.tipus"><spring:message code="interessat.form.camp.tipus"/></label> \
+									<div class="controls col-xs-8"> \
+										<select disabled="true" id="enviaments[#num_notificacio#].destinatari.tipus" name="enviaments[#num_notificacio#].destinatari.tipus" class="form-control interessat" style="width:100%"> \
+											<option value="' + notificacio.destinatari.tipus + '">' + interessatTipusEnum[notificacio.destinatari.tipus] + '</option> \
+										</select> \
+									</div> \
+								</div> \
+							</div> \
+							<!----  NUM. DOCUMENT ----> \
+							<div class="col-md-6"> \
+								<div class="form-group"> \
+									<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].destinatari.documentNum"><spring:message code="interessat.nifCifDni"/></label> \
+									<div class="col-xs-8"> \
+										<input disabled="true" id="enviaments[#num_notificacio#].destinatari.documentNum" name="enviaments[#num_notificacio#].destinatari.documentNum" class="form-control " type="text" value="' + (notificacio.destinatari.documentNum != null ? notificacio.destinatari.documentNum : "") +'"> \
+									</div> \
+								</div> \
+							</div> \
+							<!---- NOM / RAÓ SOCIAL ----> \
+							<div class="col-md-6"> \
+								<div class="form-group"> ' +
+									getTipusInteressat(notificacio.destinatari) + 
+								'</div> \
+							</div>' + 
+							checkIfPersonaFisica(notificacio.destinatari) +
+							'<!---- EMAIL ----> \
+							<div class="col-md-6"> \
+								<div class="form-group"> \
+									<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].destinatari.email1"><spring:message code="interessat.form.camp.email"/></label> \
+									<div class="col-xs-8"> \
+										<input disabled="true" id="enviaments[#num_notificacio#].destinatari.email1" name="enviaments[#num_notificacio#].destinatari.email1" class="form-control " type="text" value="' + (notificacio.destinatari.email != null ? notificacio.destinatari.email : "") +'"> \
+									</div> \
+								</div> \
+							</div> \
+							<!---- TELÈFON ----> \
+							<div class="col-md-6"> \
+								<div class="form-group"> \
+									<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].destinatari.telefon"><spring:message code="interessat.form.camp.telefon"/></label> \
+									<div class="col-xs-8"> \
+										<input disabled="true" id="enviaments[#num_notificacio#].destinatari.telefon" name="enviaments[#num_notificacio#].destinatari.telefon" class="form-control " type="text" value="' + (notificacio.destinatari.telefon != null ? notificacio.destinatari.telefon : "") +'"> \
+									</div> \
+								</div> \
+							</div>' +
+							checkIfAdministracio(notificacio.destinatari) +
+							checkIfPersonafisicaIncapacitat(notificacio) +
+					'</div> \
+				</div>';
+	} else {
+		return '';
+	}
+}
+
+function getTipusInteressat(interessat) {
+	switch (interessat.tipus) {
+		case "PERSONA_FISICA":
+			return '<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.nom"><spring:message code="interessat.nomRaoSocial"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].titular.documentNum" name="enviaments[#num_notificacio#].titular.nom" class="form-control " type="text" value="' + (interessat.nom != null ? interessat.nom : "") +'"> \
+					</div>';
+		case 'PERSONA_JURIDICA':
+			return'<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.raoSocial"><spring:message code="interessat.nomRaoSocial"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].titular.raoSocial" name="enviaments[#num_notificacio#].titular.raoSocial" class="form-control " type="text" value="' + (interessat.raoSocial != null ? interessat.raoSocial : "") +'"> \
+					</div>';
+		case 'ADMINISTRACIO':
+			return '<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.organNom"><spring:message code="interessat.nomRaoSocial"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].titular.organNom" name="enviaments[#num_notificacio#].titular.organNom" class="form-control " type="text" value="' + (interessat.organNom != null ? interessat.organNom : "") +'"> \
+					</div>';
+	}
+}
+
+function checkIfPersonaFisica (interessat) {
+	if (interessat.tipus == "PERSONA_FISICA") {
+			return '<!---- PRIMER LLINATGE ----> \
+					<div class="col-md-6 llinatge1"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.llinatge1"><spring:message code="interessat.form.camp.llinatge1"/></label> \
+							<div class="col-xs-8"> \
+								<input disabled="true" id="enviaments[#num_notificacio#].titular.llinatge1" name="enviaments[#num_notificacio#].titular.llinatge1" class="form-control " type="text" value="' + (interessat.llinatge1 != null ? interessat.llinatge1 : "") +'"> \
+							</div> \
+						</div> \
+					</div> \
+					<!---- SEGON LLINATGE ----> \
+					<div class="col-md-6 llinatge2"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.llinatge2"><spring:message code="interessat.form.camp.llinatge2"/></label> \
+							<div class="col-xs-8"> \
+								<input disabled="true" id="enviaments[#num_notificacio#].titular.llinatge2" name="enviaments[#num_notificacio#].titular.llinatge2" class="form-control " type="text" value="' + (interessat.llinatge2 != null ? interessat.llinatge2 : "") +'"> \
+							</div> \
+						</div> \
+					</div>';
+	} else {
+		return '';
+	}
+}
+
+function checkIfAdministracio(interessat) {
+	if (interessat.tipus == "ADMINISTRACIO") {
+		return '<!---- CODI DIR3 ----> \
+				<div class="col-md-6"> \
+					<div class="form-group"> \
+						<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.organCodi"><spring:message code="interessat.dir3codi"/></label> \
+						<div class="col-xs-8"> \
+							<input disabled="true" id="enviaments[#num_notificacio#].titular.organCodi" name="enviaments[#num_notificacio#].titular.organCodi" class="form-control " type="text" value="' + (interessat.organCodi != null ? interessat.organCodi : "") +'"> \
+						</div> \
+					</div> \
+				</div>';
+	} else {
+		return '';
+	}
+}
+
+function checkIfPersonafisicaIncapacitat(notificacio) {
+	if (notificacio.titular.tipus == "PERSONA_FISICA") {
+		return '<!---- INCAPACITAT ----> \
+				<div class="col-md-6"> \
+					<div class="form-group"> \
+						<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.incapacitat"><spring:message code="interessat.form.camp.incapacitat"/></label> \
+						<div class="controls col-xs-8"> \
+							<div class="checkbox"> \
+								<label> \
+									<input disabled="true" type="checkbox" id="enviaments[#num_notificacio#].titular.incapacitat" name="enviaments[#num_notificacio#].titular.incapacitat" class="span12" type="text" value="' + (notificacio.titular.incapacitat != null ? notificacio.titular.incapacitat : "") +'"> \
+								</label> \
+							</div> \
+						</div>' +
+						checkIfIncapacitat(notificacio) +
+					'</div> \
+				</div>'
+	} else {
+		return '';
+	}
+}
+
+function checkIfIncapacitat(notificacio) {
+	if (notificacio.titular.incapacitat && (notificacio.destinatari == null || notificacio.destinatari == '')) {
+		return '<div class="alert alert-danger"> \
+					<spring:message code="interessat.form.camp.incapacitat.error.nodestinatari"/> \
+				</div>'
+	} else {
+		return '';
+	}
+}
+
+function replaceAll(string, search, replace) {
+	return string.split(search).join(replace);
+}
 
 </script>
 </head>
@@ -105,8 +368,12 @@
 				</c:choose>
 				<!----  ESTAT   ------->
 				<rip:inputSelect disabled="true" labelSize="2" name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+				<!----  TITULARS   ------->
+				<rip:inputSelect required="true" labelSize="2" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari"/>
 				<!---  CONCEPTE   ---->
 				<rip:inputText labelSize="2" name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
+				<!---- TIPUS DE SERVEI  ------->	
+				<rip:inputSelect labelSize="2" required="true" name="serveiTipusEnum" optionItems="${serveiTipusEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="notificacio.form.camp.serveiTipus" />
 				<!---  OBSERVACIONS   --->
 				<rip:inputTextarea labelSize="2" name="observacions" textKey="notificacio.form.camp.descripcio"/>
 				<!----  DATA PROGRAMADA   ----->
@@ -115,195 +382,19 @@
 				<rip:inputDate labelSize="2" name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
 				<!---  RETARD  ------->
 				<rip:inputNumber labelSize="2" name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
-
+				<c:if test="${entregaPostal}">
+					<rip:inputCheckbox labelSize="2" name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
+				</c:if>
 
 				<!--------------------------------------------------------  ENVIAMENTS  ------------------------------------------------------------>
 				<div class="container-fluid">
 					<div class="title">
-						<span class="fa fa-vcard"></span> <label><spring:message
-								code="notificacio.form.camp.enviaments" /></label>
+						<span class="fa fa-vcard"></span> <label><spring:message code="notificacio.form.camp.enviaments" /></label>
 						<hr />
 					</div>
-
-					<div class="container-envios">
-						<c:forEach items="${documentNotificacionsCommand.enviaments}" var="enviament"
-							varStatus="status">
-							<c:set var="i" value="${status.index}" />
-							<div class="row enviamentsForm formEnviament enviamentForm_${i}" style="margin-bottom: 30px">
-								<div class="col-md-12">
-									<label class="envio[${i+1}] badge badge-light"><spring:message code="notificacio.form.label.notificacio"/> ${i+1}</label>
-								</div>
-									
-								<!-----------------------------------  TIPUS DE SERVEI  --------------------------------->	
-								<rip:inputSelect labelSize="2" required="true" name="enviaments[${i}].serveiTipusEnum" optionItems="${serveiTipusEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="notificacio.form.camp.serveiTipus" />
-
-
-								<!---------------------------------------  TITULAR  --------------------------------------->	
-								<div class="titular">
-									<div class="col-md-12 title-envios">
-										<div class="title-container">
-											<label><spring:message code="enviament.label.titular"/></label>
-										</div>
-										<hr/>
-									</div>
-									<div class="personaForm">
-										<div>
-											<rip:inputHidden name="enviaments[${i}].titular.id" />
-											<!----  TIPUS INTERESSAT ---->
-											<div class="col-md-6">
-												<rip:inputSelect disabled="true" name="enviaments[${i}].titular.tipus" textKey="interessat.form.camp.tipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-												<input type="hidden" name="enviaments[${i}].titular.tipus" />
-											</div>
-											<!---- NIF ---->
-											<div class="col-md-6">
-												<rip:inputText readonly="true" name="enviaments[${i}].titular.documentNum" textKey="interessat.nifCifDni"/>
-											</div>
-											<!---- NOM / RAÓ SOCIAL ---->
-											<div class="col-md-6">
-												<c:choose>
-												<c:when test="${enviament.titular.tipus=='PERSONA_FISICA'}">
-													<rip:inputText readonly="true" name="enviaments[${i}].titular.nom" textKey="interessat.nomRaoSocial" required="true" />
-												</c:when>
-												<c:when test="${enviament.titular.tipus=='PERSONA_JURIDICA'}">
-													<rip:inputText readonly="true" name="enviaments[${i}].titular.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
-												</c:when>
-												<c:when test="${enviament.titular.tipus=='ADMINISTRACIO'}">
-													<rip:inputText readonly="true" name="enviaments[${i}].titular.organNom" textKey="interessat.nomRaoSocial" required="true" />
-												</c:when>													
-												</c:choose>
-											</div>
-											<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
-												<!---- PRIMER LLINATGE ---->										
-												<div class="col-md-6 llinatge1">
-													<rip:inputText readonly="true" name="enviaments[${i}].titular.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
-												</div>
-												<!---- SEGON LLINATGE ---->
-												<div class="col-md-6 llinatge2">
-													<rip:inputText readonly="true" name="enviaments[${i}].titular.llinatge2" textKey="interessat.form.camp.llinatge2" />
-												</div>
-											</c:if>
-											<!---- EMAIL ---->
-											<div class="col-md-6">
-												<rip:inputText readonly="true" name="enviaments[${i}].titular.email" textKey="interessat.form.camp.email" />
-											</div>
-											<!---- TELÈFON ---->
-											<div class="col-md-6">
-												<rip:inputText readonly="true" name="enviaments[${i}].titular.telefon" textKey="interessat.form.camp.telefon" />
-											</div>
-											<!---- CODI DIR3 ---->
-											<c:if test="${enviament.titular.tipus=='ADMINISTRACIO'}">
-												<div class="col-md-6">
-													<rip:inputText readonly="true" name="enviaments[${i}].titular.organCodi" textKey="interessat.dir3codi" required="true"/>
-												</div>
-											</c:if>
-											<!---- INCAPACITAT ---->
-											<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
-												<div class="col-md-6">
-													<rip:inputCheckbox disabled="true" name="enviaments[${i}].titular.incapacitat" textKey="interessat.form.camp.incapacitat" />
-													<c:if test="${enviament.titular.incapacitat==true && empty enviament.destinatari}">
-														<div class="alert alert-danger">
-															<spring:message code="interessat.form.camp.incapacitat.error.nodestinatari"/>
-														</div>
-													</c:if>
-												</div>
-											</c:if>
-										</div>
-									</div>
-								</div>
-								
-								<!---------------------------------------  DESTINATARI  --------------------------------------->	
-								<c:if test="${not empty enviament.destinatari}">
-									<div class="destinatari">
-										<div class="col-md-12 title-envios">
-											<div class="title-container">
-												<label><spring:message code="enviament.label.destinatari"/></label>
-											</div>
-											<hr/>
-										</div>
-										<div class="personaForm">
-											<div>
-												<rip:inputHidden name="enviaments[${i}].destinatari.id" />
-												<!----  TIPUS INTERESSAT ---->
-												<div class="col-md-6">
-													<rip:inputSelect disabled="true" name="enviaments[${i}].destinatari.tipus" textKey="interessat.form.camp.tipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-												</div>
-												<!---- NIF ---->
-												<div class="col-md-6">
-													<rip:inputText readonly="true" name="enviaments[${i}].destinatari.documentNum" textKey="interessat.nifCifDni"/>
-												</div>
-												<!---- NOM / RAÓ SOCIAL ---->
-												<div class="col-md-6">
-													<c:choose>
-													<c:when test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
-														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.nom" textKey="interessat.nomRaoSocial" required="true" />
-													</c:when>
-													<c:when test="${enviament.destinatari.tipus=='PERSONA_JURIDICA'}">
-														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.raoSocial" textKey="interessat.nomRaoSocial" required="true" />
-													</c:when>
-													<c:when test="${enviament.destinatari.tipus=='ADMINISTRACIO'}">
-														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.nomRaoSocial" required="true" />
-													</c:when>													
-													</c:choose>
-												</div>
-												<c:if test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
-													<!---- PRIMER LLINATGE ---->										
-													<div class="col-md-6 llinatge1">
-														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.llinatge1" textKey="interessat.form.camp.llinatge1" required="true" />
-													</div>
-													
-													<!---- SEGON LLINATGE ---->
-													<div class="col-md-6 llinatge2">
-														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.llinatge2" textKey="interessat.form.camp.llinatge2" />
-													</div>
-												</c:if>
-												<!---- EMAIL ---->
-												<div class="col-md-6">
-													<rip:inputText readonly="true" name="enviaments[${i}].destinatari.email" textKey="interessat.form.camp.email" />
-												</div>
-												
-												<!---- TELÈFON ---->
-												<div class="col-md-6">
-													<rip:inputText readonly="true" name="enviaments[${i}].destinatari.telefon" textKey="interessat.form.camp.telefon" />
-												</div>
-												<!---- CODI DIR3 ---->
-												<c:if test="${enviament.destinatari.tipus=='ADMINISTRACIO'}">
-													<div class="col-md-6">
-														<rip:inputText readonly="true" name="enviaments[${i}].destinatari.organNom" textKey="interessat.dir3codi" required="true"/>
-													</div>
-												</c:if>
-												<!---- INCAPACITAT ---->
-												<c:if test="${enviament.destinatari.tipus=='PERSONA_FISICA'}">
-													<div class="col-md-6">
-														<rip:inputCheckbox disabled="true" name="enviaments[${i}].destinatari.incapacitat" textKey="interessat.form.camp.incapacitat" />
-													</div>
-												</c:if>
-											</div>
-										</div>
-									</div>								
-								</c:if>
-								
-								<!-------------------------------------  MÈTODE ENVIO  ----------------------------------->	
-								<c:if test="${enviament.titular.tipus=='PERSONA_FISICA'}">
-									<div class="metodeEntrega">
-										<div class="col-md-12 title-envios">
-											<div class="title-container entrega">
-												<label><spring:message code="enviament.label.metodeEnvio"/></label>
-											</div>
-											<hr />
-										</div>
-										<div class="col-md-12">
-											<rip:inputCheckbox labelSize="2" name="enviaments[${i}].entregaPostal"
-												textKey="notificacio.form.camp.entregaPostal" />
-										</div>
-									</div>
-								</c:if>
-							</div>
-						</c:forEach>
-					</div>
+					<div id="container-envios"></div>
 				</div>
 			</div>
-			
-			
 			
 <!-- 			<div role="tabpanel" class="tab-pane" id="annexos"> -->
 <%-- 				<rip:inputSelect name="annexos" textKey="notificacio.form.camp.annexos" optionItems="${annexos}" emptyOption="true" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.form.camp.annexos"/> --%>

@@ -20,7 +20,6 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NotificacioEnviamentDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
@@ -76,17 +75,19 @@ public class DocumentNotificacioHelper {
 	@Autowired
 	private ContingutHelper contingutHelper;
 	
-	public void crear(DocumentNotificacioDto notificacioDto, DocumentEntity documentEntity) {
+	public void crear(
+			DocumentNotificacioDto notificacioDto, 
+			DocumentEntity documentEntity) {
 //		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
-		for (NotificacioEnviamentDto notificacioEnviamentDto : notificacioDto.getEnviaments()) {
+		for (Long interessatId : notificacioDto.getInteressatsIds()) {
 			
 			InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
 					expedientEntity,
-					notificacioEnviamentDto.getTitular().getId());
-			notificacioDto.setServeiTipusEnum(notificacioEnviamentDto.getServeiTipusEnum());
-			notificacioDto.setEntregaPostal(notificacioEnviamentDto.getEntregaPostal());
+					interessatId);
+			notificacioDto.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());
+			notificacioDto.setEntregaPostal(notificacioDto.isEntregaPostal());
 			
 			RespostaEnviar respostaEnviar = new RespostaEnviar();
 //			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
@@ -114,8 +115,9 @@ public class DocumentNotificacioHelper {
 			documentNotificacioRepository.save(notificacioEntity);
 			
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity;
-			documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(interessat, 
-																							 notificacioEntity).build();
+			documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(
+					interessat, 
+					notificacioEntity).build();
 			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
 			
 //			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
