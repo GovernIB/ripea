@@ -42,6 +42,8 @@ public class InteressatNoRepetitValidator implements ConstraintValidator<Interes
 		try {
 			
 			InteressatCommand interessat = (InteressatCommand)value;
+			if (interessat.getId() != null)
+				return true;
 			List<InteressatDto> interessats = expedientInteressatService.findByExpedientAndDocumentNum(interessat.getDocumentNum(), interessat.getExpedientId());
 			return interessats.isEmpty();
 			
