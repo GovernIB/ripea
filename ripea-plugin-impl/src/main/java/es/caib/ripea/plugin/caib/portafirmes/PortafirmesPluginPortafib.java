@@ -67,6 +67,7 @@ import es.caib.portafib.ws.api.v1.PortaFIBPeticioDeFirmaWsService;
 import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWs;
 import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
 import es.caib.portafib.ws.api.v1.TipusDocumentInfoWs;
+import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
 import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
 import es.caib.portafib.ws.api.v1.utils.PeticioDeFirmaUtils;
 import es.caib.ripea.plugin.SistemaExternException;
@@ -524,12 +525,21 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					
 					for (FirmaBean firmaBean : blocDeFirmesWs.getFirmes()) {
 						PortafirmesBlockSignerInfo signer = new PortafirmesBlockSignerInfo();
-						String usuariPersonaId = getUsuariEntitatWs().getUsuariEntitat(firmaBean.getDestinatariID()).getUsuariPersonaID();
-						UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
-						signer.setSignerId(usuariPersona.getNif());
-						signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-						signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
-						signers.add(signer);
+						UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(firmaBean.getDestinatariID());
+						if (usuariEntitat != null) {
+							String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
+							UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+							if (usuariPersona != null) {
+								signer.setSignerId(usuariPersona.getNif());
+								signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+								signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+								signers.add(signer);
+							} else {
+								throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+							}
+						} else {
+							throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + firmaBean.getDestinatariID());
+						}
 					}
 					portafirmesBlock.setSigners(signers);
 					portafirmesBlocks.add(portafirmesBlock);
@@ -569,11 +579,20 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 								signer.setSignerId(flowTemplateSimpleSignature.getSigner().getAdministrationID());				
 								signer.setSignerCodi(flowTemplateSimpleSignature.getSigner().getUsername());
 							} else {
-								String usuariPersonaId = getUsuariEntitatWs().getUsuariEntitat(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername()).getUsuariPersonaID();
-								UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
-								signer.setSignerId(usuariPersona.getNif());
-								signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-								signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+								UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
+								if (usuariEntitat != null) {
+									String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
+									UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+									if (usuariPersona != null) {
+										signer.setSignerId(usuariPersona.getNif());
+										signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+										signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+									} else {
+										throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+									}
+								} else {
+									throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
+								}
 							}
 							signers.add(signer);
 						}
