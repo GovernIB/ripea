@@ -9,11 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -25,7 +26,6 @@ import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -41,6 +41,7 @@ import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 @Service
@@ -68,6 +69,9 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private UsuariRepository usuariRepository;
+	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -462,11 +466,14 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				null);
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
 		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
 					entitat,
+					usuariActual,
 					metaExpedientsPermesos, 
 					metaExpedient == null,
 					metaExpedient,
@@ -533,11 +540,14 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				null);
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
 		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
 					entitat,
+					usuariActual,
 					metaExpedientsPermesos,
 					metaExpedient == null,
 					metaExpedient,

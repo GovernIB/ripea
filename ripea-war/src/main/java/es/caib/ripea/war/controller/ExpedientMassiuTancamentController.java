@@ -1,12 +1,8 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,28 +21,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.command.ExpedientMassiuCanviEstatCommand;
+import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
- * Controlador per canvi estat massiu del expedients
+ * Controlador per tancament massiu d'expedients
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/massiu/canviEstat")
-public class ExpedientMassiuCanviEstatController extends BaseUserOAdminController {
+@RequestMapping("/massiu/tancament")
+public class ExpedientMassiuTancamentController extends BaseUserOAdminController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientCanviEstatMassiuController.session.filtre";
-	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientCanviEstatMassiuController.session.seleccio";
+	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientMassiuTancamentController.session.filtre";
+	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientMassiuTancamentController.session.seleccio";
 
 
 	@Autowired
@@ -54,9 +47,6 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 	@Autowired
 	private ExpedientService expedientService;
 
-	
-	@Autowired
-	private ExpedientEstatService expedientEstatService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -78,7 +68,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId()));
 
-		return "expedientMassiuCanviEstatList";
+		return "expedientMassiuTancamentList";
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -94,7 +84,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 					filtreCommand);
 		}
 		
-		return "redirect:/massiu/canviEstat";
+		return "redirect:/massiu/tancament";
 	}
 	
 
@@ -110,7 +100,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
-					 expedientEstatService.findExpedientsPerCanviEstatMassiu(
+					 expedientService.findExpedientsPerTancamentMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request)),
@@ -148,7 +138,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 			seleccio.addAll(
-					expedientEstatService.findIdsExpedientsPerCanviEstatMassiu(
+					expedientService.findIdsExpedientsPerTancamentMassiu(
 							entitatActual.getId(),
 							ContingutMassiuFiltreCommand.asDto(filtreCommand)));
 		}
@@ -183,13 +173,16 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 	
 	
 	
+	
+	
+	
+	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/canviarEstat", method = RequestMethod.GET)
+	@RequestMapping(value = "/tancar", method = RequestMethod.GET)
 	public String canviarEstatGet(
 			HttpServletRequest request,
 			Model model) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
@@ -202,39 +195,30 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 					"accio.massiva.seleccio.buida");
 		}
 		
-		ExpedientDto oneOfSelectedExpedients = expedientService.findById(entitatActual.getId(), seleccio.iterator().next());
-
-		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstatsByMetaExpedient(
-				entitatActual.getId(),
-				oneOfSelectedExpedients.getMetaExpedient().getId());
-		ExpedientEstatDto expedientEstatObert = new ExpedientEstatDto();
-		expedientEstatObert.setNom("OBERT");
-		expedientEstats.add(0, expedientEstatObert);
-		model.addAttribute(
-				"expedientEstats",
-				expedientEstats);
-		
-		
-		ExpedientMassiuCanviEstatCommand command = new ExpedientMassiuCanviEstatCommand();
+		ExpedientMassiuTancamentCommand command = new ExpedientMassiuTancamentCommand();
 		model.addAttribute(command);
-	
 		
-		return "expedientMassiuCanviEstatForm";
+		return "expedientMassiuTancamentForm";
 	}
 	
 	
+	
+	
+
+	
+	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/canviarEstat", method = RequestMethod.POST)
+	@RequestMapping(value = "/tancar", method = RequestMethod.POST)
 	public String canviarEstatPost(
 			HttpServletRequest request,
-			ExpedientMassiuCanviEstatCommand command,
+			@Valid ExpedientMassiuTancamentCommand command,
 			BindingResult bindingResult,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 
-			return "expedientEstatsForm";
+			return "expedientMassiuTancamentForm";
 		}
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -242,21 +226,25 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 				SESSION_ATTRIBUTE_SELECCIO);
 		
 		for (Long expedientId : seleccio) {
-			expedientEstatService.changeEstatOfExpedient(
+			expedientService.tancar(
 					entitatActual.getId(),
 					expedientId,
-					command.getExpedientEstatId()
-					);
+					command.getMotiu(),
+					null);
+			
 		}
 		
+		seleccio.clear();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO,
+				seleccio);
 		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../expedient",
-				"expedient.controller.estatsModificats.ok");
+				"expedient.controller.tancar.massiu.ok");
 	}
-	
-	
 	
 	
 	

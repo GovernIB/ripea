@@ -14,6 +14,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -299,5 +300,25 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.exportIndexExpedient(
 				entitatId,
 				expedientId);
+	}
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		return delegate.findExpedientsPerTancamentMassiu(
+				entitatId,
+				filtre,
+				paginacioParams);
+	}
+	@Override
+	@RolesAllowed("tothom")
+	public List<Long> findIdsExpedientsPerTancamentMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+		return delegate.findIdsExpedientsPerTancamentMassiu(
+				entitatId,
+				filtre);
 	}
 }
