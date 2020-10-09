@@ -761,10 +761,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 			// Eliminam de l'expedient els esborranys que no s'han firmat
 			for (DocumentEntity esborrany : esborranys) {
 				boolean trobat = false;
-				for (Long documentPerFirmarId : documentsPerFirmar) {
-					if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
-						trobat = true;
-						break;
+				if (documentsPerFirmar != null) {
+					for (Long documentPerFirmarId : documentsPerFirmar) {
+						if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
+							trobat = true;
+							break;
+						}
 					}
 				}
 				if (!trobat) {
