@@ -21,55 +21,67 @@
 let fluxIframe = window.frameElement;
 
 if (fluxIframe) {
-	let idFlux = "${fluxId}";
-	let FluxError = "${FluxError}";
-	let FluxCreat = "${FluxCreat}";
-	let FluxNom = "${FluxNom}";
-	let alertDiv;
+	const idTransaccioFlux = "${fluxId}";
+	const fluxErrorDesc = "${FluxError}";
+	const fluxSuccesDesc = "${FluxCreat}";
+	const fluxCreatedNom = "${FluxNom}";
+	const $modalFlux = $(fluxIframe.parentElement.parentElement).prev();
+	var alertDiv;
 	
-	if (idFlux != null && idFlux != '') {
-		//$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').val(idFlux);
-		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').append("<option value=\"" + idFlux + "\" selected>" + FluxNom + "</option>");
-	} else if (FluxError != null && FluxError != '') {
-		alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxError + '</span></div>';
-		if (localStorage.getItem('transaccioId') == null && localStorage.getItem('transaccioId') == '') 
-			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesFluxId').attr('disabled', false);
+	if (idTransaccioFlux != null && idTransaccioFlux != '') {
+		var successMessage = "<option value=\"" + idTransaccioFlux + "\" selected>" + fluxCreatedNom + "</option>";
+		$modalFlux.find('#portafirmesFluxId').append(successMessage);
+	} else if (fluxErrorDesc != null && fluxErrorDesc != '') {
+		alertDiv = '<div class="alert alert-danger" role="alert"> \
+						<a class="close" data-dismiss="alert">×</a> \
+						<span>' + fluxErrorDesc + '</span> \
+					</div>';
+		//desactivar selecció si s'ha creat un nou flux
+		if (localStorage.getItem('transaccioId') == null && localStorage.getItem('transaccioId') == '') {
+			$modalFlux.find('#portafirmesFluxId').attr('disabled', false);
+		}
+
+		$modalFlux.find(".portafirmesEnviarFluxId_btn_addicional").find('i').addClass('fa-eye').removeClass('fa-eye-slash');
 	}
-	if (FluxCreat != null && FluxCreat != '') {
-		//
-		$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').attr('disabled', true);
-		alertDiv = '<div class="alert alert-success" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + FluxCreat + '</span>';
-		if ((FluxNom != null && FluxNom != '')) {
-			let $comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
-			$comentari = $(fluxIframe.parentElement.parentElement).prev().find('.comentari');
+	if (fluxSuccesDesc != null && fluxSuccesDesc != '') {
+		$modalFlux.find('#portafirmesEnviarFluxId').empty();
+		$modalFlux.find('#portafirmesEnviarFluxId').attr('disabled', true);
+		//desactivar botó de visualitzar
+		$modalFlux.find('.portafirmesEnviarFluxId_btn_addicional').attr('disabled', true);
+		alertDiv = '<div class="alert alert-success" role="alert"> \
+						<a class="close" data-dismiss="alert">×</a> \
+						<span>' + fluxSuccesDesc + '</span> \
+					</div>';
+		if ((fluxCreatedNom != null && fluxCreatedNom != '')) {
+			var $comentari = $modalFlux.find('.comentari');
+			$comentari = $modalFlux.find('.comentari');
 			$comentari.text('');
 			//if flux success text exists
-			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('.form-group').prev('p').remove();
+			$modalFlux.find('#portafirmesEnviarFluxId').closest('.form-group').prev('p').remove();
+			$modalFlux.find('#portafirmesEnviarFluxId').closest('form').find('.success-label').removeClass('hidden');
+			$modalFlux.find('#portafirmesEnviarFluxId').closest('.form-group').before('<p class="success col-xs-8"></p>');
 			
-			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('form').find('.success-label').removeClass('hidden');
-			$(fluxIframe.parentElement.parentElement).prev().find('#portafirmesEnviarFluxId').closest('.form-group').before('<p class="success col-xs-8"></p>');
-			let $success =  $(fluxIframe.parentElement.parentElement).prev().find('.success');
-			
+			var $success =  $modalFlux.find('.success');
 			var text = '<spring:message code='contingut.document.form.camp.portafirmes.flux.seleccionat'/>';
-			$success.html(text + " <span>" + FluxNom + "</span>");
+			$success.html(text + " <span>" + fluxCreatedNom + "</span>");
 			$success.css('color', '#3c763d');
 			$success.find('span').css('font-weight', 'bold');
 		}
 	}
-	$(fluxIframe.parentElement.parentElement).prev().removeClass('hidden');
-	$(fluxIframe.parentElement.parentElement).prev().find('.alert').remove();
-	$(fluxIframe.parentElement.parentElement).prev().prepend(alertDiv);
+	$modalFlux.removeClass('hidden');
+	$modalFlux.find('.alert').remove();
+	$modalFlux.prepend(alertDiv);
 	
 	//Adjust modal width/height
-	adjustModalPerFluxRemove(FluxNom);
+	adjustModalPerFluxRemove(fluxCreatedNom);
 	$(fluxIframe.parentElement).trigger('remove');
 }
 
-function adjustModalPerFluxRemove(FluxNom) {
+function adjustModalPerFluxRemove(fluxCreatedNom) {
 	webutilModalAdjustHeight();
 	let $iframe = $(window.parent.frameElement);
 	let height = localStorage.getItem('currentIframeHeight');
-	$iframe.css('height', height =! null ? height : '50vh');
+	$iframe.css('height', (height =! null) ? height : '50vh');
 	$iframe.parent().css('height', 'auto');
 	$iframe.closest('div.modal-content').css('height',  '');
 	$iframe.closest('div.modal-dialog').css({
@@ -80,7 +92,7 @@ function adjustModalPerFluxRemove(FluxNom) {
 	$iframe.closest('div.modal-lg').css('width', '900px');
 
 	$iframe.parent().next().removeClass('hidden');
-	if ($iframe.parent().next().find('button').hasClass('disabled') && (FluxNom != null && FluxNom != '')) {
+	if ($iframe.parent().next().find('button').hasClass('disabled') && (fluxCreatedNom != null && fluxCreatedNom != '')) {
 		$iframe.parent().next().find('button').removeClass("disabled");
 	}
 	localStorage.removeItem('currentIframeHeight');
