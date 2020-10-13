@@ -1133,7 +1133,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String[] fila = new String[numColumnes];
 			fila[0] = expedientHelper.calcularNumero(expedient);
 			fila[1] = expedient.getNom();
-			fila[2] = expedient.getEstat().name();
+			if (expedient.getExpedientEstat() != null && expedient.getEstat() != ExpedientEstatEnumDto.TANCAT) {
+				fila[2] = expedient.getExpedientEstat().getNom();
+			} else {
+				fila[2] = expedient.getEstat().name();
+			}
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
 			fila[4] = expedient.getNtiIdentificador();
 			if (!dades.isEmpty()) {
@@ -1144,17 +1148,29 @@ public class ExpedientServiceImpl implements ExpedientService {
 						int dadesIndexIncrement = 1;
 						while (dadaActual.getNode().getId().equals(expedient.getId())) {
 							if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
-								break;
+ 								break;
 							}
 							dadaActual = dades.get(dadesIndex + dadesIndexIncrement++);
 						}
 						if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
 							fila[5 + i] = dadaActual.getValorComString();
+						} else {
+							dadaActual = dades.get(dadesIndex);
 						}
 					}
 				}
+				DadaEntity dada = dades.get(dadesIndex);
+				while (dada.getNode().getId().equals(expedient.getId())) {
+					dadesIndex++;
+					if (dadesIndex == dades.size()) {
+						break;
+					}
+					dada = dades.get(dadesIndex);
+				}
 			}
 			files.add(fila);
+			
+			
 		}
 		FitxerDto fitxer = new FitxerDto();
 		if ("ODS".equalsIgnoreCase(format)) {
