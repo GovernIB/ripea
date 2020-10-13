@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -417,4 +418,14 @@ public interface ExpedientService {
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
 			Long expedientId) throws IOException;
+
+	@PreAuthorize("hasRole('tothom')")
+	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<Long> findIdsExpedientsPerTancamentMassiu(Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException;
 }

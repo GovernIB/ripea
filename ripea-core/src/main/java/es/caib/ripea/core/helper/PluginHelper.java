@@ -3925,6 +3925,12 @@ public class PluginHelper {
 					firma.setCsvRegulacio(firmaDto.getCsvRegulacio());
 					document.getFirmes().add(firma);
 				}
+				contingut = new DocumentContingut();
+				contingut.setArxiuNom(fitxer.getNom());
+				contingut.setContingut(fitxer.getContingut());
+				contingut.setTipusMime(fitxer.getContentType());
+				document.setContingut(contingut);
+				
 			}
 			if (getPropertyArxiuMetadadesAddicionalsActiu()) {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();

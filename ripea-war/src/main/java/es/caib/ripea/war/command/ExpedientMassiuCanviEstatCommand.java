@@ -4,7 +4,7 @@
 package es.caib.ripea.war.command;
 
 /**
- * Command per canvi massiu del estat del expedients.
+ * Command per canvi massiu d'estat d'expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
