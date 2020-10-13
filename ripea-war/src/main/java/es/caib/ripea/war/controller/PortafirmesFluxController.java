@@ -4,7 +4,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -44,32 +43,43 @@ public class PortafirmesFluxController extends BaseUserController {
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
 	
-	
 	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
+			Model model) {
+		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
+//		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
+//		String descripcio = getMessage(
+//				request, 
+//				"document.controller.portafirmes.flux.desc");
+
+		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
+		try {
+			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
+					urlReturn,
+					false);
+		} catch (Exception ex) {
+			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
+			transaccioResponse.setError(true);
+			transaccioResponse.setErrorDescripcio(ex.getMessage());
+		}
+		return transaccioResponse;
+	}
+	
+	@RequestMapping(value = "/portafirmes/flux/mostrar", method = RequestMethod.GET)
+	@ResponseBody
+	public PortafirmesIniciFluxRespostaDto mostrarFlux(
+			HttpServletRequest request,
 			@RequestParam(value = "plantillaId", required = false) String plantillaId,
 			Model model) {
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
-		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
-		String descripcio = getMessage(
-				request, 
-				"document.controller.portafirmes.flux.desc");
-		
-		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
 		try {
 			if (plantillaId != null && !plantillaId.isEmpty()) {
 				transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 				String urlEdicio = portafirmesFluxService.recuperarUrlMostrarPlantilla(plantillaId);
 				transaccioResponse.setUrlRedireccio(urlEdicio);
-			} else {
-				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
-						urlReturn,
-						nomCodificat,
-						descripcio,
-						false);
 			}
 		} catch (Exception ex) {
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();

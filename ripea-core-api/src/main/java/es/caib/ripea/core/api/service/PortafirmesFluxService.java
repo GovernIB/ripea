@@ -31,8 +31,6 @@ public interface PortafirmesFluxService {
 	@PreAuthorize("hasRole('tothom')")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
-			String documentNom,
-			String descripcio,
 			boolean isPlantilla) throws SistemaExternException;
 	
 	/**

@@ -69,14 +69,19 @@
 	border-radius: 4px;
 	padding: 2%;
 	margin: 1%;
+	border: 1px solid #2FF000;
 }
 
-.signed_false {
-	background-color: #67bdff;
+.pendent_color {
+	background-color: #FFFFFF;
 }
 
-.signed_true {
-	background-color: #02cda2;
+.proces_color {
+	background-color: #C0F7FE;
+}
+
+.signed_color {
+	background-color: #BBFFBB;
 }
 
 .leyenda {
@@ -109,21 +114,27 @@
 }
 
 .leyenda_block > div {
-	width: 6%;
-	height: 5px;
 	background-color: #1f20fd;
 }
 
 .leyenda_pendent > div {
-	width: 6%;
-	height: 5px;
-	background-color: #67bdff;
+	background-color: #FFFFFF;
+	border: 1px solid #2FF000;
+}
+
+.leyenda_proces > div {
+	background-color: #C0F7FE;
+	border: 1px solid #2FF000;
 }
 
 .leyenda_firmat > div {
-	width: 6%;
-	height: 5px;
-	background-color: #02cda2;
+	background-color: #BBFFBB;
+	border: 1px solid #2FF000;
+}
+
+.leyenda_container > div > div:nth-child(1) {
+	width: 10px;
+	height: 10px;
 }
 
 .block_arrow {
@@ -142,10 +153,40 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	let parentIframe = window.frameElement;
-	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	if (parentIframe != null) {
+		let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+		$('#btn_cancelar').on('click', function(){
+			window.parent.addLoading(idModal);
+		});
+	}
 	
-	$('#btn_cancelar').on('click', function(){
-		window.parent.addLoading(idModal);
+	//colors blocs
+	var blocs = document.getElementsByClassName('block_container');
+	var primerBlocEnProces = false;
+	var signedContainer;
+	
+	$(blocs).each(function(index, data) {
+		var $blocActual = $(this);
+		var hasBlocFirmaPendent = false;
+		if (!primerBlocEnProces) {
+			var signatures = $blocActual.children();
+			$(signatures).each(function(index, data) {
+				var $signaturaActual = $(this);
+				//firmat
+				if ($signaturaActual.hasClass('signed_true')) {
+					$signaturaActual.addClass('signed_color');
+				}
+				//pendent
+				if (index >= 0 && $signaturaActual.hasClass('signed_false')) {
+					var nextSigner = $signaturaActual;
+					$(nextSigner).addClass("proces_color");
+					hasBlocFirmaPendent = true;
+				}
+				if ((index === signatures.length - 1) && hasBlocFirmaPendent && !primerBlocEnProces) {
+					primerBlocEnProces = true;
+				}
+			});
+		}
 	});
 });
 </script>
@@ -251,11 +292,14 @@ $(document).ready(function() {
 									<div class="leyenda_block">
 										<div></div><span><spring:message code="firma.info.accio.flux.bloc"/></span>
 									</div>
-									<div class="leyenda_pendent">
-										<div></div><span><spring:message code="firma.info.accio.flux.firma.pendent"/></span>
-									</div>
 									<div class="leyenda_firmat">
 										<div></div><span><spring:message code="firma.info.accio.flux.firma.finalitzada"/></span>
+									</div>
+									<div class="leyenda_proces">
+										<div></div><span><spring:message code="firma.info.accio.flux.firma.proces"/></span>
+									</div>
+									<div class="leyenda_pendent">
+										<div></div><span><spring:message code="firma.info.accio.flux.firma.pendent"/></span>
 									</div>
 								</div>
 							</div>

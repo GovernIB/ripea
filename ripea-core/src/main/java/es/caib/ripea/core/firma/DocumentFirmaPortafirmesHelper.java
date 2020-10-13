@@ -1,5 +1,7 @@
 package es.caib.ripea.core.firma;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -443,6 +445,15 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
 		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			Collections.sort(portafirmesBlocks, new Comparator<PortafirmesBlockEntity>() {
+				@Override
+				public int compare(PortafirmesBlockEntity o1, PortafirmesBlockEntity o2) {
+					if (o1.getOrder() < o2.getOrder())
+						return -1;
+					else
+						return 1;
+				}
+			});
 			if (portafirmesBlocks != null) {
 				portafirmesBlockDto = conversioTipusHelper.convertirList(
 							portafirmesBlocks, 

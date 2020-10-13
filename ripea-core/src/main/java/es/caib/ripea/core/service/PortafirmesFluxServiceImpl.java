@@ -37,19 +37,16 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Override
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
-			String documentNom,
-			String descripcio,
 			boolean isPlantilla) throws SistemaExternException {
 		logger.debug("(Iniciant flux de firma (" +
-				"urlRedireccio=" + urlReturn + "," +
-				"tipusDocumentNom=" + documentNom + ")");
+				"urlRedireccio=" + urlReturn + ")");
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
 		
 		PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(
 				idioma,
 				isPlantilla,
-				generarNomFlux(documentNom),
-				descripcio,
+				null,
+				null,
 				true,
 				urlReturn);
 		
