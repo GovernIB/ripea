@@ -14,5 +14,6 @@ public enum IntegracioEnumDto {
 	VALIDASIG,
 	NOTIFICACIO,
 	DISTRIBUCIO,
-	GESDOC
+	GESDOC,
+	FIRMASERV
 }
