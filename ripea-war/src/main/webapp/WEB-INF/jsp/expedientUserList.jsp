@@ -70,6 +70,8 @@ body.loading .rmodal {
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
 var columnaAgafatPer = 15;
 $(document).ready(function() {
+
+
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
 				"expedient/" + accio,
@@ -134,23 +136,34 @@ $(document).ready(function() {
 		alert("Button Clicked");
 	});
 
+
+	
 	var metaExpedientId = "";
+	var counter = 0;
 	$('#metaExpedientId').on('change', function() {
 		metaExpedientId = $(this).val();
-		$('#expedientEstatId').select2('val', '', true);
-		$('#expedientEstatId option[value!=""]').remove();
-		var metaNodeRefresh = function(data) {
-			for (var i = 0; i < data.length; i++) {
-				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+
+		if (counter != 0) {
+			
+			if (metaExpedientId) {
+				$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
+				.done(function(data) {
+					
+					$('#expedientEstatId').select2('val', '', true);
+					$('#expedientEstatId option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					}
+				})
+				.fail(function() {
+					alert("<spring:message code="error.jquery.ajax"/>");
+				});
 			}
-		};
-		if (metaExpedientId) {
-			$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
-			.done(metaNodeRefresh)
-			.fail(function() {
-				alert("<spring:message code="error.jquery.ajax"/>");
-			});
 		}
+		counter++;
+
+
+		
 		//select dominis a partir de metaexpedient
 		var dominisRefresh = function(data) {	
 			$('#metaExpedientDominiCodi').append("<option value=\"\"></option>");
@@ -170,6 +183,10 @@ $(document).ready(function() {
 		}
 		
 	});
+	$('#metaExpedientId').trigger('change');
+
+	
+			
 	$('#metaExpedientDominiCodi').on('change', function() {
 		var dominiCodi= $(this).val();
 		//get valor domini seleccionat
@@ -189,8 +206,6 @@ $(document).ready(function() {
 			});
 		}
 	});
-	$('#metaExpedientId').trigger('change');
-
 	
 
 	$('#organGestorId').on('change', function() {

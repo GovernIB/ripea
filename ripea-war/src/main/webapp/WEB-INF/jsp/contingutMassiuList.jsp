@@ -36,7 +36,7 @@
 	}
 </style>
 <script>
-	$(document).ready(function() {
+$(document).ready(function() {
 		var tipus = $('#metaDocumentId').val();
 
 		

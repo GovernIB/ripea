@@ -34,13 +34,9 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 	@RolesAllowed("tothom")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn, 
-			String tipusDocumentNom,
-			String descripcio,
 			boolean isPlantilla) {
 		return delegate.iniciarFluxFirma(
 				urlReturn, 
-				tipusDocumentNom,
-				descripcio,
 				isPlantilla);
 	}
 	

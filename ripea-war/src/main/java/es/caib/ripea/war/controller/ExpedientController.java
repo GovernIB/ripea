@@ -142,7 +142,7 @@ public class ExpedientController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_METAEXP_ID);
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), metaExpedientId));
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",
@@ -692,12 +692,12 @@ public class ExpedientController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatByMetaExpedient(
+		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatsByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name().toUpperCase(), Long.valueOf(0)));
 		expedientEstatsOptions.addAll(estatsFromDatabase);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name().toUpperCase(), Long.valueOf(-1)));		
 		return expedientEstatsOptions;
 	}
 
@@ -814,7 +814,7 @@ public class ExpedientController extends BaseUserController {
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",

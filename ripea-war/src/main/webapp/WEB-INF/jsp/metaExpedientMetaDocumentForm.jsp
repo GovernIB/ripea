@@ -161,13 +161,19 @@ body.loading .rmodal {
 					if (transaccioResponse != null && !transaccioResponse.error) {
 						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 						$('#metaDocumentCommand').addClass("hidden");
-						$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
+						var fluxIframe = '<div class="iframe_container">' + 
+											'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe>' + 
+							  			 '</div>';
+						$('.flux_container').html(fluxIframe);	
 						adjustModalPerFlux();
 						$body = $("body");
 						$body.addClass("loading");
 					} else if (transaccioResponse != null && transaccioResponse.error) {
 						let currentIframe = window.frameElement;
-						var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span></div>';
+						var alertDiv = '<div class="alert alert-danger" role="alert">' + 
+											'<a class="close" data-dismiss="alert">×</a>' + 
+											'<span>' + transaccioResponse.errorDescripcio + '</span>' +
+									   '</div>';
 						$('form').prev().find('.alert').remove();
 						$('form').prev().prepend(alertDiv);
 						webutilModalAdjustHeight();
@@ -176,7 +182,10 @@ body.loading .rmodal {
 				error: function(error) {
 					if (error != null && error.responseJSON != null) {
 						let currentIframe = window.frameElement;
-						var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + error.responseJSON.message + '</span></div>';
+						var alertDiv = '<div class="alert alert-danger" role="alert">' + 
+											'<a class="close" data-dismiss="alert">×</a>' + 
+											'<span>' + error.responseJSON.message + '</span>' + 
+									   '</div>';
 						$('form').prev().find('.alert').remove();
 						$('form').prev().prepend(alertDiv);
 						webutilModalAdjustHeight();
@@ -221,41 +230,48 @@ body.loading .rmodal {
 			}
 		});
 		
-		$(".portafirmesFluxId_btn_esborrar").on('click', function () {
-			var portafirmesFluxId = $("#portafirmesFluxId").val();
-			$.ajax({
-				type: 'GET',
-				dataType: "json",
-				url: "<c:url value="/metaExpedient/metaDocument/flux/esborrar/"/>" + portafirmesFluxId,
-				success: function(esborrat) {
-					if (esborrat) {
-						var alertDiv = "<div class='alert alert-success' role='alert'><a class='close' data-dismiss='alert'>×</a><span>" + "<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.ok"/>" + "</span></div>";
+		$(".portafirmesFluxId_btn_addicional").on('click', function () {
+			if (confirm("<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.confirm"/>")) {
+				var portafirmesFluxId = $("#portafirmesFluxId").val();
+				var successAlert = "<div class='alert alert-success' role='alert'>" +
+										"<a class='close' data-dismiss='alert'>×</a>" + 
+										"<span><spring:message code='metadocument.form.camp.portafirmes.flux.esborrar.ok'/></span>" +
+								   "</div>";
+				var errorAlert = "<div class='alert alert-danger' role='alert'>" + 
+									 "<a class='close' data-dismiss='alert'>×</a>" + 
+									 "<span><spring:message code='metadocument.form.camp.portafirmes.flux.esborrar.ko'/></span>" + 
+								 "</div>";
+				$.ajax({
+					type: 'GET',
+					dataType: "json",
+					url: "<c:url value="/metaExpedient/metaDocument/flux/esborrar/"/>" + portafirmesFluxId,
+					success: function(esborrat) {
+						if (esborrat) {
+							$('form').prev().find('.alert').remove();
+							$('form').prev().prepend(successAlert);
+							$("#portafirmesFluxId option[value='" + portafirmesFluxId + "']").remove();
+						} else {
+							$('form').prev().find('.alert').remove();
+							$('form').prev().prepend(errorAlert);
+						}
+						webutilModalAdjustHeight();
+					},
+					error: function (error) {
 						$('form').prev().find('.alert').remove();
-						$('form').prev().prepend(alertDiv);
-						$("#portafirmesFluxId option[value='" + portafirmesFluxId + "']").remove();
-					} else {
-						var alertDiv = "<div class='alert alert-danger' role='alert'><a class='close' data-dismiss='alert'>×</a><span>" + "<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.ko"/>" + "</span></div>";
-						$('form').prev().find('.alert').remove();
-						$('form').prev().prepend(alertDiv);
+						$('form').prev().prepend(errorAlert);
+						webutilModalAdjustHeight();		
 					}
-					webutilModalAdjustHeight();
-				},
-				error: function (error) {
-					var alertDiv = "<div class='alert alert-danger' role='alert'><a class='close' data-dismiss='alert'>×</a><span>" + "<spring:message code="metadocument.form.camp.portafirmes.flux.esborrar.ko"/>" + "</span></div>";
-					$('form').prev().find('.alert').remove();
-					$('form').prev().prepend(alertDiv);
-					webutilModalAdjustHeight();		
-				}
-			});
+				});
+			}
 		});
 		$("#portafirmesFluxId").on('change', function () {
 			var portafirmesFluxId = $(this).val();
 			if(portafirmesFluxId != null && portafirmesFluxId != '') {
 				$(".portafirmesFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.editar"/>");
-				$(".portafirmesFluxId_btn_esborrar").removeClass("flux_disabled");
+				$(".portafirmesFluxId_btn_addicional").removeClass("flux_disabled");
 			} else {
 				$(".portafirmesFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>");
-				$(".portafirmesFluxId_btn_esborrar").addClass("flux_disabled");
+				$(".portafirmesFluxId_btn_addicional").addClass("flux_disabled");
 			}
 		});
 		
@@ -329,7 +345,7 @@ function removeLoading() {
 				</c:choose>
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<div class="flux_portafib">
-					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" botons="true" icon="fa fa-external-link" iconDelete="fa fa-trash-o" buttonMsg="${buttonTitle}"/>
+					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" botons="true" icon="fa fa-external-link" iconAddicional="fa fa-trash-o" buttonMsg="${buttonTitle}"/>
 				</div>
 				<div class="flux_simple">
 					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

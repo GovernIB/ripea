@@ -244,7 +244,11 @@ public class IntegracioHelper {
 			integracio.setNom("Dades ext.");
 		} else if (INTCODI_NOTIFICACIO.equals(codi)) {
 			integracio.setNom("Notificació");
-		}
+		} else if (INTCODI_FIRMASERV.equals(codi)) {
+			integracio.setNom("Firma servidor");
+		} 
+		
+		
 		return integracio;
 	}
 

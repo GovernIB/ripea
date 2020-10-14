@@ -195,8 +195,6 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			Model model) throws UnsupportedEncodingException {
 		String urlReturn;
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
-		String nomCodificat = new String(nom.getBytes(), "UTF-8");
-		String descripcio = getMessage(request, "document.controller.portafirmes.flux.desc");
 		try {
 			urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
 			if (plantillaId != null && !plantillaId.isEmpty()) {
@@ -204,7 +202,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(plantillaId, urlReturn);
 				transaccioResponse.setUrlRedireccio(urlEdicio);
 			} else {
-				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, nomCodificat, descripcio, true);
+				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, true);
 			}
 		} catch (Exception ex) {
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();

@@ -137,6 +137,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 			}
 			if (document.getFirmes() != null && !document.getFirmes().isEmpty()) {
 				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+			} else {
+				entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 			}
 			entity.updateArxiu(document.getIdentificador());
 			entity.updateNtiIdentificador(document.getMetadades().getIdentificador());
