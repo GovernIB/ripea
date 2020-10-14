@@ -1332,7 +1332,6 @@ function showLoadingModal(message) {
 							</c:when>
 							<c:otherwise>
 								<spring:message code="contingut.info.informacio"/>
-								<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
 							</c:otherwise>
 						</c:choose>
 					</h3>
@@ -1345,12 +1344,20 @@ function showLoadingModal(message) {
 							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
 						</c:if>
 						<c:if test="${contingut.expedient}">
+							<dt><spring:message code="contingut.info.numero"/></dt>
+							<dd>${contingut.numero}</dd>
+							
+							<dt><spring:message code="contingut.info.titol"/></dt>
+							<dd>${contingut.nom}</dd>							
+							
 							<c:if test="${not empty contingut.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
-							<dt><spring:message code="contingut.info.numero"/></dt>
-							<dd>${contingut.numero}</dd>
+							
+							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
+							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
@@ -1359,43 +1366,44 @@ function showLoadingModal(message) {
 								<c:otherwise>
 									<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
 								</c:otherwise>
-							</c:choose>								
-						</c:if>
-					<c:if test="${contingut.expedient or contingut.document}">
-						<c:if test="${contingut.expedient}">
-							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
-							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							</c:choose>	
+								
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-							<dd>${contingut.ntiClasificacionSia}</dd>
+							<dd>${contingut.ntiClasificacionSia}</dd>							
 						</c:if>
-					</c:if>
-					<c:if test="${!isTasca && not empty relacionats}">
-						<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
-							<spring:message code="contingut.info.relacionats"/>
-						</h4>
-						<ul class="list-unstyled">
-							<c:forEach var="expedientRelacionat" items="${relacionats}">
-								<c:if test="${!expedientRelacionat.esborrat}">
-									<li style="font-size:14px; line-height: 25px;">
-										<span style="width:10%" class="fa ${iconaExpedientObert}"></span>
-										<span style="width:76%" class="ellipsis">
-											<a href="${expedientRelacionat.id}">
-												[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] 
-												${expedientRelacionat.nom} 
-											</a>
-										</span>
-										 <span style="width:10%; height: 16px;" class="align-right qqq">
-											<c:if test="${potModificarContingut}">
-												<a href="<c:url value="/expedient/${contingut.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
-													<span class="fa fa-trash-o"></span>
-												</a> 
-											</c:if>										 
-								        </span>	
-									</li>
-								</c:if>
-							</c:forEach>
-						</ul>
-					</c:if>   
+
+						<c:if test="${!isTasca && not empty relacionats}">
+							<h4 id="expedient-info-relacionats" style="padding-bottom: 0 !important;margin-bottom: 4px !important; border-bottom: 1px solid #e3e3e3">
+								<spring:message code="contingut.info.relacionats"/>
+							</h4>
+							<ul class="list-unstyled">
+								<c:forEach var="expedientRelacionat" items="${relacionats}">
+									<c:if test="${!expedientRelacionat.esborrat}">
+										<li style="font-size:14px; line-height: 25px;">
+											<span style="width:10%" class="fa ${iconaExpedientObert}"></span>
+											<span style="width:76%" class="ellipsis">
+												<a href="${expedientRelacionat.id}">
+													[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] 
+													${expedientRelacionat.nom} 
+												</a>
+											</span>
+											 <span style="width:10%; height: 16px;" class="align-right qqq">
+												<c:if test="${potModificarContingut}">
+													<a href="<c:url value="/expedient/${contingut.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
+														<span class="fa fa-trash-o"></span>
+													</a> 
+												</c:if>										 
+									        </span>	
+										</li>
+									</c:if>
+								</c:forEach>
+							</ul>
+						</c:if> 
+						
+						<c:if test="${!isTasca}">
+							<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/>
+						</c:if>
+					</dl>
 				</div>
 			</div>
 		</c:if>
