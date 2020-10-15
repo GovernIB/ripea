@@ -346,59 +346,43 @@ function replaceAll(string, search, replace) {
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/notificacio/${documentNotificacionsCommand.id}"/></c:set></c:otherwise>
 	</c:choose>
 	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacionsCommand" role="form">
-		<c:if test="${empty documentNotificacionsCommand.id || documentNotificacionsCommand.tipus == 'ELECTRONICA'}">
-			<ul class="nav nav-tabs" role="tablist">
-				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="notificacio.form.camp.tab.dades"/></a></li>
-				<%--li role="presentation"><a href="#annexos" aria-controls="annexos" role="tab" data-toggle="tab"><spring:message code="notificacio.form.camp.tab.annexos"/></a></li--%>
-			</ul>
-			<br/>
-		</c:if>
 		<rip:inputHidden name="id"/>
 		<rip:inputHidden name="documentId"/>
-		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane active" id="dades">
-				<!---  TIPUS (NOTIFICACIO / COMUNICACIO) ---->
-				<c:choose>
-					<c:when test="${empty documentNotificacionsCommand.id}">
-						<rip:inputSelect labelSize="2" name="tipus" textKey="notificacio.form.camp.tipus" optionItems="${notificacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-					</c:when>
-					<c:otherwise>
-						<rip:inputHidden name="tipus"/>
-					</c:otherwise>
-				</c:choose>
-				<!----  ESTAT   ------->
-				<rip:inputSelect disabled="true" labelSize="2" name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-				<!----  TITULARS   ------->
-				<rip:inputSelect required="true" labelSize="2" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari"/>
-				<!---  CONCEPTE   ---->
-				<rip:inputText labelSize="2" name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
-				<!---- TIPUS DE SERVEI  ------->	
-				<rip:inputSelect labelSize="2" required="true" name="serveiTipusEnum" optionItems="${serveiTipusEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="notificacio.form.camp.serveiTipus" />
-				<!---  OBSERVACIONS   --->
-				<rip:inputTextarea labelSize="2" name="observacions" textKey="notificacio.form.camp.descripcio"/>
-				<!----  DATA PROGRAMADA   ----->
-				<rip:inputDate labelSize="2" name="dataProgramada" textKey="notificacio.form.camp.data.programada" comment="notificacio.form.camp.data.programada.comment"/>
-				<!----  DATA CADUCITAT  ------->
-				<rip:inputDate labelSize="2" name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
-				<!---  RETARD  ------->
-				<rip:inputNumber labelSize="2" name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
-				<c:if test="${entregaPostal}">
-					<rip:inputCheckbox labelSize="2" name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
-				</c:if>
-
-				<!--------------------------------------------------------  ENVIAMENTS  ------------------------------------------------------------>
-				<div class="container-fluid">
-					<div class="title">
-						<span class="fa fa-vcard"></span> <label><spring:message code="notificacio.form.camp.enviaments" /></label>
-						<hr />
-					</div>
-					<div id="container-envios"></div>
-				</div>
+		<!---  TIPUS (NOTIFICACIO / COMUNICACIO) ---->
+		<c:choose>
+			<c:when test="${empty documentNotificacionsCommand.id}">
+				<rip:inputSelect labelSize="2" name="tipus" textKey="notificacio.form.camp.tipus" optionItems="${notificacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+			</c:when>
+			<c:otherwise>
+				<rip:inputHidden name="tipus"/>
+			</c:otherwise>
+		</c:choose>
+		<!----  ESTAT   ------->
+		<rip:inputSelect disabled="true" labelSize="2" name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+		<!----  TITULARS   ------->
+		<rip:inputSelect required="true" labelSize="2" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari"/>
+		<!---  CONCEPTE   ---->
+		<rip:inputText labelSize="2" name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
+		<!---- TIPUS DE SERVEI  ------->	
+		<rip:inputSelect labelSize="2" required="true" name="serveiTipusEnum" optionItems="${serveiTipusEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="notificacio.form.camp.serveiTipus" />
+		<!---  OBSERVACIONS   --->
+		<rip:inputTextarea labelSize="2" name="observacions" textKey="notificacio.form.camp.descripcio"/>
+		<!----  DATA PROGRAMADA   ----->
+		<rip:inputDate labelSize="2" name="dataProgramada" textKey="notificacio.form.camp.data.programada" comment="notificacio.form.camp.data.programada.comment"/>
+		<!----  DATA CADUCITAT  ------->
+		<rip:inputDate labelSize="2" name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
+		<!---  RETARD  ------->
+		<rip:inputNumber labelSize="2" name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
+		<c:if test="${entregaPostal}">
+			<rip:inputCheckbox labelSize="2" name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
+		</c:if>
+		<!--------------------------------------------------------  ENVIAMENTS  ------------------------------------------------------------>
+		<div class="container-fluid">
+			<div class="title">
+				<span class="fa fa-vcard"></span> <label><spring:message code="notificacio.form.camp.enviaments" /></label>
+				<hr />
 			</div>
-			
-<!-- 			<div role="tabpanel" class="tab-pane" id="annexos"> -->
-<%-- 				<rip:inputSelect name="annexos" textKey="notificacio.form.camp.annexos" optionItems="${annexos}" emptyOption="true" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.form.camp.annexos"/> --%>
-<!-- 			</div> -->
+			<div id="container-envios"></div>
 		</div>
 		<c:choose>
 			<c:when test="${empty document}"><c:set var="urlTancar"><c:url value="/contingut/${expedientId}"/></c:set></c:when>
