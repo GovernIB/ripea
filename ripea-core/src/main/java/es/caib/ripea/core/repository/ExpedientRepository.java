@@ -199,9 +199,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat);
 
-	List<ExpedientEntity> findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
+	List<ExpedientEntity> findByEntitatAndIdInOrderByIdAsc(
 			EntitatEntity entitat,
-			MetaNodeEntity metaNode,
 			Collection<Long> id);
 
 	@Query(	"select" +

@@ -337,8 +337,6 @@ public interface ExpedientService {
 	 * 
 	 * @param entitatId 
 	 *            Atribut id de l'entitat.
-	 * @param metaExpedientId 
-	 *            Atribut id del meta-expedient.
 	 * @param expedientIds
 	 *            Atribut id dels expedients a exportar.
 	 * @param format
@@ -352,7 +350,6 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportacio(
 			Long entitatId,
-			Long metaExpedientId,
 			Collection<Long> expedientIds,
 			String format) throws IOException, NotFoundException;
 

@@ -201,12 +201,10 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public FitxerDto exportacio(
 			Long entitatId,
-			Long metaExpedientId,
 			Collection<Long> expedientIds,
 			String format) throws IOException {
 		return delegate.exportacio(
 				entitatId,
-				metaExpedientId,
 				expedientIds,
 				format);
 	}

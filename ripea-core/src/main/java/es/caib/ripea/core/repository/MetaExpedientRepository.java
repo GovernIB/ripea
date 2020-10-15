@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -126,6 +127,14 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	
 	
 	
+	@Query(	"select" +
+			"    distinct e.metaExpedient.id " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.id in (:ids) ")
+	List<Long> findDistinctMetaExpedientIdsByExpedients(
+			@Param("ids") Collection<Long> ids); 
 	
 
 	

@@ -1094,23 +1094,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	public FitxerDto exportacio(
 			Long entitatId,
-			Long metaExpedientId,
 			Collection<Long> expedientIds,
 			String format) throws IOException {
 		logger.debug(
-				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
-						metaExpedientId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
+				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+		
+		List<Long> metaExpedientIds = metaExpedientRepository.findDistinctMetaExpedientIdsByExpedients(expedientIds);
+		for (Long metaExpedientId : metaExpedientIds) {
+			entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					true,
+					false,
+					false,
+					false);
+		}
+
+		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndIdInOrderByIdAsc(
 				entitat,
-				metaExpedientId,
-				true,
-				false,
-				false,
-				false);
-		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
-				metaExpedient.getEntitat(),
-				metaExpedient,
 				expedientIds);
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
 				expedientIds);
@@ -1144,22 +1146,29 @@ public class ExpedientServiceImpl implements ExpedientService {
 				DadaEntity dadaActual = dades.get(dadesIndex);
 				if (dadaActual.getNode().getId().equals(expedient.getId())) {
 					for (int i = 0; i < metaDades.size(); i++) {
-						MetaDadaEntity metaDada = metaDades.get(i);
-						int dadesIndexIncrement = 1;
+						MetaDadaEntity metaDada = metaDades.get(i); 
+						int dadesIndexIncrement = 0;
 						while (dadaActual.getNode().getId().equals(expedient.getId())) {
-							if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
+							
+							if (dadaActual.getMetaDada().getId().equals(metaDada.getId())) {
  								break;
 							}
-							dadaActual = dades.get(dadesIndex + dadesIndexIncrement++);
+							
+							dadesIndexIncrement++;
+							if (dadesIndex + dadesIndexIncrement == dades.size()) {
+								break;
+							}
+							dadaActual = dades.get(dadesIndex + dadesIndexIncrement);
 						}
-						if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
+						if (dadaActual.getMetaDada().getId().equals(metaDada.getId()) && dadaActual.getNode().getId().equals(expedient.getId())) {
 							fila[5 + i] = dadaActual.getValorComString();
 						} else {
 							dadaActual = dades.get(dadesIndex);
 						}
 					}
 				}
-				DadaEntity dada = dades.get(dadesIndex);
+				// search for first dada index of next expedient
+				DadaEntity dada = dades.get(dadesIndex); 
 				while (dada.getNode().getId().equals(expedient.getId())) {
 					dadesIndex++;
 					if (dadesIndex == dades.size()) {

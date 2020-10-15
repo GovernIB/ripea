@@ -235,7 +235,6 @@ public class ExpedientDetailController extends BaseUserController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			FitxerDto fitxer = expedientService.exportacio(
 					entitatActual.getId(),
-					command.getMetaExpedientId(),
 					seleccio,
 					format);
 			writeFileToResponse(
