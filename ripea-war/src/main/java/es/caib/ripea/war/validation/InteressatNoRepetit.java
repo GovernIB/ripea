@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy=InteressatNoRepetitValidator.class)
 public @interface InteressatNoRepetit {
 
-	String message() default "Ja existeix un altre interessat donat d'alta amb aquestes dades";
+	String message() default "Ja existeix un altre interessat donat d''alta amb aquestes dades";
 
 	Class<?>[] groups() default {};
 
