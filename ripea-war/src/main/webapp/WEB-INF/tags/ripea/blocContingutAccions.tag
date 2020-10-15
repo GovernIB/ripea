@@ -42,7 +42,7 @@
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
 		
-		<c:if test="${isEntitatUserAdminOrOrgan}">
+		<c:if test="${contingut.expedient && isEntitatUserAdminOrOrgan}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 		</c:if>
 		
