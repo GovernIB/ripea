@@ -425,4 +425,10 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<Long> findIdsExpedientsPerTancamentMassiu(Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	void agafar(
+			Long entitatId,
+			Long expedientId,
+			String usuariCodi);
 }

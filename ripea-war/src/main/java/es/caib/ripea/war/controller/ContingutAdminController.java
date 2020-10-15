@@ -30,12 +30,14 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutFiltreCommand;
 import es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum;
+import es.caib.ripea.war.command.ExpedientAssignarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -53,6 +55,8 @@ public class ContingutAdminController extends BaseAdminController {
 	private ContingutService contingutService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private ExpedientService expedientService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -195,6 +199,45 @@ public class ContingutAdminController extends BaseAdminController {
 					"redirect:../../esborrat",
 					"contingut.admin.controller.recuperat.duplicat");
 		}
+	}
+	
+	
+	
+	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.GET)
+	public String assignar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
+		getEntitatActualComprovantPermisAdminEntitat(request);
+
+		ExpedientAssignarCommand command = new ExpedientAssignarCommand();
+		model.addAttribute(command);
+		
+		return "expedientAssignarForm";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.POST)
+	public String expedientTancarPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@Valid ExpedientAssignarCommand command,
+			BindingResult bindingResult,
+			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		if (bindingResult.hasErrors()) {
+			return "expedientAssignarForm";
+		}
+		expedientService.agafar(
+				entitatActual.getId(),
+				expedientId,
+				command.getUsuariCodi());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../contingut/" + expedientId,
+				"expedient.assignar.controller.assignat.ok");
 	}
 
 	@RequestMapping(value = "/{contingutId}/delete", method = RequestMethod.GET)

@@ -319,4 +319,15 @@ public class ExpedientServiceBean implements ExpedientService {
 				entitatId,
 				filtre);
 	}
+	@Override
+	@RolesAllowed("tothom")
+	public void agafar(
+			Long entitatId,
+			Long expedientId,
+			String usuariCodi) {
+		delegate.agafar(
+				entitatId,
+				expedientId,
+				usuariCodi);
+	}
 }

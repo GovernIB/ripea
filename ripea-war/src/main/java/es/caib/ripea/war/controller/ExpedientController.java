@@ -57,6 +57,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
+import es.caib.ripea.war.command.ExpedientAssignarCommand;
 import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
@@ -621,6 +622,45 @@ public class ExpedientController extends BaseUserController {
 				"redirect:../../contingut/" + expedientId,
 				"expedient.controller.alliberat.ok");
 	}
+	
+	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.GET)
+	public String assignar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
+		getEntitatActualComprovantPermisos(request);
+
+		ExpedientAssignarCommand command = new ExpedientAssignarCommand();
+		model.addAttribute(command);
+		
+		return "expedientAssignarForm";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.POST)
+	public String expedientTancarPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@Valid ExpedientAssignarCommand command,
+			BindingResult bindingResult,
+			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			return "expedientAssignarForm";
+		}
+		expedientService.agafar(
+				entitatActual.getId(),
+				expedientId,
+				command.getUsuariCodi());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../contingut/" + expedientId,
+				"expedient.assignar.controller.assignat.ok");
+	}
+	
+	
 
 	@RequestMapping(value = "/{expedientId}/tancar", method = RequestMethod.GET)
 	public String expedientTancarGet(

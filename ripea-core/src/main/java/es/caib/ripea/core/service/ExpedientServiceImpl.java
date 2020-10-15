@@ -678,6 +678,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
+	public void agafar(
+			Long entitatId,
+			Long expedientId,
+			String usuariCodi) {
+		logger.debug("Agafant l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId + ", " + "usuari=" + usuariCodi + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				false);
+		expedientHelper.agafar(expedient, usuariCodi);
+	}
+
+	@Transactional
+	@Override
 	public void agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
 		logger.debug(
 				"Agafant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "arxiuId=" + arxiuId +
