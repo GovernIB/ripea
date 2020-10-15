@@ -5,6 +5,9 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<c:set var="charSearch" value='"' />
+<c:set var="charReplace" value='\\"' />
+
 <%
 	pageContext.setAttribute(
 		"idioma",
@@ -148,7 +151,7 @@ body.loading .rmodal {
 		$("#portafirmesFluxTipus").trigger('change');
 		
 		$(".portafirmesFluxId_btn_edicio").on('click', function(){
-			var metaDocumentNom = '${metaDocumentCommand.nom}';
+			var metaDocumentNom = "${fn:replace(metaDocumentCommand.nom, charSearch, charReplace)}";
 			$.ajax({
 				type: 'GET',
 				dataType: "json",
