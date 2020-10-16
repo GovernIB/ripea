@@ -39,14 +39,12 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -312,10 +310,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId) {
-		logger.debug(
-				"Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId +
-						")");
-		return findActiusAmbEntitatPermis(entitatId, new Permission[] { ExtendedPermission.WRITE }, null);
+		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
+		return findActiusAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				null);
 	}
 
 	@Transactional(readOnly = true)

@@ -500,11 +500,12 @@ public class DocumentServiceImpl implements DocumentService {
 	public Exception portafirmesCallback(
 			long portafirmesId,
 			PortafirmesCallbackEstatEnumDto callbackEstat,
-			String motiuRebuig) {
+			String motiuRebuig,
+			String administrationId) {
 		logger.debug("Processant petició del callback ("
 				+ "portafirmesId=" + portafirmesId + ", "
 				+ "callbackEstat=" + callbackEstat + ")");
-		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig);
+		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId);
 	}
 
 	@Transactional

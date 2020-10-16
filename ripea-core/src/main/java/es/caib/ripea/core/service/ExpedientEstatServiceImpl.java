@@ -1,14 +1,20 @@
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -25,12 +31,18 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 @Service
 public class ExpedientEstatServiceImpl implements ExpedientEstatService {
@@ -53,6 +65,13 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private ExpedientRepository expedientRepository;
+	@Autowired
+	private UsuariRepository usuariRepository;
+	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -113,7 +132,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientEstatDto> findExpedientEstatByMetaExpedient(
+	public List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {
 		logger.debug("Consultant els estats del expedient ("
@@ -331,6 +350,9 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "expedientEstatId=" + expedientEstatId + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		ExpedientEstatEntity entity = expedientEstatRepository.findOne(expedientEstatId);
+		if (!entity.getExpedients().isEmpty()) {
+			throw new ValidationException("");
+		}
 		expedientEstatRepository.delete(entity);
 		return conversioTipusHelper.convertir(
 				entity,
@@ -409,6 +431,145 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				estat,
 				ExpedientEstatDto.class);
 	}
+	
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
+					entitat,
+					usuariActual,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+	
+			return paginacioHelper.toPaginaDto(
+					paginaDocuments,
+					ExpedientDto.class,
+					new Converter<ExpedientEntity, ExpedientDto>() {
+						@Override
+						public ExpedientDto convert(ExpedientEntity source) {
+							ExpedientDto dto = (ExpedientDto)contingutHelper.toContingutDto(
+									source,
+									false,
+									false,
+									false,
+									false,
+									true,
+									true,
+									false);
+							return dto;
+						}
+					});
+		} else {
+			return paginacioHelper.getPaginaDtoBuida(
+					ExpedientDto.class);
+		}
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
+					entitat,
+					usuariActual,
+					metaExpedientsPermesos,
+					metaExpedient == null,
+					metaExpedient,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi);
+			return idsDocuments;
+
+		} else {
+			return new ArrayList<>();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	private void canviPosicio(
 			ExpedientEstatEntity estat,
@@ -448,6 +609,11 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		
 		return expedientDto;
 	}
+	
+	
+	
+	
+	
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientEstatServiceImpl.class);
 }

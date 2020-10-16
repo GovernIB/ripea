@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -95,6 +98,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -153,6 +157,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private UsuariRepository usuariRepository;
+	
+	
 	
 	@Transactional
 	@Override
@@ -670,6 +678,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
+	public void agafar(
+			Long entitatId,
+			Long expedientId,
+			String usuariCodi) {
+		logger.debug("Agafant l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId + ", " + "usuari=" + usuariCodi + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				false);
+		expedientHelper.agafar(expedient, usuariCodi);
+	}
+
+	@Transactional
+	@Override
 	public void agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
 		logger.debug(
 				"Agafant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "arxiuId=" + arxiuId +
@@ -760,10 +786,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 			// Eliminam de l'expedient els esborranys que no s'han firmat
 			for (DocumentEntity esborrany : esborranys) {
 				boolean trobat = false;
-				for (Long documentPerFirmarId : documentsPerFirmar) {
-					if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
-						trobat = true;
-						break;
+				if (documentsPerFirmar != null) {
+					for (Long documentPerFirmarId : documentsPerFirmar) {
+						if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
+							trobat = true;
+							break;
+						}
 					}
 				}
 				if (!trobat) {
@@ -792,6 +820,150 @@ public class ExpedientServiceImpl implements ExpedientService {
 			pluginHelper.arxiuExpedientReobrir(expedient);
 		}
 	}
+	
+	
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerTancamentMassiu(
+					entitat,
+					usuariActual,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+	
+			return paginacioHelper.toPaginaDto(
+					paginaDocuments,
+					ExpedientDto.class,
+					new Converter<ExpedientEntity, ExpedientDto>() {
+						@Override
+						public ExpedientDto convert(ExpedientEntity source) {
+							ExpedientDto dto = (ExpedientDto)contingutHelper.toContingutDto(
+									source,
+									false,
+									false,
+									false,
+									false,
+									true,
+									true,
+									false);
+							return dto;
+						}
+					});
+		} else {
+			return paginacioHelper.getPaginaDtoBuida(
+					ExpedientDto.class);
+		}
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Long> findIdsExpedientsPerTancamentMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerTancamentMassiu(
+					entitat,
+					usuariActual,
+					metaExpedientsPermesos,
+					metaExpedient == null,
+					metaExpedient,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi);
+			return idsDocuments;
+
+		} else {
+			return new ArrayList<>();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	@Transactional
 	@Override
@@ -940,23 +1112,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	public FitxerDto exportacio(
 			Long entitatId,
-			Long metaExpedientId,
 			Collection<Long> expedientIds,
 			String format) throws IOException {
 		logger.debug(
-				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
-						metaExpedientId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
+				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+		
+		List<Long> metaExpedientIds = metaExpedientRepository.findDistinctMetaExpedientIdsByExpedients(expedientIds);
+		for (Long metaExpedientId : metaExpedientIds) {
+			entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					true,
+					false,
+					false,
+					false);
+		}
+
+		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndIdInOrderByIdAsc(
 				entitat,
-				metaExpedientId,
-				true,
-				false,
-				false,
-				false);
-		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
-				metaExpedient.getEntitat(),
-				metaExpedient,
 				expedientIds);
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
 				expedientIds);
@@ -979,28 +1153,51 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String[] fila = new String[numColumnes];
 			fila[0] = expedientHelper.calcularNumero(expedient);
 			fila[1] = expedient.getNom();
-			fila[2] = expedient.getEstat().name();
+			if (expedient.getExpedientEstat() != null && expedient.getEstat() != ExpedientEstatEnumDto.TANCAT) {
+				fila[2] = expedient.getExpedientEstat().getNom();
+			} else {
+				fila[2] = expedient.getEstat().name();
+			}
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
 			fila[4] = expedient.getNtiIdentificador();
 			if (!dades.isEmpty()) {
 				DadaEntity dadaActual = dades.get(dadesIndex);
 				if (dadaActual.getNode().getId().equals(expedient.getId())) {
 					for (int i = 0; i < metaDades.size(); i++) {
-						MetaDadaEntity metaDada = metaDades.get(i);
-						int dadesIndexIncrement = 1;
+						MetaDadaEntity metaDada = metaDades.get(i); 
+						int dadesIndexIncrement = 0;
 						while (dadaActual.getNode().getId().equals(expedient.getId())) {
-							if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
+							
+							if (dadaActual.getMetaDada().getId().equals(metaDada.getId())) {
+ 								break;
+							}
+							
+							dadesIndexIncrement++;
+							if (dadesIndex + dadesIndexIncrement == dades.size()) {
 								break;
 							}
-							dadaActual = dades.get(dadesIndex + dadesIndexIncrement++);
+							dadaActual = dades.get(dadesIndex + dadesIndexIncrement);
 						}
-						if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
+						if (dadaActual.getMetaDada().getId().equals(metaDada.getId()) && dadaActual.getNode().getId().equals(expedient.getId())) {
 							fila[5 + i] = dadaActual.getValorComString();
+						} else {
+							dadaActual = dades.get(dadesIndex);
 						}
 					}
 				}
+				// search for first dada index of next expedient
+				DadaEntity dada = dades.get(dadesIndex); 
+				while (dada.getNode().getId().equals(expedient.getId())) {
+					dadesIndex++;
+					if (dadesIndex == dades.size()) {
+						break;
+					}
+					dada = dades.get(dadesIndex);
+				}
 			}
 			files.add(fila);
+			
+			
 		}
 		FitxerDto fitxer = new FitxerDto();
 		if ("ODS".equalsIgnoreCase(format)) {
@@ -1257,7 +1454,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Page<ExpedientEntity> paginaExpedients;
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
-
+			ordenacioMap.put("tipusStr", new String[] { "metaExpedient.nom", "metaExpedient.classificacioSia" });
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
+			
 			paginaExpedients = expedientRepository.findByEntitatAndFiltre(
 					entitat,
 					metaExpedientsPermesos,
@@ -1293,7 +1492,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					esNullRolsCurrentUser,
 					rolsCurrentUser,
-					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+					pageable);
 
 			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
 					paginaExpedients,

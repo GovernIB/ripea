@@ -3,24 +3,30 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un expedient.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "ipa_expedient_estat")
 @EntityListeners(AuditingEntityListener.class)
@@ -47,6 +53,13 @@ public class ExpedientEstatEntity extends RipeaAuditable<Long>{
 	@ForeignKey(name = "ipa_metaexp_expedientestat_fk")
 	private MetaExpedientEntity metaExpedient;
 	
+	
+	@OneToMany(
+			mappedBy = "expedientEstat",
+			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+    private List<ExpedientEntity> expedients;
 	
 	public void updateInicial(
 			Boolean inicial) {
@@ -106,41 +119,14 @@ public class ExpedientEstatEntity extends RipeaAuditable<Long>{
 	}
 	
 	
-	public String getResponsableCodi() {
-		return responsableCodi;
-	}
 
 	public void setResponsableCodi(String responsableCodi) {
 		this.responsableCodi = responsableCodi;
 	}
 
-	public boolean isInicial() {
-		return inicial;
-	}
-
 	public void updateOrdre(
 			int ordre) {
 		this.ordre = ordre;
-	}
-
-	public String getCodi() {
-		return codi;
-	}
-
-	public String getNom() {
-		return nom;
-	}
-
-	public int getOrdre() {
-		return ordre;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public MetaExpedientEntity getMetaExpedient() {
-		return metaExpedient;
 	}
 
 	private static final long serialVersionUID = 2049469376271209018L;

@@ -549,6 +549,14 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		$(this).on('select2:close', function() {
 			webutilModalAdjustHeight();
 		});
+		
+		// codi per no reordenar els elements de seleccio multiple
+	    $(this).on("select2:select", function (e) {
+			var id = e.params.data.id;
+			var option = $(e.target).children('[value='+id+']');
+			option.detach();
+			$(e.target).append(option).change();
+	    });
 	}
 	$.fn.webutilInputSuggestEval = function() {
 		$('[data-toggle="suggest"]', this).each(function() {

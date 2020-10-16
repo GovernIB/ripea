@@ -53,7 +53,6 @@ import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
@@ -85,8 +84,6 @@ public class DocumentController extends BaseUserController {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
 	@Autowired
 	private ContingutService contingutService;
 	
@@ -237,10 +234,15 @@ public class DocumentController extends BaseUserController {
 			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
 					entitatActual.getId(),
 					documentId);
-			
+			List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
+					entitatActual.getId(),
+					documentId);
 			model.addAttribute(
 					"portafirmes",
 					portafirmes);
+			model.addAttribute(
+					"blocks", 
+					documentPortafirmesBlocks);
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
@@ -248,19 +250,6 @@ public class DocumentController extends BaseUserController {
 					e.getMessage());
 			}
 		return "portafirmesInfo";
-	}
-
-	@RequestMapping(value = "/{documentId}/portafirmes/blocks")
-	public String portafirmesBlocksInfo(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
-				entitatActual.getId(),
-				documentId);
-		model.addAttribute("blocks", documentPortafirmesBlocks);
-		return "portafirmesBlocksInfo";
 	}
 	
 	@RequestMapping(value = "/{documentId}/viafirma/info", method = RequestMethod.GET)
@@ -655,12 +644,11 @@ public class DocumentController extends BaseUserController {
 			PortafirmesEnviarCommand command) {
 		if (metaDocument.getPortafirmesFluxTipus() != null) {
 			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+			model.addAttribute("portafirmesFluxId", metaDocument.getPortafirmesFluxId());
 			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
 				model.addAttribute("nouFluxDeFirma", true);
 			} else {
-				String urlPlantilla = portafirmesFluxService.recuperarUrlMostrarPlantilla(metaDocument.getPortafirmesFluxId());
 				model.addAttribute("nouFluxDeFirma", false);
-				model.addAttribute("urlPlantilla", urlPlantilla);
 			}
 		} else {
 			model.addAttribute("nouFluxDeFirma", false);

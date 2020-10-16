@@ -1,5 +1,7 @@
 package es.caib.ripea.core.firma;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -183,7 +185,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							portafirmesBlockInfo.getSignerCodi(),
 							portafirmesBlockInfo.getSignerId(),
 							false).build();
-					this.portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
+					portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
 				}
 				i++;
 			}
@@ -443,6 +445,15 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
 		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			Collections.sort(portafirmesBlocks, new Comparator<PortafirmesBlockEntity>() {
+				@Override
+				public int compare(PortafirmesBlockEntity o1, PortafirmesBlockEntity o2) {
+					if (o1.getOrder() < o2.getOrder())
+						return -1;
+					else
+						return 1;
+				}
+			});
 			if (portafirmesBlocks != null) {
 				portafirmesBlockDto = conversioTipusHelper.convertirList(
 							portafirmesBlocks, 
@@ -451,11 +462,12 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 		return portafirmesBlockDto;
 	}
-	
+
 	public Exception portafirmesCallback(
 			long portafirmesId,
 			PortafirmesCallbackEstatEnumDto callbackEstat,
-			String motiuRebuig) {
+			String motiuRebuig,
+			String administrationId) {
 		logger.debug("Processant petició del callback ("
 				+ "portafirmesId=" + portafirmesId + ", "
 				+ "callbackEstat=" + callbackEstat + ")");
@@ -466,12 +478,76 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					"(portafirmesId=" + portafirmesId + ")",
 					DocumentPortafirmesEntity.class);
 		}
+		actualitzarBlocksPortafirmes(
+				callbackEstat, 
+				documentPortafirmes,
+				administrationId);
+		
 		logAll(documentPortafirmes, LogTipusEnumDto.PFIRMA_CALLBACK);
-		documentPortafirmes.updateCallbackEstat(callbackEstat);
-		documentPortafirmes.updateMotiuRebuig(motiuRebuig);
-		return portafirmesProcessar(documentPortafirmes);
-	}	
+		// Només actualitzam el estat si l'estat del document a base de dades no és un
+		// estat final (FIRMAT o REBUTJAT).
+		boolean estatFinal = documentPortafirmes.getCallbackEstat() == PortafirmesCallbackEstatEnumDto.FIRMAT || documentPortafirmes.getCallbackEstat() == PortafirmesCallbackEstatEnumDto.REBUTJAT;
+		if (!estatFinal) {
+			documentPortafirmes.updateCallbackEstat(callbackEstat);
+			documentPortafirmes.updateMotiuRebuig(motiuRebuig);
+			return portafirmesProcessar(documentPortafirmes);
+		} else {
+			return null;
+		}
+	}
 
+	private void actualitzarBlocksPortafirmes(
+			PortafirmesCallbackEstatEnumDto callbackEstat,
+			DocumentPortafirmesEntity documentPortafirmes,
+			String administrationId) {
+		List<PortafirmesBlockEntity> portafirmesBlocks = null;
+		switch (callbackEstat) {
+		case PARCIAL:
+			if (administrationId != null) {
+				List<PortafirmesBlockEntity> portafirmesBlocksEntity = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+				if (portafirmesBlocksEntity != null && !portafirmesBlocksEntity.isEmpty()) {
+					for (PortafirmesBlockEntity portafirmesBlockEntity : portafirmesBlocksEntity) {
+						PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = portafirmesBlockInfoRepository.findBySignerIdAndPortafirmesBlock(
+								administrationId,
+								portafirmesBlockEntity);
+						if (portafirmesBlockInfoEntity != null && portafirmesBlockInfoEntity.getSignerId() != null && portafirmesBlockInfoEntity.getSignerId().equals(administrationId))
+							portafirmesBlockInfoEntity.updateSigned(true);
+					}
+				}
+			}
+			break;
+		case REBUTJAT:
+			portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			if (portafirmesBlocks != null) {
+				for (PortafirmesBlockEntity portafirmesBlock : portafirmesBlocks) {
+					portafirmesBlockRepository.delete(portafirmesBlock);
+				}
+			} else {
+				logger.error(
+						"No s'ha trobat cap block de firma relacionat amb aquest enviament", 
+						new NotFoundException(
+								"(portafirmesId=" + documentPortafirmes.getId() + ")",
+								PortafirmesBlockEntity.class));
+			}
+			break;
+		case FIRMAT:
+			portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			if (portafirmesBlocks != null) {
+				for (PortafirmesBlockEntity portafirmesBlock : portafirmesBlocks) {
+					portafirmesBlockRepository.delete(portafirmesBlock);
+				}
+			} else {
+				logger.error(
+						"No s'ha trobat cap block de firma relacionat amb aquest enviament", 
+						new NotFoundException(
+								"(portafirmesId=" + documentPortafirmes.getId() + ")",
+								PortafirmesBlockEntity.class));
+			}
+			break;
+		default:
+			break;
+		}
+	}
 
 	/**
 	 * Registra el log al document i al expedient on està el document.

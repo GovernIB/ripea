@@ -124,6 +124,14 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		
+		boolean isEntitatUserAdminOrOrgan;
+		if (entitatActual.isUsuariActualAdministration() && entitatActual.isUsuariActualAdministrationOrgan()) {
+			isEntitatUserAdminOrOrgan = true;
+		} else {
+			isEntitatUserAdminOrOrgan = false;
+		}
+		model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
+		
 		model.addAttribute(
 				"metaDocumentsLeft",
 				metaDocumentService.findActiusPerCreacio(

@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
@@ -79,38 +82,15 @@ public class DocumentEnviamentController extends BaseUserController {
 	public String notificarGet(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
-			Model model) {
-		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				documentId,
-				false,
-				false);
-		
-		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
-				entitatActual.getId(),
-				document.getExpedientPare().getId(),
-				true);
+			Model model) throws JsonProcessingException {
 		DocumentNotificacionsCommand command = new DocumentNotificacionsCommand();
 		command.setDocumentId(documentId);
-		for (InteressatDto interessatDto : interessats) {
-			NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
-
-			notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
-			if (interessatDto.getRepresentant() != null) {
-				notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
-			}
-			command.getEnviaments().add(notificacioParte);
-		}
-
 		model.addAttribute(command);
-		
 		emplenarModelNotificacio(
 				request,
 				documentId,
+				command,
 				model);
-		
 		return "notificacioForm";
 	}
 
@@ -120,12 +100,13 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			@Validated({DocumentNotificacionsCommand.Create.class}) DocumentNotificacionsCommand command,
 			BindingResult bindingResult,
-			Model model) {
+			Model model) throws JsonProcessingException {
 
 		if (bindingResult.hasErrors()) {
 			emplenarModelNotificacio(
 					request,
 					documentId,
+					command,
 					model);
 			return "notificacioForm";
 		}
@@ -212,11 +193,12 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@PathVariable Long notificacioId,
-			Model model) {
+			Model model) throws JsonProcessingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		emplenarModelNotificacio(
 				request,
 				documentId,
+				null,
 				model);
 		DocumentNotificacionsCommand command = DocumentNotificacionsCommand.asCommand(
 				documentEnviamentService.notificacioFindAmbIdAndDocument(
@@ -239,6 +221,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			emplenarModelNotificacio(
 					request,
 					documentId,
+					null,
 					model);
 			return "notificacioForm";
 		}
@@ -497,7 +480,8 @@ public class DocumentEnviamentController extends BaseUserController {
 	private ExpedientDto emplenarModelNotificacio(
 			HttpServletRequest request,
 			Long documentId,
-			Model model) {
+			DocumentNotificacionsCommand command,
+			Model model) throws JsonProcessingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -525,7 +509,12 @@ public class DocumentEnviamentController extends BaseUserController {
 						DocumentEnviamentEstatEnumDto.class,
 						"notificacio.estat.enum.",
 						new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
-
+		model.addAttribute(
+				"interessats",
+				expedientInteressatService.findByExpedient(
+						entitatActual.getId(),
+						document.getExpedientPare().getId(),
+						true));
 		model.addAttribute(
 				"expedientId",
 				document.getExpedientPare().getId());
@@ -544,9 +533,28 @@ public class DocumentEnviamentController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						ServeiTipusEnumDto.class,
 						"notificacio.servei.tipus.enum."));
-		
-
-		
+		if (command != null) {
+			List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
+					entitatActual.getId(),
+					document.getExpedientPare().getId(),
+					true);
+			command.getEnviaments().clear();
+			
+			for (InteressatDto interessatDto : interessats) {
+				NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
+	
+				notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
+				if (interessatDto.getRepresentant() != null) {
+					notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
+				}
+				command.getEnviaments().add(notificacioParte);
+			}
+			if (command.getEnviaments() != null && !command.getEnviaments().isEmpty()) {
+				ObjectMapper mapper = new ObjectMapper();
+				String notificacions = mapper.writeValueAsString(command.getEnviaments());
+				model.addAttribute("notificacions", notificacions);
+			}
+		}
 		return document.getExpedientPare();
 	}
 

@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.ValidFormat;
 
@@ -42,9 +43,13 @@ public class DocumentNotificacionsCommand {
 	private Date dataProgramada;
 	private Integer retard;
 	private Date dataCaducitat;
-
+	@NotEmpty(groups = {Create.class, Update.class})
+	private List<Long> interessatsIds;
+	@NotNull
+	private ServeiTipusEnumDto serveiTipusEnum;
+	private Boolean entregaPostal;
 	private List<Long> annexos;
-
+	
 	private List<NotificacioEnviamentCommand> enviaments = new ArrayList<NotificacioEnviamentCommand>();
 
 
@@ -110,6 +115,25 @@ public class DocumentNotificacionsCommand {
 		this.annexos = annexos;
 	}
 
+	public List<Long> getInteressatsIds() {
+		return interessatsIds;
+	}
+	public void setInteressatsIds(List<Long> interessatsIds) {
+		this.interessatsIds = interessatsIds;
+	}
+	public ServeiTipusEnumDto getServeiTipusEnum() {
+		return serveiTipusEnum;
+	}
+	public void setServeiTipusEnum(ServeiTipusEnumDto serveiTipusEnum) {
+		this.serveiTipusEnum = serveiTipusEnum;
+	}
+	public Boolean getEntregaPostal() {
+		return entregaPostal;
+	}
+	public void setEntregaPostal(Boolean entregaPostal) {
+		this.entregaPostal = entregaPostal;
+	}
+	
 	public static DocumentNotificacionsCommand asCommand(DocumentNotificacioDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,

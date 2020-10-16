@@ -57,6 +57,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
+import es.caib.ripea.war.command.ExpedientAssignarCommand;
 import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
@@ -142,7 +143,7 @@ public class ExpedientController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_METAEXP_ID);
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), metaExpedientId));
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",
@@ -291,7 +292,6 @@ public class ExpedientController extends BaseUserController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			FitxerDto fitxer = expedientService.exportacio(
 					entitatActual.getId(),
-					command.getMetaExpedientId(),
 					seleccio,
 					format);
 			writeFileToResponse(
@@ -302,23 +302,36 @@ public class ExpedientController extends BaseUserController {
 		}
 	}
 	
+	
 	@RequestMapping(value = "/{expedientId}/generarIndex", method = RequestMethod.GET)
-	@ResponseBody
-	public void generarIndex(
+	public String generarIndex(
 			@PathVariable Long expedientId,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), expedientId);
+		if (!expedient.isHasAllDocumentsDefinitiu()) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.index.generar.notAllDocumentsDefinitiu"));
+			return "redirect:../../contingut/" + expedientId;
+		} else {
+		
 			FitxerDto fitxer = expedientService.exportIndexExpedient(
 					entitatActual.getId(),
 					expedientId);
 
 			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+			
 			writeFileToResponse(
 					fitxer.getNom(),
 					fitxer.getContingut(),
 					response);
+			return null;
+			}
 	}
 	
 	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)
@@ -622,6 +635,45 @@ public class ExpedientController extends BaseUserController {
 				"redirect:../../contingut/" + expedientId,
 				"expedient.controller.alliberat.ok");
 	}
+	
+	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.GET)
+	public String assignar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
+		getEntitatActualComprovantPermisos(request);
+
+		ExpedientAssignarCommand command = new ExpedientAssignarCommand();
+		model.addAttribute(command);
+		
+		return "expedientAssignarForm";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.POST)
+	public String expedientTancarPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@Valid ExpedientAssignarCommand command,
+			BindingResult bindingResult,
+			Model model) throws IOException {
+		model.addAttribute("mantenirPaginacio", true);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			return "expedientAssignarForm";
+		}
+		expedientService.agafar(
+				entitatActual.getId(),
+				expedientId,
+				command.getUsuariCodi());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../contingut/" + expedientId,
+				"expedient.assignar.controller.assignat.ok");
+	}
+	
+	
 
 	@RequestMapping(value = "/{expedientId}/tancar", method = RequestMethod.GET)
 	public String expedientTancarGet(
@@ -692,12 +744,12 @@ public class ExpedientController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatByMetaExpedient(
+		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatsByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name().toUpperCase(), Long.valueOf(0)));
 		expedientEstatsOptions.addAll(estatsFromDatabase);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name().toUpperCase(), Long.valueOf(-1)));		
 		return expedientEstatsOptions;
 	}
 
@@ -814,7 +866,7 @@ public class ExpedientController extends BaseUserController {
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
 		model.addAttribute(
 				"expedientEstatsOptions",

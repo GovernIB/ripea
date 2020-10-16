@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 
-<c:set var="titol"><spring:message code="expedient.estat.form.modificar.titol"/></c:set>
+<c:set var="titol"><spring:message code="expedient.massiu.tancar.titol"/></c:set>
 
 <html>
 <head>
@@ -20,14 +20,12 @@
 <body>
 
 
-	<c:set var="formAction"><rip:modalUrl value="/expedient/canviarEstat"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/massiu/tancament/tancar"/></c:set>
 
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
-		<form:hidden path="id"/>
-		<form:hidden path="entitatId"/>
-		<form:hidden path="pareId"/>
-		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" disabled="true"/>
-		<rip:inputSelect name="expedientEstatId" textKey="expedient.estat.form.camp"  optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom"/>
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientMassiuTancamentCommand">
+	<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
+	
+
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

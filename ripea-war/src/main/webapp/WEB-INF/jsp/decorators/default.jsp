@@ -244,6 +244,12 @@ body {
 										<spring:message code="decorator.menu.configuracio.user"/>
 									</a>
 								</li>
+								<li>
+									<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
+									   rel="noopener noreferrer" target="_blank">
+										<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
+									</a>
+								</li>
 							</ul>
 						</li>
 					</ul>
@@ -332,13 +338,11 @@ body {
 										<c:if test="${convertirDefinitiu}">
 										<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
 										</c:if>
+										<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
+										<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
 									</ul>
 								</div>
-								<a class="btn btn-success"
-									href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
-									rel="noopener noreferrer" target="_blank">
-									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
-								</a>
+
 							</c:when>
 						</c:choose>
 						<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">

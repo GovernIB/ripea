@@ -5,6 +5,9 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<c:set var="charSearch" value='"' />
+<c:set var="charReplace" value='\\"' />
+
 <%
 	pageContext.setAttribute(
 		"idioma",
@@ -147,8 +150,8 @@ body.loading .rmodal {
 		
 		$("#portafirmesFluxTipus").trigger('change');
 		
-		$(".portafirmesFluxId_btn_edicio").on('click', function(){
-			var metaDocumentNom = '${metaDocumentCommand.nom}';
+		$(".portafirmesFluxId_btn_edicio").on('click', function() {
+			var metaDocumentNom = "${fn:replace(metaDocumentCommand.nom, charSearch, charReplace)}";
 			$.ajax({
 				type: 'GET',
 				dataType: "json",
@@ -337,7 +340,7 @@ function removeLoading() {
 				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				<div class="flux_portafib">
-					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" botons="true" icon="fa fa-external-link" iconDelete="fa fa-trash-o" buttonMsg="${buttonTitle}" deleteMsg="metadocument.form.camp.portafirmes.flux.esborrar"/>
+					<rip:inputSelect name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id" emptyOption="true" botons="true" icon="fa fa-external-link" iconAddicional="fa fa-trash-o" buttonMsg="${buttonTitle}"/>
 				</div>
 				<div class="flux_simple">
 					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

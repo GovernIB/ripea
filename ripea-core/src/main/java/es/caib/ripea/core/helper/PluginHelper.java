@@ -182,6 +182,8 @@ public class PluginHelper {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	public List<String> rolsUsuariFindAmbCodi(
 			String usuariCodi) {
@@ -1876,6 +1878,7 @@ public class PluginHelper {
 				annexos);
 		List<PortafirmesDocument> portafirmesAnnexos = null;
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
+		portafirmesDocument.setExpedientUuid(document.getExpedient().getArxiuUuid());
 		portafirmesDocument.setTitol(document.getNom());
 		portafirmesDocument.setFirmat(
 				false);
@@ -3219,7 +3222,7 @@ public class PluginHelper {
 			}
 			
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
-			notificacio.setNumExpedient(expedientEntity.getCodi());
+			notificacio.setNumExpedient(expedientHelper.calcularNumero(expedientEntity));
 			
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
@@ -3922,6 +3925,12 @@ public class PluginHelper {
 					firma.setCsvRegulacio(firmaDto.getCsvRegulacio());
 					document.getFirmes().add(firma);
 				}
+				contingut = new DocumentContingut();
+				contingut.setArxiuNom(fitxer.getNom());
+				contingut.setContingut(fitxer.getContingut());
+				contingut.setTipusMime(fitxer.getContentType());
+				document.setContingut(contingut);
+				
 			}
 			if (getPropertyArxiuMetadadesAddicionalsActiu()) {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();

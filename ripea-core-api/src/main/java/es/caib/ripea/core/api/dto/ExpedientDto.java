@@ -57,6 +57,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean ambEnviamentsPendents;
 	private boolean ambNotificacionsPendents;
 	private Long grupId;
+	private boolean hasAllDocumentsDefinitiu;
 
 	public MetaExpedientDto getMetaExpedient() {
 		return (MetaExpedientDto)getMetaNode();

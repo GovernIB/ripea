@@ -13,11 +13,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -196,9 +199,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat);
 
-	List<ExpedientEntity> findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
+	List<ExpedientEntity> findByEntitatAndIdInOrderByIdAsc(
 			EntitatEntity entitat,
-			MetaNodeEntity metaNode,
 			Collection<Long> id);
 
 	@Query(	"select" +
@@ -216,30 +218,64 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaNode") MetaNodeEntity metaNode);
 	
 	
-//	@Query(	"select" +
-//			"    e " +
-//			"from" +
-//			"    ExpedientEntity e " +
-//			"where " +
-//			"    e.entitat = :entitat " +
-//			"and e.metaNode = :metaNode "
-//			+ "and e != :expedient)")
-//	List<ExpedientEntity> findByEntitatAndMetaExpedientWithoutGivenExp(
-//			@Param("entitat") EntitatEntity entitat,
-//			@Param("metaNode") MetaNodeEntity metaNode,
-//			@Param("expedient") ExpedientEntity expedient);
+
 	
 	
-	@Query(	"select" +
-			"    count(e) " +
-			"from" +
+	
+	@Query(	"select " +
+			"    e " +
+			"from " +
 			"    ExpedientEntity e " +
 			"where " +
-			"   e.alertes IS EMPTY " +
-			"and e.metaNode = :metaNode ")
-	int findByMetaExpedientAndAlertesEmpty(
-			@Param("metaNode") MetaNodeEntity metaNode);
+			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
+			"and e.estat = 0 " +
+			"and e.agafatPer = :usuariActual " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
+	public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("usuariActual") UsuariEntity usuariActual,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			Pageable pageable);
 	
+	@Query(	"select " +
+			"    e.id " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
+			"and e.estat = 0 " +
+			"and e.agafatPer = :usuariActual " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
+	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("usuariActual") UsuariEntity usuariActual,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi);
 	@Query(	"select" +
 			"    count(e) " +
 			"from" +
@@ -250,13 +286,106 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	int findByMetaExpedientAndAlertesNotEmpty(
 			@Param("metaNode") MetaNodeEntity metaNode);
 	
-//	@Query(	"select" +
-//			"    count(e) " +
-//			"from" +
-//			"    ExpedientEntity e " +
-//			"where " +
-//			"   e.alertes IS EMPTY " +
-//			"and e.metaNode = :metaNode ")
-//	int findByMetaExpedientAndValid(
-//			@Param("metaNode") MetaNodeEntity metaNode);
+	
+	
+	@Query(	"select " +
+			"    e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
+			"and e.estat = 0 " +
+			"and e.agafatPer = :usuariActual " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
+			"and (select count(document) from DocumentEntity document where document.expedient = e and document.estat = 3) > 0 " +   // at least one document custodiat
+			"and (select " +																										// all dades obligatoris created
+			"	     	count(metaDada) " +
+			"	  from " +
+			"			MetaDadaEntity metaDada" +
+			"	  where " +
+			"			metaDada.activa = true " +
+			"			and metaDada.metaNode = e.metaNode " +
+			"			and (metaDada.multiplicitat = 0 or metaDada.multiplicitat = 3) " +
+			"			and metaDada not in (select dada.metaDada from DadaEntity dada where e.id = dada.node.id)) = 0 " +
+			"and (select " +																									// all documents obligatoris created
+			"	     	count(metaDocument) " +
+			"	  from " +
+			"			MetaDocumentEntity metaDocument" +
+			"	  where " +
+			"			metaDocument.metaExpedient = e.metaExpedient " +
+			"			and (metaDocument.multiplicitat = 0 or metaDocument.multiplicitat = 3) " +
+			"			and metaDocument.id not in (select doc.metaNode.id from DocumentEntity doc where e.id = doc.expedient.id)) = 0"			
+			)
+	public Page<ExpedientEntity> findExpedientsPerTancamentMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("usuariActual") UsuariEntity usuariActual,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			Pageable pageable);
+	
+	
+	
+	@Query(	"select " +
+			"    e.id " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
+			"and e.estat = 0 " +
+			"and e.agafatPer = :usuariActual " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
+			"and (select count(document) from DocumentEntity document where document.expedient = e and document.estat = 3) > 0 " + 
+			"and (select " +
+			"	     	count(metaDada) " +
+			"	  from " +
+			"			MetaDadaEntity metaDada" +
+			"	  where " +
+			"			metaDada.activa = true " +
+			"			and metaDada.metaNode = e.metaNode " +
+			"			and (metaDada.multiplicitat = 0 or metaDada.multiplicitat = 3) " +
+			"			and metaDada not in (select dada.metaDada from DadaEntity dada where e.id = dada.node.id)) = 0 " +
+			"and (select " +
+			"	     	count(metaDocument) " +
+			"	  from " +
+			"			MetaDocumentEntity metaDocument" +
+			"	  where " +
+			"			metaDocument.metaExpedient = e.metaExpedient " +
+			"			and (metaDocument.multiplicitat = 0 or metaDocument.multiplicitat = 3) " +
+			"			and metaDocument.id not in (select doc.metaNode.id from DocumentEntity doc where e.id = doc.expedient.id)) = 0"			
+			)
+	public List<Long> findIdsExpedientsPerTancamentMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("usuariActual") UsuariEntity usuariActual,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi);
+	
+	
+
+	
+	
+	
 }

@@ -146,6 +146,9 @@ $(document).ready(function() {
 									<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									{{/if}}								
 								{{/if}}
+								{{if expedient}}
+									<li><a href="<c:url value="contingutAdmin/{{:id}}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
+								{{/if}}								
 							</ul>
 						</div>
 					</script>

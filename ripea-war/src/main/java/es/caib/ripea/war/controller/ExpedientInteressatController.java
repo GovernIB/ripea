@@ -166,7 +166,7 @@ public class ExpedientInteressatController extends BaseUserController {
 		}
 		return getModalControllerReturnValueSuccess(
 				request,
-				"redirect:../../contenidor/" + expedientId,
+				"redirect:../../../contingut/" + expedientId,
 				msgKey);
 	}
 
@@ -183,7 +183,7 @@ public class ExpedientInteressatController extends BaseUserController {
 				interessatId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../../../contenidor/" + expedientId,
+				"redirect:../../../contingut/" + expedientId,
 				"interessat.controller.eliminat.ok");
 	}
 	

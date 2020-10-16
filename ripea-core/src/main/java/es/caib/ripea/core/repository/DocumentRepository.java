@@ -58,6 +58,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    c.entitat = :entitat " +
 			"and c.expedient = :expedient "  + 
 			"and c.documentTipus != 2 " +
+			"and c.esborrat = 0 " +
 			"and c.id != :documentId) ")
 	List<DocumentEntity> findByExpedientAndTipus(
 			@Param("entitat") EntitatEntity entitat,
