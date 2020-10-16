@@ -201,12 +201,11 @@ public class ContingutHelper {
 			dto.setHasEsborranys(
 					documentHelper.hasFillsEsborranys(expedient));
 			dto.setConteDocumentsFirmats(
-					documentRepository.countByExpedient(expedient) > 0);
-			dto.setConteDocumentsFirmats(
 					documentRepository.countByExpedientAndEstat(
 							expedient,
 							DocumentEstatEnumDto.CUSTODIAT) > 0);
-			dto.setNumComentaris(expedientComentariRepository.countByExpedient(expedient));
+			
+			dto.setHasAllDocumentsDefinitiu(documentHelper.hasAllDocumentsDefinitiu(expedient));
 			// expedient estat
 			if (expedient.getExpedientEstat() != null) {
 				ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getExpedientEstat().getMetaExpedient(), expedient.getExpedientEstat().getOrdre()+1);

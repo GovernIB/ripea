@@ -535,6 +535,18 @@ public class DocumentHelper {
 		}
 		return false;
 	}
+	
+	public boolean hasAllDocumentsDefinitiu(
+			ExpedientEntity expedient) {
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		for (DocumentEntity document : documents) {
+			if (document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL) && 
+					!(document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public boolean hasAnyDocumentDefinitiu(
 			ExpedientEntity expedient) {

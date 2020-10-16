@@ -295,7 +295,7 @@
 			</c:choose>	
 			<c:if test="${contingut.expedient}">
 				<c:choose>
-					<c:when test="${contingut.hasFills}">
+					<c:when test="${contingut.hasFills}" >
 						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
 					</c:when>
 					<c:otherwise>
