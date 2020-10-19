@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.aggregation.ContingutLogCountAggregation;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
@@ -33,25 +34,28 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			Pageable pageable);
 	
 	@Query(	"select " +
-			"    count(tasca) " +
+            "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+            "	     tasca.responsable, " +
+			"	     e.metaExpedient, " +
+            "        count(tasca) " +
+            "    ) " +
 			"from " +
-			"    ExpedientTascaEntity tasca " +
+			"    ExpedientTascaEntity tasca JOIN tasca.expedient e " +
 			"where " +
-			"     tasca.responsable = :responsable " +
-			" and tasca.expedient.metaExpedient = :metaExpedient " +
-			" and tasca.estat IN :estats")
-	long countByResponsableAndEstat(
-			@Param("responsable") UsuariEntity responsable,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			"    tasca.estat IN :estats " +
+			"group by" +
+			"    tasca.responsable, e.metaExpedient")
+    List<ContingutLogCountAggregation<UsuariEntity>> countByResponsableAndEstat(
 			@Param("estats") TascaEstatEnumDto[] estats);
 	
 	@Query(	"select " +
 			"    count(tasca) " +
 			"from " +
 			"    ExpedientTascaEntity tasca " +
-			"where tasca.responsable = :responsable " +
-			"and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
-	public long countTasquesPendents(
+			"where " +
+			"        tasca.responsable = :responsable " +
+			"    and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
+	long countTasquesPendents(
 			@Param("responsable") UsuariEntity responsable);
 
 }

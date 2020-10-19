@@ -3,6 +3,7 @@ package es.caib.ripea.core.ejb;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
@@ -26,6 +27,7 @@ public class HistoricServiceBean implements HistoricService {
 	private HistoricService historicService;
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
 			Long entitatId,
 			HistoricFiltreDto filtre,
@@ -34,31 +36,47 @@ public class HistoricServiceBean implements HistoricService {
 	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre) {
 		return historicService.getDadesEntitat(entitatId, filtre);
 	}
 
 	@Override
-	public Map<Long, List<HistoricExpedientDto>> getDadesOrgansGestors(
-			List<OrganGestorDto> organGestors,
+	@RolesAllowed("IPA_ADMIN")
+	public Map<OrganGestorDto, List<HistoricExpedientDto>> getDadesOrgansGestors(
 			HistoricFiltreDto filtre) {
-		return historicService.getDadesOrgansGestors(organGestors, filtre);
+		return historicService.getDadesOrgansGestors(filtre);
 	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre) {
 		return historicService.getDadesUsuari(usuariCodi, filtre);
 	}
 
-	@Override
-	public List<HistoricUsuariDto> getDadesUsuariActual(HistoricFiltreDto filtre) {
-		return getDadesUsuariActual(filtre);
-	}
+//	@Override
+//	@RolesAllowed("IPA_ADMIN")
+//	public List<HistoricUsuariDto> getDadesUsuariActual(HistoricFiltreDto filtre) {
+//		return getDadesUsuariActual(filtre);
+//	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public List<HistoricDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre) {
+		return historicService.getDadesActualsEntitat(entitatId, filtre);
+	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre) {
+		return historicService.getDadesActualsOrgansGestors(filtre);
 	}
 
 }

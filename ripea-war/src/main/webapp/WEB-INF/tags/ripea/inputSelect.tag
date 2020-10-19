@@ -152,7 +152,17 @@
 	</c:when>
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
-		<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-netejar="${netejar}" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
+		<form:select    path="${campPath}" 
+						cssClass="form-control" 
+						id="${campId}" 
+						disabled="${disabled}" 
+						data-netejar="${netejar}" 
+						data-toggle="select2" 
+						data-placeholder="${campPlaceholder}" 
+						data-minimumresults="${minimumResultsForSearch}" 
+						data-enum="${optionEnum}" 
+						data-enum-value="${campValue}"
+						multiple="${multiple}">
 			<c:if test="${emptyOption == 'true'}">
 				<c:choose>
 					<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>

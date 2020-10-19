@@ -29,8 +29,7 @@ public class HistoricUsuariEntity extends HistoricEntity {
 	
 	public HistoricUsuariEntity(Date data, HistoricTipusEnumDto tipus) {
 		super(data, tipus);
-		// TODO Auto-generated constructor stub
-		numTasquesTramitades = 0L;
+		this.numTasquesTramitades = 0L;
 	}
 	
 	/**

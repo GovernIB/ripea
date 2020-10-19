@@ -14,7 +14,7 @@ public class HistoricFiltreDto {
 	private List<Long> organGestorsIds;
 	private List<Long> metaExpedientsIds;
 
-	private HistoricDadesMostrarEnum dadesMostrar;
+	private List<HistoricDadesMostrarEnum> dadesMostrar;
 		
 	private HistoricTipusEnumDto tipusAgrupament; // DIARI, MENSUAL, DIA CONCRET 
 

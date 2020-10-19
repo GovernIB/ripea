@@ -360,11 +360,6 @@ public class DocumentNotificacioHelper {
 		return contingutHelper.generarDocumentDto(notificacio, metaDocument, resposta);
 	}
 	
-//	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog) {
-//		String
-//		logAll(notificacioEntity, tipusLog, param1, notificacioEntity.getAssumpte());
-//	}
-	
 	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {
 		logAll(notificacioEntity, tipusLog, param1, notificacioEntity.getAssumpte());
 	}
@@ -392,9 +387,6 @@ public class DocumentNotificacioHelper {
 				false);
 
 	}
-
-	
-	
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat

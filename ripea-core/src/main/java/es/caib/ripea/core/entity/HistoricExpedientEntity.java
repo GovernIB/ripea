@@ -36,6 +36,12 @@ public class HistoricExpedientEntity extends HistoricEntity {
 
 	public HistoricExpedientEntity(Date data, HistoricTipusEnumDto tipus) {
 		super(data, tipus);
+		this.numExpedientsAmbAlertes = 0L;
+		this.numExpedientsAmbErrorsValidacio = 0L;
+		this.numDocsPendentsSignar = 0L;
+		this.numDocsSignats = 0L;
+		this.numDocsPendentsNotificar = 0L;
+		this.numDocsNotificats = 0L;
 	}
 
 	public void fillDailyHistoric(

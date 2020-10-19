@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.aggregation.MetaExpedientCountAggregation;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -276,16 +277,29 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
+	
+//	@Query(	"select" +
+//			"    count(e) " +
+//			"from" +
+//			"    ExpedientEntity e " +
+//			"where " +
+//			"   e.alertes IS NOT EMPTY " +
+//			"and e.metaNode = :metaNode ")
+//	int findByMetaExpedientAndAlertesNotEmpty(
+//			@Param("metaNode") MetaNodeEntity metaNode);
+	
 	@Query(	"select" +
-			"    count(e) " +
+			"    new es.caib.ripea.core.aggregation.MetaExpedientCountAggregation( " +
+			"	     e.metaExpedient, " +
+			"        count(e) " +
+			"    ) " +
 			"from" +
 			"    ExpedientEntity e " +
 			"where " +
 			"   e.alertes IS NOT EMPTY " +
-			"and e.metaNode = :metaNode ")
-	int findByMetaExpedientAndAlertesNotEmpty(
-			@Param("metaNode") MetaNodeEntity metaNode);
-	
+			"group by" +
+			"  e.metaExpedient ")
+	List<MetaExpedientCountAggregation> countByAlertesNotEmptyGroupByMetaExpedient();
 	
 	
 	@Query(	"select " +

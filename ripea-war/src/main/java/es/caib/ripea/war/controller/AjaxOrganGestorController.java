@@ -3,10 +3,12 @@ package es.caib.ripea.war.controller;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -43,6 +46,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@ResponseBody
 	public List<OrganGestorDto> get(HttpServletRequest request, @PathVariable String text, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
 		try {
 			text = URLDecoder.decode(request.getRequestURI().split("/")[4], StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException e) { }
@@ -65,11 +69,16 @@ public class AjaxOrganGestorController extends BaseAdminController{
 
 		return organGestorsList;
 	}
-	
+		
 	@RequestMapping(value = "/organgestor/item/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public OrganGestorDto getItem(HttpServletRequest request, @PathVariable Long id, Model model) {
 		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		return organGestorService.findItem(id);
+		
+		try {
+			return organGestorService.findItem(id);
+		} catch (NotFoundException e) {
+			return null;
+		} 
 	}
 }

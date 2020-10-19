@@ -24,22 +24,42 @@ public class HistoricFiltreCommand {
 	private List<Long> organGestorsIds;
 	private List<Long> metaExpedientsIds;
 
-	private HistoricDadesMostrarEnum dadesMostrar;
+	private List<HistoricDadesMostrarEnum> dadesMostrar;
 
 	private HistoricTipusEnumDto tipusAgrupament; // DIARI, MENSUAL, DIA CONCRET
 
+	private boolean showingTables;
+		
 	public HistoricFiltreCommand() {
 		DateTime dateStartToday = (new LocalDate()).toDateTimeAtStartOfDay();
 		this.dataFi = dateStartToday.toDate();
 		this.dataInici = dateStartToday.minusDays(30).toDate();
 		this.organGestorsIds = new ArrayList<Long>();
 		this.metaExpedientsIds = new ArrayList<Long>();
-		this.dadesMostrar = HistoricDadesMostrarEnum.ENTITAT;
+		this.dadesMostrar = new ArrayList<HistoricDadesMostrarEnum>();
+		this.dadesMostrar.add(HistoricDadesMostrarEnum.ENTITAT);
 		this.tipusAgrupament = HistoricTipusEnumDto.DIARI;
+		this.showingTables = true;
+	}
+
+	public boolean showingDadesEntitat() {
+		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.ENTITAT);
+	}
+
+	public boolean showingDadesOrganGestor() {
+		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.ORGANGESTOR);
+	}
+
+	public boolean showingDadesUsuari() {
+		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.USUARI);
+	}
+
+	public boolean showingDadesInteressat() {
+		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.INTERESSAT);
 	}
 
 	public HistoricFiltreDto asDto() {
 		return ConversioTipusHelper.convertir(this, HistoricFiltreDto.class);
 	}
-
+	
 }

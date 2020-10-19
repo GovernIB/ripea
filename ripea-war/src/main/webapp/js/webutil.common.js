@@ -358,6 +358,18 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		if ($(this).data('enum')) {
 			var enumValue = $(this).data('enum-value');
 			var $select = $(this);
+			if (enumValue != null && typeof enumValue === 'string' && enumValue.includes(",")) {
+				var valueArr = enumValue.split(',');
+			}
+			
+			function isSelected(enumItemValue){
+				if (valueArr != undefined){
+					return valueArr.includes(enumItemValue);
+				} else{
+					return enumValue == enumItemValue;
+				}
+				
+			}
 			$.ajax({
 				url: webutilAjaxEnumPath($(this).data('enum')),
 				async: false,
@@ -368,7 +380,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 								$('<option>', {
 									value: enumItem['value'],
 									text: enumItem['text'],
-									selected: enumValue == enumItem['value']
+									selected: isSelected(enumItem['value'])
 								}));
 					}
 				}
@@ -399,16 +411,16 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	$.fn.webutilInputSuggest = function() {
 		var urlActual = $(this).data('urlInicial');
 		var value = $(this).data('currentValue');
-		var urlInicial = urlActual + "/" + value;
+		var urlInicial = urlActual + "/item/" + value;
 		var suggestValue = $(this).data('suggestValue');
 		var suggestText = $(this).data('suggestText');
 		var suggestTextAddicional = $(this).data('suggestTextAddicional');
 		var suggest = $(this);
-		if (value != null && typeof value === 'string') {
+		if (value != null && typeof value === 'string' && value != "") {
 			if (value.includes(",")) {
 				var valueArr = value.split(',');
 				valueArr.forEach(function(value) {
-					urlInicial = urlActual + "/" + value;
+					urlInicial = urlActual + "/item/" + value;
 					// Preselected value
 					if (value) {
 						$.ajax({

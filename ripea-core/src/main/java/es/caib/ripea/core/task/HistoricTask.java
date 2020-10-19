@@ -13,28 +13,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.ContingutLogCountAggregation;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.HistoricEntity;
 import es.caib.ripea.core.entity.HistoricExpedientEntity;
+import es.caib.ripea.core.entity.HistoricInteressatEntity;
 import es.caib.ripea.core.entity.HistoricUsuariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.repository.ContingutLogRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.HistoricExpedientRepository;
+import es.caib.ripea.core.repository.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.HistoricUsuariRepository;
-import es.caib.ripea.core.repository.InteressatRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
 
 @Component
 public class HistoricTask {
@@ -44,21 +36,11 @@ public class HistoricTask {
 	@Autowired
 	private HistoricUsuariRepository historicUsuariRepository;
 	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private DocumentRepository documentRepository;
+	private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired
 	private ContingutLogRepository contingutLogRepository;
 	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
 	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
 
 	/*
 	 * TODO: ajustar expressions cron https://www.baeldung.com/cron-expressions
@@ -76,23 +58,32 @@ public class HistoricTask {
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void registreDiari() {
 		// get yesterday day
-		for (int i = 1; i <= 5; i++) {
-			LocalDate date = (new LocalDate()).minusDays(i);
-//		LocalDate date = (new LocalDate()).minusDays(1);
+//		for (int i = 1; i <= 60; i++) {
+//			LocalDate date = (new LocalDate()).minusDays(i);
+		LocalDate date = (new LocalDate()).minusDays(1);
 		Date currentDateIni = date.toDateTimeAtStartOfDay().toDate();
-		Date currentDateEnd = date.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(
-				999).toDate();
+		Date currentDateEnd = date.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(
+				59).plusMillis(999).toDate();
 
-		registreHistoricExpedient(currentDateIni, currentDateEnd, HistoricTipusEnumDto.DIARI);
-		registreHistoricUsuari(currentDateIni, currentDateEnd, HistoricTipusEnumDto.DIARI);
+		Collection<HistoricExpedientEntity> historics = calcularHistoricExpedient(
+				currentDateIni,
+				currentDateEnd,
+				HistoricTipusEnumDto.DIARI);
+		historicExpedientRepository.save(historics);
 
-		// Historic expedient
-//		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findAll();
-//		for (MetaExpedientEntity metaExpedient : metaExpedients) {
+		Collection<HistoricUsuariEntity> historicsUsuaris = calcularHistoricUsuari(
+				currentDateIni,
+				currentDateEnd,
+				HistoricTipusEnumDto.DIARI);
+		historicUsuariRepository.save(historicsUsuaris);
+		
+		Collection<HistoricInteressatEntity> historicsInteressats = calcularHistoricInteressat(
+				currentDateIni,
+				currentDateEnd,
+				HistoricTipusEnumDto.DIARI);
+		historicInteressatRepository.save(historicsInteressats);
 
-		// registreHistoricInteressat(metaExpedient, currentDateIni, currentDateEnd);
 //		}
-		}
 	}
 
 	/**
@@ -105,186 +96,179 @@ public class HistoricTask {
 	@Scheduled(cron = "0 0 0 1 * ?")
 	public void registreMensual() {
 		LocalDate date = (new LocalDate()).minusDays(1);
-		for (int i = 1; i <=5; i ++) {
-			date = date.minusMonths(1);
-			Date currentDateEnd = date.withDayOfMonth(28).toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(
-					999).toDate();
-			Date currentDateIni = date.withDayOfMonth(1).toDateTimeAtStartOfDay().toDate();
-	
-			registreHistoricExpedient(currentDateIni, currentDateEnd, HistoricTipusEnumDto.MENSUAL);
-			registreHistoricUsuari(currentDateIni, currentDateEnd, HistoricTipusEnumDto.MENSUAL);
-		}
+//		for (int i = 1; i <= 24; i++) {
+//			date = date.minusMonths(1);
+		Date currentDateEnd = date.withDayOfMonth(28).toDateTimeAtStartOfDay().plusHours(23).plusMinutes(
+				59).plusSeconds(59).plusMillis(999).toDate();
+		Date currentDateIni = date.withDayOfMonth(1).toDateTimeAtStartOfDay().toDate();
+
+		Collection<HistoricExpedientEntity> historicsExpedients = calcularHistoricExpedient(
+				currentDateIni,
+				currentDateEnd,
+				HistoricTipusEnumDto.MENSUAL);
+		historicExpedientRepository.save(historicsExpedients);
+
+		Collection<HistoricUsuariEntity> historicsUsuaris = calcularHistoricUsuari(
+				currentDateIni,
+				currentDateEnd,
+				HistoricTipusEnumDto.MENSUAL);
+		historicUsuariRepository.save(historicsUsuaris);
+		
+		Collection<HistoricInteressatEntity> historicsInteressats = calcularHistoricInteressat(
+				currentDateIni,
+				currentDateEnd,
+				HistoricTipusEnumDto.MENSUAL);
+		historicInteressatRepository.save(historicsInteressats);
+//		}
 	}
 
-	private void registreHistoricExpedient(Date currentDateIni, Date currentDateEnd, HistoricTipusEnumDto tipusLog) {
+	public Collection<HistoricExpedientEntity> calcularHistoricExpedient(
+			Date currentDateIni,
+			Date currentDateEnd,
+			HistoricTipusEnumDto tipusLog) {
 
-		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCount = contingutLogRepository.findLogsBetweenCreatedDateGroupByMetaExpedient(
-				LogObjecteTipusEnumDto.EXPEDIENT,
+		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByMetaExpedient(
 				currentDateIni,
 				currentDateEnd);
 		MapHistoricMetaExpedients mapExpedients = new MapHistoricMetaExpedients(tipusLog);
 		registreHistoricExpedients(logsCount, mapExpedients, currentDateIni);
 
-		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCountAccum = contingutLogRepository.findLogsBeforeCreatedDateGroupByMetaExpedient(
-				LogObjecteTipusEnumDto.EXPEDIENT,
+		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBeforeCreatedDateGroupByMetaExpedient(
 				currentDateEnd);
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapExpedients, currentDateIni);
 
-		for (HistoricExpedientEntity histUsuari : mapExpedients.getValues()) {
-			histUsuari.setNumExpedientsOberts(
-					histUsuari.getNumExpedientsOberts() + histUsuari.getNumExpedientsCreats());
-			histUsuari.setNumExpedientsObertsTotal(
-					histUsuari.getNumExpedientsObertsTotal() + histUsuari.getNumExpedientsCreatsTotal());
+		for (HistoricExpedientEntity historic : mapExpedients.getValues()) {
+			historic.setNumExpedientsOberts(historic.getNumExpedientsOberts() + historic.getNumExpedientsCreats());
+			historic.setNumExpedientsObertsTotal(
+					historic.getNumExpedientsObertsTotal() + historic.getNumExpedientsCreatsTotal());
 		}
 
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findAll();
-		for (MetaExpedientEntity metaExpedient : metaExpedients) {
+//		List<MetaExpedientCountAggregation> countsPendentsSignar = documentRepository.countByEstatGroupByMetaExpedient(
+//				DocumentEstatEnumDto.FIRMA_PENDENT);
+//		for (MetaExpedientCountAggregation count : countsPendentsSignar) {
+//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
+//					count.getMetaExpedient().getId(),
+//					currentDateIni,
+//					count.getMetaExpedient());
+//			historic.setNumDocsPendentsSignar(count.getCount());
+//		}
+
+		List<ContingutLogCountAggregation<MetaExpedientEntity>> countsSignats = contingutLogRepository.findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
+				currentDateIni,
+				currentDateEnd);
+		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countsSignats) {
 			HistoricExpedientEntity historic = mapExpedients.getHistoric(
-					metaExpedient.getId(),
+					count.getMetaExpedient().getId(),
 					currentDateIni,
-					metaExpedient);
-			long nExpedientsAmbErrorsValidacio = 0;
-			long nDocsPendentsSignar = 0;
-			long nDocsSignats = 0;
-			long nDocsNotificats = 0;
-			long nDocsPendentsNotificar = 0;
-			for (ExpedientEntity expedient : expedientRepository.findByMetaExpedient(metaExpedient)) {
+					count.getMetaExpedient());
+			switch (count.getTipus()) {
+				case DOC_FIRMAT:
+					historic.setNumDocsSignats(count.getCount());
+					break;
+				case NOTIFICACIO_CERTIFICADA:
+					historic.setNumDocsNotificats(count.getCount());
+					break;
+				default:
+					break;
+			}
+				
+		}
+
+//		List<MetaExpedientCountAggregation> countsPendentsNotificats = documentRepository.countByNotificacioEstatInGroupByMetaExpedient(
+//				new DocumentNotificacioEstatEnumDto[] {
+//						DocumentNotificacioEstatEnumDto.PENDENT,
+//						DocumentNotificacioEstatEnumDto.ENVIADA,
+//						DocumentNotificacioEstatEnumDto.REGISTRADA });
+//		for (MetaExpedientCountAggregation count : countsPendentsNotificats) {
+//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
+//					count.getMetaExpedient().getId(),
+//					currentDateIni,
+//					count.getMetaExpedient());
+//			historic.setNumDocsPendentsNotificar(count.getCount());
+//		}
+
+//		List<MetaExpedientCountAggregation> countsExpedientsAmbAlertes = expedientRepository.countByAlertesNotEmptyGroupByMetaExpedient();
+//		for (MetaExpedientCountAggregation count : countsExpedientsAmbAlertes) {
+//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
+//					count.getMetaExpedient().getId(),
+//					currentDateIni,
+//					count.getMetaExpedient());
+//			historic.setNumExpedientsAmbAlertes(count.getCount());
+//		}
+
+//		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findAll();
+//		for (MetaExpedientEntity metaExpedient : metaExpedients) {
+//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
+//					metaExpedient.getId(),
+//					currentDateIni,
+//					metaExpedient);
+//			long nExpedientsAmbErrorsValidacio = 0;
+//			for (ExpedientEntity expedient : expedientRepository.findByMetaExpedient(metaExpedient)) {
 //				if (cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
 //					nExpedientsAmbErrorsValidacio += 1;
 //				}
+//			}
+//			historic.setNumExpedientsAmbErrorsValidacio(nExpedientsAmbErrorsValidacio);
+//		}
 
-				nDocsPendentsSignar += documentRepository.countByExpedientAndEstat(
-						expedient,
-						DocumentEstatEnumDto.FIRMA_PENDENT);
-				nDocsSignats += documentRepository.countByExpedientAndEstat(expedient, DocumentEstatEnumDto.FIRMAT);
-				nDocsNotificats += documentRepository.countByExpedientAndNotificacionsNotificacioEstatIn(
-						expedient,
-						new DocumentNotificacioEstatEnumDto[] {
-								DocumentNotificacioEstatEnumDto.FINALITZADA,
-								DocumentNotificacioEstatEnumDto.PROCESSADA });
-
-				nDocsPendentsNotificar += documentRepository.countByExpedientAndNotificacionsNotificacioEstatIn(
-						expedient,
-						new DocumentNotificacioEstatEnumDto[] {
-								DocumentNotificacioEstatEnumDto.PENDENT,
-								DocumentNotificacioEstatEnumDto.ENVIADA,
-								DocumentNotificacioEstatEnumDto.REGISTRADA });
-			}
-
-			historic.setNumExpedientsAmbAlertes(
-					Long.valueOf(expedientRepository.findByMetaExpedientAndAlertesNotEmpty(metaExpedient)));
-			historic.setNumExpedientsAmbErrorsValidacio(nExpedientsAmbErrorsValidacio);
-			historic.setNumDocsPendentsSignar(nDocsPendentsSignar);
-			historic.setNumDocsSignats(nDocsSignats);
-			historic.setNumDocsPendentsNotificar(nDocsPendentsNotificar);
-			historic.setNumDocsNotificats(nDocsNotificats);
-		}
-		historicExpedientRepository.save(mapExpedients.getValues());
+		return mapExpedients.getValues();
 
 	}
 
-	private void registreHistoricUsuari(Date currentDateIni, Date currentDateEnd, HistoricTipusEnumDto tipusLog) {
+	private Collection<HistoricUsuariEntity> calcularHistoricUsuari(
+			Date currentDateIni,
+			Date currentDateEnd,
+			HistoricTipusEnumDto tipusLog) {
 
-		List<ContingutLogCountAggregation<UsuariEntity>> logsCount = contingutLogRepository.findLogsBetweenCreatedDateGroupByCreatedByAndTipus(
-				LogObjecteTipusEnumDto.EXPEDIENT,
+		List<ContingutLogCountAggregation<UsuariEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
 				currentDateIni,
 				currentDateEnd);
 		MapHistoricUsuaris mapHistorics = new MapHistoricUsuaris(tipusLog);
 		registreHistoricExpedients(logsCount, mapHistorics, currentDateIni);
 
-		List<ContingutLogCountAggregation<UsuariEntity>> logsCountAccum = contingutLogRepository.findLogsBetweenCreatedDateGroupByCreatedByAndTipus(
-				LogObjecteTipusEnumDto.EXPEDIENT,
+		List<ContingutLogCountAggregation<UsuariEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
 				currentDateEnd);
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics, currentDateIni);
 
-		List<UsuariEntity> usuaris = usuariRepository.findAll();
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findAll();
-		for (MetaExpedientEntity metaExpedient : metaExpedients) {
-			for (UsuariEntity usuari : usuaris) {
-				HistoricUsuariEntity historicUsuari = mapHistorics.getHistoric(usuari, currentDateIni, metaExpedient);
-				long numTasquesTramitades = expedientTascaRepository.countByResponsableAndEstat(
-						usuari,
-						metaExpedient,
-						new TascaEstatEnumDto[] { TascaEstatEnumDto.FINALITZADA });
-
-				historicUsuari.setNumTasquesTramitades(numTasquesTramitades);
-			}
-
-			for (HistoricUsuariEntity histUsuari : mapHistorics.getValues()) {
-				histUsuari.setNumExpedientsOberts(
-						histUsuari.getNumExpedientsOberts() + histUsuari.getNumExpedientsCreats());
-				histUsuari.setNumExpedientsObertsTotal(
-						histUsuari.getNumExpedientsObertsTotal() + histUsuari.getNumExpedientsCreatsTotal());
-			}
+		for (HistoricUsuariEntity historic : mapHistorics.getValues()) {
+			historic.setNumExpedientsOberts(historic.getNumExpedientsOberts() + historic.getNumExpedientsCreats());
+			historic.setNumExpedientsObertsTotal(
+					historic.getNumExpedientsObertsTotal() + historic.getNumExpedientsCreatsTotal());
 		}
-		historicUsuariRepository.save(mapHistorics.getValues());
 
+		List<ContingutLogCountAggregation<UsuariEntity>> numTasquesTramitades = expedientTascaRepository.countByResponsableAndEstat(
+				new TascaEstatEnumDto[] { TascaEstatEnumDto.FINALITZADA });
+		for (ContingutLogCountAggregation<UsuariEntity> count : numTasquesTramitades) {
+			HistoricUsuariEntity historic = mapHistorics.getHistoric(
+					count.getItemGrouped(),
+					currentDateIni,
+					count.getMetaExpedient());
+			historic.setNumTasquesTramitades(count.getCount());
+		}
+
+		return mapHistorics.getValues();
 	}
 
-//	private void registreHistoricInteressat(
-//			MetaExpedientEntity metaExpedient,
-//			Date currentDateIni,
-//			Date currentDateEnd) {
-//		List<String> docNumbers = interessatRepository.findAllDocumentNumbers(metaExpedient);
-//		for (String docNum : docNumbers) {
-//			HistoricInteressatEntity historicInteressat = new HistoricInteressatEntity(
-//					currentDateIni,
-//					HistoricTipusEnumDto.DIARI);
-//			historicInteressat.setEntitat(metaExpedient.getEntitat());
-//			historicInteressat.setOrganGestor(metaExpedient.getOrganGestor());
-//			historicInteressat.setMetaExpedient(metaExpedient);
-//			historicInteressat.setInteressatDocNum(docNum);
-//			int nExpedientsCreatsAvui = contingutLogRepository.findLogsExpedientByInteressatAndBetweenCreatedDate(
-//					LogObjecteTipusEnumDto.EXPEDIENT,
-//					LogTipusEnumDto.CREACIO,
-//					metaExpedient,
-//					docNum,
-//					currentDateIni,
-//					currentDateEnd).size();
-//			int nExpedientsCreatsFinsAvui = contingutLogRepository.findLogsExpedientByInteressatAndCreateDateBefore(
-//					LogObjecteTipusEnumDto.EXPEDIENT,
-//					LogTipusEnumDto.CREACIO,
-//					metaExpedient,
-//					docNum,
-//					currentDateIni).size();
-//
-//			int nExpedientsObertsAvui = contingutLogRepository.findLogsExpedientByInteressatAndBetweenCreatedDate(
-//					LogObjecteTipusEnumDto.EXPEDIENT,
-//					LogTipusEnumDto.REOBERTURA,
-//					metaExpedient,
-//					docNum,
-//					currentDateIni,
-//					currentDateEnd).size() + nExpedientsCreatsAvui;
-//			int nExpedientsObertsTotal = contingutLogRepository.findLogsExpedientByInteressatAndCreateDateBefore(
-//					LogObjecteTipusEnumDto.EXPEDIENT,
-//					LogTipusEnumDto.REOBERTURA,
-//					metaExpedient,
-//					docNum,
-//					currentDateIni).size() + nExpedientsCreatsFinsAvui;
-//
-//			int nExpedientsTancatsAvui = contingutLogRepository.findLogsExpedientByInteressatAndBetweenCreatedDate(
-//					LogObjecteTipusEnumDto.EXPEDIENT,
-//					LogTipusEnumDto.TANCAMENT,
-//					metaExpedient,
-//					docNum,
-//					currentDateIni,
-//					currentDateEnd).size();
-//			int nExpedientsTancatsTotal = contingutLogRepository.findLogsExpedientByInteressatAndCreateDateBefore(
-//					LogObjecteTipusEnumDto.EXPEDIENT,
-//					LogTipusEnumDto.TANCAMENT,
-//					metaExpedient,
-//					docNum,
-//					currentDateIni).size();
-//			historicInteressat.setNumExpedientsCreats(Long.valueOf(nExpedientsCreatsAvui));
-//			historicInteressat.setNumExpedientsCreatsTotal(Long.valueOf(nExpedientsCreatsFinsAvui));
-//			historicInteressat.setNumExpedientsOberts(Long.valueOf(nExpedientsObertsAvui));
-//			historicInteressat.setNumExpedientsObertsTotal(Long.valueOf(nExpedientsObertsTotal));
-//			historicInteressat.setNumExpedientsTancats(Long.valueOf(nExpedientsTancatsAvui));
-//			historicInteressat.setNumExpedientsTancatsTotal(Long.valueOf(nExpedientsTancatsTotal));
-//		}
-//		
-//	}
-//		
+	private Collection<HistoricInteressatEntity> calcularHistoricInteressat(Date currentDateIni, Date currentDateEnd, HistoricTipusEnumDto tipusLog) {
+
+		List<ContingutLogCountAggregation<String>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
+				currentDateIni,
+				currentDateEnd);
+		MapHistoricInteressat mapHistorics = new MapHistoricInteressat(tipusLog);
+		registreHistoricExpedients(logsCount, mapHistorics, currentDateIni);
+
+		List<ContingutLogCountAggregation<String>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
+				currentDateEnd);
+		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics, currentDateIni);
+
+		for (HistoricInteressatEntity historic : mapHistorics.getValues()) {
+			historic.setNumExpedientsOberts(historic.getNumExpedientsOberts() + historic.getNumExpedientsCreats());
+			historic.setNumExpedientsObertsTotal(
+					historic.getNumExpedientsObertsTotal() + historic.getNumExpedientsCreatsTotal());
+		}
+		
+		return mapHistorics.getValues();
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private <T> void registreHistoricExpedients(
@@ -448,4 +432,55 @@ public class HistoricTask {
 
 	}
 
+	private class MapHistoricInteressat implements IMapHistoric<String, HistoricInteressatEntity> {
+
+		private Map<String, HistoricInteressatEntity> mapHistorics;
+		private HistoricTipusEnumDto tipusLog;
+
+		public MapHistoricInteressat(HistoricTipusEnumDto tipusLog) {
+			this.tipusLog = tipusLog;
+			mapHistorics = new HashMap<String, HistoricInteressatEntity>();
+		}
+
+		public HistoricInteressatEntity getHistoric(ContingutLogCountAggregation<String> countLogs, Date data) {
+			HistoricInteressatEntity historicUsuari;
+			String interessat = countLogs.getItemGrouped();
+			MetaExpedientEntity metaExpedient = countLogs.getMetaExpedient();
+			if (!mapHistorics.containsKey(interessat)) {
+				historicUsuari = new HistoricInteressatEntity(data, this.tipusLog);
+				historicUsuari.setEntitat(metaExpedient.getEntitat());
+				historicUsuari.setOrganGestor(metaExpedient.getOrganGestor());
+				historicUsuari.setMetaExpedient(metaExpedient);
+				historicUsuari.setInteressatDocNum(interessat);
+				mapHistorics.put(interessat, historicUsuari);
+
+			} else {
+				historicUsuari = mapHistorics.get(interessat);
+			}
+
+			return historicUsuari;
+		}
+
+		public HistoricInteressatEntity getHistoric(String interessat, Date data, MetaExpedientEntity metaExpedient) {
+			HistoricInteressatEntity historicUsuari;
+			if (!mapHistorics.containsKey(interessat)) {
+				historicUsuari = new HistoricInteressatEntity(data, this.tipusLog);
+				historicUsuari.setEntitat(metaExpedient.getEntitat());
+				historicUsuari.setOrganGestor(metaExpedient.getOrganGestor());
+				historicUsuari.setMetaExpedient(metaExpedient);
+				historicUsuari.setInteressatDocNum(interessat);
+				mapHistorics.put(interessat, historicUsuari);
+
+			} else {
+				historicUsuari = mapHistorics.get(interessat);
+			}
+
+			return historicUsuari;
+		}
+
+		public Collection<HistoricInteressatEntity> getValues() {
+			return this.mapHistorics.values();
+		}
+
+	}
 }

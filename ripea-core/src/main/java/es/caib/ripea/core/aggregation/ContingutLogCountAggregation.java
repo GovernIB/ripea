@@ -11,6 +11,7 @@ public class ContingutLogCountAggregation<E> {
 	private MetaExpedientEntity metaExpedient;
 	private LogTipusEnumDto tipus;
 	private Long count;
+
 	public ContingutLogCountAggregation(
 			E itemGrouped,
 			MetaExpedientEntity metaExpedient,
@@ -22,5 +23,13 @@ public class ContingutLogCountAggregation<E> {
 		this.tipus = tipus;
 		this.count = count;
 	}
-
+	public ContingutLogCountAggregation(
+			E itemGrouped,
+			MetaExpedientEntity metaExpedient,
+			Long count) {
+		super();
+		this.itemGrouped = itemGrouped;
+		this.metaExpedient = metaExpedient;
+		this.count = count;
+	}
 }

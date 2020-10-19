@@ -32,7 +32,7 @@ public interface HistoricService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
+	PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
 			Long entitatId,
 			HistoricFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
@@ -49,7 +49,7 @@ public interface HistoricService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre);
+	List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre);
 
 	/**
 	 * Consulta l'històric dels expedients d'un conjunt d'òrgans gestors dins un
@@ -63,8 +63,7 @@ public interface HistoricService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public Map<Long, List<HistoricExpedientDto>> getDadesOrgansGestors(
-			List<OrganGestorDto> organGestors,
+	Map<OrganGestorDto, List<HistoricExpedientDto>> getDadesOrgansGestors(
 			HistoricFiltreDto filtre);
 
 	/**
@@ -79,8 +78,9 @@ public interface HistoricService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre);
+	List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre);
 
+	
 	/**
 	 * Consulta l'històric dels expedients de l'usuari actual dins un rang de dates
 	 * definit.
@@ -91,8 +91,8 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<HistoricUsuariDto> getDadesUsuariActual(HistoricFiltreDto filtre);
+//	@PreAuthorize("hasRole('IPA_ADMIN')")
+//	List<HistoricUsuariDto> getDadesUsuariActual(HistoricFiltreDto filtre);
 
 	/**
 	 * Consulta l'històric dels expedients d'un interessat concret dins un rang de
@@ -107,6 +107,13 @@ public interface HistoricService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<HistoricDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre);
+	List<HistoricDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre);
+	
 
 }

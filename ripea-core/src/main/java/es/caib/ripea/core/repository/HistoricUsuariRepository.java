@@ -39,7 +39,7 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
 			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
-			"    h.data ")
+			"    h.data, h.usuari ")
 	List<HistoricUsuariAggregation> findByDateRangeGroupedByDate(
 			@Param("usuari") UsuariEntity usuari,
 			@Param("tipus") HistoricTipusEnumDto tipus,
@@ -72,7 +72,7 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
 			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
-			"    h.data ")
+			"    h.data, h.usuari ")
 	Page<HistoricUsuariAggregation> findByDateRangeGroupedByDate(
 			@Param("usuari") UsuariEntity usuari,
 			@Param("tipus") HistoricTipusEnumDto tipus,

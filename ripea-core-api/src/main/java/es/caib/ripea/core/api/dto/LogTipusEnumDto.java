@@ -35,7 +35,7 @@ public enum LogTipusEnumDto {
 	NOTIFICACIO_ENVIADA,
 //	NOTIFICACIO_ENTREGADA,
 	NOTIFICACIO_REBUTJADA,
-	NOTIFICACIO_CERTIFICADA,
+	NOTIFICACIO_CERTIFICADA, // notificacio feta
 //	NOTIFICACIO_REINTENT,
 	
 	// Portafirmes
@@ -67,6 +67,7 @@ public enum LogTipusEnumDto {
 	ARXIU_CUSTODIAT,
 	CUSTODIA_CANCELACIO,
 
+	// Log una vegada s'ha validat la firma
 	DOC_FIRMAT,
 
 	CANVI_ESTAT

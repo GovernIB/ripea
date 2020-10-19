@@ -81,6 +81,8 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
 			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
+			"    h.data " +
+			" order by " +
 			"    h.data ")
 	Page<HistoricExpedientAggregation> findByEntitatAndDateRangeGroupedByDate(
 			@Param("entitat") EntitatEntity entitat,
@@ -118,6 +120,8 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			"    and h.tipus = :tipus " +
 			"    and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
+			"    h.data " +
+			" order by " +
 			"    h.data ")
 	List<HistoricExpedientAggregation> findByOrganGestorAndDateRangeGroupedByDate(
 			@Param("organGestor") OrganGestorEntity organGestor,
