@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
@@ -103,5 +104,13 @@ public interface PortafirmesFluxService {
 	public String recuperarUrlEdicioPlantilla(
 			String plantillaFluxId,
 			String returnUrl);
+	
+	/**
+	 * Recupera un llistat dels càrrecs disponibles per l'usuari aplicació configurat
+	 * 
+	 * @return Els càrrecs
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<PortafirmesCarrecDto> recuperarCarrecs();
 	
 }

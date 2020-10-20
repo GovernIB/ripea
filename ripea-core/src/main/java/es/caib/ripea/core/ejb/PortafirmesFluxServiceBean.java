@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
@@ -79,5 +80,11 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 	@RolesAllowed("IPA_ADMIN")
 	public boolean esborrarPlantilla(String plantillaFluxId) {
 		return delegate.esborrarPlantilla(plantillaFluxId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<PortafirmesCarrecDto> recuperarCarrecs() {
+		return delegate.recuperarCarrecs();
 	}
 }
