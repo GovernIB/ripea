@@ -47,10 +47,22 @@ pageContext.setAttribute(
 	<rip:modalHead/>
 	
 <style type="text/css">
-
 .rmodal {
     display:    none;
     position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+.rmodal_carrecs {
+    display:    none;
+    position:   absolute;
     z-index:    1000;
     top:        0;
     left:       0;
@@ -109,12 +121,51 @@ body.loading .rmodal {
 .flux_disabled:hover {
 	cursor: not-allowed;
 }
+.carrec-selected {
+	font-weight: bold;
+	background-color: #1a3d5c;
+	border-radius: 2px;
+}
+div[class^="carrec_"] > a {
+	color: black;
+}
+.carrec-selected > a {
+	color: #FFF !important;
+}
+div[class^="carrec_"] {
+	padding: 1%;
+	margin: 2px;
+}
+div[class^="carrec_"]:hover {
+	background-color: #1a3d5c;;
+}
+div[class^="carrec_"]:hover a{
+	color: #FFF;
+}
+div[class^="carrec_"] > a:hover {
+	text-decoration: none;
+	cursor: pointer;
+}
+div.dropdown-menu {
+	left: auto;
+	right: 0;
+	padding: 1%;
+	width: 70%;
+}
+div.dropdown-menu.loading {
+    overflow: hidden;   
+    height: 100px;
+}
+div.dropdown-menu.loading .rmodal_carrecs {
+    display: block;
+}
 </style>	
 <script type="text/javascript">
 	$(document).ready(function() {
-		let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
-		localStorage.setItem("currentIframeHeight", currentHeight);
-		
+		if (window.frameElement != null) {
+			let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
+			localStorage.setItem("currentIframeHeight", currentHeight);
+		}
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
 				$(".callback").removeClass("hidden");
@@ -280,7 +331,74 @@ body.loading .rmodal {
 		$('.modal-cancel').on('click', function(){
 			localStorage.removeItem('transaccioId');
 		});
+		
+		$(".portafirmesResponsables_btn").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.carrecs"/>");
+		$("#portafirmesResponsables").on('select2:unselecting', function (e) {
+			var optionRemoved = e.params.args.data.id;
+			$("#portafirmesResponsables option[value='" + optionRemoved + "']").remove();
+		});
 	});
+	
+function toggleCarrecs() {
+	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+	if (dropdown.length === 0) {
+		$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
+		$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
+		
+	} else {
+		dropdown.toggle();
+	}
+}
+
+function recuperarCarrecs() {
+	var llistatCarrecs = "<div class='loading dropdown-menu'>";
+	$.ajax({
+		type: 'GET',
+		dataType: "json",
+		url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
+		success: function(carrecs) {
+			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+			dropdown.removeClass('loading');
+			if (carrecs) {
+				llistatCarrecs += '<div class="carrecsList">';
+				$.each(carrecs, function(i, carrec) {
+					var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
+					
+					$('#portafirmesResponsables option').each(function(i, responsable) {
+						if (responsable.value === carrec.carrecId) {
+							llistatCarrecs = llistatCarrecs.replace('carrec_' + carrec.carrecId, 'carrec_' + carrec.carrecId + ' carrec-selected');
+						}
+					});
+				});
+			}
+			dropdown.append(llistatCarrecs);
+		},
+		error: function (error) {
+			return "sense càrrecs";
+		}
+	});
+	llistatCarrecs += "<div class='rmodal_carrecs'></div></div>";
+	return llistatCarrecs;
+}
+
+function seleccionarCarrec(carrec) {
+	if ($('.carrec_' + carrec.carrecId).hasClass('carrec-selected')) {
+		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
+		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
+	} else {
+		var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNif + ')';
+		var items = [];
+		items.push({
+			"id": carrec.carrecId,
+			"text": nomCarrec
+		});
+	    var newOption = new Option(items[0].text, items[0].id, true, true);
+	    $("#portafirmesResponsables").append(newOption).trigger('change');
+
+		$('.carrec_' + carrec.carrecId).addClass('carrec-selected');
+	}
+}
 	
 function adjustModalPerFlux() {
 	var $iframe = $(window.frameElement);
@@ -321,7 +439,7 @@ function removeLoading() {
 		<form:hidden path="metaExpedientId"/>
 		<br/>
 		<div class="tab-content content">
-			<div role="tabpanel" class="tab-pane active" id="dades">
+			<div role="tabpanel" class="tab-pane " id="dades">
 				<rip:inputText name="codi" textKey="metadocument.form.camp.codi" required="true"/>
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio"/>
@@ -333,7 +451,7 @@ function removeLoading() {
 				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="codi" optionTextAttribute="nom" required="true"/>
 				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">
+			<div role="tabpanel" class="tab-pane active" id="firma-portafirmes">
 				<rip:inputCheckbox name="firmaPortafirmesActiva" textKey="metadocument.form.camp.firma.portafirmes.activa"/>
 				<c:choose>
 					<c:when test="${isPortafirmesDocumentTipusSuportat}">
@@ -358,7 +476,8 @@ function removeLoading() {
 						suggestValue="codi"
 						suggestText="nom"
 						suggestTextAddicional="nif"
-						required="true"/>
+						required="true"
+						icon="fa fa-star"/>
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				</div>					
 				<rip:inputText name="portafirmesCustodiaTipus" textKey="metadocument.form.camp.portafirmes.custodia"/>				

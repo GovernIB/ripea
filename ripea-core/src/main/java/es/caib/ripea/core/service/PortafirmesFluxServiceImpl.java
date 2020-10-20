@@ -3,9 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -13,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
@@ -117,15 +115,22 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 		return pluginHelper.portafirmesEsborrarPlantillaFirma(idioma, plantillaFluxId);
 	}
 
-	private String generarNomFlux(String documentNom) {		
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
-		Date date = new Date();
-		documentNom = documentNom.replace(" ", "_");
-		
-		String nomFlux = "Flux_" + documentNom + "_" + dateFormat.format(date);
-		return nomFlux;
+	@Override
+	public List<PortafirmesCarrecDto> recuperarCarrecs() {
+		logger.debug("Recuperant els càrrecs disponibles");
+		return pluginHelper.portafirmesRecuperarCarrecs();
 	}
 	
+//	private String generarNomFlux(String documentNom) {		
+//		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
+//		Date date = new Date();
+//		documentNom = documentNom.replace(" ", "_");
+//		
+//		String nomFlux = "Flux_" + documentNom + "_" + dateFormat.format(date);
+//		return nomFlux;
+//	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(PortafirmesFluxServiceImpl.class);
+
 
 }

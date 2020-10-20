@@ -9,6 +9,7 @@ import java.util.List;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
@@ -158,6 +159,18 @@ public class PortafirmesPluginMock implements PortafirmesPlugin {
 	@Override
 	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
 			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<PortafirmesCarrec> recuperarCarrecs() throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PortafirmesCarrec recuperarCarrec(String carrecId) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;
 	}
