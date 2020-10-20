@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
 import es.caib.ripea.core.api.dto.NodeDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -285,8 +286,18 @@ public class ContingutHelper {
 				TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 						document.getNtiTipoDocumental(),
 						contingut.getEntitat());
-				if (tipusDocumental != null)
+				
+				if (tipusDocumental != null) {
 					dto.setNtiTipoDocumentalNom(tipusDocumental.getNom());
+				} else {
+					List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
+					
+					for (TipusDocumentalDto docAddicional : docsAddicionals) {
+						if (docAddicional.getCodi().equals(document.getNtiTipoDocumental())) {
+							dto.setNtiTipoDocumentalNom(docAddicional.getNom());
+						}
+					}
+				}
 				
 			}
 			dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());

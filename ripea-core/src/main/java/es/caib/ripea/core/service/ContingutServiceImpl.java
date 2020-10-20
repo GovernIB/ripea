@@ -54,6 +54,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -1287,10 +1288,23 @@ public class ContingutServiceImpl implements ContingutService {
 
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
-					TipusDocumentalEntity tipusDocuemntal = tipusDocumentalRepository.findByCodiAndEntitat(
+					TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 							metadades.getTipusDocumentalAddicional(),
 							entitat);
-					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocuemntal.getNom());
+
+					if (tipusDocumental != null) {
+						arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNom());
+					} else {
+						List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
+						
+						for (TipusDocumentalDto docAddicional : docsAddicionals) {
+							if (docAddicional.getCodi().equals(metadades.getTipusDocumentalAddicional())) {
+								arxiuDetall.setEniTipusDocumentalAddicional(docAddicional.getNom());
+							}
+						}
+					}
+
+					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNom());
 				}
 
 				arxiuDetall.setEniOrgans(metadades.getOrgans());

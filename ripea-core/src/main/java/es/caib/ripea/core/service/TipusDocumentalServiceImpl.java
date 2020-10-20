@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.plugins.arxiu.api.DocumentTipusAddicional;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
@@ -23,6 +24,7 @@ import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 
@@ -42,6 +44,10 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
+	
+	
 	
 	@Transactional
 	@Override
@@ -179,11 +185,18 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true);
 
-		List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
-
-		return conversioTipusHelper.convertirList(
-				tipusDocumentals,
+		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
+		List<TipusDocumentalDto> tipusDocumentalsDto =  conversioTipusHelper.convertirList(
+				tipusDocumentalsEntity,
 				TipusDocumentalDto.class);
+		
+		List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
+		
+		if (docsAddicionals != null  && !docsAddicionals.isEmpty()) {
+			tipusDocumentalsDto.addAll(docsAddicionals);
+		}
+
+		return tipusDocumentalsDto;
 	}
 
 	@Override

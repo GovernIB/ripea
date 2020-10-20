@@ -39,6 +39,7 @@ import es.caib.plugins.arxiu.api.DocumentExtensio;
 import es.caib.plugins.arxiu.api.DocumentFormat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
+import es.caib.plugins.arxiu.api.DocumentTipusAddicional;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.ExpedientEstat;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
@@ -78,6 +79,7 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
@@ -1058,6 +1060,10 @@ public class PluginHelper {
 				false);
 	}
 
+	
+	
+	
+	
 
 	public Document arxiuDocumentConsultar(
 			ContingutEntity contingut,
@@ -1333,6 +1339,58 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	
+	
+	
+	public List<TipusDocumentalDto> documentTipusAddicionals() {
+
+		String accioDescripcio = "Consulta de tipus de documents addicionals";
+		
+		long t0 = System.currentTimeMillis();
+
+		try {
+			
+			List<DocumentTipusAddicional> documentTipusAddicionals = getArxiuPlugin().documentTipusAddicionals();
+			
+			List<TipusDocumentalDto> tipusDocumentalsDto = new ArrayList<>();
+			if (documentTipusAddicionals != null && !documentTipusAddicionals.isEmpty()) {
+				for (DocumentTipusAddicional documentTipusAddicional : documentTipusAddicionals) {
+					TipusDocumentalDto tipusDocumentalDto =  new TipusDocumentalDto();
+					tipusDocumentalDto.setCodi(documentTipusAddicional.getCodi());
+					tipusDocumentalDto.setNom(documentTipusAddicional.getDescripcio());
+					
+					tipusDocumentalsDto.add(tipusDocumentalDto);
+				}
+			}
+
+			
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return tipusDocumentalsDto;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	
 
 	public String arxiuDocumentGuardarFirmaCades(
 			DocumentEntity document,
