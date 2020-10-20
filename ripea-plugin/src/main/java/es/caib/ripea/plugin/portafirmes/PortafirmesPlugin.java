@@ -230,4 +230,24 @@ public interface PortafirmesPlugin {
 			String idioma)
 			throws SistemaExternException;
 
+	/**
+	 * Recupera els càrrecs disponibles per un usuari aplicació
+	 * 
+	 * @return Una llista dels càrrecs
+	 * @throws SistemaExternException
+	 * 			Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	List<PortafirmesCarrec> recuperarCarrecs() throws SistemaExternException;
+
+	/**
+	 * Recupera la informació d'un càrrec a partir del seu id
+	 * 
+	 * @param carrecId
+	 * 				ID del càrrec a consultar
+	 * @return La informació del càrrec
+	 * @throws SistemaExternException
+	 * 			Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	PortafirmesCarrec recuperarCarrec(String carrecId) throws SistemaExternException;
+
 }
