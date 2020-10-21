@@ -102,7 +102,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (d.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPortafirmesActiva = 1" + 
-			"				and (metaDocument.portafirmesResponsables != null or metaDocument.portafirmesFluxId != null)))")
+			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" + 
+			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
 	public Page<DocumentEntity> findDocumentsPerFirmaMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -140,7 +141,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (d.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPortafirmesActiva = 1" + 
-			"				and (metaDocument.portafirmesResponsables != null or metaDocument.portafirmesFluxId != null)))")
+			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" + 
+			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
