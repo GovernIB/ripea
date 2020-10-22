@@ -32,7 +32,7 @@ public class AjaxUnitatsController extends BaseAdminController {
 	@Autowired
 	private UnitatOrganitzativaService unitatOrganitzativaService;
 	
-	@RequestMapping(value = "/unitat/{codi}", method = RequestMethod.GET)
+	@RequestMapping(value = "/unitat/item/{codi}", method = RequestMethod.GET)
 	@ResponseBody
 	public UnitatOrganitzativaDto getByCodi(
 			HttpServletRequest request,

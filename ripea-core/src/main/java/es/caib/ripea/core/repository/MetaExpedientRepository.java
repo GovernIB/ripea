@@ -170,6 +170,5 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findByOrganGestorOrderByNomAsc(OrganGestorEntity organGestorEntity);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
-	
 
 }

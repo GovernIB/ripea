@@ -38,7 +38,7 @@
 		<property name="jpaProperties">
 			<props>
 				<prop key="hibernate.dialect">${config:es.caib.ripea.hibernate.dialect}</prop>
-				<prop key="hibernate.show_sql">${config:es.caib.ripea.hibernate.show_sql}</prop>
+				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>
 			</props>
 		</property>

@@ -163,46 +163,58 @@ public class CacheHelper {
 		List<ValidacioErrorDto> errors = new ArrayList<ValidacioErrorDto>();
 		List<DadaEntity> dades = dadaRepository.findByNode(node);
 		// Valida dades específiques del meta-node
-		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(node.getMetaNode());
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeAndActivaTrueAndMultiplicitatIn(node.getMetaNode(),
+					new MultiplicitatEnumDto [] {
+						MultiplicitatEnumDto.M_1,
+						MultiplicitatEnumDto.M_1_N
+					});
 		for (MetaDadaEntity metaDada: metaDades) {
-			if (metaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDada.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
-				boolean trobada = false;
-				for (DadaEntity dada: dades) {
-					if (dada.getMetaDada() != null && dada.getMetaDada().equals(metaDada)) {
-						trobada = true;
-						break;
-					}
+			boolean trobada = false;
+			for (DadaEntity dada: dades) {
+				if (dada.getMetaDada() != null && dada.getMetaDada().equals(metaDada)) {
+					trobada = true;
+					break;
 				}
-				if (!trobada)
-					errors.add(
-							crearValidacioError(
-									metaDada,
-									metaDada.getMultiplicitat()));
 			}
+			if (!trobada)
+				errors.add(
+						crearValidacioError(
+								metaDada,
+								metaDada.getMultiplicitat()));
+
 		}
 		if (node instanceof ExpedientEntity) {
 			ExpedientEntity expedient = (ExpedientEntity)node;
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
 					expedient,
 					0);
+			
 			// Valida documents específics del meta-node
-			List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(expedient.getMetaExpedient());
+			List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndMultiplicitatIn(
+					expedient.getMetaExpedient(),
+					new MultiplicitatEnumDto [] {
+						MultiplicitatEnumDto.M_1,
+						MultiplicitatEnumDto.M_1_N
+					});
 			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
-				if (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N)) {
-					boolean trobat = false;
-					for (DocumentEntity document: documents) {
-						if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaDocument)) {
-							trobat = true;
-							break;
-						}
+				boolean trobat = false;
+				for (DocumentEntity document: documents) {
+					if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaDocument)) {
+						trobat = true;
+						break;
 					}
-					if (!trobat)
-						errors.add(
-								crearValidacioError(
-										metaDocument,
-										metaDocument.getMultiplicitat()));
 				}
+				if (!trobat)
+					errors.add(
+							crearValidacioError(
+									metaDocument,
+									metaDocument.getMultiplicitat()));
 			}
+		}
+		if (!errors.isEmpty()) {
+			// TODO: registrar a la base de dades
+			// Aquesta operació és necessària per a generar els historics de forma eficient
+			
 		}
 		return errors;
 	}

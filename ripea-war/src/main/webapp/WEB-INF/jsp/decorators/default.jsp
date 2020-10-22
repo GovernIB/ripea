@@ -295,6 +295,11 @@ body {
 												<spring:message code="decorator.menu.accions.massives.admin"/>
 											</a>
 										</li>
+																				<li>
+											<a href="<c:url value="/historic"/>" data-maximized="true">
+												<spring:message code="decorator.menu.accions.estadistiques"/>
+											</a>
+										</li>
 									</ul>
 								</div>
 							</c:when>

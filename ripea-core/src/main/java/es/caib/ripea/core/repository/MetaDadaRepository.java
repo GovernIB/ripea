@@ -13,7 +13,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 
 /**
@@ -27,9 +30,7 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 	MetaDadaEntity findByMetaNodeAndCodi(
 			MetaNodeEntity metaNode,
 			String codi);
-	
-	
-	
+		
 	@Query(	"from " +
 			"    MetaDadaEntity md " +
 			"where " +
@@ -69,6 +70,10 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 			MetaDadaTipusEnumDto tipus);
 	List<MetaDadaEntity> findByMetaNodeAndActivaTrueOrderByOrdreAsc(
 			MetaNodeEntity metaNode);
+	List<MetaDadaEntity> findByMetaNodeAndActivaTrueAndMultiplicitatIn(
+			MetaNodeEntity metaExpedient,
+			MultiplicitatEnumDto[] multiplicitats);
+	
 	
 
 }

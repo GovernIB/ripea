@@ -4,6 +4,7 @@
 package es.caib.ripea.core.entity;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -103,6 +104,10 @@ public class DocumentEntity extends NodeEntity {
 
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	protected Set<DocumentEnviamentEntity> enviaments;
+	@OneToMany(
+			mappedBy = "document",
+			fetch = FetchType.LAZY, targetEntity = DocumentEnviamentEntity.class)
+	protected List<DocumentNotificacioEntity> notificacions;
 	
 	public Long getPareId() {
 		return pare.getId();
