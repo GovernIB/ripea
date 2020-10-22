@@ -89,6 +89,7 @@ import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -415,7 +416,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// No es poden moure documents firmats
 		if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat()) {
+			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
 				throw new ValidationException(
 						contingutOrigenId,
 						contingutOrigen.getClass(),
@@ -1976,9 +1977,10 @@ public class ContingutServiceImpl implements ContingutService {
 		fContent.delete();
 	}
 
-
-
-
+	public boolean isCarpetaLogica() {
+		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
+		return Boolean.valueOf(carpetesLogiques);
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 
