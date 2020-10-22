@@ -59,6 +59,7 @@ import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
@@ -447,9 +448,22 @@ public class ContingutController extends BaseUserController {
 			@PathVariable Long contingutId,
 			@PathVariable Long alertaId,
 			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		AlertaDto alerta = alertaService.find(alertaId);
 		alerta.setLlegida(true);
 		alertaService.update(alerta);
+		
+		List<AlertaDto> alertes = contingutService.findAlertes(
+				entitatActual.getId(),
+				contingutId);
+		if (alertes != null && alertes.isEmpty()) {
+			MissatgesHelper.success(
+					request, 
+					getMessage(
+							request, 
+							"contingut.controller.alertes.llegides"));
+			return modalUrlTancar();
+		}
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../modal/contingut/" + contingutId + "/alertes",
