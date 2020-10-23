@@ -1,13 +1,14 @@
 package es.caib.ripea.core.api.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.HistoricDto;
 import es.caib.ripea.core.api.dto.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -22,12 +23,12 @@ public interface HistoricService {
 
 	/**
 	 * Consulta l'històric dels expedients d'una entitat concreta dins un rang de
-	 * dates definit.
+	 * dates definit. 
+	 * Retorna els resultats paginats segons els valor del parèmetre paginacioParams.
 	 * 
-	 * @param entitatId      Identificador de l'entitat consultada
-	 * @param dataInici      Data d'inici de les dades a consultar
-	 * @param dataFi         Data final de les dates a consultar
-	 * @param metaExpedients Tipus d'expedients consultats
+	 * @param entitatId      Identificador de l'entitat a consultar
+	 * @param filtre         Configuració de la selecció de històrics a consultar
+	 * @param paginacioParams Parametre amb la configuració de la paginació de la consulta.
 	 * 
 	 * @return
 	 */
@@ -41,10 +42,8 @@ public interface HistoricService {
 	 * Consulta l'històric dels expedients d'una entitat concreta dins un rang de
 	 * dates definit.
 	 * 
-	 * @param entitatId      Identificador de l'entitat consultada
-	 * @param dataInici      Data d'inici de les dades a consultar
-	 * @param dataFi         Data final de les dates a consultar
-	 * @param metaExpedients Tipus d'expedients consultats
+	 * @param entitatId      Identificador de l'entitat a consultar
+	 * @param filtre         Configuració de la selecció de històrics a consultar
 	 * 
 	 * @return
 	 */
@@ -52,68 +51,90 @@ public interface HistoricService {
 	List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre);
 
 	/**
-	 * Consulta l'històric dels expedients d'un conjunt d'òrgans gestors dins un
-	 * rang de dates definit.
+	 * Consulta l'històric dels expedients agrupats per data i per organ gestor.
 	 * 
-	 * @param organGestors   Llistat d'òrgans gestors que es volen consultar
-	 * @param dataInici      Data d'inici de les dades a consultar
-	 * @param dataFi         Data final de les dates a consultar
-	 * @param metaExpedients Tipus d'expedients consultats
+	 * @param filtre    Configuració de la selecció de històrics a consultar
 	 * 
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	Map<OrganGestorDto, List<HistoricExpedientDto>> getDadesOrgansGestors(
-			HistoricFiltreDto filtre);
+	Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(HistoricFiltreDto filtre);
 
 	/**
-	 * Consulta l'històric dels expedients d'un usuari concret dins un rang de dates
-	 * definit.
+	 * Consulta l'històric dels expedients d'un conjunt d'òrgans gestors agrupats per organs gestors.
+	 * 
+	 * @param filtre    Configuració de la selecció de històrics a consultar
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(HistoricFiltreDto filtre);
+	
+	/**
+	 * Consulta l'històric dels expedients d'un usuari concret.
 	 * 
 	 * @param usuariCodi     Codi de l'usuari que es vol consultar
-	 * @param dataInici      Data d'inici de les dades a consultar
-	 * @param dataFi         Data final de les dates a consultar
-	 * @param metaExpedients Tipus d'expedients consultats
+	 * @param filtre    Configuració de la selecció de històrics a consultar
 	 * 
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre);
 
-	
 	/**
-	 * Consulta l'històric dels expedients de l'usuari actual dins un rang de dates
-	 * definit.
-	 * 
-	 * @param dataInici      Data d'inici de les dades a consultar
-	 * @param dataFi         Data final de les dates a consultar
-	 * @param metaExpedients Tipus d'expedients consultats
-	 * 
-	 * @return
-	 */
-//	@PreAuthorize("hasRole('IPA_ADMIN')")
-//	List<HistoricUsuariDto> getDadesUsuariActual(HistoricFiltreDto filtre);
-
-	/**
-	 * Consulta l'històric dels expedients d'un interessat concret dins un rang de
-	 * dates definit.
+	 * Consulta l'històric dels expedients d'un interessat concret.
 	 * 
 	 * @param interessatDocNum Número del document de l'interessat que es vol
 	 *                         consultar.
-	 * @param dataInici        Data d'inici de les dades a consultar
-	 * @param dataFi           Data final de les dates a consultar
-	 * @param metaExpedients   Tipus d'expedients consultats
+	 * @param filtre    Configuració de la selecció de històrics a consultar
 	 * 
 	 * @return
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	List<HistoricDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre);
-	
+	List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre);
+
+	/**
+	 * Consulta l'històric dels expedients d'una entitat concreta per el dia d'avui.
+	 * 
+	 * @param interessatDocNum Número del document de l'interessat que es vol
+	 *                         consultar.
+	 * @param filtre    Configuració de la selecció de històrics a consultar
+	 * 
+	 * @return
+	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre);
-	
+
+	/**
+	 * Consulta l'històric dels expedients del dia d'avui agrupats per òrgans gestors.
+	 * 
+	 * @param filtre    Configuració de la selecció de històrics a consultar
+	 * 
+	 * @return
+	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre);
-	
+
+	/**
+	 * Consulta l'històric dels expedients d'una entitat concreta per el dia d'avui.
+	 * 
+	 * @param usuariCodi     Codi de l'usuari que es vol consultar
+	 * @param filtre    Configuració de la selecció de històrics a consultar
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, HistoricFiltreDto filtre);
+
+	/**
+	 * Consulta l'històric dels expedients d'un usuari concret per el dia d'avui.
+	 * 
+	 * @param interessatDocNum	Nombre del document de l'interessat a consultar.
+	 * @param filtre    		Configuració de la selecció de històrics a consultar
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<HistoricInteressatDto> getDadesActualsInteressat(String interessatDocNum, HistoricFiltreDto filtre);
 
 }
