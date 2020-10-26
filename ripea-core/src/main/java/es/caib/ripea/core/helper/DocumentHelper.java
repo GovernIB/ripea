@@ -378,11 +378,11 @@ public class DocumentHelper {
 			fitxer.setContentType(document.getFitxerContentType());
 			fitxer.setContingut(document.getFitxerContingut());
 		}
-		if (versio == null && DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
-			fitxer.setNom(
-					pluginHelper.conversioConvertirPdfArxiuNom(
-							document.getFitxerNom()));
-		}
+//		if (versio == null && DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+//			fitxer.setNom(
+//					pluginHelper.conversioConvertirPdfArxiuNom(
+//							document.getFitxerNom()));
+//		}
 		return fitxer;
 	}
 

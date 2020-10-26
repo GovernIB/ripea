@@ -98,7 +98,9 @@ public class DocumentDto extends NodeDto {
 	public boolean isDefinitiu() {
 		return DocumentEstatEnumDto.DEFINITIU.equals(estat);
 	}
-
+	public boolean isPdf() {
+		return (fitxerContentType != null && fitxerContentType.equals("application/pdf"));
+	}
 	protected DocumentDto copiarContenidor(ContingutDto original) {
 		DocumentDto copia = new DocumentDto();
 		copia.setId(original.getId());
