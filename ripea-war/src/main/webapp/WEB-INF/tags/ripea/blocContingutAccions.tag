@@ -142,6 +142,18 @@
 				<c:if test="${contingut.custodiat and !isTasca and contingut.pdf}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
 				</c:if>
+				<c:if test="${!contingut.custodiat and !isTasca and contingut.pdf and imprimibleNoFirmats}">
+					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
+				</c:if>
+				<%---- Descarregar ----%>
+				<c:choose>
+					<c:when test="${isTasca}">
+						<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+					</c:when>
+					<c:otherwise>
+						<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+					</c:otherwise>
+				</c:choose>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>
@@ -158,17 +170,7 @@
 							}, 2000);
 						}); 
 					</script>
-				</c:if>
-				
-				<%---- Descarregar ----%>
-				<c:choose>
-					<c:when test="${isTasca}">
-						<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
-					</c:when>
-					<c:otherwise>
-						<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
-					</c:otherwise>
-				</c:choose>				
+				</c:if>		
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
 			
