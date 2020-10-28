@@ -230,9 +230,11 @@ public class ContingutHelper {
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-			if (expedient.getSeguidors().contains(usuariActual)) 
-				dto.setSeguidor(true);
+			if (auth != null) {
+				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
+				if (expedient.getSeguidors().contains(usuariActual)) 
+					dto.setSeguidor(true);
+			}
 			dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
 			dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
 			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
@@ -468,14 +470,14 @@ public class ContingutHelper {
 			RespostaConsultaEstatEnviament resposta) {
 		DocumentDto dto = new DocumentDto();
 		MetaNodeDto metaNode = null;
-		dto.setNom("Justificant_" + notificacio.getAssumpte());
+		dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_"));
 		dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		dto.setUbicacio(null);
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
 			logger.debug("[CERT] Generant fitxer certificació...");
 			dto.setAmbFirma(true);
-			dto.setFitxerNom("Justificant_" + notificacio.getAssumpte() + ".pdf");
+			dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());

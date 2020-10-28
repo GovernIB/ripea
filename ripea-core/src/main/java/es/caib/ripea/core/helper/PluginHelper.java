@@ -3520,7 +3520,7 @@ public class PluginHelper {
 					resposta.getEstat(),
 					resposta.getEstatData(),
 					resposta.getEstatOrigen(),
-					resposta.getCertificacioData(),
+					documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
 					resposta.getCertificacioOrigen(),
 					resposta.isError(),
 					resposta.getErrorDescripcio());
