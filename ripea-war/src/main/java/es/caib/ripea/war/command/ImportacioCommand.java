@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.LocalDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
@@ -27,8 +26,7 @@ public class ImportacioCommand {
 	@NotEmpty
 	private String numeroRegistre;
 	@NotNull
-	@DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-	private LocalDateTime dataPresentacio;
+	private String dataPresentacio;
 	
 	protected Long pareId;
 	
@@ -44,10 +42,10 @@ public class ImportacioCommand {
 	public void setNumeroRegistre(String numeroRegistre) {
 		this.numeroRegistre = numeroRegistre;
 	}
-	public LocalDateTime getDataPresentacio() {
+	public String getDataPresentacio() {
 		return dataPresentacio;
 	}
-	public void setDataPresentacio(LocalDateTime dataPresentacio) {
+	public void setDataPresentacio(String dataPresentacio) {
 		this.dataPresentacio = dataPresentacio;
 	}
 	public static ImportacioCommand asCommand(ImportacioDto dto) {
@@ -65,7 +63,8 @@ public class ImportacioCommand {
 		return importacioDto;
 	}
 	
-	private static Date convertToDateViaSqlTimestamp(LocalDateTime dateToConvert) throws ParseException {
-		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dateToConvert.toString("dd/MM/yyyy HH:mm:ss"));
+	private static Date convertToDateViaSqlTimestamp(String dataPresentacioStr) throws ParseException {
+//		dateToConvert.toString("dd/MM/yyyy HH:mm:ss")
+		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataPresentacioStr);
 	}
 }
