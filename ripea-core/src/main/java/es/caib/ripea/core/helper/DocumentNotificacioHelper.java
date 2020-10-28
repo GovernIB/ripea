@@ -297,9 +297,10 @@ public class DocumentNotificacioHelper {
 			DocumentEntity documentEntity = documentRepository.findOne(documentCreat.getId());
 			documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			logger.debug("[CERT] La certificació s'ha guardat correctament...");
-		}else {
+		} else {
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
 		}
+		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
 		DocumentNotificacioEstatEnumDto estatDespres = documentEnviamentInteressatEntity.getNotificacio().getNotificacioEstat();
 		logger.debug("Estat després: " + estatDespres);
 		if (estatAnterior != estatDespres 
