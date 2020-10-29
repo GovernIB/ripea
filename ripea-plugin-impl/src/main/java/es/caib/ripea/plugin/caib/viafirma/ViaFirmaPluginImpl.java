@@ -82,6 +82,7 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             
             message.setCallbackURL(getCallBackUrl());
             message.setCallbackAuthorization(generateAuthenticationHeader());
+            message.setGroupCode(getGroupCodi());
             
             String messageCode = getViaFirmaClient(parametresViaFirma.getCodiUsuari(), parametresViaFirma.getContrasenya()).
 				getV3MessagesApi().sendMessage(message);
@@ -111,7 +112,7 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 			if (download != null) {
 				viaFirmaDocument.setNomFitxer(download.getFileName());
 				viaFirmaDocument.setLink(download.getLink());
-				viaFirmaDocument.setExpriacio(download.getExpires());
+				viaFirmaDocument.setExpiracio(download.getExpires());
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(
@@ -155,7 +156,7 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 	private ViaFirmaClient viaFirmaClient;
 	private ViaFirmaClient getViaFirmaClient(
 			String usuari,
-			String contrasenya) {
+			String contrasenya) throws SistemaExternException {
 		if (viaFirmaClient == null) {
 			viaFirmaClient = new ViaFirmaClient(
 					getProxyHost(),
@@ -242,6 +243,10 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 	private String getCallBackPassword() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.viafirma.caib.callback.password");
+	}
+	private String getGroupCodi() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.viafirma.caib.group.codi");
 	}
 	private String getProxyHost() {
 		return PropertiesHelper.getProperties().getProperty(
