@@ -25,4 +25,28 @@ public class ExceptionHelper {
 		
 		return isTheException;
 	}
+	
+	
+	public static Throwable findThrowableInstance(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
+		int i = 0;
+		Throwable exception = null;
+		boolean isTheException = exceptionClass.isInstance(e);
+		if (isTheException) {
+			exception = e;
+		}
+		Throwable t = e;
+		while (i < nCheckedNestedExceptions && !isTheException && t.getCause() != null)
+		{
+			t = t.getCause();
+			isTheException = exceptionClass.isInstance(t);
+			i++;
+			
+			if (isTheException) {
+				exception = t;
+			}
+			
+		}
+		return exception;
+	}
+	
 }
