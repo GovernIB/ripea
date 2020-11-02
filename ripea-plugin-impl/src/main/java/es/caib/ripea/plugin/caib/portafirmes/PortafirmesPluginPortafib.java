@@ -922,6 +922,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 						FirmaBean firma = new FirmaBean();
 						UsuariEntitatBean usuariEntitatBean = getUsuariEntitatWs().getUsuariEntitat(fluxBloc.getDestinataris()[i]); //if identificador càrrec (portafib)
 						if (usuariEntitatBean != null) {
+							logger.debug("Usuari trobat amb identificador càrrec: " + fluxBloc.getDestinataris()[i]);
 							firma.setDestinatariID(fluxBloc.getDestinataris()[i]);
 						} else {
 							UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(fluxBloc.getDestinataris()[i]); //if identificador usuari (ldap)
@@ -931,6 +932,7 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 							if (usuariEntitatId == null)
 								throw new SistemaExternException("No s'ha trobat cap usuari entitat amb id = " + usuariEntitatId);
 							firma.setDestinatariID(usuariEntitatId);
+							logger.debug("Usuari trobat amb identificador usuari: " + fluxBloc.getDestinataris()[i] + ", nif=" + usuariPersona.getNif() + ", usuariEntitatId=" + usuariEntitatId);
 						}
 						firma.setObligatori(fluxBloc.getObligatorietats()[i]);
 						blocWs.getFirmes().add(firma);
