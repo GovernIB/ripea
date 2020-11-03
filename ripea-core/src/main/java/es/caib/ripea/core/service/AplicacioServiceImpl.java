@@ -237,7 +237,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyPluginPassarelaFirmaIgnorarModalIds() {
 		logger.debug("Consulta de la propietat amb les ids pels plugins de passarela de firma");
-		return PropertiesHelper.getProperties().getProperty("plugin.passarelafirma.ignorar.modal.ids");
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.passarelafirma.ignorar.modal.ids");
 	}
 
 	@Override
