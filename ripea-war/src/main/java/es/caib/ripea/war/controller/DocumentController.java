@@ -512,7 +512,15 @@ public class DocumentController extends BaseUserController {
 		if (ignorarModal) {
 			return "redirect:/contingut/" + documentId;
 		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
-			return "redirect:/passarelaModalTancar";
+			if (aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga").equals("true")) {
+				return "redirect:/passarelaModalTancar";
+				
+			} else {
+				EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+				return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
+				
+			}
+			
 		} else {
 			String response = getModalControllerReturnValueSuccess(
 					request, 
