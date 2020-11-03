@@ -21,6 +21,8 @@ import org.apache.mina.handler.demux.ExceptionHandler;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -486,8 +488,14 @@ public class DocumentController extends BaseUserController {
 		passarelaFirmaHelper.closeSignaturesSet(
 				request,
 				signaturesSet);
+		
+
+		
 		boolean ignorarModal = false;
 		String ignorarModalIdsProperty = aplicacioService.propertyPluginPassarelaFirmaIgnorarModalIds();
+		
+		logger.debug("Signatura set plugin id=" + signaturesSet.getPluginId() + ", ignorarModalIdsProperty=" + ignorarModalIdsProperty);
+		
 		if (ignorarModalIdsProperty != null && !ignorarModalIdsProperty.isEmpty()) {
 			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
 			for (String ignorarModalId: ignorarModalIds) {
@@ -499,6 +507,7 @@ public class DocumentController extends BaseUserController {
 				}
 			}
 		}
+		
 		String forsarTancamentModal = aplicacioService.propertyFindByNom("plugin.passarelafirma.forsar.tancament.modal");
 		if (ignorarModal) {
 			return "redirect:/contingut/" + documentId;
@@ -717,4 +726,7 @@ public class DocumentController extends BaseUserController {
 			DocumentDto document) {
 		return getMessage(request, "document.controller.viafirma.motiu") + document.getNom() + " [" + document.getMetaNode().getNom() + "]";
 	}
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
 }
