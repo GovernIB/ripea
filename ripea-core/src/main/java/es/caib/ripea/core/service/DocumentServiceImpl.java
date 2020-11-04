@@ -456,8 +456,8 @@ public class DocumentServiceImpl implements DocumentService {
 					annexosIds,
 					transaccioId);
 		} catch (Exception e) {
-			Throwable excpetionOrCause = ExceptionHelper.findThrowableInstance(e, WsValidationException.class, 3);
-			if (excpetionOrCause != null && excpetionOrCause.getMessage().contains("Destinatari ID")) {
+			Throwable wsValidationException = ExceptionHelper.findThrowableInstance(e, WsValidationException.class, 6);
+			if (wsValidationException != null && (wsValidationException.getMessage().contains("Destinatari ID") || wsValidationException.getMessage().contains("ha trobat cap usuari"))) {
 				throw new ResponsableNoValidPortafirmesException();
 			} else {
 				throw e;
