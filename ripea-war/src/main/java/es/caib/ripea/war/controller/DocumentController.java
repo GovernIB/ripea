@@ -512,12 +512,14 @@ public class DocumentController extends BaseUserController {
 		if (ignorarModal) {
 			return "redirect:/contingut/" + documentId;
 		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
-			if (aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga").equals("true")) {
-				return "redirect:/passarelaModalTancar";
-				
-			} else {
+			String propertyValue = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga");
+			boolean usingNewVersion = propertyValue == null || !propertyValue.equals("true");
+			if (usingNewVersion) {
 				EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 				return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
+
+			} else {
+				return "redirect:/passarelaModalTancar";
 				
 			}
 			
