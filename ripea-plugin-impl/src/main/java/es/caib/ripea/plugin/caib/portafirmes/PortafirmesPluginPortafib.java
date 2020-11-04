@@ -71,6 +71,7 @@ import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
 import es.caib.portafib.ws.api.v1.TipusDocumentInfoWs;
 import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
 import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
+import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
@@ -927,10 +928,10 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 						} else {
 							UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(fluxBloc.getDestinataris()[i]); //if identificador usuari (ldap)
 							if (usuariPersona == null)
-								throw new SistemaExternException("No s'ha trobat cap usuari persona amb id = " + fluxBloc.getDestinataris()[i]);
+								throw new WsValidationException("No s'ha trobat cap usuari persona amb id = " + fluxBloc.getDestinataris()[i]);
 							String usuariEntitatId = getUsuariEntitatWs().getUsuariEntitatIDInMyEntitatByAdministrationID(usuariPersona.getNif());
 							if (usuariEntitatId == null)
-								throw new SistemaExternException("No s'ha trobat cap usuari entitat amb id = " + usuariEntitatId);
+								throw new WsValidationException("No s'ha trobat cap usuari entitat amb id = " + usuariEntitatId);
 							firma.setDestinatariID(usuariEntitatId);
 							logger.debug("Usuari trobat amb identificador usuari: " + fluxBloc.getDestinataris()[i] + ", nif=" + usuariPersona.getNif() + ", usuariEntitatId=" + usuariEntitatId);
 						}
