@@ -116,7 +116,13 @@
 	      <artifactId>apiplantillafluxsimple-jersey</artifactId>
 	      <groupId>org.fundaciobit.apisib.apiplantillafluxsimple</groupId>
 	      <version>1.0.0</version>
-	    </dependency>
+	      <exclusions>
+	      	<exclusion>
+	      		<groupId>log4j</groupId>
+	      		<artifactId>log4j</artifactId>
+	      	</exclusion>
+	      </exclusions>
+	   </dependency>
 	    <dependency>
 	      <artifactId>apiscanwebsimple-api</artifactId>
 	      <groupId>org.fundaciobit.apisib.apiscanwebsimple</groupId>
@@ -126,7 +132,13 @@
 	      <artifactId>apiscanwebsimple-jersey</artifactId>
 	      <groupId>org.fundaciobit.apisib.apiscanwebsimple</groupId>
 	      <version>1.0.0</version>
-		</dependency>
+	      <exclusions>
+	      	<exclusion>
+	      		<groupId>log4j</groupId>
+	      		<artifactId>log4j</artifactId>
+	      	</exclusion>
+	      </exclusions>
+	    </dependency>
 		<dependency>
 			<artifactId>apifirmaasyncsimple-api</artifactId>
 			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>
@@ -136,16 +148,12 @@
 			<artifactId>apifirmaasyncsimple-jersey</artifactId>
 			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>
 			<version>2.0.0</version>
-		</dependency>
-		<dependency>
-			<artifactId>apifirmaasyncsimple-api</artifactId>
-			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<artifactId>apifirmaasyncsimple-jersey</artifactId>
-			<groupId>org.fundaciobit.apisib.apifirmaasyncsimple</groupId>
-			<version>2.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	    <dependency>
 	      <groupId>org.fundaciobit.genapp</groupId>
@@ -168,12 +176,6 @@
 			<artifactId>plugin-signatureserver-portafib</artifactId>
 			<version>2.0.0</version>
 		</dependency>		
-	    <dependency>
-	      <groupId>log4j</groupId>
-	      <artifactId>log4j</artifactId>
-	      <version>1.2.14</version>
-	      <scope>provided</scope>
-	    </dependency>
 		<!-- Fi signatura en el servidor amb PortaFib -->
   		<dependency>
 			<groupId>es.caib.regweb3</groupId>
@@ -258,6 +260,10 @@
             	<exclusion>
             		<groupId>ch.qos.logback</groupId>
             		<artifactId>logback-classic</artifactId>
+            	</exclusion>
+            	<exclusion>
+            		<groupId>log4j</groupId>
+            		<artifactId>log4j</artifactId>
             	</exclusion>
             </exclusions>
         </dependency>

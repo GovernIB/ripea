@@ -476,7 +476,6 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
 		<form:hidden name="portafirmesFluxTipus" path="portafirmesFluxTipus"/>
-
 		<c:choose>
 		<c:when test="${fluxTipus == 'SIMPLE'}">
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
@@ -491,7 +490,6 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 				suggestTextAddicional="nif"
 				required="true"
 				icon="fa fa-star"/>
-						
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSeqtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">

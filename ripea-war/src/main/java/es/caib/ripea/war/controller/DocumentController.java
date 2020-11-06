@@ -17,7 +17,6 @@ import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.mina.handler.demux.ExceptionHandler;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
@@ -464,13 +463,12 @@ public class DocumentController extends BaseUserController {
 			}
 			break;
 		case StatusSignaturesSet.STATUS_FINAL_ERROR:
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.error",
-							new Object[] {status.getErrorMsg()}));
-			break;
+			if (status.getErrorMsg() != null) {
+				MissatgesHelper.error(
+						request,
+						status.getErrorMsg());
+				break;
+			}
 		case StatusSignaturesSet.STATUS_CANCELLED:
 			MissatgesHelper.warning(
 					request,
