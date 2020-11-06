@@ -1248,15 +1248,20 @@ function removeCookie(cname) {
     document.cookie = cname + "=; path=/; expires=" + expires + ";";
 }
 
-
-function addLoading(idModal) {
-	$('#' + idModal).on('hidden.bs.modal', function () {
-		$('body').addClass('loading');
-	})	
+function modalCloseLoadingHandler() {
+	$('body').addClass('loading');
 }
 
-function removeLoading() {
-	$('body').removeClass('loading');
+function addLoading(idModal) {
+	$('#' + idModal).on('hidden.bs.modal', modalCloseLoadingHandler)
+}
+
+function removeLoading(idModal) {
+	if (idModal) {
+		$('#' + idModal).off('hidden.bs.modal', modalCloseLoadingHandler)
+	} else {
+		$('body').removeClass('loading');
+	}
 }
 
 function modalLoading(modalDivId, modalData, message){

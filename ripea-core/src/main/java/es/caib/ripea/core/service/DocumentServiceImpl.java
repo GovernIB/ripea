@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
@@ -44,6 +45,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -439,18 +441,28 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 		
-		firmaPortafirmesHelper.portafirmesEnviar(
-				entitatId,
-				document,
-				assumpte,
-				prioritat,
-				dataCaducitat,
-				portafirmesFluxId,
-				portafirmesResponsables,
-				portafirmesSeqTipus,
-				portafirmesFluxTipus,
-				annexosIds,
-				transaccioId);
+		
+		try {
+			firmaPortafirmesHelper.portafirmesEnviar(
+					entitatId,
+					document,
+					assumpte,
+					prioritat,
+					dataCaducitat,
+					portafirmesFluxId,
+					portafirmesResponsables,
+					portafirmesSeqTipus,
+					portafirmesFluxTipus,
+					annexosIds,
+					transaccioId);
+		} catch (Exception e) {
+			Throwable wsValidationException = ExceptionHelper.findThrowableInstance(e, WsValidationException.class, 6);
+			if (wsValidationException != null && (wsValidationException.getMessage().contains("Destinatari ID") || wsValidationException.getMessage().contains("ha trobat cap usuari"))) {
+				throw new ResponsableNoValidPortafirmesException();
+			} else {
+				throw e;
+			}
+		}
 	}
 
 	@Transactional
