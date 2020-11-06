@@ -165,7 +165,8 @@ $(document).ready(function() {
 	var idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
 	var currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
-	
+
+	window.parent.removeLoading(idModal);
 	$('form').on('submit', function(){
 		window.parent.addLoading(idModal);
 	});

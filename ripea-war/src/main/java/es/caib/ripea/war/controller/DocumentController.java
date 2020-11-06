@@ -137,15 +137,12 @@ public class DocumentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
 				documentId);
-		
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				entitatActual.getId(),
 				document.getMetaDocument().getId());
-		
 		if (bindingResult.hasErrors()) {
 			setFluxPredefinit(
 					metaDocument, 
@@ -157,12 +154,10 @@ public class DocumentController extends BaseUserController {
 					model);
 			return "portafirmesForm";
 		}
-		
 		String transaccioId = null;
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB)) {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		}
-		
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && 
 				(metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()) &&
 				(transaccioId == null || transaccioId.isEmpty()) && 
@@ -182,8 +177,6 @@ public class DocumentController extends BaseUserController {
 							"document.controller.portafirmes.flux.ko"));
 			return "portafirmesForm";
 		}
-		
-		
 		try {
 			documentService.portafirmesEnviar(entitatActual.getId(),
 					documentId,
@@ -202,19 +195,26 @@ public class DocumentController extends BaseUserController {
 					"redirect:../../../contingut/" + documentId,
 					"document.controller.portafirmes.upload.ok");	
 			
-		} catch (Exception e) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ResponsableNoValidPortafirmesException.class)) {
-				
-				return this.getAjaxControllerReturnValueError(
+		} catch (Exception ex) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)) {
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes"));
+				setFluxPredefinit(
+						metaDocument, 
+						model, 
+						command);
+				emplenarModelPortafirmes(
 						request,
-						"redirect:../../" + documentId + "/portafirmes/upload",
-						"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes");
+						documentId,
+						model);
+				return "portafirmesForm";
 			} else {
-				throw e;
+				throw ex;
 			}
-
 		}
-
 	}
 
 	@RequestMapping(value = "/{documentId}/portafirmes/reintentar", method = RequestMethod.GET)
