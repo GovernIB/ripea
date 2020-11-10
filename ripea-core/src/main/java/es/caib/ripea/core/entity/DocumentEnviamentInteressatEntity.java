@@ -118,7 +118,9 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 		}
 	}
 	
-	
+	public void updateEnviamentCertificacioData(Date enviamentCertificacioData) {
+		this.enviamentCertificacioData = enviamentCertificacioData;
+	}
 	
 	public void updateEnviamentEstat(
 			EnviamentEstat enviamentDatatEstat,

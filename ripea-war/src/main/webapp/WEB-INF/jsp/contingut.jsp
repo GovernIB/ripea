@@ -1248,15 +1248,20 @@ function removeCookie(cname) {
     document.cookie = cname + "=; path=/; expires=" + expires + ";";
 }
 
-
-function addLoading(idModal) {
-	$('#' + idModal).on('hidden.bs.modal', function () {
-		$('body').addClass('loading');
-	})	
+function modalCloseLoadingHandler() {
+	$('body').addClass('loading');
 }
 
-function removeLoading() {
-	$('body').removeClass('loading');
+function addLoading(idModal) {
+	$('#' + idModal).on('hidden.bs.modal', modalCloseLoadingHandler)
+}
+
+function removeLoading(idModal) {
+	if (idModal) {
+		$('#' + idModal).off('hidden.bs.modal', modalCloseLoadingHandler)
+	} else {
+		$('body').removeClass('loading');
+	}
 }
 
 function modalLoading(modalDivId, modalData, message){
@@ -1438,7 +1443,7 @@ function showLoadingModal(message) {
 						<c:when test="${contingut.expedient}"><spring:message code="contingut.errors.expedient.alertes"/></c:when>
 						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.alertes"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${contingut.id}/alertes"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal" data-refresh-tancar="true"><spring:message code="contingut.alertes.consultar"/></a>
+					<a href="<c:url value="/contingut/${contingut.id}/alertes"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.alertes.consultar"/></a>
 				</div>
 			</c:if>
 			<c:if test="${!isTasca && contingut.node and not contingut.valid}">

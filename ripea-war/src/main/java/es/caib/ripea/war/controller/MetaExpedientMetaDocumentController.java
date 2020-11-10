@@ -25,6 +25,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
@@ -256,6 +257,14 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	@ResponseBody
 	public boolean esborrarPlantilla(HttpServletRequest request, @PathVariable String plantillaId, Model model) {
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
+	}
+	
+	@RequestMapping(value = "/metaDocument/carrecs", method = RequestMethod.GET)
+	@ResponseBody
+	public List<PortafirmesCarrecDto> recuperarCarrecs(
+			HttpServletRequest request, 
+			Model model) {
+		return portafirmesFluxService.recuperarCarrecs();
 	}
 
 	public void emplenarModelForm(

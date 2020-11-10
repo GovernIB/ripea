@@ -39,6 +39,7 @@ import es.caib.plugins.arxiu.api.DocumentExtensio;
 import es.caib.plugins.arxiu.api.DocumentFormat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
+import es.caib.plugins.arxiu.api.DocumentTipusAddicional;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.ExpedientEstat;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
@@ -72,12 +73,14 @@ import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockInfoDto;
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
@@ -125,6 +128,7 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
@@ -1058,6 +1062,10 @@ public class PluginHelper {
 				false);
 	}
 
+	
+	
+	
+	
 
 	public Document arxiuDocumentConsultar(
 			ContingutEntity contingut,
@@ -1333,6 +1341,58 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	
+	
+	
+	public List<TipusDocumentalDto> documentTipusAddicionals() {
+
+		String accioDescripcio = "Consulta de tipus de documents addicionals";
+		
+		long t0 = System.currentTimeMillis();
+
+		try {
+			
+			List<DocumentTipusAddicional> documentTipusAddicionals = getArxiuPlugin().documentTipusAddicionals();
+			
+			List<TipusDocumentalDto> tipusDocumentalsDto = new ArrayList<>();
+			if (documentTipusAddicionals != null && !documentTipusAddicionals.isEmpty()) {
+				for (DocumentTipusAddicional documentTipusAddicional : documentTipusAddicionals) {
+					TipusDocumentalDto tipusDocumentalDto =  new TipusDocumentalDto();
+					tipusDocumentalDto.setCodi(documentTipusAddicional.getCodi());
+					tipusDocumentalDto.setNom(documentTipusAddicional.getDescripcio());
+					
+					tipusDocumentalsDto.add(tipusDocumentalDto);
+				}
+			}
+
+			
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return tipusDocumentalsDto;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	
 
 	public String arxiuDocumentGuardarFirmaCades(
 			DocumentEntity document,
@@ -2180,6 +2240,77 @@ public class PluginHelper {
 					ex);
 		}
 		return respostaDto;
+	}
+	
+	public List<PortafirmesCarrecDto> portafirmesRecuperarCarrecs() {
+		String accioDescripcio = "Recuperant els càrrecs disponibles";
+		long t0 = System.currentTimeMillis();
+		List<PortafirmesCarrecDto> carrecsDto = new ArrayList<PortafirmesCarrecDto>();
+		try {
+			List<PortafirmesCarrec> portafirmesCarrecs = getPortafirmesPlugin().recuperarCarrecs();
+			
+			for (PortafirmesCarrec portafirmesCarrec : portafirmesCarrecs) {
+				PortafirmesCarrecDto carrecDto = new PortafirmesCarrecDto();
+				carrecDto.setCarrecId(portafirmesCarrec.getCarrecId());
+				carrecDto.setCarrecName(portafirmesCarrec.getCarrecName());
+				carrecDto.setEntitatId(portafirmesCarrec.getEntitatId());
+				carrecDto.setUsuariPersonaId(portafirmesCarrec.getUsuariPersonaId());
+				carrecDto.setUsuariPersonaNif(portafirmesCarrec.getUsuariPersonaNif());
+				carrecDto.setUsuariPersonaEmail(portafirmesCarrec.getUsuariPersonaEmail());
+				carrecDto.setUsuariPersonaNom(portafirmesCarrec.getUsuariPersonaNom());
+				carrecsDto.add(carrecDto);
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return carrecsDto;
+	}
+	
+	public PortafirmesCarrecDto portafirmesRecuperarCarrec(String carrecId) {
+		String accioDescripcio = "Recuperan un càrrec a partir del seu ID";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put(
+				"carrecId",
+				carrecId);
+		long t0 = System.currentTimeMillis();
+		PortafirmesCarrecDto carrecDto = new PortafirmesCarrecDto();
+		try {
+			PortafirmesCarrec portafirmesCarrec = getPortafirmesPlugin().recuperarCarrec(carrecId);		
+			carrecDto.setCarrecId(portafirmesCarrec.getCarrecId());
+			carrecDto.setCarrecName(portafirmesCarrec.getCarrecName());
+			carrecDto.setEntitatId(portafirmesCarrec.getEntitatId());
+			carrecDto.setUsuariPersonaId(portafirmesCarrec.getUsuariPersonaId());
+			carrecDto.setUsuariPersonaNif(portafirmesCarrec.getUsuariPersonaNif());
+			carrecDto.setUsuariPersonaEmail(portafirmesCarrec.getUsuariPersonaEmail());
+			carrecDto.setUsuariPersonaNom(portafirmesCarrec.getUsuariPersonaNom());
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PFIRMA,
+					errorDescripcio,
+					ex);
+		}
+		return carrecDto;
 	}
 	
 	public void portafirmesTancarFluxDeFirma(
@@ -3389,7 +3520,7 @@ public class PluginHelper {
 					resposta.getEstat(),
 					resposta.getEstatData(),
 					resposta.getEstatOrigen(),
-					resposta.getCertificacioData(),
+					documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
 					resposta.getCertificacioOrigen(),
 					resposta.isError(),
 					resposta.getErrorDescripcio());

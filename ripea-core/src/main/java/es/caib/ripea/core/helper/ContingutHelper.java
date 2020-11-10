@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
 import es.caib.ripea.core.api.dto.NodeDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -229,9 +230,11 @@ public class ContingutHelper {
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-			if (expedient.getSeguidors().contains(usuariActual)) 
-				dto.setSeguidor(true);
+			if (auth != null) {
+				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
+				if (expedient.getSeguidors().contains(usuariActual)) 
+					dto.setSeguidor(true);
+			}
 			dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
 			dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
 			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
@@ -285,8 +288,18 @@ public class ContingutHelper {
 				TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 						document.getNtiTipoDocumental(),
 						contingut.getEntitat());
-				if (tipusDocumental != null)
+				
+				if (tipusDocumental != null) {
 					dto.setNtiTipoDocumentalNom(tipusDocumental.getNom());
+				} else {
+					List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
+					
+					for (TipusDocumentalDto docAddicional : docsAddicionals) {
+						if (docAddicional.getCodi().equals(document.getNtiTipoDocumental())) {
+							dto.setNtiTipoDocumentalNom(docAddicional.getNom());
+						}
+					}
+				}
 				
 			}
 			dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
@@ -457,14 +470,14 @@ public class ContingutHelper {
 			RespostaConsultaEstatEnviament resposta) {
 		DocumentDto dto = new DocumentDto();
 		MetaNodeDto metaNode = null;
-		dto.setNom("Justificant_" + notificacio.getAssumpte());
+		dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_"));
 		dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		dto.setUbicacio(null);
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
 			logger.debug("[CERT] Generant fitxer certificació...");
 			dto.setAmbFirma(true);
-			dto.setFitxerNom("Justificant_" + notificacio.getAssumpte() + ".pdf");
+			dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());

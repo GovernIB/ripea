@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -143,10 +144,28 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariAmbCodiDades(String codi) {
-		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
-		return conversioTipusHelper.convertir(
-				usuariHelper.getUsuariByCodiDades(codi),
-				UsuariDto.class);
+		logger.debug("Obtenint usuari/càrrec amb codi (codi=" + codi + ")");
+		UsuariDto usuariDto = null;
+		try {
+			usuariDto = conversioTipusHelper.convertir(
+					usuariHelper.getUsuariByCodiDades(codi),
+					UsuariDto.class);
+		} catch (NotFoundException ex) {
+			logger.error("No s'ha trobat cap usuari amb el codi " + codi + ". Procedim a cercar si és un càrrec.");
+			usuariDto = new UsuariDto();
+			PortafirmesCarrecDto carrec = pluginHelper.portafirmesRecuperarCarrec(codi);
+			
+			if (carrec != null) {
+				usuariDto.setCodi(carrec.getCarrecId());
+				usuariDto.setNom(carrec.getCarrecName() + " - " + carrec.getUsuariPersonaNom());
+				usuariDto.setNif(carrec.getUsuariPersonaNif());
+			} else {
+				throw new NotFoundException(
+						codi,
+						DadesUsuari.class);
+			}
+		}
+		return usuariDto;
 	}
 
 	@Transactional(readOnly = true)
@@ -218,7 +237,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyPluginPassarelaFirmaIgnorarModalIds() {
 		logger.debug("Consulta de la propietat amb les ids pels plugins de passarela de firma");
-		return PropertiesHelper.getProperties().getProperty("plugin.passarelafirma.ignorar.modal.ids");
+		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.passarelafirma.ignorar.modal.ids");
 	}
 
 	@Override

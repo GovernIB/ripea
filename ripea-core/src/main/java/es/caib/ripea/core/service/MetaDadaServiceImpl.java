@@ -85,7 +85,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			valor = metaDada.getValorImport();
 		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
 			valor = metaDada.getValorSencer();
-		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDada.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
 			valor = metaDada.getValorString();
 		}
 		
@@ -137,7 +137,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			valor = metaDada.getValorImport();
 		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
 			valor = metaDada.getValorSencer();
-		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDada.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
 			valor = metaDada.getValorString();
 		}
 		entity.update(

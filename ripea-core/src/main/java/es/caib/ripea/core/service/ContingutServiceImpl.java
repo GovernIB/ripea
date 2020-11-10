@@ -54,6 +54,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -88,6 +89,7 @@ import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -414,7 +416,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// No es poden moure documents firmats
 		if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat()) {
+			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
 				throw new ValidationException(
 						contingutOrigenId,
 						contingutOrigen.getClass(),
@@ -1287,10 +1289,23 @@ public class ContingutServiceImpl implements ContingutService {
 
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
-					TipusDocumentalEntity tipusDocuemntal = tipusDocumentalRepository.findByCodiAndEntitat(
+					TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 							metadades.getTipusDocumentalAddicional(),
 							entitat);
-					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocuemntal.getNom());
+
+					if (tipusDocumental != null) {
+						arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNom());
+					} else {
+						List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
+						
+						for (TipusDocumentalDto docAddicional : docsAddicionals) {
+							if (docAddicional.getCodi().equals(metadades.getTipusDocumentalAddicional())) {
+								arxiuDetall.setEniTipusDocumentalAddicional(docAddicional.getNom());
+							}
+						}
+					}
+
+					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNom());
 				}
 
 				arxiuDetall.setEniOrgans(metadades.getOrgans());
@@ -1962,9 +1977,10 @@ public class ContingutServiceImpl implements ContingutService {
 		fContent.delete();
 	}
 
-
-
-
+	public boolean isCarpetaLogica() {
+		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
+		return Boolean.valueOf(carpetesLogiques);
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 

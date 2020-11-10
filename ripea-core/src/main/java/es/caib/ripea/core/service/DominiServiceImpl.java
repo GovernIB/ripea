@@ -253,7 +253,7 @@ public class DominiServiceImpl implements DominiService {
 				MetaDadaTipusEnumDto.DOMINI);
 		//2. recuperar els tipus de domini d'aquestes metadades
 		for (MetaDadaEntity metaDadaEntity : metaDades) {
-			dominisCodis.add(metaDadaEntity.getValor());
+			dominisCodis.add(metaDadaEntity.getValor() != null ? metaDadaEntity.getValor(): "");
 		}
 		if (!dominisCodis.isEmpty()) {
 			dominis = dominiRepository.findByEntitatAndCodiInOrderByIdAsc(

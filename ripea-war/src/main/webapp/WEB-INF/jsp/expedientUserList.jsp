@@ -269,19 +269,6 @@ function removeCookie(cname) {
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
 			<div class="col-md-3">
-			
-				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
-				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
- 					name="organGestorId"  
- 					urlConsultaInicial="${urlConsultaInicial}"
- 					urlConsultaLlistat="${urlConsultaLlistat}"
- 					placeholderKey="metaexpedient.form.camp.organgestor"
- 					suggestValue="id"
- 					suggestText="nom"
- 					inline="true"/>	
-			</div>	
-			<div class="col-md-3">
 				<c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaInicial"/>
 				<c:url value="/metaexpedientajax/metaexpedients" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
@@ -302,12 +289,25 @@ function removeCookie(cname) {
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="expedient.list.user.placeholder.titol"/>
 			</div>
+			<div class="col-md-3">
+				<rip:inputSelect name="expedientEstatId" optionItems="${expedientEstatsOptions}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
+			</div>
 
 		</div>
 		<div class="row">
 			<div class="col-md-3">
-				<rip:inputSelect name="expedientEstatId" optionItems="${expedientEstatsOptions}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
-			</div>
+			
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+ 					name="organGestorId"  
+ 					urlConsultaInicial="${urlConsultaInicial}"
+ 					urlConsultaLlistat="${urlConsultaLlistat}"
+ 					placeholderKey="metaexpedient.form.camp.organgestor"
+ 					suggestValue="id"
+ 					suggestText="nom"
+ 					inline="true"/>	
+			</div>	
 			<div class="col-md-3">
 				<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
 			</div>
@@ -321,19 +321,17 @@ function removeCookie(cname) {
 		
 		<div class="row">
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
-			<div class="col-md-2">
-				<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-			</div>						
-			<rip:inputHidden name="meusExpedients"/>
-		
-			<div class="col-md-4">
+			<div class="col-md-3">
 			<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
 				<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
 			</div>
 			<div class="col-md-3">
 				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
 			</div>
-
+			<div class="col-md-2">
+				<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
+			</div>						
+			<rip:inputHidden name="meusExpedients"/>
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

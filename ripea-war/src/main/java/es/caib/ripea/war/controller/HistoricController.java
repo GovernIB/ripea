@@ -51,7 +51,7 @@ public class HistoricController extends BaseAdminController {
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		model.addAttribute(historicFiltreCommand);
 		model.addAttribute("showDadesEntitat", historicFiltreCommand.showingDadesEntitat());
@@ -85,7 +85,7 @@ public class HistoricController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
 			return "redirect:historic";
@@ -136,7 +136,7 @@ public class HistoricController extends BaseAdminController {
 	public Map<Date, Map<String, HistoricExpedientDto>> getOrgansGestorsMetrics(
 			HttpServletRequest request,
 			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 
@@ -225,7 +225,7 @@ public class HistoricController extends BaseAdminController {
 		// registram els usuaris consultats a la sessió
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS, usuarisCodi);
 
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {

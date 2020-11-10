@@ -59,6 +59,7 @@ import org.fundaciobit.apisib.core.exceptions.ApisIBTimeOutException;
 import org.slf4j.LoggerFactory;
 
 import es.caib.portafib.ws.api.v1.BlocDeFirmesWs;
+import es.caib.portafib.ws.api.v1.CarrecWs;
 import es.caib.portafib.ws.api.v1.FirmaBean;
 import es.caib.portafib.ws.api.v1.FitxerBean;
 import es.caib.portafib.ws.api.v1.FluxDeFirmesWs;
@@ -70,10 +71,11 @@ import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
 import es.caib.portafib.ws.api.v1.TipusDocumentInfoWs;
 import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
 import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
-import es.caib.portafib.ws.api.v1.utils.PeticioDeFirmaUtils;
+import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
@@ -465,6 +467,60 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 	}
 
 	@Override
+	public List<PortafirmesCarrec> recuperarCarrecs() throws SistemaExternException {
+		List<PortafirmesCarrec> carrecs = new ArrayList<PortafirmesCarrec>();
+		try {
+			List<CarrecWs> carrecsWs = getUsuariEntitatWs().getCarrecsOfMyEntitat();
+			if (carrecsWs != null) {
+				for (CarrecWs carrecWs : carrecsWs) {
+					PortafirmesCarrec carrec = new PortafirmesCarrec();
+					carrec.setCarrecId(carrecWs.getCarrecID());
+					carrec.setCarrecName(carrecWs.getCarrecName());
+					carrec.setEntitatId(carrecWs.getEntitatID());
+					carrec.setUsuariPersonaId(carrecWs.getUsuariPersonaID());
+					UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+					if (usuariPersona != null) {
+						carrec.setUsuariPersonaNif(usuariPersona.getNif());
+						carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
+						carrec.setUsuariPersonaNom(usuariPersona.getNom());
+					} else {
+						throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+					}
+					carrecs.add(carrec);
+				}
+			}
+			return carrecs;
+		} catch (Exception ex) {
+			throw new SistemaExternException("Hi ha hagut un problema recuperant els càrrecs per l'usuari aplicació " + getUsername(), ex);
+		}
+	}
+	
+	@Override
+	public PortafirmesCarrec recuperarCarrec(String carrecId) throws SistemaExternException {
+		PortafirmesCarrec carrec = new PortafirmesCarrec();
+		try {
+			CarrecWs carrecWs = getUsuariEntitatWs().getCarrec(carrecId);
+			if (carrecWs != null) {
+				carrec.setCarrecId(carrecWs.getCarrecID());
+				carrec.setCarrecName(carrecWs.getCarrecName());
+				carrec.setEntitatId(carrecWs.getEntitatID());
+				carrec.setUsuariPersonaId(carrecWs.getUsuariPersonaID());
+				UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+				if (usuariPersona != null) {
+					carrec.setUsuariPersonaNif(usuariPersona.getNif());
+					carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
+					carrec.setUsuariPersonaNom(usuariPersona.getNom());
+				} else {
+					throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+				}
+			}
+			return carrec;
+		} catch (Exception ex) {
+			throw new SistemaExternException("Hi ha hagut un problema recuperant els càrrecs per l'usuari aplicació " + getUsername(), ex);
+		}
+	}
+
+	@Override
 	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(
 			String idPlantilla, 
 			String idTransaccio, 
@@ -533,7 +589,11 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 							if (usuariPersona != null) {
 								signer.setSignerId(usuariPersona.getNif());
 								signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-								signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+								CarrecWs carrec = getUsuariEntitatWs().getCarrec(firmaBean.getDestinatariID());
+								if (carrec != null && carrec.getCarrecName() != null)
+									signer.setSignerNom(carrec.getCarrecName());
+								else
+									signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
 								signers.add(signer);
 							} else {
 								throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
@@ -848,10 +908,10 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					nifs[i][j] = fluxBloc.getDestinataris()[j];
 				}
 			}
-			fluxWs = PeticioDeFirmaUtils.constructFluxDeFirmesWsUsingBlocDeFirmes(
-					getUsuariEntitatWs(),
-					nifs);
-			/*fluxWs = new FluxDeFirmesWs();
+//			fluxWs = PeticioDeFirmaUtils.constructFluxDeFirmesWsUsingBlocDeFirmes(
+//					getUsuariEntitatWs(),
+//					nifs);
+			fluxWs = new FluxDeFirmesWs();
 			fluxWs.setNom("qwerty");
 			int index = 0;
 			for (PortafirmesFluxBloc fluxBloc: flux) {
@@ -861,14 +921,27 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				if (fluxBloc.getDestinataris() != null) {
 					for (int i = 0; i < fluxBloc.getDestinataris().length; i++) {
 						FirmaBean firma = new FirmaBean();
-						firma.setDestinatariID(fluxBloc.getDestinataris()[i]);
+						UsuariEntitatBean usuariEntitatBean = getUsuariEntitatWs().getUsuariEntitat(fluxBloc.getDestinataris()[i]); //if identificador càrrec (portafib)
+						if (usuariEntitatBean != null) {
+							logger.debug("Usuari trobat amb identificador càrrec: " + fluxBloc.getDestinataris()[i]);
+							firma.setDestinatariID(fluxBloc.getDestinataris()[i]);
+						} else {
+							UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(fluxBloc.getDestinataris()[i]); //if identificador usuari (ldap)
+							if (usuariPersona == null)
+								throw new WsValidationException("No s'ha trobat cap usuari persona amb id = " + fluxBloc.getDestinataris()[i]);
+							String usuariEntitatId = getUsuariEntitatWs().getUsuariEntitatIDInMyEntitatByAdministrationID(usuariPersona.getNif());
+							if (usuariEntitatId == null)
+								throw new WsValidationException("No s'ha trobat cap usuari entitat amb id = " + usuariEntitatId);
+							firma.setDestinatariID(usuariEntitatId);
+							logger.debug("Usuari trobat amb identificador usuari: " + fluxBloc.getDestinataris()[i] + ", nif=" + usuariPersona.getNif() + ", usuariEntitatId=" + usuariEntitatId);
+						}
 						firma.setObligatori(fluxBloc.getObligatorietats()[i]);
 						blocWs.getFirmes().add(firma);
 					}
 				}
 				fluxWs.getBlocsDeFirmes().add(blocWs);
 				index++;
-			}*/
+			}
 		}
 		return fluxWs;
 	}

@@ -20,6 +20,8 @@ import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -48,6 +50,7 @@ import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
@@ -56,6 +59,7 @@ import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -133,15 +137,12 @@ public class DocumentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
 				documentId);
-		
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				entitatActual.getId(),
 				document.getMetaDocument().getId());
-		
 		if (bindingResult.hasErrors()) {
 			setFluxPredefinit(
 					metaDocument, 
@@ -153,12 +154,10 @@ public class DocumentController extends BaseUserController {
 					model);
 			return "portafirmesForm";
 		}
-		
 		String transaccioId = null;
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB)) {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		}
-		
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && 
 				(metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()) &&
 				(transaccioId == null || transaccioId.isEmpty()) && 
@@ -178,23 +177,44 @@ public class DocumentController extends BaseUserController {
 							"document.controller.portafirmes.flux.ko"));
 			return "portafirmesForm";
 		}
-		documentService.portafirmesEnviar(
-				entitatActual.getId(),
-				documentId,
-				command.getMotiu(),
-				command.getPrioritat(),
-				command.getDataCaducitat(),
-				command.getPortafirmesEnviarFluxId(), //selecció flux
-				command.getPortafirmesResponsables(),
-				command.getPortafirmesSequenciaTipus(),
-				command.getPortafirmesFluxTipus(),
-				command.getAnnexos(),
-				transaccioId); //nou flux
-		
-		return this.getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../../contingut/" + documentId,
-				"document.controller.portafirmes.upload.ok");
+		try {
+			documentService.portafirmesEnviar(entitatActual.getId(),
+					documentId,
+					command.getMotiu(),
+					command.getPrioritat(),
+					command.getDataCaducitat(),
+					command.getPortafirmesEnviarFluxId(), //selecció flux
+					command.getPortafirmesResponsables(),
+					command.getPortafirmesSequenciaTipus(),
+					command.getPortafirmesFluxTipus(),
+					command.getAnnexos(),
+					transaccioId); //nou flux
+			
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + documentId,
+					"document.controller.portafirmes.upload.ok");	
+			
+		} catch (Exception ex) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)) {
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes"));
+				setFluxPredefinit(
+						metaDocument, 
+						model, 
+						command);
+				emplenarModelPortafirmes(
+						request,
+						documentId,
+						model);
+				return "portafirmesForm";
+			} else {
+				throw ex;
+			}
+		}
 	}
 
 	@RequestMapping(value = "/{documentId}/portafirmes/reintentar", method = RequestMethod.GET)
@@ -443,13 +463,12 @@ public class DocumentController extends BaseUserController {
 			}
 			break;
 		case StatusSignaturesSet.STATUS_FINAL_ERROR:
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.error",
-							new Object[] {status.getErrorMsg()}));
-			break;
+			if (status.getErrorMsg() != null) {
+				MissatgesHelper.error(
+						request,
+						status.getErrorMsg());
+				break;
+			}
 		case StatusSignaturesSet.STATUS_CANCELLED:
 			MissatgesHelper.warning(
 					request,
@@ -467,8 +486,14 @@ public class DocumentController extends BaseUserController {
 		passarelaFirmaHelper.closeSignaturesSet(
 				request,
 				signaturesSet);
+		
+
+		
 		boolean ignorarModal = false;
 		String ignorarModalIdsProperty = aplicacioService.propertyPluginPassarelaFirmaIgnorarModalIds();
+		
+		logger.debug("Signatura set plugin id=" + signaturesSet.getPluginId() + ", ignorarModalIdsProperty=" + ignorarModalIdsProperty);
+		
 		if (ignorarModalIdsProperty != null && !ignorarModalIdsProperty.isEmpty()) {
 			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
 			for (String ignorarModalId: ignorarModalIds) {
@@ -480,11 +505,22 @@ public class DocumentController extends BaseUserController {
 				}
 			}
 		}
+		
 		String forsarTancamentModal = aplicacioService.propertyFindByNom("plugin.passarelafirma.forsar.tancament.modal");
 		if (ignorarModal) {
 			return "redirect:/contingut/" + documentId;
 		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
-			return "redirect:/passarelaModalTancar";
+			String propertyValue = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga");
+			boolean usingNewVersion = propertyValue == null || !propertyValue.equals("true");
+			if (usingNewVersion) {
+				EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+				return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
+
+			} else {
+				return "redirect:/passarelaModalTancar";
+				
+			}
+			
 		} else {
 			String response = getModalControllerReturnValueSuccess(
 					request, 
@@ -698,4 +734,7 @@ public class DocumentController extends BaseUserController {
 			DocumentDto document) {
 		return getMessage(request, "document.controller.viafirma.motiu") + document.getNom() + " [" + document.getMetaNode().getNom() + "]";
 	}
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
 }

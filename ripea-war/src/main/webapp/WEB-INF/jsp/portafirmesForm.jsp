@@ -40,6 +40,19 @@ pageContext.setAttribute(
                 50% 50% 
                 no-repeat;
 }
+.rmodal_carrecs {
+    display:    none;
+    position:   absolute;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
 body.loading {
     overflow: hidden;   
 }
@@ -100,6 +113,50 @@ body.loading .rmodal {
 .espai {
 	height: 20px;
 }
+.carrec-selected {
+	font-weight: bold;
+	background-color: #1a3d5c;
+	border-radius: 2px;
+}
+div[class^="carrec_"] > a {
+	color: black;
+}
+.carrec-selected > a {
+	color: #FFF !important;
+}
+div[class^="carrec_"] {
+	padding: 1%;
+	margin: 2px;
+}
+div[class^="carrec_"]:hover{
+	background-color: #4b80af;
+}
+div[class^="carrec_"]:hover {
+	background-color: #1a3d5c;;
+}
+div[class^="carrec_"]:hover a{
+	color: #FFF;
+}
+div[class^="carrec_"] > a:hover {
+	text-decoration: none;
+	cursor: pointer;
+}
+div.dropdown-menu {
+	left: auto;
+	right: 0;
+	padding: 1%;
+	width: 70%;
+}
+div.dropdown-menu.loading {
+    overflow: hidden;   
+    height: 100px;
+}
+div.dropdown-menu.loading .rmodal_carrecs {
+    display: block;
+}
+a.btn.input-group-addon.portafirmesResponsables_btn {
+	background-color: #fff;
+}
 </style>
 
 <script type="text/javascript">
@@ -108,7 +165,8 @@ $(document).ready(function() {
 	var idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
 	var currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
-	
+
+	window.parent.removeLoading(idModal);
 	$('form').on('submit', function(){
 		window.parent.addLoading(idModal);
 	});
@@ -230,8 +288,83 @@ $(document).ready(function() {
 		localStorage.removeItem('transaccioId');
 	});
 	$("#portafirmesEnviarFluxId").trigger('change');
+	$(".portafirmesResponsables_btn").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.carrecs"/>");
+	
+	$("#portafirmesResponsables").on('select2:unselecting', function (e) {
+		var optionRemoved = e.params.args.data.id;
+		$("#portafirmesResponsables option[value='" + optionRemoved + "']").remove();
+	});
 });
 
+function toggleCarrecs() {
+	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+	if (dropdown.length === 0) {
+		$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
+		$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
+		
+	} else {
+		dropdown.toggle();
+	}
+}
+
+function recuperarCarrecs() {
+	var llistatCarrecs = "<div class='loading dropdown-menu'>";
+	$.ajax({
+		type: 'GET',
+		dataType: "json",
+		url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
+		success: function(carrecs) {
+			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+			dropdown.removeClass('loading');
+			if (carrecs) {
+				llistatCarrecs += '<div class="carrecsList">';
+				$.each(carrecs, function(i, carrec) {
+					var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
+					
+					$('#portafirmesResponsables option').each(function(i, responsable) {
+						if (responsable.value === carrec.carrecId) {
+							llistatCarrecs = llistatCarrecs.replace('carrec_' + carrec.carrecId, 'carrec_' + carrec.carrecId + ' carrec-selected');
+						}
+					});
+				});
+			}
+			dropdown.append(llistatCarrecs);
+		},
+		error: function (error) {
+			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+			dropdown.removeClass('loading');
+			dropdown.empty();
+			dropdown.append("Hi ha hagut un problema recuperant els càrrecs " + error.statusText);
+		},
+		statusCode: {
+	        500: function(error) {
+	        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+				dropdown.removeClass('loading');
+	        	dropdown.empty();
+				dropdown.append("Hi ha hagut un problema recuperant els càrrecs: " + error.statusText);
+	        }
+	   	}
+	});
+	llistatCarrecs += "<div class='rmodal_carrecs'></div></div>";
+	return llistatCarrecs;
+}
+function seleccionarCarrec(carrec) {
+	if ($('.carrec_' + carrec.carrecId).hasClass('carrec-selected')) {
+		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
+		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
+	} else {
+		var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNif + ')';
+		var items = [];
+		items.push({
+			"id": carrec.carrecId,
+			"text": nomCarrec
+		});
+	    var newOption = new Option(items[0].text, items[0].id, true, true);
+	    $("#portafirmesResponsables").append(newOption).trigger('change');
+		$('.carrec_' + carrec.carrecId).addClass('carrec-selected');
+	}
+}
 function mostrarFluxSeleccionat(urlPlantilla) {
 	adjustModalPerFlux(false);
 	var plantilla = '<hr>' + 
@@ -344,7 +477,6 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/>
 		<form:hidden name="portafirmesFluxTipus" path="portafirmesFluxTipus"/>
-
 		<c:choose>
 		<c:when test="${fluxTipus == 'SIMPLE'}">
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
@@ -354,11 +486,11 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 				urlConsultaInicial="${urlConsultaInicial}" 
 				urlConsultaLlistat="${urlConsultaLlistat}" 
 				textKey="metadocument.form.camp.portafirmes.responsables"
-				suggestValue="nif"
+				suggestValue="codi"
 				suggestText="nom"
 				suggestTextAddicional="nif"
-				required="true"/>
-						
+				required="true"
+				icon="fa fa-star"/>
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSeqtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">

@@ -18,7 +18,7 @@
 <%@ attribute name="suggestText" required="false" rtexprvalue="true"%>
 <%@ attribute name="suggestTextAddicional" required="false" rtexprvalue="true"%>
 <%@ attribute name="urlParamAddicional" required="false" rtexprvalue="true"%>
-
+<%@ attribute name="icon" required="false" rtexprvalue="true"%>
 
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -47,20 +47,44 @@
 				<c:if test="${required}">*</c:if>
 			</label>
 			<div class="controls col-xs-${campInputSize}">
-				<form:select path="${campPath}" cssClass="form-control"
-					id="${campPath}" disabled="${disabled}" style="width:100%"
-					data-toggle="suggest" data-netejar="${netejar}"
-					data-placeholder="${placeholderText}"
-					data-minimum-input-length="${minimumInputLength}"
-					data-url-llistat="${urlConsultaLlistat}"
-					data-url-inicial="${urlConsultaInicial}"
-					data-current-value="${campValue}"
-					data-suggest-value="${suggestValue}"
-					data-suggest-text="${suggestText}"
-					data-suggest-text-addicional="${suggestTextAddicional}" 
-					data-url-param-addicional="${urlParamAddicional}" 
-					/>
-				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+			<c:choose>
+				<c:when test="${not empty icon}">
+					<div class="input-group select2-bootstrap-append">
+						<form:select path="${campPath}" cssClass="form-control"
+							id="${campPath}" disabled="${disabled}" style="width:100%"
+							data-toggle="suggest" data-netejar="${netejar}"
+							data-placeholder="${placeholderText}"
+							data-minimum-input-length="${minimumInputLength}"
+							data-url-llistat="${urlConsultaLlistat}"
+							data-url-inicial="${urlConsultaInicial}"
+							data-current-value="${campValue}"
+							data-suggest-value="${suggestValue}"
+							data-suggest-text="${suggestText}"
+							data-suggest-text-addicional="${suggestTextAddicional}" 
+							data-url-param-addicional="${urlParamAddicional}" 
+							/>
+							<a class="input-group-addon btn btn-default ${campPath}_btn" onclick="toggleCarrecs()"><i class="${icon}"></i></a>
+							
+						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<form:select path="${campPath}" cssClass="form-control"
+							id="${campPath}" disabled="${disabled}" style="width:100%"
+							data-toggle="suggest" data-netejar="${netejar}"
+							data-placeholder="${placeholderText}"
+							data-minimum-input-length="${minimumInputLength}"
+							data-url-llistat="${urlConsultaLlistat}"
+							data-url-inicial="${urlConsultaInicial}"
+							data-current-value="${campValue}"
+							data-suggest-value="${suggestValue}"
+							data-suggest-text="${suggestText}"
+							data-suggest-text-addicional="${suggestTextAddicional}" 
+							data-url-param-addicional="${urlParamAddicional}" 
+							/>
+						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+				</c:otherwise>
+			</c:choose>
 			</div>
 		</div>
 	</c:when>
