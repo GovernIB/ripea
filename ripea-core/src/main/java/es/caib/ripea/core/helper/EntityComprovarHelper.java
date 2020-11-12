@@ -212,6 +212,12 @@ public class EntityComprovarHelper {
 		if (metaExpedient == null) {
 			throw new NotFoundException(metaExpedientId, MetaExpedientEntity.class);
 		}
+		if (HibernateHelper.isProxy(entitat)) {
+			entitat = HibernateHelper.deproxy(entitat);
+		}
+		if (HibernateHelper.isProxy(metaExpedient)) {
+			metaExpedient = HibernateHelper.deproxy(metaExpedient);
+		}
 		if (!entitat.equals(metaExpedient.getEntitat())) {
 			throw new ValidationException(metaExpedientId, MetaExpedientEntity.class,
 			        "L'entitat especificada (id=" + entitat.getId()
