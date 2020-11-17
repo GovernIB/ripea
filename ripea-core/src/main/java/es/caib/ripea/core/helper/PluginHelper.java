@@ -3747,7 +3747,11 @@ public class PluginHelper {
 			parametresViaFirma.setLecturaObligatoria(documentViaFirmaEntity.isLecturaObligatoria());
 			parametresViaFirma.setTitol(documentViaFirmaEntity.getTitol());
 			parametresViaFirma.setViaFirmaDispositiu(viaFirmaDispositiu);
-
+			parametresViaFirma.setExpedientCodi(expedientHelper.calcularNumero(document.getExpedientPare()));
+			parametresViaFirma.setSignantNif(documentViaFirmaEntity.getSignantNif());
+			parametresViaFirma.setSignantNom(documentViaFirmaEntity.getSignantNom());
+			parametresViaFirma.setObservaciones(documentViaFirmaEntity.getObservacions());
+			
 			viaFirmaResponse = getViaFirmaPlugin().uploadDocument(parametresViaFirma);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
