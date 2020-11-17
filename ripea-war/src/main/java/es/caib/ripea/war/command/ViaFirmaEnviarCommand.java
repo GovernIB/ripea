@@ -11,12 +11,15 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per a enviar documents al portafirmes.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class ViaFirmaEnviarCommand {
 
 	@Size(max=256)
@@ -28,38 +31,14 @@ public class ViaFirmaEnviarCommand {
 	private String codisUsuariViaFirma;
 	@NotEmpty
 	private String dispositiuViaFirma;
+	private Long interessatId;
+	@NotEmpty
+	private String signantNif;
+	@NotEmpty
+	private String signantNom;
+	@Size(max=256)
+	private String observacions;
 
-	public String getTitol() {
-		return titol;
-	}
-	public void setTitol(String titol) {
-		this.titol = titol;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getCodiUsuariViaFirma() {
-		return codiUsuariViaFirma;
-	}
-	public void setCodiUsuariViaFirma(String codiUsuariViaFirma) {
-		this.codiUsuariViaFirma = codiUsuariViaFirma;
-	}
-	public String getCodisUsuariViaFirma() {
-		return codisUsuariViaFirma;
-	}
-	public void setCodisUsuariViaFirma(String codisUsuariViaFirma) {
-		this.codisUsuariViaFirma = codisUsuariViaFirma;
-	}
-	public String getDispositiuViaFirma() {
-		return dispositiuViaFirma;
-	}
-	public void setDispositiuViaFirma(String dispositiuViaFirma) {
-		this.dispositiuViaFirma = dispositiuViaFirma;
-	}
-	
 	public static ViaFirmaEnviarDto asDto(ViaFirmaEnviarCommand command) {
 		ViaFirmaEnviarDto viaFirmaEnviar = ConversioTipusHelper.convertir(
 				command,

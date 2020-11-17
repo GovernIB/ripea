@@ -45,6 +45,13 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	@Column(name = "vf_callback_estat")
 	private ViaFirmaCallbackEstatEnumDto callbackEstat;
 	
+	@Column(name = "vf_signant_nif")
+	private String signantNif;
+	@Column(name = "vf_signant_nom")
+	private String signantNom;
+	@Column(name = "vf_observacions")
+	private String observacions;
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "vf_viafirma_dispositiu")
 	@ForeignKey(name = "ipa_document_enviament_dis_fk")
@@ -74,11 +81,18 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	public ViaFirmaCallbackEstatEnumDto getCallbackEstat() {
 		return callbackEstat;
 	}
-
 	public DispositiuEnviamentEntity getDispositiuEnviament() {
 		return dispositiuEnviament;
 	}
-	
+	public String getSignantNif() {
+		return signantNif;
+	}
+	public String getSignantNom() {
+		return signantNom;
+	}
+	public String getObservacions() {
+		return observacions;
+	}
 	public void updateMessageCode(String messageCode) {
 		this.messageCode = messageCode;
 	}
@@ -102,6 +116,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			String titol,
 			String descripcio,
 			String codiDispositiu,
+			String signantNif,
+			String signantNom,
+			String observacions,
 			DispositiuEnviamentEntity dispositiuEnviament,
 			boolean lecturaObligatoria,
 			ExpedientEntity expedient,
@@ -113,6 +130,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				titol,
 				descripcio,
 				codiDispositiu,
+				signantNif,
+				signantNom,
+				observacions,
 				dispositiuEnviament,
 				lecturaObligatoria,
 				expedient,
@@ -128,6 +148,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				String titol,
 				String descripcio,
 				String codiDispositiu,
+				String signantNif,
+				String signantNom,
+				String observacions,
 				DispositiuEnviamentEntity dispositiuEnviament,
 				boolean lecturaObligatoria,
 				ExpedientEntity expedient,
@@ -141,6 +164,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			built.titol = titol;
 			built.descripcio = descripcio;
 			built.codiDispositiu = codiDispositiu;
+			built.signantNif = signantNif;
+			built.signantNom = signantNom;
+			built.observacions = observacions;
 			built.dispositiuEnviament = dispositiuEnviament;
 			built.lecturaObligatoria = lecturaObligatoria;
 			built.expedient = expedient;

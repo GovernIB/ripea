@@ -55,6 +55,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
@@ -90,6 +91,8 @@ public class DocumentController extends BaseUserController {
 	private DocumentEnviamentService documentEnviamentService;
 	@Autowired
 	private ContingutService contingutService;
+	@Autowired
+	private ExpedientInteressatService expedientInteressatService;
 	
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -547,7 +550,12 @@ public class DocumentController extends BaseUserController {
 		command.setDescripcio(recuperarMotiu(
 				request,
 				document));
-		
+		model.addAttribute(
+				"interessats",
+				expedientInteressatService.findByExpedient(
+						entitatActual.getId(),
+						document.getExpedientPare().getId(),
+						true));
 		model.addAttribute(command);
 		return "viaFirmaForm";
 	}
@@ -591,6 +599,10 @@ public class DocumentController extends BaseUserController {
 					ViaFirmaEnviarCommand.asDto(command),
 					usuariActual);
 		} catch (Exception ex) {
+			emplenarModelPortafirmes(
+					request,
+					documentId,
+					model);
 			MissatgesHelper.error(request, ex.getMessage());
 			return "viaFirmaForm";
 		}
@@ -717,6 +729,12 @@ public class DocumentController extends BaseUserController {
 				documentService.findAnnexosAmbExpedient(
 						entitatActual.getId(), 
 						document));
+		model.addAttribute(
+				"interessats",
+				expedientInteressatService.findByExpedient(
+						entitatActual.getId(),
+						document.getExpedientPare().getId(),
+						true));
 	}
 
 	private void emplenarModelFirmaClient(

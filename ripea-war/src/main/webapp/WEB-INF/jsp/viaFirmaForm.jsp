@@ -130,6 +130,28 @@ $(document).ready(function() {
 	        return option;
 	    }
 	}
+	
+	$('#interessatId').on('change', function() {
+		var interessatId = $(this).val();
+		if (interessatId) {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/expedient/interessat/"/>" + interessatId,
+				success: function(data) {
+					if (data) {
+						$('#signantNom').val(data.llinatgesComaNom);
+						$('#signantNif').val(data.documentNum);
+					}
+				},
+				error: function() {
+					console.log("error recuperant la informació de l'interessat: " + interessatId);
+				}
+			});
+		} else {
+			$('#signantNom').val('');
+			$('#signantNif').val('');
+		}
+	});
 });
 
 </script>
@@ -142,6 +164,10 @@ $(document).ready(function() {
 		<rip:inputHidden name="codiUsuariViaFirma"/>
 		<rip:inputSelect name="codisUsuariViaFirma" textKey="contenidor.document.biometrica.camp.usuari"  required="true"/>
 		<rip:inputSelect name="dispositiuViaFirma" textKey="contenidor.document.biometrica.camp.dispositiu" required="true"/>
+		<rip:inputSelect name="interessatId" textKey="contenidor.document.biometrica.camp.interessat" emptyOption="true" emptyOptionTextKey="contenidor.document.biometrica.camp.interessat.nou" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador"/>
+		<rip:inputText name="signantNom" textKey="contenidor.document.biometrica.camp.interessat.nom" required="true"/>
+		<rip:inputText name="signantNif" textKey="contenidor.document.biometrica.camp.interessat.nif" required="true"/>
+		<rip:inputTextarea name="observacions" textKey="contenidor.document.biometrica.camp.observacions"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.biometrica.enviar"/></button>
 			<a href="<c:url value="/contenidor/${document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
