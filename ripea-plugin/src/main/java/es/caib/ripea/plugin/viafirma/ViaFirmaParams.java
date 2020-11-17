@@ -2,11 +2,15 @@ package es.caib.ripea.plugin.viafirma;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Paràmetres entrada per el sistema viaFirma
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class ViaFirmaParams implements Serializable {
 
 	private boolean lecturaObligatoria;
@@ -16,49 +20,10 @@ public class ViaFirmaParams implements Serializable {
 	private String codiUsuari;
 	private String contrasenya;
 	private ViaFirmaDispositiu viaFirmaDispositiu;
-	
-	public boolean isLecturaObligatoria() {
-		return lecturaObligatoria;
-	}
-	public void setLecturaObligatoria(boolean lecturaObligatoria) {
-		this.lecturaObligatoria = lecturaObligatoria;
-	}
-	public String getTitol() {
-		return titol;
-	}
-	public void setTitol(String titol) {
-		this.titol = titol;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getContingut() {
-		return contingut;
-	}
-	public void setContingut(String contingut) {
-		this.contingut = contingut;
-	}
-	public String getCodiUsuari() {
-		return codiUsuari;
-	}
-	public void setCodiUsuari(String codiUsuari) {
-		this.codiUsuari = codiUsuari;
-	}
-	public String getContrasenya() {
-		return contrasenya;
-	}
-	public void setContrasenya(String contrasenya) {
-		this.contrasenya = contrasenya;
-	}
-	public ViaFirmaDispositiu getViaFirmaDispositiu() {
-		return viaFirmaDispositiu;
-	}
-	public void setViaFirmaDispositiu(ViaFirmaDispositiu viaFirmaDispositiu) {
-		this.viaFirmaDispositiu = viaFirmaDispositiu;
-	}
+	private String signantNif;
+	private String signantNom;
+	private String expedientCodi;
+	private String observaciones;
 
 	private static final long serialVersionUID = 7518162775992143312L;
 }

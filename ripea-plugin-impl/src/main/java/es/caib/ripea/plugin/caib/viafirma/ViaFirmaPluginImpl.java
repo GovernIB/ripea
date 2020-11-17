@@ -20,6 +20,7 @@ import com.viafirma.documents.sdk.java.model.Evidence;
 import com.viafirma.documents.sdk.java.model.Evidence.TypeEnum;
 import com.viafirma.documents.sdk.java.model.Message;
 import com.viafirma.documents.sdk.java.model.Notification;
+import com.viafirma.documents.sdk.java.model.Param;
 import com.viafirma.documents.sdk.java.model.Policy;
 import com.viafirma.documents.sdk.java.model.Signature;
 
@@ -60,15 +61,41 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             document.setTemplateType(TemplateTypeEnum.base64);
             document.setTemplateReference(parametresViaFirma.getContingut());
             message.setDocument(document);
-            
+
+            String signantNom = parametresViaFirma.getSignantNom().replaceAll(",", "");
+            String signantNif = parametresViaFirma.getSignantNif();
+            //Configuració de las políticas de firma
             message.setPolicies(new ArrayList<Policy>());
             Policy policy = new Policy();
-
             policy.setEvidences(new ArrayList<Evidence>());
             Evidence evidence = new Evidence();
             evidence.setType(TypeEnum.SIGNATURE);
-            evidence.setHelpText("User signature");
+            evidence.setHelpText("Firma de " + signantNom);
+            evidence.setHelpDetail("Yo, " + signantNom + ", con NIF número " + signantNif + " he leído y entendido el contenido del documento que voy a firmar." + (parametresViaFirma.getObservaciones() != null ? "[Observaciones: " + parametresViaFirma.getObservaciones()  + "]" : ""));
             evidence.setTypeFormatSign("XADES_B");
+            
+            List<Param> metadataList = new ArrayList<Param>();
+            //Titular Nom
+            Param titularNom = new Param();
+            titularNom.setKey("TITULAR");
+            titularNom.setValue(signantNom);
+            metadataList.add(titularNom);
+            //Titular NIF
+            Param titularNif = new Param();
+            titularNif.setKey("TITULAR_DNI");
+            titularNif.setValue(signantNif);
+            metadataList.add(titularNif);
+            //Codi expedient
+            Param expedient = new Param();
+            expedient.setKey("EXPEDIENTE");
+            expedient.setValue(parametresViaFirma.getExpedientCodi());
+            metadataList.add(expedient);
+            //Observacions
+            Param observacions = new Param();
+            observacions.setKey("OBSERVACIONES");
+            observacions.setValue(parametresViaFirma.getObservaciones());
+            metadataList.add(observacions);
+            evidence.setMetadataList(metadataList);   
             policy.getEvidences().add(evidence);
 
             policy.setSignatures(new ArrayList<Signature>());
