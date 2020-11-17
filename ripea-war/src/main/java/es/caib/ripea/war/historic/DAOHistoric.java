@@ -1,18 +1,24 @@
 package es.caib.ripea.war.historic;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import es.caib.ripea.core.api.dto.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.HistoricInteressatDto;
@@ -91,13 +97,14 @@ public class DAOHistoric {
 	 *
 	 **********/
 	
-	@JacksonXmlRootElement(localName = "registres-entitat")
+	@XmlRootElement(name = "registres-entitat")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
-	public static class RootEntitat {
+	public static class RootEntitat implements Serializable {
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		public Date generationDate;
-		@JacksonXmlElementWrapper(localName = "registres")
-		@JacksonXmlProperty(localName = "registre")
+//		@XmlElementWrapper(name = "registres")
+		@XmlElement(name = "registre")
 		public List<RegistreEntitat> registres;
 		
 		public RootEntitat(List<RegistreEntitat> registres) {
@@ -110,9 +117,10 @@ public class DAOHistoric {
 		
 	}
 		
-	@Getter @Setter
+	@Setter
 	public static class RegistreEntitat extends RegistreExpedient {
-		@JacksonXmlProperty(isAttribute=true)
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		private Date data;
 	}
@@ -123,13 +131,15 @@ public class DAOHistoric {
 	 *
 	 **********/
 	
-	@JacksonXmlRootElement(localName = "registres-organGestor")
+	@XmlRootElement(name = "registres-organGestor")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootOrganGestors {
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		public Date generationDate;
-		@JacksonXmlElementWrapper(localName = "registres")
-		@JacksonXmlProperty(localName = "registre")
+		
+		@XmlElement(name = "registre")
 		public List<RegistresOrganGestor> registres;
 		
 		public RootOrganGestors(List<RegistresOrganGestor> registres) {
@@ -141,12 +151,12 @@ public class DAOHistoric {
 	}
 	
 	public static class RegistresOrganGestor {
-		@JacksonXmlProperty(isAttribute=true)
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		public Date data;
 
-		@JacksonXmlProperty(localName = "organ_gestor")
-		@JacksonXmlElementWrapper(useWrapping = false)
+		@XmlElement(name = "organ_gestor")
 		public List<RegistreOrganGestor> organGestors;
 		
 		public RegistresOrganGestor(Date data, List<RegistreOrganGestor> organGestors) {
@@ -158,7 +168,7 @@ public class DAOHistoric {
 	}
 
 	public static class RegistreOrganGestor extends Registre {
-		@JacksonXmlProperty(isAttribute=true, localName = "nom")
+		@XmlAttribute(name = "nom")
 		public String nomOrganGestor;
 	}
 	
@@ -171,14 +181,16 @@ public class DAOHistoric {
 	 **********/
 	
 
-	@JacksonXmlRootElement(localName = "registres-usuaris")
+	@XmlRootElement(name = "registres-usuaris")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootUsuaris {
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		public Date generationDate;
 		
-		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
-		@JacksonXmlProperty(localName = "usuari")
+//		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
+		@XmlElement(name = "usuari")
 		public List<RegistresUsuari> registres;
 		
 		public RootUsuaris(List<RegistresUsuari> registres) {
@@ -186,13 +198,14 @@ public class DAOHistoric {
 			this.generationDate = new Date();
 			this.registres = registres;
 		}
+		public RootUsuaris() {}
 	}
 	
 	public static class RegistresUsuari {
-		@JacksonXmlProperty(isAttribute=true, localName="codi-usuari")
+		@XmlAttribute(name="codi-usuari")
 		public String user;
-		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
-		@JacksonXmlProperty(localName = "registre")
+//		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
+		@XmlElement(name = "registre")
 		public List<RegistreUsuari> registres;
 		
 		public RegistresUsuari(String user) {
@@ -200,19 +213,22 @@ public class DAOHistoric {
 			this.user = user;
 			this.registres = new ArrayList<>();
 		}
+		public RegistresUsuari() {}
 		
 		public void addRegistre(RegistreUsuari registre) {
 			this.registres.add(registre);
 		}
 	}
 	
-	@Getter @Setter
+	@Setter
 	public static class RegistreUsuari extends Registre {
-		@JacksonXmlProperty(isAttribute=true)
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-		private Date data;
+		public Date data;
 		
-		private Long numTasquesTramitades;
+		public Long numTasquesTramitades;
+		public RegistreUsuari() {}
 	}
 	
 
@@ -223,12 +239,13 @@ public class DAOHistoric {
 	 *
 	 **********/
 	
-	@JacksonXmlRootElement(localName = "registres-usuaris")
+	@XmlRootElement(name = "registres-interessats")
 	public static class RootInteressats {
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		public Date generationDate;
-		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
-		@JacksonXmlProperty(localName = "interessat")
+		@XmlElement(name = "interessat")
 		public List<RegistresInteressat> registres;
 		
 		public RootInteressats(List<RegistresInteressat> registres) {
@@ -236,14 +253,15 @@ public class DAOHistoric {
 			this.generationDate = new Date();
 			this.registres = registres;
 		}
+		public RootInteressats() {}
 	}
 	
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RegistresInteressat {
-		@JacksonXmlProperty(isAttribute=true, localName="numero-document")
+		@XmlAttribute(name="numero-document")
 		public String interessatDocNum;
-		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
-		@JacksonXmlProperty(localName = "registre")
+//		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
+		@XmlElement(name = "registre")
 		public List<RegistreInteressat> registres;
 		
 		public RegistresInteressat(String interessatDocNum) {
@@ -256,11 +274,12 @@ public class DAOHistoric {
 		}
 	}
 	
-	@Getter @Setter
+	@Setter
 	public static class RegistreInteressat extends Registre {
-		@JacksonXmlProperty(isAttribute=true)
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-		private Date data;
+		public Date data;
 	}
 
 	/**********
@@ -271,7 +290,7 @@ public class DAOHistoric {
 		
 	@Data
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
-	public static class RegistreExpedient extends Registre {
+	public static class RegistreExpedient extends Registre  implements Serializable {
 		private Long numDocsSignats;
 		private Long numDocsNotificats;
 	}
@@ -287,4 +306,23 @@ public class DAOHistoric {
 		private Long numExpedientsTancatsTotal;
 	}
 	
+	public static class DateAdapter extends XmlAdapter<String, Date> {
+
+	    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+	    @Override
+	    public String marshal(Date v) throws Exception {
+	        synchronized (dateFormat) {
+	            return dateFormat.format(v);
+	        }
+	    }
+
+	    @Override
+	    public Date unmarshal(String v) throws Exception {
+	        synchronized (dateFormat) {
+	            return dateFormat.parse(v);
+	        }
+	    }
+
+	}
 }

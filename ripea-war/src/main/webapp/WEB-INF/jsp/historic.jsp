@@ -284,12 +284,49 @@
 			    }
 			});
 		}
+
+		
+		function modalLoading() {
+			var modalId = "modal-loading";
+			this.show = function () {
+				$("#" + modalId).modal('show');
+			};
+			
+			this.hide = function () {
+				$("#" + modalId).modal('hide');
+			};
+			
+			$('body').append(
+					'	<div id="' + modalId + '" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
+					'		<div class="modal-dialog modal-sm">' +
+					'			<div class="modal-content">' +
+// 					'				<div class="modal-header">' +
+// 					'					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+// 					'					<h4 class="modal-title"></h4>' +
+// 					'				</div>' +
+					'				<div class="modal-body" style="padding:0">' +
+					'					<iframe frameborder="0" height="100" width="100%"></iframe>' +
+					'					<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
+					'						<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>' + 
+// 					(plugin.settings.missatgeLoading != null ? '<p>' + plugin.settings.missatgeLoading + '</p>' : '') +	
+					'					</div>' +
+					'				</div>' +
+// 					'				<div class="modal-footer"></div>' +
+					'			</div>' +
+					'		</div>' +
+					'	</div>');
+			console.log("uep! com anam?")
+		}
+		
+		
 		
 		/**
 		* 	CODI SECCIÓ ENTITAT
 		*/
 		function seccioEntitat () {
 			var taules = new Taules();
+			var loading = new modalLoading();
+			
 			// function to update our chart
 		    function buildChartEntitat(chart, url, data) {
 		        var data = data || {};
@@ -321,13 +358,14 @@
 
 			
 		    if ( showingDadesActuals && showingTables) {
+		    	loading.show();
 				$.ajax({
 					type: "GET",
 					url: 'historic/entitat/actual',
 					success: function(response) {
 						taules.cleanTaules();
 						$('#div-dades-entitat').html("");
-						
+						loading.hide();
 						var title = '<h2><spring:message code="historic.taula.titol.permetaexp"/></h2>';
 						$('#div-dades-entitat').append(title);
 						taules.addTaulaAcualsPerMetaExpedient(response, '#div-dades-entitat');
@@ -363,6 +401,7 @@
 		*/
 		function seccioOrgansGestors() {
 			var taules = new Taules();
+			var loading = new modalLoading();
 			function buildTablesMetrics(data, metric){
 				var organsGestors = [];
 				var iSerie = 0;
@@ -450,16 +489,19 @@
 			function updateContentOrganGestors(metrics) {
 				
 				if ( showingDadesActuals && showingTables) {
+					loading.show();
 					$.ajax({
 						type: "GET",
 						url: 'historic/entitat/actual',
 						success: function(response) {
 							taules.cleanTaules();
+							loading.hide();
 							taules.addTaulaAcualsPerOrganGestor(response, '#div-dades-organ');
 						}
 					});
 					
 				} else if ( showingDadesActuals && !showingTables && metrics.length != 0){		
+					loading.show();
 					$.ajax({
 						type: "POST",
 						url: 'historic/organgestors/actual',
@@ -467,6 +509,7 @@
 							metrics: metrics
 						},
 						success: function(response) {
+							loading.hide();
 							for (var metric in response) {
 								var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
 								$('#div-dades-organ').append(canvas);
@@ -476,6 +519,7 @@
 					});						
 
 				}  else if ( !showingDadesActuals && showingTables && metrics.length != 0) {
+					loading.show();
 					$.ajax({
 						type: "POST",
 						url: 'historic/organgestors',
@@ -485,8 +529,7 @@
 						success: function(response) {
 							taules.cleanTaules();
 							$('#div-dades-organ').html("");
-
-							console.log(response);
+							loading.hide();
 							metrics.forEach(function(metric){
 								console.log(metric);
 								var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
@@ -500,6 +543,7 @@
 						}
 					});
 				}  else if ( !showingDadesActuals && !showingTables && metrics.length != 0) {
+					loading.show();
 					$.ajax({
 						type: "POST",
 						url: 'historic/organgestors/grouped',
@@ -508,8 +552,7 @@
 						},
 						success: function(response) {
 							$('#div-dades-organ').html("");
-
-							console.log(response);
+							loading.hide();
 							metrics.forEach(function(metric){
 								var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
 								var canvas = '<canvas id="chart-' + metric + '" width="400" height="100"></canvas>';
@@ -530,8 +573,8 @@
 		*/
 		function seccioUsuaris() {
 			var taules = new Taules();
+			var loading = new modalLoading();
 			function usuari_construirTaula(dades, codiUsuari){
-// 				console.log(dades);
 				var tableHeader = '<table id="table-user-' + codiUsuari + '" class="table table-bordered table-striped table-hover style="width:100%" >' +
 						'<thead>' +
 							'<tr>';
@@ -544,12 +587,8 @@
 	
 				tableHeader += '</tr></thead><tbody>';
 				
-				
-// 				var dates = dades.map(item => new Date(item.data).toLocaleDateString("es"));
-				
 				var tableBody = '';
 				dades.forEach(function(registre){
-// 					console.log(registre)
 					var row = '<tr>';
 					row += '<td data-sort="' + registre.data + '">' + new Date(registre.data).toLocaleDateString("es") + '</td>';
 					row += '<td>' + registre['EXPEDIENTS_CREATS'] + '</td>';
@@ -646,6 +685,7 @@
 				if (usuaris.length == 0){
 					return;
 				}
+				loading.show();
 				if ( showingDadesActuals ) {
 					taules.cleanTaules();
 					$('#div-dades-usuaris').html("");
@@ -670,9 +710,12 @@
 							}
 							
 							taules.addTaula(dataTable);
+							
+							loading.hide();
 						}
 					});
 				} else {
+					
 					$.ajax({
 						type: "POST",
 						url: 'historic/usuaris/dades/',
@@ -701,7 +744,8 @@
 									
 								}
 								
-							}								
+							}	
+							loading.hide();
 						}
 					});
 				}
@@ -718,6 +762,7 @@
 		
 		function seccioInteressats() {
 			var taules = new Taules();
+			var loading = new modalLoading();
 			function interessatConstruirTaula(dades, interessatDoc) {
 				var tableHeader = '<table id="table-interessat-' + interessatDoc + '" class="table table-bordered table-striped table-hover style="width:100%" >' +
 						'<thead>' +
@@ -812,6 +857,7 @@
 				if (interessats.length == 0){
 					return;
 				}
+				loading.show();
 				if ( showingDadesActuals ) {
 					$.ajax({
 						type: "POST",
@@ -836,6 +882,7 @@
 							}
 							
 							taules.addTaula(dataTable);
+							loading.hide();
 						}
 					});
 
@@ -869,7 +916,8 @@
 									
 								}
 
-							}								
+							}
+							loading.hide();
 						}
 					});
 				}

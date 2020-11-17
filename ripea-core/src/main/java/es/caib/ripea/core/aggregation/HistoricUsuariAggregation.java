@@ -3,6 +3,7 @@ package es.caib.ripea.core.aggregation;
 import java.util.Date;
 
 import es.caib.ripea.core.entity.UsuariEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

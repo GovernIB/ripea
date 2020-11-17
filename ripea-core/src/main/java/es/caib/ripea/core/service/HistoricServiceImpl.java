@@ -70,8 +70,6 @@ public class HistoricServiceImpl implements HistoricService {
 			HistoricFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
-//		historicTask.registreDiari();
-//		historicTask.registreMensual();
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;

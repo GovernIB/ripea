@@ -1,6 +1,7 @@
 package es.caib.ripea.core.task;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,31 +60,12 @@ public class HistoricTask {
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void registreDiari() {
 		// get yesterday day
-		for (int i = 1; i <= 60; i++) {
-		LocalDate date = (new LocalDate()).minusDays(i);
-//		LocalDate date = (new LocalDate()).minusDays(1);
+		LocalDate date = (new LocalDate()).minusDays(1);
 		Date currentDateIni = date.toDateTimeAtStartOfDay().toDate();
 		Date currentDateEnd = date.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(
 				999).toDate();
 
-		Collection<HistoricExpedientEntity> historics = calcularHistoricExpedient(
-				currentDateIni,
-				currentDateEnd,
-				HistoricTipusEnumDto.DIARI);
-		historicExpedientRepository.save(historics);
-
-		Collection<HistoricUsuariEntity> historicsUsuaris = calcularHistoricUsuari(
-				currentDateIni,
-				currentDateEnd,
-				HistoricTipusEnumDto.DIARI);
-		historicUsuariRepository.save(historicsUsuaris);
-
-		Collection<HistoricInteressatEntity> historicsInteressats = calcularHistoricInteressat(
-				currentDateIni,
-				currentDateEnd,
-				HistoricTipusEnumDto.DIARI);
-		historicInteressatRepository.save(historicsInteressats);
-		}
+		computeData(currentDateIni, currentDateEnd, HistoricTipusEnumDto.DIARI);
 	}
 
 	/**
@@ -96,32 +78,71 @@ public class HistoricTask {
 	@Scheduled(cron = "0 0 0 1 * ?")
 	public void registreMensual() {
 		LocalDate date = (new LocalDate()).minusDays(1);
-//		Date currentDateEnd = date.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(
-//				999).toDate();
-//		Date currentDateIni = date.withDayOfMonth(1).toDateTimeAtStartOfDay().toDate();
-		for (int i = 1; i <= 24; i++) {
-		date = date.minusMonths(1);
-		Date currentDateEnd = date.withDayOfMonth(28).toDateTimeAtStartOfDay().plusHours(23).plusMinutes(
-				59).plusSeconds(59).plusMillis(999).toDate();
 		Date currentDateIni = date.withDayOfMonth(1).toDateTimeAtStartOfDay().toDate();
+		
+		// Get last day of month
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(currentDateIni);
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.HOUR, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+		Date currentDateEnd = cal.getTime();		
+		
+		computeData(currentDateIni, currentDateEnd, HistoricTipusEnumDto.MENSUAL);
+	}
+	
+	@Transactional
+	public void generateOldMontlyHistorics () {
+		LocalDate date = (new LocalDate()).minusDays(1);
+		for (int i = 1; i <= 12*2; i++) {
+			Date currentDateIni = date.withDayOfMonth(1).toDateTimeAtStartOfDay().minusMonths(i).toDate();
+
+			// Get last day of month
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(currentDateIni);
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+			cal.set(Calendar.HOUR, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			cal.set(Calendar.MILLISECOND, 999);
+			Date currentDateEnd = cal.getTime();
+
+			computeData(currentDateIni, currentDateEnd, HistoricTipusEnumDto.MENSUAL);
+		}
+	}
+	
+	@Transactional
+	public void generateOldDailyHistorics () {
+		for (int i = 0; i <= 30*12*2; i++) {
+			LocalDate date = (new LocalDate()).minusDays(i);
+			Date currentDateIni = date.toDateTimeAtStartOfDay().toDate();
+			Date currentDateEnd = date.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(
+					999).toDate();
+	
+			computeData(currentDateIni, currentDateEnd, HistoricTipusEnumDto.DIARI);
+		}
+	}
+	
+	private void computeData(Date currentDateIni, Date currentDateEnd, HistoricTipusEnumDto tipus) {
 		Collection<HistoricExpedientEntity> historicsExpedients = calcularHistoricExpedient(
 				currentDateIni,
 				currentDateEnd,
-				HistoricTipusEnumDto.MENSUAL);
+				tipus);
 		historicExpedientRepository.save(historicsExpedients);
 
 		Collection<HistoricUsuariEntity> historicsUsuaris = calcularHistoricUsuari(
 				currentDateIni,
 				currentDateEnd,
-				HistoricTipusEnumDto.MENSUAL);
+				tipus);
 		historicUsuariRepository.save(historicsUsuaris);
 
 		Collection<HistoricInteressatEntity> historicsInteressats = calcularHistoricInteressat(
 				currentDateIni,
 				currentDateEnd,
-				HistoricTipusEnumDto.MENSUAL);
+				tipus);
 		historicInteressatRepository.save(historicsInteressats);
-		}
 	}
 
 	public Collection<HistoricExpedientEntity> calcularHistoricExpedient(
@@ -165,43 +186,6 @@ public class HistoricTask {
 			}
 
 		}
-
-//		List<MetaExpedientCountAggregation> countsPendentsNotificats = documentRepository.countByNotificacioEstatInGroupByMetaExpedient(
-//				new DocumentNotificacioEstatEnumDto[] {
-//						DocumentNotificacioEstatEnumDto.PENDENT,
-//						DocumentNotificacioEstatEnumDto.ENVIADA,
-//						DocumentNotificacioEstatEnumDto.REGISTRADA });
-//		for (MetaExpedientCountAggregation count : countsPendentsNotificats) {
-//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
-//					count.getMetaExpedient().getId(),
-//					currentDateIni,
-//					count.getMetaExpedient());
-//			historic.setNumDocsPendentsNotificar(count.getCount());
-//		}
-
-//		List<MetaExpedientCountAggregation> countsExpedientsAmbAlertes = expedientRepository.countByAlertesNotEmptyGroupByMetaExpedient();
-//		for (MetaExpedientCountAggregation count : countsExpedientsAmbAlertes) {
-//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
-//					count.getMetaExpedient().getId(),
-//					currentDateIni,
-//					count.getMetaExpedient());
-//			historic.setNumExpedientsAmbAlertes(count.getCount());
-//		}
-
-//		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findAll();
-//		for (MetaExpedientEntity metaExpedient : metaExpedients) {
-//			HistoricExpedientEntity historic = mapExpedients.getHistoric(
-//					metaExpedient.getId(),
-//					currentDateIni,
-//					metaExpedient);
-//			long nExpedientsAmbErrorsValidacio = 0;
-//			for (ExpedientEntity expedient : expedientRepository.findByMetaExpedient(metaExpedient)) {
-//				if (cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
-//					nExpedientsAmbErrorsValidacio += 1;
-//				}
-//			}
-//			historic.setNumExpedientsAmbErrorsValidacio(nExpedientsAmbErrorsValidacio);
-//		}
 
 		return mapExpedients.getValues();
 
