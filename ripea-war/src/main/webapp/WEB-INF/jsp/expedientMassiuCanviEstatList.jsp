@@ -159,7 +159,7 @@ function enableDisableSelection($this, tipus) {
 		<div class="btn-group pull-right">
 			<button type="button" id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 			<button type="button" id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			<button type="button" class="btn btn-default" href="./canviEstat/canviarEstat" data-toggle="modal" data-refresh-pagina="false">
+			<button type="button" class="btn btn-default" href="./canviEstat/canviarEstat" data-toggle="modal" data-refresh-pagina="false" data-maximized="true">
 				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.boto.canviEstat"/>
 			</button>
 		</div>
