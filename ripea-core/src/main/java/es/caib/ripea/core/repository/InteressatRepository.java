@@ -27,6 +27,8 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	List<InteressatEntity> findByExpedientAndDocumentNum(
 			ExpedientEntity expedient, String documentNum);
 	
+	List<InteressatEntity> findByDocumentNum(String documentNum); 
+	
 	@Query(	  "select "
 			+ "    inter "
 			+ "from "
@@ -158,5 +160,17 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	List<String> findAllDocumentNumbers(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient
 			);
+	
+	@Query(	 
+//			"select "
+//			+ "    distinct inter.documentNum "
+//			+ 
+			"from "
+			+ "    InteressatEntity inter "
+			+ "where "
+			+ "    lower(inter.documentNum) like concat('%', lower(?1), '%') "
+			+ "order by "
+			+ "    inter.id asc")
+	List<InteressatEntity> findByText(String text);
 	
 }

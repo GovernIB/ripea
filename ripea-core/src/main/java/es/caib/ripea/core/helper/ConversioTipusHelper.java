@@ -14,6 +14,9 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.aggregation.HistoricAggregation;
+import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
+import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
@@ -23,6 +26,9 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEst
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
@@ -35,6 +41,7 @@ import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
@@ -43,6 +50,7 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -261,6 +269,67 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<OrganGestorEntity, Long>() {
+					@Override
+					public Long convert(OrganGestorEntity source, Type<? extends Long> destinationType) {
+						return source.getId();
+					}
+				});
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<EntitatEntity, Long>() {
+					@Override
+					public Long convert(EntitatEntity source, Type<? extends Long> destinationType) {
+						return source.getId();
+					}
+				});	
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<HistoricExpedientAggregation, HistoricExpedientDto>() {
+					@Override
+					public HistoricExpedientDto convert(HistoricExpedientAggregation source, Type<? extends HistoricExpedientDto> destinationType) {
+						HistoricExpedientDto target = new HistoricExpedientDto();
+						target.setData(source.getData());
+						target.setNumExpedientsCreats(source.getNumExpedientsCreats());
+						target.setNumExpedientsCreatsTotal(source.getNumExpedientsCreatsTotal());
+						target.setNumExpedientsTancats(source.getNumExpedientsTancats());
+						target.setNumExpedientsTancatsTotal(source.getNumExpedientsTancatsTotal());
+						target.setNumDocsSignats(source.getNumDocsSignats());
+						target.setNumDocsNotificats(source.getNumDocsNotificats());
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<HistoricUsuariAggregation, HistoricUsuariDto>() {
+					@Override
+					public HistoricUsuariDto convert(HistoricUsuariAggregation source, Type<? extends HistoricUsuariDto> destinationType) {
+						HistoricUsuariDto target = new HistoricUsuariDto(null, null);
+						target.setData(source.getData());
+						target.setNumExpedientsCreats(source.getNumExpedientsCreats());
+						target.setNumExpedientsCreatsTotal(source.getNumExpedientsCreatsTotal());
+						target.setNumExpedientsTancats(source.getNumExpedientsTancats());
+						target.setNumExpedientsTancatsTotal(source.getNumExpedientsTancatsTotal());
+						target.setNumTasquesTramitades(source.getNumTasquesTramitades());
+						target.setUsuariCodi(source.getUsuari().getCodi());
+						
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<HistoricAggregation, HistoricInteressatDto>() {
+					@Override
+					public HistoricInteressatDto convert(HistoricAggregation source, Type<? extends HistoricInteressatDto> destinationType) {
+						HistoricInteressatDto target = new HistoricInteressatDto(null, null);
+						target.setData(source.getData());
+						target.setNumExpedientsCreats(source.getNumExpedientsCreats());
+						target.setNumExpedientsCreatsTotal(source.getNumExpedientsCreatsTotal());
+						target.setNumExpedientsTancats(source.getNumExpedientsTancats());
+						target.setNumExpedientsTancatsTotal(source.getNumExpedientsTancatsTotal());
+						return target;
+					}
+				});	
 	}
 
 

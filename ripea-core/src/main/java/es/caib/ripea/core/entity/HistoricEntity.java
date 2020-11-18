@@ -10,12 +10,14 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
@@ -82,6 +84,9 @@ public class HistoricEntity extends RipeaAuditable<Long> {
 	@Column(name = "n_exped_tancats_acum")
 	protected Long numExpedientsTancatsTotal;
 
+	@Column(name = "organ_id", insertable = false, updatable=false)
+	protected Long organGestorId;
+	
 	public HistoricEntity() {
 	}
 	
@@ -104,49 +109,20 @@ public class HistoricEntity extends RipeaAuditable<Long> {
 		this.setEntitat(metaExpedient.getEntitat());
 		this.setOrganGestor(metaExpedient.getOrganGestor());
 		this.setMetaExpedient(metaExpedient);
-//		int nExpedientsCreatsAvui = contingutLogRepository.findByDate(
-//				LogObjecteTipusEnumDto.EXPEDIENT,
-//				LogTipusEnumDto.CREACIO,
-//				metaExpedient.getId(),
-//				date).size();
-//		int nExpedientsCreatsFinsAvui = contingutLogRepository.findByCreateDateBefore(
-//				LogObjecteTipusEnumDto.EXPEDIENT,
-//				LogTipusEnumDto.CREACIO,
-//				metaExpedient.getId(),
-//				date).size();
-//		
-//		int nExpedientsObertsAvui = contingutLogRepository.findByDate(
-//				LogObjecteTipusEnumDto.EXPEDIENT,
-//				LogTipusEnumDto.REOBERTURA,
-//				metaExpedient.getId(),
-//				date).size();
-//		int nExpedientsObertsTotal = contingutLogRepository.findByCreateDateBefore(
-//				LogObjecteTipusEnumDto.EXPEDIENT,
-//				LogTipusEnumDto.REOBERTURA,
-//				metaExpedient.getId(),
-//				date).size();
-//		
-//		int nExpedientsTancatsAvui = contingutLogRepository.findByDate(
-//				LogObjecteTipusEnumDto.EXPEDIENT,
-//				LogTipusEnumDto.TANCAMENT,
-//				metaExpedient.getId(),
-//				date).size();
-//		int nExpedientsTancatsTotal = contingutLogRepository.findByCreateDateBefore(
-//				LogObjecteTipusEnumDto.EXPEDIENT,
-//				LogTipusEnumDto.TANCAMENT,
-//				metaExpedient.getId(),
-//				date).size();
-//		
-//		this.setNExpedientsCreats(nExpedientsCreatsAvui);
-//		this.setNExpedientsCreatsTotal(nExpedientsCreatsFinsAvui);
-//
-//		this.setNExpedientsOberts(nExpedientsObertsAvui);
-//		this.setNExpedientsObertsTotal(nExpedientsObertsTotal);
-//
-//		this.setNExpedientsTancats(nExpedientsTancatsAvui);
-//		this.setNExpedientsTancatsTotal(nExpedientsTancatsTotal);
 	}
 	
+//	public Long getOrganGestorId() {
+//		return this.organGestorId == null ? (long)-1 : this.organGestorId;
+//	}
+//	@PostLoad
+//	private void onLoad() {
+//	    if (this.organGestor != null ) {
+//	    	this.organGestorId = this.organGestor.getId();
+//	    } else {
+//	    	this.organGestorId = (long)-1;
+//	    }
+//	}
+
 	/**
 	 * 
 	 */
