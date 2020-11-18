@@ -13,9 +13,10 @@ public enum HistoricMetriquesEnumDto {
 //	DOCUMENTS_PENDENTS_SIGNAR,
 	DOCUMENTS_SIGNATS,
 //	DOCUMENTS_PENDENTS_NOTIFICAR,
-	DOCUMENTS_NOTIFICATS;
+	DOCUMENTS_NOTIFICATS,
+	TASQUES_TRAMITADES;
 	
-	public Long getValue(HistoricExpedientDto historic) {
+	public Long getValue(HistoricDto historic) {
 		Long value = 0L;
 		switch (this) {
 		case EXPEDIENTS_CREATS:
@@ -46,14 +47,65 @@ public enum HistoricMetriquesEnumDto {
 //			value = historic.getNumDocsPendentsSignar();
 //			break;
 		case DOCUMENTS_SIGNATS:
-			value = historic.getNumDocsSignats();
+			value = ((HistoricExpedientDto) historic).getNumDocsSignats();
 			break;
 //		case DOCUMENTS_PENDENTS_NOTIFICAR:
 //			value = historic.getNumDocsPendentsNotificar();
 //			break;
 		case DOCUMENTS_NOTIFICATS:
-			value = historic.getNumDocsNotificats();
+			value = ((HistoricExpedientDto) historic).getNumDocsNotificats();
+			break;	
+		case TASQUES_TRAMITADES:
+			value = ((HistoricUsuariDto) historic).getNumTasquesTramitades();
 			break;			
+		default:
+			break;
+		}
+		return value;		
+	}
+	
+	public String toString() {
+		String value = "";
+		switch (this) {
+		case EXPEDIENTS_CREATS:
+			value = "Nombre d'expedients creats";
+			break;
+		case EXPEDIENTS_CREATS_ACUM:
+			value = "Nombre d'expedients creats acumulats";
+			break;
+//		case EXPEDIENTS_OBERTS:
+//			value = historic.getNumExpedientsOberts();
+//			break;
+//		case EXPEDIENTS_OBERTS_ACUM:
+//			value = historic.getNumExpedientsObertsTotal();
+//			break;
+		case EXPEDIENTS_TANCATS:
+			value = "Nombre d'expedients tancats";
+			break;
+		case EXPEDIENTS_TANCATS_ACUM:
+			value = "Nombre d'expedients tancats acumulats";
+			break;
+//		case EXPEDIENTS_AMB_ALERTES:
+//			value = historic.getNumExpedientsAmbAlertes();
+//			break;
+//		case EXPEDIENTS_AMB_ERRORS_VALID:
+//			value = historic.getNumExpedientsAmbErrorsValidacio();
+//			break;
+//		case DOCUMENTS_PENDENTS_SIGNAR:
+//			value = historic.getNumDocsPendentsSignar();
+//			break;
+		case DOCUMENTS_SIGNATS:
+			value = "Nombre de documents signats";
+			break;
+//		case DOCUMENTS_PENDENTS_NOTIFICAR:
+//			value = historic.getNumDocsPendentsNotificar();
+//			break;
+		case DOCUMENTS_NOTIFICATS:
+			value = "Nombre de documents notificats";
+			break;		
+		case TASQUES_TRAMITADES:
+			value = "Nombre de tasques tramitades";
+			break;
 		default:
 			break;
 		}

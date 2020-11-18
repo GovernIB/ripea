@@ -5,6 +5,7 @@ package es.caib.ripea.core.api.dto;
 
 import java.util.List;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import lombok.Setter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@EqualsAndHashCode
 @Getter
 @Setter
 public class OrganGestorDto extends AuditoriaDto {
@@ -30,4 +32,5 @@ public class OrganGestorDto extends AuditoriaDto {
         else
             return permisos.size();
     }
+       
 }

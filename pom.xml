@@ -17,7 +17,7 @@
 		<orika.version>1.1.7</orika.version>
 		<groovy.version>2.1.6</groovy.version>
 		<jackson.version>2.6.3</jackson.version>
-		<xdocreport.version>1.0.3</xdocreport.version>
+		<xdocreport.version>2.0.2</xdocreport.version>
 		<bouncycastle.version>1.46</bouncycastle.version>
 		<cxf.version>2.2.12</cxf.version> 
 		<slf4j.version>1.5.11</slf4j.version>

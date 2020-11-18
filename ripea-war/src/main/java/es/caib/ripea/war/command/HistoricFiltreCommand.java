@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -23,9 +25,12 @@ public class HistoricFiltreCommand {
 
 	private List<Long> organGestorsIds;
 	private List<Long> metaExpedientsIds;
-
-	private List<HistoricDadesMostrarEnum> dadesMostrar;
-
+	
+	private Boolean incorporarExpedientsComuns;
+	
+	@NotNull
+	private HistoricDadesMostrarEnum dadesMostrar;
+	
 	private HistoricTipusEnumDto tipusAgrupament; // DIARI, MENSUAL, DIA CONCRET
 
 	private boolean showingTables;
@@ -36,26 +41,26 @@ public class HistoricFiltreCommand {
 		this.dataInici = dateStartToday.minusDays(30).toDate();
 		this.organGestorsIds = new ArrayList<Long>();
 		this.metaExpedientsIds = new ArrayList<Long>();
-		this.dadesMostrar = new ArrayList<HistoricDadesMostrarEnum>();
-		this.dadesMostrar.add(HistoricDadesMostrarEnum.ENTITAT);
+		this.dadesMostrar = HistoricDadesMostrarEnum.ENTITAT;
 		this.tipusAgrupament = HistoricTipusEnumDto.DIARI;
 		this.showingTables = true;
+		this.incorporarExpedientsComuns = false;
 	}
 
 	public boolean showingDadesEntitat() {
-		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.ENTITAT);
+		return dadesMostrar != null && dadesMostrar == HistoricDadesMostrarEnum.ENTITAT;
 	}
 
 	public boolean showingDadesOrganGestor() {
-		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.ORGANGESTOR);
+		return dadesMostrar != null && dadesMostrar == HistoricDadesMostrarEnum.ORGANGESTOR;
 	}
 
 	public boolean showingDadesUsuari() {
-		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.USUARI);
+		return dadesMostrar != null && dadesMostrar == HistoricDadesMostrarEnum.USUARI;
 	}
 
 	public boolean showingDadesInteressat() {
-		return dadesMostrar != null && dadesMostrar.contains(HistoricDadesMostrarEnum.INTERESSAT);
+		return dadesMostrar != null && dadesMostrar == HistoricDadesMostrarEnum.INTERESSAT;
 	}
 
 	public HistoricFiltreDto asDto() {

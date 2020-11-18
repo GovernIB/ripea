@@ -565,4 +565,18 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatServiceImpl.class);
 
+	@Override
+	public List<InteressatDto> findByText(String text) {
+		return conversioTipusHelper.convertirList(
+				interessatRepository.findByText(text),
+				InteressatDto.class);
+	}
+
+	@Override
+	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException {
+		return conversioTipusHelper.convertir(
+				interessatRepository.findByDocumentNum(documentNum).get(0),
+				InteressatDto.class);
+	}
+
 }
