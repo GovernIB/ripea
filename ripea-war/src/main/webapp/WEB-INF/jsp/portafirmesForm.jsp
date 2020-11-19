@@ -5,6 +5,9 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<c:set var="charSearch" value='"' />
+<c:set var="charReplace" value='\\"' />
+
 <%
 pageContext.setAttribute(
 		"metadocumentSeqtipEnumOptions",
@@ -173,7 +176,8 @@ $(document).ready(function() {
 	
 	//crear nou flux
 	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function() {		
-		let documentNom = '${document.nom}';
+
+		let documentNom = "${fn:replace(document.nom, charSearch, charReplace)}";
 		$.ajax({
 			type: 'GET',
 			contentType: "application/json; charset=utf-8",
