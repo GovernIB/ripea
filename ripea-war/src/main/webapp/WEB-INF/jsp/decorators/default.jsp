@@ -149,6 +149,7 @@ body {
 			<div class="navbar-collapse collapse">
 				<div class="nav navbar-nav navbar-right">
 					<ul class="list-inline pull-right">
+						<%------------------------ ENTITATS ------------------------%>
 						<c:if test="${hiHaEntitats}">
 							<li class="dropdown">
 								<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
@@ -168,6 +169,7 @@ body {
 								</c:if>
 							</li>
 						</c:if>
+						<%------------------------ ROLS ------------------------%>
 						<li class="dropdown">
 							<c:choose>
 								<c:when test="${fn:length(rolsUsuariActual) > 1}">
@@ -194,6 +196,7 @@ body {
 								</c:otherwise>
 							</c:choose>
 						</li>
+						<%------------------------ ORGANS ------------------------%>
 						<c:if test="${ isRolActualAdministradorOrgan }">
 							<li class="dropdown">
 								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
@@ -224,6 +227,7 @@ body {
 								</c:if>
 							</li>
 						</c:if>
+						<%------------------------ USER ------------------------%>
 						<li class="dropdown">
 							<a href="#" data-toggle="dropdown">
 								<span class="fa fa-user"></span>

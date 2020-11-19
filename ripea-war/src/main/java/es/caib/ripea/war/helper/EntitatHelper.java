@@ -79,9 +79,9 @@ public class EntitatHelper {
 		return REQUEST_PARAMETER_CANVI_ENTITAT;
 	}
 
-	public static boolean isUsuariActualAdminOrgan(HttpServletRequest request) {
+	public static boolean isUsuariActualTeOrgans(HttpServletRequest request) {
 		EntitatDto entitat = getEntitatActual(request);
-		return entitat.isUsuariActualAdministrationOrgan();
+		return entitat.isUsuariActualTeOrgans();
 	}
 
 	private static void canviEntitatActual(

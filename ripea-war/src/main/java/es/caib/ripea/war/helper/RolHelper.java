@@ -22,7 +22,7 @@ public class RolHelper {
 
 	private static final String ROLE_SUPER = "IPA_SUPER";
 	private static final String ROLE_ADMIN = "IPA_ADMIN";
-	private static final String ROLE_ADMIN_ORGAN = "IPA_ADMIN_ORGAN";
+	private static final String ROLE_ADMIN_ORGAN = "IPA_ORGAN_ADMIN";
 	private static final String ROLE_USER = "tothom";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
@@ -32,7 +32,7 @@ public class RolHelper {
 		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
 		if (canviRol != null && canviRol.length() > 0) {
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
-			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualAdministradorOrgan(request)) {
+			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 			} else if (request.isUserInRole(canviRol)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
@@ -49,7 +49,7 @@ public class RolHelper {
 				rolActual = ROLE_USER;
 			} else if (request.isUserInRole(ROLE_ADMIN) && rolsDisponibles.contains(ROLE_ADMIN)) {
 				rolActual = ROLE_ADMIN;
-			} else if (isUsuariActualAdministradorOrgan(request) && rolsDisponibles.contains(ROLE_ADMIN_ORGAN)) {
+			} else if (isUsuariActualTeOrgans(request) && rolsDisponibles.contains(ROLE_ADMIN_ORGAN)) {
 				rolActual = ROLE_ADMIN_ORGAN;
 			} else if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
 				rolActual = ROLE_SUPER;
@@ -89,7 +89,7 @@ public class RolHelper {
 			if (entitatActual.isUsuariActualAdministration() && request.isUserInRole(ROLE_ADMIN)) {
 				rols.add(ROLE_ADMIN);
 			}
-			if (entitatActual.isUsuariActualRead() && isUsuariActualAdministradorOrgan(request)) {
+			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_ADMIN_ORGAN) && isUsuariActualTeOrgans(request)) {
 				rols.add(ROLE_ADMIN_ORGAN);
 			}
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {
@@ -107,8 +107,8 @@ public class RolHelper {
 		return REQUEST_PARAMETER_CANVI_ROL;
 	}
 
-	private static boolean isUsuariActualAdministradorOrgan(HttpServletRequest request) {
-		return EntitatHelper.isUsuariActualAdminOrgan(request);
+	private static boolean isUsuariActualTeOrgans(HttpServletRequest request) {
+		return EntitatHelper.isUsuariActualTeOrgans(request);
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RolHelper.class);
