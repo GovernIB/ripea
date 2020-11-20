@@ -192,6 +192,26 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             return built;
         }
     }
+    
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CarpetaEntity other = (CarpetaEntity) obj;
+		if (getId() == null) {
+			if (other.getId() != null)
+				return false;
+		} else if (!getId().equals(other.getId()))
+			return false;
+		return true;
+	}
+    
+    
+    
 
     private static final long serialVersionUID = -2299453443943600172L;
 

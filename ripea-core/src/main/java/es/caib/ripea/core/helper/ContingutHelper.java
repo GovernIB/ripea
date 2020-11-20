@@ -767,68 +767,15 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (node.getMetaNode() != null) {
-			if (comprovarPermisRead) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a llegir el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per accedir al node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-			if (comprovarPermisWrite) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.WRITE},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a modificar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per a modificar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-			if (comprovarPermisCreate) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.CREATE},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a crear el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per a crear el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-			if (comprovarPermisDelete) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.DELETE},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a esborrar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per a esborrar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
+			
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					node.getMetaNode(),
+					node.getId(),
+					comprovarPermisRead,
+					comprovarPermisWrite,
+					comprovarPermisCreate,
+					comprovarPermisDelete);
 		} else {
 			throw new ValidationException(
 					node.getId(),
@@ -863,18 +810,13 @@ public class ContingutHelper {
 		if (expedient != null) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (comprovarPermisRead) {
-				boolean granted = permisosHelper.isGrantedAll(
+				entityComprovarHelper.comprovarMetaExpedient(
+						expedient.getEntitat(),
 						expedient.getMetaExpedient().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth);
-				if (!granted) {
-					throw new PermissionDeniedException(
-							expedient.getMetaExpedient().getId(),
-							MetaExpedientEntity.class,
-							auth.getName(),
-							"READ");
-				}
+						true,
+						false,
+						false,
+						false);
 			}
 			if (comprovarPermisWrite) {
 				boolean granted = permisosHelper.isGrantedAll(

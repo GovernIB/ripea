@@ -34,5 +34,11 @@ public class BaseUserController extends BaseController {
 		}
 		return entitat;
 	}
+	
+	
+	
+	
+	
+	
 
 }

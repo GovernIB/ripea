@@ -95,6 +95,7 @@ public class RolHelper {
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {
 				rols.add(ROLE_USER);
 			}
+			
 		}
 		return rols;
 	}

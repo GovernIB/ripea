@@ -459,7 +459,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					false);
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
@@ -533,7 +533,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					false);
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,

@@ -50,10 +50,12 @@ import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -849,7 +851,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false);
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
@@ -923,7 +925,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false);
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
@@ -1374,6 +1376,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = null;
 
 		if (filtre.getMetaExpedientId() != null) {
+			
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
@@ -1385,14 +1388,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		List<MetaExpedientEntity> metaExpedientsPermesos;
 		if (filtre.getOrganGestorId() != null) {
-			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganGestorPermis(
+			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganFiltrePermis(
 					entitatId,
 					filtre.getOrganGestorId(),
 					new Permission[] { ExtendedPermission.READ },
 					false,
 					null);
 		} else {
-			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 					entitatId,
 					new Permission[] { ExtendedPermission.READ },
 					false,

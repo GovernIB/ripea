@@ -29,6 +29,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -53,6 +54,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     private PluginHelper pluginHelper;
     @Autowired
     private CacheHelper cacheHelper;
+    @Autowired
+    private OrganGestorHelper organGestorHelper;
     
     @Transactional(readOnly = true)
     public List<OrganGestorDto> findAll() {
@@ -81,8 +84,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			String filterText) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				true,
+				false,
 				false);
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
@@ -192,16 +195,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     
     @Override
     public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId) {
-    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
-		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
-				OrganGestorEntity.class,
-				ExtendedPermission.ADMINISTRATION);
-		if (objectsIds.isEmpty()) {
-			return new ArrayList<OrganGestorDto>();
-		}
-		return conversioTipusHelper.convertirList(
-				organGestorRepository.findByEntitatAndIds(entitat, objectsIds),
-				OrganGestorDto.class);		
+    	
+    	return conversioTipusHelper.convertirList(
+    			organGestorHelper.findOrganismesEntitatAmbPermis(entitatId),
+				OrganGestorDto.class);	
     }
     
     @Transactional
