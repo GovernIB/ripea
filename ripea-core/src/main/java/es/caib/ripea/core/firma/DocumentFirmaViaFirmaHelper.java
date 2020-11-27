@@ -246,18 +246,18 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	}
 	
 	public Exception viaFirmaCallback(DocumentViaFirmaEntity documentViaFirma, ViaFirmaCallbackEstatEnumDto callbackEstat) {
-		DocumentEntity document = documentViaFirma.getDocument();
-		documentViaFirma.updateMessageCode(null);
-		documentViaFirma.updateCancelat(new Date());
-		document.updateEstat(
-				DocumentEstatEnumDto.REDACCIO);
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.VFIRMA_CANCELACIO,
-				documentViaFirma.getMessageCode(),
-				documentViaFirma.getEstat().name(),
-				false,
-				false);
+//		DocumentEntity document = documentViaFirma.getDocument();
+//		documentViaFirma.updateMessageCode(null);
+//		documentViaFirma.updateCancelat(new Date());
+//		document.updateEstat(
+//				DocumentEstatEnumDto.REDACCIO);
+//		contingutLogHelper.log(
+//				document,
+//				LogTipusEnumDto.VFIRMA_CANCELACIO,
+//				documentViaFirma.getMessageCode(),
+//				documentViaFirma.getEstat().name(),
+//				false,
+//				false);
 		contingutLogHelper.log(
 				documentViaFirma.getDocument(),
 				LogTipusEnumDto.VFIRMA_CALLBACK,

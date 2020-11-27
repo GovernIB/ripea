@@ -36,7 +36,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	MetaExpedientService delegate;
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto create(
 			Long entitatId,
 			MetaExpedientDto metaExpedient) {
@@ -44,7 +44,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient) {
@@ -52,7 +52,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
@@ -61,7 +61,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto delete(
 			Long entitatId,
 			Long metaExpedientId) {
@@ -69,7 +69,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) {
@@ -79,7 +79,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
 			String codi) {
@@ -102,28 +102,28 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
 			Long entitatId) {
 		return delegate.findActiusAmbEntitatPerCreacio(entitatId);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(
 			Long entitatId) {
 		return delegate.findActiusAmbEntitatPerModificacio(entitatId);
 	}	
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
 			Long entitatId, String filtreNomOrCodiSia) {
 		return delegate.findActiusAmbEntitatPerLectura(entitatId, filtreNomOrCodiSia);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public long getProximNumeroSequencia(
 			Long entitatId,
 			Long id,
@@ -135,7 +135,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -147,7 +147,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -159,7 +159,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public MetaExpedientTascaDto tascaUpdateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -173,7 +173,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -185,7 +185,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public MetaExpedientTascaDto tascaFindById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -197,7 +197,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -209,7 +209,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			Long id) {
@@ -219,7 +219,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
@@ -231,7 +231,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public void permisDelete(Long entitatId, Long id, Long permisId) {
 		delegate.permisDelete(
 				entitatId,
@@ -240,7 +240,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
 			Long organGestorId,
@@ -258,7 +258,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public MetaExpedientDto getAndCheckAdminPermission(
 			Long entitatId,
 			Long id) {
@@ -268,7 +268,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public List<GrupDto> findGrupsAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {
@@ -278,7 +278,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
 			Long organGestorId, String filtre) {

@@ -1516,7 +1516,7 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
@@ -1615,7 +1615,7 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,

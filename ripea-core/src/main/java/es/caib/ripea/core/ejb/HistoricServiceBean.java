@@ -1,5 +1,6 @@
 package es.caib.ripea.core.ejb;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -9,10 +10,11 @@ import javax.interceptor.Interceptors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.HistoricDto;
 import es.caib.ripea.core.api.dto.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -43,28 +45,29 @@ public class HistoricServiceBean implements HistoricService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public Map<OrganGestorDto, List<HistoricExpedientDto>> getDadesOrgansGestors(
+	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(
 			HistoricFiltreDto filtre) {
 		return historicService.getDadesOrgansGestors(filtre);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
+	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
+			HistoricFiltreDto filtre) {
+		return historicService.getHistoricsByOrganGestor(filtre);
+	}
+
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
 	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre) {
 		return historicService.getDadesUsuari(usuariCodi, filtre);
 	}
 
-//	@Override
-//	@RolesAllowed("IPA_ADMIN")
-//	public List<HistoricUsuariDto> getDadesUsuariActual(HistoricFiltreDto filtre) {
-//		return getDadesUsuariActual(filtre);
-//	}
-
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public List<HistoricDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre) {
+		return historicService.getDadesInteressat(interessatDocNum, filtre);
 	}
 	
 	@Override
@@ -77,6 +80,18 @@ public class HistoricServiceBean implements HistoricService {
 	@RolesAllowed("IPA_ADMIN")
 	public Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre) {
 		return historicService.getDadesActualsOrgansGestors(filtre);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, HistoricFiltreDto filtre) {
+		return historicService.getDadesActualsUsuari(codiUsuari, filtre);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<HistoricInteressatDto> getDadesActualsInteressat(String codiUsuari, HistoricFiltreDto filtre) {
+		return historicService.getDadesActualsInteressat(codiUsuari, filtre);
 	}
 
 }

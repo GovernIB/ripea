@@ -860,7 +860,81 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	public void arxiuExpedientEnllacar(
+			ExpedientEntity expedientFill, 
+			ExpedientEntity expedientPare) {
+		String accioDescripcio = "Enllaçant dos expedients (expedientUuidPare=" + expedientPare.getId() + ", expedientUuidFill=" + expedientFill.getId() + ")";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idExpedientPare", expedientPare.getId().toString());
+		accioParams.put("titolExpedientPare", expedientPare.getNom());
+		accioParams.put("idExpedientFill", expedientFill.getId().toString());
+		accioParams.put("titolExpedientFill", expedientFill.getNom());
+		long t0 = System.currentTimeMillis();
+		try {
+			getArxiuPlugin().expedientLligar(
+					expedientPare.getArxiuUuid(), 
+					expedientFill.getArxiuUuid());
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
 
+	public void arxiuExpedientDesenllacar(
+			ExpedientEntity expedientFill, 
+			ExpedientEntity expedientPare) {
+		String accioDescripcio = "Desenllaçant dos expedients (expedientUuidPare=" + expedientPare.getId() + ", expedientUuidFill=" + expedientFill.getId() + ")";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idExpedientPare", expedientPare.getId().toString());
+		accioParams.put("titolExpedientPare", expedientPare.getNom());
+		accioParams.put("idExpedientFill", expedientFill.getId().toString());
+		accioParams.put("titolExpedientFill", expedientFill.getNom());
+		long t0 = System.currentTimeMillis();
+		try {
+			getArxiuPlugin().expedientDeslligar(
+					expedientPare.getArxiuUuid(), 
+					expedientFill.getArxiuUuid());
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
 	public String arxiuDocumentActualitzar(
 			DocumentEntity document,
 			ContingutEntity contingutPare,
@@ -3520,7 +3594,7 @@ public class PluginHelper {
 					resposta.getEstat(),
 					resposta.getEstatData(),
 					resposta.getEstatOrigen(),
-					resposta.getCertificacioData(),
+					documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
 					resposta.getCertificacioOrigen(),
 					resposta.isError(),
 					resposta.getErrorDescripcio());
@@ -3747,7 +3821,11 @@ public class PluginHelper {
 			parametresViaFirma.setLecturaObligatoria(documentViaFirmaEntity.isLecturaObligatoria());
 			parametresViaFirma.setTitol(documentViaFirmaEntity.getTitol());
 			parametresViaFirma.setViaFirmaDispositiu(viaFirmaDispositiu);
-
+			parametresViaFirma.setExpedientCodi(expedientHelper.calcularNumero(document.getExpedientPare()));
+			parametresViaFirma.setSignantNif(documentViaFirmaEntity.getSignantNif());
+			parametresViaFirma.setSignantNom(documentViaFirmaEntity.getSignantNom());
+			parametresViaFirma.setObservaciones(documentViaFirmaEntity.getObservacions());
+			
 			viaFirmaResponse = getViaFirmaPlugin().uploadDocument(parametresViaFirma);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";

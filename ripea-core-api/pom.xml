@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.77.3</version>
+		<version>0.9.78.pre1</version>
 	</parent>
 	<artifactId>ripea-core-api</artifactId>
 	<dependencies>
@@ -46,6 +46,17 @@
 			<version>1.18.12</version>
 			<scope>provided</scope>
 		</dependency>
+	    <!-- Jackson -->
+	    <dependency>
+	        <groupId>com.fasterxml.jackson.core</groupId>
+	        <artifactId>jackson-annotations</artifactId>
+		    <version>${jackson.version}</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>com.fasterxml.jackson.core</groupId>
+	        <artifactId>jackson-databind</artifactId>
+		    <version>${jackson.version}</version>
+	    </dependency>
 	</dependencies>
 	<build>
 		<plugins>

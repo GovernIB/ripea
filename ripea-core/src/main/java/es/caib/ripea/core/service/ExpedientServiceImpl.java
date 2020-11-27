@@ -50,10 +50,12 @@ import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -88,6 +90,7 @@ import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
@@ -849,7 +852,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false);
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
@@ -923,7 +926,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false);
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
@@ -1001,25 +1004,31 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 
 		expedient.addRelacionat(toRelate);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-
-			@Override
-			public String getId() {
-				return id + "#" + relacionatId;
-			}
-
-			@Override
-			public boolean isNew() {
-				return false;
-			}
-
-		},
+		contingutLogHelper.log(
+				expedient, 
+				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+					@Override
+					public String getId() {
+						return id + "#" + relacionatId;
+					}
+					@Override
+					public boolean isNew() {
+						return false;
+					}
+				},
 				LogObjecteTipusEnumDto.RELACIO,
 				LogTipusEnumDto.CREACIO,
 				id.toString(),
 				relacionatId.toString(),
 				false,
 				false);
+		
+		boolean isPropagarRelacioActiva = isProgaparRelacioActiva();
+		if (pluginHelper.isArxiuPluginActiu() && isPropagarRelacioActiva) {
+			pluginHelper.arxiuExpedientEnllacar(
+					expedient, 
+					toRelate);
+		}
 	}
 
 	@Transactional
@@ -1054,25 +1063,40 @@ public class ExpedientServiceImpl implements ExpedientService {
 			trobat = false;
 		}
 		if (trobat) {
-			contingutLogHelper.log(expedient, LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-
-				@Override
-				public String getId() {
-					return id + "#" + relacionatId;
-				}
-
-				@Override
-				public boolean isNew() {
-					return false;
-				}
-
-			},
+			contingutLogHelper.log(
+					expedient, 
+					LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+						@Override
+						public String getId() {
+							return id + "#" + relacionatId;
+						}
+						@Override
+						public boolean isNew() {
+							return false;
+						}
+		
+					},
 					LogObjecteTipusEnumDto.RELACIO,
 					LogTipusEnumDto.ELIMINACIO,
 					id.toString(),
 					relacionatId.toString(),
 					false,
 					false);
+		}
+		boolean isPropagarRelacioActiva = isProgaparRelacioActiva();
+		if (pluginHelper.isArxiuPluginActiu() && isPropagarRelacioActiva) {
+			try {
+				//provar desenllaçar fill del pare des del pare
+				pluginHelper.arxiuExpedientDesenllacar(
+						expedient, 
+						relacionat);
+			} catch (Exception e) {
+				logger.debug(e.getMessage());
+				//provar desenllaçar fill del pare des del fill
+				pluginHelper.arxiuExpedientDesenllacar(
+						relacionat, 
+						expedient);
+			}
 		}
 		return trobat;
 	}
@@ -1374,6 +1398,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = null;
 
 		if (filtre.getMetaExpedientId() != null) {
+			
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
@@ -1385,14 +1410,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		List<MetaExpedientEntity> metaExpedientsPermesos;
 		if (filtre.getOrganGestorId() != null) {
-			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganGestorPermis(
+			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganFiltrePermis(
 					entitatId,
 					filtre.getOrganGestorId(),
 					new Permission[] { ExtendedPermission.READ },
 					false,
 					null);
 		} else {
-			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
+			metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 					entitatId,
 					new Permission[] { ExtendedPermission.READ },
 					false,
@@ -1588,6 +1613,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false);
 
 		return expedientDto;
+	}
+	
+	private boolean isProgaparRelacioActiva() {
+		boolean isPropagarRelacio = Boolean.parseBoolean(
+				PropertiesHelper.getProperties().getProperty("es.caib.ripea.propagar.relacio.expedients"));
+		return isPropagarRelacio;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);

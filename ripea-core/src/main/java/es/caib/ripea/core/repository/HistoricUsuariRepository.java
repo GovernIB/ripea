@@ -16,8 +16,18 @@ import es.caib.ripea.core.entity.UsuariEntity;
 
 @Transactional
 public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsuariEntity> {
+	static String commonFilter =
+			"         h.usuari = :usuari " +
+			"     and h.data >= :dataInici " +
+			"     and h.data <= :dataFi " +
+			"     and h.tipus = :tipus " +
+			"     and ((:isNullOrgansGestors = true and :incorporarExpedientsComuns = true) or " +
+			"					(:isNullOrgansGestors = true or h.organGestorId in (:organsGestors)) or " +
+			"					(:incorporarExpedientsComuns = true and h.organGestorId = null)" +
+			"     )  " +
+			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  ";
 	
-	@Query( "select " +
+	static String commonConstructor =
 			"    new es.caib.ripea.core.aggregation.HistoricUsuariAggregation( " +
 			"	     h.data, " +
 			"	     sum(h.numExpedientsCreats), " +
@@ -28,16 +38,14 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			"	     sum(h.numExpedientsTancatsTotal), " +
 			"	     h.usuari, " +
 			"	     sum(h.numTasquesTramitades) " +
-			"    ) " +
+			"    ) ";
+	
+	@Query( "select " +
+				commonConstructor +
 			" from " +
 			"    HistoricUsuariEntity h " +
 			" where " +
-			"         h.usuari = :usuari " +
-			"     and h.data >= :dataInici " +
-			"     and h.data <= :dataFi " +
-			"     and h.tipus = :tipus " +
-			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
-			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
+				commonFilter +
 			" group by " +
 			"    h.data, h.usuari ")
 	List<HistoricUsuariAggregation> findByDateRangeGroupedByDate(
@@ -45,32 +53,18 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			@Param("tipus") HistoricTipusEnumDto tipus,
 			@Param("isNullOrgansGestors") boolean isNullOrgansGestors,
 			@Param("organsGestors") List<Long> organsGestors,
+			@Param("incorporarExpedientsComuns") boolean incorporarExpedientsComuns,
 			@Param("isNullMetaExpedients") boolean isNullMetaExpedients,
 			@Param("metaExpedients") List<Long> metaExpedients,
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi);
 	
 	@Query( "select " +
-			"    new es.caib.ripea.core.aggregation.HistoricUsuariAggregation( " +
-			"	     h.data, " +
-			"	     sum(h.numExpedientsCreats), " +
-			"        sum(h.numExpedientsCreatsTotal), " +
-			"	     sum(h.numExpedientsOberts), " +
-			"	     sum(h.numExpedientsObertsTotal), " +
-			"	     sum(h.numExpedientsTancats), " +
-			"	     sum(h.numExpedientsTancatsTotal), " +
-			"	     h.usuari, " +
-			"	     sum(h.numTasquesTramitades) " +
-			"    ) " +
+				commonConstructor +
 			" from " +
 			"    HistoricUsuariEntity h " +
 			" where " +
-			"         h.usuari = :usuari " +
-			"     and h.data >= :dataInici " +
-			"     and h.data <= :dataFi " +
-			"     and h.tipus = :tipus " +
-			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
-			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
+				commonFilter +
 			" group by " +
 			"    h.data, h.usuari ")
 	Page<HistoricUsuariAggregation> findByDateRangeGroupedByDate(
@@ -78,6 +72,7 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			@Param("tipus") HistoricTipusEnumDto tipus,
 			@Param("isNullOrgansGestors") boolean isNullOrgansGestors,
 			@Param("organsGestors") List<Long> organsGestors,
+			@Param("incorporarExpedientsComuns") boolean incorporarExpedientsComuns,
 			@Param("isNullMetaExpedients") boolean isNullMetaExpedients,
 			@Param("metaExpedients") List<Long> metaExpedients,
 			@Param("dataInici") Date dataInici,

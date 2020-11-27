@@ -187,6 +187,16 @@ public class ExpedientInteressatController extends BaseUserController {
 				"interessat.controller.eliminat.ok");
 	}
 	
+	@RequestMapping(value = "/interessat/{interessatId}", method = RequestMethod.GET)
+	@ResponseBody
+	public InteressatDto getInteressat(
+			HttpServletRequest request,
+			@PathVariable Long interessatId,
+			Model model) {
+		InteressatDto interessatDto = expedientInteressatService.findById(interessatId);
+		return interessatDto;
+	}
+	
 	// REPRESENTANT
 	//////////////////////////////////////////////////////////////////
 	

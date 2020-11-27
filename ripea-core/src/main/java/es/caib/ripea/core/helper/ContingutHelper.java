@@ -230,9 +230,11 @@ public class ContingutHelper {
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-			if (expedient.getSeguidors().contains(usuariActual)) 
-				dto.setSeguidor(true);
+			if (auth != null) {
+				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
+				if (expedient.getSeguidors().contains(usuariActual)) 
+					dto.setSeguidor(true);
+			}
 			dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
 			dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
 			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
@@ -468,14 +470,14 @@ public class ContingutHelper {
 			RespostaConsultaEstatEnviament resposta) {
 		DocumentDto dto = new DocumentDto();
 		MetaNodeDto metaNode = null;
-		dto.setNom("Justificant_" + notificacio.getAssumpte());
+		dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_"));
 		dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		dto.setUbicacio(null);
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
 			logger.debug("[CERT] Generant fitxer certificació...");
 			dto.setAmbFirma(true);
-			dto.setFitxerNom("Justificant_" + notificacio.getAssumpte() + ".pdf");
+			dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
@@ -765,68 +767,15 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (node.getMetaNode() != null) {
-			if (comprovarPermisRead) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a llegir el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per accedir al node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-			if (comprovarPermisWrite) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.WRITE},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a modificar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per a modificar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-			if (comprovarPermisCreate) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.CREATE},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a crear el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per a crear el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
-			if (comprovarPermisDelete) {
-				boolean granted = permisosHelper.isGrantedAll(
-						node.getMetaNode().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.DELETE},
-						auth);
-				if (!granted) {
-					logger.debug("No te permisos per a esborrar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-					throw new SecurityException("Sense permisos per a esborrar el node ("
-							+ "id=" + node.getId() + ", "
-							+ "usuari=" + auth.getName() + ")");
-				}
-			}
+			
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					node.getMetaNode(),
+					node.getId(),
+					comprovarPermisRead,
+					comprovarPermisWrite,
+					comprovarPermisCreate,
+					comprovarPermisDelete);
 		} else {
 			throw new ValidationException(
 					node.getId(),
@@ -861,18 +810,13 @@ public class ContingutHelper {
 		if (expedient != null) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (comprovarPermisRead) {
-				boolean granted = permisosHelper.isGrantedAll(
+				entityComprovarHelper.comprovarMetaExpedient(
+						expedient.getEntitat(),
 						expedient.getMetaExpedient().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth);
-				if (!granted) {
-					throw new PermissionDeniedException(
-							expedient.getMetaExpedient().getId(),
-							MetaExpedientEntity.class,
-							auth.getName(),
-							"READ");
-				}
+						true,
+						false,
+						false,
+						false);
 			}
 			if (comprovarPermisWrite) {
 				boolean granted = permisosHelper.isGrantedAll(

@@ -720,7 +720,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			String filtreNomOrCodiSia) {
 
 		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbEntitatPermis(
+				metaExpedientHelper.findAmbEntitatOrOrganPermis(
 						entitatId,
 						permisos,
 						true,

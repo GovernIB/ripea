@@ -61,7 +61,7 @@ public interface OrganGestorService {
 	 *            Paràmetre de filtre 
 	 * @return Llistat dels organs gestors de l'entitat
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<OrganGestorDto> findByEntitat(Long entitatId, String filterText);
 	
 	/**

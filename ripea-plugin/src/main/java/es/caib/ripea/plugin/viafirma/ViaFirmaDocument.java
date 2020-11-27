@@ -12,7 +12,7 @@ public class ViaFirmaDocument implements Serializable {
 
 	private String link;
 	private String nomFitxer;
-	private Date expriacio;
+	private Date expiracio;
 	private ViaFirmaError viaFirmaError;
 	
 	public String getLink() {
@@ -27,11 +27,11 @@ public class ViaFirmaDocument implements Serializable {
 	public void setNomFitxer(String nomFitxer) {
 		this.nomFitxer = nomFitxer;
 	}
-	public Date getExpriacio() {
-		return expriacio;
+	public Date getExpiracio() {
+		return expiracio;
 	}
-	public void setExpriacio(Date expriacio) {
-		this.expriacio = expriacio;
+	public void setExpiracio(Date expiracio) {
+		this.expiracio = expiracio;
 	}
 	public ViaFirmaError getViaFirmaError() {
 		return viaFirmaError;

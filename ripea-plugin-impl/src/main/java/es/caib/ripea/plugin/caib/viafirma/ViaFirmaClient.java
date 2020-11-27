@@ -6,6 +6,7 @@ import com.viafirma.documents.sdk.java.api.V3devicesApi;
 import com.viafirma.documents.sdk.java.api.V3documentsApi;
 import com.viafirma.documents.sdk.java.api.V3messagesApi;
 
+import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.viafirma.OAuthType;
 
 public class ViaFirmaClient {
@@ -19,7 +20,7 @@ public class ViaFirmaClient {
 			String authMode,
 			OAuthType authenticationType,
 			String usuari,
-			String contrasenya) {
+			String contrasenya) throws SistemaExternException {
 		V3Api api = new V3Api();
         try {
         	if (proxyHost != null) {
@@ -35,9 +36,8 @@ public class ViaFirmaClient {
            		api.setAuth_mode(authMode);
            		api.generateNewToken();
            }
-		} catch (ApiException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (ApiException ex) {
+			throw new SistemaExternException("Hi ha hagut un error generant el client de viaFirma", ex);
 		}
 	}
 

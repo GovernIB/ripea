@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class HistoricAggregation {
+
 	protected Date data;
 	protected Long numExpedientsCreats;
 	protected Long numExpedientsCreatsTotal;
@@ -13,7 +14,7 @@ public class HistoricAggregation {
 	protected Long numExpedientsObertsTotal;
 	protected Long numExpedientsTancats;
 	protected Long numExpedientsTancatsTotal;
-	
+
 	public HistoricAggregation(
 			Date data,
 			Long numExpedientsCreats,
@@ -30,4 +31,5 @@ public class HistoricAggregation {
 		this.numExpedientsTancats = numExpedientsTancats;
 		this.numExpedientsTancatsTotal = numExpedientsTancatsTotal;
 	}
+
 }

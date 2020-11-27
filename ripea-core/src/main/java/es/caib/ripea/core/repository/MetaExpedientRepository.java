@@ -4,6 +4,7 @@
 package es.caib.ripea.core.repository;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,9 +14,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -170,5 +176,19 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findByOrganGestorOrderByNomAsc(OrganGestorEntity organGestorEntity);
 	
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
+	
+	
+	
+	@Query(	"from" +
+			"    MetaExpedientEntity me " +
+			"where " +
+			"	 me.entitat = :entitat " +
+			"and me.organGestor in (:organGestors) ")
+	List<MetaExpedientEntity> findByOrganGestors(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organGestors") List<OrganGestorEntity> organGestors);
+	
+	
+	
 
 }

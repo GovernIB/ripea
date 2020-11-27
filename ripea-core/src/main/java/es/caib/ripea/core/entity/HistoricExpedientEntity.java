@@ -51,8 +51,7 @@ public class HistoricExpedientEntity extends HistoricEntity {
 		super.fillDailyHistoric(contingutLogRepository, metaExpedient, date);
 
 	}
-	
-	
+		
 	/**
 	 * 
 	 */

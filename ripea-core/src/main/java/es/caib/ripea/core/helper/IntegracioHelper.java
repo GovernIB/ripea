@@ -85,6 +85,12 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_NOTIFICACIO));
+		integracions.add(
+				novaIntegracio(
+						INTCODI_VIAFIRMA));
+		integracions.add(
+				novaIntegracio(
+						INTCODI_DIGITALITZACIO));
 		return integracions;
 	}
 
@@ -246,7 +252,11 @@ public class IntegracioHelper {
 			integracio.setNom("Notificació");
 		} else if (INTCODI_FIRMASERV.equals(codi)) {
 			integracio.setNom("Firma servidor");
-		} 
+		} else if (INTCODI_VIAFIRMA.equals(codi)) {
+			integracio.setNom("ViaFirma");
+		} else if (INTCODI_DIGITALITZACIO.equals(codi)) {
+			integracio.setNom("Digitalització");
+		}
 		
 		
 		return integracio;

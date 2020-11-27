@@ -17,9 +17,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 
 @Transactional
 public interface HistoricExpedientRepository extends HistoricRepository<HistoricExpedientEntity> {
-	
-	@Query( "select " +
-			"    new es.caib.ripea.core.aggregation.HistoricExpedientAggregation( " +
+	static String commonConstructor = "    new es.caib.ripea.core.aggregation.HistoricExpedientAggregation( " +
 			"	     h.data, " +
 			"	     sum(h.numExpedientsCreats), " +
 			"        sum(h.numExpedientsCreatsTotal), " +
@@ -33,16 +31,24 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			"        sum(h.numDocsSignats), " +
 			"	     sum(h.numDocsPendentsNotificar), " +
 			"        sum(h.numDocsNotificats) " +
-			"    ) " +
+			"    ) ";
+	static String entitatFiltre = 
+			"         h.entitat = :entitat " +
+					"     and h.data >= :dataInici " +
+					"     and h.data <= :dataFi " +
+					"     and h.tipus = :tipus " +
+					"     and ((:isNullOrgansGestors = true and :incorporarExpedientsComuns = true) or " +
+					"					(:isNullOrgansGestors = true or h.organGestorId in (:organsGestors)) or " +
+					"					(:incorporarExpedientsComuns = true and h.organGestorId = null)" +
+					"     )  " +
+					"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  ";
+
+	@Query( "select " +
+				commonConstructor +
 			" from " +
 			"    HistoricExpedientEntity h " +
 			" where " +
-			"         h.entitat = :entitat " +
-			"     and h.data >= :dataInici " +
-			"     and h.data <= :dataFi " +
-			"     and h.tipus = :tipus " +
-			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
-			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
+				entitatFiltre +
 			" group by " +
 			"    h.data ")
 	List<HistoricExpedientAggregation> findByEntitatAndDateRangeGroupedByDate(
@@ -50,45 +56,26 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			@Param("tipus") HistoricTipusEnumDto tipus,
 			@Param("isNullOrgansGestors") boolean isNullOrgansGestors,
 			@Param("organsGestors") List<Long> organsGestors,
+			@Param("incorporarExpedientsComuns") boolean incorporarExpedientsComuns,
 			@Param("isNullMetaExpedients") boolean isNullMetaExpedients,
 			@Param("metaExpedients") List<Long> metaExpedients,
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi);
 	
 	@Query( "select " +
-			"    new es.caib.ripea.core.aggregation.HistoricExpedientAggregation( " +
-			"	     h.data, " +
-			"	     sum(h.numExpedientsCreats), " +
-			"        sum(h.numExpedientsCreatsTotal), " +
-			"	     sum(h.numExpedientsOberts), " +
-			"	     sum(h.numExpedientsObertsTotal), " +
-			"	     sum(h.numExpedientsTancats), " +
-			"	     sum(h.numExpedientsTancatsTotal), " +
-			"        sum(h.numExpedientsAmbAlertes), " +
-			"        sum(h.numExpedientsAmbErrorsValidacio), " +
-			"        sum(h.numDocsPendentsSignar), " +
-			"        sum(h.numDocsSignats), " +
-			"	     sum(h.numDocsPendentsNotificar), " +
-			"        sum(h.numDocsNotificats) " +
-			"    ) " +
+				commonConstructor +
 			" from " +
 			"    HistoricExpedientEntity h " +
 			" where " +
-			"         h.entitat = :entitat " +
-			"     and h.data >= :dataInici " +
-			"     and h.data <= :dataFi " +
-			"     and h.tipus = :tipus " +
-			"     and (:isNullOrgansGestors = true or (h.organGestor != null and h.organGestor.id in (:organsGestors)))  " +
-			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
+				entitatFiltre +
 			" group by " +
-			"    h.data " +
-			" order by " +
 			"    h.data ")
 	Page<HistoricExpedientAggregation> findByEntitatAndDateRangeGroupedByDate(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("tipus") HistoricTipusEnumDto tipus,
 			@Param("isNullOrgansGestors") boolean isNullOrgansGestors,
 			@Param("organsGestors") List<Long> organsGestors,
+			@Param("incorporarExpedientsComuns") boolean incorporarExpedientsComuns,
 			@Param("isNullMetaExpedients") boolean isNullMetaExpedients,
 			@Param("metaExpedients") List<Long> metaExpedients,
 			@Param("dataInici") Date dataInici,
@@ -96,21 +83,7 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			Pageable pageable);
 
 	@Query( "select " +
-			"    new es.caib.ripea.core.aggregation.HistoricExpedientAggregation( " +
-			"	     h.data, " +
-			"	     sum(h.numExpedientsCreats), " +
-			"        sum(h.numExpedientsCreatsTotal), " +
-			"	     sum(h.numExpedientsOberts), " +
-			"	     sum(h.numExpedientsObertsTotal), " +
-			"	     sum(h.numExpedientsTancats), " +
-			"	     sum(h.numExpedientsTancatsTotal), " +
-			"        sum(h.numExpedientsAmbAlertes), " +
-			"        sum(h.numExpedientsAmbErrorsValidacio), " +
-			"        sum(h.numDocsPendentsSignar), " +
-			"        sum(h.numDocsSignats), " +
-			"	     sum(h.numDocsPendentsNotificar), " +
-			"        sum(h.numDocsNotificats) " +
-			"    ) " +
+				commonConstructor +
 			" from " +
 			"    HistoricExpedientEntity h " +
 			" where " +
@@ -120,8 +93,6 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			"    and h.tipus = :tipus " +
 			"    and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
-			"    h.data " +
-			" order by " +
 			"    h.data ")
 	List<HistoricExpedientAggregation> findByOrganGestorAndDateRangeGroupedByDate(
 			@Param("organGestor") OrganGestorEntity organGestor,
@@ -131,4 +102,22 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi);
 
+	@Query( "select " +
+				commonConstructor +
+			" from " +
+			"    HistoricExpedientEntity h " +
+			" where " +
+			"        h.organGestor = null " +
+			"    and h.data >= :dataInici " +
+			"	 and h.data <= :dataFi " +
+			"    and h.tipus = :tipus " +
+			"    and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
+			" group by " +
+			"    h.data ")
+	List<HistoricExpedientAggregation> findByExpedientsComunsAndDateRangeGroupedByDate(
+			@Param("tipus") HistoricTipusEnumDto tipus,
+			@Param("isNullMetaExpedients") boolean isNullMetaExpedients,
+			@Param("metaExpedients") List<Long> metaExpedients,
+			@Param("dataInici") Date dataInici,
+			@Param("dataFi") Date dataFi);
 }

@@ -94,7 +94,7 @@ $(document).ready(function() {
 		id="taulaDades"
 		data-toggle="datatable"
 		data-url="<c:url value="/contingutAdmin/datatable"/>"
-		data-default-order="10"
+		data-default-order="11"
 		data-default-dir="desc"
 		class="table table-bordered table-striped"
 		data-rowhref-template="#rowhrefTemplate"
@@ -116,6 +116,7 @@ $(document).ready(function() {
 						{{if esborrat}}<span class="fa fa-trash-o pull-right" title="<spring:message code="contingut.admin.columna.esborrat"/>"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="numero" data-orderable="false"><spring:message code="contingut.admin.columna.numero"/></th>				
 				<th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.metanode"/></th>
 				<th data-col-name="createdBy.nom" width="10%"><spring:message code="contingut.admin.columna.creat.per"/></th>
 				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.creat.el"/></th>

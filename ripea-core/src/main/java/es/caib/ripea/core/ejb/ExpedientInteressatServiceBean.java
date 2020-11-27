@@ -140,4 +140,16 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 		return delegate.findByExpedientAndDocumentNum(documentNum, expedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<InteressatDto> findByText(String text) {
+		return delegate.findByText(text);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException {
+		return delegate.findByDocumentNum(documentNum);
+	}
+
 }

@@ -17,10 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
@@ -86,21 +89,21 @@ public class ImportacioServiceImpl implements ImportacioService {
 		}
 		int idx = 1;
 		List<Document> documents = new ArrayList<Document>();
-		outerloop: for (ContingutArxiu documentArxiu : documentsArxiu) {
+		outerloop: for (ContingutArxiu contingutArxiu : documentsArxiu) {
 			DocumentEntity entity = null;
-			Document document = pluginHelper.importarDocument(
+			Document documentArxiu = pluginHelper.importarDocument(
 					expedientSuperior.getArxiuUuid(),
-					documentArxiu.getIdentificador(),
+					contingutArxiu.getIdentificador(),
 					true);
 
-			documents.add(document);
+			documents.add(documentArxiu);
 			documents = findAndCorrectDuplicates(
 					documents,
 					idx);	
-			String tituloDoc = (String) document.getMetadades().getMetadadaAddicional("tituloDoc");
-			fitxer.setNom(document.getNom());
-			fitxer.setContentType(document.getContingut().getTipusMime());
-			fitxer.setContingut(document.getContingut().getContingut());
+			String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
+			fitxer.setNom(documentArxiu.getNom());
+			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
+			fitxer.setContingut(documentArxiu.getContingut().getContingut());
 
 			for (ContingutEntity contingut: contingutPare.getFills()) {
 				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
@@ -110,18 +113,18 @@ public class ImportacioServiceImpl implements ImportacioService {
 					} 
 				}
 			}
-			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')): document.getNom();
+			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')) : documentArxiu.getNom();
 			entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
 					nomDocument,
 					null,
-					document.getMetadades().getDataCaptura(),
-					document.getMetadades().getDataCaptura(),
+					documentArxiu.getMetadades().getDataCaptura(),
+					documentArxiu.getMetadades().getDataCaptura(),
 					//Només hi ha un òrgan
-					document.getMetadades().getOrgans().get(0),
-					getOrigen(document),
-					getEstatElaboracio(document),
-					getTipusDocumental(document),
+					getOrgans(documentArxiu),
+					getOrigen(documentArxiu),
+					getEstatElaboracio(documentArxiu),
+					getTipusDocumental(documentArxiu),
 					null, //metaDocumentEntity
 					contingutPare,
 					contingutPare.getEntitat(),
@@ -135,13 +138,25 @@ public class ImportacioServiceImpl implements ImportacioService {
 						fitxer.getContentType(),
 						null);
 			}
-			if (document.getFirmes() != null && !document.getFirmes().isEmpty()) {
+			if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
 				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			} else {
 				entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 			}
-			entity.updateArxiu(document.getIdentificador());
-			entity.updateNtiIdentificador(document.getMetadades().getIdentificador());
+			entity.updateArxiu(documentArxiu.getIdentificador());
+			entity.updateNtiIdentificador(documentArxiu.getMetadades().getIdentificador());
+			entity.updateNti(
+					obtenirNumeroVersioEniDocument(
+							documentArxiu.getMetadades().getVersioNti()),
+							documentArxiu.getMetadades().getIdentificador(),
+					getOrgans(documentArxiu),
+					getOrigen(documentArxiu),
+					getEstatElaboracio(documentArxiu),
+					getTipusDocumental(documentArxiu),
+					documentArxiu.getMetadades().getIdentificadorOrigen(),
+					getNtiTipoFirma(documentArxiu),
+					getNtiCsv(documentArxiu)[0],
+					getNtiCsv(documentArxiu)[1]);
 			contingutLogHelper.logCreacio(
 					entity,
 					true,
@@ -155,7 +170,36 @@ public class ImportacioServiceImpl implements ImportacioService {
 		}
 		return documentsRepetits;
 	}
-
+	
+	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
+	private String obtenirNumeroVersioEniDocument(String versio) {
+		if (versio != null) {
+			if (versio.startsWith(ENI_DOCUMENT_PREFIX)) {
+				int indexBarra = versio.indexOf("/", ENI_DOCUMENT_PREFIX.length());
+				return versio.substring(ENI_DOCUMENT_PREFIX.length(), indexBarra);
+			}
+		}
+		return null;
+	}
+	
+	private String getOrgans(Document documentArxiu) {
+		String organs = null;
+		if (documentArxiu.getMetadades().getOrgans() != null) {
+			List<String> metadadaOrgans = documentArxiu.getMetadades().getOrgans();
+			StringBuilder organsSb = new StringBuilder();
+			boolean primer = true;
+			for (String organ: metadadaOrgans) {
+				organsSb.append(organ);
+				if (primer || metadadaOrgans.size() == 1) {
+					primer = false;
+				} else {
+					organsSb.append(",");
+				}
+			}
+			organs = organsSb.toString();
+		}
+		return organs;
+	}
 	private List<Document> findAndCorrectDuplicates(
 			List<Document> documents,
 			int idx) {
@@ -298,6 +342,62 @@ public class ImportacioServiceImpl implements ImportacioService {
 		}
 
 		return tipusDocumental;
+	}
+
+	private DocumentNtiTipoFirmaEnumDto getNtiTipoFirma(Document documentArxiu) {
+		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
+		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
+			FirmaTipus firmaTipus = null;
+			for (Firma firma: documentArxiu.getFirmes()) {
+				if (firma.getTipus() != FirmaTipus.CSV) {
+					firmaTipus = firma.getTipus();
+					break;
+				}
+			}
+			switch (firmaTipus) {
+			case CSV:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
+				break;
+			case XADES_DET:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
+				break;
+			case XADES_ENV:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
+				break;
+			case CADES_DET:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
+				break;
+			case CADES_ATT:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
+				break;
+			case PADES:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
+				break;
+			case SMIME:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
+				break;
+			case ODT:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
+				break;
+			case OOXML:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
+				break;
+			}
+		}
+		return ntiTipoFirma;
+	}
+	
+	private String[] getNtiCsv(Document documentArxiu) {
+		String [] ntiCsv = new String[2]; 
+		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
+			for (Firma firma : documentArxiu.getFirmes()) {
+				if (firma.getTipus() == FirmaTipus.CSV) {
+					ntiCsv[0] = firma.getCsvRegulacio();
+					ntiCsv[1] = firma.getContingut() != null ? new String(firma.getContingut()) : null;
+				}
+			}
+		}
+		return ntiCsv;
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ImportacioServiceImpl.class);
 

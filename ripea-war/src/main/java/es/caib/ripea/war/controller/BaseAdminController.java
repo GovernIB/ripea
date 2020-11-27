@@ -38,7 +38,7 @@ public class BaseAdminController extends BaseController {
 			throw new SecurityException("No te cap entitat assignada");
 		}
 
-		if (!entitat.isUsuariActualAdministrationOrgan()) {
+		if (!entitat.isUsuariActualTeOrgans()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
 		}
 		return entitat;
@@ -50,7 +50,7 @@ public class BaseAdminController extends BaseController {
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
-		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualAdministrationOrgan()) {
+		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
 		}
 		return entitat;

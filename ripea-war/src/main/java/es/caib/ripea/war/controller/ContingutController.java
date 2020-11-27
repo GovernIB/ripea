@@ -124,9 +124,10 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
-		
+		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
+
 		boolean isEntitatUserAdminOrOrgan;
-		if (entitatActual.isUsuariActualAdministration() && entitatActual.isUsuariActualAdministrationOrgan()) {
+		if (entitatActual.isUsuariActualAdministration() && entitatActual.isUsuariActualTeOrgans()) {
 			isEntitatUserAdminOrOrgan = true;
 		} else {
 			isEntitatUserAdminOrOrgan = false;

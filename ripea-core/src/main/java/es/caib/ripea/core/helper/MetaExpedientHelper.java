@@ -5,6 +5,7 @@ package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,8 @@ public class MetaExpedientHelper {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private PermisosHelper permisosHelper;
+    @Autowired
+    private OrganGestorHelper organGestorHelper;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
@@ -123,7 +126,7 @@ public class MetaExpedientHelper {
 			Long organGestorId, 
 			String filtre) {
 
-		return findAmbOrganGestorPermis(
+		return findAmbOrganFiltrePermis(
 				entitatId,
 				organGestorId,
 				new Permission[] {ExtendedPermission.READ},
@@ -134,7 +137,7 @@ public class MetaExpedientHelper {
 	}
 	
 	
-	public List<MetaExpedientEntity> findAmbOrganGestorPermis(
+	public List<MetaExpedientEntity> findAmbOrganFiltrePermis(
 			Long entitatId,
 			Long organGestorId,
 			Permission[] permisos,
@@ -156,18 +159,38 @@ public class MetaExpedientHelper {
 			metaExpedients = metaExpedientRepository.findByOrganGestorOrderByNomAsc(organGestorEntity);
 		}
 		
-		permisosHelper.filterGrantedAll(
-				metaExpedients,
-				new ObjectIdentifierExtractor<MetaNodeEntity>() {
-					public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-						return metaNode.getId();
-					}
-				},
-				MetaNodeEntity.class,
-				permisos,
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
+				entitatId,
+				EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
 				auth);
+
+		if (!esAdministradorEntitat) {
+			
+			boolean organPermitted = false;
+			List<OrganGestorEntity> organsPermitted = organGestorHelper.findOrganismesEntitatAmbPermis(entitatId);
+			if (organsPermitted != null && !organsPermitted.isEmpty()) {
+				for (OrganGestorEntity organGestor : organsPermitted) {
+					if (organGestor.getId().equals(organGestorEntity.getId())) {
+						organPermitted = true;
+					}
+				}
+			} 	
+			if (!organPermitted) {
+				permisosHelper.filterGrantedAll(
+						metaExpedients,
+						new ObjectIdentifierExtractor<MetaNodeEntity>() {
+							public Long getObjectIdentifier(MetaNodeEntity metaNode) {
+								return metaNode.getId();
+							}
+						},
+						MetaNodeEntity.class,
+						permisos,
+						auth);
+			}
+		}
+
 		return metaExpedients;
-		
 
 	}
 	
@@ -177,7 +200,7 @@ public class MetaExpedientHelper {
 			Long entitatId,
 			Permission[] permisos,
 			String filtreNomOrCodiSia) {
-		return findAmbEntitatPermis(
+		return findAmbEntitatOrOrganPermis(
 				entitatId,
 				permisos,
 				true,
@@ -185,7 +208,7 @@ public class MetaExpedientHelper {
 	}
 	
 	
-	public List<MetaExpedientEntity> findAmbEntitatPermis(
+	public List<MetaExpedientEntity> findAmbEntitatOrOrganPermis(
 			Long entitatId,
 			Permission[] permisos,
 			boolean nomesActius,
@@ -206,17 +229,43 @@ public class MetaExpedientHelper {
 		} else {
 			metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		}
-
-		permisosHelper.filterGrantedAll(
-				metaExpedients,
-				new ObjectIdentifierExtractor<MetaNodeEntity>() {
-					public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-						return metaNode.getId();
-					}
-				},
-				MetaNodeEntity.class,
-				permisos,
+		
+		
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
+				entitat.getId(),
+				EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
 				auth);
+
+		if (!esAdministradorEntitat) {
+			
+			permisosHelper.filterGrantedAll(
+					metaExpedients,
+					new ObjectIdentifierExtractor<MetaNodeEntity>() {
+						public Long getObjectIdentifier(MetaNodeEntity metaNode) {
+							return metaNode.getId();
+						}
+					},
+					MetaNodeEntity.class,
+					permisos,
+					auth);
+
+			List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
+			if (organs != null && !organs.isEmpty()) {
+				List<MetaExpedientEntity> metaExpedientsOfOrgans = metaExpedientRepository.findByOrganGestors(
+						entitat,
+						organs);
+				
+				metaExpedients.addAll(metaExpedientsOfOrgans);
+				// remove duplicates
+				metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
+				
+			} 	
+				
+		}
+			
+		
+
 		return metaExpedients;		
 	}
 	
