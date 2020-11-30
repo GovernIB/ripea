@@ -25,6 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
+
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
@@ -476,11 +481,15 @@ public class ContingutHelper {
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
 			logger.debug("[CERT] Generant fitxer certificació...");
-			dto.setAmbFirma(true);
 			dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
+			
+//			## Comprovar si la certificació està firmada
+			if (resposta.getCertificacioTipusMime() != null && resposta.getCertificacioTipusMime().equals("application/pdf") && isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
+				dto.setAmbFirma(true);
+			}
 		}
 		dto.setVersioCount(0);
 		dto.setDataCaptura(new Date());
@@ -1334,6 +1343,30 @@ public class ContingutHelper {
 		return Boolean.valueOf(carpetesLogiques);
 	}
 
+	private boolean isCertificacioAmbFirma(byte[] certificacioContingut) {
+		boolean hasFirma = false;
+		try {
+			PdfReader reader = new PdfReader(certificacioContingut);
+			AcroFields fields = reader.getAcroFields();
+			
+			@SuppressWarnings("unchecked")
+			List<String> signatureNames = fields.getSignatureNames();
+			if (signatureNames != null) {
+				for (String name: signatureNames) {
+//					### comprovar si és una firma o un segell
+					PdfDictionary dictionary = fields.getSignatureDictionary(name);
+					if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/sig")) {
+						hasFirma = true;
+						break;
+					}
+				}
+			}
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error comprovant si la certificació està firmada", ex);
+		}
+		return hasFirma;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 
 }
