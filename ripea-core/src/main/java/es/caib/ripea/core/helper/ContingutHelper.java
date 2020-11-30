@@ -487,8 +487,9 @@ public class ContingutHelper {
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
 			
 //			## Comprovar si la certificació està firmada
-			if (resposta.getCertificacioTipusMime().equals("application/pdf") && isCertificacioAmbFirma(resposta.getCertificacioContingut()))
+			if (resposta.getCertificacioTipusMime() != null && resposta.getCertificacioTipusMime().equals("application/pdf") && isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
 				dto.setAmbFirma(true);
+			}
 		}
 		dto.setVersioCount(0);
 		dto.setDataCaptura(new Date());

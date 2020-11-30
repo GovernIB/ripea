@@ -642,11 +642,16 @@ public class EntityComprovarHelper {
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						auth);
 
+				List<MetaExpedientEntity> metaExpedients = null;
 				List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(metaNode.getEntitat().getId());
-				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByOrganGestors(
-						metaNode.getEntitat(),
-						organs);
 				boolean metaExpedientBelongsToOrgans = false;
+				
+//				## si hi ha òrgans gestors definits
+				if (organs != null && !organs.isEmpty()) {
+					metaExpedients = metaExpedientRepository.findByOrganGestors(
+							metaNode.getEntitat(),
+							organs);
+				}
 				if (metaExpedients != null) {
 					for (MetaExpedientEntity metaExpedientEntity : metaExpedients) {
 						if (metaExpedientEntity.getId().equals(metaNode.getId())) {
