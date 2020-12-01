@@ -968,6 +968,10 @@
 			$selectOrgansGestors.on('select2:unselect', function (e) {
 				checkBoxExpedientsComunsLogic($selectOrgansGestors);
 			});
+			
+			$(".form-filtre-visualitzacio").on('change', 'input:radio', function (event) {
+				$("#historicFiltreCommand").submit();
+			});
 		});
 		
 	</script>
@@ -1024,7 +1028,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row form-filtre-visualitzacio">
 			<div class="col-md-2">
 				<div class="btn-group" data-toggle="buttons">
 					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.showingTables == false}">active</c:if>"> 

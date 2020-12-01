@@ -114,7 +114,7 @@ public class HistoricServiceImpl implements HistoricService {
 	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(HistoricFiltreDto filtre) {
 		List<Long> organGestorIds = filtre.getOrganGestorsIds();
 		if (organGestorIds == null) {
-			organGestorIds = new ArrayList<Long>();
+			return new HashMap<>();
 		}
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
@@ -168,8 +168,11 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		
 		// Fill empty data
-		for (Date date : results.keySet()) {
+		for (Date date : filtre.getQueriedDates()) {
 			Map<OrganGestorDto, HistoricExpedientDto> mapOrganGestors = results.get(date);
+			if (mapOrganGestors == null) {
+				mapOrganGestors = new HashMap<>();
+			}
 			for (OrganGestorDto organ: organGestors) {
 				if (!mapOrganGestors.containsKey(organ)) {
 					mapOrganGestors.put(organ, new HistoricExpedientDto(filtre.getTipusAgrupament(), date));
