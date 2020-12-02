@@ -47,7 +47,7 @@ public class ExportacioActionHistoric {
 			break;
 		case "odf":
 			fileContent = (new ExportacioDocHistoric()).convertDadesEntitat(entitat, dades);
-			fitxer = new FitxerDto("historicEntitat.odt", "application/vnd.oasis.opendocument.text", fileContent);
+			fitxer = new FitxerDto("historicEntitat.ods", "application/vnd.oasis.opendocument.text", fileContent);
 			break;
 		case "xml":
 			fileContent = exportacioXMLHistoric.convertDadesEntitat(dades);
@@ -91,7 +91,7 @@ public class ExportacioActionHistoric {
 		} else if (format.equals("odf")) {
 			Map<OrganGestorDto, List<HistoricExpedientDto>> dades = historicService.getHistoricsByOrganGestor(filtre);
 			fileContent = (new ExportacioDocHistoric()).convertDadesOrgansGestors(dades);
-			fitxer = new FitxerDto("historicOrgansGestors.odt", "application/vnd.oasis.opendocument.text", fileContent);
+			fitxer = new FitxerDto("historicOrgansGestors.ods", "application/vnd.oasis.opendocument.text", fileContent);
 
 		} else if (format.equals("xml")) {
 			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(filtre);
@@ -127,7 +127,7 @@ public class ExportacioActionHistoric {
 			break;
 		case "odf":
 			fileContent = (new ExportacioDocHistoric()).convertDadesUsuaris(dades);
-			fitxer = new FitxerDto("historicUsuaris.odt", "application/vnd.oasis.opendocument.text", fileContent);
+			fitxer = new FitxerDto("historicUsuaris.ods", "application/vnd.oasis.opendocument.text", fileContent);
 			break;
 		case "xml":
 			fileContent = exportacioXMLHistoric.convertDadesUsuaris(dades);
@@ -161,7 +161,7 @@ public class ExportacioActionHistoric {
 			break;
 		case "odf":
 			fileContent = (new ExportacioDocHistoric()).convertDadesInteressats(dades);
-			fitxer = new FitxerDto("historicInteressats.odt", "application/vnd.oasis.opendocument.text", fileContent);
+			fitxer = new FitxerDto("historicInteressats.ods", "application/vnd.oasis.opendocument.text", fileContent);
 			break;
 		case "xml":
 			fileContent = exportacioXMLHistoric.convertDadesInteressats(dades);
