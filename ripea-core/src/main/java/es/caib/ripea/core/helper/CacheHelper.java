@@ -318,6 +318,8 @@ public class CacheHelper {
 			String consulta) {
 		List<ResultatDominiDto> resultat = new ArrayList<ResultatDominiDto>();
 		try {
+//			select * from not_notificacio_event order by id
+//			OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY;
 			if (jdbcTemplate != null)
 				resultat = jdbcTemplate.query(consulta, new DominiRowMapperHelper());
 		} catch (Exception e) {

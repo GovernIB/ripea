@@ -226,9 +226,12 @@ public class DominiServiceImpl implements DominiService {
 		Properties conProps = dominiHelper.getProperties(domini);
 		
 		if (conProps != null && !conProps.isEmpty()) {
+			long t0 = System.currentTimeMillis();
 			DataSource dataSource = cacheHelper.createDominiConnexio(
 					entitat.getCodi(),
 					conProps);
+			long t1 = System.currentTimeMillis();
+			System.out.println("La creació de la connexió ha tardat: "  + (t1 - t0) + "");
 			jdbcTemplate = dominiHelper.setDataSource(dataSource);
 		}
 		return cacheHelper.findDominisByConsutla(
