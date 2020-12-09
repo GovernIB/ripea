@@ -20,7 +20,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import es.caib.ripea.core.repository.ContingutLogRepository;
 import lombok.Getter;

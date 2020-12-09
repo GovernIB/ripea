@@ -1,22 +1,23 @@
-package es.caib.ripea.core.api.dto;
+package es.caib.ripea.core.api.dto.historic;
 
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.Data;
 
 @Data
+@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 public class HistoricExpedientDto extends HistoricDto {
 //	private Long numExpedientsAmbAlertes;
 //	private Long numExpedientsAmbErrorsValidacio;
 //	private Long numDocsPendentsSignar;
 	
-	@JsonProperty("DOCUMENTS_SIGNATS")
 	private Long numDocsSignats;
 //	private Long numDocsPendentsNotificar;
 	
-	@JsonProperty("DOCUMENTS_NOTIFICATS")
 	private Long numDocsNotificats;
 	
 
@@ -28,7 +29,7 @@ public class HistoricExpedientDto extends HistoricDto {
 	public HistoricExpedientDto() {
 		initValues();
 	}
-	
+		
 	public void combinarAmb(HistoricExpedientDto historic) {
 		super.combinarAmb(historic);
 //		this.numExpedientsAmbAlertes += historic.getNumExpedientsAmbAlertes();

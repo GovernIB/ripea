@@ -12,10 +12,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.war.historic.DAOHistoric.RootEntitat;
 import es.caib.ripea.war.historic.DAOHistoric.RootInteressats;
 import es.caib.ripea.war.historic.DAOHistoric.RootOrganGestors;

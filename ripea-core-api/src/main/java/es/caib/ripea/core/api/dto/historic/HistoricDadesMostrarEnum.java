@@ -1,4 +1,4 @@
-package es.caib.ripea.core.api.dto;
+package es.caib.ripea.core.api.dto.historic;
 
 
 public enum HistoricDadesMostrarEnum {

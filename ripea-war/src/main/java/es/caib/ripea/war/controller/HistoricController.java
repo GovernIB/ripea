@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricMetriquesEnumDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;

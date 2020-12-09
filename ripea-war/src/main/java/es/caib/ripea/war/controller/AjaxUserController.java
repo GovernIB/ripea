@@ -88,7 +88,7 @@ public class AjaxUserController extends BaseUserController {
 	public List<HtmlOption> enumValorsAmbText(
 			HttpServletRequest request,
 			@PathVariable String enumClass) throws ClassNotFoundException {
-		Class<?> enumeracio = Class.forName("es.caib.ripea.core.api.dto." + enumClass);
+		Class<?> enumeracio = findEnumDtoClass(enumClass);
 		StringBuilder textKeyPrefix = new StringBuilder();
 		String[] textKeys = StringUtils.splitByCharacterTypeCamelCase(enumClass);
 		for (String textKey: textKeys) {
@@ -100,7 +100,7 @@ public class AjaxUserController extends BaseUserController {
 		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
 		if (enumeracio.isEnum()) {
 			for (Object e: enumeracio.getEnumConstants()) {
-				resposta.add(new HtmlOption(
+				resposta.add(new HtmlOption( 
 						((Enum<?>)e).name(),
 						getMessage(
 								request,
@@ -109,6 +109,15 @@ public class AjaxUserController extends BaseUserController {
 			}
 		}
 		return resposta;
+	}
+	
+	private Class<?> findEnumDtoClass(String className) throws ClassNotFoundException{
+		try {
+			return Class.forName("es.caib.ripea.core.api.dto." + className);
+		} catch(ClassNotFoundException e) {
+			// TODO: això hauria de cercar per tots els subpackages de dto
+			return Class.forName("es.caib.ripea.core.api.dto.historic." + className);
+		}		
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AjaxUserController.class);

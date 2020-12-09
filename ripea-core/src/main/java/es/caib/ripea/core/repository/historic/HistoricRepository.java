@@ -1,4 +1,4 @@
-package es.caib.ripea.core.repository;
+package es.caib.ripea.core.repository.historic;
 
 import java.util.Date;
 import java.util.List;

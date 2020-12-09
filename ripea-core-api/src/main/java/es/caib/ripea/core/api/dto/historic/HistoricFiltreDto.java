@@ -1,10 +1,11 @@
-package es.caib.ripea.core.api.dto;
+package es.caib.ripea.core.api.dto.historic;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
@@ -31,7 +32,7 @@ public class HistoricFiltreDto {
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
-			cal.add(Calendar.DAY_OF_MONTH, -1);
+//			cal.add(Calendar.DAY_OF_MONTH, -1);
 			Date dataFinal = cal.getTime();
 			
 			cal = Calendar.getInstance();

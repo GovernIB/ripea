@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import es.caib.ripea.core.api.dto.HistoricDadesMostrarEnum;
-import es.caib.ripea.core.api.dto.HistoricFiltreDto;
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricDadesMostrarEnum;
+import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +47,38 @@ public class HistoricFiltreCommand {
 		this.incorporarExpedientsComuns = false;
 	}
 
+	public void updateConditional(
+			Date dataInici, 
+			Date dataFi, 
+			List<Long> organGestorsIds, 
+			List<Long> metaExpedientsIds,
+			Boolean incorporarExpedientsComuns,
+			HistoricTipusEnumDto tipusAgrupament) {
+		if (dataInici != null) {
+			this.dataInici = dataInici;
+		}
+		
+		if (dataFi != null) {
+			this.dataFi = dataFi;
+		}
+		
+		if (organGestorsIds != null) {
+			this.organGestorsIds = organGestorsIds;
+		}
+		
+		if (metaExpedientsIds != null) {
+			this.metaExpedientsIds = metaExpedientsIds;
+		}
+		
+		if (incorporarExpedientsComuns != null) {
+			this.incorporarExpedientsComuns = incorporarExpedientsComuns;
+		}
+
+		if (tipusAgrupament != null) {
+			this.tipusAgrupament =tipusAgrupament;
+		}
+	}
+	
 	public boolean showingDadesEntitat() {
 		return dadesMostrar != null && dadesMostrar == HistoricDadesMostrarEnum.ENTITAT;
 	}

@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricFiltreDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 
 /**
  * Declaració dels mètodes per a la consulta de l'històric
@@ -21,6 +21,8 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
  */
 public interface HistoricService {
 
+	public void generateOldHistorics();
+	
 	/**
 	 * Consulta l'històric dels expedients d'una entitat concreta dins un rang de
 	 * dates definit. 

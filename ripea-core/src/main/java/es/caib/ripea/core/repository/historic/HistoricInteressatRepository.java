@@ -1,4 +1,4 @@
-package es.caib.ripea.core.repository;
+package es.caib.ripea.core.repository.historic;
 
 import java.util.Date;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.HistoricAggregation;
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.entity.HistoricInteressatEntity;
 
 @Transactional
@@ -36,7 +36,9 @@ public interface HistoricInteressatRepository extends HistoricRepository<Histori
 			"     )  " +
 			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
-			"    h.data, h.interessatDocNum ")
+			"    h.data, h.interessatDocNum " +
+			" order by " +
+			"    h.data desc ")
 	List<HistoricAggregation> findByDateRangeGroupedByDate(
 			@Param("interessatDocNum") String interessatDocNum,
 			@Param("tipus") HistoricTipusEnumDto tipus,

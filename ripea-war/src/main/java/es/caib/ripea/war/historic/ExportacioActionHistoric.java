@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricFiltreDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 

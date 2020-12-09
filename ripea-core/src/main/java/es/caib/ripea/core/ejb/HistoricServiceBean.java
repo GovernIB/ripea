@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricFiltreDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.service.HistoricService;
 
 @Stateless
@@ -28,6 +28,12 @@ public class HistoricServiceBean implements HistoricService {
 	@Autowired
 	private HistoricService historicService;
 
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void generateOldHistorics() {
+		historicService.generateOldHistorics();
+	}
+	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public PaginaDto<HistoricExpedientDto> getPageDadesEntitat(

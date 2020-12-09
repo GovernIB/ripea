@@ -1,4 +1,4 @@
-package es.caib.ripea.core.repository;
+package es.caib.ripea.core.repository.historic;
 
 import java.util.Date;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.entity.HistoricUsuariEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
@@ -47,7 +47,9 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			" where " +
 				commonFilter +
 			" group by " +
-			"    h.data, h.usuari ")
+			"    h.data, h.usuari " +
+			" order by " +
+			"    h.data desc ")
 	List<HistoricUsuariAggregation> findByDateRangeGroupedByDate(
 			@Param("usuari") UsuariEntity usuari,
 			@Param("tipus") HistoricTipusEnumDto tipus,

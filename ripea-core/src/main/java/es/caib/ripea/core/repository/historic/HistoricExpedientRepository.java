@@ -1,4 +1,4 @@
-package es.caib.ripea.core.repository;
+package es.caib.ripea.core.repository.historic;
 
 import java.util.Date;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.HistoricExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -50,7 +50,9 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			" where " +
 				entitatFiltre +
 			" group by " +
-			"    h.data ")
+			"    h.data " +
+			" order by " +
+			"    h.data desc ")
 	List<HistoricExpedientAggregation> findByEntitatAndDateRangeGroupedByDate(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("tipus") HistoricTipusEnumDto tipus,
@@ -93,7 +95,9 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			"    and h.tipus = :tipus " +
 			"    and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
-			"    h.data ")
+			"    h.data " +
+			" order by " +
+			"    h.data desc ")
 	List<HistoricExpedientAggregation> findByOrganGestorAndDateRangeGroupedByDate(
 			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("tipus") HistoricTipusEnumDto tipus,
@@ -113,7 +117,9 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			"    and h.tipus = :tipus " +
 			"    and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  " +
 			" group by " +
-			"    h.data ")
+			"    h.data " +
+			" order by " +
+			"    h.data desc ")
 	List<HistoricExpedientAggregation> findByExpedientsComunsAndDateRangeGroupedByDate(
 			@Param("tipus") HistoricTipusEnumDto tipus,
 			@Param("isNullMetaExpedients") boolean isNullMetaExpedients,

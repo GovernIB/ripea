@@ -1,5 +1,4 @@
-package es.caib.ripea.core.api.dto;
-
+package es.caib.ripea.core.api.dto.historic;
 
 public enum HistoricMetriquesEnumDto {
 	EXPEDIENTS_CREATS,

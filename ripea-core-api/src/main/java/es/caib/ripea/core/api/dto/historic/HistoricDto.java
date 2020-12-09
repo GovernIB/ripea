@@ -1,10 +1,12 @@
-package es.caib.ripea.core.api.dto;
+package es.caib.ripea.core.api.dto.historic;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import lombok.Data;
 
 @Data
@@ -13,25 +15,23 @@ public class HistoricDto implements Comparable<HistoricDto> {
 	@JsonIgnore
 	protected Long entitat;
 
+	@JsonIgnore
 	protected MetaExpedientDto metaExpedient;
 	
 	@JsonIgnore
 	protected HistoricTipusEnumDto tipus;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	protected Date data;
 
-	@JsonProperty("EXPEDIENTS_CREATS")
 	protected Long numExpedientsCreats;
 	
-	@JsonProperty("EXPEDIENTS_CREATS_ACUM")
 	protected Long numExpedientsCreatsTotal;
 //	protected Long numExpedientsOberts;
 //	protected Long numExpedientsObertsTotal;
 	
-	@JsonProperty("EXPEDIENTS_TANCATS")
 	protected Long numExpedientsTancats;
 	
-	@JsonProperty("EXPEDIENTS_TANCATS_ACUM")
 	protected Long numExpedientsTancatsTotal;
 
 	public HistoricDto(HistoricTipusEnumDto tipus, Date data) {
@@ -57,13 +57,13 @@ public class HistoricDto implements Comparable<HistoricDto> {
 		this.numExpedientsTancatsTotal += historic.getNumExpedientsTancatsTotal();
 	}
 
-
-//	public String formatDate() {
-//		return (new SimpleDateFormat("dd-MM-yyyy")).format(data);
-//	}
-
 	@Override
 	public int compareTo(HistoricDto o) {
 		return this.data.compareTo(o.getData());
+	}
+	
+	@JsonProperty("metaExpedient")
+	public String getMetaExpedientText() {
+	    return this.metaExpedient.getCodi() + " - " + this.metaExpedient.getNom();
 	}
 }

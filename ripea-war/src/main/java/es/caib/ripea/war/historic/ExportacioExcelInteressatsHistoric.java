@@ -12,8 +12,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.util.HSSFColor;
 
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricMetriquesEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
 
 public class ExportacioExcelInteressatsHistoric extends ExportacioExcelHistoric {
 

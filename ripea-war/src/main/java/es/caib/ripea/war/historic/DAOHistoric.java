@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -20,13 +19,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 
 public class DAOHistoric {
@@ -46,6 +43,19 @@ public class DAOHistoric {
 		}
 		
 		return new RootOrganGestors(registres);		
+	}
+	
+	public static List<RegistreOrganGestor> mapRegistresActualsOrganGestors(Map<OrganGestorDto, HistoricExpedientDto> dades) {
+		List<RegistreOrganGestor> registres = new ArrayList<>();
+		for (OrganGestorDto organGestor : dades.keySet()) {
+			HistoricExpedientDto historic = dades.get(organGestor);
+			RegistreOrganGestor registre = new RegistreOrganGestor();
+			BeanUtils.copyProperties(historic, registre);
+			registre.nomOrganGestor = organGestor.getNom() + " - " + organGestor.getCodi();
+			registres.add(registre);
+		}
+
+		return registres;		
 	}
 	
 	public static RootUsuaris mapRegistresUsuaris(Map<String, List<HistoricUsuariDto>> dades) {
@@ -122,7 +132,7 @@ public class DAOHistoric {
 		@XmlAttribute
 		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-		private Date data;
+		public Date data;
 	}
 	
 	/**********
