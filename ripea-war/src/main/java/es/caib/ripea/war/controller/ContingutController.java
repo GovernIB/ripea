@@ -70,7 +70,7 @@ import es.caib.ripea.war.helper.SessioHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-public class ContingutController extends BaseUserController {
+public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";

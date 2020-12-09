@@ -67,10 +67,13 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
    		 " 	and og.id in (:ids)")
 	public List<OrganGestorEntity> findByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
 
-  @Query( "select og.id " + 
-      "from " +
-      "    OrganGestorEntity og " +
-      "where og.codi in (:codi)")
-  public List<Long> findIdsByCodiDir3List(List<String> codi);
+	  @Query( "select og.id " + 
+	      "from " +
+	      "    OrganGestorEntity og " +
+	      "where og.codi in (:codi)")
+	public List<Long> findIdsByCodiDir3List(List<String> codi);
+	  
+
+  
 }
 

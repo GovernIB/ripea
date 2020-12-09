@@ -72,7 +72,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
     @Transactional(readOnly = true)
     public List<OrganGestorDto> findByEntitat(Long entitatId) {
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
         List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
         return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
     }
@@ -86,7 +86,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
 				filterText == null || filterText.isEmpty(),
@@ -101,7 +101,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Override
     @Transactional
     public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
 			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
 		}
@@ -151,7 +151,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
                                                                        PaginacioParamsDto paginacioParams) {
 
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 
         Page<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(entitat,
                 paginacioParams.getFiltre() == null,
@@ -215,7 +215,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         logger.debug("Consulta com a administrador els permisos dels organs gestors de l'entitat (" + "id="
                 + entitatId + ")");
 
-        entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+        entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 
         List<PermisOrganGestorDto> results = new ArrayList<PermisOrganGestorDto>();
         boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,

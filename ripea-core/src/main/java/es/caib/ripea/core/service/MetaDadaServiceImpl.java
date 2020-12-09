@@ -370,7 +370,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -389,9 +389,10 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "nodeId=" + nodeId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		NodeEntity node = entityComprovarHelper.comprovarNode(
 				entitat,
 				nodeId,
@@ -414,7 +415,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		NodeEntity node = entityComprovarHelper.comprovarNode(
 				entitat,
 				nodeId,

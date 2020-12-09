@@ -415,7 +415,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + ")");
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,
@@ -448,7 +448,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Obtenint els comentaris pel contingut (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
 						")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -471,7 +471,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Obtenint els comentaris pel expedient (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
 						")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -529,7 +529,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, false, true);
 	}
 
@@ -544,7 +544,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 
 		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId);
 	}
@@ -555,7 +555,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients(" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 
@@ -617,7 +617,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients segons el tipus per usuaris (" + "entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
@@ -657,7 +657,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els ids d'expedient segons el filtre (" + "entitatId=" + entitatId + ", " + "filtre=" +
 						filtre + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		return findIdsAmbFiltrePaginat(entitatId, filtre, false, true);
 	}
 
@@ -839,7 +839,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
@@ -913,7 +913,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
@@ -1140,7 +1140,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String format) throws IOException {
 		logger.debug(
 				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		
 		List<Long> metaExpedientIds = metaExpedientRepository.findDistinctMetaExpedientIdsByExpedients(expedientIds);
 		for (Long metaExpedientId : metaExpedientIds) {
@@ -1253,7 +1253,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId +
 						")");
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -1363,7 +1363,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Exportant índex dels expedients seleccionats (" + "entitatId=" + entitatId + ", " + "expedientIds=" +
 						expedientIds + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
 
@@ -1394,7 +1394,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			Long expedientId) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 		MetaExpedientEntity metaExpedient = null;
 
 		if (filtre.getMetaExpedientId() != null) {
@@ -1545,7 +1545,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			boolean accesAdmin,
 			boolean comprovarAccesMetaExpedients) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, (!accesAdmin), accesAdmin, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, (!accesAdmin), accesAdmin, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(

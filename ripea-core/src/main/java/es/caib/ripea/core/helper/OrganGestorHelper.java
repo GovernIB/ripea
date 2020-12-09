@@ -26,7 +26,7 @@ public class OrganGestorHelper {
 
 	
     public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(Long entitatId) {
-    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				ExtendedPermission.ADMINISTRATION);

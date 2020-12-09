@@ -89,7 +89,7 @@ public class RolHelper {
 			if (entitatActual.isUsuariActualAdministration() && request.isUserInRole(ROLE_ADMIN)) {
 				rols.add(ROLE_ADMIN);
 			}
-			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_ADMIN_ORGAN) && isUsuariActualTeOrgans(request)) {
+			if (request.isUserInRole(ROLE_ADMIN_ORGAN) && isUsuariActualTeOrgans(request)) {
 				rols.add(ROLE_ADMIN_ORGAN);
 			}
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {

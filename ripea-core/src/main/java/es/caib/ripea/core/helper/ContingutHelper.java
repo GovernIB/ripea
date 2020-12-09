@@ -551,9 +551,10 @@ public class ContingutHelper {
 			boolean comprovarPermisDelete) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -636,9 +637,10 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -669,7 +671,7 @@ public class ContingutHelper {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);

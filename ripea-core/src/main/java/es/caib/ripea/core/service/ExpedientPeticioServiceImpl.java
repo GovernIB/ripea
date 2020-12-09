@@ -102,7 +102,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
 				true,
 				false,
-				false);
+				false, false);
 
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("numero",
@@ -189,7 +189,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
