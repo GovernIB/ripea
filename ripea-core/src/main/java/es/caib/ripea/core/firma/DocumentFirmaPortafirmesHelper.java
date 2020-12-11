@@ -216,7 +216,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				DocumentPortafirmesDto.class);
 	}	
 	
-	public void portafirmesReintentar(
+	public Exception portafirmesReintentar(
 			Long entitatId,
 			DocumentEntity document) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
@@ -238,14 +238,16 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
 		logAll(documentPortafirmes, LogTipusEnumDto.PFIRMA_REINTENT);
+		Exception exception = null;
 		if (DocumentEnviamentEstatEnumDto.PENDENT.equals(documentPortafirmes.getEstat())) {
-			portafirmesEnviar(
+			exception = portafirmesEnviar(
 					documentPortafirmes,
 					null);
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
-			portafirmesProcessar(documentPortafirmes);
+			exception = portafirmesProcessar(documentPortafirmes);
 		}
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		return exception;
 	}
 	
 
@@ -304,7 +306,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				documentPortafirmes.updateProcessatError(
 						ExceptionUtils.getStackTrace(rootCause),
 						null);
-				return null;
+				return ex;
 			}
 			try {
 				if (portafirmesDocument.isCustodiat()) {
@@ -368,6 +370,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				documentPortafirmes.updateProcessatError(
 						ExceptionUtils.getStackTrace(rootCause),
 						null);
+				return ex;
 			}
 		}
 		if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {

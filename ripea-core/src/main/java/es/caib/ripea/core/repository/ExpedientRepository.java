@@ -210,6 +210,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    ExpedientEntity e " +
 			"where " +
 			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
 			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode)")
 	List<ExpedientEntity> findByEntitatAndMetaExpedientOrderByNomAsc(

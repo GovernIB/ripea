@@ -5,6 +5,7 @@ package es.caib.ripea.core.ejb;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
@@ -22,6 +24,8 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -350,6 +354,31 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(Long entitatId, Long documentId) {
 		return delegate.recuperarBlocksFirmaEnviament(entitatId, documentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		return delegate.findDocumentsPerCustodiarMassiu(entitatId, filtre, paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Exception portafirmesReintentar(
+			Long entitatId,
+			Set<Long> ids) {
+		return delegate.portafirmesReintentar(entitatId, ids);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<Long> findDocumentsIdsPerCustodiarMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+		return delegate.findDocumentsIdsPerCustodiarMassiu(entitatId, filtre);
 	}
 
 }
