@@ -60,4 +60,14 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 
 	List<EntitatEntity> findBy(
 			Sort sort);
+	
+	  
+	@Query("select org.entitat " + 
+			"from " + 
+			"    OrganGestorEntity org " + 
+			" where org.id in (:ids)")
+	public List<EntitatEntity> findByOrgansIds(@Param("ids") List<Long> ids);
+  	
+	
+	
 }

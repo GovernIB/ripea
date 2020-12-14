@@ -14,8 +14,6 @@ import es.caib.ripea.core.api.dto.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-import fr.opensagres.xdocreport.converter.ConverterTypeTo;
-import fr.opensagres.xdocreport.converter.Options;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
@@ -27,13 +25,14 @@ import fr.opensagres.xdocreport.template.velocity.internal.VelocityTemplateEngin
 
 public class ExportacioDocHistoric {
 
+
 	public byte[] convertDadesEntitat(
 			EntitatDto entitat,
 			List<HistoricExpedientDto> dades) throws IOException, XDocReportException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
 		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_entitat_ca.odt");
-
+		
 		// https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldInTable
 		// 2) Create fields metadata to manage lazy loop (#forech velocity) for table
 		// row.
@@ -55,7 +54,7 @@ public class ExportacioDocHistoric {
 		context.put("dateFormatter", new DateTool());
 
 		// 3) Set PDF as format converter
-		Options options = Options.getTo(ConverterTypeTo.PDF);
+//		Options options = Options.getTo(ConverterTypeTo.PDF);
 
 		// 3) Generate report by merging Java model with the ODT and convert it to PDF
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -121,17 +120,19 @@ public class ExportacioDocHistoric {
 	private IXDocReport getReportInstance(String filename) throws IOException, XDocReportException {
 		InputStream in = this.getClass().getResourceAsStream(filename);
 		IXDocReport report = XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Velocity);
-
+	
 		Properties properties = new Properties();
 		properties.setProperty("resource.loader", "class");
 		properties.setProperty(
 				"class.resource.loader.class",
 				"org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-
+		properties.setProperty("runtime.log.logsystem.class", 
+				"org.apache.velocity.runtime.log.NullLogChute");
+		
 		ITemplateEngine templateEngine = new VelocityTemplateEngine(properties);
-
+				
 		report.setTemplateEngine(templateEngine);
 		return report;
 	}
-
+    
 }

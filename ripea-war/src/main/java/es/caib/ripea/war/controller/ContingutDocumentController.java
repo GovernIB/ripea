@@ -86,7 +86,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/contingut")
-public class ContingutDocumentController extends BaseUserController {
+public class ContingutDocumentController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_ORDRE = "ContingutDocumentController.session.ordre";

@@ -85,7 +85,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				false,
 				false,
-				false);
+				false, false);
 		ExpedientEstatEntity estat =  expedientEstatRepository.findOne(id);
 		ExpedientEstatDto dto = conversioTipusHelper.convertir(
 				estat,
@@ -140,9 +140,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "metaExpedientId=" + metaExpedientId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
@@ -172,9 +173,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "expedientId=" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -446,7 +448,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
@@ -520,7 +522,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {

@@ -75,7 +75,7 @@ public class MetaExpedientHelper {
 	}
 
 	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId, Long organGestorId) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (organGestorId == null) {
 			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);			
@@ -218,6 +218,7 @@ public class MetaExpedientHelper {
 				entitatId,
 				false,
 				false,
+				false, 
 				true);
 		
 		List<MetaExpedientEntity> metaExpedients;
@@ -236,9 +237,41 @@ public class MetaExpedientHelper {
 				EntitatEntity.class,
 				new Permission[] { ExtendedPermission.ADMINISTRATION },
 				auth);
+		
+		boolean onlyChecksReadPermission = onlyChecksReadPermission(permisos);
+		
+		
+		
+		
+		
+		
+		if (onlyChecksReadPermission) {
+			if (!esAdministradorEntitat) {
+				permisosHelper.filterGrantedAll(
+						metaExpedients,
+						new ObjectIdentifierExtractor<MetaNodeEntity>() {
+							public Long getObjectIdentifier(MetaNodeEntity metaNode) {
+								return metaNode.getId();
+							}
+						},
+						MetaNodeEntity.class,
+						permisos,
+						auth);
 
-		if (!esAdministradorEntitat) {
-			
+				List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
+				if (organs != null && !organs.isEmpty()) {
+					List<MetaExpedientEntity> metaExpedientsOfOrgans = metaExpedientRepository.findByOrganGestors(
+							entitat,
+							organs);
+					
+					metaExpedients.addAll(metaExpedientsOfOrgans);
+					// remove duplicates
+					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
+					
+				} 	
+					
+			}			
+		} else {
 			permisosHelper.filterGrantedAll(
 					metaExpedients,
 					new ObjectIdentifierExtractor<MetaNodeEntity>() {
@@ -249,20 +282,9 @@ public class MetaExpedientHelper {
 					MetaNodeEntity.class,
 					permisos,
 					auth);
-
-			List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
-			if (organs != null && !organs.isEmpty()) {
-				List<MetaExpedientEntity> metaExpedientsOfOrgans = metaExpedientRepository.findByOrganGestors(
-						entitat,
-						organs);
-				
-				metaExpedients.addAll(metaExpedientsOfOrgans);
-				// remove duplicates
-				metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
-				
-			} 	
-				
 		}
+
+
 			
 		
 
@@ -270,6 +292,13 @@ public class MetaExpedientHelper {
 	}
 	
 	
+	private boolean onlyChecksReadPermission(Permission[] permisos) {
+		if (permisos.length == 0 || permisos.length == 1 && permisos[0] == ExtendedPermission.READ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	
 	

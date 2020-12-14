@@ -1361,6 +1361,12 @@ public class PluginHelper {
 				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 				firmes = Arrays.asList(firma);
 			}
+			
+			boolean throwException = true; // throwException = true;
+			if (throwException) {
+				throw new RuntimeException("Mock Exception al custodiar document de portafirmes");
+			}
+			
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),

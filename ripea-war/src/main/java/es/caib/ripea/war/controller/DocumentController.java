@@ -74,7 +74,7 @@ import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
  */
 @Controller
 @RequestMapping("/document")
-public class DocumentController extends BaseUserController {
+public class DocumentController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 

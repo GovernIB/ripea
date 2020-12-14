@@ -47,7 +47,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		
 		GrupEntity enitity = GrupEntity.getBuilder(
 				grupDto.getRol(),
@@ -72,7 +72,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		
 		GrupEntity grupEntity = grupRepository.findOne(grupDto.getId());
 
@@ -98,7 +98,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 
 		GrupEntity grupEntity = grupRepository.findOne(id);
 		
@@ -134,7 +134,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				false,
-				false);
+				false, false);
 
 		Page<GrupEntity> page = grupRepository.findByEntitat(
 				entitat,
@@ -183,7 +183,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				false,
-				false);
+				false, false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		
@@ -208,7 +208,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				false,
-				false);
+				false, false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		

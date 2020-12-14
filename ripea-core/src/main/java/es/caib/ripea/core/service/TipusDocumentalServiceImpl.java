@@ -59,7 +59,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		if (! suportaMetaDocumentalsAddicionals())
 			throw new ValidationException(
 					"<creacio>",
@@ -88,7 +88,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		if (! suportaMetaDocumentalsAddicionals())
 			throw new ValidationException(
 					"<creacio>",
@@ -124,7 +124,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		if (! suportaMetaDocumentalsAddicionals())
 			throw new ValidationException(
 					"<creacio>",
@@ -164,7 +164,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 
 		Page<TipusDocumentalEntity> page = tipusDocumentalRepository.findByEntitat(
 				entitat,
@@ -182,6 +182,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				false,
+				false, 
 				true);
 
 		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
@@ -204,7 +205,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 
 		TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 				codi, 

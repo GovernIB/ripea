@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -50,6 +51,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.AclSidRepository;
@@ -140,6 +142,18 @@ public class CacheHelper {
 					ExtendedPermission.READ,
 					ExtendedPermission.ADMINISTRATION},
 				auth);
+		
+		
+		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+				OrganGestorEntity.class,
+				ExtendedPermission.ADMINISTRATION);
+		if (objectsIds != null && !objectsIds.isEmpty()) {
+			List<EntitatEntity> entitatsOfOrgans = entitatRepository.findByOrgansIds(objectsIds);
+			entitats.addAll(entitatsOfOrgans);
+			// remove duplicates
+			entitats = new ArrayList<EntitatEntity>(new HashSet<EntitatEntity>(entitats));
+		}
+
 		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
 				entitats,
 				EntitatDto.class);

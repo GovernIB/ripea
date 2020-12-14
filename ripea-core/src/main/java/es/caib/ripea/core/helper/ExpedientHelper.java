@@ -135,7 +135,7 @@ public class ExpedientHelper {
 					ExpedientEntity.class,
 					"No es pot crear un expedient sense un meta-expedient associat");
 		}
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,

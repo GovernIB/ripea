@@ -72,7 +72,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		DominiEntity entity = DominiEntity.getBuilder(
 				domini.getCodi(),
 				domini.getNom(),
@@ -161,7 +161,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 
 		Page<DominiEntity> page = dominiRepository.findByEntitat(
 				entitat,
@@ -182,7 +182,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 
 		List<DominiEntity> tipusDocumentals = dominiRepository.findByEntitatOrderByNomAsc(entitat);
 
@@ -199,7 +199,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 
 		DominiEntity tipusDocumental = dominiRepository.findByCodiAndEntitat(
 				codi, 
@@ -222,7 +222,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		if (domini == null) {
 			return new ResultatDominiDto();
 		}
@@ -280,9 +280,10 @@ public class DominiServiceImpl implements DominiService {
 			MetaExpedientDto metaExpedient) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId, 
-				true, 
 				false, 
-				false);
+				false, 
+				false, 
+				true);
 		List<String> dominisCodis = new ArrayList<String>();
 		List<DominiEntity> dominis = new ArrayList<DominiEntity>();
 		//1. trobar metadades de tipus domini d'aquests metaexpedients
