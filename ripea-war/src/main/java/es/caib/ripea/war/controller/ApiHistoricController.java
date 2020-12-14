@@ -106,8 +106,8 @@ public class ApiHistoricController extends BaseAdminController {
 			@RequestParam(value = "incorporarExpedientsComuns", required = false) 
 			Boolean incorporarExpedientsComuns,
 			
-			@ApiParam(name = "tipusAgrupament", value = "Tipus d'agrupament, DIARI/MENSUAL", required = true)
-			@RequestParam(value = "tipusAgrupament", required = true) HistoricTipusEnumDto tipusAgrupament
+			@ApiParam(name = "tipusAgrupament", value = "Tipus d'agrupament, DIARI/MENSUAL", required = false)
+			@RequestParam(value = "tipusAgrupament", required = false) HistoricTipusEnumDto tipusAgrupament
 			) {
 
 		HistoricFiltreCommand filtre = new HistoricFiltreCommand();
@@ -236,8 +236,8 @@ public class ApiHistoricController extends BaseAdminController {
 	public List<RegistreOrganGestor> getHistoricsActualsByOrganGestor(
 			HttpServletRequest request,
 
-			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
-			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
+			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = true)
+			@RequestParam(value = "organGestorsIds", required = true) List<Long> organGestorsIds,
 			
 			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,

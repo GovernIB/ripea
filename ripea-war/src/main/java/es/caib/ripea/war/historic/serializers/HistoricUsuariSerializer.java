@@ -63,7 +63,7 @@ public class HistoricUsuariSerializer {
 	public static class RegistreUsuari extends Registre {
 		@XmlAttribute
 		@XmlJavaTypeAdapter(DateAdapter.class)
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
 		public Date data;
 		
 		public Long numTasquesTramitades;
