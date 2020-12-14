@@ -291,7 +291,7 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		dto.setEnviarCorreu(filtreCommand.isEnviarCorreu());
 		dto.setMotiu(filtreCommand.getMotiu());
 		dto.setPrioritat(filtreCommand.getPrioritat());
-		dto.setDataCaducitat(filtreCommand.getDataCaducitat());
+//		dto.setDataCaducitat(filtreCommand.getDataCaducitat());
 		dto.setContingutIds(new ArrayList<Long>(seleccio));
 
 		execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto);

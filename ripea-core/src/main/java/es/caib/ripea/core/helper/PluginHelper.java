@@ -2070,24 +2070,13 @@ public class PluginHelper {
 			}
 		}
 		try {
-			Calendar dataCaducitatCal = Calendar.getInstance();
-			dataCaducitatCal.setTime(dataCaducitat);
-			if (	dataCaducitatCal.get(Calendar.HOUR_OF_DAY) == 0 &&
-					dataCaducitatCal.get(Calendar.MINUTE) == 0 &&
-					dataCaducitatCal.get(Calendar.SECOND) == 0 &&
-					dataCaducitatCal.get(Calendar.MILLISECOND) == 0) {
-				dataCaducitatCal.set(Calendar.HOUR_OF_DAY, 23);
-				dataCaducitatCal.set(Calendar.MINUTE, 59);
-				dataCaducitatCal.set(Calendar.SECOND, 59);
-				dataCaducitatCal.set(Calendar.MILLISECOND, 999);
-			}
 			String portafirmesEnviamentId = getPortafirmesPlugin().upload(
 					portafirmesDocument,
 					documentTipus,
 					motiu,
 					"Aplicació RIPEA",
 					prioritat,
-					dataCaducitatCal.getTime(),
+					null,
 					flux,
 					fluxId,
 					portafirmesAnnexos,
@@ -4746,9 +4735,9 @@ public class PluginHelper {
 				document.getNom());
 		accioParams.put("motiu", motiu);
 		accioParams.put("prioritat", prioritat.toString());
-		accioParams.put(
-				"dataCaducitat",
-				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
+//		accioParams.put(
+//				"dataCaducitat",
+//				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
 		accioParams.put("documentTipus", documentTipus);
 		if (responsables != null) {
 			accioParams.put("responsables", Arrays.toString(responsables));

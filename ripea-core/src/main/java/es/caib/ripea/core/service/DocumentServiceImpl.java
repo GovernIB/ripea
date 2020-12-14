@@ -440,7 +440,6 @@ public class DocumentServiceImpl implements DocumentService {
 			Long id,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
 			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
@@ -451,8 +450,7 @@ public class DocumentServiceImpl implements DocumentService {
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
 				"assumpte=" + assumpte + ", " +
-				"prioritat=" + prioritat + ", " +
-				"dataCaducitat=" + dataCaducitat + ")");
+				"prioritat=" + prioritat + ")");
 		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
 				id,
@@ -468,7 +466,7 @@ public class DocumentServiceImpl implements DocumentService {
 					document,
 					assumpte,
 					prioritat,
-					dataCaducitat,
+					null,
 					portafirmesFluxId,
 					portafirmesResponsables,
 					portafirmesSeqTipus,

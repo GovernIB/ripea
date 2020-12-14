@@ -744,7 +744,7 @@ public class UsuariTascaController extends BaseUserController {
 				documentId,
 				command.getMotiu(),
 				command.getPrioritat(),
-				command.getDataCaducitat(),
+				null,
 				command.getPortafirmesResponsables(),
 				command.getPortafirmesSequenciaTipus(),
 				command.getPortafirmesFluxTipus(),

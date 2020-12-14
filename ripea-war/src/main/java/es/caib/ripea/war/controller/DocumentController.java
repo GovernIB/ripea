@@ -185,7 +185,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					documentId,
 					command.getMotiu(),
 					command.getPrioritat(),
-					command.getDataCaducitat(),
 					command.getPortafirmesEnviarFluxId(), //selecció flux
 					command.getPortafirmesResponsables(),
 					command.getPortafirmesSequenciaTipus(),

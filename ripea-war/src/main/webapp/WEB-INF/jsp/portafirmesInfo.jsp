@@ -223,10 +223,12 @@ $(document).ready(function() {
 								<td><strong><spring:message code="firma.info.camp.prioritat"/></strong></td>
 								<td><spring:message code="portafirmes.prioritat.enum.${portafirmes.prioritat}"/></td>
 							</tr>
+							<%-- 
 							<tr>
 								<td><strong><spring:message code="firma.info.camp.data.cad"/></strong></td>
 								<td><fmt:formatDate value="${portafirmes.caducitatData}" pattern="dd/MM/yyyy"/></td>
 							</tr>
+							--%>
 							<tr>
 								<td><strong><spring:message code="firma.info.camp.document.tipus"/></strong></td>
 								<td>${portafirmes.documentTipus}</td> 

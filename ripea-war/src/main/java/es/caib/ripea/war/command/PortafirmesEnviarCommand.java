@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.war.command;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -27,8 +26,8 @@ public class PortafirmesEnviarCommand {
 	private String motiu;
 	@NotNull
 	private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
-	@NotNull
-	private Date dataCaducitat;
+	//@NotNull
+	//private Date dataCaducitat;
 	private Date dataInici;
 	private boolean enviarCorreu;
 	private String[] portafirmesResponsables;
@@ -96,15 +95,15 @@ public class PortafirmesEnviarCommand {
 		this.annexos = annexos;
 	}
 
-	public PortafirmesEnviarCommand() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_MONTH, 7);
-		cal.set(Calendar.HOUR, 23);
-		cal.set(Calendar.MINUTE, 59);
-		cal.set(Calendar.SECOND, 59);
-		cal.set(Calendar.MILLISECOND, 999);
-		dataCaducitat = cal.getTime();
-	}
+//	public PortafirmesEnviarCommand() {
+//		Calendar cal = Calendar.getInstance();
+//		cal.add(Calendar.DAY_OF_MONTH, 7);
+//		cal.set(Calendar.HOUR, 23);
+//		cal.set(Calendar.MINUTE, 59);
+//		cal.set(Calendar.SECOND, 59);
+//		cal.set(Calendar.MILLISECOND, 999);
+//		dataCaducitat = cal.getTime();
+//	}
 
 	public String getMotiu() {
 		return motiu;
@@ -117,12 +116,6 @@ public class PortafirmesEnviarCommand {
 	}
 	public void setPrioritat(PortafirmesPrioritatEnumDto prioritat) {
 		this.prioritat = prioritat;
-	}
-	public Date getDataCaducitat() {
-		return dataCaducitat;
-	}
-	public void setDataCaducitat(Date dataCaducitat) {
-		this.dataCaducitat = dataCaducitat;
 	}
 
 	public Date getDataInici() {

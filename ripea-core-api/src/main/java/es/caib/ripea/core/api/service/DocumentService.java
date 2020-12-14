@@ -277,7 +277,6 @@ public interface DocumentService {
 			Long documentId,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
 			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,

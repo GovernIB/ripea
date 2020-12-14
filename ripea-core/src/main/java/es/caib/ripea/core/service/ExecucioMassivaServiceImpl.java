@@ -420,7 +420,6 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					contingut.getId(),
 					em.getMotiu(),
 					em.getPrioritat(),
-					em.getDataCaducitat(),
 					null,
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesResponsables(),
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),
