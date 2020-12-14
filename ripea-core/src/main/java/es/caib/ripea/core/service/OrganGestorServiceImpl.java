@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -66,6 +67,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     @Transactional(readOnly = true)
     public OrganGestorDto findItem(Long id) {
         OrganGestorEntity organGestor = organGestorRepository.findOne(id);
+        if (organGestor == null) {
+        	throw new NotFoundException(id, OrganGestorEntity.class);
+        }
         OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
         return resposta;
     }

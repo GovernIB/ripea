@@ -1362,7 +1362,7 @@ public class PluginHelper {
 				firmes = Arrays.asList(firma);
 			}
 			
-			boolean throwException = true; // throwException = true;
+			boolean throwException = false; // throwException = true;
 			if (throwException) {
 				throw new RuntimeException("Mock Exception al custodiar document de portafirmes");
 			}

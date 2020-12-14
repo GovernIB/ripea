@@ -33,4 +33,10 @@ public class HistoricUsuariAggregation extends HistoricAggregation{
 		this.usuari = usuari;
 		this.numTasquesTramitades = numTasquesTramitades;
 	}
+	public HistoricUsuariAggregation(
+			Date data) {
+		super(data);
+		this.usuari = null;
+		this.numTasquesTramitades = 0L;
+	}
 }

@@ -6,6 +6,8 @@ package es.caib.ripea.core.api.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +29,7 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     private int expedientTasquesCount;
     private int expedientDominisCount;
     private int grupsCount;
+	@JsonIgnore
     private List<MetaDocumentDto> metaDocuments;
     private boolean permetMetadocsGenerals;
     private OrganGestorDto organGestor;

@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricFiltreDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 
 /**
  * Declaració dels mètodes per a la consulta de l'històric
@@ -21,6 +21,8 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
  */
 public interface HistoricService {
 
+	public void generateOldHistorics();
+	
 	/**
 	 * Consulta l'històric dels expedients d'una entitat concreta dins un rang de
 	 * dates definit. 
@@ -47,7 +49,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre);
 
 	/**
@@ -57,7 +59,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(HistoricFiltreDto filtre);
 
 	/**
@@ -78,7 +80,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre);
 
 	/**
@@ -90,7 +92,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre);
 
 	/**
@@ -102,7 +104,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre);
 
 	/**
@@ -112,7 +114,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre);
 
 	/**
@@ -123,7 +125,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, HistoricFiltreDto filtre);
 
 	/**
@@ -134,7 +136,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricInteressatDto> getDadesActualsInteressat(String interessatDocNum, HistoricFiltreDto filtre);
 
 }
