@@ -251,10 +251,11 @@ public class DominiServiceImpl implements DominiService {
 			DominiDto domini,
 			String dadaValor) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
+				entitatId, 
+				true, 
+				false, 
+				false, 
+				true);
 		if (domini == null) {
 			return new ResultatConsultaDto();
 		}
