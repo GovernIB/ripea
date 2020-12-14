@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.ForeignKey;
 
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import lombok.Data;
 
 @Data

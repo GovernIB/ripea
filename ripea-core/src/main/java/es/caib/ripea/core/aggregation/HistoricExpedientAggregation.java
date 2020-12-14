@@ -43,4 +43,14 @@ public class HistoricExpedientAggregation extends HistoricAggregation{
 		this.numDocsPendentsNotificar = numDocsPendentsNotificar;
 		this.numDocsNotificats = numDocsNotificats;
 	}
+	
+	public HistoricExpedientAggregation(Date data) {
+		super(data);
+		this.numExpedientsAmbAlertes = 0L;
+		this.numExpedientsAmbErrorsValidacio = 0L;
+		this.numDocsPendentsSignar = 0L;
+		this.numDocsSignats = 0L;
+		this.numDocsPendentsNotificar = 0L;
+		this.numDocsNotificats = 0L;
+	}
 }
