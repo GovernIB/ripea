@@ -16,10 +16,11 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.war.historic.DAOHistoric.RootEntitat;
-import es.caib.ripea.war.historic.DAOHistoric.RootInteressats;
-import es.caib.ripea.war.historic.DAOHistoric.RootOrganGestors;
-import es.caib.ripea.war.historic.DAOHistoric.RootUsuaris;
+import es.caib.ripea.war.historic.serializers.DAOHistoric;
+import es.caib.ripea.war.historic.serializers.HistoricEntitatSerializer.RootEntitat;
+import es.caib.ripea.war.historic.serializers.HistoricInteressatSerializer.RootInteressats;
+import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RootOrganGestors;
+import es.caib.ripea.war.historic.serializers.HistoricUsuariSerializer.RootUsuaris;
 
 public class ExportacioJSONHistoric {
 	

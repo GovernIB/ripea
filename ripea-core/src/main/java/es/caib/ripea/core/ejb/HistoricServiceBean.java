@@ -29,7 +29,7 @@ public class HistoricServiceBean implements HistoricService {
 	private HistoricService historicService;
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_API_HIST"})
 	public void generateOldHistorics() {
 		historicService.generateOldHistorics();
 	}
@@ -44,13 +44,13 @@ public class HistoricServiceBean implements HistoricService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre) {
 		return historicService.getDadesEntitat(entitatId, filtre);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(
 			HistoricFiltreDto filtre) {
 		return historicService.getDadesOrgansGestors(filtre);
@@ -65,37 +65,37 @@ public class HistoricServiceBean implements HistoricService {
 
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre) {
 		return historicService.getDadesUsuari(usuariCodi, filtre);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre) {
 		return historicService.getDadesInteressat(interessatDocNum, filtre);
 	}
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre) {
 		return historicService.getDadesActualsEntitat(entitatId, filtre);
 	}
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre) {
 		return historicService.getDadesActualsOrgansGestors(filtre);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, HistoricFiltreDto filtre) {
 		return historicService.getDadesActualsUsuari(codiUsuari, filtre);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_API_HIST"})
 	public List<HistoricInteressatDto> getDadesActualsInteressat(String codiUsuari, HistoricFiltreDto filtre) {
 		return historicService.getDadesActualsInteressat(codiUsuari, filtre);
 	}

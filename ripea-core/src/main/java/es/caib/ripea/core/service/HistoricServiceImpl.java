@@ -44,7 +44,6 @@ import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
-import es.caib.ripea.core.task.HistoricTask;
 
 @Service
 public class HistoricServiceImpl implements HistoricService {
@@ -71,7 +70,7 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Override
 	public void generateOldHistorics() {
-		historicHelper.generateOldDailyHistorics(30*6);
+		historicHelper.generateOldDailyHistorics(30*8);
 		historicHelper.generateOldMontlyHistorics(12*3);
 	}
 	
@@ -131,15 +130,18 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		
 		// Format data
+		List<Date> dates = filtre.getQueriedDates();
+		Collections.reverse(dates);
+		
+		int i = 0;
 		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> results = new HashMap<>();
-		for (HistoricExpedientDto historic : data.get(data.keySet().toArray()[0])) {
-			results.put(historic.getData(), new HashMap<OrganGestorDto, HistoricExpedientDto>());
-		}
-			
-		for (OrganGestorDto organ: data.keySet()) {
-			for (HistoricExpedientDto historic : data.get(organ)) {
-				results.get(historic.getData()).put(organ, historic);
+		for (Date date : dates) {
+			Map<OrganGestorDto, HistoricExpedientDto> mapDate = new HashMap<>();
+			for (OrganGestorDto organ: data.keySet()) {
+				mapDate.put(organ, data.get(organ).get(i));
 			}
+			i++;
+			results.put(date, mapDate);
 		}
 		return results;
 	}
@@ -204,6 +206,9 @@ public class HistoricServiceImpl implements HistoricService {
 				filtre.getDataInici(),
 				filtre.getDataFi());
 		historics = fillEmptyData(filtre, historics, HistoricUsuariAggregation.class);
+		for (HistoricUsuariAggregation h: historics) {
+			h.setUsuari(usuari);
+		}
 		return conversioTipusHelper.convertirList(historics, HistoricUsuariDto.class);
 	}
 
@@ -246,7 +251,9 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 			boolean selectedByOrgan = !fiteringByOrganGestors || (historic.getOrganGestor() != null &&
 					filtre.getOrganGestorsIds().contains(historic.getOrganGestor().getId()));
-			if (selectedByMetaExp && selectedByOrgan && metaExpedient.getEntitat().equals(entitat)) {
+			boolean selectedByExpedientComu = filtre.getIncorporarExpedientsComuns() && 
+					historic.getOrganGestor() == null;
+			if (selectedByMetaExp && (selectedByOrgan || selectedByExpedientComu) && metaExpedient.getEntitat().equals(entitat)) {
 				resultat.add(historic);
 			}
 		}

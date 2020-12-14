@@ -1,5 +1,6 @@
 package es.caib.ripea.war.controller;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.war.command.HistoricFiltreCommand;
@@ -129,41 +131,8 @@ public class HistoricController extends BaseAdminController {
 				historicFiltreCommand.asDto());
 		return response;
 	}
-
-	@RequestMapping(value = "/organgestors", method = RequestMethod.POST)
-	@ResponseBody
-//	public Map<HistoricMetriquesEnumDto, Map<String, Map<Date, Long>>> getOrgansGestorsMetrics(
-	public Map<Date, Map<String, HistoricExpedientDto>> getOrgansGestorsMetrics(
-			HttpServletRequest request,
-			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) {
-		getEntitatActualComprovantPermisAdminEntitat(request);
-
-		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-
-		// registram les mètriques consultades a la sessió
-//		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_METRIQUES, metrics);
-
-		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(
-				historicFiltreCommand.asDto());
-		if (dades == null) {
-			return new HashMap<>();
-		}
-
-		// Substituim els objectes organGestorsDto pel nom de l'organ
-		Map<Date, Map<String, HistoricExpedientDto>> response = new HashMap<>();
-		for (Date data : dades.keySet()) {
-			Map<String, HistoricExpedientDto> mapOrgansGestors = new HashMap<>();
-			for (OrganGestorDto organGestor : dades.get(data).keySet()) {
-				HistoricExpedientDto historic = dades.get(data).get(organGestor);
-				mapOrgansGestors.put(organGestor.getNom(),  historic);
-			}
-			response.put(data, mapOrgansGestors);
-		}
-
-		return response;
-	}
 	
-	@RequestMapping(value = "/organgestors/grouped", method = RequestMethod.POST)
+	@RequestMapping(value = "/organgestors", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
 			HttpServletRequest request,
@@ -186,34 +155,22 @@ public class HistoricController extends BaseAdminController {
 
 		return response;
 	}
-
-
 	
 	@RequestMapping(value = "/organgestors/actual", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<HistoricMetriquesEnumDto, Map<String, Long>> getDadesActualsOrgansGestors(
-			HttpServletRequest request,
-			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) {
+	public Map<String, HistoricExpedientDto> getDadesActualsOrgansGestors(
+			HttpServletRequest request) {
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-
-		// registram les mètriques consultades a la sessió
-//		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_METRIQUES, metrics);
 
 		Map<OrganGestorDto, HistoricExpedientDto> dades = historicService.getDadesActualsOrgansGestors(
 				historicFiltreCommand.asDto());
-
-		Map<HistoricMetriquesEnumDto, Map<String, Long>> response = new HashMap<>();
+		Map<String, HistoricExpedientDto> response = new HashMap<>();
 		if (dades == null) {
 			return response;
 		}
-		for (HistoricMetriquesEnumDto metric : metrics) {
-			Map<String, Long> mapOrgansGestors = new HashMap<>();
-			for (Entry<OrganGestorDto, HistoricExpedientDto> entry : dades.entrySet()) {
-				mapOrgansGestors.put(entry.getKey().getNom(), metric.getValue(entry.getValue()));
-			}
-			response.put(metric, mapOrgansGestors);
+		for (OrganGestorDto organ : dades.keySet()) {
+			response.put(organ.getNom(), dades.get(organ));
 		}
-
 		return response;
 	}
 
@@ -296,7 +253,9 @@ public class HistoricController extends BaseAdminController {
 			HttpServletResponse response,
 			@RequestParam String format) throws Exception {
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-
+		if (historicFiltreCommand.getTipusAgrupament() == null) {
+			historicFiltreCommand.setTipusAgrupament(HistoricTipusEnumDto.DIARI);
+		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		FitxerDto fitxer = null;
 		if (historicFiltreCommand.showingDadesEntitat()) {

@@ -11,27 +11,27 @@ import lombok.Data;
 
 @Data
 public class HistoricDto implements Comparable<HistoricDto> {
-	
+
 	@JsonIgnore
 	protected Long entitat;
 
 	@JsonIgnore
 	protected MetaExpedientDto metaExpedient;
-	
+
 	@JsonIgnore
 	protected HistoricTipusEnumDto tipus;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
 	protected Date data;
 
 	protected Long numExpedientsCreats;
-	
+
 	protected Long numExpedientsCreatsTotal;
 //	protected Long numExpedientsOberts;
 //	protected Long numExpedientsObertsTotal;
-	
+
 	protected Long numExpedientsTancats;
-	
+
 	protected Long numExpedientsTancatsTotal;
 
 	public HistoricDto(HistoricTipusEnumDto tipus, Date data) {
@@ -39,7 +39,7 @@ public class HistoricDto implements Comparable<HistoricDto> {
 		this.tipus = tipus;
 		this.data = data;
 	}
-	
+
 	public HistoricDto() {
 		super();
 		this.numExpedientsCreats = 0L;
@@ -49,7 +49,7 @@ public class HistoricDto implements Comparable<HistoricDto> {
 		this.numExpedientsTancats = 0L;
 		this.numExpedientsTancatsTotal = 0L;
 	}
-	
+
 	public void combinarAmb(HistoricDto historic) {
 		this.numExpedientsCreats += historic.getNumExpedientsCreats();
 		this.numExpedientsCreatsTotal += historic.getNumExpedientsCreatsTotal();
@@ -61,9 +61,22 @@ public class HistoricDto implements Comparable<HistoricDto> {
 	public int compareTo(HistoricDto o) {
 		return this.data.compareTo(o.getData());
 	}
-	
+
 	@JsonProperty("metaExpedient")
 	public String getMetaExpedientText() {
-	    return this.metaExpedient.getCodi() + " - " + this.metaExpedient.getNom();
+		if (this.metaExpedient == null) {
+			return "";
+		}
+		return this.metaExpedient.getCodi() + " - " + this.metaExpedient.getNom();
 	}
+
+	@JsonProperty("organ_gestor")
+	public String getOrganGestor() {
+		if (this.metaExpedient == null || this.metaExpedient.getOrganGestor() == null) {
+			return "";
+		}
+		return this.metaExpedient.getOrganGestor().getCodi() + " - " + 
+					this.metaExpedient.getOrganGestor().getNom();
+	}
+
 }

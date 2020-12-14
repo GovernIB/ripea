@@ -49,7 +49,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre);
 
 	/**
@@ -59,7 +59,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(HistoricFiltreDto filtre);
 
 	/**
@@ -80,7 +80,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre);
 
 	/**
@@ -92,7 +92,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre);
 
 	/**
@@ -104,7 +104,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre);
 
 	/**
@@ -114,7 +114,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre);
 
 	/**
@@ -125,7 +125,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, HistoricFiltreDto filtre);
 
 	/**
@@ -136,7 +136,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
 	List<HistoricInteressatDto> getDadesActualsInteressat(String interessatDocNum, HistoricFiltreDto filtre);
 
 }

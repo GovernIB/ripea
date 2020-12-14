@@ -37,7 +37,7 @@ public class HistoricFiltreCommand {
 		
 	public HistoricFiltreCommand() {
 		DateTime dateStartToday = (new LocalDate()).toDateTimeAtStartOfDay();
-		this.dataFi = dateStartToday.toDate();
+		this.dataFi = dateStartToday.minusDays(1).toDate();
 		this.dataInici = dateStartToday.minusDays(30).toDate();
 		this.organGestorsIds = new ArrayList<Long>();
 		this.metaExpedientsIds = new ArrayList<Long>();
