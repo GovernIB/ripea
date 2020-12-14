@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -35,6 +34,7 @@ import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
@@ -292,34 +292,61 @@ public class CacheHelper {
 		return pluginHelper.dadesExternesTipusViaAll();
 	}
 
-	@Cacheable(value = "connexioDomini", key="#entitatCodi")
-	public DataSource createDominiConnexio(
-			String entitatCodi,
-			Properties conProps) {
-		DataSource dataSource = null;
-		try {
-			dataSource = new DriverManagerDataSource(
-					conProps.getProperty("url"),
-					conProps);
-		} catch (Exception e) {
-			throw new DominiException(
-					"No s'ha pogut crear el datasource " + e.getMessage(),
-					e.getCause());
-		}
-		return dataSource;
-	}
-	@CacheEvict(value = "connexioDomini", allEntries=true)
-	public void evictCreateDominiConnexio() {
-	}
-
-	@Cacheable(value = "resultatConsultaDominis", key="#consulta")
-	public List<ResultatDominiDto> findDominisByConsutla(
+	@Cacheable(value = "resultatConsultaDominis", key="#consulta.concat(#filtre).concat(#iniciCerca).concat(#finalCerca)")
+	public ResultatDominiDto findDominisByConsutla(
 			JdbcTemplate jdbcTemplate,
-			String consulta) {
-		List<ResultatDominiDto> resultat = new ArrayList<ResultatDominiDto>();
+			String consulta,
+			String filtre,
+			int iniciCerca,
+			int finalCerca) {
+		ResultatDominiDto resultat = new ResultatDominiDto();
 		try {
-			if (jdbcTemplate != null)
-				resultat = jdbcTemplate.query(consulta, new DominiRowMapperHelper());
+			if (jdbcTemplate.getDataSource().getConnection() == null)
+				throw new DominiException("La hi ha cap connexió establerta amb el domini configurat.");
+			if (jdbcTemplate.getDataSource().getConnection().isClosed())
+				throw new DominiException("La connexió amb el domini està tancada.");
+
+   			boolean isMySql = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName().toLowerCase().contains("mysql");
+			jdbcTemplate.setMaxRows(finalCerca);
+			boolean compatible = true;
+			
+//   		### SI ÉS UNA BBDD MYSQL I HI HA FILTRE
+   			if (isMySql && !filtre.isEmpty()) {
+   				jdbcTemplate.setMaxRows(0);
+   				consulta = "SELECT * FROM (" + consulta + ") RESULT WHERE RESULT.VALOR LIKE '%"+ filtre + "%'";
+   			}
+   			
+//			### NOMÉS PAGINACIÓ SENSE FILTRE
+   			if (isMySql && filtre.isEmpty()) {
+   				consulta += " LIMIT " + iniciCerca + "," + finalCerca;
+   			}
+   			
+//   		### SI ÉS UNA BBDD ORACLE I HI HA FILTRE
+   			if (!isMySql && !filtre.isEmpty()) {
+   				jdbcTemplate.setMaxRows(0);
+   				consulta = "SELECT * FROM (" + consulta + ") WHERE VALOR LIKE '%"+ filtre + "%'";
+   			}
+   			
+   			if (!isMySql && filtre.isEmpty()) {
+//   			### ORACLE > 12C OR ORACLE < 12C
+   				if (isOracleVersionGtOrEq12c(jdbcTemplate)) {
+					consulta += " OFFSET " + iniciCerca + " ROWS FETCH NEXT " + finalCerca + " ROWS ONLY";
+				} else if (!isOracleVersionGtOrEq12c(jdbcTemplate)) {
+					StringBuilder consultaBuilder = new StringBuilder(consulta);
+					consultaBuilder.insert(consulta.toLowerCase().indexOf("valor") + 5, ", ROWNUM AS RW ");
+					consulta = "SELECT * FROM (" + consultaBuilder + ") WHERE RW  >= " + iniciCerca + " AND RW <= " + finalCerca;
+				}
+   			}
+   			
+   			if (!compatible)
+   				throw new DominiException("La versió actual de la BBDD no és compatible amb la cerca de dominis. Consulti el seu administrador.");
+   			
+			if (jdbcTemplate != null) {
+				List<ResultatConsultaDto> resultatConsulta = jdbcTemplate.query(consulta, new DominiRowMapperHelper());
+				
+				resultat.setTotalElements(resultatConsulta.size());
+				resultat.setResultat(resultatConsulta);
+			}
 		} catch (Exception e) {
 			throw new DominiException(
 					"No s'ha pogut recuperar el resultat de consulta: " + e.getMessage(),
@@ -327,6 +354,48 @@ public class CacheHelper {
 		}
 		return resultat;
 	}
+	
+	@Cacheable(value = "resultatConsultaDominis", key="#consulta.concat(#dadaValor)")
+	public ResultatConsultaDto getValueSelectedDomini(
+			JdbcTemplate jdbcTemplate,
+			String consulta,
+			String dadaValor) {
+		List<ResultatConsultaDto> resultat = new ArrayList<ResultatConsultaDto>();
+		try {
+			if (jdbcTemplate.getDataSource().getConnection() == null)
+				throw new DominiException("La hi ha cap connexió establerta amb el domini configurat.");
+			if (jdbcTemplate.getDataSource().getConnection().isClosed())
+				throw new DominiException("La connexió amb el domini està tancada.");
+
+   			boolean isMySql = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName().toLowerCase().contains("mysql");
+			boolean compatible = true;
+			
+//   		### SI ÉS UNA BBDD MYSQL I HI HA FILTRE
+   			if (isMySql && !dadaValor.isEmpty()) {
+   				jdbcTemplate.setMaxRows(0);
+   				consulta = "SELECT * FROM (" + consulta + ") RESULT WHERE RESULT.ID = '"+ dadaValor + "'";
+   			}
+   			
+//   		### SI ÉS UNA BBDD ORACLE I HI HA FILTRE
+   			if (!isMySql && !dadaValor.isEmpty()) {
+   				jdbcTemplate.setMaxRows(0);
+   				consulta = "SELECT * FROM (" + consulta + ") WHERE ID = '"+ dadaValor + "'";
+   			}
+   			
+   			if (!compatible)
+   				throw new DominiException("La versió actual de la BBDD no és compatible amb la cerca de dominis. Consulti el seu administrador.");
+   			
+			if (jdbcTemplate != null) {
+				resultat = jdbcTemplate.query(consulta, new DominiRowMapperHelper());
+			}
+		} catch (Exception e) {
+			throw new DominiException(
+					"No s'ha pogut recuperar el resultat de consulta: " + e.getMessage(),
+					e.getCause());
+		}
+		return resultat.get(0);
+	}
+	
 	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
 	public void evictFindDominisByConsutla() {
 	}
@@ -455,6 +524,24 @@ public class CacheHelper {
 						metaDocument,
 						MetaDocumentDto.class),
 				MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
+	}
+	
+	private boolean isOracleVersionGtOrEq12c(JdbcTemplate jdbcTemplate) throws SQLException {
+		DatabaseMetaData databaseMetaData = jdbcTemplate.getDataSource().getConnection().getMetaData();
+		int versionMajor = databaseMetaData.getDatabaseMajorVersion();
+		int versionMinnor = databaseMetaData.getDatabaseMinorVersion();
+		
+		if (versionMajor < 12) {
+			return false;
+		} else if (versionMajor == 12) {
+			if (versionMinnor >= 1) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);

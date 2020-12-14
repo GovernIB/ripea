@@ -6,7 +6,6 @@ package es.caib.ripea.war.controller;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -18,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,12 +25,13 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.service.DominiService;
@@ -249,20 +247,50 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getDomini(
+	public ResultatDominiDto getDomini(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
-			@PathVariable String dominiCodi){
+			@PathVariable String dominiCodi,
+			@RequestParam(value="filter", required = false) String filter,
+			@RequestParam(value="pageSize", required = false) int pageSize,
+			@RequestParam(value="page", required = false) int page){
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
+		ResultatDominiDto resultatDomini = null;
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
-		List<ResultatDominiDto> resultatConsulta = new ArrayList<ResultatDominiDto>();
 		try {
-			resultatConsulta = dominiService.getResultDomini(
-					entitatActual.getId(),
-					domini);
+			resultatDomini = dominiService.getResultDomini(
+						entitatActual.getId(),
+						domini,
+						filter,
+						page,
+						pageSize);
 		} catch (DominiException e) {
-			return new ResponseEntity<Error>(new Error(e.getMessage()),HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
+		}
+		
+		return resultatDomini;
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}/{dadaValor}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResultatConsultaDto getDomini(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable String dominiCodi,
+			@PathVariable String dadaValor){
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
+//		String resultJson = null;
+		ResultatConsultaDto resultatConsulta = null;
+		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
+		try {
+			resultatConsulta = dominiService.getSelectedDomini(
+						entitatActual.getId(),
+						domini,
+						dadaValor);
+		} catch (DominiException e) {
+			e.printStackTrace();
 		}
 		
 		return resultatConsulta;

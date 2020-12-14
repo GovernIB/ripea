@@ -18,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -26,6 +27,7 @@ import org.xml.sax.SAXException;
 
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.exception.CipherException;
+import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
 /**
@@ -111,6 +113,22 @@ public class DominiHelper {
 					e.getCause());
 		} 
 		return new String(desxifrat);
+	}
+	
+	public DataSource createDominiConnexio(
+			String entitatCodi,
+			Properties conProps) {
+		DataSource dataSource = null;
+		try {
+			dataSource = new DriverManagerDataSource(
+					conProps.getProperty("url"),
+					conProps);
+		} catch (Exception e) {
+			throw new DominiException(
+					"No s'ha pogut crear el datasource " + e.getMessage(),
+					e.getCause());
+		}
+		return dataSource;
 	}
 
 }

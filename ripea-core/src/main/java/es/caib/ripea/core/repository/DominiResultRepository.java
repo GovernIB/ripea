@@ -5,7 +5,7 @@ package es.caib.ripea.core.repository;
 
 import javax.sql.DataSource;
 
-import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 
 
 /**
@@ -16,5 +16,5 @@ import es.caib.ripea.core.api.dto.ResultatDominiDto;
  */
 public interface DominiResultRepository {
 	void setDataSource(DataSource dataSource,String consulta);
-	ResultatDominiDto findDominisByConsutla();
+	ResultatConsultaDto findDominisByConsutla();
 }

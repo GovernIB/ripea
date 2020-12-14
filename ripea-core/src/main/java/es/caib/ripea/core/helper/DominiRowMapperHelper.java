@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 
 /**
  * Mapeig del resultat d'una consulta a ResultatDominiDto
@@ -17,13 +17,13 @@ import es.caib.ripea.core.api.dto.ResultatDominiDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
-public class DominiRowMapperHelper implements RowMapper<ResultatDominiDto> {
+public class DominiRowMapperHelper implements RowMapper<ResultatConsultaDto> {
 
 	@Override
-	public ResultatDominiDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-		ResultatDominiDto resultat = new ResultatDominiDto();
+	public ResultatConsultaDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+		ResultatConsultaDto resultat = new ResultatConsultaDto();
 		resultat.setId(rs.getString("id"));
-		resultat.setValor(rs.getString("valor"));
+		resultat.setText(rs.getString("valor"));
 		return resultat;
 	}
 }

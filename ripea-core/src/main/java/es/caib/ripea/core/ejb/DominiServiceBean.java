@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DominiService;
@@ -91,8 +92,16 @@ public class DominiServiceBean implements DominiService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ResultatDominiDto> getResultDomini(Long entitatId, DominiDto domini) throws NotFoundException {
-		return delegate.getResultDomini(entitatId, domini);
+	public ResultatDominiDto getResultDomini(Long entitatId, DominiDto domini, String filter, int page, int resultCount)
+			throws NotFoundException {
+		return delegate.getResultDomini(entitatId, domini, filter, page, resultCount);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ResultatConsultaDto getSelectedDomini(Long entitatId, DominiDto domini, String dadaValor)
+			throws NotFoundException {
+		return delegate.getSelectedDomini(entitatId, domini, dadaValor);
 	}
 
 	@Override

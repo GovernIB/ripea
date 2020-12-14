@@ -11,6 +11,7 @@ import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
@@ -133,17 +134,43 @@ public interface DominiService {
 	 * Recupera el resultat de una consulta d'un domini.
 	 * 
 	 * @param entitatId
-	 *            Id de l'entitat.
+	 *            	Id de l'entitat.
 	 * @param domini 
 	 * 				Informació del domini.
+	 * @param currentLength
+	 * 				Longitud actual de la consulta de dominis
+	 * @param currentLength 
 	 * @return Resultat de la consulta.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<ResultatDominiDto> getResultDomini(
+	public ResultatDominiDto getResultDomini(
 			Long entitatId,
-			DominiDto domini) throws NotFoundException;
+			DominiDto domini,
+			String filter,
+			int page,
+			int resultCount) throws NotFoundException;
+	
+	/**
+	 * Recupera el resultat de una consulta d'un domini.
+	 * 
+	 * @param entitatId
+	 *            	Id de l'entitat.
+	 * @param domini 
+	 * 				Informació del domini.
+	 * @param currentLength
+	 * 				Longitud actual de la consulta de dominis
+	 * @param currentLength 
+	 * @return Resultat de la consulta.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ResultatConsultaDto getSelectedDomini(
+			Long entitatId,
+			DominiDto domini,
+			String dadaValor) throws NotFoundException;
 	
 	/**
 	 * Recupera el resultat de una consulta d'un domini.
