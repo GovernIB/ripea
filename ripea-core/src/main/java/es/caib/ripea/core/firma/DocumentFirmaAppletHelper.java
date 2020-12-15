@@ -50,7 +50,14 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 
 		// Registra al log la firma del document
 		logAll(document, LogTipusEnumDto.FIRMA_CLIENT, null, null);
-
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.DOC_FIRMAT,
+				null,
+				null,
+				false,
+				false);
+		
 		// Custodia el document firmat
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(arxiuNom);

@@ -290,6 +290,13 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 			document.updateEstat(
 					DocumentEstatEnumDto.FIRMAT);
+			contingutLogHelper.log(
+					document,
+					LogTipusEnumDto.DOC_FIRMAT,
+					null,
+					null,
+					false,
+					false);
 			PortafirmesDocument portafirmesDocument = null;
 			// Descarrega el document firmat del portafirmes
 			try {
