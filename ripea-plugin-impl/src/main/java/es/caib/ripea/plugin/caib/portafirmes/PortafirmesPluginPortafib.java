@@ -510,9 +510,6 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				}
 				return asyncBlockToPortafirmesBlockInfo(blocks);
 			} else {
-				FirmaAsyncSimpleSignatureRequestInfo info = new FirmaAsyncSimpleSignatureRequestInfo(portafirmesId, "ca");
-				getFirmaAsyncSimpleApi().getSignatureRequestState(info);
-//				getFluxDeFirmaClient().getFlowTemplateResult(portafirmesId);
 				PeticioDeFirmaWs peticioFirmaSimple = getPeticioDeFirmaWs().getPeticioDeFirma(portafirmesId);
 				FluxDeFirmesWs fluxFirma = peticioFirmaSimple.getFluxDeFirmes();
 				List<BlocDeFirmesWs> blocs = fluxFirma.getBlocsDeFirmes();
