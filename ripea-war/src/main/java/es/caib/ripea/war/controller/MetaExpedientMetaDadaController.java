@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
@@ -133,6 +134,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		MetaDadaCommand command = null;
 		if (metaDada != null) {
 			command = MetaDadaCommand.asCommand(metaDada);
+			if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI))
+				model.addAttribute("selectedMetaDada", metaDada.getCodi());
 		} else {
 			command = new MetaDadaCommand();
 		}

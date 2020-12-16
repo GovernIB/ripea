@@ -532,6 +532,9 @@ public class ExpedientHelper {
 				case TEXT:
 					valor = (String) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
 					break;
+				case DOMINI:
+					valor = (String) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
+					break;
 				default:
 					valor = (String) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
 					break;
