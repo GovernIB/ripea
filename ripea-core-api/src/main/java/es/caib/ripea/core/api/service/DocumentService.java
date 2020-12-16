@@ -412,13 +412,14 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param documentId
 	 *            Atribut id del document que es vol custodiar.
+	 * @return TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void portafirmesReintentar(
+	public Exception portafirmesReintentar(
 			Long entitatId,
 			Long documentId) throws NotFoundException, SistemaExternException;
 

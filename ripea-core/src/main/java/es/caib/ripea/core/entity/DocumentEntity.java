@@ -102,6 +102,12 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "descripcio", length = 512)
 	protected String descripcio;
 
+	
+	@Column(name = "ges_doc_firmat_id", length = 256)
+	private String gesDocFirmatId;
+	@Column(name = "nom_fitxer_firmat", length = 512)
+	private String nomFitxerFirmat;
+	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	protected Set<DocumentEnviamentEntity> enviaments;
 	@OneToMany(
@@ -132,6 +138,7 @@ public class DocumentEntity extends NodeEntity {
 				DocumentEstatEnumDto.CUSTODIAT.equals(estat);
 	}
 
+	
 	public void update(
 			MetaDocumentEntity metaDocument,
 			String nom,

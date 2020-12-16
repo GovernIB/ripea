@@ -104,6 +104,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			if (fContent.exists()) {
 				FileInputStream contingutIn = new FileInputStream(fContent);
 				IOUtils.copy(contingutIn, contingutOut);
+				contingutIn.close();
 			} else {
 				throw new SistemaExternException(
 						"No s'ha trobat l'arxiu (id=" + id + ")");

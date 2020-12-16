@@ -175,10 +175,10 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void portafirmesReintentar(
+	public Exception portafirmesReintentar(
 			Long entitatId,
 			Long id) {
-		delegate.portafirmesReintentar(
+		return delegate.portafirmesReintentar(
 				entitatId,
 				id);
 	}

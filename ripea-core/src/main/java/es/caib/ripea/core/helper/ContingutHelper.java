@@ -312,6 +312,7 @@ public class ContingutHelper {
 			dto.setEstatDarreraNotificacio(document.getEstatDarreraNotificacio());
 			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
 			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
+			dto.setGesDocFirmatId(document.getGesDocFirmatId());
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);

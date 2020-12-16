@@ -225,10 +225,18 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@PathVariable Long documentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentService.portafirmesReintentar(
+		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
 				documentId);
-		return "redirect:./info";
+		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
+		if (exc != null || doc.getGesDocFirmatId() != null) {
+			return "redirect:./info";
+		} else {
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"firma.info.processat.ok");
+		}
 	}
 
 	@RequestMapping(value = "/{documentId}/portafirmes/cancel", method = RequestMethod.GET)
@@ -265,6 +273,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			model.addAttribute(
 					"blocks", 
 					documentPortafirmesBlocks);
+			model.addAttribute(
+					"document", 
+					documentService.findById(entitatActual.getId(), documentId));
+			
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
 					request,

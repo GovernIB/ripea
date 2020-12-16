@@ -160,6 +160,7 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS = "docsFirmats";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;

@@ -536,7 +536,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional
 	@Override
-	public void portafirmesReintentar(
+	public Exception portafirmesReintentar(
 			Long entitatId,
 			Long id) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
@@ -549,7 +549,7 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false);
-		firmaPortafirmesHelper.portafirmesReintentar(
+		return firmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
 

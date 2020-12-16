@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,6 +41,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -356,7 +358,7 @@ public class DocumentHelper {
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
+			if (pluginHelper.isArxiuPluginActiu() && document.getEstat() != DocumentEstatEnumDto.FIRMAT) {
 				fitxer = new FitxerDto();
 				fitxer.setContentType(document.getFitxerContentType());
 				fitxer.setNom(document.getFitxerNom());
@@ -374,9 +376,22 @@ public class DocumentHelper {
 			}
 		} else {
 			fitxer = new FitxerDto();
-			fitxer.setNom(document.getFitxerNom());
-			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(document.getFitxerContingut());
+			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
+				
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						document.getGesDocFirmatId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS,
+						streamAnnex);
+				fitxer.setContingut(streamAnnex.toByteArray());
+				fitxer.setNom(document.getNomFitxerFirmat());
+				fitxer.setContentType(document.getFitxerContentType());
+			} else {
+				fitxer.setNom(document.getFitxerNom());
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setContingut(document.getFitxerContingut());
+			}
+			
 		}
 //		if (versio == null && DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
 //			fitxer.setNom(
