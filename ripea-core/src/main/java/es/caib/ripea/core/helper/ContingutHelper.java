@@ -77,7 +77,6 @@ import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
@@ -107,8 +106,6 @@ public class ContingutHelper {
 	private ContingutMovimentRepository contenidorMovimentRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-	@Autowired
-	private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired

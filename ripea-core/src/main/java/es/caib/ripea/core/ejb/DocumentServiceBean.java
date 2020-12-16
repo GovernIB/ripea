@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
