@@ -127,7 +127,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 
 		boolean isEntitatUserAdminOrOrgan;
-		if (entitatActual.isUsuariActualAdministration() && entitatActual.isUsuariActualTeOrgans()) {
+		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
 			isEntitatUserAdminOrOrgan = true;
 		} else {
 			isEntitatUserAdminOrOrgan = false;
