@@ -31,5 +31,15 @@ public class HistoricAggregation {
 		this.numExpedientsTancats = numExpedientsTancats;
 		this.numExpedientsTancatsTotal = numExpedientsTancatsTotal;
 	}
+	
+	public HistoricAggregation(Date data) {
+		this.data = data;
+		this.numExpedientsCreats = 0L;
+		this.numExpedientsCreatsTotal = 0L;
+		this.numExpedientsOberts = 0L;
+		this.numExpedientsObertsTotal = 0L;
+		this.numExpedientsTancats = 0L;
+		this.numExpedientsTancatsTotal = 0L;
+	}
 
 }

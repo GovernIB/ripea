@@ -269,12 +269,16 @@ body {
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
+										<%---- Integracions ----%>
 										<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
+										<%---- Excepcions ----%>
 										<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 									</ul>
 								</div>
 							</c:when>
 							<c:when test="${isRolActualAdministrador}">
+								<%---- Expedients ----%>
+								<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>								
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
@@ -308,9 +312,12 @@ body {
 								</div>
 							</c:when>
 							<c:when test="${isRolActualAdministradorOrgan}">
+								<%---- Expedients ----%>
+								<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>									
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
+										 <%---- Tipus d'expedients ----%>
 										<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
 									</ul>
 								</div>
@@ -344,6 +351,7 @@ body {
 										</c:if>
 										<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 										<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
+										<li><a href="<c:url value="/massiu/custodiar"/>"><spring:message code="massiu.custodiar"/></a></li>
 									</ul>
 								</div>
 

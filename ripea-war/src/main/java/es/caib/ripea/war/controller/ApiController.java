@@ -16,6 +16,13 @@ public class ApiController extends BaseController {
 
 	@Autowired
 	private DocumentService documentService;
+
+
+	@RequestMapping(value = {"/apidoc", "/rest"}, method = RequestMethod.GET)
+	public String documentacio(HttpServletRequest request) {
+		return "apidoc";
+	}
+	
 	
 	@RequestMapping(value = "/viaFirmaResponse" , method = RequestMethod.GET)
 	public void get(HttpServletRequest request, HttpServletResponse response) {

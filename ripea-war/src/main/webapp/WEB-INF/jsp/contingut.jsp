@@ -464,6 +464,7 @@ var publicacioEstatText = new Array();
 publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/>";
 </c:forEach>
 
+let pageSizeDominis = 20;
 $(document).ready(function() {
 	removeLoading();
 	$("a.fileDownload").on("click", function() {
@@ -1035,7 +1036,7 @@ $(document).ready(function() {
 			$('table tbody', td).append(tableBody);
 			$('table tbody td').webutilModalEval();
 		});
-	});	
+	});
 });
 
 function getEnviamentsDocument(document) {
@@ -1177,37 +1178,63 @@ function recuperarResultatDomini(
 		metaExpedientId,
 		metaDadaCodi,
 		dadaValor) {
+	var dadaValorUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '/"/>' + dadaValor;
 	var multipleUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '"/>';
-	$.ajax({
-		type: 'GET',
-		url: multipleUrl, 
-		success: function(data) {
-			var selDomini = $("#" + metaDadaCodi);
-			selDomini.empty();
-			selDomini.append("<option value=\"\"></option>");
-			if (data) {
-				var existeix = false;
-				var items = [];
-					$.each(data, function(i, val) {
-					if (dadaValor == val.id) {
-						existeix = true;
- 						selDomini.append("<option value=\"" + val.id + "\" selected>" + val.valor + "</option>");
-					} else {
-						selDomini.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
-					}
-					});
-					if (dadaValor != null && dadaValor != '' && !existeix) {
-						alert("El domini de les metadades s'ha canviat. Revisa les dades de l'expedient.")
-					}
+	var selDomini = $("#" + metaDadaCodi);
+	
+
+	if (dadaValor != '') {
+		$.ajax({
+	        type: "GET",
+	        url: dadaValorUrl,
+	        success: function (resultat) {
+	        	var newOption = new Option(resultat.text, resultat.id, false, false);
+	        	selDomini.append(newOption);
+	        	selDomini.val(resultat.id).trigger('change');
 			}
-			var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6", width: '100%', dropdownAutoWidth : true};
-			selDomini.select2(select2Options);
-		},
-		error: function (error) {
-			if (error != null && error.responseJSON != null)
-				alert(error.responseJSON.message);
-		}
-	});
+	    });
+	}
+	
+	selDomini.empty();
+	var select2Options = {
+			language: "${requestLocale}",
+	        theme: 'bootstrap',
+			allowClear: true,
+	        ajax: {
+	            url: multipleUrl,
+	            dataType: 'json',
+	            delay: 250,
+                global: false,
+	            data: function (params) {
+	                params.page = params.page || 1;
+	                return {
+	                	filter: params.term ? params.term : '',
+	                    pageSize: pageSizeDominis,
+	                    page: params.page
+	                };
+	            },
+	            processResults: function (data, params) {
+	                params.page = params.page || 1;
+	                var dominis = [];
+	                for (let i = 0; i < data.resultat.length; i++) {
+	                	dominis.push({
+	                        id: data.resultat[i].id, 
+	                        text: data.resultat[i].text
+	                    })
+	                }
+	                return {
+	                    results: dominis,
+	                    pagination: {
+	                        more: params.term ? (params.page * data.totalElements < data.totalElements) : ((params.page * pageSizeDominis < data.totalElements) || (data.resultat.length > 0))
+	                    }
+	                };
+	            },
+	            cache: true
+	        },
+	        width: '100%',
+	        minimumInputLength: 0
+    };
+	selDomini.select2(select2Options);
 }
 
 function checkLoadingFinished() {
@@ -1837,7 +1864,7 @@ function showLoadingModal(message) {
 																			</c:when>
 																			<c:when test="${metaDada.tipus == 'DOMINI'}">
 																			
-																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="false"/>
+																				<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" cssClass="form-control${multipleClass} dominis" multiple="false"/>
 																				<script type="text/javascript">
 																				recuperarResultatDomini(
 																						"${contingut.metaNode.id}",

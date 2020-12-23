@@ -5,10 +5,12 @@ package es.caib.ripea.core.api.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
@@ -17,6 +19,8 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -273,7 +277,6 @@ public interface DocumentService {
 			Long documentId,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
 			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
@@ -409,13 +412,14 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param documentId
 	 *            Atribut id del document que es vol custodiar.
+	 * @return TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void portafirmesReintentar(
+	public Exception portafirmesReintentar(
 			Long entitatId,
 			Long documentId) throws NotFoundException, SistemaExternException;
 
@@ -606,5 +610,18 @@ public interface DocumentService {
 	List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
 			Long entitatId, 
 			Long documentId);
+
+	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
+
+	public Exception portafirmesReintentar(
+			Long entitatId,
+			Set<Long> ids);
+
+	public List<Long> findDocumentsIdsPerCustodiarMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException;
 
 }

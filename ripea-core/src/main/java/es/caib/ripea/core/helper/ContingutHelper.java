@@ -77,7 +77,6 @@ import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
@@ -107,8 +106,6 @@ public class ContingutHelper {
 	private ContingutMovimentRepository contenidorMovimentRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-	@Autowired
-	private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
@@ -315,6 +312,7 @@ public class ContingutHelper {
 			dto.setEstatDarreraNotificacio(document.getEstatDarreraNotificacio());
 			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
 			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
+			dto.setGesDocFirmatId(document.getGesDocFirmatId());
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);
@@ -551,9 +549,10 @@ public class ContingutHelper {
 			boolean comprovarPermisDelete) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -636,9 +635,10 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -669,7 +669,7 @@ public class ContingutHelper {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);

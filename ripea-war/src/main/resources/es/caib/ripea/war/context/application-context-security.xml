@@ -53,7 +53,8 @@
 						<property name="defaultMappableAttributes">
 							<set>
 								<value>IPA_SUPER</value>
-								<value>IPA_ADMIN</value>
+								<value>IPA_ADMIN</value>								
+								<value>IPA_API_HIST</value>
 								<value>IPA_BSTWS</value>
 								<value>IPA_ORGAN_ADMIN</value>
 								<value>tothom</value>

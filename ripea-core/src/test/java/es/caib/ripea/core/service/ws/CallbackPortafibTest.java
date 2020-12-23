@@ -34,7 +34,7 @@ import es.caib.portafib.ws.callback.api.v1.SigningRequest;
  */
 public class CallbackPortafibTest {
 
-	private static final String ENDPOINT_ADDRESS = "http://localhost:8180/ripea/ws/portafibCallback";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:8080/ripea/ws/portafibCallback";
 	//private static final String USERNAME = "XXX";
 	//private static final String PASSWORD = "XXX";
 
@@ -47,9 +47,9 @@ public class CallbackPortafibTest {
 			//   70 - DOCUMENT_REBUTJAT;
 			//   80 - DOCUMENT_PAUSAT;
 			new CallbackPortafibTest().test(
-					6318393,
-					70,
-					"Prova rebuig");
+					770617,
+					60,
+					null);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

@@ -39,13 +39,25 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
-	
+
+<style type="text/css">
+.disabled {
+	pointer-events: none;
+    opacity: 0.4; 
+}
+</style>
 <script type="text/javascript">
 $(document).ready(function() {
 	$('select#tipus').change(function() {
 		if ($(this).val() == 'DOMINI') {
+			let valor = '${selectedMetaDada}';
+			$('#codi').addClass('disabled');
+			//la implementació actual no permet multiplicitat per camps tipus select
+			$('#multiplicitat').val('M_1');
+			$('#multiplicitat').trigger('change');
+			$('#multiplicitat').nextAll('span:first').addClass('disabled');
+			
 			$('#domini').parent().parent().show();
-			let valor = $('#valorString').val();
 			$('#valorString').parent().parent().hide();
 			$('#valorSencer').parent().parent().hide();
 			$('#valorFlotant').parent().parent().hide();
@@ -87,6 +99,8 @@ $(document).ready(function() {
 			$('#valorBoolea').parent().parent().show();
 			$('#valorString').parent().parent().hide();
 			$('#domini').parent().parent().hide();
+			$('#codi').removeClass('disabled');
+			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
 			
 		} else if ($(this).val() == 'DATA') {
 			$('#valorSencer').parent().parent().hide();
@@ -96,6 +110,8 @@ $(document).ready(function() {
 			$('#valorBoolea').parent().parent().hide();
 			$('#valorString').parent().parent().hide();
 			$('#domini').parent().parent().hide();
+			$('#codi').removeClass('disabled');
+			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
 			
 		} else if ($(this).val() == 'FLOTANT') {
 			$('#valorSencer').parent().parent().hide();
@@ -105,6 +121,8 @@ $(document).ready(function() {
 			$('#valorBoolea').parent().parent().hide();
 			$('#valorString').parent().parent().hide();
 			$('#domini').parent().parent().hide();
+			$('#codi').removeClass('disabled');
+			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
 			
 		} else if ($(this).val() == 'IMPORT') {
 			$('#valorSencer').parent().parent().hide();
@@ -114,6 +132,8 @@ $(document).ready(function() {
 			$('#valorBoolea').parent().parent().hide();
 			$('#valorString').parent().parent().hide();
 			$('#domini').parent().parent().hide();
+			$('#codi').removeClass('disabled');
+			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
 			
 		} else if ($(this).val() == 'SENCER') {
 			$('#valorSencer').parent().parent().show();
@@ -123,6 +143,8 @@ $(document).ready(function() {
 			$('#valorBoolea').parent().parent().hide();
 			$('#valorString').parent().parent().hide();
 			$('#domini').parent().parent().hide();
+			$('#codi').removeClass('disabled');
+			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
 			
 		}  else if ($(this).val() == 'TEXT') {
 			$('#valorSencer').parent().parent().hide();
@@ -132,7 +154,8 @@ $(document).ready(function() {
 			$('#valorBoolea').parent().parent().hide();
 			$('#valorString').parent().parent().show();
 			$('#domini').parent().parent().hide();
-			
+			$('#codi').removeClass('disabled');
+			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
 		}	
 
 
@@ -148,7 +171,7 @@ $(document).ready(function() {
 		var dominiNomSelected = $(this).text();
 		if (dominiCodiSelected != null && dominiCodiSelected != '') {
 			$('#codi').val(dominiCodiSelected);
-			$('#valorString').val(dominiCodiSelected);
+			//$('#valorString').val(dominiCodiSelected);
 		}
 	});
 	$('select#domini').trigger('change');

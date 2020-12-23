@@ -363,7 +363,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		// check permis administracio d'entitat
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
@@ -474,7 +474,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.debug(
 				"Consulta el pròxim número de seqüència (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
 						"any=" + any + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, true);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				id,

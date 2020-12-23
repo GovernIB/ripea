@@ -14,7 +14,6 @@ import es.caib.ripea.core.aggregation.ContingutLogCountAggregation;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
 public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEntity, Long> {

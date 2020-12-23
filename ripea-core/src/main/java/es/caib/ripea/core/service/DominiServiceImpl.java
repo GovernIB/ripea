@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -71,7 +72,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 		DominiEntity entity = DominiEntity.getBuilder(
 				domini.getCodi(),
 				domini.getNom(),
@@ -160,7 +161,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				false,
 				true,
-				false);
+				false, false);
 
 		Page<DominiEntity> page = dominiRepository.findByEntitat(
 				entitat,
@@ -181,7 +182,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 
 		List<DominiEntity> tipusDocumentals = dominiRepository.findByEntitatOrderByNomAsc(entitat);
 
@@ -198,7 +199,7 @@ public class DominiServiceImpl implements DominiService {
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 
 		DominiEntity tipusDocumental = dominiRepository.findByCodiAndEntitat(
 				codi, 
@@ -211,29 +212,67 @@ public class DominiServiceImpl implements DominiService {
 	
 	@Transactional
 	@Override
-	public List<ResultatDominiDto> getResultDomini(
+	public ResultatDominiDto getResultDomini(
 			Long entitatId,
-			DominiDto domini) throws NotFoundException, DominiException {
+			DominiDto domini,
+			String filter,
+			int page,
+			int resultCount) throws NotFoundException, DominiException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
-				false);
+				false, false);
 		if (domini == null) {
-			return new ArrayList<ResultatDominiDto>();
+			return new ResultatDominiDto();
 		}
 		JdbcTemplate jdbcTemplate = null;
 		Properties conProps = dominiHelper.getProperties(domini);
 		
 		if (conProps != null && !conProps.isEmpty()) {
-			DataSource dataSource = cacheHelper.createDominiConnexio(
+			DataSource dataSource = dominiHelper.createDominiConnexio(
 					entitat.getCodi(),
 					conProps);
 			jdbcTemplate = dominiHelper.setDataSource(dataSource);
 		}
+		int start = (((page - 1) * resultCount != 0 && filter.isEmpty()) ? ((page - 1) * resultCount + 1) : (page - 1) * resultCount);
+		int addToEnd = (page - 1) * resultCount;
+		int end = resultCount + addToEnd;
 		return cacheHelper.findDominisByConsutla(
 				jdbcTemplate,
-				domini.getConsulta());
+				domini.getConsulta(),
+				filter,
+				start,
+				end);
+	}
+	
+	public ResultatConsultaDto getSelectedDomini(
+			Long entitatId,
+			DominiDto domini,
+			String dadaValor) throws NotFoundException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				true, 
+				false, 
+				false, 
+				true);
+		if (domini == null) {
+			return new ResultatConsultaDto();
+		}
+		JdbcTemplate jdbcTemplate = null;
+		Properties conProps = dominiHelper.getProperties(domini);
+		
+		if (conProps != null && !conProps.isEmpty()) {
+			DataSource dataSource = dominiHelper.createDominiConnexio(
+					entitat.getCodi(),
+					conProps);
+			jdbcTemplate = dominiHelper.setDataSource(dataSource);
+		}
+		
+		return cacheHelper.getValueSelectedDomini(
+				jdbcTemplate,
+				domini.getConsulta(),
+				dadaValor);
 	}
 	
 	@Override
@@ -242,9 +281,10 @@ public class DominiServiceImpl implements DominiService {
 			MetaExpedientDto metaExpedient) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId, 
-				true, 
 				false, 
-				false);
+				false, 
+				false, 
+				true);
 		List<String> dominisCodis = new ArrayList<String>();
 		List<DominiEntity> dominis = new ArrayList<DominiEntity>();
 		//1. trobar metadades de tipus domini d'aquests metaexpedients
@@ -266,7 +306,6 @@ public class DominiServiceImpl implements DominiService {
 	}
 
 	public void evictDominiCache() {
-		cacheHelper.evictCreateDominiConnexio();
 		cacheHelper.evictFindDominisByConsutla();
 	}
 	private static final Logger logger = LoggerFactory.getLogger(DominiServiceImpl.class);

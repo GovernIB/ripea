@@ -3,26 +3,19 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'un domini.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class ResultatDominiDto {
 	
-	private String id;
-	private String valor;
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getValor() {
-		return valor;
-	}
-	public void setValor(String valor) {
-		this.valor = valor;
-	}
+	private int totalElements;
+	private List<ResultatConsultaDto> resultat;
 }

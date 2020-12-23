@@ -39,7 +39,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
  */
 @Controller
 @RequestMapping("/expedientTasca")
-public class ExpedientTascaController extends BaseUserController {
+public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 
 //	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientTascaController.session.filtre";
 

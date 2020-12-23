@@ -1,9 +1,12 @@
 package es.caib.ripea.core.service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.aggregation.HistoricAggregation;
 import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
 import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.core.api.dto.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.HistoricFiltreDto;
-import es.caib.ripea.core.api.dto.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.HistoricTipusEnumDto;
-import es.caib.ripea.core.api.dto.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.HistoricExpedientEntity;
@@ -34,13 +37,13 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.HistoricHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.repository.HistoricExpedientRepository;
-import es.caib.ripea.core.repository.HistoricInteressatRepository;
-import es.caib.ripea.core.repository.HistoricUsuariRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.task.HistoricTask;
+import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 
 @Service
 public class HistoricServiceImpl implements HistoricService {
@@ -62,14 +65,21 @@ public class HistoricServiceImpl implements HistoricService {
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	private HistoricTask historicTask;
+	private HistoricHelper historicHelper;
 
+
+	@Override
+	public void generateOldHistorics() {
+		historicHelper.generateOldDailyHistorics(30*8);
+		historicHelper.generateOldMontlyHistorics(12*3);
+	}
+	
 	@Override
 	public PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
 			Long entitatId,
 			HistoricFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
@@ -93,7 +103,7 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Override
 	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
@@ -107,18 +117,44 @@ public class HistoricServiceImpl implements HistoricService {
 				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici(),
 				filtre.getDataFi());
+		historicEntitat = fillEmptyData(filtre, historicEntitat, HistoricExpedientAggregation.class);
 		return conversioTipusHelper.convertirList(historicEntitat, HistoricExpedientDto.class);
 	}
 
 	@Override
 	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(HistoricFiltreDto filtre) {
+		Map<OrganGestorDto, List<HistoricExpedientDto>> data = getHistoricsByOrganGestor(filtre);
+		
+		if (data.keySet().isEmpty()) {
+			return null;
+		}
+		
+		// Format data
+		List<Date> dates = filtre.getQueriedDates();
+		Collections.reverse(dates);
+		
+		int i = 0;
+		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> results = new HashMap<>();
+		for (Date date : dates) {
+			Map<OrganGestorDto, HistoricExpedientDto> mapDate = new HashMap<>();
+			for (OrganGestorDto organ: data.keySet()) {
+				mapDate.put(organ, data.get(organ).get(i));
+			}
+			i++;
+			results.put(date, mapDate);
+		}
+		return results;
+	}
+
+	@Override
+	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(HistoricFiltreDto filtre) {
 		List<Long> organGestorIds = filtre.getOrganGestorsIds();
 		if (organGestorIds == null) {
 			return new HashMap<>();
 		}
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
-		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> results = new HashMap<>();
+		Map<OrganGestorDto, List<HistoricExpedientDto>> results = new HashMap<>();
 		List<OrganGestorDto> organGestors = new ArrayList<>();
 		for (Long organId : organGestorIds) {
 			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
@@ -131,17 +167,9 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getDataFi());
 			OrganGestorDto organDto = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
 			organGestors.add(organDto);
+			historics = fillEmptyData(filtre, historics, HistoricExpedientAggregation.class);
+			results.put(organDto, conversioTipusHelper.convertirList(historics, HistoricExpedientDto.class));
 			
-			for (HistoricExpedientAggregation historic : historics) {
-				Date key = historic.getData();
-				if (!results.containsKey(key)) {
-					results.put(key, new HashMap<OrganGestorDto, HistoricExpedientDto>());
-				}
-				Map<OrganGestorDto, HistoricExpedientDto> mapOrganGestors = results.get(key);	
-				mapOrganGestors.put(
-						organDto,
-						conversioTipusHelper.convertir(historic, HistoricExpedientDto.class));
-			}			
 		}
 		if (filtre.getIncorporarExpedientsComuns()) {
 			OrganGestorDto organDto = new OrganGestorDto();
@@ -154,49 +182,10 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getDataInici(),
 					filtre.getDataFi());
 			organGestors.add(organDto);
-			
-			for (HistoricExpedientAggregation historic : historics) {
-				Date key = historic.getData();
-				if (!results.containsKey(key)) {
-					results.put(key, new HashMap<OrganGestorDto, HistoricExpedientDto>());
-				}
-				Map<OrganGestorDto, HistoricExpedientDto> mapOrganGestors = results.get(key);	
-				mapOrganGestors.put(
-						organDto,
-						conversioTipusHelper.convertir(historic, HistoricExpedientDto.class));
-			}		
+			historics = fillEmptyData(filtre, historics, HistoricExpedientAggregation.class);
+			results.put(organDto, conversioTipusHelper.convertirList(historics, HistoricExpedientDto.class));
 		}
 		
-		// Fill empty data
-		for (Date date : filtre.getQueriedDates()) {
-			Map<OrganGestorDto, HistoricExpedientDto> mapOrganGestors = results.get(date);
-			if (mapOrganGestors == null) {
-				mapOrganGestors = new HashMap<>();
-			}
-			for (OrganGestorDto organ: organGestors) {
-				if (!mapOrganGestors.containsKey(organ)) {
-					mapOrganGestors.put(organ, new HistoricExpedientDto(filtre.getTipusAgrupament(), date));
-				}
-			}
-			results.put(date, mapOrganGestors);
-			
-		}
-		return results;
-	}
-
-	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(HistoricFiltreDto filtre) {
-		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> mapByDate = this.getDadesOrgansGestors(filtre); 
-		Map<OrganGestorDto, List<HistoricExpedientDto>> results = new HashMap<>();
-		for (Date data : mapByDate.keySet()) {
-			Map<OrganGestorDto, HistoricExpedientDto> dateHistoric = mapByDate.get(data);
-			for (OrganGestorDto organ : dateHistoric.keySet()) {
-				if (!results.containsKey(organ)) {
-					results.put(organ, new ArrayList<HistoricExpedientDto>());
-				}
-				
-				results.get(organ).add(dateHistoric.get(organ));
-			}
-		}
 		return results;
 	}
 	
@@ -206,7 +195,7 @@ public class HistoricServiceImpl implements HistoricService {
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
-		List<HistoricUsuariAggregation> historic = historicUsuariRepository.findByDateRangeGroupedByDate(
+		List<HistoricUsuariAggregation> historics = historicUsuariRepository.findByDateRangeGroupedByDate(
 				usuari,
 				filtre.getTipusAgrupament(),
 				!fiteringByOrganGestors,
@@ -216,8 +205,11 @@ public class HistoricServiceImpl implements HistoricService {
 				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici(),
 				filtre.getDataFi());
-
-		return conversioTipusHelper.convertirList(historic, HistoricUsuariDto.class);
+		historics = fillEmptyData(filtre, historics, HistoricUsuariAggregation.class);
+		for (HistoricUsuariAggregation h: historics) {
+			h.setUsuari(usuari);
+		}
+		return conversioTipusHelper.convertirList(historics, HistoricUsuariDto.class);
 	}
 
 	@Override
@@ -225,7 +217,7 @@ public class HistoricServiceImpl implements HistoricService {
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
-		List<HistoricAggregation> historic = historicInteressatRepository.findByDateRangeGroupedByDate(
+		List<HistoricAggregation> historics = historicInteressatRepository.findByDateRangeGroupedByDate(
 				interessatDocNum,
 				filtre.getTipusAgrupament(),
 				!fiteringByOrganGestors,
@@ -235,19 +227,19 @@ public class HistoricServiceImpl implements HistoricService {
 				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici(),
 				filtre.getDataFi());
-
-		return conversioTipusHelper.convertirList(historic, HistoricInteressatDto.class);
+		historics = fillEmptyData(filtre, historics, HistoricAggregation.class);
+		return conversioTipusHelper.convertirList(historics, HistoricInteressatDto.class);
 	}
 
 	@Transactional
 	@Override
 	public List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
 
-		Collection<HistoricExpedientEntity> historics = historicTask.calcularHistoricExpedient(
+		Collection<HistoricExpedientEntity> historics = historicHelper.calcularHistoricExpedient(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
 				HistoricTipusEnumDto.DIARI);
@@ -259,7 +251,9 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 			boolean selectedByOrgan = !fiteringByOrganGestors || (historic.getOrganGestor() != null &&
 					filtre.getOrganGestorsIds().contains(historic.getOrganGestor().getId()));
-			if (selectedByMetaExp && selectedByOrgan && metaExpedient.getEntitat().equals(entitat)) {
+			boolean selectedByExpedientComu = filtre.getIncorporarExpedientsComuns() && 
+					historic.getOrganGestor() == null;
+			if (selectedByMetaExp && (selectedByOrgan || selectedByExpedientComu) && metaExpedient.getEntitat().equals(entitat)) {
 				resultat.add(historic);
 			}
 		}
@@ -276,7 +270,7 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
-		Collection<HistoricExpedientEntity> historics = historicTask.calcularHistoricExpedient(
+		Collection<HistoricExpedientEntity> historics = historicHelper.calcularHistoricExpedient(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
 				HistoricTipusEnumDto.DIARI);
@@ -354,7 +348,7 @@ public class HistoricServiceImpl implements HistoricService {
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
 
-		Collection<HistoricUsuariEntity> historics = historicTask.calcularHistoricUsuari(
+		Collection<HistoricUsuariEntity> historics = historicHelper.calcularHistoricUsuari(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
 				HistoricTipusEnumDto.DIARI);
@@ -380,7 +374,7 @@ public class HistoricServiceImpl implements HistoricService {
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
 
-		Collection<HistoricInteressatEntity> historics = historicTask.calcularHistoricInteressat(
+		Collection<HistoricInteressatEntity> historics = historicHelper.calcularHistoricInteressat(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
 				HistoricTipusEnumDto.DIARI);
@@ -399,4 +393,49 @@ public class HistoricServiceImpl implements HistoricService {
 		return conversioTipusHelper.convertirList(resultat, HistoricInteressatDto.class);
 	}
 
+	/**
+	 * 
+	 * @param <T>
+	 * @param filtre
+	 * @param historics Llista d'històrics, ha d'estar ordenada descendentment per
+	 *                  data
+	 * @return
+	 */
+	private <T extends HistoricAggregation> List<T> fillEmptyData(HistoricFiltreDto filtre, List<T> historics, Class<T> cls) {
+		List<Date> dates = filtre.getQueriedDates();
+		Collections.reverse(dates);
+		Iterator<T> it = historics.iterator();
+		T currentHistoric = null;
+		if (it.hasNext())
+			currentHistoric = it.next();
+		else
+			currentHistoric = emptyInstance(dates.get(0), cls);
+		List<T> results = new ArrayList<T>();
+		for (Date data : dates) {
+			T dateHistoric = null;
+			if (data.compareTo(currentHistoric.getData()) < 0) { // anterior que l'actual
+				dateHistoric = emptyInstance(data, cls);
+
+			} else if (data.compareTo(currentHistoric.getData()) == 0) { // igual que l'actual
+				dateHistoric = currentHistoric;
+				if (it.hasNext())
+					currentHistoric = it.next();
+
+			} else { // major que l'actual
+				dateHistoric = emptyInstance(data, cls);
+				
+			}
+			results.add(dateHistoric);
+		}
+		return results;
+	}
+
+	private <T extends HistoricAggregation> T emptyInstance(Date date, Class<T> cls) {
+		try {
+			return cls.getConstructor(Date.class).newInstance(date);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+				InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			return null;
+		}
+	}
 }

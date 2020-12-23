@@ -160,6 +160,7 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS = "docsFirmats";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
@@ -1361,6 +1362,12 @@ public class PluginHelper {
 				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 				firmes = Arrays.asList(firma);
 			}
+			
+			boolean throwException = false; // throwException = true;
+			if (throwException) {
+				throw new RuntimeException("Mock Exception al custodiar document de portafirmes");
+			}
+			
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
 					toArxiuDocument(
 							document.getArxiuUuid(),
@@ -2064,24 +2071,13 @@ public class PluginHelper {
 			}
 		}
 		try {
-			Calendar dataCaducitatCal = Calendar.getInstance();
-			dataCaducitatCal.setTime(dataCaducitat);
-			if (	dataCaducitatCal.get(Calendar.HOUR_OF_DAY) == 0 &&
-					dataCaducitatCal.get(Calendar.MINUTE) == 0 &&
-					dataCaducitatCal.get(Calendar.SECOND) == 0 &&
-					dataCaducitatCal.get(Calendar.MILLISECOND) == 0) {
-				dataCaducitatCal.set(Calendar.HOUR_OF_DAY, 23);
-				dataCaducitatCal.set(Calendar.MINUTE, 59);
-				dataCaducitatCal.set(Calendar.SECOND, 59);
-				dataCaducitatCal.set(Calendar.MILLISECOND, 999);
-			}
 			String portafirmesEnviamentId = getPortafirmesPlugin().upload(
 					portafirmesDocument,
 					documentTipus,
 					motiu,
 					"Aplicació RIPEA",
 					prioritat,
-					dataCaducitatCal.getTime(),
+					null,
 					flux,
 					fluxId,
 					portafirmesAnnexos,
@@ -4740,9 +4736,9 @@ public class PluginHelper {
 				document.getNom());
 		accioParams.put("motiu", motiu);
 		accioParams.put("prioritat", prioritat.toString());
-		accioParams.put(
-				"dataCaducitat",
-				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
+//		accioParams.put(
+//				"dataCaducitat",
+//				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataCaducitat));
 		accioParams.put("documentTipus", documentTipus);
 		if (responsables != null) {
 			accioParams.put("responsables", Arrays.toString(responsables));

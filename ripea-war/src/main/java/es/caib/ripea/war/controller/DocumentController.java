@@ -74,7 +74,7 @@ import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
  */
 @Controller
 @RequestMapping("/document")
-public class DocumentController extends BaseUserController {
+public class DocumentController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 
@@ -185,7 +185,6 @@ public class DocumentController extends BaseUserController {
 					documentId,
 					command.getMotiu(),
 					command.getPrioritat(),
-					command.getDataCaducitat(),
 					command.getPortafirmesEnviarFluxId(), //selecció flux
 					command.getPortafirmesResponsables(),
 					command.getPortafirmesSequenciaTipus(),
@@ -226,10 +225,18 @@ public class DocumentController extends BaseUserController {
 			@PathVariable Long documentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentService.portafirmesReintentar(
+		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
 				documentId);
-		return "redirect:./info";
+		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
+		if (exc != null || doc.getGesDocFirmatId() != null) {
+			return "redirect:./info";
+		} else {
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"firma.info.processat.ok");
+		}
 	}
 
 	@RequestMapping(value = "/{documentId}/portafirmes/cancel", method = RequestMethod.GET)
@@ -266,6 +273,10 @@ public class DocumentController extends BaseUserController {
 			model.addAttribute(
 					"blocks", 
 					documentPortafirmesBlocks);
+			model.addAttribute(
+					"document", 
+					documentService.findById(entitatActual.getId(), documentId));
+			
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
 					request,

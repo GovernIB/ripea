@@ -26,7 +26,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
  */
 @Controller
 @RequestMapping("/metaexpedientajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
-public class AjaxMetaExpedientController extends BaseUserController {
+public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;

@@ -75,7 +75,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/expedient")
-public class ExpedientController extends BaseUserController {
+public class ExpedientController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";

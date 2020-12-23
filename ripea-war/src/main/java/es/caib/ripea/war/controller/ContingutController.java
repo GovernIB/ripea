@@ -70,7 +70,7 @@ import es.caib.ripea.war.helper.SessioHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-public class ContingutController extends BaseUserController {
+public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
@@ -127,7 +127,7 @@ public class ContingutController extends BaseUserController {
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 
 		boolean isEntitatUserAdminOrOrgan;
-		if (entitatActual.isUsuariActualAdministration() && entitatActual.isUsuariActualTeOrgans()) {
+		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
 			isEntitatUserAdminOrOrgan = true;
 		} else {
 			isEntitatUserAdminOrOrgan = false;

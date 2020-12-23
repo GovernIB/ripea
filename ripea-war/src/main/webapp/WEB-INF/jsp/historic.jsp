@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="es.caib.ripea.core.api.dto.HistoricTipusEnumDto" %>
+<%@ page import="es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto" %>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -24,6 +24,7 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/webjars/chartjs/2.9.3/Chart.min.js"/>"></script>
+	<script src="<c:url value="/webjars/moment/2.15.1/min/moment.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
@@ -40,31 +41,31 @@
 
 		var metricsDefinition = {
 			'EXPEDIENTS_CREATS': {
-				'attrname' : 'numExpedientsCreats',
+				'attrname' : 'num_expedients_creats',
 				'text': "<spring:message code="historic.metriques.enum.EXPEDIENTS_CREATS"/>"
 			},
 			'EXPEDIENTS_CREATS_ACUM': {
-				'attrname' : 'numExpedientsCreatsTotal',
+				'attrname' : 'num_expedients_creats_total',
 				'text': "<spring:message code="historic.metriques.enum.EXPEDIENTS_CREATS_ACUM"/>"
 			},
 			'EXPEDIENTS_TANCATS': {
-				'attrname' : 'numExpedientsTancats',
+				'attrname' : 'num_expedients_tancats',
 				'text': "<spring:message code="historic.metriques.enum.EXPEDIENTS_TANCATS"/>"
 			},
 			'EXPEDIENTS_TANCATS_ACUM': {
-				'attrname' : 'numExpedientsTancatsTotal',
+				'attrname' : 'num_expedients_tancats_total',
 				'text': "<spring:message code="historic.metriques.enum.EXPEDIENTS_TANCATS_ACUM"/>"
 			},
 			'DOCUMENTS_SIGNATS': {
-				'attrname' : 'numDocsSignats',
+				'attrname' : 'num_docs_signats',
 				'text': "<spring:message code="historic.metriques.enum.DOCUMENTS_SIGNATS"/>"
 			},
 			'DOCUMENTS_NOTIFICATS': {
-				'attrname' : 'numDocsNotificats',
+				'attrname' : 'num_docs_notificats',
 				'text': "<spring:message code="historic.metriques.enum.DOCUMENTS_NOTIFICATS"/>"
 			},
 			'TASQUES_TRAMITADES': {
-				'attrname' : 'numDocsNotificats',
+				'attrname' : 'num_tasques_tramitades',
 				'text': "<spring:message code="historic.metriques.enum.TASQUES_TRAMITADES"/>"
 			}
 		}
@@ -94,12 +95,27 @@
 	    </c:forEach>
 		console.log(interessatsSeleccionats);
 		
+		<c:if test="${empty historicFiltreCommand.organGestorsIds}">
+		var isAnyOrganSelected = false; 
+		</c:if>;
+		<c:if test="${not empty historicFiltreCommand.organGestorsIds}">
+			var isAnyOrganSelected = true; 
+		</c:if>;
+	
 		var language = requestLocale;
 		// Només acceptam es i ca com a llengues //
 		if (language.startsWith("es")) {
 			language = "es";
 		} else {
 			language = "ca";
+		}
+
+		function sumListAttr(list, attrname) {
+			var sum = 0;
+			list.forEach(function(serie){
+				sum += serie[attrname];
+			});
+			return sum;
 		}
 		
 		function dataTableHistoric (selector) {
@@ -145,11 +161,11 @@
 		function Taules () {
 			
 			this.buildTableActualsPerMetaExpedient = function(data) {
-				
+
 				var tableHeader = '<table id="table-per-metaexpedients-' + this.taules.length + '" class="table table-bordered table-striped table-hover style="width:100%" >' +
 				'<thead>' +
 					'<tr>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreats"/></th>';
+				tableHeader += "<th><spring:message code="historic.taula.header.tipusexpedient"/></th>";
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreats"/></th>';
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
@@ -161,11 +177,11 @@
 				var tableBody = '';
 				data.forEach(function(serie){
 					var row = '<tr>';
-					row += '<td>' + serie.metaExpedient.nom + '</td>';
-					row += '<td>' + serie.EXPEDIENTS_CREATS + '</td>';
-					row += '<td>' + serie.EXPEDIENTS_CREATS_ACUM + '</td>';
-					row += '<td>' + serie.EXPEDIENTS_TANCATS + '</td>';
-					row += '<td>' + serie.EXPEDIENTS_TANCATS_ACUM + '</td>';
+					row += '<td>' + serie.metaExpedient + '</td>';
+					row += '<td>' + serie.num_expedients_creats + '</td>';
+					row += '<td>' + serie.num_expedients_creats_total + '</td>';
+					row += '<td>' + serie.num_expedients_tancats + '</td>';
+					row += '<td>' + serie.num_expedients_tancats_total + '</td>';
 					
 					row += '</tr>';
 					tableBody += row;
@@ -179,18 +195,15 @@
 			
 			this.buildTableActualsPerOrganGestor = function(data) {
 				var mapOrgansGestors = {};
-				
+				console.log(data);
 				data.forEach(function(serie){
-					var organGestor = serie.metaExpedient.organGestor;
-					var organGestorId = organGestor != null ? organGestor.id : 'Comu';
-					if (organGestorId in mapOrgansGestors) {
-						mapOrgansGestors[organGestorId].dades.push(serie);
+					var organGestor = serie['organ_gestor'] != "" ? serie['organ_gestor'] : 'Comu';
+					
+					if (organGestor in mapOrgansGestors) {
+						mapOrgansGestors[organGestor].push(serie);
 						
 					} else {
-						mapOrgansGestors[organGestorId] = {
-								organGestor: organGestor,
-								dades: [serie]
-						}
+						mapOrgansGestors[organGestor] = [serie];
 					}
 				});
 				
@@ -213,15 +226,14 @@
 					return sum;
 				}
 				var tableBody = '';
-				for (var organGestorId in mapOrgansGestors) {
-					var dataOrganGestor = mapOrgansGestors[organGestorId];
-					var organGestorNom = dataOrganGestor.organGestor != null ? dataOrganGestor.organGestor.nom : 'Comú';
+				for (var organGestor in mapOrgansGestors) {
+					var dataOrganGestor = mapOrgansGestors[organGestor];
 					var row = '<tr>';
-					row += '<td>' + organGestorNom + '</td>';
-					row += '<td>' + sumListAttr(dataOrganGestor.dades, 'EXPEDIENTS_CREATS') + '</td>';
-					row += '<td>' + sumListAttr(dataOrganGestor.dades, 'EXPEDIENTS_CREATS_ACUM') + '</td>';
-					row += '<td>' + sumListAttr(dataOrganGestor.dades, 'EXPEDIENTS_TANCATS') + '</td>';
-					row += '<td>' + sumListAttr(dataOrganGestor.dades, 'EXPEDIENTS_TANCATS_ACUM') + '</td>';
+					row += '<td>' + organGestor + '</td>';
+					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_creats') + '</td>';
+					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_creats_total') + '</td>';
+					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_tancats') + '</td>';
+					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_tancats_total') + '</td>';
 					
 					row += '</tr>';
 					tableBody += row;
@@ -300,25 +312,132 @@
 					'	<div id="' + modalId + '" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
 					'		<div class="modal-dialog modal-sm">' +
 					'			<div class="modal-content">' +
-// 					'				<div class="modal-header">' +
-// 					'					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-// 					'					<h4 class="modal-title"></h4>' +
-// 					'				</div>' +
 					'				<div class="modal-body" style="padding:0">' +
 					'					<iframe frameborder="0" height="100" width="100%"></iframe>' +
 					'					<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
 					'						<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>' + 
-// 					(plugin.settings.missatgeLoading != null ? '<p>' + plugin.settings.missatgeLoading + '</p>' : '') +	
 					'					</div>' +
 					'				</div>' +
-// 					'				<div class="modal-footer"></div>' +
 					'			</div>' +
 					'		</div>' +
 					'	</div>');
-			console.log("uep! com anam?")
 		}
 		
 		
+		function buildTableMetric(data, metric, idTable) {
+			var columns = Object.keys(data);
+			var tableHeader = '<table id="' + idTable + '" class="table table-bordered table-striped table-hover style="width:100%">' +
+					'<thead>' +
+						'<tr>';
+			var tableFooter = '</tbody></table>';
+			tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
+			
+			columns.forEach(function(c){
+				tableHeader += '<th>' + c + '</th>';
+			});
+			
+			tableHeader += '</tr></thead><tbody>';
+			if (columns.length == 0) {
+				return tableHeader + tableFooter;
+			}
+			var dates = [];
+			columns.forEach(function(c){
+				data[c] = data[c].sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')));
+				if (data[c].length > dates.length) {
+					dates = data[c].map(item => item.data);	
+				}
+			});
+						
+			var tableBody = '';
+			for (var i = 0; i < dates.length; i++ ){
+				var date = dates[i];
+				var row = '<tr>';
+				row += '<td data-sort="' + moment(date, 'DD-MM-YYYY') + '">' +  date + '</td>'
+				columns.forEach(function(c){
+					var attrname = metricsDefinition[metric]['attrname'];
+					var value = data[c][i][attrname] != null ? data[c][i][attrname] : 0;
+					row += '<td>' + value + '</td>';
+				});
+				row += '</tr>';
+				tableBody += row;
+			}
+			
+			return tableHeader + tableBody + tableFooter;
+		}
+		
+		function createChartMetric(data, metric, colors) {
+			var columns = Object.keys(data);
+			
+			columns.forEach(function(c){
+				data[c] = data[c].sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')));
+			});
+			
+			var dates = data[columns[0]].map(item => item.data);
+			
+			var datasets = []
+			columns.forEach(function(c){
+				var attrname = metricsDefinition[metric]['attrname'];
+				var dataset = data[c].map(item => item[attrname] != null ? item[attrname] : 0)
+				var color = (colors == null || colors[c] == null) ? getRandomColor() : colors[c]
+				datasets.push({
+    				'data': dataset,
+    				'label': c,
+    				'backgroundColor': "rgba(0,0,0,0.0)",
+    				'borderColor': color
+    				});	
+			});
+
+			var ctx = 'chart-' + metric;
+			var labels = dates
+			var chart = chartLine(ctx, labels, datasets, metricsDefinition[metric]["text"]);
+		}
+		
+		
+		function buildTableCurrent(data, metriques, firstColumnHeader, getRegistreName) {
+
+			var idTable = "table-organgestors";
+			var tableHeader = '<table id="' + idTable + '" class="table table-bordered table-striped table-hover style="width:100%">' +
+					'<thead>' +
+						'<tr>';
+			tableHeader += '<th>' + firstColumnHeader + '</th>';
+			metriques.forEach(function(metrica){
+				tableHeader += '<th>' + metricsDefinition[metrica]['text']+ '</th>';
+			});
+			tableHeader += '</tr></thead><tbody>';
+			
+			var tableBody = '';
+			data.forEach(function(registre){
+				var row = '<tr>';
+				row += '<td>' +  getRegistreName(registre) + '</td>'
+				metriques.forEach(function(metrica){
+					var attrname = metricsDefinition[metrica]['attrname'];
+					var value = registre[attrname] != null ? registre[attrname] : 0;
+					row += '<td>' + value + '</td>';
+				});
+				row += '</tr>';
+				tableBody += row;
+			});
+			var tableFooter = '</tbody></table>';
+			return tableHeader + tableBody + tableFooter;
+		}
+
+		function createChartCurrent(data, metric, getRegistreName) {
+			var labels = []
+			var values = []
+			var colors = []
+			data.forEach(function(registre){
+				labels.push(getRegistreName(registre));
+				
+				var attrname = metricsDefinition[metric]['attrname'];
+				var value = registre[attrname] != null ? registre[attrname] : 0;
+				values.push(value);
+				
+				colors.push(getRandomColor());
+			});
+			
+			var ctx = 'chart-current-' + metric;
+			var chart = chartPie(ctx, values, labels, colors, metricsDefinition[metric]["text"]);
+		}
 		
 		/**
 		* 	CODI SECCIÓ ENTITAT
@@ -326,30 +445,31 @@
 		function seccioEntitat () {
 			var taules = new Taules();
 			var loading = new modalLoading();
-			
+			var metriques = [
+				'EXPEDIENTS_CREATS',
+				'EXPEDIENTS_CREATS_ACUM',
+				'EXPEDIENTS_TANCATS',
+				'EXPEDIENTS_TANCATS_ACUM'	
+			];
 			// function to update our chart
 		    function buildChartEntitat(chart, url, data) {
 		        var data = data || {};
 		
 		        $.getJSON(url, data).done(function(response) {
 		        	console.log(response);
-		        	response.sort((a, b) => (a.data > b.data))
+		        	response.sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')))
 		        	if (response.length > 0) {
-			        	var yLabels = response.map(item => new Date(item.data).toLocaleDateString("es"));
+			        	var yLabels = response.map(item => item.data);
 			        	
-			        	var i = 0;
 			            chart.data.labels = yLabels;
-			        	for (var nomSerie in response[0]) {
-			        		if (nomSerie.includes("_")){
-			        			chart.data.datasets.push({
-			        				'data': response.map(item => item[nomSerie]),
-			        				'label': metricsDefinition[nomSerie]["text"],
-			        				'backgroundColor': "rgba(0,0,0,0.0)",
-			        				'borderColor': getRandomColor()
-			        				});
-			        			i = i + 1;
-			        		}	
-			        	}
+			            metriques.forEach(function(metrica){
+		        			chart.data.datasets.push({
+		        				'data': response.map(item => item[metricsDefinition[metrica]["attrname"]]),
+		        				'label': metricsDefinition[metrica]["text"],
+		        				'backgroundColor': "rgba(0,0,0,0.0)",
+		        				'borderColor': getRandomColor()
+		        				});			            	
+			            });
 		        	}
 		        	
 		            chart.update(); // finally update our chart
@@ -357,13 +477,14 @@
 		    }
 
 			
-		    if ( showingDadesActuals && showingTables) {
+		    if ( showingDadesActuals) {
 		    	loading.show();
 				$.ajax({
 					type: "GET",
 					url: 'historic/entitat/actual',
 					success: function(response) {
 						taules.cleanTaules();
+						console.log(response);
 						$('#div-dades-entitat').html("");
 						loading.hide();
 						var title = '<h2><spring:message code="historic.taula.titol.permetaexp"/></h2>';
@@ -402,91 +523,49 @@
 		function seccioOrgansGestors() {
 			var taules = new Taules();
 			var loading = new modalLoading();
-			function buildTablesMetrics(data, metric){
-				var organsGestors = [];
-				var iSerie = 0;
-				while (organsGestors.length == 0 && iSerie < Object.keys(data).length ){
-					var serie = data[Object.keys(data)[iSerie]];
-					organsGestors = Object.keys(serie);
-					iSerie ++;
-				}
-				var idTable = "table-organgestor-" + metric;
-				var tableHeader = '<table id="' + idTable + '" class="table table-bordered table-striped table-hover style="width:100%">' +
-						'<thead>' +
-							'<tr>';
-				tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
-				
-				organsGestors.forEach(function(organGestor){
-					tableHeader += '<th>' + organGestor + '</th>';
-				});
-				
-				tableHeader += '</tr></thead><tbody>';
-				
-				var tableBody = '';
-				for (var date in data) {
-					var serie = data[date];
-					console.log(serie);
-					var row = '<tr>';
-					row += '<td data-sort="' + date + '">' +  new Date(date).toLocaleDateString("es") + '</td>'
-					organsGestors.forEach(function(organGestor){
-						var value = serie[organGestor][metric] != null ? serie[organGestor][metric] : 0;
-						row += '<td>' + value + '</td>';
+			var metriques = [
+				'EXPEDIENTS_CREATS',
+				'EXPEDIENTS_CREATS_ACUM',
+				'EXPEDIENTS_TANCATS',
+				'EXPEDIENTS_TANCATS_ACUM'	
+			];
+			
+			var selectorContainer = '#div-dades-organ';
+			var $container = $(selectorContainer);
+			
+			var getColumnName = function (registre){
+				return registre['organ_gestor']
+			};
+			
+			function viewHistoric(data) {
+				taules.cleanTaules();
+				$container.html("");
+
+				if ( showingTables ) {
+					metriques.forEach(function(metric){
+						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
+						var htmlTable = buildTableMetric(data, metric, "table-dades-" + metric);
+						
+						$container.append(title + htmlTable);	
+						
+						var dataTable = dataTableHistoric("#table-dades-" + metric);								
+						taules.addTaula(dataTable);
 					});
-					row += '</tr>';
-					tableBody += row;
-				}
-									
-				var tableFooter = '</tbody></table>';
-				
-				return tableHeader + tableBody + tableFooter;
-				
-			}
-			
-			function create_chart_organGestors(data, metric) {
-				var dates = [];
-				for (var organGestor in data) {
-					data[organGestor].sort((a, b) => (a.data > b.data) ? 1 : -1);
-					if (data[organGestor].length > dates.length) {
-						dates = data[organGestor].map(item => item.data);
+				} else {
+					var colors = {};
+					for (var column in data) {
+						colors[column] = getRandomColor();
 					}
+					metriques.forEach(function(metric){
+						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
+						var canvas = '<canvas id="chart-' + metric + '" width="400" height="100"></canvas>';
+						$container.append(title + canvas);
+						createChartMetric(data, metric, colors);
+					});
 				}
-				
-				var organsGestors = Object.keys(data);
-				var datasets = []
-				for (var organGestor in data) {
-					
-					var dataset_data = data[organGestor].map(item => item[metric]);
-        			datasets.push({
-        				'data': dataset_data,
-        				'label': organGestor,
-        				'backgroundColor': "rgba(0,0,0,0.0)",
-        				'borderColor': getRandomColor()
-        				});
-				}
-
-				var ctx = 'chart-' + metric;
-				var labels = dates.map(item => new Date(item).toLocaleDateString("es"))
-				var chart = chartLine(ctx, labels, datasets, metricsDefinition[metric]["text"]);
-				
 			}
 
-			function create_chart_current(metric, data) {
-				var labels = []
-				var values = []
-				var colors = []
-				for (var organGestor in data) {
-					labels.push(organGestor);
-					values.push(data[organGestor]);
-					colors.push(getRandomColor())
-				}
-				
-				console.log(values);
-				console.log(labels);
-				var ctx = 'chart-current-' + metric;
-				var chart = chartPie(ctx, values, labels, colors, metricsDefinition[metric]["text"]);
-			}
-			
-			function updateContentOrganGestors(metrics) {
+			function updateContentOrganGestors() {
 				
 				if ( showingDadesActuals && showingTables) {
 					loading.show();
@@ -500,71 +579,53 @@
 						}
 					});
 					
-				} else if ( showingDadesActuals && !showingTables && metrics.length != 0){		
+				} else if ( showingDadesActuals && !showingTables){	
+					if (!isAnyOrganSelected){
+						alert("Es necessari seleccionar algún òrgan gestor.");
+						return;
+					}
 					loading.show();
 					$.ajax({
 						type: "POST",
 						url: 'historic/organgestors/actual',
-						data: {
-							metrics: metrics
-						},
 						success: function(response) {
 							loading.hide();
-							for (var metric in response) {
-								var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
-								$('#div-dades-organ').append(canvas);
-								create_chart_current(metric, response[metric]);
+							console.log(response);
+							var data = [];
+							for (var oGestor in response) {
+								var registre = response[oGestor];
+								registre["organ_gestor"] = oGestor;
+								data.push(registre);
 							}
+							metriques.forEach(function(metric){
+								var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
+								$container.append(canvas);
+								createChartCurrent(data, metric, getColumnName);
+							});
 						}
 					});						
 
-				}  else if ( !showingDadesActuals && showingTables && metrics.length != 0) {
+				}  else if ( !showingDadesActuals ) {
+					if (!isAnyOrganSelected){
+						alert("Es necessari seleccionar algún òrgan gestor.");
+						return;
+					}
 					loading.show();
 					$.ajax({
 						type: "POST",
 						url: 'historic/organgestors',
 						data: {
-							metrics: metrics
+							metrics: metriques
 						},
 						success: function(response) {
-							taules.cleanTaules();
-							$('#div-dades-organ').html("");
 							loading.hide();
-							metrics.forEach(function(metric){
-								console.log(metric);
-								var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
-								var htmlTable = buildTablesMetrics(response, metric);
-								
-								$('#div-dades-organ').append(title + htmlTable);	
-								
-								var dataTable = dataTableHistoric("#table-organgestor-" + metric);								
-								taules.addTaula(dataTable);
-							});
-						}
-					});
-				}  else if ( !showingDadesActuals && !showingTables && metrics.length != 0) {
-					loading.show();
-					$.ajax({
-						type: "POST",
-						url: 'historic/organgestors/grouped',
-						data: {
-							metrics: metrics
-						},
-						success: function(response) {
-							$('#div-dades-organ').html("");
-							loading.hide();
-							metrics.forEach(function(metric){
-								var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
-								var canvas = '<canvas id="chart-' + metric + '" width="400" height="100"></canvas>';
-								$('#div-dades-organ').append(title + canvas);
-								create_chart_organGestors(response, metric);
-							});
+							viewHistoric(response);			
 						}
 					});
 				}
 			}
 					
-			updateContentOrganGestors(Object.keys(metricsDefinition));
+			updateContentOrganGestors();
 
 		}
 		
@@ -574,111 +635,79 @@
 		function seccioUsuaris() {
 			var taules = new Taules();
 			var loading = new modalLoading();
-			function usuari_construirTaula(dades, codiUsuari){
-				var tableHeader = '<table id="table-user-' + codiUsuari + '" class="table table-bordered table-striped table-hover style="width:100%" >' +
-						'<thead>' +
-							'<tr>';
-				tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancatsTotal"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numTasquesTramitades"/></th>';
-	
-				tableHeader += '</tr></thead><tbody>';
-				
-				var tableBody = '';
-				dades.forEach(function(registre){
-					var row = '<tr>';
-					row += '<td data-sort="' + registre.data + '">' + new Date(registre.data).toLocaleDateString("es") + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_CREATS'] + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_CREATS_ACUM'] + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_TANCATS'] + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_TANCATS_ACUM'] + '</td>';
-					row += '<td>' + registre['TASQUES_TRAMITADES'] + '</td>';
-					
-					row += '</tr>';
-					tableBody += row;
-				});
-									
-				var tableFooter = '</tbody></table>';
-				
-				return tableHeader + tableBody + tableFooter;
-			}
-
-			function buildChartUser(data, user) {
-				data.sort((a, b) => (a.data > b.data) ? 1 : -1)
-				
-				var datasets = []
-				for (var nomSerie in data[0]) {
-					if (nomSerie.includes("_")){
-	        			datasets.push({
-	        				'data': data.map(item => item[nomSerie]),
-	        				'label': metricsDefinition[nomSerie]["text"],
-	        				'backgroundColor': "rgba(0,0,0,0.0)",
-	        				'borderColor': getRandomColor()
-	        				});
-	        		}        			
-				}
-				var labels = data.map(item => new Date(item.data).toLocaleDateString("es"));
-				var ctx = 'chart-' + user;
-				var chart = chartLine(ctx, labels, datasets, user);
-				
-			}
+			var metriques = [
+				'EXPEDIENTS_CREATS',
+				'EXPEDIENTS_CREATS_ACUM',
+				'EXPEDIENTS_TANCATS',
+				'EXPEDIENTS_TANCATS_ACUM',
+				'TASQUES_TRAMITADES'
+			];
+			var columnHeader = '<spring:message code="historic.taula.header.usuari"/>';
+			var selectorContainer = '#div-dades-usuaris';
+			var $container = $(selectorContainer);
 			
-			function create_chart_current(metric, data) {
-				var labels = []
-				var values = []
-				var colors = []
-				for (var user in data) {
-					labels.push(organGestor);
-					values.push(data[organGestor]);
-					colors.push(getRandomColor())
-				}
-				
-				console.log(values);
-				console.log(labels);
-				var ctx = 'chart-current-' + metric;
-				var chart = chartPie(ctx, values, labels, colors, metricsDefinition[metric]["text"]);
-			}
+			var getColumnName = function (registre){
+				return registre['user']
+			};
 			
-			function buildTableUsuarisActuals (data) {
-				var tableHeader = '<table id="table-usuaris-actuals" class="table table-bordered table-striped table-hover style="width:100%" >' +
-				'<thead>' +
-					'<tr>';
-				tableHeader += '<th>Usuari</th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancatsTotal"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numTasquesTramitades"/></th>';
-		
-				tableHeader += '</tr></thead><tbody>';
-				
-				function sumListAttr(list, attrname) {
-					var sum = 0;
-					list.forEach(function(serie){
-						sum += serie[attrname];
+			function viewHistoric(data) {
+				taules.cleanTaules();
+				$container.html("");
+				console.log(data)
+				if ( showingTables ) {
+					var dataTable = dataTableHistoric("#table-estats");								
+					taules.addTaula(dataTable);
+					metriques.forEach(function(metric){
+						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
+						var htmlTable = buildTableMetric(data, metric, "table-usuaris-" + metric);
+						
+						$container.append(title + htmlTable);	
+						
+						var dataTable = dataTableHistoric("#table-usuaris-" + metric);								
+						taules.addTaula(dataTable);
 					});
-					return sum;
+				} else {
+					var colors = {};
+					for (var column in data) {
+						colors[column] = getRandomColor();
+					}
+					metriques.forEach(function(metric){
+						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
+						var canvas = '<canvas id="chart-' + metric + '" width="400" height="100"></canvas>';
+						$container.append(title + canvas);
+						createChartMetric(data, metric, colors);
+					});
 				}
-				var tableBody = '';
-				for (var usuari in data) {
-					var row = '<tr>';
-					row += '<td>' + usuari + '</td>';
-					row += '<td>' + sumListAttr(data[usuari], 'EXPEDIENTS_CREATS') + '</td>';
-					row += '<td>' + sumListAttr(data[usuari], 'EXPEDIENTS_CREATS_ACUM') + '</td>';
-					row += '<td>' + sumListAttr(data[usuari], 'EXPEDIENTS_TANCATS') + '</td>';
-					row += '<td>' + sumListAttr(data[usuari], 'EXPEDIENTS_TANCATS_ACUM') + '</td>';
-					row += '<td>' + sumListAttr(data[usuari], 'TASQUES_TRAMITADES') + '</td>';
-					
-					row += '</tr>';
-					tableBody += row;
+			}
+			
+			function viewActuals(data) {
+				taules.cleanTaules();
+				loading.hide();
+				var listData = [];
+				for (var user in data) {
+					var registres = data[user];
+					var registre = {};
+					registre["user"] = user;
+					metriques.forEach(function(metric){
+						var metrName = metricsDefinition[metric]["attrname"];
+						registre[metrName] = sumListAttr(registres, metrName);
+					});
+					listData.push(registre);
 				}
-
-				var tableFooter = '</tbody></table>';
+				console.log(listData);
 				
-				return tableHeader + tableBody + tableFooter;
+				if ( showingTables ) {
+					var title = '<h2></h2>'
+					var htmlTable = buildTableCurrent(listData, metriques, columnHeader, getColumnName);
+					$container.append(title + htmlTable);
+					
+				} else {
+					metriques.forEach(function(metric){
+						var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
+						$container.append(canvas);
+						createChartCurrent(listData, metric, getColumnName);
+					});
+				}
 			}
 			
 			function updateContentUsuaris(usuaris) {
@@ -697,21 +726,8 @@
 							usuaris: usuaris
 						},
 						success: function(response) {
-							console.log(response);
-							var htmlTable = buildTableUsuarisActuals(response);
-							var title = '<h2><spring:message code="historic.taula.titol.perusuari"/></h2>'
-							$('#div-dades-usuaris').append(title + htmlTable);
-							var dataTable = dataTableHistoric("#table-usuaris-actuals");
-							
-							for (var usuari in response) {
-								var title = '<h2><spring:message code="historic.taula.titol.perusuari.usuari"/> ' + usuari + '</h2>';
-								$('#div-dades-usuaris').append(title);
-								taules.addTaulaAcualsPerMetaExpedient(response[usuari], '#div-dades-usuaris');
-							}
-							
-							taules.addTaula(dataTable);
-							
 							loading.hide();
+							viewActuals(response);
 						}
 					});
 				} else {
@@ -723,29 +739,8 @@
 							usuaris: usuaris
 						},
 						success: function (response) {
-							taules.cleanTaules();
-							$('#div-dades-usuaris').html("");
-							console.log(response);
-							for (usuariCodi in response){
-								var title = '<h2>' + usuariCodi + '</h2>'
-								$('#div-dades-usuaris').append(title);
-								if (showingTables) {
-									var htmlTable = usuari_construirTaula(response[usuariCodi], usuariCodi);
-									var title = '<h2>' + usuariCodi + '</h2>'
-									
-									$('#div-dades-usuaris').append(htmlTable);
-									var dataTable = dataTableHistoric("#table-user-" + usuariCodi);
-									taules.addTaula(dataTable);
-									
-								} else {								
-									var canvas = '<canvas id="chart-' + usuariCodi + '" width="400" height="100"></canvas>';
-									$('#div-dades-usuaris').append(canvas);
-									buildChartUser(response[usuariCodi], usuariCodi);
-									
-								}
-								
-							}	
 							loading.hide();
+							viewHistoric(response);	
 						}
 					});
 				}
@@ -763,94 +758,79 @@
 		function seccioInteressats() {
 			var taules = new Taules();
 			var loading = new modalLoading();
-			function interessatConstruirTaula(dades, interessatDoc) {
-				var tableHeader = '<table id="table-interessat-' + interessatDoc + '" class="table table-bordered table-striped table-hover style="width:100%" >' +
-						'<thead>' +
-							'<tr>';
-				tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancatsTotal"/></th>';
-	
-				tableHeader += '</tr></thead><tbody>';
-				
-				
-				var dates = dades.map(item => new Date(item.data).toLocaleDateString("es"));
-				
-				var tableBody = '';
-				dades.forEach(function(registre){
-					var row = '<tr>';
-					row += '<td data-sort="' + registre.data + '">' + new Date(registre.data).toLocaleDateString("es") + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_CREATS'] + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_CREATS_ACUM'] + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_TANCATS'] + '</td>';
-					row += '<td>' + registre['EXPEDIENTS_TANCATS_ACUM'] + '</td>';
-					
-					row += '</tr>';
-					tableBody += row;
-				});
-									
-				var tableFooter = '</tbody></table>';
-				
-				return tableHeader + tableBody + tableFooter;
-			}
+			var metriques = [
+				'EXPEDIENTS_CREATS',
+				'EXPEDIENTS_CREATS_ACUM',
+				'EXPEDIENTS_TANCATS',
+				'EXPEDIENTS_TANCATS_ACUM'
+			];
+			var columnHeader = '<spring:message code="historic.taula.header.interessat"/>';
 			
-			function buildTableInteressatsActuals (data) {
-				var tableHeader = '<table id="table-interessats-actuals" class="table table-bordered table-striped table-hover style="width:100%" >' +
-				'<thead>' +
-					'<tr>';
-				tableHeader += '<th>Interessat</th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
-				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancatsTotal"/></th>';
-		
-				tableHeader += '</tr></thead><tbody>';
-				
-				function sumListAttr(list, attrname) {
-					var sum = 0;
-					list.forEach(function(serie){
-						sum += serie[attrname];
-					});
-					return sum;
-				}
-				var tableBody = '';
-				for (var interessatDoc in data) {
-					var row = '<tr>';
-					row += '<td>' + interessatDoc + '</td>';
-					row += '<td>' + sumListAttr(data[interessatDoc], 'EXPEDIENTS_CREATS') + '</td>';
-					row += '<td>' + sumListAttr(data[interessatDoc], 'EXPEDIENTS_CREATS_ACUM') + '</td>';
-					row += '<td>' + sumListAttr(data[interessatDoc], 'EXPEDIENTS_TANCATS') + '</td>';
-					row += '<td>' + sumListAttr(data[interessatDoc], 'EXPEDIENTS_TANCATS_ACUM') + '</td>';
-					
-					row += '</tr>';
-					tableBody += row;
-				}
+			var selectorContainer = '#div-dades-interessats';
+			var $container = $(selectorContainer);
+			
+			var getColumnName = function (registre){
+				return registre['interessat']
+			};
 
-				var tableFooter = '</tbody></table>';
-				
-				return tableHeader + tableBody + tableFooter;
+			function viewHistoric(data) {
+				taules.cleanTaules();
+				$container.html("");
+				console.log(data)
+				if ( showingTables ) {
+					var dataTable = dataTableHistoric("#table-estats");								
+					taules.addTaula(dataTable);
+					metriques.forEach(function(metric){
+						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
+						var htmlTable = buildTableMetric(data, metric, "table-usuaris-" + metric);
+						
+						$container.append(title + htmlTable);	
+						
+						var dataTable = dataTableHistoric("#table-usuaris-" + metric);								
+						taules.addTaula(dataTable);
+					});
+				} else {
+					var colors = {};
+					for (var column in data) {
+						colors[column] = getRandomColor();
+					}
+					metriques.forEach(function(metric){
+						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
+						var canvas = '<canvas id="chart-' + metric + '" width="400" height="100"></canvas>';
+						$container.append(title + canvas);
+						createChartMetric(data, metric, colors);
+					});
+				}
 			}
 			
-			function buildChartInteressat(data, interessatDoc) {
-				data.sort((a, b) => (a.data > b.data) ? 1 : -1)
-				
-				var datasets = []
-				for (var nomSerie in data[0]) {
-					if (nomSerie.includes("_")){
-	        			datasets.push({
-	        				'data': data.map(item => item[nomSerie]),
-	        				'label': metricsDefinition[nomSerie]["text"],
-	        				'backgroundColor': "rgba(0,0,0,0.0)",
-	        				'borderColor': getRandomColor()
-	        				});
-	        		}        			
+			function viewActuals(data) {
+				taules.cleanTaules();
+				loading.hide();
+				var listData = [];
+				for (var interessat in data) {
+					var registres = data[interessat];
+					var registre = {};
+					registre["interessat"] = interessat;
+					metriques.forEach(function(metric){
+						var metrName = metricsDefinition[metric]["attrname"];
+						registre[metrName] = sumListAttr(registres, metrName);
+					});
+					listData.push(registre);
 				}
-				var labels = data.map(item => new Date(item.data).toLocaleDateString("es"));
-				var ctx = 'chart-' + interessatDoc;
-				var chart = chartLine(ctx, labels, datasets, interessatDoc);
+				console.log(listData);
 				
+				if ( showingTables ) {
+					var title = '<h2></h2>'
+					var htmlTable = buildTableCurrent(listData, metriques, columnHeader, getColumnName);
+					$container.append(title + htmlTable);
+					
+				} else {
+					metriques.forEach(function(metric){
+						var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
+						$container.append(canvas);
+						createChartCurrent(listData, metric, getColumnName);
+					});
+				}
 			}
 			
 			function updateContentInteressats(interessats) {
@@ -866,23 +846,8 @@
 							interessats: interessats
 						},
 						success: function(response) {
-							taules.cleanTaules();
-							$('#div-dades-interessats').html("");
-							
-							console.log(response);
-							var htmlTable = buildTableInteressatsActuals(response);
-							var title = '<h2><spring:message code="historic.taula.titol.perinteressat"/></h2>'
-							$('#div-dades-interessats').append(title + htmlTable);
-							var dataTable = dataTableHistoric("#table-interessats-actuals");
-							
-							for (var interessatDoc in response) {
-								var title = '<h2><spring:message code="historic.taula.titol.perinteressat.interessat"/> ' + interessatDoc + '</h2>';
-								$('#div-dades-interessats').append(title);
-								taules.addTaulaAcualsPerMetaExpedient(response[interessatDoc], '#div-dades-interessats');
-							}
-							
-							taules.addTaula(dataTable);
 							loading.hide();
+							viewActuals(response);
 						}
 					});
 
@@ -894,30 +859,8 @@
 							interessats: interessats
 						},
 						success: function (response) {
-							console.log(response);
-							taules.cleanTaules();
-							$('#div-dades-interessats').html("");
-							
-							for (interessatDoc in response) {
-								var title = '<h2>' + interessatDoc + '</h2>'
-								if (showingTables) {
-									var htmlTable = interessatConstruirTaula(response[interessatDoc], interessatDoc);
-									var title = '<h2>' + interessatDoc + '</h2>'
-									
-									$('#div-dades-interessats').append(title + htmlTable);
-							
-									var dataTable = dataTableHistoric("#table-interessat-" + interessatDoc);								
-									taules.addTaula(dataTable);
-									
-								} else {								
-									var canvas = '<canvas id="chart-' + interessatDoc + '" width="400" height="100"></canvas>';
-									$('#div-dades-interessats').append(title + canvas);
-									buildChartInteressat(response[interessatDoc], interessatDoc);
-									
-								}
-
-							}
 							loading.hide();
+							viewHistoric(response);	
 						}
 					});
 				}

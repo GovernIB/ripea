@@ -201,5 +201,111 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
+	
+	
+	
+	
+	
+	
+	
+	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.entitat = :entitat " +
+			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and (d.estat = 1 or d.estat = 2) "  + 
+			"and d.esborrat = 0 " + 
+			"and d.documentTipus = 0 " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
+			"and (d.id in " + 
+			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
+			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
+			"				and docPortafirmes.estat = 'ENVIAT' " +
+			"				and docPortafirmes.error = 1))")
+	public Page<DocumentEntity> findDocumentsPerCustodiarMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaDocument") boolean esNullMetaDocument,
+			@Param("metaDocument") MetaNodeEntity metaDocument,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			Pageable pageable);
+	
+	
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.entitat = :entitat " +
+			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and (d.estat = 1 or d.estat = 2) "  + 
+			"and d.esborrat = 0 " + 
+			"and d.documentTipus = 0 " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
+			"and (d.id in " + 
+			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
+			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
+			"				and docPortafirmes.estat = 'ENVIAT' " +
+			"				and docPortafirmes.error = 1))")
+	public List<Long> findDocumentsIdsPerCustodiarMassiu(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaDocument") boolean esNullMetaDocument,
+			@Param("metaDocument") MetaNodeEntity metaDocument,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi);
+	
+	
+	
+
+	
+	
+//	@Query(	"select " +
+//			"    d " +
+//			"from " +
+//			"    DocumentEntity d " +
+//			"where " +
+//			"    d.entitat = :entitat " +
+//			"and (d.id in " + 
+//			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
+//			"				where docPortafirmes.createdDate = (select max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf where docPortaf.id = docPortafirmes.id)))")
+//	public Page<DocumentEntity> findDocumentsPerCustodiarMassiu(
+//			@Param("entitat") EntitatEntity entitat,
+//			Pageable pageable);
+	
+
+	
+	
+	
 
 }

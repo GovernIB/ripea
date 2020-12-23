@@ -192,7 +192,37 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
+	<c:choose>
+	<c:when test="${document.estat == 'FIRMAT' && document.gesDocFirmatId != null }">
+		<c:if test="${portafirmes.error}">
+			<div class="alert well-sm alert-danger alert-dismissable">
+				<span class="fa fa-exclamation-triangle"></span>
 
+				<spring:message code="firma.info.errors.processament"/>
+					
+				<a href="../portafirmes/reintentar" class="btn btn-xs btn-default pull-right">
+					<span class="fa fa-refresh"></span>
+					<spring:message code="firma.info.errors.reintentar"/>
+				</a>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title"><spring:message code="firma.info.error.custodiar"/></h4>
+				</div>
+				<div class="panel-body">
+					<br/>
+					<dl class="dl-horizontal">
+						<dt><spring:message code="firma.info.camp.error.data.darrer"/></dt>
+						<dd><fmt:formatDate value="${portafirmes.intentData}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+						<dt><spring:message code="firma.info.camp.error.intents"/></dt>
+						<dd>${portafirmes.intentNum}</dd>
+					</dl>
+					<pre style="height:300px; margin: 12px">${portafirmes.errorDescripcio}</pre>
+				</div>
+			</div>
+		</c:if>	
+	</c:when>
+	<c:otherwise>
 	<c:if test="${portafirmes.error}">
 		<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
 	</c:if>
@@ -223,10 +253,12 @@ $(document).ready(function() {
 								<td><strong><spring:message code="firma.info.camp.prioritat"/></strong></td>
 								<td><spring:message code="portafirmes.prioritat.enum.${portafirmes.prioritat}"/></td>
 							</tr>
+							<%-- 
 							<tr>
 								<td><strong><spring:message code="firma.info.camp.data.cad"/></strong></td>
 								<td><fmt:formatDate value="${portafirmes.caducitatData}" pattern="dd/MM/yyyy"/></td>
 							</tr>
+							--%>
 							<tr>
 								<td><strong><spring:message code="firma.info.camp.document.tipus"/></strong></td>
 								<td>${portafirmes.documentTipus}</td> 
@@ -364,6 +396,16 @@ $(document).ready(function() {
 				</c:if>
 			</div>
 		</div>
+		</c:otherwise>
+	</c:choose>
+
+
+
+
+
+
+
+
 	<div id="modal-botons" class="well">
 		<a href="<c:url value="/contenidor/${portafirmes.document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
 	</div>

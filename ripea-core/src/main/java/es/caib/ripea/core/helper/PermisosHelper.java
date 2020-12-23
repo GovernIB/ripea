@@ -157,18 +157,20 @@ public class PermisosHelper {
 	 */
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		Collection<? extends GrantedAuthority> authorities = roleHierarchy.getReachableGrantedAuthorities(
-//				auth.getAuthorities());
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
-
-		sids.add(aclSidRepository.getUserSid(auth.getName()));
-
+		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
+		if (userSid != null) {
+			sids.add(userSid);
+		}
 		List<String> rolesNames = new ArrayList<String>();
 		for (GrantedAuthority authority : auth.getAuthorities()) {
 			rolesNames.add(authority.getAuthority());
 		}
-		sids.addAll(aclSidRepository.findRolesSid(rolesNames));
-		
+		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+			if (aclSid != null) {
+				sids.add(aclSid);
+			}
+		}
 		return aclObjectIdentityRepository.findObjectsWithPermissions(clazz.getName(), sids, permission.getMask());
 	}
 

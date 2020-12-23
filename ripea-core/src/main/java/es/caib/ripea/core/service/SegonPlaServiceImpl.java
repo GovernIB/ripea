@@ -159,8 +159,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Scheduled(fixedDelayString = "${config:es.caib.ripea.dominis.cache.execucio}")
 	public void buidarCacheDominis() {
 		try {
-			//Connexió amb la BBDD del domini
-			cacheHelper.evictCreateDominiConnexio();
 			//Consulta
 			cacheHelper.evictFindDominisByConsutla();
 		} catch (Exception ex) {

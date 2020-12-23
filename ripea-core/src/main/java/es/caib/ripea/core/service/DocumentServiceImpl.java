@@ -13,6 +13,8 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -32,6 +35,8 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
@@ -57,6 +62,7 @@ import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
@@ -66,10 +72,14 @@ import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentNotificacioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
@@ -78,6 +88,7 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -121,6 +132,10 @@ public class DocumentServiceImpl implements DocumentService {
 	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private DocumentNotificacioHelper documentNotificacioHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private PaginacioHelper paginacioHelper;
 	
 	@Transactional
 	@Override
@@ -288,9 +303,10 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "expedientId=" + expedientId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId, 
-				true, 
 				false, 
-				false);
+				false, 
+				false, 
+				true);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -420,7 +436,6 @@ public class DocumentServiceImpl implements DocumentService {
 			Long id,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
 			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
@@ -431,8 +446,7 @@ public class DocumentServiceImpl implements DocumentService {
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
 				"assumpte=" + assumpte + ", " +
-				"prioritat=" + prioritat + ", " +
-				"dataCaducitat=" + dataCaducitat + ")");
+				"prioritat=" + prioritat + ")");
 		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 				entitatId,
 				id,
@@ -448,7 +462,7 @@ public class DocumentServiceImpl implements DocumentService {
 					document,
 					assumpte,
 					prioritat,
-					dataCaducitat,
+					null,
 					portafirmesFluxId,
 					portafirmesResponsables,
 					portafirmesSeqTipus,
@@ -522,7 +536,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional
 	@Override
-	public void portafirmesReintentar(
+	public Exception portafirmesReintentar(
 			Long entitatId,
 			Long id) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
@@ -535,11 +549,40 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false);
-		firmaPortafirmesHelper.portafirmesReintentar(
+		return firmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
 
 	}
+	
+	@Transactional
+	@Override
+	public Exception portafirmesReintentar(
+			Long entitatId,
+			Set<Long> ids) {
+		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
+				+ "entitatId=" + entitatId + ", "
+				+ "ids=" + ids + ")");
+		
+		for (Long id : ids) {
+			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+					entitatId,
+					id,
+					false,
+					true,
+					false,
+					false);
+			Exception exception = firmaPortafirmesHelper.portafirmesReintentar(
+					entitatId,
+					document);
+			if (exception != null) {
+				return exception;
+			}
+		}
+		return null;
+	}
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -566,6 +609,188 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		return docPortafir;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, 
+				false);
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitat.getId(),
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false);
+		}
+		
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					entitat,
+					filtre.getMetaDocumentId());
+		}
+		
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+
+		
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerCustodiarMassiu(
+					entitat,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+	
+	
+			return paginacioHelper.toPaginaDto(
+					paginaDocuments,
+					DocumentDto.class,
+					new Converter<DocumentEntity, DocumentDto>() {
+						@Override
+						public DocumentDto convert(DocumentEntity source) {
+							DocumentDto dto = (DocumentDto)contingutHelper.toContingutDto(
+									source,
+									false,
+									false,
+									false,
+									false,
+									true,
+									true,
+									false);
+							return dto;
+						}
+					});
+		} else {
+			return paginacioHelper.getPaginaDtoBuida(
+					DocumentDto.class);
+		}
+	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Long> findDocumentsIdsPerCustodiarMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, 
+				false);
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false);
+		}
+		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitat.getId(),
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false);
+		}
+		
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					entitat,
+					filtre.getMetaDocumentId());
+		}
+		
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
+				entitatId,
+				new Permission[] { ExtendedPermission.WRITE },
+				false,
+				null);
+
+		
+		
+		if (!metaExpedientsPermesos.isEmpty()) {
+		
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			List<Long> documentsIds = documentRepository.findDocumentsIdsPerCustodiarMassiu(
+					entitat,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					filtre.getNom(),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi);
+	
+	
+			return documentsIds;
+		} else {
+			return new ArrayList<>();
+		}
+	}
+	
 	
 	@Transactional
 	@Override
@@ -1029,7 +1254,7 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
-		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false) : null;
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	

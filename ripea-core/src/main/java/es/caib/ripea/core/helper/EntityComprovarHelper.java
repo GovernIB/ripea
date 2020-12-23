@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -113,7 +112,7 @@ public class EntityComprovarHelper {
 				entitat.getId(),
 				comprovarPermisUsuari,
 				comprovarPermisAdmin,
-				comprovarPermisUsuariOrAdmin);
+				comprovarPermisUsuariOrAdmin, false);
 
 	}
 
@@ -121,16 +120,18 @@ public class EntityComprovarHelper {
 
 		return comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false);
+				false,
+				false, 
+				true);
 	}
 	
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
 			boolean comprovarPermisUsuari,
 			boolean comprovarPermisAdmin,
-			boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
+			boolean comprovarPermisUsuariOrAdmin, 
+			boolean comprovarPermisUsuariOrAdminOrOrgan) throws NotFoundException {
 		EntitatEntity entitat = entitatRepository.findOne(entitatId);
 		if (entitat == null) {
 			throw new NotFoundException(entitatId, EntitatEntity.class);
@@ -160,21 +161,18 @@ public class EntityComprovarHelper {
 				        "ADMINISTRATION || READ");
 			}
 		}
-//		if (comprovarPermisUsuariOrAdminOrOrgan) {
-//			boolean esAdministradorOLectorEntitat = permisosHelper.isGrantedAny(entitatId,
-//			        EntitatEntity.class,
-//			        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.READ }, auth);
-//			
-//			List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
-//			
-//			if (!esAdministradorOLectorEntitat && (organs == null || organs.isEmpty())) {
-//				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
-//				        "ADMINISTRATION || READ");
-//			}
-//		}
-		
-		
-		
+		if (comprovarPermisUsuariOrAdminOrOrgan) {
+			boolean esAdministradorOLectorEntitat = permisosHelper.isGrantedAny(entitatId,
+			        EntitatEntity.class,
+			        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.READ }, auth);
+			
+			List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
+			
+			if (!esAdministradorOLectorEntitat && (organs == null || organs.isEmpty())) {
+				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
+				        "ADMINISTRATION || READ || ORGAN");
+			}
+		}
 		
 		return entitat;
 	}
@@ -428,7 +426,7 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
-		EntitatEntity entitat = comprovarEntitat(entitatId, true, false, false);
+		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
 			throw new NotFoundException(expedientId, ExpedientEntity.class);

@@ -100,7 +100,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				entitatId,
 				false,
 				false,
-				true);
+				true, false);
 		
 		ExecucioMassivaEntity execucioMassiva = null;
 		
@@ -277,7 +277,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				entitatId,
 				false,
 				false,
-				true);
+				true, false);
 		
 		Pageable paginacio = new PageRequest(pagina, 8, Direction.DESC, "dataInici");		
 		
@@ -420,7 +420,6 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					contingut.getId(),
 					em.getMotiu(),
 					em.getPrioritat(),
-					em.getDataCaducitat(),
 					null,
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesResponsables(),
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),

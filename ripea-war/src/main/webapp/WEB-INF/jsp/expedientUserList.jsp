@@ -166,6 +166,7 @@ $(document).ready(function() {
 		
 		//select dominis a partir de metaexpedient
 		var dominisRefresh = function(data) {	
+			$('#metaExpedientDominiCodi').empty();
 			$('#metaExpedientDominiCodi').append("<option value=\"\"></option>");
 			for (var i = 0; i < data.length; i++) {
 
@@ -184,27 +185,71 @@ $(document).ready(function() {
 		
 	});
 	$('#metaExpedientId').trigger('change');
-
 	
-			
+	let pageSizeDominis = 20;		
 	$('#metaExpedientDominiCodi').on('change', function() {
+		var selDomini = $("#metaExpedientDominiValor");
 		var dominiCodi= $(this).val();
+		var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDada/domini/' + dominiCodi + '"/>';
+		selDomini.empty();
+		selDomini.append("<option value=\"\"></option>");
+		var select2Options = {
+				language: "${requestLocale}",
+		        theme: 'bootstrap',
+				allowClear: true,
+		        ajax: {
+		            url: multipleUrl,
+		            dataType: 'json',
+		            delay: 250,
+	                global: false,
+		            data: function (params) {
+		                params.page = params.page || 1;
+		                return {
+		                	filter: params.term ? params.term : '',
+		                    pageSize: pageSizeDominis,
+		                    page: params.page
+		                };
+		            },
+		            processResults: function (data, params) {
+		                params.page = params.page || 1;
+		                var dominis = [];
+		                for (let i = 0; i < data.resultat.length; i++) {
+		                	dominis.push({
+		                        id: data.resultat[i].id, 
+		                        text: data.resultat[i].text
+		                    })
+		                }
+		                return {
+		                    results: dominis,
+		                    pagination: {
+		                        more: params.term ? (params.page * data.totalElements < data.totalElements) : ((params.page * pageSizeDominis < data.totalElements) || (data.resultat.length > 0))
+		                    }
+		                };
+		            },
+		            cache: true
+		        },
+		        width: '100%',
+		        minimumInputLength: 0
+	    };
+		selDomini.select2(select2Options);
+		
 		//get valor domini seleccionat
-		var dominisRefresh = function(data) {
-			$('#metaExpedientDominiValor').append("<option value=\"\"></option>");
-			for (var i = 0; i < data.length; i++) {
-				console.log(data[i]);
-				$('#metaExpedientDominiValor').append('<option value="' + data[i].id + '">' + data[i].valor + '</option>');
-			}
-		};
-		if (metaExpedientId != "") {
-			var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDada/domini/' + dominiCodi + '"/>';
-			$.get(multipleUrl)
-			.done(dominisRefresh)
-			.fail(function() {
-			alert("<spring:message code="error.jquery.ajax"/>");
-			});
-		}
+		//var dominisRefresh = function(data) {
+		//	
+		//	$('#metaExpedientDominiValor').append("<option value=\"\"></option>");
+		//	for (var i = 0; i < data.length; i++) {
+		//		console.log(data[i]);
+		//		$('#metaExpedientDominiValor').append('<option value="' + data[i].id + '">' + data[i].valor + '</option>');
+		//	}
+		//};
+		//if (metaExpedientId != "") {
+		//	var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDada/domini/' + dominiCodi + '"/>';
+		//	$.get(multipleUrl)
+		//	.done(dominisRefresh)
+		//	.fail(function() {
+		//	alert("<spring:message code="error.jquery.ajax"/>");
+		//	});
+		//}
 	});
 	
 
