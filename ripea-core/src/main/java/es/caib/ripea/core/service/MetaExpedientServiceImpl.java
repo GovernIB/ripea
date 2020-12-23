@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -376,8 +377,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
 							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
-									filtre.getOrganGestorId()) : null,
-							filtre.getVeureTots() != null ? filtre.getVeureTots() : false,
+							filtre.getOrganGestorId()) : null,
+							filtre.getAmbit() == null ,
+							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaExpedientDto.class);
 		} else {
@@ -392,8 +394,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
 							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
-									filtre.getOrganGestorId()) : null,
-							filtre.getVeureTots() != null ? filtre.getVeureTots() : false,
+							filtre.getOrganGestorId()) : null,
+							filtre.getAmbit() == null ,
+							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaExpedientDto.class);
 		}

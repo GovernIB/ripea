@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -44,7 +45,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
-			"and (:hideWithoutOrganGestor = true or me.organGestor != null) " +
+			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
 	List<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
@@ -56,7 +57,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
 			@Param("organGestor") OrganGestorEntity organGestor,
-			@Param("hideWithoutOrganGestor") boolean hideWithoutOrganGestor,
+			@Param("esNullAmbit") boolean esNullAmbit,
+			@Param("comuns") boolean comuns,
 			Sort sort);
 	  
 	@Query( "from " +
@@ -88,7 +90,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
-			"and (:hideWithoutOrganGestor = true or me.organGestor != null) " +
+			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
@@ -100,7 +102,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
 			@Param("organGestor") OrganGestorEntity organGestor,	
-			@Param("hideWithoutOrganGestor") boolean hideWithoutOrganGestor,
+			@Param("esNullAmbit") boolean esNullAmbit,
+			@Param("comuns") boolean comuns,
 			Pageable pageable);
 
 	@Query( "from " +

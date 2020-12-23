@@ -74,11 +74,13 @@
  					suggestValue="id"
  					suggestText="nom" />
 			</div>
-			<div class="col-md-4"> 
+			<div class="col-md-4">
 				<c:if test="${not isRolAdminOrgan}">
-				 	<rip:inputCheckbox name="veureTots" inline="true" textKey="metaexpedient.list.filtre.camp.veure.tots"/>
+					<rip:inputSelect name="ambit" optionEnum="MetaExpedientAmbitEnumDto" 
+									 emptyOption="true" 
+									 placeholderKey="metaexpedient.list.filtre.camp.ambit" inline="true"/>
 				</c:if>
-			</div>
+			</div>			
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
