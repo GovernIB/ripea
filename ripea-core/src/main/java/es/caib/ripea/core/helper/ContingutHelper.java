@@ -72,6 +72,7 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
@@ -142,6 +143,8 @@ public class ContingutHelper {
 	private IndexHelper indexHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
@@ -737,6 +740,15 @@ public class ContingutHelper {
 			}
 			// Elimina contingut a l'arxiu
 			arxiuPropagarEliminacio(contingut);
+		}
+		// Cancel·lar enviament si el document conté enviaments pendents
+		if (contingut instanceof DocumentEntity) {
+			DocumentEntity document = (DocumentEntity)contingut;
+			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+				firmaPortafirmesHelper.portafirmesCancelar(
+						entitatId,
+						document);
+			}
 		}
 		return dto;
 	}
