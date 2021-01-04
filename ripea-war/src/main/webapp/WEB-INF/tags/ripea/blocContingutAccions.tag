@@ -114,6 +114,9 @@
 			
 			<%---- Esborrar ----%>
 			<c:choose>
+				<c:when test="${contingut.document && contingut.estat == 'FIRMA_PENDENT'}">
+					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat.pendent"/> </c:set>
+				</c:when>
 				<c:when test="${contingut.document && contingut.estat != 'REDACCIO'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat"/> </c:set>
 				</c:when>
