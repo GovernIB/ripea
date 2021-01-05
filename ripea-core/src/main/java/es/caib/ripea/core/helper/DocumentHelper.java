@@ -277,7 +277,7 @@ public class DocumentHelper {
 	
 	public void actualitzarEstat(DocumentEntity document, DocumentEstatEnumDto nouEstat) {
 		
-		if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+		if ((document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) || document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
 		contingutLogHelper.log(

@@ -902,7 +902,8 @@ public class DocumentServiceImpl implements DocumentService {
 					dispositiuEnviament,
 					document.getMetaDocument().isBiometricaLectura(),
 					document.getExpedient(),
-					document).build();
+					document,
+					viaFirmaEnviarDto.isFirmaParcial()).build();
 			
 			firmaViaFirmaHelper.viaFirmaEnviar(documentViaFirma);
 		

@@ -56,6 +56,9 @@
 									<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
 										<span class="pendent fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 									</c:if>
+									<c:if test="${fill.document && fill.estat == 'FIRMA_PARCIAL'}">
+										<span class="parcial fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
+									</c:if>
 									<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && fill.errorEnviamentPortafirmes && fill.gesDocFirmatId == null}">
 										<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 									</c:if>
@@ -177,6 +180,9 @@
 							</c:if>
 							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
 								<span class="pendent fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
+							</c:if>
+							<c:if test="${fill.document && fill.estat == 'FIRMA_PARCIAL'}">
+								<span class="parcial fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmaparcial"/>"></span>
 							</c:if>
 							<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && fill.errorEnviamentPortafirmes && fill.gesDocFirmatId == null}">
 								<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>

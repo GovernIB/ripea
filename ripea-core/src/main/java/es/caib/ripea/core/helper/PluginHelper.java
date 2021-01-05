@@ -1385,7 +1385,7 @@ public class PluginHelper {
 							document.getDataCaptura(),
 							document.getNtiEstadoElaboracion(),
 							document.getNtiTipoDocumental(),
-							DocumentEstat.DEFINITIU,
+							document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
 							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
 							serieDocumental));
 			integracioHelper.addAccioOk(
@@ -1394,8 +1394,8 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			document.updateEstat(
-					DocumentEstatEnumDto.CUSTODIAT);
+			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
+				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			if (getArxiuPlugin().suportaMetadadesNti()) {
 				Document documentDetalls = getArxiuPlugin().documentDetalls(
 						documentModificat.getIdentificador(),

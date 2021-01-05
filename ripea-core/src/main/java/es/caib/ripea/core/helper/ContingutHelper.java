@@ -764,7 +764,7 @@ public class ContingutHelper {
 			}
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat());
+			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat()) && !DocumentEstatEnumDto.FIRMA_PARCIAL.equals(document.getEstat());
 		}
 		return conteDefinitius;
 	}

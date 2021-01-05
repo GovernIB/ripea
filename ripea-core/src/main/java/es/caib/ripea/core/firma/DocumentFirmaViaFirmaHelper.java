@@ -76,8 +76,10 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
 			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
-			document.updateEstat(
-					DocumentEstatEnumDto.FIRMAT);
+			if (documentViaFirma.isFirmaParcial())
+				document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
+			else
+				document.updateEstat(DocumentEstatEnumDto.FIRMAT);
 			contingutLogHelper.log(
 					document,
 					LogTipusEnumDto.DOC_FIRMAT,

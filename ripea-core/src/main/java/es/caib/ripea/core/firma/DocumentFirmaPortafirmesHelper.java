@@ -32,6 +32,7 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
@@ -43,6 +44,7 @@ import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.PortafirmesBlockInfoRepository;
 import es.caib.ripea.core.repository.PortafirmesBlockRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
@@ -75,6 +77,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	private PortafirmesBlockRepository portafirmesBlockRepository;
 	@Autowired
 	private PortafirmesBlockInfoRepository portafirmesBlockInfoRepository;
+	@Autowired
+	private DocumentViaFirmaRepository documentViaFirmaRepository;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -467,6 +471,14 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				"id=" + document.getId() + ")");
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
 		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+		boolean hasFirmaParcial = false;
+		List<DocumentViaFirmaEntity> enviamentsViaFirmaProcessats = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+				document, 
+				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.PROCESSAT});
+		if (enviamentsViaFirmaProcessats != null && ! enviamentsViaFirmaProcessats.isEmpty()) {
+			hasFirmaParcial = enviamentsViaFirmaProcessats.get(0).isFirmaParcial();
+		}
+		
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -487,8 +499,11 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			}
 		}
 		documentPortafirmes.updateCancelat(new Date());
-		document.updateEstat(
-				DocumentEstatEnumDto.REDACCIO);
+		if (!hasFirmaParcial)
+			document.updateEstat(DocumentEstatEnumDto.REDACCIO);
+		else
+			document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
+		
 		logAll(document, documentPortafirmes, LogTipusEnumDto.PFIRMA_CANCELACIO);
 	}
 	

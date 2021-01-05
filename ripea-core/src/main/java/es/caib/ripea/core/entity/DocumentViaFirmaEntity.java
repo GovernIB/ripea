@@ -57,6 +57,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	@ForeignKey(name = "ipa_document_enviament_dis_fk")
 	protected DispositiuEnviamentEntity dispositiuEnviament;
 	
+	@Column(name = "firma_parcial")
+	private boolean firmaParcial;
+	
 	public String getCodiUsuari() {
 		return codiUsuari;
 	}
@@ -96,6 +99,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	public void updateMessageCode(String messageCode) {
 		this.messageCode = messageCode;
 	}
+	public boolean isFirmaParcial() {
+		return firmaParcial;
+	}
 	
 	public void updateEnviat(
 			Date enviatData,
@@ -122,7 +128,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			DispositiuEnviamentEntity dispositiuEnviament,
 			boolean lecturaObligatoria,
 			ExpedientEntity expedient,
-			DocumentEntity document) {
+			DocumentEntity document,
+			boolean firmaParcial) {
 		return new Builder(
 				estat,
 				codiUsuari,
@@ -136,7 +143,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				dispositiuEnviament,
 				lecturaObligatoria,
 				expedient,
-				document);
+				document,
+				firmaParcial);
 	}
 
 	public static class Builder {
@@ -154,7 +162,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				DispositiuEnviamentEntity dispositiuEnviament,
 				boolean lecturaObligatoria,
 				ExpedientEntity expedient,
-				DocumentEntity document) {
+				DocumentEntity document,
+				boolean firmaParcial) {
 			built = new DocumentViaFirmaEntity();
 			built.inicialitzar();
 			built.assumpte = titol;
@@ -171,6 +180,7 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			built.lecturaObligatoria = lecturaObligatoria;
 			built.expedient = expedient;
 			built.document = document;
+			built.firmaParcial = firmaParcial;
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;

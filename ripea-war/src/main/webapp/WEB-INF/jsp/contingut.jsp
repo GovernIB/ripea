@@ -300,6 +300,11 @@ ul.interessats {
 	font-size: 16px;
 	vertical-align: text-top;
 }
+.parcial.fa.fa-pencil-square {
+	color: #FFAB66;
+	font-size: 16px;
+	vertical-align: text-top;
+}
 .error.fa.fa-pencil-square {
 	color: #ffab66;
 	font-size: 16px;

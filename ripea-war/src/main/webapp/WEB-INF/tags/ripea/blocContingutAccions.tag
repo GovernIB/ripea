@@ -117,7 +117,7 @@
 				<c:when test="${contingut.document && contingut.estat == 'FIRMA_PENDENT'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat.pendent"/> </c:set>
 				</c:when>
-				<c:when test="${contingut.document && contingut.estat != 'REDACCIO'}">
+				<c:when test="${contingut.document && contingut.estat != 'REDACCIO' && contingut.estat != 'FIRMA_PARCIAL'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat"/> </c:set>
 				</c:when>
 				<c:otherwise>
@@ -142,7 +142,7 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
-				<c:if test="${contingut.custodiat and !isTasca}">
+				<c:if test="${(contingut.custodiat or contingut.firmaParcial) and !isTasca}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
 				</c:if>
 				<c:if test="${!contingut.custodiat and !isTasca and contingut.pdf and imprimibleNoFirmats}">
@@ -181,7 +181,7 @@
 			<c:if test="${isTasca || potModificarExpedientPare}">
 			
 				<%---- Enviar a portafirmes ----%>
-				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
+				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<c:choose>
@@ -201,7 +201,7 @@
 				</c:if>
 				
 				<%---- Firmar al navegador ----%>
-				<c:if test="${contingut.metaNode.firmaPassarelaActiva && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
+				<c:if test="${contingut.metaNode.firmaPassarelaActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<c:choose>
@@ -274,7 +274,7 @@
 					<li><a href="<c:url value="/document/${contingut.id}/viafirma/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.viafirma.info"/></a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				<c:if test="${contingut.document && contingut.estat == 'REDACCIO' && contingut.documentTipus == 'DIGITAL' && convertirDefinitiu}">	
+				<c:if test="${contingut.document && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && convertirDefinitiu}">	
 					<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu"/></c:set>
 					<li role="separator" class="divider"></li>			
 					<li><a href="<c:url value="/document/${contingut.id}/convertir"/>" data-refresh-pagina="true" data-confirm="${definitiuConfirmacioMsg}"><span class="fa fa-check-square"></span>&nbsp;<spring:message code="contingut.boto.definitiu"/></a></li>

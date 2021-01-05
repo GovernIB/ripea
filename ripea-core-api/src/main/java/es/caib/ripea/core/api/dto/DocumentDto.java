@@ -100,6 +100,9 @@ public class DocumentDto extends NodeDto {
 	public boolean isDefinitiu() {
 		return DocumentEstatEnumDto.DEFINITIU.equals(estat);
 	}
+	public boolean isFirmaParcial() {
+		return DocumentEstatEnumDto.FIRMA_PARCIAL.equals(estat);
+	}
 	public boolean isPdf() {
 		return (fitxerContentType != null && fitxerContentType.equals("application/pdf"));
 	}
