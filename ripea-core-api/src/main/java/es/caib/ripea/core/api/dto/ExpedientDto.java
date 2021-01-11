@@ -4,6 +4,7 @@
 package es.caib.ripea.core.api.dto;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import lombok.Getter;
@@ -50,6 +51,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean tasques;
 	private boolean hasEsborranys;
 	private Set<InteressatDto> interessats;
+	private List<InteressatDto> interessatsNotificable;
 	private long numSeguidors;
 	private boolean seguidor;
 	private boolean errorLastEnviament;
