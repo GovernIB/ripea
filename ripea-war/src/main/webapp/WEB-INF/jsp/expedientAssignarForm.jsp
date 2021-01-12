@@ -28,7 +28,7 @@
 			urlConsultaLlistat="${urlConsultaLlistat}" 
 			textKey="expedient.assignar.form.camp.usuari"
 			suggestValue="codi"
-			suggestText="nom"
+			suggestText="codiAndNom"
 			required="true"/>
 		<div class="row" style="margin-bottom: 60px;"></div>
 		
