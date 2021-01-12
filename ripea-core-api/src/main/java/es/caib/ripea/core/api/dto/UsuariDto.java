@@ -28,6 +28,9 @@ public class UsuariDto implements Serializable {
 			boolean rebreEmailsAgrupats) {
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 	}
+	public String getCodiAndNom() {
+		return nom + " (" + codi + ")";
+	}
 	public String getCodi() {
 		return codi;
 	}
