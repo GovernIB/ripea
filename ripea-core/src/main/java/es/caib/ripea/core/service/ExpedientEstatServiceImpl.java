@@ -465,7 +465,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -539,7 +540,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();

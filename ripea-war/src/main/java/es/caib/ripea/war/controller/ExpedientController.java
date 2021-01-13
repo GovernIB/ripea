@@ -83,6 +83,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
+
 	@Autowired
 	private ContingutService contingutService;
 	@Autowired
@@ -110,9 +111,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			model.addAttribute("mantenirPaginacio", false);
 		}
 		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
+		
 		if (filtreCommand.getOrganGestorId() != null) {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 					entitatActual.getId(),
@@ -121,7 +126,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		} else {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
 					entitatActual.getId(), 
-					null);
+					null, 
+					rolActual);
 		}
 
 		
@@ -205,12 +211,16 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				expedientService.findAmbFiltreUser(
 						entitatActual.getId(),
 						ExpedientFiltreCommand.asDto(filtreCommand),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+						DatatablesHelper.getPaginacioDtoFromRequest(request), 
+						rolActual),
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
 	}
@@ -515,10 +525,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public List<MetaExpedientDto> metaExpedients(
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitatActual.getId(), 
-				null);
+				null, 
+				rolActual);
 	}
 	
 
@@ -839,11 +851,16 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerLectura(
 						entitatActual.getId(), 
-						null));
+						null, 
+						rolActual));
 		model.addAttribute(
 				"expedientEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(
@@ -851,7 +868,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						"expedient.estat.enum."));
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitatActual.getId(), 
-				null);
+				null, 
+				rolActual);
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);

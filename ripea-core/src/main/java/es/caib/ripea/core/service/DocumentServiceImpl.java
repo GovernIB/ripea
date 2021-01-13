@@ -662,7 +662,8 @@ public class DocumentServiceImpl implements DocumentService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -763,7 +764,8 @@ public class DocumentServiceImpl implements DocumentService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 
 		
 		

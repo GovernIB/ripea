@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 public class ExpedientHelper {
 
 	private static final String REQUEST_PARAMETER_ACCES_EXPEDIENTS = "ExpedientHelper.teAccesExpedients";
+	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
 	public static void accesUsuariExpedients(
 			HttpServletRequest request,
@@ -35,12 +36,15 @@ public class ExpedientHelper {
 	public static Boolean teAccesExpedients(
 			HttpServletRequest request,
 			MetaExpedientService metaExpedientService) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		Boolean teAcces = (Boolean)request.getSession().getAttribute(REQUEST_PARAMETER_ACCES_EXPEDIENTS);
 		if (RolHelper.isRolActualUsuari(request) && teAcces == null && metaExpedientService != null) {
 			teAcces = new Boolean(false);
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			if (entitatActual != null) {
-				List<MetaExpedientDto> expedientsAccessibles =  metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId(), null);
+				List<MetaExpedientDto> expedientsAccessibles =  metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId(), null, rolActual);
 				teAcces = new Boolean(expedientsAccessibles != null && !expedientsAccessibles.isEmpty());
 			}
 			request.getSession().setAttribute(
