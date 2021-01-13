@@ -28,6 +28,8 @@ import es.caib.ripea.war.helper.ModalHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class BaseController implements MessageSourceAware {
+	
+	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
 	MessageSource messageSource;
 

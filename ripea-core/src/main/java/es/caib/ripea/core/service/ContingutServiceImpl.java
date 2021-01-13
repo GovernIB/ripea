@@ -1522,7 +1522,8 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
@@ -1621,7 +1622,8 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 
 		
 		if (!metaExpedientsPermesos.isEmpty()) {

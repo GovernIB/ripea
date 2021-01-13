@@ -204,7 +204,8 @@ public class MetaExpedientHelper {
 				entitatId,
 				permisos,
 				true,
-				filtreNomOrCodiSia);		
+				filtreNomOrCodiSia, 
+				"tothom");		
 	}
 	
 	
@@ -212,7 +213,8 @@ public class MetaExpedientHelper {
 			Long entitatId,
 			Permission[] permisos,
 			boolean nomesActius,
-			String filtreNomOrCodiSia) {
+			String filtreNomOrCodiSia, 
+			String rolActual) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -230,23 +232,25 @@ public class MetaExpedientHelper {
 		} else {
 			metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		}
+
 		
+		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
+
 		
-		boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
-				entitat.getId(),
-				EntitatEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION },
-				auth);
-		
-		boolean onlyChecksReadPermission = onlyChecksReadPermission(permisos);
-		
-		
-		
-		
-		
-		
-		if (onlyChecksReadPermission) {
-			if (!esAdministradorEntitat) {
+		if (onlyToCheckReadPermission) {
+			if (rolActual.equals("tothom")) { 
+				permisosHelper.filterGrantedAll(
+						metaExpedients,
+						new ObjectIdentifierExtractor<MetaNodeEntity>() {
+							public Long getObjectIdentifier(MetaNodeEntity metaNode) {
+								return metaNode.getId();
+							}
+						},
+						MetaNodeEntity.class,
+						permisos,
+						auth);
+					
+			} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 				permisosHelper.filterGrantedAll(
 						metaExpedients,
 						new ObjectIdentifierExtractor<MetaNodeEntity>() {
@@ -268,9 +272,9 @@ public class MetaExpedientHelper {
 					// remove duplicates
 					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
 					
-				} 	
-					
-			}			
+				} 
+			}
+			
 		} else {
 			permisosHelper.filterGrantedAll(
 					metaExpedients,
@@ -292,7 +296,7 @@ public class MetaExpedientHelper {
 	}
 	
 	
-	private boolean onlyChecksReadPermission(Permission[] permisos) {
+	private boolean onlyToCheckReadPermission(Permission[] permisos) {
 		if (permisos.length == 0 || permisos.length == 1 && permisos[0] == ExtendedPermission.READ) {
 			return true;
 		} else {
