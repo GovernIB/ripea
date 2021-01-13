@@ -36,6 +36,13 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     
     private boolean gestioAmbGrupsActiva;
     
+	public boolean isComu() {
+		if (organGestor == null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
     public int getMetaDocumentsCount() {
         if (metaDocuments == null)
