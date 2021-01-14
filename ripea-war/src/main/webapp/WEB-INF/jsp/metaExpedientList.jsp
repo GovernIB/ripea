@@ -56,6 +56,9 @@
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
 			<div class="col-md-4">
+				<rip:inputText name="classificacioSia" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
+			</div>
+			<div class="col-md-4">
 				<rip:inputSelect name="actiu" optionEnum="MetaExpedientActiuEnumDto" 
 								 emptyOption="true" 
 								 placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>

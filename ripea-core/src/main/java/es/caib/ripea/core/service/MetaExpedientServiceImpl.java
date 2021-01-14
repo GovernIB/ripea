@@ -375,6 +375,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -392,6 +394,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -418,12 +422,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		} else if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByEntitat(
+					metaExpedientRepository.findByOrganGestor(
 							entitat,
 							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -434,12 +440,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					MetaExpedientDto.class);
 		} else {
 			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByEntitat(
+					metaExpedientRepository.findByOrganGestor(
 							entitat,
 							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
