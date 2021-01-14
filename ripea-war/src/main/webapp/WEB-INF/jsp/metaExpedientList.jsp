@@ -58,13 +58,15 @@
 			<div class="col-md-4">
 				<rip:inputText name="classificacioSia" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
 			</div>
-			<div class="col-md-4">
-				<rip:inputSelect name="actiu" optionEnum="MetaExpedientActiuEnumDto" 
-								 emptyOption="true" 
-								 placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
-			</div>
 		</div>
 		<div class="row">
+			<div class="col-md-4">
+				<rip:inputSelect 
+						name="actiu" 
+						optionEnum="MetaExpedientActiuEnumDto" 
+						emptyOption="true" 
+						placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
+			</div>
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
