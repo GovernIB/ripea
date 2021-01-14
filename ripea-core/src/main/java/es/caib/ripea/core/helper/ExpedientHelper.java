@@ -46,6 +46,7 @@ import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -117,6 +118,8 @@ public class ExpedientHelper {
 	private DadaRepository dadaRepository;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 	
 	public ExpedientEntity create(
 			Long entitatId,
@@ -179,18 +182,10 @@ public class ExpedientHelper {
 				grupId);
 		contingutLogHelper.logCreacio(expedient, false, false);
 		
-		
 		crearDadesPerDefecte(
 				metaExpedient,
 				expedient);
 
-		
-		
-
-
-		
-		
-		
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		//find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;
@@ -219,11 +214,11 @@ public class ExpedientHelper {
 			}
 		}
 		
+		// crear carpetes per defecte del tipus d'expedient
+		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
+		
 		return expedient;
 	}
-	
-	
-	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId) {
@@ -839,6 +834,53 @@ public class ExpedientHelper {
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
+	}
+	
+	//crea les carpetes per defecte definides al tipus d'expedient
+	private void crearCarpetesMetaExpedient(
+			Long entitatId, 
+			MetaExpedientEntity metaExpedient, 
+			ExpedientEntity expedient) {
+		List<MetaExpedientCarpetaDto> carpetesMetaExpedient = metaExpedientCarpetaHelper.findCarpetesArrelMetaExpedient(metaExpedient);
+		
+		for (MetaExpedientCarpetaDto metaExpedientCarpeta : carpetesMetaExpedient) {
+
+			CarpetaDto carpetaPare = carpetaHelper.create(
+					entitatId, 
+					expedient.getId(), 
+					metaExpedientCarpeta.getNom(), 
+					false, 
+					null, 
+					false, 
+					null);
+			if (! metaExpedientCarpeta.getFills().isEmpty()) {
+				crearSubCarpetes(
+						metaExpedientCarpeta.getFills(), 
+						entitatId, 
+						carpetaPare);
+			}
+		}
+	}
+	
+	private void crearSubCarpetes(
+			Set<MetaExpedientCarpetaDto> subCarpetes, 
+			Long entitatId, 
+			CarpetaDto pare) {
+		for (MetaExpedientCarpetaDto metaExpedientCarpetaDto : subCarpetes) {
+			CarpetaDto subCarpeta = carpetaHelper.create(
+					entitatId, 
+					pare.getId(), 
+					metaExpedientCarpetaDto.getNom(), 
+					false, 
+					null, 
+					false, 
+					null);
+				
+			crearSubCarpetes(
+					metaExpedientCarpetaDto.getFills(), 
+					entitatId, 
+					subCarpeta);
+		}
 	}
 
 //	public void comprovarSiExpedientAmbMateixNom(

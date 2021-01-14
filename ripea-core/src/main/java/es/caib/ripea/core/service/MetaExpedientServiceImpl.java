@@ -20,9 +20,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -42,6 +44,7 @@ import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -86,6 +89,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 
 	@Transactional
 	@Override
@@ -120,7 +125,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva()).build();
-		return conversioTipusHelper.convertir(metaExpedientRepository.save(entity), MetaExpedientDto.class);
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
+		
+		//crear estructura carpetes per defecte
+		metaExpedientHelper.crearEstructuraCarpetes(
+				metaExpedient.getEstructuraCarpetes(), 
+				metaExpedientEntity);
+		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
 
 	@Transactional
@@ -163,6 +174,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva());
+		
+		//crear estructura carpetes per defecte
+		metaExpedientHelper.crearEstructuraCarpetes(
+				metaExpedient.getEstructuraCarpetes(), 
+				metaExpedientEntity);
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
 
@@ -204,6 +220,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if (allEsborats == true && expedients.size() > 0)
 			throw new ExisteixenExpedientsEsborratsException();
 
+		//esborrar les carpetes per defecte
+		metaExpedientCarpetaHelper.removeAllCarpetes(metaExpedient);
+		
 		metaExpedientRepository.delete(metaExpedient);
 
 		return conversioTipusHelper.convertir(
@@ -522,6 +541,43 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional
 	@Override
+	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(
+			Long entitatId, 
+			Long metaExpedientId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				false, 
+				false, 
+				false, 
+				true);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId,
+				false,
+				false,
+				false,
+				false);
+		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
+		return metaExpedientHelper.obtenirPareArbreCarpetesPerMetaExpedient(metaExpedient,carpetes);
+	}
+	
+	@Transactional
+	@Override
+	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(
+			Long entitatId, 
+			Long metaExpedientCarpetaId) {
+		entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				false, 
+				false, 
+				false, 
+				true);
+		MetaExpedientCarpetaDto carpeteDeleted = metaExpedientHelper.deleteCarpetaMetaExpedient(metaExpedientCarpetaId);
+		return carpeteDeleted;
+	}
+	
+	@Transactional
+	@Override
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -683,7 +739,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
 		permisosHelper.deletePermis(id, MetaNodeEntity.class, permisId);
 	}
-
+	
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
 		List<Long> metaExpedientIds = new ArrayList<Long>();
 		for (MetaExpedientDto metaExpedient : metaExpedients) {

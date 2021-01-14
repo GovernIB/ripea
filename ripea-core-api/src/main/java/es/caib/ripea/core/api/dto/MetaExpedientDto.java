@@ -36,7 +36,8 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     
     private boolean gestioAmbGrupsActiva;
     
-
+    List<ArbreJsonDto> estructuraCarpetes;
+    
     public int getMetaDocumentsCount() {
         if (metaDocuments == null)
             return 0;

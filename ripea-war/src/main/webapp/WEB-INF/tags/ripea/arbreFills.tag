@@ -1,8 +1,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
-<%@ attribute name="pare" required="true" type="java.lang.Object"%>
-<%@ attribute name="fills" required="true" type="java.lang.Object"%>
+<%@ attribute name="pare" type="java.lang.Object"%>
+<%@ attribute name="fills" type="java.lang.Object"%>
 <%@ attribute name="atributId" required="true"%>
 <%@ attribute name="atributNom" required="true"%>
 <%@ attribute name="seleccionatId"%>
@@ -17,7 +17,7 @@
 <ul>
 	<c:forEach var="fill" items="${fills}">
 		<li id="${fill.dades[atributId]}" data-jstree='{"icon":"fa fa-folder fa-lg"<c:if test="${not empty seleccionatId and fill.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
-			<small>${fill.dades[atributNom]}<c:if test="${not isOcultarCounts and fill.mostrarCount}"> <span class="badge">${fill.count}</span></c:if></small>
+			${fill.dades[atributNom]}<c:if test="${not isOcultarCounts and fill.mostrarCount}"> <span class="badge">${fill.count}</span></c:if>
 			<rip:arbreFills pare="${fill}" fills="${fill.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"  fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" fullesAtributInfo="${fullesAtributInfo}" fullesAtributInfoText="${fullesAtributInfoText}" isOcultarCounts="${isOcultarCounts}"/>
 		</li>
 	</c:forEach>
