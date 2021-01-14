@@ -56,12 +56,17 @@
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputSelect name="actiu" optionEnum="MetaExpedientActiuEnumDto" 
-								 emptyOption="true" 
-								 placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
+				<rip:inputText name="classificacioSia" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
 			</div>
 		</div>
 		<div class="row">
+			<div class="col-md-4">
+				<rip:inputSelect 
+						name="actiu" 
+						optionEnum="MetaExpedientActiuEnumDto" 
+						emptyOption="true" 
+						placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
+			</div>
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
@@ -106,8 +111,16 @@
 		<thead>
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
-				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>
+				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
+				<th data-col-name="classificacioSia" width="20%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>				
 				<th data-col-name="organGestor.nom" width="1%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="comu" data-orderable="false" data-template="#cellActiuTemplate" width="1%">
+					<spring:message code="metaexpedient.list.columna.comu"/>
+					<script id="cellActiuTemplate" type="text/x-jsrender">
+						{{if comu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				
 				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
