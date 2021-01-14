@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -660,10 +662,11 @@ public class DocumentServiceImpl implements DocumentService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 
-		
-		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
 		if (!metaExpedientsPermesos.isEmpty()) {
 		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
@@ -671,6 +674,7 @@ public class DocumentServiceImpl implements DocumentService {
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerCustodiarMassiu(
 					entitat,
 					metaExpedientsPermesos, 
+					auth.getName(),
 					metaExpedient == null,
 					metaExpedient,
 					expedient == null,
@@ -760,7 +764,8 @@ public class DocumentServiceImpl implements DocumentService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 
 		
 		

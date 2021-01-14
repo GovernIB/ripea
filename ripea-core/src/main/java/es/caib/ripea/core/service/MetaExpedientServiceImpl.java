@@ -324,7 +324,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.debug(
 				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
 						")");
-		return findActiusAmbEntitatPermis(entitatId, new Permission[] { ExtendedPermission.CREATE }, null);
+		return findActiusAmbEntitatPermis(entitatId, new Permission[] { ExtendedPermission.CREATE }, null, null);
 	}
 
 	@Transactional(readOnly = true)
@@ -334,19 +334,21 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return findActiusAmbEntitatPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
-				null);
+				null, null);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
 			Long entitatId,
-			String filtreNomOrCodiSia) {
+			String filtreNomOrCodiSia, 
+			String rolActual) {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
 		return findActiusAmbEntitatPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.READ },
-				filtreNomOrCodiSia);
+				filtreNomOrCodiSia, 
+				rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -392,6 +394,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -409,6 +413,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -435,12 +441,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		} else if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByEntitat(
+					metaExpedientRepository.findByOrganGestor(
 							entitat,
 							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -451,12 +459,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					MetaExpedientDto.class);
 		} else {
 			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByEntitat(
+					metaExpedientRepository.findByOrganGestor(
 							entitat,
 							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 							filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom(),
+							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+							filtre.getClassificacioSia(),
 							filtre.getActiu() == null,
 							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 							filtre.getOrganGestorId() == null,
@@ -776,14 +786,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private List<MetaExpedientDto> findActiusAmbEntitatPermis(
 			Long entitatId,
 			Permission[] permisos,
-			String filtreNomOrCodiSia) {
+			String filtreNomOrCodiSia, 
+			String rolActual) {
 
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatOrOrganPermis(
 						entitatId,
 						permisos,
 						true,
-						filtreNomOrCodiSia),
+						filtreNomOrCodiSia, 
+						rolActual == null ? "tothom" : rolActual),
 				MetaExpedientDto.class);
 	}
 

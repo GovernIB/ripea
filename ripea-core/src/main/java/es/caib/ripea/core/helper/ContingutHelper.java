@@ -82,6 +82,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -145,6 +146,8 @@ public class ContingutHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
+	@Autowired
+	private InteressatRepository interessatRepository;
 	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
@@ -245,6 +248,8 @@ public class ContingutHelper {
 			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
 			dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
 			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+			dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+					expedient), InteressatDto.class));
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			resposta = dto;
 

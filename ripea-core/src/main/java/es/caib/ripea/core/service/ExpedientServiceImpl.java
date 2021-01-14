@@ -523,12 +523,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) {
 		logger.debug(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, false, true);
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, false, true, rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -544,7 +545,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"id del expedient relacionat" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId);
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, "tothom");
 	}
 
 	@Transactional
@@ -854,7 +855,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -928,7 +930,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
-				null);
+				null, 
+				"tothom");
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1383,15 +1386,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			boolean accesAdmin,
-			boolean comprovarAccesMetaExpedients) {
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null);
+			boolean comprovarAccesMetaExpedients, 
+			String rolActual) {
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, rolActual);
 	}
 
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			Long expedientId) {
+			Long expedientId, 
+			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
 		MetaExpedientEntity metaExpedient = null;
 
@@ -1419,7 +1424,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					entitatId,
 					new Permission[] { ExtendedPermission.READ },
 					false,
-					null);
+					null, 
+					rolActual);
 		}
 
 		if (!metaExpedientsPermesos.isEmpty()) {

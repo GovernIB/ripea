@@ -135,6 +135,7 @@ public interface ExpedientService {
 	 *            Filtre per a la consulta.
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @param rolActual TODO
 	 * @return La pàgina amb els expedients trobats.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -143,7 +144,7 @@ public interface ExpedientService {
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 	
 	/**
 	 * Consulta els expedients de l'usuari per tipus d'expedient

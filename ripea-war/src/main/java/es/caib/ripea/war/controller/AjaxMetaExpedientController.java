@@ -58,12 +58,14 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
-		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
 		metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitat.getId(), 
-				text);
+				text, 
+				rolActual);
 		
 		return metaExpedientsPermisLectura;
 	}

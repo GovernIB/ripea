@@ -101,8 +101,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltreUser(entitatId, filtre, paginacioParams);
+			PaginacioParamsDto paginacioParams, String rolActual) {
+		return delegate.findAmbFiltreUser(entitatId, filtre, paginacioParams, rolActual);
 	}
 
 	@Override

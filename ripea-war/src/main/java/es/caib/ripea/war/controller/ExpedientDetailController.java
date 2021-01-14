@@ -56,7 +56,7 @@ public class ExpedientDetailController extends BaseUserController {
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
-
+	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 	@Autowired
 	private ExpedientService expedientService;
 	@Autowired
@@ -72,7 +72,7 @@ public class ExpedientDetailController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitatActual.getId(), 
-				null);
+				null, "tothom");
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);
@@ -148,12 +148,15 @@ public class ExpedientDetailController extends BaseUserController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				expedientService.findAmbFiltreUser(
 						entitatActual.getId(),
 						ExpedientFiltreCommand.asDto(filtreCommand),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+						DatatablesHelper.getPaginacioDtoFromRequest(request), 
+						rolActual),
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
 	}

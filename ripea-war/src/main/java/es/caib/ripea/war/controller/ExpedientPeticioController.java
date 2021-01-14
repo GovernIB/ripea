@@ -270,7 +270,8 @@ public class ExpedientPeticioController extends BaseUserController {
 				entitat.getId());
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitat.getId(), 
-				null);
+				null, 
+				"tothom");
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
