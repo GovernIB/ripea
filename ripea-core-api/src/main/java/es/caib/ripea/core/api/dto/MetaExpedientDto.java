@@ -43,7 +43,9 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 			return false;
 		}
 	}
-
+	
+    List<ArbreJsonDto> estructuraCarpetes;
+    
     public int getMetaDocumentsCount() {
         if (metaDocuments == null)
             return 0;

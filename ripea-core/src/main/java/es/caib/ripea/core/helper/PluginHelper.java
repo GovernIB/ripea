@@ -1936,7 +1936,7 @@ public class PluginHelper {
 		accioParams.put("numeroRegistre", numeroRegistre);
 		long t0 = System.currentTimeMillis();
 		try {
-			DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss");  
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");  
 			String dataPresentacioStr = dateFormat.format(dataPresentacio);  
 			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
 					numeroRegistre + ";" + tipusRegistre.getLabel() + ";" + dataPresentacioStr);
