@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
@@ -56,6 +58,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -212,6 +215,24 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					model);
 			return "contingutDocumentForm";
+		} catch (Exception ex) {
+			logger.error("Error al crear un document", ex);
+			Throwable throwable = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+			if (throwable!=null) {
+				SistemaExternException sisExtExc = (SistemaExternException) throwable;
+				MissatgesHelper.error(request, sisExtExc.getMessage());
+				omplirModelFormulari(
+						request,
+						command,
+						null,
+						pareId,
+						model);
+				return "contingutDocumentForm";
+			} else {
+				throw ex;
+			}
+			
+
 		}
 	}
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
@@ -1048,5 +1069,5 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
 	}
 	
-//	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 
+	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 
 }
