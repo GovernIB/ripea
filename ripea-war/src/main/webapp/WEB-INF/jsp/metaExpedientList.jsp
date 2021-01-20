@@ -135,7 +135,7 @@
 					<script id="cellGestioAmbGrupsActivaTemplate" type="text/x-jsrender">
 						{{if gestioAmbGrupsActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>	-->			
+				</th>	-->
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
@@ -148,7 +148,9 @@
 						<div class="dropdown">
 							<button class="btn btn-default" data-toggle="dropdown"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.elements"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="metaExpedient/{{:id}}/metaDocument"><span class="badge">{{:metaDocumentsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.documents"/></a></li>
+								<c:if test="${sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null  && sessionScope['SessionHelper.isTipusDocumentsEnabled']}">
+									<li><a href="metaExpedient/{{:id}}/metaDocument"><span class="badge">{{:metaDocumentsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.documents"/></a></li>
+								</c:if>
 								<li><a href="metaExpedient/{{:id}}/metaDada"><span class="badge">{{:metaDadesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/></a></li>
 								<li><a href="expedientEstat/{{:id}}"><span class="badge">{{:expedientEstatsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.estats"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/tasca"><span class="badge">{{:expedientTasquesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.tasques"/></a></li>
