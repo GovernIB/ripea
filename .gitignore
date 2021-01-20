@@ -5,3 +5,7 @@ target/
 .settings/
 .classpath
 .project
+
+# intellij files
+.idea
+*.iml
