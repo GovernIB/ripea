@@ -100,8 +100,8 @@ public class HistoricHelper {
 	 * Calcula l'històric de tots els metaexpedients de la base de dades de dins el rang de dades especificat
 	 * per paràmetre.
 	 * 
-	 * @param currentDateIni
-	 * @param currentDateEnd
+	 * @param currentDateIni Data a partir de la qual es volen calcular els historics
+	 * @param currentDateEnd Data fins a la qual es volen calcular els historics
 	 * @param tipusLog Indica si estem agrupant els històrics per mes o per dia.
 	 * 
 	 * @return Llistat d'històrics dels metaexpedients de la base de dades 

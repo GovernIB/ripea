@@ -80,13 +80,8 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
 			else
 				document.updateEstat(DocumentEstatEnumDto.FIRMAT);
-			contingutLogHelper.log(
-					document,
-					LogTipusEnumDto.DOC_FIRMAT,
-					null,
-					null,
-					false,
-					false);
+			logFirmat(document);
+
 			ViaFirmaDocument viaFirmaDocument = null;
 			// Descarrega el document firmat del portafirmes
 			try {

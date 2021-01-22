@@ -12,6 +12,7 @@ import java.util.Date;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +51,7 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 
 		// Registra al log la firma del document
 		logAll(document, LogTipusEnumDto.FIRMA_CLIENT, null, null);
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.DOC_FIRMAT,
-				null,
-				null,
-				false,
-				false);
+		logFirmat(document);
 		
 		// Custodia el document firmat
 		FitxerDto fitxer = new FitxerDto();
@@ -127,7 +122,7 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 	/**
 	 * Registra el log al document i al expedient on està el document.
 	 * 
-	 * @param documentPortafirmes
+	 * @param document
 	 * @param tipusLog
 	 */
 	private void logAll(DocumentEntity document, LogTipusEnumDto tipusLog, String param1, String param2) {
