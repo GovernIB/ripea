@@ -311,7 +311,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
 					pluginHelper.gestioDocumentalGet(
 							gestioDocumentalId,
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS,
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
 							streamAnnex);
 					portafirmesDocument.setArxiuNom(document.getNomFitxerFirmat());
 					portafirmesDocument.setArxiuContingut(streamAnnex.toByteArray());
@@ -358,7 +358,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						String gestioDocumentalId = document.getGesDocFirmatId();
 							if (gestioDocumentalId == null ) {
 								gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS,
+										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
 										new ByteArrayInputStream(portafirmesDocument.getArxiuContingut()));
 								document.setGesDocFirmatId(gestioDocumentalId);
 								document.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
@@ -392,7 +392,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							if (gestioDocumentalId != null ) {
 								pluginHelper.gestioDocumentalDelete(
 										gestioDocumentalId,
-										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS);
+										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB);
 								document.setGesDocFirmatId(null);
 							}
 							

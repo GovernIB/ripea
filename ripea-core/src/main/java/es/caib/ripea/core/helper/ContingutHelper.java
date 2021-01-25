@@ -310,7 +310,6 @@ public class ContingutHelper {
 						}
 					}
 				}
-				
 			}
 			dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
 			dto.setNtiTipoFirma(document.getNtiTipoFirma());
@@ -321,6 +320,8 @@ public class ContingutHelper {
 			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
 			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
 			dto.setGesDocFirmatId(document.getGesDocFirmatId());
+			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
+			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);

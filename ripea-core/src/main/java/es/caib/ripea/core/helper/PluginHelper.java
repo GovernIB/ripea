@@ -160,7 +160,8 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS = "docsFirmats";
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats";
+	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
@@ -1018,19 +1019,23 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			return document.getId().toString();
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_ARXIU,
-					errorDescripcio,
-					ex);
+			if (ex.getClass() == SistemaExternException.class) {
+				throw ex;
+			} else {
+				String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_ARXIU,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						ex);
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_ARXIU,
+						errorDescripcio,
+						ex);
+			}
 		}
 	}
 

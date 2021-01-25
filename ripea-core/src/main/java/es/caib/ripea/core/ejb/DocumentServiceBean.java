@@ -378,4 +378,10 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.findDocumentsIdsPerCustodiarMassiu(entitatId, filtre);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public Exception guardarEnArxiuDocumentAdjunt(Long docId) {
+		return delegate.guardarEnArxiuDocumentAdjunt(docId);
+	}
+
 }

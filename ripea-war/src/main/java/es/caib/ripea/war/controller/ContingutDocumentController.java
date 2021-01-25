@@ -279,6 +279,32 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "contingutDocumentForm";
 		}
 	}
+	
+	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarEnArxiuDocumentAdjunt", method = RequestMethod.GET)
+	public String guardarEnArxiuDocumentAdjunt(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			Model model)  {
+
+		Exception exception = documentService.guardarEnArxiuDocumentAdjunt(documentId);
+		
+		if (exception == null) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../",
+					"document.controller.guardar.arxiu.ok");
+		} else {
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:../../",
+					"document.controller.guardar.arxiu.error",
+					new Object[] {exception.getMessage()});
+		}
+
+
+	}
+
 
 	private String recuperarResultatEscaneig(
 			HttpServletRequest request,
@@ -975,10 +1001,22 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					valors);
 			
 			if (!notificar) {
-				return getModalControllerReturnValueSuccess(
-						request,
-						"redirect:../../contingut/" + pareId,
-						"document.controller.creat.ok");
+				if (document.getGesDocAdjuntId()==null) {
+					return getModalControllerReturnValueSuccess(
+							request,
+							"redirect:../../contingut/" + pareId,
+							"document.controller.creat.ok");
+				} else {
+					return getModalControllerReturnValueWarning(
+							request,
+							"redirect:../../contingut/" + pareId,
+							"document.controller.creat.error.arxiu",
+							null);
+				}
+
+				
+				
+				
 			} else {
 				modalUrlTancar();
 				return "redirect:../../document/" + document.getId() + "/notificar";

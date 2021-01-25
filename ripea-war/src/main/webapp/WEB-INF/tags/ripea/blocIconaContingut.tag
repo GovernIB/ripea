@@ -29,7 +29,7 @@
 			</c:when>
 			<c:when test="${contingut.document}">
 				<c:choose>
-					<c:when test="${contingut.fitxerExtension=='pdf' or contingut.estat == 'CUSTODIAT' or contingut.estat == 'FIRMAT'}">
+					<c:when test="${contingut.fitxerExtension=='pdf' or contingut.estat == 'CUSTODIAT' or contingut.estat == 'FIRMAT' or contingut.estat == 'ADJUNT_FIRMAT'}">
 						<span class="fa fa-file-pdf-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
 					</c:when>
 					<c:when test="${contingut.fitxerExtension=='doc' or contingut.fitxerExtension=='docx' or contingut.fitxerExtension=='odt'}">
