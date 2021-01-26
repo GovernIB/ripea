@@ -953,8 +953,14 @@ public class PluginHelper {
 		accioParams.put("contingutPareNom", contingutPare.getNom());
 		accioParams.put("serieDocumental", serieDocumental);
 		long t0 = System.currentTimeMillis();
+		
+		
+		boolean throwExcepcion = false;
+		if (throwExcepcion) { // throwExcepcion = true;
+			throw new RuntimeException("Mock Error al accedir arxiu");
+		}
+		
 		try {
-
 			if (document.getArxiuUuid() == null) {
 				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
 						toArxiuDocument(

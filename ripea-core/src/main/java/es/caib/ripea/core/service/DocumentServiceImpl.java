@@ -289,17 +289,25 @@ public class DocumentServiceImpl implements DocumentService {
 		fitxer.setContingut(streamAnnex.toByteArray());
 		
 		List<ArxiuFirmaDto> firmes = null;
-		if (documentEntity.getGesDocAdjuntFirmaId() != null) {
-			ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					documentEntity.getGesDocAdjuntFirmaId(),
-					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-					streamAnnex1);
+		if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+			byte[] firmaSeparada = null;
+			if (documentEntity.getGesDocAdjuntFirmaId() != null) {
+				ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						documentEntity.getGesDocAdjuntFirmaId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+						streamAnnex1);
+				firmaSeparada = streamAnnex1.toByteArray();
+			}
 			firmes = documentHelper.validaFirmaDocument(
 					documentEntity,
 					fitxer,
-					streamAnnex1.toByteArray());
+					firmaSeparada);
 		}
+		
+		if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
+			documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
+
 		try {
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,

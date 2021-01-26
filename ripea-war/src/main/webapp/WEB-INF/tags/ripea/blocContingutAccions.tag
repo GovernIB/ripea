@@ -19,8 +19,9 @@
 
 	<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle<c:if test="${not modeLlistat}"> btn-xs</c:if>"><span class="fa fa-cog"></span><c:if test="${modeLlistat}">&nbsp;<spring:message code="comu.boto.accions"/></c:if>&nbsp;<span class="caret caret-white"></span></button>
 	<ul class="dropdown-menu">
-	
-		<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarEnArxiuDocumentAdjunt"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+		<c:if test="${contingut.document && contingut.gesDocAdjuntId!=null}">
+			<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarEnArxiuDocumentAdjunt"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+		</c:if>
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
 			<c:choose>
 				<c:when test="${!contingut.carpeta}">
