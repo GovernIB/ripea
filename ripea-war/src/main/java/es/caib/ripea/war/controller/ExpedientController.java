@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -47,6 +49,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -459,7 +462,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
 		} catch (Exception ex) {
-			Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+			Throwable e = ExceptionHelper.findExceptionInstance(ex, SistemaExternException.class, 3);
 			if (e != null) {
 				return getModalControllerReturnValueError(
 						request,
@@ -585,19 +588,40 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		expedientService.agafarUser(
-				entitatActual.getId(),
-				expedientId);
-		String url;
-		if (contingutId != null) {
-			url = "redirect:../../contingut/" + contingutId;
-		} else {
-			url = "redirect:../../contingut/" + expedientId;
+		String url = null;
+		try {
+			
+			if (contingutId != null) {
+				url = "redirect:../../contingut/" + contingutId;
+			} else {
+				url = "redirect:../../contingut/" + expedientId;
+			}
+			
+			expedientService.agafarUser(
+					entitatActual.getId(),
+					expedientId);
+
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					url,
+					"expedient.controller.agafat.ok");
+			
+			
+		} catch (Exception e) {
+			logger.error("Error agafant expedient", e);
+			
+			Exception permisExcepcion = ExceptionHelper.findExceptionInstance(e, PermissionDeniedException.class, 3);
+			if (permisExcepcion != null) {
+				return getAjaxControllerReturnValueError(
+						request,
+						url,
+						"expedient.controller.agafat.error"
+						);
+			} else {
+				throw e;
+			}
+			
 		}
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				url,
-				"expedient.controller.agafat.ok");
 	}
 
 	@RequestMapping(value = "/{expedientId}/comentaris", method = RequestMethod.GET)
@@ -1140,5 +1164,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			model.addAttribute("esborranys", esborranys);
 		}
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ExpedientController.class);
 
 }

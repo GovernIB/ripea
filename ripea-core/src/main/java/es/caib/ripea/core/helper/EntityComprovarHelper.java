@@ -252,7 +252,6 @@ public class EntityComprovarHelper {
 		
 		comprovarPermisosMetaNode(
 				metaExpedient,
-				metaExpedientId,
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
@@ -401,8 +400,8 @@ public class EntityComprovarHelper {
 			throw new ValidationException(nodeId, NodeEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat del node");
 		}
-		comprovarPermisosMetaNode(node.getMetaNode(), nodeId, comprovarPermisRead, comprovarPermisWrite,
-		        comprovarPermisCreate, comprovarPermisDelete);
+		comprovarPermisosMetaNode(node.getMetaNode(), comprovarPermisRead, comprovarPermisWrite, comprovarPermisCreate,
+		        comprovarPermisDelete);
 		return node;
 	}
 
@@ -460,8 +459,8 @@ public class EntityComprovarHelper {
 				comprovarPermisWrite = false;
 		}
 
-		comprovarPermisosMetaNode(expedient.getMetaExpedient(), expedientId, comprovarPermisRead,
-		        comprovarPermisWrite, comprovarPermisCreate, comprovarPermisDelete);
+		comprovarPermisosMetaNode(expedient.getMetaExpedient(), comprovarPermisRead, comprovarPermisWrite,
+		        comprovarPermisCreate, comprovarPermisDelete);
 		return expedient;
 	}
 
@@ -623,7 +622,6 @@ public class EntityComprovarHelper {
 
 	public void comprovarPermisosMetaNode(
 			MetaNodeEntity metaNode,
-			Long nodeId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
@@ -663,7 +661,6 @@ public class EntityComprovarHelper {
 				}
 				
 			}
-
 			
 			if (hasToCheckReadPermissions) {
 				boolean granted = permisosHelper.isGrantedAll(
@@ -673,11 +670,9 @@ public class EntityComprovarHelper {
 						auth);
 				
 				if (!granted) {
-					throw new SecurityException("Sense permisos per accedir al node (" + "id=" + nodeId + ", "
-					        + "usuari=" + auth.getName() + ")");
+					throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "READ");
 				}
 			}
-			
 
 		}
 		if (comprovarPermisWrite) {
@@ -687,8 +682,7 @@ public class EntityComprovarHelper {
 					new Permission[] { ExtendedPermission.WRITE },
 					auth);
 			if (!granted) {
-				throw new SecurityException("Sense permisos per a modificar el node (" + "id=" + nodeId + ", "
-				        + "usuari=" + auth.getName() + ")");
+				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "WRITE");
 			}
 		}
 //		if (comprovarPermisCreate) {
@@ -710,8 +704,7 @@ public class EntityComprovarHelper {
 					new Permission[] { ExtendedPermission.DELETE },
 					auth);
 			if (!granted) {
-				throw new SecurityException("Sense permisos per a esborrar el node (" + "id=" + nodeId + ", "
-				        + "usuari=" + auth.getName() + ")");
+				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "DELETE");
 			}
 		}
 	}
