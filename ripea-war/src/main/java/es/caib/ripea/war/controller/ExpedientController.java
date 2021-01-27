@@ -462,13 +462,22 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
 		} catch (Exception ex) {
-			Throwable e = ExceptionHelper.findExceptionInstance(ex, SistemaExternException.class, 3);
+			logger.error("Error al crear expedient", ex);
+			Exception e = ExceptionHelper.findExceptionInstance(ex, SistemaExternException.class, 3);
 			if (e != null) {
-				return getModalControllerReturnValueError(
-						request,
-						"redirect:../expedient",
-						"expedient.controller.creat.error",
-						new Object[] {e.getMessage()});
+				if (e.getMessage().contains("Serie documental no trobat")) {
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:../expedient",
+							"expedient.controller.crear.error.serie.documental.not.found");
+				} else {
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:../expedient",
+							"expedient.controller.creat.error",
+							new Object[] {e.getMessage()});
+				}
+
 			} else { 
 				throw ex;
 			}
