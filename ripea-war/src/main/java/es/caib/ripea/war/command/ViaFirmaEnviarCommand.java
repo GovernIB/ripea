@@ -38,11 +38,15 @@ public class ViaFirmaEnviarCommand {
 	private String signantNom;
 	@Size(max=256)
 	private String observacions;
-
+	
+	private String firmaParcial;
+	
 	public static ViaFirmaEnviarDto asDto(ViaFirmaEnviarCommand command) {
 		ViaFirmaEnviarDto viaFirmaEnviar = ConversioTipusHelper.convertir(
 				command,
 				ViaFirmaEnviarDto.class);
+		viaFirmaEnviar.setFirmaParcial(Boolean.parseBoolean(command.getFirmaParcial()));
+		
 		String dispositiuViaFirmaFormatted = command.getDispositiuViaFirma();
 		if (dispositiuViaFirmaFormatted != null && !dispositiuViaFirmaFormatted.isEmpty()) {
 			String [] dispositiuViaFirma = dispositiuViaFirmaFormatted.split("\\|");

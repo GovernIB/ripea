@@ -96,14 +96,33 @@ public class ContingutLogHelper {
 				contingut,
 				tipus,
 				null,
-				null,
-				null,
+				contingut,
+				getLogObjecteTipusPerContingut(contingut),
 				null,
 				param1,
 				param2,
 				logContingutPare,
 				logExpedientSuperior);
 	}
+
+	/**
+	 *
+	 * @param contingut Contingut al qual es vol registrar el log
+	 * @param tipus Log a enregistrar
+	 * @param objecte ??? Li has de pasar la mateixa referència que contingut, sinó no registra el tipus d'objecte
+	 * @param objecteTipus Tipus del objecte contingut
+	 * @param objecteLogTipus ???
+	 * @param param1 Parametre 1 del log
+	 * @param param2 Parametre 2 del log
+	 * @param logContingutPare
+	 * 		Especificar si també es vol enregistrar el log per el contenidor del contingut
+	 * 		(No estic segur)
+	 * @param logExpedientSuperior
+	 * 		Especificar si també es vol enregistrar el log per el expedient on s'engloba contingut
+	 * 		(No estic segur)
+	 *
+	 * @return Objecte amb el log de contingut creat.
+	 */
 	public ContingutLogEntity log(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
@@ -182,53 +201,6 @@ public class ContingutLogHelper {
 			detalls.setPare(pare);
 		}
 		if (log.getObjecteId() != null) {
-//			String objecteNom = null;
-//			switch (log.getObjecteTipus()) {
-//			case ContingutId:
-//			case CARPETA:
-//			case DOCUMENT:
-//			case EXPEDIENT:
-//			case REGISTRE:
-//				ContingutEntity c = contingutRepository.findOne(
-//						new Long(log.getObjecteId()));
-//				objecteNom = c.getNom();
-//				break;
-//			case DADA:
-//				DadaEntity dada = dadaRepository.findOne(
-//						new Long(log.getObjecteId()));
-//				objecteNom = dada.getMetaDada().getNom();
-//				break;
-//			case INTERESSAT:
-//				InteressatEntity interessat = interessatRepository.findOne(
-//						new Long(log.getObjecteId()));
-//				objecteNom = interessat.getIdentificador();
-//				break;
-//			case NOTIFICACIO:
-//				DocumentNotificacioEntity notificacio = documentNotificacioRepository.findOne(
-//						new Long(log.getObjecteId()));
-//				objecteNom = notificacio.getAssumpte();
-//				break;
-//			case PUBLICACIO:
-//				DocumentPublicacioEntity publicacio = documentPublicacioRepository.findOne(
-//						new Long(log.getObjecteId()));
-//				objecteNom = publicacio.getAssumpte();
-//				break;
-//			case RELACIO:
-//				String[] ids = log.getObjecteId().split("#");
-//				if (ids.length >= 2) {
-//					ContingutEntity exp1 = contingutRepository.findOne(
-//							new Long(ids[0]));
-//					ContingutEntity exp2 = contingutRepository.findOne(
-//							new Long(ids[1]));
-//					objecteNom = exp1.getNom() + " <-> " + exp2.getNom();
-//					break;
-//				}
-//			case ALTRES:
-//			default:
-//				objecteNom = "???" + log.getObjecteTipus().name() + "#" + log.getObjecteId() + "???";
-//				break;
-//			}
-			
 			String objecteNom = null;
 			ContingutEntity c = contingutRepository.findOne(new Long(log.getObjecteId()));
 			objecteNom = c != null ? c.getNom() : "";
@@ -276,30 +248,7 @@ public class ContingutLogHelper {
 				param1,
 				param2);
 		if (logContingutPare) {
-			if (contingutMoviment == null) {
-				if (contingut.getPare() != null) {
-					logContingutSuperior(
-							contingut,
-							tipus,
-							contingut.getPare().getId(),
-							logPare);
-				}
-			} else {
-				if (contingutMoviment.getOrigenId() != null) {
-					logContingutSuperior(
-							contingut,
-							tipus,
-							contingutMoviment.getOrigenId(),
-							logPare);
-				}
-				if (contingutMoviment.getDestiId() != null) {
-					logContingutSuperior(
-							contingut,
-							tipus,
-							contingutMoviment.getDestiId(),
-							logPare);
-				}
-			}
+			logContingutPare(logPare, contingut, tipus, contingutMoviment);
 		}
 		if (logExpedientSuperior) {
 			// Si el pare és l'expedient superior i logContingutPare == true
@@ -333,7 +282,37 @@ public class ContingutLogHelper {
 		}
 		return logPare;
 	}
+	private void logContingutPare(
+			ContingutLogEntity logPare,
+			ContingutEntity contingut,
+			LogTipusEnumDto tipus,
+			ContingutMovimentEntity contingutMoviment) {
 
+		if (contingutMoviment == null) {
+			if (contingut.getPare() != null) {
+				logContingutSuperior(
+						contingut,
+						tipus,
+						contingut.getPare().getId(),
+						logPare);
+			}
+		} else {
+			if (contingutMoviment.getOrigenId() != null) {
+				logContingutSuperior(
+						contingut,
+						tipus,
+						contingutMoviment.getOrigenId(),
+						logPare);
+			}
+			if (contingutMoviment.getDestiId() != null) {
+				logContingutSuperior(
+						contingut,
+						tipus,
+						contingutMoviment.getDestiId(),
+						logPare);
+			}
+		}
+	}
 	private void logExpedientSuperior(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,

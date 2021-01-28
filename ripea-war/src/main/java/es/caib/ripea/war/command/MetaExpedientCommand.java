@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,11 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -58,9 +64,9 @@ public class MetaExpedientCommand {
 	private boolean isRolAdminOrgan;
 	
     private boolean gestioAmbGrupsActiva;
-	
-    
 
+    private String estructuraCarpetesJson;
+    
 	public MetaExpedientCommand(boolean isRolOrgan) {
 		this.isRolAdminOrgan = isRolOrgan;
 	}
@@ -83,8 +89,16 @@ public class MetaExpedientCommand {
 		return command;
 	}
 
-	public MetaExpedientDto asDto() {
+	public MetaExpedientDto asDto() throws JsonMappingException {
 		MetaExpedientDto dto = ConversioTipusHelper.convertir(this, MetaExpedientDto.class);
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			List<ArbreJsonDto> listCarpetes = objectMapper.readValue(this.getEstructuraCarpetesJson(), new TypeReference<List<ArbreJsonDto>>(){});
+			dto.setEstructuraCarpetes(listCarpetes);
+		} catch (IOException ex) {
+			throw new JsonMappingException("Hi ha hagut un error en la conversió del json de jstree a List<ArbreJsonDto>", ex);
+		}
+		
 		if (this.getOrganGestorId() != null) {
 			OrganGestorDto organ = new OrganGestorDto();
 			organ.setId(this.getOrganGestorId());

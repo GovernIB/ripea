@@ -152,6 +152,17 @@ $(document).ready(function() {
 			$('#signantNif').val('');
 		}
 	});
+	
+	var firmaParcialSel = $('#firmaParcial');
+	
+	firmaParcialSel.empty();
+	
+	var data = {id: false, text: 'No'};
+	var newOption = new Option(data.text, data.id, false, false);
+	firmaParcialSel.append(newOption);
+	var data = {id: true, text: 'Si'};
+	var newOption = new Option(data.text, data.id, false, false);
+	firmaParcialSel.append(newOption).trigger('change');
 });
 
 </script>
@@ -167,6 +178,7 @@ $(document).ready(function() {
 		<rip:inputSelect name="interessatId" textKey="contenidor.document.biometrica.camp.interessat" emptyOption="true" emptyOptionTextKey="contenidor.document.biometrica.camp.interessat.nou" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador"/>
 		<rip:inputText name="signantNom" textKey="contenidor.document.biometrica.camp.interessat.nom" required="true"/>
 		<rip:inputText name="signantNif" textKey="contenidor.document.biometrica.camp.interessat.nif" required="true"/>
+		<rip:inputSelect name="firmaParcial" textKey="contenidor.document.biometrica.camp.firmaparcial"  required="true"/>
 		<rip:inputTextarea name="observacions" textKey="contenidor.document.biometrica.camp.observacions"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.biometrica.enviar"/></button>

@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,12 +132,56 @@ public class DocumentHelper {
 				true,
 				true);
 		logger.debug("[CERT] Fitxer nom: " + fitxer.getNom());
-		contingutHelper.arxiuPropagarModificacio(
-				entity,
-				fitxer,
-				document.isAmbFirma(),
-				document.isFirmaSeparada(),
-				firmes);
+		
+		
+		String gestioDocumentalAdjuntId = document.getGesDocAdjuntId();
+		if (document.getFitxerContingut() != null) {
+			gestioDocumentalAdjuntId = pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+					new ByteArrayInputStream(document.getFitxerContingut()));
+			entity.setGesDocAdjuntId(gestioDocumentalAdjuntId);
+		}
+		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
+		if (document.isFirmaSeparada()) {
+			gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+					new ByteArrayInputStream(document.getFirmaContingut()));
+			entity.setGesDocAdjuntFirmaId(gestioDocumentalAdjuntFirmaId);
+		}
+
+		if (document.isAmbFirma()) 
+			entity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
+		
+		try {
+			contingutHelper.arxiuPropagarModificacio(
+					entity,
+					fitxer,
+					document.isAmbFirma(),
+					document.isFirmaSeparada(),
+					firmes);
+		
+			if (gestioDocumentalAdjuntId != null ) {
+				pluginHelper.gestioDocumentalDelete(
+						gestioDocumentalAdjuntId,
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+				entity.setGesDocAdjuntId(null);
+			}
+			if (gestioDocumentalAdjuntFirmaId != null ) {
+				pluginHelper.gestioDocumentalDelete(
+						gestioDocumentalAdjuntFirmaId,
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+				entity.setGesDocAdjuntFirmaId(null);
+			}
+			
+		} catch (Exception ex) {
+			logger.error("Error al custodiar en arxiu document adjunt  (" +
+					"id=" + entity.getId() + ")",
+					ex);
+			Throwable rootCause = ExceptionUtils.getRootCause(ex);
+			if (rootCause == null) rootCause = ex;
+
+		}
+		
 		DocumentDto dto = toDocumentDto(entity);
 		return dto;
 	}
@@ -277,7 +323,7 @@ public class DocumentHelper {
 	
 	public void actualitzarEstat(DocumentEntity document, DocumentEstatEnumDto nouEstat) {
 		
-		if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+		if ((document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) || document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) || document.getEstat().equals(DocumentEstatEnumDto.ADJUNT_FIRMAT)) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
 		contingutLogHelper.log(
@@ -381,7 +427,7 @@ public class DocumentHelper {
 				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
 				pluginHelper.gestioDocumentalGet(
 						document.getGesDocFirmatId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS,
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
 						streamAnnex);
 				fitxer.setContingut(streamAnnex.toByteArray());
 				fitxer.setNom(document.getNomFitxerFirmat());

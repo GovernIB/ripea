@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -135,8 +140,13 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
 
+		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = null;
+		if (metaExpedientId != null)
+			carpetes = metaExpedientService.findArbreCarpetesMetaExpedient(entitatActual.getId(), metaExpedientId);
+		else
+			carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
 		
-		
+		model.addAttribute("carpetes", carpetes);
 		fillFormModel(
 				request,
 				metaExpedient,
@@ -144,12 +154,23 @@ public class MetaExpedientController extends BaseAdminController {
 		return "metaExpedientForm";
 	}
 
+	@RequestMapping(value = "/{metaExpedientCarpetaId}/deleteCarpeta", method = RequestMethod.GET)
+	@ResponseBody
+	public void deleteCarpeta(
+			HttpServletRequest request, 
+			@PathVariable Long metaExpedientCarpetaId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		metaExpedientService.deleteCarpetaMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientCarpetaId);
+	}
+	
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
 			@Valid MetaExpedientCommand command,
 			BindingResult bindingResult,
-			Model model) {
+			Model model) throws JsonMappingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		MetaExpedientDto dto = command.asDto();
 		if (bindingResult.hasErrors()) {

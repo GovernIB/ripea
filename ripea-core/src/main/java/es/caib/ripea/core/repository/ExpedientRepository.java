@@ -99,7 +99,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
-			"and (:esNullExpedientsToBeExcluded = true or e not in :expedientsToBeExluded) " + 
+			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " + 
 			"and (:esNullInteressat = true " +
 			"		or  e.id in (" +
 			"			select interessat.expedient.id " +

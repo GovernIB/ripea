@@ -16,7 +16,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
+import es.caib.ripea.core.api.dto.ArbreNodeDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -48,6 +53,8 @@ public class MetaExpedientHelper {
 	private PermisosHelper permisosHelper;
     @Autowired
     private OrganGestorHelper organGestorHelper;
+    @Autowired
+    private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
@@ -295,7 +302,105 @@ public class MetaExpedientHelper {
 		return metaExpedients;		
 	}
 	
+	public List<ArbreDto<MetaExpedientCarpetaDto>> obtenirPareArbreCarpetesPerMetaExpedient(
+			MetaExpedientEntity metaExpedient,
+			List<ArbreDto<MetaExpedientCarpetaDto>> carpetes) {
+		//crear nova carpeta arrel
+		ArbreDto<MetaExpedientCarpetaDto> carpetaPrincipal = null;
+		
+		List<MetaExpedientCarpetaDto> carpetesMetaExpedient = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedient);
+		
+		if (carpetesMetaExpedient != null && ! carpetesMetaExpedient.isEmpty()) {
+			for (MetaExpedientCarpetaDto metaExpedientCarpeta: carpetesMetaExpedient) {
+				
+				if (metaExpedientCarpeta.getPare() == null) {
+					carpetaPrincipal = new ArbreDto<MetaExpedientCarpetaDto>(true);
+					
+					carpetaPrincipal.setArrel(
+							obtenirArbreCarpetesPerMetaExpedient(
+								metaExpedientCarpeta, 
+								null));
+					
+					carpetes.add(carpetaPrincipal);
+				}
+			}
+		}
+		
+		return carpetes;
+	}
 	
+<<<<<<< HEAD
+=======
+	public ArbreNodeDto<MetaExpedientCarpetaDto> obtenirArbreCarpetesPerMetaExpedient(
+			MetaExpedientCarpetaDto metaExpedientCarpetaDto,
+			ArbreNodeDto<MetaExpedientCarpetaDto> pare) {
+		ArbreNodeDto<MetaExpedientCarpetaDto> currentArbreNode =  new ArbreNodeDto<MetaExpedientCarpetaDto>(
+				pare,
+				metaExpedientCarpetaDto);
+			
+		// crear estructura carpetes a partir del pare actual
+		for (MetaExpedientCarpetaDto fill: metaExpedientCarpetaDto.getFills()) {
+			// recuperar estructura per cada fill recursivament
+			currentArbreNode.addFill(
+					obtenirArbreCarpetesPerMetaExpedient(
+							fill,
+							currentArbreNode));
+		}
+		return currentArbreNode;
+	}
+	
+	public void crearEstructuraCarpetes(
+			List<ArbreJsonDto> estructuraCarpetes,
+			MetaExpedientEntity metaExpedient) {
+		
+		for (ArbreJsonDto carpeta: estructuraCarpetes) {
+			MetaExpedientCarpetaEntity pare = null;
+			crearCarpeta(
+					carpeta,
+					pare,
+					metaExpedient);
+		}
+	}
+
+	public void crearCarpeta(
+			ArbreJsonDto carpeta,
+			MetaExpedientCarpetaEntity pare,
+			MetaExpedientEntity metaExpedient) {
+
+		// crear carpeta actual
+		Long carpetaId = null;
+		try {
+			carpetaId = Long.valueOf(carpeta.getId());
+		} catch (NumberFormatException nfe) {}
+		
+		if (carpetaId != null) {
+			pare = metaExpedientCarpetaHelper.actualitzarCarpeta(
+					carpetaId, 
+					carpeta.getText());
+		} else {
+			pare = metaExpedientCarpetaHelper.crearNovaCarpeta(
+					carpeta.getText(),
+					pare,
+					metaExpedient);
+		}
+		
+		// crear recursivament totes les carpetes
+		if (!carpeta.getChildren().isEmpty()) {
+			for (ArbreJsonDto subcarpeta : carpeta.getChildren()) {
+				crearCarpeta(
+						subcarpeta, 
+						pare, 
+						metaExpedient);
+			}
+		}
+	}
+	
+	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long carpetaIdJstree) {
+		MetaExpedientCarpetaDto carpeta = metaExpedientCarpetaHelper.deleteCarpeta(carpetaIdJstree);
+		return carpeta;
+	} 
+	
+>>>>>>> refs/heads/ripea-dev
 	private boolean onlyToCheckReadPermission(Permission[] permisos) {
 		if (permisos.length == 0 || permisos.length == 1 && permisos[0] == ExtendedPermission.READ) {
 			return true;

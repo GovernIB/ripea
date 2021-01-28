@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
@@ -56,6 +58,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -212,6 +215,24 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					model);
 			return "contingutDocumentForm";
+		} catch (Exception ex) {
+			logger.error("Error al crear un document", ex);
+			Throwable throwable = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+			if (throwable!=null) {
+				SistemaExternException sisExtExc = (SistemaExternException) throwable;
+				MissatgesHelper.error(request, sisExtExc.getMessage());
+				omplirModelFormulari(
+						request,
+						command,
+						null,
+						pareId,
+						model);
+				return "contingutDocumentForm";
+			} else {
+				throw ex;
+			}
+			
+
 		}
 	}
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
@@ -258,6 +279,33 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "contingutDocumentForm";
 		}
 	}
+	
+	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarEnArxiuDocumentAdjunt", method = RequestMethod.GET)
+	public String guardarEnArxiuDocumentAdjunt(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			Model model)  {
+
+		Exception exception = documentService.guardarEnArxiuDocumentAdjunt(documentId);
+		
+		if (exception == null) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../",
+					"document.controller.guardar.arxiu.ok");
+		} else {
+			logger.error("Error guardant document en arxiu", exception);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:../../",
+					"document.controller.guardar.arxiu.error",
+					new Object[] {exception.getMessage()});
+		}
+
+
+	}
+
 
 	private String recuperarResultatEscaneig(
 			HttpServletRequest request,
@@ -954,10 +1002,22 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					valors);
 			
 			if (!notificar) {
-				return getModalControllerReturnValueSuccess(
-						request,
-						"redirect:../../contingut/" + pareId,
-						"document.controller.creat.ok");
+				if (document.getGesDocAdjuntId()==null) {
+					return getModalControllerReturnValueSuccess(
+							request,
+							"redirect:../../contingut/" + pareId,
+							"document.controller.creat.ok");
+				} else {
+					return getModalControllerReturnValueWarning(
+							request,
+							"redirect:../../contingut/" + pareId,
+							"document.controller.creat.error.arxiu",
+							null);
+				}
+
+				
+				
+				
 			} else {
 				modalUrlTancar();
 				return "redirect:../../document/" + document.getId() + "/notificar";
@@ -1048,5 +1108,5 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
 	}
 	
-//	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 
+	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 
 }

@@ -624,4 +624,6 @@ public interface DocumentService {
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException;
 
+	public Exception guardarEnArxiuDocumentAdjunt(Long docId);
+
 }

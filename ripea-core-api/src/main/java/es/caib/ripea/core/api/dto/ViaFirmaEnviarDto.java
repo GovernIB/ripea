@@ -25,5 +25,7 @@ public class ViaFirmaEnviarDto implements Serializable {
 	private String signantNif;
 	private String signantNom;
 	private String observacions;
+	private boolean isFirmaParcial; 
+	
 	private static final long serialVersionUID = 6451235953471494106L;
 }

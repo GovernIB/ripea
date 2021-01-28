@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,7 @@ import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -91,6 +95,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -260,7 +265,88 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return dtos;
 	}
+	
+	
+	
+	@Transactional
+	@Override
+	public Exception guardarEnArxiuDocumentAdjunt(
+			Long docId) {
+		
+		Exception exception = null;
+		
+		DocumentEntity documentEntity = documentRepository.findOne(docId);
+		
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(documentEntity.getFitxerNom());
+		fitxer.setContentType(documentEntity.getFitxerContentType());
+		
+		ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+		pluginHelper.gestioDocumentalGet(
+				documentEntity.getGesDocAdjuntId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+				streamAnnex);
+		fitxer.setContingut(streamAnnex.toByteArray());
+		
+		List<ArxiuFirmaDto> firmes = null;
+		if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+			byte[] firmaSeparada = null;
+			if (documentEntity.getGesDocAdjuntFirmaId() != null) {
+				ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						documentEntity.getGesDocAdjuntFirmaId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+						streamAnnex1);
+				firmaSeparada = streamAnnex1.toByteArray();
+			}
+			firmes = documentHelper.validaFirmaDocument(
+					documentEntity,
+					fitxer,
+					firmaSeparada);
+		}
+		
+		if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
+			documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
 
+		try {
+			contingutHelper.arxiuPropagarModificacio(
+					documentEntity,
+					fitxer,
+					documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
+					documentEntity.getGesDocAdjuntFirmaId() != null,
+					firmes);
+		
+			if (documentEntity.getGesDocAdjuntId() != null ) {
+				pluginHelper.gestioDocumentalDelete(
+						documentEntity.getGesDocAdjuntId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+				documentEntity.setGesDocAdjuntId(null);
+			}
+			if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+				pluginHelper.gestioDocumentalDelete(
+						documentEntity.getGesDocAdjuntFirmaId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+				documentEntity.setGesDocAdjuntFirmaId(null);
+			}
+		} catch (Exception ex) {
+			logger.error("Error al custodiar en arxiu document adjunt  (" +
+					"id=" + documentEntity.getId() + ")",
+					ex);
+
+			Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+			if (e != null) {
+				exception = (Exception) e;
+			} else {
+				exception = (Exception) ExceptionUtils.getRootCause(ex);
+				if (exception == null)
+					exception = ex;
+			}
+		}
+		return exception;
+	}
+
+
+	
 	@Transactional(readOnly = true)
 	@Override
 	public List<DocumentDto> findAmbExpedientIEstat(
@@ -907,7 +993,8 @@ public class DocumentServiceImpl implements DocumentService {
 					dispositiuEnviament,
 					document.getMetaDocument().isBiometricaLectura(),
 					document.getExpedient(),
-					document).build();
+					document,
+					viaFirmaEnviarDto.isFirmaParcial()).build();
 			
 			firmaViaFirmaHelper.viaFirmaEnviar(documentViaFirma);
 		

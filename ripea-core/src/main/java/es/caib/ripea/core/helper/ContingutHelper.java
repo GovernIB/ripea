@@ -82,6 +82,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -245,6 +246,8 @@ public class ContingutHelper {
 			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
 			dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
 			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+			dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+					expedient), InteressatDto.class));
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			resposta = dto;
 
@@ -305,7 +308,6 @@ public class ContingutHelper {
 						}
 					}
 				}
-				
 			}
 			dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
 			dto.setNtiTipoFirma(document.getNtiTipoFirma());
@@ -316,6 +318,8 @@ public class ContingutHelper {
 			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
 			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
 			dto.setGesDocFirmatId(document.getGesDocFirmatId());
+			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
+			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);
@@ -764,7 +768,7 @@ public class ContingutHelper {
 			}
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat());
+			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat()) && !DocumentEstatEnumDto.FIRMA_PARCIAL.equals(document.getEstat());
 		}
 		return conteDefinitius;
 	}
