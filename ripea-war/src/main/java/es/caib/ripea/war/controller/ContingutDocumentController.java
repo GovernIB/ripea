@@ -295,6 +295,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					"redirect:../../",
 					"document.controller.guardar.arxiu.ok");
 		} else {
+			logger.error("Error guardant document en arxiu", exception);
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:../../",
