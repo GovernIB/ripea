@@ -61,6 +61,9 @@ public class DocumentDto extends NodeDto {
 	
 	private String gesDocFirmatId;
 	
+	private String gesDocAdjuntId;
+	private String gesDocAdjuntFirmaId;
+	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
 			return fitxerNom.substring(
@@ -99,6 +102,9 @@ public class DocumentDto extends NodeDto {
 	}
 	public boolean isDefinitiu() {
 		return DocumentEstatEnumDto.DEFINITIU.equals(estat);
+	}
+	public boolean isFirmaParcial() {
+		return DocumentEstatEnumDto.FIRMA_PARCIAL.equals(estat);
 	}
 	public boolean isPdf() {
 		return (fitxerContentType != null && fitxerContentType.equals("application/pdf"));

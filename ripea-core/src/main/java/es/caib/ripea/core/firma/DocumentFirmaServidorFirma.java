@@ -41,7 +41,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	 * Pots especificar directament el document firmat.
 	 * Usar quan el document no està associat a l'objecte documentPortafirmes.
 	 *   
-	 * @param documentPortafirmes 
+	 * @param document
 	 * @param tipusLog
 	 */
 	private void logAll(DocumentEntity document, LogTipusEnumDto tipusLog) {

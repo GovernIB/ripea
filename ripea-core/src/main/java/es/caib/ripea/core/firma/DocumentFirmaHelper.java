@@ -97,7 +97,7 @@ public class DocumentFirmaHelper {
 	/**
 	 * Registre el log al expedient on està ubicat el document a firmar/firmat
 	 * 
-	 * @param documentPortafirmes
+	 * @param document
 	 * @param tipusLog
 	 */
 	protected void logExpedient(DocumentEntity document, LogTipusEnumDto tipusLog) {
@@ -108,7 +108,7 @@ public class DocumentFirmaHelper {
 	 * Registre el log al expedient on està ubicat el document a firmar/firmat.
 	 * Permet especificar els parametres del log
 	 * 
-	 * @param documentPortafirmes
+	 * @param document
 	 * @param tipusLog
 	 */
 	protected void logExpedient(DocumentEntity document, LogTipusEnumDto tipusLog, String param1, String param2) {
@@ -124,6 +124,15 @@ public class DocumentFirmaHelper {
 				false);
 	}
 
+	protected void logFirmat(DocumentEntity document) {
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.DOC_FIRMAT,
+				"Document firmat",
+				null,
+				false,
+				false);
+	}
 	private static final Logger logger = LoggerFactory.getLogger(DocumentFirmaHelper.class);
 
 }

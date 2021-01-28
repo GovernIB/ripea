@@ -16,10 +16,49 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
+	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
 	<rip:modalHead/>
 	
+	<style type="text/css">
+		.rmodal {
+		    display:    none;
+		    position:   absolute;
+		    z-index:    1000;
+		    top:        0;
+		    left:       0;
+		    height:     100%;
+		    width:      100%;
+		    background: rgba( 255, 255, 255, .8 ) 
+		                url('<c:url value="/img/loading.gif"/>') 
+		                50% 50% 
+		                no-repeat;
+		}
+		body.loading {
+		    overflow: hidden;   
+		}
+		body.loading .rmodal {
+		    display: block;
+		}
+		ul .rmodal {
+		    display: block;
+		}
+		#botons_container {
+			width: 100%;
+			overflow: auto;
+			margin-bottom:10px;
+			text-align: right;
+		}
+		.positionRelative {
+			position: relative;
+		}
+		.arbre-emtpy {
+			text-align: center;
+		}
+	</style>
 	<c:if test="${not isRolAdminOrgan}">
 		<script type="text/javascript">
+		var novesCarpetes = [];
 		var hasOrganGestor = ${hasOrganGestor};
 		$(document).ready(function() {
 			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
@@ -29,8 +68,6 @@
 					
 			    } else {
 			    	selectOrganGestorContainer.show();
-			    	
-			    	
 			    }
 		  	});
 			if (!hasOrganGestor) {
@@ -38,6 +75,88 @@
 				selectOrganGestorContainer.hide();
 			}
 		});
+		
+		function addFolder() {
+			var arbre = $('#arbreCarpetes');
+			var selectedNode = arbre.jstree("get_selected");
+			var position = 'inside';
+			if (selectedNode.length != 0) {
+			var selectedFolder = $('ul').find('li#' + selectedNode[0]);
+			} else {
+				alert("<spring:message code='metaexpedient.form.camp.estructura.empty'/>");
+			}
+			arbre.jstree('create_node', selectedNode , false, "last", function (node) {
+		        this.edit(node);
+		    });
+			$('.arbre-emtpy').hide();
+		}
+		
+		function addParentFolder() {
+			var arbre = $('#arbreCarpetes');
+			
+			arbre.jstree('create_node', "#" , false, "last", function (node) {
+		        this.edit(node);
+		    });
+			$('.arbre-emtpy').hide();
+		}
+		
+		function changedCallback(e, data) {
+			var arbre = $('#arbreCarpetes');
+			var json = arbre.data().jstree.get_json()
+			var jsonString = JSON.stringify(json);
+			
+			webutilModalAdjustHeight();
+			$('#estructuraCarpetesJson').val(jsonString);
+		}
+		
+		function deletedCallback(e, data) {
+			var metaExpedientCarpetaId = data.node.id;
+			if (!isNaN(metaExpedientCarpetaId)) {
+				$('#arbreCarpetes').closest('ul').addClass('positionRelative');
+				$('#arbreCarpetes').closest('ul').append("<div class='rmodal'></div></div>");
+				var deleteUrl = '<c:url value="/metaExpedient/'+ metaExpedientCarpetaId + '/deleteCarpeta"/>';
+				$.ajax({
+			        type: "GET",
+			        url: deleteUrl,
+			        success: function (data) {
+			        	$('#arbreCarpetes').closest('ul').removeClass('positionRelative');
+			        	$('#arbreCarpetes').next().remove();
+			        }
+				});
+			}
+			var json = $('#arbreCarpetes').data().jstree.get_json()
+			var jsonString = JSON.stringify(json);
+			$('#estructuraCarpetesJson').val(jsonString);
+			webutilModalAdjustHeight();
+			
+			if(jsonString === '[]') {
+				if ($(".arbre-emtpy")[0]) {
+					$('.arbre-emtpy').show();
+				} else {
+					$('#carpetes').find('ul').append("<div class='arbre-emtpy'><spring:message code='metaexpedient.form.camp.estructura.arbre.empty'/></div>");
+				}
+			}
+		}
+		
+		function renamedCallback(e, data) {
+			var arbre = $('#arbreCarpetes');
+			// comprovar si existeix la carpeta
+			var parent = data.node.parent;
+			var childrens = arbre.jstree(true).get_node(parent).children;
+				
+			childrens.forEach(function(child) {
+				var children = arbre.jstree(true).get_node(child);
+				if (childrens.length > 1 && children.text.trim() === data.node.text.trim() && children.id != data.node.id) {
+					alert("<spring:message code='metaexpedient.form.camp.estructura.exists'/>");
+					var childAdded = arbre.jstree(true).get_node(data.node.id);
+					arbre.jstree(true).delete_node(childAdded);
+				}
+			});
+					
+			var json = arbre.data().jstree.get_json()
+			var jsonString = JSON.stringify(json);
+			$('#estructuraCarpetesJson').val(jsonString);
+		}
 		</script>
 	</c:if>
 </head>
@@ -47,6 +166,7 @@
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>
 			<li role="presentation"><a href="#notificacions" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.notificacions"/></a></li>
+			<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -87,6 +207,16 @@
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa"/>
+			</div>
+			
+			<div role="carpetes" class="tab-pane" id="carpetes">
+				
+				<rip:arbreMultiple id="arbreCarpetes" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
+				<form:hidden path="estructuraCarpetesJson"/>
+				<div id="botons_container" class="well">
+					<input id="add_folder" onclick="addFolder();" type="button" class="btn btn-default" value="<spring:message code="metaexpedient.form.camp.estructura.subcarpeta"/>">
+					<input id="add_parent_folder" onclick="addParentFolder();" type="button" class="btn btn-info" value="<spring:message code="metaexpedient.form.camp.estructura.carpeta"/>">
+				</div>
 			</div>
 		</div>
 		<div id="modal-botons">

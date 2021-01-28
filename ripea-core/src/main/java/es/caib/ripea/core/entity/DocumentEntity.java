@@ -108,6 +108,13 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "nom_fitxer_firmat", length = 512)
 	private String nomFitxerFirmat;
 	
+	
+	@Column(name = "ges_doc_adjunt_id", length = 256)
+	private String gesDocAdjuntId;
+	@Column(name = "ges_doc_adjunt_firma_id", length = 256)
+	private String gesDocAdjuntFirmaId;
+	
+	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	protected Set<DocumentEnviamentEntity> enviaments;
 	@OneToMany(

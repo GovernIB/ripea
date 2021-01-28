@@ -76,15 +76,12 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
 			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
-			document.updateEstat(
-					DocumentEstatEnumDto.FIRMAT);
-			contingutLogHelper.log(
-					document,
-					LogTipusEnumDto.DOC_FIRMAT,
-					null,
-					null,
-					false,
-					false);
+			if (documentViaFirma.isFirmaParcial())
+				document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
+			else
+				document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+			logFirmat(document);
+
 			ViaFirmaDocument viaFirmaDocument = null;
 			// Descarrega el document firmat del portafirmes
 			try {

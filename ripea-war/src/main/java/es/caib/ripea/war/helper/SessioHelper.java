@@ -57,6 +57,14 @@ public class SessioHelper {
 					.getSession()
 					.setAttribute("SessionHelper.capsaleraColorLletra", aplicacioService
 							.propertyFindByNom("es.caib.ripea.capsalera.color.lletra"));
+			request
+					.getSession()
+					.setAttribute("SessionHelper.isTipusDocumentsEnabled", aplicacioService
+							.propertyFindByNom("es.caib.ripea.habilitar.tipusdocument") != null);
+			request
+					.getSession()
+					.setAttribute("SessionHelper.isDocumentsGeneralsEnabled", aplicacioService
+							.propertyFindByNom("es.caib.ripea.habilitar.documentsgenerals") != null);
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			localeResolver
 					.setLocale(request, response, StringUtils

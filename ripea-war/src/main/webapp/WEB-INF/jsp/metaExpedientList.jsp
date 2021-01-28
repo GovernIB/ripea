@@ -28,6 +28,9 @@
 	#metaExpedientFiltreForm {
 		margin-bottom: 15px;
 	}
+	.badge {
+  	 	background-color: #333;
+  	 }
 	</style>
 	<script type="text/javascript">
 	$(function() {
@@ -56,12 +59,17 @@
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputSelect name="actiu" optionEnum="MetaExpedientActiuEnumDto" 
-								 emptyOption="true" 
-								 placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
+				<rip:inputText name="classificacioSia" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
 			</div>
 		</div>
 		<div class="row">
+			<div class="col-md-4">
+				<rip:inputSelect 
+						name="actiu" 
+						optionEnum="MetaExpedientActiuEnumDto" 
+						emptyOption="true" 
+						placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
+			</div>
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
@@ -74,11 +82,13 @@
  					suggestValue="id"
  					suggestText="nom" />
 			</div>
-			<div class="col-md-4"> 
+			<div class="col-md-4">
 				<c:if test="${not isRolAdminOrgan}">
-				 	<rip:inputCheckbox name="veureTots" inline="true" textKey="metaexpedient.list.filtre.camp.veure.tots"/>
+					<rip:inputSelect name="ambit" optionEnum="MetaExpedientAmbitEnumDto" 
+									 emptyOption="true" 
+									 placeholderKey="metaexpedient.list.filtre.camp.ambit" inline="true"/>
 				</c:if>
-			</div>
+			</div>			
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -104,8 +114,16 @@
 		<thead>
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
-				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>
-				<th data-col-name="organGestor.nom" width="1%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
+				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
+				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
+				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="comu" data-orderable="false" data-template="#cellActiuTemplate" width="1%">
+					<spring:message code="metaexpedient.list.columna.comu"/>
+					<script id="cellActiuTemplate" type="text/x-jsrender">
+						{{if comu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
@@ -117,37 +135,32 @@
 					<script id="cellGestioAmbGrupsActivaTemplate" type="text/x-jsrender">
 						{{if gestioAmbGrupsActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>	-->			
-				<th data-col-name="metaDocumentsCount" data-template="#cellMetaDocumentsTemplate" data-orderable="false" width="1%">
-					<script id="cellMetaDocumentsTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/metaDocument" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.documents"/>&nbsp;<span class="badge">{{:metaDocumentsCount}}</span></a>
+				</th>	-->
+				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
+				<th data-col-name="metaDadesCount" data-visible="false"></th>
+				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
+				<th data-col-name="expedientTasquesCount" data-visible="false"></th>
+				<th data-col-name="grupsCount" data-visible="false"></th>
+				<th data-col-name="permisosCount" data-visible="false"></th>
+				
+				<th data-col-name="elements" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
+					<script id="cellElementsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-default" data-toggle="dropdown"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.elements"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<c:if test="${sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null  && sessionScope['SessionHelper.isTipusDocumentsEnabled']}">
+									<li><a href="metaExpedient/{{:id}}/metaDocument"><span class="badge">{{:metaDocumentsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.documents"/></a></li>
+								</c:if>
+								<li><a href="metaExpedient/{{:id}}/metaDada"><span class="badge">{{:metaDadesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/></a></li>
+								<li><a href="expedientEstat/{{:id}}"><span class="badge">{{:expedientEstatsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.estats"/></a></li>
+								<li><a href="metaExpedient/{{:id}}/tasca"><span class="badge">{{:expedientTasquesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.tasques"/></a></li>
+								<li><a href="metaExpedient/{{:id}}/grup"><span class="badge">{{:grupsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.grups"/></a></li>
+								<li><a href="metaExpedient/{{:id}}/permis"><span class="badge">{{:permisosCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.permisos"/></a></li>
+							</ul>
+						</div>					
 					</script>
 				</th>
-				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="1%">
-					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/metaDada" class="btn btn-default"><spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
-					</script>
-				</th>
-				<th data-col-name="expedientEstatsCount" data-template="#cellEstatsTemplate" data-orderable="false" width="1%">
-					<script id="cellEstatsTemplate" type="text/x-jsrender">
-						<a href="expedientEstat/{{:id}}" class="btn btn-default"><spring:message code="metaexpedient.list.boto.estats"/>&nbsp;<span class="badge">{{:expedientEstatsCount}}</span></a>
-					</script>
-				</th>
-				<th data-col-name="expedientTasquesCount" data-template="#cellTasquesTemplate" data-orderable="false" width="1%">
-					<script id="cellTasquesTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/tasca" class="btn btn-default"><spring:message code="metaexpedient.list.boto.tasques"/>&nbsp;<span class="badge">{{:expedientTasquesCount}}</span></a>
-					</script>
-				</th>
-				<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="1%">
-					<script id="cellGrupsTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/grup" class="btn btn-default"><spring:message code="metaexpedient.list.boto.grups"/>&nbsp;<span class="badge">{{:grupsCount}}</span></a>
-					</script>
-				</th>
-				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
-					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
-					</script>
-				</th>
+				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

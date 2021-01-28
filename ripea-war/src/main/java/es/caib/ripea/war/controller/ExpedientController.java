@@ -47,6 +47,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -98,6 +99,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ExpedientEstatService expedientEstatService;
+
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -456,6 +458,17 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "contingutExpedientForm";
+		} catch (Exception ex) {
+			Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+			if (e != null) {
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../expedient",
+						"expedient.controller.creat.error",
+						new Object[] {e.getMessage()});
+			} else { 
+				throw ex;
+			}
 		}
 	}
 	@RequestMapping(value = "/{expedientId}/update", method = RequestMethod.POST)
