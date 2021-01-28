@@ -146,6 +146,8 @@ public class ContingutHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
+	@Autowired
+	private InteressatRepository interessatRepository;
 	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {

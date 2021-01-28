@@ -329,8 +329,6 @@ public class MetaExpedientHelper {
 		return carpetes;
 	}
 	
-<<<<<<< HEAD
-=======
 	public ArbreNodeDto<MetaExpedientCarpetaDto> obtenirArbreCarpetesPerMetaExpedient(
 			MetaExpedientCarpetaDto metaExpedientCarpetaDto,
 			ArbreNodeDto<MetaExpedientCarpetaDto> pare) {
@@ -400,7 +398,6 @@ public class MetaExpedientHelper {
 		return carpeta;
 	} 
 	
->>>>>>> refs/heads/ripea-dev
 	private boolean onlyToCheckReadPermission(Permission[] permisos) {
 		if (permisos.length == 0 || permisos.length == 1 && permisos[0] == ExtendedPermission.READ) {
 			return true;

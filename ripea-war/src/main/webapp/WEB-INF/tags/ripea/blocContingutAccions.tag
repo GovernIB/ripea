@@ -119,7 +119,7 @@
 				<c:when test="${contingut.document && contingut.estat == 'FIRMA_PENDENT'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat.pendent"/> </c:set>
 				</c:when>
-				<c:when test="${contingut.document && contingut.estat != 'REDACCIO'}">
+				<c:when test="${contingut.document && contingut.estat != 'REDACCIO' && contingut.estat != 'FIRMA_PARCIAL'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat"/> </c:set>
 				</c:when>
 				<c:otherwise>
