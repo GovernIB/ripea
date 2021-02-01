@@ -103,7 +103,7 @@
 		data-toggle="datatable" 
 		data-url="<c:url value="/metaExpedient/datatable"/>" 
 		data-info-type="search" 
-		data-default-order="1" 
+		data-default-order="2" 
 		data-default-dir="asc" 
 		class="table table-striped table-bordered"
 		data-rowhref-template="#rowhrefTemplate" 
@@ -114,8 +114,8 @@
 		<thead>
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
-				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
+				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
 				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellActiuTemplate" width="1%">
