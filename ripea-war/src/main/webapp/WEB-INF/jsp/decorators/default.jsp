@@ -287,7 +287,9 @@ body {
 											<li><a href="<c:url value="/metaDocument"/>"><spring:message code="decorator.menu.metadocuments"/></a></li>
 										</c:if>
 										<li class="divider"></li>
-										<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
+										<c:if test="${sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null  && sessionScope['SessionHelper.isTipusDocumentsEnabled']}">
+											<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
+										</c:if>
 										<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
 										<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 										<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
