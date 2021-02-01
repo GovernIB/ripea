@@ -246,6 +246,7 @@
 							</c:when>
 							<c:otherwise>
 								<li class="disabled"><a href="#"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+								<p style="font-size: 9px;padding: 1px 15px;">&nbsp;<spring:message code="comu.boto.notificar.comentari"/></p>
 							</c:otherwise>
 						</c:choose>
 					</c:if>
