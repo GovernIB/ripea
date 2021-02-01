@@ -386,11 +386,17 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				}
 			});
 		}
+		
+		var noResultsFunction = window[$(this).data('noresultsfunction')];
+		
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
 		    allowClear: $(this).data('placeholder') ? true : false,
-		    minimumResultsForSearch: $(this).data('minimumresults')
+		    minimumResultsForSearch: $(this).data('minimumresults'),
+		    language: {
+		        noResults: noResultsFunction
+		    }
 		});
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();

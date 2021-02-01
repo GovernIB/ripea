@@ -18,6 +18,7 @@
 <%@ attribute name="emptyOption" required="false" rtexprvalue="true"%>
 <%@ attribute name="emptyOptionText" required="false" rtexprvalue="true"%>
 <%@ attribute name="emptyOptionTextKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="noResultsFunction" required="false" rtexprvalue="true"%>
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
@@ -44,12 +45,14 @@
 	<c:when test="${not inline && not botons}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
+		
 				<form:select path="${campPath}" cssClass="form-control"
 					id="${campId}" disabled="${disabled}" style="width:100%"
 					data-toggle="select2" data-netejar="${netejar}"
 					data-placeholder="${campPlaceholder}"
 					data-minimumresults="${minimumResultsForSearch}"
 					data-enum="${optionEnum}" data-enum-value="${campValue}"
+					data-noresultsfunction="${noResultsFunction}"
 					multiple="${multiple}">
 					<c:if test="${emptyOption == 'true'}">
 						<c:choose>
