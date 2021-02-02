@@ -280,6 +280,36 @@ public class MetaExpedientController extends BaseAdminController {
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 	
+	
+	@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> findPerLectura(
+			HttpServletRequest request,
+			Model model) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId(), 
+				null, 
+				rolActual);
+		return metaExpedientsPermisLectura;
+	}
+	
+	@RequestMapping(value = "/findPerLectura/{organId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> findPerLectura(
+			HttpServletRequest request,
+			@PathVariable Long organId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
+				entitatActual.getId(),
+				organId, 
+				null);
+		return metaExpedientsPermisLectura;
+	}
+	
 
 	private MetaExpedientFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {

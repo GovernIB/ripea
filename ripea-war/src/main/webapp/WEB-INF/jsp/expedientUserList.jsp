@@ -135,8 +135,9 @@ $(document).ready(function() {
 		e.stopPropagation();
 		alert("Button Clicked");
 	});
-
-
+	
+	// Mostrar els tipus d'expedients al filtre
+	findActiusPerLectura();
 	
 	var metaExpedientId = "";
 	var counter = 0;
@@ -232,38 +233,21 @@ $(document).ready(function() {
 		        minimumInputLength: 0
 	    };
 		selDomini.select2(select2Options);
-		
-		//get valor domini seleccionat
-		//var dominisRefresh = function(data) {
-		//	
-		//	$('#metaExpedientDominiValor').append("<option value=\"\"></option>");
-		//	for (var i = 0; i < data.length; i++) {
-		//		console.log(data[i]);
-		//		$('#metaExpedientDominiValor').append('<option value="' + data[i].id + '">' + data[i].valor + '</option>');
-		//	}
-		//};
-		//if (metaExpedientId != "") {
-		//	var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDada/domini/' + dominiCodi + '"/>';
-		//	$.get(multipleUrl)
-		//	.done(dominisRefresh)
-		//	.fail(function() {
-		//	alert("<spring:message code="error.jquery.ajax"/>");
-		//	});
-		//}
 	});
 	
 
 	$('#organGestorId').on('change', function() {
 		var organGestorId = $(this).val();
-
-		$('#metaExpedientId').val('').trigger('change')
+		findActiusPerLectura(organGestorId);
+		
+		/*$('#metaExpedientId').val('').trigger('change')
 
 		if (organGestorId) {
 			$("#metaExpedientId").data('urlParamAddicional', organGestorId);
 		} else {
 			$("#metaExpedientId").data('urlParamAddicional', null);
 
-		}
+		}*/
 
 	});
 
@@ -271,6 +255,36 @@ $(document).ready(function() {
 
 	
 });
+
+function findActiusPerLectura(organId) {
+	var findUrl;
+	if (organId != undefined) {
+		findUrl = '<c:url value="/metaExpedient/findPerLectura/"/>' + organId;
+	} else {
+		findUrl = '<c:url value="/metaExpedient/findPerLectura/"/>';
+	}
+	var selDomini = $("#metaExpedientId");
+	console.log(selDomini.val());
+	$.ajax({
+        type: "GET",
+        url: findUrl,
+        success: function (data) {
+        	selDomini.empty();
+    		selDomini.append("<option value=\"\"></option>");
+    		if (data) {
+    			data.forEach(function(tipus) {
+    				if(tipus.id == '${expedientFiltreCommand.metaExpedientId}') {
+    					selDomini.append("<option value='" + tipus.id + "' selected>" + tipus.nom + " (" + tipus.classificacioSia + ")</option>");
+    				} else {
+    					selDomini.append("<option value='" + tipus.id + "'>" + tipus.nom + " (" + tipus.classificacioSia + ")</option>");
+    				}
+    			});
+    		}
+        }
+	});
+	var select2Options = {theme: 'bootstrap', width: '100%', minimumInputLength: 0, allowClear: true}
+	selDomini.select2(select2Options);
+}
 
 function checkLoadingFinished() {
 	var cookieName = "contentLoaded";
@@ -313,6 +327,7 @@ function removeCookie(cname) {
 <body>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
+			<%--
 			<div class="col-md-3">
 				<c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaInicial"/>
 				<c:url value="/metaexpedientajax/metaexpedients" var="urlConsultaLlistat"/>
@@ -327,7 +342,11 @@ function removeCookie(cname) {
  					inline="true"
  					urlParamAddicional="${expedientFiltreCommand.organGestorId}"
  					/>				
-			</div>		
+			</div>
+			--%>
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientId" inline="true" emptyOption="true" optionMinimumResultsForSearch="6" placeholderKey="expedient.list.user.placeholder.tipusExpedient"/>
+			</div>
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>
 			</div>
