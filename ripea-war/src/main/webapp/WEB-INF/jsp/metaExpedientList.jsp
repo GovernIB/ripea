@@ -118,9 +118,9 @@
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
 				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
-				<th data-col-name="comu" data-orderable="false" data-template="#cellActiuTemplate" width="1%">
+				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.comu"/>
-					<script id="cellActiuTemplate" type="text/x-jsrender">
+					<script id="cellComuTemplate" type="text/x-jsrender">
 						{{if comu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
