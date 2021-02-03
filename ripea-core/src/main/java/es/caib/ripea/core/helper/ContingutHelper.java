@@ -236,7 +236,7 @@ public class ContingutHelper {
 								auth));
 			}
 			dto.setNumSeguidors(expedient.getSeguidors().size());
-			
+			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth != null) {
 				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());

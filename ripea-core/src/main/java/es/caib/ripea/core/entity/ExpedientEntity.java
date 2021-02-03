@@ -249,6 +249,9 @@ public class ExpedientEntity extends NodeEntity {
 	public List<UsuariEntity> getSeguidors() {
 		return seguidors;
 	}
+	public List<ExpedientComentariEntity> getComentaris() {
+		return comentaris;
+	}
 	public MetaExpedientEntity getMetaExpedient() {
 		return (MetaExpedientEntity)getMetaNode();
 	}
