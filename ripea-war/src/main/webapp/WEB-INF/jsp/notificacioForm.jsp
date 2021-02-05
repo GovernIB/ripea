@@ -338,6 +338,12 @@ function replaceAll(string, search, replace) {
 	return string.split(search).join(replace);
 }
 
+
+
+function destinitarisNoResults() {
+	return '<spring:message code="notificacio.form.camp.destinatari.buit"/>';
+}
+
 </script>
 </head>
 <body>
@@ -360,7 +366,7 @@ function replaceAll(string, search, replace) {
 		<!----  ESTAT   ------->
 		<rip:inputSelect disabled="true" labelSize="2" name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
 		<!----  TITULARS   ------->
-		<rip:inputSelect required="true" labelSize="2" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari"/>
+		<rip:inputSelect required="true" labelSize="2" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari" noResultsFunction="destinitarisNoResults"/>
 		<!---  CONCEPTE   ---->
 		<rip:inputText labelSize="2" name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
 		<!---- TIPUS DE SERVEI  ------->	

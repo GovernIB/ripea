@@ -185,7 +185,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (expedientPeticioId != null) {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		}
-		// create expedient in db and in arxiu
+		// create expedient in db 
 		ExpedientEntity expedient = expedientHelper.create(
 				entitatId,
 				metaExpedientId,
@@ -199,7 +199,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 				grupId);
 
 		ExpedientDto expedientDto = toExpedientDto(expedient, true);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		//create expedient in arxiu
+		contingutHelper.arxiuPropagarModificacio(
+				expedient,
+				null,
+				false,
+				false,
+				null);
 		boolean processatOk = true;
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {

@@ -798,7 +798,6 @@ public class ContingutHelper {
 			
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					node.getMetaNode(),
-					node.getId(),
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
