@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy=CodiMetaDadaNomValidValidator.class)
 public @interface CodiMetaDadaNomValid {
 
-	String message() default "Valor del camp codi consta de caràcters que no poden formar part del correcte identificador java";
+	String message() default "Valor del camp codi no es pot constar de caràcters que no poden formar part del correcte identificador java i no es pot començar amb lletra majúscula";
 
 	Class<?>[] groups() default {};
 
