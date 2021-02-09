@@ -72,6 +72,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
@@ -96,6 +97,8 @@ public class ExpedientHelper {
 	private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private CarpetaHelper carpetaHelper;
 	@Autowired
@@ -126,6 +129,7 @@ public class ExpedientHelper {
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
 			Long pareId,
+			Long organGestorId,
 			Integer any,
 			Long sequencia,
 			String nom,
@@ -173,6 +177,7 @@ public class ExpedientHelper {
 				metaExpedient,
 				contingutPare,
 				metaExpedient.getEntitat(),
+				organGestorRepository.getOne(organGestorId),
 				"1.0",
 				metaExpedient.getEntitat().getUnitatArrel(),
 				new Date(),

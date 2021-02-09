@@ -70,6 +70,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
@@ -891,6 +892,7 @@ public class ContingutHelper {
 			MetaExpedientEntity metaExpedient,
 			ContingutEntity pare,
 			EntitatEntity entitat,
+			OrganGestorEntity organGestor,
 			String ntiVersion,
 			String ntiOrgano,
 			Date ntiFechaApertura,
@@ -903,12 +905,10 @@ public class ContingutHelper {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			agafatPer = usuariRepository.getOne(auth.getName());
 		}
-		
 		GrupEntity grupEntity = null;
 		if (grupId != null) {
 			grupEntity = grupRepository.findOne(grupId);
 		}
-		
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
@@ -917,7 +917,8 @@ public class ContingutHelper {
 				"1.0",
 				ntiOrgano,
 				ntiFechaApertura,
-				metaExpedient.getClassificacioSia()).
+				metaExpedient.getClassificacioSia(),
+				organGestor).
 				agafatPer(agafatPer).
 				grup(grupEntity).
 				build();
