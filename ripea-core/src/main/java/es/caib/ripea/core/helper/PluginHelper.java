@@ -2445,10 +2445,13 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_DIGITALITZACIO,
-					errorDescripcio,
-					ex);
+			if (ex.getClass() == SistemaExternException.class) {
+				throw (SistemaExternException) ex;
+			} else {
+				throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
+						errorDescripcio,
+						ex);
+			}
 		}
 		return perfilsDto;
 	}
