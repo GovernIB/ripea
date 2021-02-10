@@ -1265,8 +1265,8 @@ public class ContingutHelper {
 					entitatActual);
 		
 		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".docx");
-		fitxer.setContentType("application/msword");
+		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".pdf");
+		fitxer.setContentType("application/pdf");
 		if (indexGenerated != null)
 			fitxer.setContingut(indexGenerated);
 		return fitxer;

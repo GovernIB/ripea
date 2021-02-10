@@ -649,7 +649,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						
 						FitxerDto index = expedientService.exportIndexExpedient(
 								entitatCreada.getId(), 
-								expedientCreat.getId());
+								expedientCreat.getId(),
+								false);
 						
 						assertNotNull(index);
 						assertNotNull(index.getContingut());

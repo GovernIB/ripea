@@ -415,7 +415,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
-			Long expedientId) throws IOException;
+			Long expedientId,
+			boolean exportar) throws IOException;
 
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
