@@ -994,9 +994,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		ExpedientEntity toRelate = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				relacionatId,
-				true,
 				false,
 				true,
+				false,
 				false,
 				false);
 
@@ -1057,9 +1057,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				relacionatId,
-				true,
 				false,
 				true,
+				false,
 				false,
 				false);
 		boolean trobat = true;
