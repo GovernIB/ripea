@@ -9,7 +9,7 @@ import javax.validation.ConstraintValidatorContext;
 import es.caib.ripea.war.command.MetaDadaCommand;
 
 /**
- * Constraint de validació que controla que no es repeteixi
+ * Constraint de validació que controla que
  * nom del codi de meta-dada es valid.
  * 
  * @author Limit Tecnologies <limit@limit.es>
@@ -31,7 +31,7 @@ public class CodiMetaDadaNomValidValidator implements ConstraintValidator<CodiMe
 	
 	
 	/**
-	 * Checks if the @param nameToCheck consists of characters that may be part of a Java identifier as others than the first character
+	 * Checks if the @param nameToCheck consists of characters that may be part of a Java identifier 
 	 * 
 	 * @param nameToCheck
 	 * @return
@@ -41,6 +41,12 @@ public class CodiMetaDadaNomValidValidator implements ConstraintValidator<CodiMe
 		boolean nameValid = true;
 		for (int i = 0; i < nameToCheck.length(); i++) {
 			int codePoint = nameToCheck.codePointAt(i);
+			
+			if (i == 0 && Character.isUpperCase(codePoint)) {
+				nameValid = false;
+				break;
+			}
+			
 			if (!Character.isJavaIdentifierPart(codePoint)) {
 				nameValid = false;
 				break;
