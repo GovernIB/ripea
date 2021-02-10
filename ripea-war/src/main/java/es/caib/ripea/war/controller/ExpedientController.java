@@ -319,34 +319,43 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	
 	
 	@RequestMapping(value = "/{expedientId}/generarIndex", method = RequestMethod.GET)
-	public String generarIndex(
+	public void generarIndex(
 			@PathVariable Long expedientId,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), expedientId);
-		if (!expedient.isHasAllDocumentsDefinitiu()) {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.index.generar.notAllDocumentsDefinitiu"));
-			return "redirect:../../contingut/" + expedientId;
-		} else {
-		
-			FitxerDto fitxer = expedientService.exportIndexExpedient(
-					entitatActual.getId(),
-					expedientId);
+		FitxerDto fitxer = expedientService.exportIndexExpedient(
+				entitatActual.getId(),
+				expedientId);
 
-			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
-			
-			writeFileToResponse(
-					fitxer.getNom(),
-					fitxer.getContingut(),
-					response);
-			return null;
-			}
+		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+		
+		writeFileToResponse(
+				fitxer.getNom(),
+				fitxer.getContingut(),
+				response);
+//		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), expedientId);
+//		if (!expedient.isHasAllDocumentsDefinitiu()) {
+//			MissatgesHelper.error(
+//					request, 
+//					getMessage(
+//							request, 
+//							"expedient.controller.index.generar.notAllDocumentsDefinitiu"));
+//			return "redirect:../../contingut/" + expedientId;
+//		} else {
+//		
+//			FitxerDto fitxer = expedientService.exportIndexExpedient(
+//					entitatActual.getId(),
+//					expedientId);
+//
+//			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+//			
+//			writeFileToResponse(
+//					fitxer.getNom(),
+//					fitxer.getContingut(),
+//					response);
+//			return null;
+//			}
 	}
 	
 	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)

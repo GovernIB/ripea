@@ -1,45 +1,53 @@
 package es.caib.ripea.core.helper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigInteger;
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.NoSuchFileException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.util.Units;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-import org.apache.poi.xwpf.usermodel.TextAlignment;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRelation;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHyperlink;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTJc;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTShd;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STJc;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfAction;
+import com.itextpdf.text.pdf.PdfAnnotation;
+import com.itextpdf.text.pdf.PdfBorderArray;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPCellEvent;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 
 /**
  * Mètodes per generar un índex d'un expedient
@@ -50,25 +58,72 @@ import es.caib.ripea.core.repository.ContingutRepository;
 @Component
 public class IndexHelper {
 
+	private Font frutiger7 = FontFactory.getFont("Frutiger", 7, Font.BOLD, new BaseColor(255, 255, 255)); // #7F7F7F
+	private Font frutiger6 = FontFactory.getFont("Frutiger", 6);
+	private Font frutiger11TitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
+	private Font frutiger9TitolBold = FontFactory.getFont("Frutiger", 9, Font.BOLD);
+	private Font frutiger7Italic = FontFactory.getFont("Frutiger", 7, Font.ITALIC, new BaseColor(160, 160, 160));
+	
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private ContingutService contingutService;
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	@Autowired
+	private DocumentNotificacioRepository documentNotificacioRepository;
 	
 	public byte[] generarIndexPerExpedient(
 			ExpedientEntity expedient, 
 			EntitatEntity entitatActual) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			XWPFDocument xwpfDocument = configurarDocument(expedient);
-			configurarTaulaDocument(
-					xwpfDocument,
+			Document index = inicialitzaDocument(out);
+			
+			crearTitol(
+					index, 
 					expedient,
-					entitatActual);
-			xwpfDocument.write(out);
-			out.close();
+					false);
+			
+			crearTaulaDocuments(
+					index, 
+					expedient, 
+					entitatActual,
+					false);
+			
+//			## Crear un índex per cada expedient relacionat
+			if (!expedient.getRelacionatsAmb().isEmpty() && indexExpedientsRelacionats()) {
+//				## [TAULA QUE CONTÉ EL TÍTOL 'EXPEDIENTS RELACIONATS']
+				PdfPTable titolRelacioTable = new PdfPTable(1);
+				titolRelacioTable.setWidthPercentage(100);
+
+//				## [TITOL EXPEDIENTS RELACIONATS]
+				PdfPCell relacioTitolCell = new PdfPCell();
+				relacioTitolCell.setBorder(Rectangle.BOTTOM);
+				relacioTitolCell.setBorderColor(new BaseColor(160, 160, 160));
+				Paragraph relacioTitol = new Paragraph(messageHelper.getMessage("expedient.service.exportacio.index.relacions"), frutiger7Italic);
+				relacioTitol.add(Chunk.NEWLINE);
+				relacioTitolCell.addElement(relacioTitol);
+				titolRelacioTable.addCell(relacioTitolCell);
+				index.add(titolRelacioTable);
+				
+//				## [TÍTOL I TAULA PER CADA RELACIÓ]
+				for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsAmb()) {
+					crearTitol(
+							index, 
+							expedient_relacionat,
+							true);
+					crearTaulaDocuments(
+							index, 
+							expedient_relacionat, 
+							entitatActual,
+							true);
+				}
+			}
+			
+			index.close();
 		} catch (Exception ex) {
 			throw new RuntimeException(
 					"S'ha produït un error generant l'índex de l'expedient",
@@ -77,107 +132,106 @@ public class IndexHelper {
 
 		return out.toByteArray();
 	}
-
-	private XWPFDocument configurarDocument(
-			ExpedientEntity expedient) throws NoSuchFileException, FileNotFoundException, IOException, InvalidFormatException {
-		//plantilla base
-		XWPFDocument xwpfDocument = new XWPFDocument(getClass().getResourceAsStream("/es/caib/ripea/core/templates/template_index.docx"));
-		
-		// Logo
-		XWPFParagraph headerLogo = xwpfDocument.createParagraph();
-		headerLogo.setAlignment(ParagraphAlignment.RIGHT);
-		XWPFRun regio_header_logo = headerLogo.createRun();
-
-		if (getLogo() != null) {
-			FileInputStream is = new FileInputStream(getLogo());
-			regio_header_logo.addPicture(is, XWPFDocument.PICTURE_TYPE_JPEG, getLogo(), Units.toEMU(400), Units.toEMU(100));
-			regio_header_logo.addBreak();
-			regio_header_logo.addBreak();
-		}
-		// Títol
-		XWPFParagraph headerParagraph = xwpfDocument.createParagraph();
-		headerParagraph.setAlignment(ParagraphAlignment.CENTER);
-		XWPFRun regio_header_text = headerParagraph.createRun();
-
-		regio_header_text.setText(expedient.getNom());
-		regio_header_text.addCarriageReturn();
-		regio_header_text.setText(expedient.getCreatedBy().getNom());
-		regio_header_text.setBold(true);
-		regio_header_text.addBreak();
-		regio_header_text.addBreak();
-		return xwpfDocument;
-	}
-
-	private XWPFTable configurarTaulaDocument(
-			XWPFDocument xwpfDocument,
+	
+	private void crearTitol(
+			Document index,
 			ExpedientEntity expedient,
-			EntitatEntity entitatActual) throws Exception {
-		XWPFTable taula = xwpfDocument.createTable();
-		
-		alinearTaula(
-				taula,
-				ParagraphAlignment.CENTER);
-		configurarCapsaleraTaula(taula);
-		configurarContingutTaula(
-				taula,
-				expedient,
-				entitatActual);
-		
-		return taula;
+			boolean isRelacio) {
+		logger.debug("Creant el títol de l'índex per l'expedient [expedientId=" + expedient.getId() + "]");
+		try {
+//			## [TAULA QUE CONTÉ TÍTOL I INTRODUCCIÓ]
+			PdfPTable titolIntroduccioTable = new PdfPTable(1);
+			titolIntroduccioTable.setWidthPercentage(100);
+			
+//			## [TITOL ÍNDEX]
+			PdfPCell titolIntroduccioCell = new PdfPCell();
+			titolIntroduccioCell.setBorder(Rectangle.NO_BORDER);
+			
+			Paragraph indexTitol = new Paragraph(expedient.getNom(), frutiger11TitolBold);
+			indexTitol.setAlignment(Element.ALIGN_CENTER);
+			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacioSia() + "] (" + expedientHelper.calcularNumero(expedient) + ")";
+			Paragraph indexSubtitol = new Paragraph(subtitol, frutiger9TitolBold);
+			indexSubtitol.setAlignment(Element.ALIGN_CENTER);
+			indexSubtitol.add(Chunk.NEWLINE);
+			
+			titolIntroduccioCell.addElement(indexTitol);
+			titolIntroduccioCell.addElement(indexSubtitol);
+			
+			titolIntroduccioTable.addCell(titolIntroduccioCell);
+			titolIntroduccioTable.setSpacingAfter(10f);
+			index.add(titolIntroduccioTable);
+		} catch (DocumentException ex) {
+			logger.error("Hi ha hagut un error generant la introducció de l'índex", ex);
+		}
 	}
 	
-	private void configurarCapsaleraTaula(XWPFTable taula) {
-		XWPFTableRow headerTaula = taula.getRow(0);
-		// La primera cel·la ve creada
-		XWPFParagraph parafraph_nom= headerTaula.getCell(0).getParagraphs().get(0);
-		parafraph_nom.setAlignment(ParagraphAlignment.CENTER);
-		parafraph_nom.setVerticalAlignment(TextAlignment.TOP);
-		XWPFRun regio_num = parafraph_nom.createRun();
-		regio_num.setText(messageHelper.getMessage("expedient.service.exportacio.index.numero"));
-		regio_num.setBold(true);
-		regio_num.setFontSize(8);
-
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.nom"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.estat"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.tipusdocument"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.creatper"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.datacreacio"));
-//		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.datafirma"));
-//		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.dataestat"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.csv"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.link"));
-		addNewCellToHeader(headerTaula, messageHelper.getMessage("expedient.service.exportacio.index.datadocument"));
-
-		// background header
-		for (XWPFTableCell capsalera_col : headerTaula.getTableCells()) {
-			CTTcPr tcpr = capsalera_col.getCTTc().addNewTcPr();
-			CTShd ctshd = tcpr.addNewShd();
-			ctshd.setFill("969696");
+	private void crearTaulaDocuments(
+			Document index, 
+			ExpedientEntity expedient,
+			EntitatEntity entitatActual,
+			boolean isRelacio) {
+		logger.debug("Generant la taula amb els documents de l'expedient [expedientId=" + expedient.getId() + "]");
+		try {
+//			## [DEFINICIÓ TAULA]
+			float [] pointColumnWidths;
+			PdfPTable taulaDocuments;
+			if (!isRelacio) {
+				pointColumnWidths = new float[] {4f, 12f, 10f, 14f, 14f, 10f, 20f, 14f, 7f};
+				taulaDocuments = new PdfPTable(9);
+			} else {
+				pointColumnWidths = new float[] {14f, 12f, 14f, 14f, 15f, 20f, 14f, 7f};
+				taulaDocuments = new PdfPTable(8);
+			}
+			taulaDocuments.setWidthPercentage(100f);
+			taulaDocuments.setWidths(pointColumnWidths);
+			
+//			## [TÍTOL]
+			crearCapsaleraTaula(taulaDocuments, isRelacio);
+			
+//			## [CONTINGUT]
+			crearContingutTaula(taulaDocuments, expedient, entitatActual, isRelacio);
+			
+			index.add(taulaDocuments);
+			if (!isRelacio)
+				index.add(Chunk.NEXTPAGE);
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error generant la taula dels documents", ex);
 		}
 	}
-
-	private void configurarContingutTaula(
-			XWPFTable taula, 
+	
+	private void crearContingutTaula(
+			PdfPTable taulaDocuments,
 			ExpedientEntity expedient,
-			EntitatEntity entitatActual) throws Exception {
+			EntitatEntity entitatActual,
+			boolean isRelacio) throws Exception {
+		logger.debug("Generant la capçalera de la taula de documents");
 		List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
-				expedient, 
-				0, 
-				new Sort("createdDate"));
-		long num = 0;
+			expedient, 
+			0, 
+			new Sort("createdDate"));
+		BigDecimal num = new BigDecimal(0);
 		
 		for (ContingutEntity contingut : continguts) {
+			if (num.scale() > 0)
+				num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
+			
 			if (contingut instanceof DocumentEntity) {
-				XWPFTableRow bodyTaula = taula.createRow();
-				num += 10;
-				addAndAdjustFila(
-						taula,
-						bodyTaula,
-						(DocumentEntity) contingut,
-						entitatActual,
-						num);
+				DocumentEntity document = (DocumentEntity) contingut;
+				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+					BigDecimal sum = new BigDecimal(1);
+					num = num.add(sum);
+					crearNovaFila(
+							taulaDocuments,
+							document,
+							entitatActual,
+							num,
+							isRelacio);
+				}
 			}
 			if (contingut instanceof CarpetaEntity) {
+				BigDecimal sum = new BigDecimal(1);
+				num = num.add(sum);
+				
 				List<String> estructuraCarpetes = new ArrayList<String>();
 				List<DocumentEntity> documentsCarpeta = new ArrayList<DocumentEntity>();
 				ContingutEntity carpetaActual = contingut;
@@ -194,14 +248,16 @@ public class IndexHelper {
 						}
 					}
 					for (DocumentEntity document : documentsCarpeta) {
-						XWPFTableRow bodyTaula = taula.createRow();
-						num += (document.getNom() == documentsCarpeta.get(0).getNom()) ? 10 : 1; // primer document
-						addAndAdjustFila(
-								taula,
-								bodyTaula,
-								document,
-								entitatActual,
-								num);
+						if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+							BigDecimal sum2 = new BigDecimal(0.1);
+							num = num.add(sum2);
+							crearNovaFila(
+									taulaDocuments,
+									document,
+									entitatActual,
+									num,
+									isRelacio);
+						}
 					}
 					documentsCarpeta = new ArrayList<DocumentEntity>();
 					if (darreraCarpeta)
@@ -209,101 +265,209 @@ public class IndexHelper {
 				}
 			}
 		}
-		ajustarLongitudFiles(taula);
 	}
-
-	private void addAndAdjustFila(
-			XWPFTable taula,
-			XWPFTableRow bodyTaula,
-			DocumentEntity document,
-			EntitatEntity entitatActual,
-			long num) throws Exception {
-
-		addNewCellToBody(bodyTaula.getCell(0), String.valueOf(((num) / 10.0)), false);
-		SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
-
-		addNewCellToBody(bodyTaula.getCell(1), document.getNom() != null ? document.getNom() : "", true);
-		addNewCellToBody(bodyTaula.getCell(2), document.getEstat() != null ? messageHelper.getMessage("document.estat.enum." + document.getEstat()): "", false);
-		addNewCellToBody(bodyTaula.getCell(3), document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "", false);
-		addNewCellToBody(bodyTaula.getCell(4), document.getCreatedBy() != null ? document.getCreatedBy().getCodi() : "", false);
-		addNewCellToBody(bodyTaula.getCell(5), document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "", false);
-//		addNewCellToBody(bodyTaula.getCell(6), "firma data");
-//		addNewCellToBody(bodyTaula.getCell(7), "estat data");
+	
+	private void crearNovaFila(
+		PdfPTable taulaDocuments,
+		DocumentEntity document,
+		EntitatEntity entitatActual,
+		BigDecimal num,
+		boolean isRelacio) throws Exception {
+		logger.debug("Afegint nova fila a la taula de documents...");
 		ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
 				entitatActual.getId(),
 				document.getId());
+		
+//		Nº
+		String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
+		if (!isRelacio)
+			taulaDocuments.addCell(crearCellaContingut(nextVal, null));
+		
+//		Nom document
+		String nom = document.getNom() != null ? document.getNom() : "";
+		taulaDocuments.addCell(crearCellaContingut(nom, null));
+		
 		if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
-			addNewCellToBody(bodyTaula.getCell(6), arxiuDetall.getMetadadesAddicionals().get("csv") != null ? arxiuDetall.getMetadadesAddicionals().get("csv").toString() : "", false);
-			addNewCellToBody(bodyTaula.getCell(7), arxiuDetall.getMetadadesAddicionals().get("csv") != null ? getCsvUrl() + arxiuDetall.getMetadadesAddicionals().get("csv") : "", true);
+//			Nom natural
+			String tituloDoc = arxiuDetall.getMetadadesAddicionals().get("tituloDoc") != null ? arxiuDetall.getMetadadesAddicionals().get("tituloDoc").toString() : "";
+			taulaDocuments.addCell(crearCellaContingut(tituloDoc, null));
 		}
-		addNewCellToBody(bodyTaula.getCell(8), document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "", false);
+//		Tipus documental
+		String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
+		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null));
+		
+//		Tipus document
+		String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
+		taulaDocuments.addCell(crearCellaContingut(tipusDocument, null));
+
+//		Data creació
+		SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
+		String dataCreacio = document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "";
+		taulaDocuments.addCell(crearCellaContingut(dataCreacio, null));
+		
+		
+		if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+//			Enllaç csv
+			String csv = arxiuDetall.getMetadadesAddicionals().get("csv").toString();
+			String csvLink = csv != null ? getCsvUrl() + csv : "";
+			taulaDocuments.addCell(crearCellaContingut(csv, csvLink));
+		}
+		
+//		Data captura
+		String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
+		taulaDocuments.addCell(crearCellaContingut(dataCaptura, null));	
+		
+//		Custodiat / Notificat
+		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
+		boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
+		
+		if (hasNotificacions) {
+			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.notificat"), null));
+		} else if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), null));
+		} else {
+			taulaDocuments.addCell(crearCellaContingut("-", null));
+		}
 	}
 	
-	private void ajustarLongitudFiles(XWPFTable table) {
-		table.getCTTbl().addNewTblGrid().addNewGridCol().setW(BigInteger.valueOf(500));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(800));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1500));
-//		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-//		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(2500));
-		table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(1000));
-	}
+	private Document inicialitzaDocument(
+			ByteArrayOutputStream out) throws DocumentException {
+		logger.debug("Inicialitzant el document...");
+//		## [Event per crear el header]
+		HeaderPageEvent headerEvent = new HeaderPageEvent();
+		
+	    Document index = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
+		PdfWriter writer = PdfWriter.getInstance(index, out);
+//		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
+		
+		writer.setPageEvent(headerEvent);
+		
+		index.open();
+		index.addAuthor("Ripea");
+		index.addCreationDate();
+		index.addCreator("iText library");
 
-	private void addNewCellToHeader(
-			XWPFTableRow row,
-			String titol) {
-		XWPFParagraph parafraph = row.addNewTableCell().getParagraphs().get(0);
-		parafraph.setAlignment(ParagraphAlignment.CENTER);
-		parafraph.setVerticalAlignment(TextAlignment.TOP);
-		XWPFRun regio = parafraph.createRun();
-		regio.setText(titol);
-		regio.setBold(true);
-		regio.setFontSize(8);
-	}
-
-	private void addNewCellToBody(
-			XWPFTableCell cell,
-			String titol,
-			boolean isEnllac) throws Exception {
-		XWPFParagraph parafraph= cell.getParagraphs().get(0);
-		parafraph.setAlignment(ParagraphAlignment.CENTER);
-		parafraph.setVerticalAlignment(TextAlignment.TOP);
-		XWPFRun regio = parafraph.createRun();
-		regio.setText(titol);
-		regio.setFontSize(7);
-//		if (isEnllac)
-//			crearEnllacPerParagraf(cell.getParagraphs().get(0), regio_nom.getParagraph().getText());
-	}
-
-	private void alinearTaula(
-			XWPFTable table,
-			ParagraphAlignment align) {
-		CTTblPr tblPr = table.getCTTbl().getTblPr();
-		CTJc jc = (tblPr.isSetJc() ? tblPr.getJc() : tblPr.addNewJc());
-		STJc.Enum en = STJc.Enum.forInt(align.getValue());
-		jc.setVal(en);
+		return index;
 	}
 	
-	@SuppressWarnings("unused")
-	private XWPFHyperlinkRun crearEnllacPerParagraf(
-			XWPFParagraph paragraph, 
-			String uri) throws Exception {
-		String rId = paragraph.getPart().getPackagePart().addExternalRelationship(
-				uri, 
-				XWPFRelation.HYPERLINK.getRelation()).getId();
+	private class HeaderPageEvent extends PdfPageEventHelper {
+		private PdfPTable header;
+		private float tableHeight;
+	    
+		
+	    public float getTableHeight() {
+			return tableHeight;
+		}
 
-		CTHyperlink cthyperLink = paragraph.getCTP().addNewHyperlink();
-		cthyperLink.setId(rId);
-		cthyperLink.addNewR();
+		public void onEndPage(PdfWriter writer, Document index) {
+			header.writeSelectedRows(
+					0, 
+					-1,
+					index.left(),
+					750 + ((index.topMargin() + tableHeight) / 2),
+                    writer.getDirectContent());
+	    }
+		
+		private HeaderPageEvent() {
+			try {
+				PdfPCell cellDireccio = new PdfPCell();
+				header = new PdfPTable(2);
+				header.setTotalWidth(523);
+				header.setLockedWidth(true);
+				Image logoCapsalera = null;
+				
+	//			## [LOGO ENTITAT]
+				if (getLogo() != null && !getLogo().isEmpty()) {
+					logoCapsalera = Image.getInstance(getLogo());
+				} else {
+					byte[] logoBytes = IOUtils.toByteArray(getCapsaleraDefaultLogo());
+					logoCapsalera = Image.getInstance(logoBytes);
+				}
+				
+				if (logoCapsalera != null) {
+					logoCapsalera.scaleToFit(120f, 50f);
+					PdfPCell cellLogo = new PdfPCell(logoCapsalera);
+					cellLogo.setHorizontalAlignment(Element.ALIGN_LEFT);
+					cellLogo.setBorder(Rectangle.NO_BORDER);
+					header.addCell(cellLogo);
+				}
+	
+				cellDireccio.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cellDireccio.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cellDireccio.setBorder(Rectangle.NO_BORDER);
+				header.addCell(cellDireccio);
+				tableHeight = header.getTotalHeight();
+			} catch (Exception ex) {
+				logger.error("Hi ha hagut un error generant el header del document", ex);
+			}
+		}
+	}
 
-		return new XWPFHyperlinkRun(
-				cthyperLink, 
-				cthyperLink.getRArray(0),
-				paragraph);
+	private void crearCapsaleraTaula(PdfPTable taulaDocuments, boolean isRelacio) {
+		logger.debug("Generant la capçalera de la taula de documents");
+		if (!isRelacio)
+			taulaDocuments.addCell(crearCellaCapsalera("Nº"));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nom")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nomnatural")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocumental")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocument")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.datacreacio")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.link")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.datadocument")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.estat")));
+	}
+	
+	private PdfPCell crearCellaCapsalera(String titol) {
+		PdfPCell titolCell = new PdfPCell();
+		String titolEnviamentMessage = titol;
+		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, frutiger7);
+		titolParagraph.setAlignment(Element.ALIGN_CENTER);
+		titolCell.addElement(titolParagraph);
+		titolCell.setPaddingBottom(6f);
+		titolCell.setBackgroundColor(new BaseColor(166, 166, 166));
+		titolCell.setBorderWidth((float) 0.5);
+		//titolCell.setBorderColor(new BaseColor(166, 166, 166));
+		return titolCell;
+	}
+	
+	private PdfPCell crearCellaContingut(String titol, String link) {
+		PdfPCell titolCell = new PdfPCell();
+		String titolEnviamentMessage = titol;
+		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, frutiger6);
+//		Phrase phrase = new Phrase(titolEnviamentMessage, frutiger6);
+//		Anchor anchor = new Anchor(titolEnviamentMessage, frutiger6);
+//		if (link != null)
+//	        anchor.setReference(link);
+		titolParagraph.setAlignment(Element.ALIGN_CENTER);
+		titolCell.addElement(titolParagraph);
+		titolCell.setPaddingBottom(6f);
+		titolCell.setBorderWidth((float) 0.5);
+		if (link != null) {
+			titolCell.setCellEvent(new LinkInCell(link));
+		}
+		return titolCell;
+	}
+	
+	private class LinkInCell implements PdfPCellEvent {
+	    protected String url;
+	    public LinkInCell(String url) {
+	        this.url = url;
+	    }
+	    
+	    public void cellLayout(
+	    		PdfPCell cell, 
+	    		Rectangle position,
+	    		PdfContentByte[] canvases) {
+	    	PdfWriter writer = canvases[0].getPdfWriter();
+	    	PdfAction action = new PdfAction(url);
+	        PdfAnnotation link = PdfAnnotation.createLink(writer, position, PdfAnnotation.HIGHLIGHT_NONE, action);
+	        link.setBorder(new PdfBorderArray(0f, 0f, 0f));
+	        writer.addAnnotation(link);
+	    }
+	}
+	
+	private InputStream getCapsaleraDefaultLogo() {
+		return getClass().getResourceAsStream("/es/caib/ripea/core/templates/govern-logo.png");
 	}
 	
 	private String getLogo() throws NoSuchFileException, IOException {
@@ -311,9 +475,15 @@ public class IndexHelper {
 		return filePath;
 	}
 	
+	private boolean indexExpedientsRelacionats() throws NoSuchFileException, IOException {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.index.expedients.relacionats");
+	}
+	
 	private String getCsvUrl() throws NoSuchFileException, IOException {
 		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.ripea.documents.validacio.url");
 		return filePath;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(IndexHelper.class);
 
 }
