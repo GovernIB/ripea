@@ -1257,7 +1257,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Override
 	@Transactional
-	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId) throws IOException {
+	public FitxerDto exportIndexExpedient(
+			Long entitatId, 
+			Long expedientId,
+			boolean exportar) throws IOException {
 		logger.debug(
 				"Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId +
 						")");
@@ -1270,115 +1273,115 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ZipOutputStream zos = new ZipOutputStream(baos);
-
-		List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
-				expedient,
-				0,
-				new Sort("createdDate"));
-		BigDecimal num = new BigDecimal(0);
+		FitxerDto resultat = new FitxerDto();
 		
-		for (ContingutEntity contingut : continguts) {
-			if (contingut instanceof DocumentEntity) {
-				if (num.scale() > 0)
-					num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
-				
-				DocumentEntity document = (DocumentEntity)contingut;
-				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-				BigDecimal sum = new BigDecimal(1);
-				num = num.add(sum);
-				String nomDocument = (num.scale() > 0 ? num.doubleValue() : num.intValue()) + " " + fitxer.getNom();
-
-				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
-					contingutHelper.crearNovaEntrada(nomDocument, fitxer, zos);
-					if (document.isFirmat()) {
-						String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
-						if (documentExportacioEni != null) {
-							FitxerDto exportacioEni = new FitxerDto();
-							exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
-							exportacioEni.setContentType("application/xml");
-							exportacioEni.setContingut(documentExportacioEni.getBytes());
+		if (exportar) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ZipOutputStream zos = new ZipOutputStream(baos);
 	
-							contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
-						}
-					}
-				}
-			}
-			if (contingut instanceof CarpetaEntity) {
-				if (num.scale() > 0)
-					num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
-				BigDecimal sum = new BigDecimal(1);
-				num = num.add(sum);
-				
-				List<String> estructuraCarpetes = new ArrayList<String>();
-				List<DocumentEntity> documentsCarpetaActual = new ArrayList<DocumentEntity>();
-				ContingutEntity carpetaActual = contingut;
-				while (carpetaActual instanceof CarpetaEntity) {
-					boolean darreraCarpeta = true;
-					estructuraCarpetes.add((num.scale() > 0 ? num.doubleValue() : num.intValue()) + " " + carpetaActual.getNom());
-					for (ContingutEntity contingutCarpetaActual : carpetaActual.getFills()) {
-						if (contingutCarpetaActual instanceof CarpetaEntity) {
-							carpetaActual = contingutCarpetaActual;
-							darreraCarpeta = false;
-						} else {
-							documentsCarpetaActual.add((DocumentEntity)contingutCarpetaActual);
-						}
-					}
-					String nomEstructuraCarpetes = "";
-					for (String carpeta : estructuraCarpetes) {
-						nomEstructuraCarpetes += carpeta + "/";
-					}
-					for (DocumentEntity document : documentsCarpetaActual) {
-						BigDecimal sum2 = new BigDecimal(0.1);
-						num = num.add(sum2);
-						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						//num += (document.getNom() == documentsCarpetaActual.get(0).getNom()) ? 10 : 1; // primer
-																										// document
-						String nomDocument =  (num.scale() > 0 ? num.doubleValue() : num.intValue()) + " " + fitxer.getNom();
-						String nomCarpeta = nomEstructuraCarpetes + nomDocument;
-						
-						if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
-							contingutHelper.crearNovaEntrada(nomCarpeta, fitxer, zos);
-							if (document.isFirmat()) {
-								String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
-								if (documentExportacioEni != null) {
-									FitxerDto exportacioEni = new FitxerDto();
-									exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
-									exportacioEni.setContentType("application/xml");
-									exportacioEni.setContingut(documentExportacioEni.getBytes());
+			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
+					expedient,
+					0,
+					new Sort("createdDate"));
+			BigDecimal num = new BigDecimal(0);
+			
+			for (ContingutEntity contingut : continguts) {
+				if (contingut instanceof DocumentEntity) {
+					if (num.scale() > 0)
+						num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
+					
+					DocumentEntity document = (DocumentEntity)contingut;
+					FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+					BigDecimal sum = new BigDecimal(1);
+					num = num.add(sum);
+					String nomDocument = (num.scale() > 0 ? num.doubleValue() : num.intValue()) + " " + fitxer.getNom();
 	
-									contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
-								}
+					if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+						contingutHelper.crearNovaEntrada(nomDocument, fitxer, zos);
+						if (document.isFirmat()) {
+							String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+							if (documentExportacioEni != null) {
+								FitxerDto exportacioEni = new FitxerDto();
+								exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
+								exportacioEni.setContentType("application/xml");
+								exportacioEni.setContingut(documentExportacioEni.getBytes());
+		
+								contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 							}
 						}
 					}
-					documentsCarpetaActual = new ArrayList<DocumentEntity>();
-					if (darreraCarpeta)
-						break;
+				}
+				if (contingut instanceof CarpetaEntity) {
+					if (num.scale() > 0)
+						num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
+					BigDecimal sum = new BigDecimal(1);
+					num = num.add(sum);
+					
+					List<String> estructuraCarpetes = new ArrayList<String>();
+					List<DocumentEntity> documentsCarpetaActual = new ArrayList<DocumentEntity>();
+					ContingutEntity carpetaActual = contingut;
+					while (carpetaActual instanceof CarpetaEntity) {
+						boolean darreraCarpeta = true;
+						estructuraCarpetes.add((num.scale() > 0 ? num.doubleValue() : num.intValue()) + " " + carpetaActual.getNom());
+						for (ContingutEntity contingutCarpetaActual : carpetaActual.getFills()) {
+							if (contingutCarpetaActual instanceof CarpetaEntity) {
+								carpetaActual = contingutCarpetaActual;
+								darreraCarpeta = false;
+							} else {
+								documentsCarpetaActual.add((DocumentEntity)contingutCarpetaActual);
+							}
+						}
+						String nomEstructuraCarpetes = "";
+						for (String carpeta : estructuraCarpetes) {
+							nomEstructuraCarpetes += carpeta + "/";
+						}
+						for (DocumentEntity document : documentsCarpetaActual) {
+							BigDecimal sum2 = new BigDecimal(0.1);
+							num = num.add(sum2);
+							FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+							//num += (document.getNom() == documentsCarpetaActual.get(0).getNom()) ? 10 : 1; // primer document
+							String nomDocument =  (num.scale() > 0 ? num.doubleValue() : num.intValue()) + " " + fitxer.getNom();
+							String nomCarpeta = nomEstructuraCarpetes + nomDocument;
+							
+							if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+								contingutHelper.crearNovaEntrada(nomCarpeta, fitxer, zos);
+								if (document.isFirmat()) {
+									String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+									if (documentExportacioEni != null) {
+										FitxerDto exportacioEni = new FitxerDto();
+										exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
+										exportacioEni.setContentType("application/xml");
+										exportacioEni.setContingut(documentExportacioEni.getBytes());
+		
+										contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+									}
+								}
+							}
+						}
+						documentsCarpetaActual = new ArrayList<DocumentEntity>();
+						if (darreraCarpeta)
+							break;
+					}
 				}
 			}
+			String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+			if (expedientExportacioEni != null) {
+				FitxerDto exportacioEni = new FitxerDto();
+				exportacioEni.setNom(expedient.getNom() + "_exportacio_ENI.xml");
+				exportacioEni.setContentType("application/xml");
+				exportacioEni.setContingut(expedientExportacioEni.getBytes());
+				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+			}
+			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient);
+			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
+			zos.close();
+	
+			resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".zip");
+			resultat.setContentType("application/zip");
+			resultat.setContingut(baos.toByteArray());
+		} else {
+			resultat = contingutHelper.generarIndex(entitatActual, expedient);
 		}
-		String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
-		if (expedientExportacioEni != null) {
-			FitxerDto exportacioEni = new FitxerDto();
-			exportacioEni.setNom(expedient.getNom() + "_exportacio_ENI.xml");
-			exportacioEni.setContentType("application/xml");
-			exportacioEni.setContingut(expedientExportacioEni.getBytes());
-			contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
-		}
-
-		FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient);
-		contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
-//		FitxerDto indexPdf = pluginHelper.conversioConvertirPdf(indexDoc, null);
-//		contingutHelper.crearNovaEntrada(indexPdf.getNom(), indexPdf, zos);
-		zos.close();
-
-		FitxerDto resultat = new FitxerDto();
-		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".zip");
-		resultat.setContentType("application/zip");
-		resultat.setContingut(baos.toByteArray());
-
 		return resultat;
 	}
 
@@ -1393,7 +1396,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		ZipOutputStream zos = new ZipOutputStream(baos);
 
 		for (Long expedientId : expedientIds) {
-			FitxerDto resultat = exportIndexExpedient(entitatId, expedientId);
+			FitxerDto resultat = exportIndexExpedient(entitatId, expedientId, false);
 			contingutHelper.crearNovaEntrada(resultat.getNom(), resultat, zos);
 		}
 		zos.close();

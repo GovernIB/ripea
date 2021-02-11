@@ -294,11 +294,13 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId) throws IOException {
+	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId, boolean exportar) throws IOException {
 		return delegate.exportIndexExpedient(
 				entitatId,
-				expedientId);
+				expedientId,
+				exportar);
 	}
+	
 	@Override
 	@RolesAllowed("tothom")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(

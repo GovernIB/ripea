@@ -58,11 +58,11 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 @Component
 public class IndexHelper {
 
-	private Font frutiger7 = FontFactory.getFont("Frutiger", 7, Font.BOLD, new BaseColor(255, 255, 255)); // #7F7F7F
+	private Font frutiger7 = FontFactory.getFont("Frutiger", 6, Font.BOLD, new BaseColor(255, 255, 255)); // #7F7F7F
 	private Font frutiger6 = FontFactory.getFont("Frutiger", 6);
 	private Font frutiger11TitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font frutiger9TitolBold = FontFactory.getFont("Frutiger", 9, Font.BOLD);
-	private Font frutiger7Italic = FontFactory.getFont("Frutiger", 7, Font.ITALIC, new BaseColor(160, 160, 160));
+	private Font frutiger10Italic = FontFactory.getFont("Frutiger", 10, Font.ITALIC, new BaseColor(160, 160, 160));
 	
 	@Autowired
 	private MessageHelper messageHelper;
@@ -103,7 +103,7 @@ public class IndexHelper {
 				PdfPCell relacioTitolCell = new PdfPCell();
 				relacioTitolCell.setBorder(Rectangle.BOTTOM);
 				relacioTitolCell.setBorderColor(new BaseColor(160, 160, 160));
-				Paragraph relacioTitol = new Paragraph(messageHelper.getMessage("expedient.service.exportacio.index.relacions"), frutiger7Italic);
+				Paragraph relacioTitol = new Paragraph(messageHelper.getMessage("expedient.service.exportacio.index.relacions"), frutiger10Italic);
 				relacioTitol.add(Chunk.NEWLINE);
 				relacioTitolCell.addElement(relacioTitol);
 				titolRelacioTable.addCell(relacioTitolCell);
@@ -176,10 +176,10 @@ public class IndexHelper {
 			float [] pointColumnWidths;
 			PdfPTable taulaDocuments;
 			if (!isRelacio) {
-				pointColumnWidths = new float[] {4f, 12f, 10f, 14f, 14f, 10f, 20f, 14f, 7f};
+				pointColumnWidths = new float[] {4f, 13f, 13f, 15f, 14f, 13f, 19f, 12f, 7f};
 				taulaDocuments = new PdfPTable(9);
 			} else {
-				pointColumnWidths = new float[] {14f, 12f, 14f, 14f, 15f, 20f, 14f, 7f};
+				pointColumnWidths = new float[] {15f, 12f, 14f, 16f, 13f, 19f, 14f, 7f};
 				taulaDocuments = new PdfPTable(8);
 			}
 			taulaDocuments.setWidthPercentage(100f);
@@ -308,8 +308,8 @@ public class IndexHelper {
 		
 		if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
 //			Enllaç csv
-			String csv = arxiuDetall.getMetadadesAddicionals().get("csv").toString();
-			String csvLink = csv != null ? getCsvUrl() + csv : "";
+			String csv = arxiuDetall.getMetadadesAddicionals().get("csv") != null ? getCsvUrl() + arxiuDetall.getMetadadesAddicionals().get("csv").toString() : null;
+			String csvLink = csv != null ? csv : "";
 			taulaDocuments.addCell(crearCellaContingut(csv, csvLink));
 		}
 		
