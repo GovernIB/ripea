@@ -312,7 +312,7 @@
 					</c:otherwise>
 				</c:choose>	
 			</c:if>
-			<c:if test="${contingut.expedient && pluginArxiuActiu}"> 
+			<c:if test="${pluginArxiuActiu}"> 
 				<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 			</c:if>
 			<c:if test="${contingut.document && contingut.fitxerExtension!='zip'}">
