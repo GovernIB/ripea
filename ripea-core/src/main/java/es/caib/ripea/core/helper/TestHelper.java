@@ -29,6 +29,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 	
 @Component
@@ -53,7 +54,8 @@ public class TestHelper {
 				"ntiVersion",
 				"ntiOrgano",
 				new Date(),
-				"ntiClasificacionSia").build(); 
+				"ntiClasificacionSia",
+				new OrganGestorEntity()).build(); 
 		
 		
 		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(new EntitatEntity(), "codi", "nom", MultiplicitatEnumDto.M_0_1, new MetaExpedientEntity(), NtiOrigenEnumDto.O0, DocumentNtiEstadoElaboracionEnumDto.EE01, "ntiTipoDocumental").build();
@@ -112,7 +114,8 @@ public class TestHelper {
 				"ntiVersion",
 				"ntiOrgano",
 				new Date(),
-				"ntiClasificacionSia").build(); 
+				"ntiClasificacionSia",
+				new OrganGestorEntity()).build(); 
 		
 		
 		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(new EntitatEntity(), "codi", "nom", MultiplicitatEnumDto.M_0_1, new MetaExpedientEntity(), NtiOrigenEnumDto.O0, DocumentNtiEstadoElaboracionEnumDto.EE01, "ntiTipoDocumental").build();

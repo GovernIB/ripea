@@ -165,7 +165,7 @@ public class ExpedientEntity extends NodeEntity {
 	@ForeignKey(name = "ipa_grup_expedient_fk")
 	private GrupEntity grup;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_gestor_id")
     @ForeignKey(name = "ipa_organ_gestor_exp_fk")
     private OrganGestorEntity organGestor;

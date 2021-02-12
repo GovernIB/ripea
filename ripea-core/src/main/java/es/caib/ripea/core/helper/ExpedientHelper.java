@@ -61,6 +61,7 @@ import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -128,8 +129,8 @@ public class ExpedientHelper {
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
-			Long pareId,
 			Long organGestorId,
+			Long pareId,
 			Integer any,
 			Long sequencia,
 			String nom,
@@ -150,7 +151,19 @@ public class ExpedientHelper {
 				false,
 				true,
 				false);
-
+		OrganGestorEntity organGestor;
+		if (metaExpedient.getOrganGestor() != null) {
+			organGestor = metaExpedient.getOrganGestor();
+		} else {
+			if (organGestorId == null) {
+				throw new ValidationException(
+						metaExpedientId,
+						MetaExpedientEntity.class,
+						"La creació d'un expedient de tipus (metaExpedientId=" + metaExpedientId + ") requereix especificar un òrgan gestor");
+			}
+			// TODO comprovar si òrgan gestor està permés
+			organGestor = organGestorRepository.getOne(organGestorId);
+		}
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
 //		}
@@ -177,7 +190,7 @@ public class ExpedientHelper {
 				metaExpedient,
 				contingutPare,
 				metaExpedient.getEntitat(),
-				organGestorRepository.getOne(organGestorId),
+				organGestor,
 				"1.0",
 				metaExpedient.getEntitat().getUnitatArrel(),
 				new Date(),

@@ -25,7 +25,7 @@
 	</label>
 	<c:choose>
 		<c:when test="${empty padding || padding}">
-			<div class="controls col-xs-${campInputSize}" style="padding-top:7px">
+			<div class="controls col-xs-${campInputSize}" style="padding-top:7px; padding-bottom: 7px">
 				<jsp:doBody/>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 			</div>

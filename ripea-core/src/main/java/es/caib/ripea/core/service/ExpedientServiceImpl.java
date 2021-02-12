@@ -169,6 +169,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
+			Long organGestorId,
 			Long pareId,
 			Integer any,
 			Long sequencia,
@@ -177,9 +178,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 			boolean associarInteressats,
 			Long grupId) {
 		logger.debug(
-				"Creant nou expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
-						", " + "pareId=" + pareId + ", " + "any=" + any + ", " + "sequencia=" + sequencia + ", " +
-						"nom=" + nom + ", " + "expedientPeticioId=" + expedientPeticioId + ")");
+				"Creant nou expedient (" +
+						"entitatId=" + entitatId + ", " +
+						"metaExpedientId=" + metaExpedientId + ", " +
+						"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
+						"organGestorId=" + organGestorId + ", " +
+						"pareId=" + pareId + ", " +
+						"any=" + any + ", " +
+						"sequencia=" + sequencia + ", " +
+						"nom=" + nom + ", " +
+						"expedientPeticioId=" + expedientPeticioId + ")");
 		// if expedient comes from distribucio
 		ExpedientPeticioEntity expedientPeticioEntity = null;
 		if (expedientPeticioId != null) {
@@ -190,6 +198,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				metaExpedientId,
 				metaExpedientDominiId,
+				organGestorId,
 				pareId,
 				any,
 				sequencia,
@@ -229,9 +238,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Override
 	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats) {
-		logger.debug(
-				"Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " + "expedientId=" +
-						expedientId + ", " + "expedientPeticioId=" + expedientPeticioId + ")");
+		logger.debug("Incorporant a l'expedient existent (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ", " +
+				"expedientPeticioId=" + expedientPeticioId + ")");
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 

@@ -140,7 +140,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (OrganGestorEntity o : organismesNotInDIR3) {
 			if (o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) {
 				organGestorRepository.delete(o.getId());
-				System.out.println("REMOVED: " + o.getNom());
 			} else {
 				o.setActiu(false);
 				organGestorRepository.flush();
@@ -303,22 +302,31 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         }
         return organismes;
     }
-    
-    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
-    {
-        for (NodeDir3 fill : root.getFills())
-        {
+
+    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes) {
+        for (NodeDir3 fill : root.getFills()) {
             OrganGestorDto organisme = new OrganGestorDto();
             organisme.setCodi(fill.getCodi());
             organisme.setNom(fill.getDenominacio());
             organisme.setPareCodi(root.getCodi());
-            
             organismes.add(organisme);
-            
             findOrganismesFills(fill, organismes);
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+	private void findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+			Long entitatId,
+			Long expedientTipusId,
+			String filtre) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+	
+		organGestorRepository.findByEntitatAndFiltreAndCodiInRecursive4Level(
+				entitat,
+				filtre == null,
+				filtre,
+				null);
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

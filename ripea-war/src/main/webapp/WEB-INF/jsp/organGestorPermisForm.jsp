@@ -20,8 +20,8 @@
 <script>
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
-			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
-			$("form#permisCommand *:disabled").removeAttr('disabled');
+			$("form#permisOrganGestorCommand *:disabled").attr('readonly', 'readonly');
+			$("form#permisOrganGestorCommand *:disabled").removeAttr('disabled');
 		});
 	});
 </script>
@@ -33,16 +33,20 @@
  	</c:if>	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisOrganGestorCommand">
 		<form:hidden path="id"/>
-		<rip:inputSelect name="organGestorId" textKey="organgestor.form.camp.organ" 
-						 disabled="${not empty permisOrganGestorCommand.organGestorId}" emptyOption="true" emptyOptionTextKey="organgestor.form.camp.organ.opcio.cap"
+		<rip:inputSelect name="organGestorId" textKey="organgestor.permis.form.camp.organ" 
+						 disabled="${not empty permisOrganGestorCommand.organGestorId}" emptyOption="true" emptyOptionTextKey="organgestor.permis.form.camp.organ.opcio.cap"
 						 optionItems="${ organsGestors }" optionValueAttribute="id" optionTextAttribute="nom"
 						 required="true" optionMinimumResultsForSearch="5"/>
 		<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
 			<form:hidden path="organGestorId"/>
 	 	</c:if>					 
-		<rip:inputSelect name="principalTipus" textKey="organgestor.form.camp.tipus" disabled="${not empty permisOrganGestorCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
-		<rip:inputText name="principalNom" required="true" textKey="organgestor.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
-		<rip:inputCheckbox name="administration" textKey="organgestor.form.camp.administracio"/>
+		<rip:inputSelect name="principalTipus" textKey="organgestor.permis.form.camp.tipus" disabled="${not empty permisOrganGestorCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
+		<rip:inputText name="principalNom" textKey="organgestor.permis.form.camp.principal" disabled="${not empty permisOrganGestorCommand.id}" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
+		<rip:inputCheckbox name="create" textKey="organgestor.permis.form.camp.creacio"/>
+		<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
+		<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
+		<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
+		<rip:inputCheckbox name="administration" textKey="organgestor.permis.form.camp.administracio"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="organgestor/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
