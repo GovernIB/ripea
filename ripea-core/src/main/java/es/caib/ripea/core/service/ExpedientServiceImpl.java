@@ -55,6 +55,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -700,6 +701,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
+		
+		boolean granted = permisosHelper.isGrantedAll(
+				expedient.getMetaExpedient().getId(),
+				MetaNodeEntity.class,
+				new Permission[] { ExtendedPermission.WRITE },
+				usuariCodi);
+		if (!granted) {
+			throw new PermissionDeniedException(expedient.getMetaExpedient().getId(), MetaExpedientEntity.class, usuariCodi, "WRITE");
+		}
+		
 		expedientHelper.agafar(expedient, usuariCodi);
 	}
 
@@ -717,6 +728,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false);
+		
+
 		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 	}
 

@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -218,7 +219,7 @@ public class ContingutAdminController extends BaseAdminController {
 	}
 	
 	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.POST)
-	public String expedientTancarPost(
+	public String assignarPost(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@Valid ExpedientAssignarCommand command,
@@ -229,10 +230,25 @@ public class ContingutAdminController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			return "expedientAssignarForm";
 		}
-		expedientService.agafar(
-				entitatActual.getId(),
-				expedientId,
-				command.getUsuariCodi());
+		
+		try {
+			expedientService.agafar(
+					entitatActual.getId(),
+					expedientId,
+					command.getUsuariCodi());
+		} catch (PermissionDeniedException e) {
+			if (e.getUserName().equals(command.getUsuariCodi()) && e.getPermissionName().equals("WRITE")) {
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../../contingut/" + expedientId,
+						"expedient.assignar.controller.no.permis",
+						new Object[] {command.getUsuariCodi()});
+				
+				
+			} else {
+				throw e;
+			}
+		}
 		
 		return getModalControllerReturnValueSuccess(
 				request,

@@ -715,7 +715,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	}
 	
 	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.POST)
-	public String expedientTancarPost(
+	public String assignarPost(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@Valid ExpedientAssignarCommand command,
@@ -726,10 +726,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			return "expedientAssignarForm";
 		}
-		expedientService.agafar(
-				entitatActual.getId(),
-				expedientId,
-				command.getUsuariCodi());
+		
+		try {
+			expedientService.agafar(
+					entitatActual.getId(),
+					expedientId,
+					command.getUsuariCodi());
+		} catch (PermissionDeniedException e) {
+			if (e.getUserName().equals(command.getUsuariCodi()) && e.getPermissionName().equals("WRITE")) {
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../../contingut/" + expedientId,
+						"expedient.assignar.controller.no.permis",
+						new Object[] {command.getUsuariCodi()});
+			} else {
+				throw e;
+			}
+		}
 		
 		return getModalControllerReturnValueSuccess(
 				request,

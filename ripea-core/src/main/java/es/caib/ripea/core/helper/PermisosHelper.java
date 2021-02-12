@@ -55,6 +55,8 @@ public class PermisosHelper {
 	private AclSidRepository aclSidRepository;
 	@Resource
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
+	@Resource
+	private PluginHelper pluginHelper;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -327,6 +329,18 @@ public class PermisosHelper {
 		}
 		return result;
 	}
+	
+	public boolean isGrantedAll(Long objectIdentifier, Class<?> clazz, Permission[] permissions, String usuariCodi) {
+		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, usuariCodi);
+		boolean result = true;
+		for (int i = 0; i < granted.length; i++) {
+			if (!granted[i]) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
 
 	public List<PermisDto> findPermisos(Long objectIdentifier, Class<?> objectClass) {
 		Acl acl = null;
@@ -507,13 +521,37 @@ public class PermisosHelper {
 			// Si no troba l'ACL no fa res
 		}
 	}
-
+	
+	
+	
 	private boolean[] verificarPermisos(
 			Long objectIdentifier,
 			Class<?> clazz,
 			Permission[] permissions,
-			Authentication auth) {
-		List<Sid> sids = getAuthSids(auth);
+			String usuariCodi) {
+		
+		List<Sid> sids = new ArrayList<Sid>();
+		sids.add(new PrincipalSid(usuariCodi));
+
+		List<String> rolsUsuariActual = pluginHelper.rolsUsuariFindAmbCodi(usuariCodi);
+		for (String rol : rolsUsuariActual) {
+			Sid sid = new GrantedAuthoritySid(getMapeigRol(rol));
+			sids.add(sid);
+		}
+		
+		return verificarPermisos(
+				objectIdentifier,
+				clazz,
+				permissions,
+				sids);
+	}
+	
+	
+	private boolean[] verificarPermisos(
+			Long objectIdentifier,
+			Class<?> clazz,
+			Permission[] permissions,
+			List<Sid> sids) {
 		boolean[] granted = new boolean[permissions.length];
 		for (int i = 0; i < permissions.length; i++)
 			granted[i] = false;
@@ -532,6 +570,21 @@ public class PermisosHelper {
 		} catch (NotFoundException ex) {
 		}
 		return granted;
+	}
+	
+	
+
+	private boolean[] verificarPermisos(
+			Long objectIdentifier,
+			Class<?> clazz,
+			Permission[] permissions,
+			Authentication auth) {
+		List<Sid> sids = getAuthSids(auth);
+		return verificarPermisos(
+				objectIdentifier,
+				clazz,
+				permissions,
+				sids);
 	}
 
 	private List<Sid> getAuthSids(Authentication auth) {
