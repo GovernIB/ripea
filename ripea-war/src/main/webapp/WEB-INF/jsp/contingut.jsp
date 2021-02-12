@@ -398,6 +398,14 @@ body.loading .rmodal {
 }
 
 
+#documentDropdownAccions ul.dropdown-menu {
+	left: auto;
+    right: 0;
+    margin-right: -10px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -1524,7 +1532,12 @@ function showLoadingModal(message) {
 						</li>
 					</c:if>
 					<c:if test="${contingut.document && pluginArxiuActiu}">
-						<a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" class="btn btn-info btn-xs pull-right" style="margin-right: 15px;margin-top: 7px;" data-toggle="modal">Arxiu</a>
+						<div class="dropdown" style="float: right;" id="documentDropdownAccions">
+							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret caret-white"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+							</ul>
+						</div>
 					</c:if>	
 					<c:if test="${contingut.expedient}">
 					
