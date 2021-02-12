@@ -490,12 +490,10 @@ function removeLoading() {
 						required="true"
 						icon="fa fa-star"/>
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				</div>					
-				<rip:inputText name="portafirmesCustodiaTipus" textKey="metadocument.form.camp.portafirmes.custodia"/>				
+				</div>							
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-passarela">
 				<rip:inputCheckbox name="firmaPassarelaActiva" textKey="metadocument.form.camp.passarela.activa"/>
-				<rip:inputText name="firmaPassarelaCustodiaTipus" textKey="metadocument.form.camp.passarela.custodia"/>
 			</div>
 			<c:if test="${isFirmaBiometrica}">
 				<div role="tabpanel" class="tab-pane" id="firma-biometrica">
