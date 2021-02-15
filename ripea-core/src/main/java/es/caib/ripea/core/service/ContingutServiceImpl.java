@@ -1422,6 +1422,9 @@ public class ContingutServiceImpl implements ContingutService {
 					case A:
 						dto.setPerfil(ArxiuFirmaPerfilEnumDto.A);
 						break;
+					case BASIC:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASIC);
+						break;
 					}
 				}
 				dto.setFitxerNom(firma.getFitxerNom());

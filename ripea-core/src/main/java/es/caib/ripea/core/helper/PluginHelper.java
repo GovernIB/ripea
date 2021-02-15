@@ -4224,6 +4224,9 @@ public class PluginHelper {
 			case A:
 				firma.setPerfil(FirmaPerfil.A);
 				break;
+			case BASIC:
+				firma.setPerfil(FirmaPerfil.BASIC);
+				break;
 			}
 		}
 	}
@@ -4832,6 +4835,9 @@ public class PluginHelper {
 			break;
 		case "AdES-A":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.A;
+			break;
+		case "PAdES-Basic":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.BASIC;
 			break;
 		}
 		return perfilFirma;
