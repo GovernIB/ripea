@@ -39,6 +39,7 @@ import es.caib.ripea.war.command.ExpedientAssignarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -236,24 +237,30 @@ public class ContingutAdminController extends BaseAdminController {
 					entitatActual.getId(),
 					expedientId,
 					command.getUsuariCodi());
-		} catch (PermissionDeniedException e) {
-			if (e.getUserName().equals(command.getUsuariCodi()) && e.getPermissionName().equals("WRITE")) {
-				return getModalControllerReturnValueError(
-						request,
-						"redirect:../../contingut/" + expedientId,
-						"expedient.assignar.controller.no.permis",
-						new Object[] {command.getUsuariCodi()});
-				
-				
+			
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.assignar.controller.assignat.ok");
+			
+		} catch (Exception e) {
+			Exception exc = ExceptionHelper.findExceptionInstance(e, PermissionDeniedException.class, 3);
+			if (exc != null) {
+				PermissionDeniedException perExc = (PermissionDeniedException) exc;
+				if (perExc.getUserName().equals(command.getUsuariCodi()) && perExc.getPermissionName().equals("WRITE")) {
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:../../contingut/" + expedientId,
+							"expedient.assignar.controller.no.permis",
+							new Object[] {command.getUsuariCodi()});
+				} else {
+					throw e;
+				}
 			} else {
 				throw e;
 			}
 		}
-		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../contingut/" + expedientId,
-				"expedient.assignar.controller.assignat.ok");
+
 	}
 
 	@RequestMapping(value = "/{contingutId}/delete", method = RequestMethod.GET)

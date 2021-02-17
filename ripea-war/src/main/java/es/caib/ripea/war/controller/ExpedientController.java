@@ -732,13 +732,19 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					expedientId,
 					command.getUsuariCodi());
-		} catch (PermissionDeniedException e) {
-			if (e.getUserName().equals(command.getUsuariCodi()) && e.getPermissionName().equals("WRITE")) {
-				return getModalControllerReturnValueError(
-						request,
-						"redirect:../../contingut/" + expedientId,
-						"expedient.assignar.controller.no.permis",
-						new Object[] {command.getUsuariCodi()});
+		} catch (Exception e) {
+			Exception exc = ExceptionHelper.findExceptionInstance(e, PermissionDeniedException.class, 3);
+			if (exc != null) {
+				PermissionDeniedException perExc = (PermissionDeniedException) exc;
+				if (perExc.getUserName().equals(command.getUsuariCodi()) && perExc.getPermissionName().equals("WRITE")) {
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:../../contingut/" + expedientId,
+							"expedient.assignar.controller.no.permis",
+							new Object[] { command.getUsuariCodi() });
+				} else {
+					throw e;
+				}
 			} else {
 				throw e;
 			}
