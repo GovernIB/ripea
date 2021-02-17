@@ -52,6 +52,8 @@ public class InteressatPaisValidator implements ConstraintValidator<InteressatPa
 					}
 				}
 			}
+			if (!valid)
+				context.disableDefaultConstraintViolation();
 			return valid;
 		} catch (final Exception ex) {
         	LOGGER.error("Ha d'informar de la provincia i el municipi quan el país és Espanya", ex);

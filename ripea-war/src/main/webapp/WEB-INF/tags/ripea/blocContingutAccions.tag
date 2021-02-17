@@ -33,7 +33,7 @@
 						<c:otherwise>
 							<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 							<%---- Consultar ----%>
-							<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
 						</c:otherwise>
 					</c:choose>	
 				</c:when>
@@ -61,7 +61,7 @@
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 						</c:when>
 						<c:otherwise>
-							<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 						</c:otherwise>
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
@@ -73,7 +73,7 @@
 			</c:choose>
 			<c:if test="${not contingut.expedient and !isTasca}">
 				
-				<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-arrows"></span>&nbsp;<spring:message code="comu.boto.moure"/>...</a></li>
+				<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-arrows"></span>&nbsp;<spring:message code="comu.boto.moure"/>...</a></li>
 				<c:if test="${isMostrarCopiar}">
 					<li><a href="<c:url value="/contingut/${contingut.id}/copiar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.copiar"/>...</a></li>
 				</c:if>
@@ -153,10 +153,10 @@
 				<%---- Descarregar ----%>
 				<c:choose>
 					<c:when test="${isTasca}">
-						<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+						<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 					</c:when>
 					<c:otherwise>
-						<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+						<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 					</c:otherwise>
 				</c:choose>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
@@ -188,10 +188,10 @@
 						<c:when test="${contingut.valid}">
 							<c:choose>
 								<c:when test="${isTasca}">
-									<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
+									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
 								</c:when>
 								<c:otherwise>
-									<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-height="450px" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
+									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-height="450px" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
 								</c:otherwise>								
 							</c:choose>
 						</c:when>
@@ -208,10 +208,10 @@
 						<c:when test="${contingut.valid}">
 							<c:choose>
 								<c:when test="${isTasca}">
-									<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:when>
 								<c:otherwise>
-									<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:otherwise>								
 							</c:choose>						
 						</c:when>
@@ -226,7 +226,7 @@
 				<c:if test="${!isTasca and (contingut.estat == 'REDACCIO' && contingut.metaNode.firmaBiometricaActiva && contingut.documentTipus == 'DIGITAL' && isFirmaBiometrica) && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
-							<li class="${contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/viafirma/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-square"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>
+							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/viafirma/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-square"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>
 						</c:when>
 						<c:otherwise>
 							<li class="disabled"><a href="#"/><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>

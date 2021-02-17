@@ -39,7 +39,8 @@ public class InteressatEmailValidator implements ConstraintValidator<InteressatE
 					.addConstraintViolation();
 				valid = false;
 			}
-
+			if (!valid)
+				context.disableDefaultConstraintViolation();
 			return valid;
 		} catch (final Exception ex) {
         	LOGGER.error("Error al validar interessat email", ex);
