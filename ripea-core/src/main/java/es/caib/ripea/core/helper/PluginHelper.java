@@ -79,6 +79,7 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
@@ -102,6 +103,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.plugin.caib.procediment.Procediment;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -137,6 +139,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
@@ -176,6 +179,7 @@ public class PluginHelper {
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 	private FirmaServidorPlugin firmaServidorPlugin;
 	private ViaFirmaPlugin viaFirmaPlugin;
+	private ProcedimentPlugin procedimentPlugin;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -2780,6 +2784,48 @@ public class PluginHelper {
 					ex);
 		}
 	}
+	
+	
+	
+	
+	public ProcedimentDto procedimentFindByCodiSia(
+			String codiDir3, 
+			String codiSia) {
+		String accioDescripcio = "Consulta del procediment pel codi SIA";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("codiDir3", codiDir3);
+		accioParams.put("codiSia", codiSia);
+		long t0 = System.currentTimeMillis();
+		try {
+			ProcedimentDto procediment = getProcedimentPlugin().findAmbCodiSia(codiDir3, codiSia);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PROCEDIMENT,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return procediment;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de procediments: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PROCEDIMENT,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_PROCEDIMENT,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+
+
+	
+	
 
 //	public RegistreAnotacioResposta registreEntradaConsultar(
 //			String identificador,
@@ -5183,6 +5229,31 @@ public class PluginHelper {
 		}
 		return viaFirmaPlugin;
 	}
+	
+	
+	private ProcedimentPlugin getProcedimentPlugin() {
+		if (procedimentPlugin == null) {
+			String pluginClass = getPropertyPluginProcediment();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					procedimentPlugin = (ProcedimentPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_PROCEDIMENT,
+							"Error al crear la instància del plugin de procediments",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_PROCEDIMENT,
+						"No està configurada la classe per al plugin de procediments");
+			}
+		}
+		return procedimentPlugin;
+	}
+	
+	
 
 	private String getPropertyPluginDadesUsuari() {
 		return PropertiesHelper.getProperties().getProperty(
@@ -5215,6 +5286,10 @@ public class PluginHelper {
 	private String getPropertyPluginDadesExternes() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.dadesext.class");
+	}
+	private String getPropertyPluginProcediment() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.procediment.class");
 	}
 	private String getPropertyPluginValidaSignatura() {
 		return PropertiesHelper.getProperties().getProperty(

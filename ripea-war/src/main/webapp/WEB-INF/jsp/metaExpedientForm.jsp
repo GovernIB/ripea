@@ -159,8 +159,64 @@
 		}
 		</script>
 	</c:if>
+	
+	
+	
+	<script>
+		$(document).ready(function(){
+			$('#importMetaExpedient').on('click', function() {
+				$('#metaExpedientCommand').hide();
+				$("#loading").show();
+				var codiSia = $('#classificacioSia').val();
+				
+				if (codiSia != null && codiSia != "") {
+					$.get("<c:url value="/metaExpedient/importMetaExpedient/"/>" + codiSia)
+					.done(function(data){
+						if (data.error) {
+							$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + data.errorMsg + '</div>');
+
+						} else {
+							if (data.data){
+								data = data.data;
+								$('#nom').val(data.nom);
+								$('#descripcio').val(data.resum);
+								
+								if ($("#checkbox-metaexpedient-comu:checked").val() != data.comu) {
+									$("#checkbox-metaexpedient-comu").click();
+								}
+								if (!data.comu) {
+									$('#organGestorId').data('currentValue', data.organId);
+									$('#organGestorId').webutilInputSuggest();
+								}	
+							} else {
+								$('#contingut-missatges').append('<div class="alert alert-warning"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="metaexpedient.form.import.rolsac.no.results"/></div>');
+							}
+						}
+					})
+					.fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					})
+					.always(function() {
+						$("#loading").hide();
+						$('#metaExpedientCommand').show();
+					});
+				} else {
+					$("#loading").hide();
+					$('#metaExpedientCommand').show();
+				}
+			});	
+		});
+	
+	</script>	
+	
+	
+	
+	
+	
 </head>
 <body>
+
+	<div id="loading" style="display: none;"><div style="text-align: center; padding-bottom: 100px; color: #666666; margin-top: 100px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientCommand">
 		<ul class="nav nav-tabs" role="tablist">
@@ -174,10 +230,21 @@
 		<br/>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
+			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
 				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
-				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
+				
+				<div class="form-group">
+					<label class="control-label col-xs-4" for="classificacioSia"><spring:message code="metaexpedient.form.camp.classificacio.sia"/> *</label>
+					<div class="col-xs-6">
+						<form:input path="classificacioSia" cssClass="form-control" id="classificacioSia" disabled="false"  readonly="false" />	
+					</div>
+					<div class="col-xs-2">
+						<button id="importMetaExpedient" type="button" class="btn btn-info"><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
+					</div>
+				</div>
+								
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
 				<c:if test="${not isRolAdminOrgan}">
 					<div class="form-group">
