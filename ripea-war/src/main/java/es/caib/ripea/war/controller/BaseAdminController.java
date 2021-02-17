@@ -56,6 +56,19 @@ public class BaseAdminController extends BaseController {
 		return entitat;
 	}
 
+	public EntitatDto getEntitatActualComprovantPermisos(
+			HttpServletRequest request) {
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		if (entitat == null) {
+			throw new SecurityException("No te cap entitat assignada");
+		}
+		
+		if (!entitat.isUsuariActualRead() && !entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans()) {
+			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari o administrador o administrator de l'organ");
+		}
+		return entitat;
+	}
+	
 	protected MetaExpedientDto comprovarAccesMetaExpedient(HttpServletRequest request, Long metaExpedientId) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (!entitat.isUsuariActualAdministration()) {

@@ -331,7 +331,7 @@ public class MetaExpedientController extends BaseAdminController {
 			Model model) {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
 				entitatActual.getId(), 
 				null, 
@@ -345,7 +345,7 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long organId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 				entitatActual.getId(),
 				organId, 

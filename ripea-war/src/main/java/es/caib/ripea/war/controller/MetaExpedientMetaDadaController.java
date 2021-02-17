@@ -257,7 +257,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@RequestParam(value="filter", required = false) String filter,
 			@RequestParam(value="pageSize", required = false) int pageSize,
 			@RequestParam(value="page", required = false) int page){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		ResultatDominiDto resultatDomini = null;
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
@@ -282,7 +282,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi,
 			@PathVariable String dadaValor){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 //		String resultJson = null;
 		ResultatConsultaDto resultatConsulta = null;
@@ -304,7 +304,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	public Object getDominiMetaExpedientPermisLectura(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaExpedientDto metaExpedientDto = comprovarAccesMetaExpedient(request, metaExpedientId);		
 		List<DominiDto> dominis = dominiService.findByMetaNodePermisLecturaAndTipusDomini(entitatActual.getId(), metaExpedientDto);		
 		return dominis;
