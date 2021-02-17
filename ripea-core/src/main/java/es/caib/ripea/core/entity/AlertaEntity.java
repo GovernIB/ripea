@@ -29,7 +29,7 @@ public class AlertaEntity extends RipeaAuditable<Long> {
 
 	private static final int ERROR_MAX_LENGTH = 2048;
 
-	@Column(name = "text", length = 256, nullable = false)
+	@Column(name = "text", length = 1024, nullable = false)
 	private String text;
 	@Column(name = "error", length = ERROR_MAX_LENGTH)
 	private String error;

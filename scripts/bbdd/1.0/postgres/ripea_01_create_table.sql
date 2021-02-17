@@ -1,7 +1,7 @@
 CREATE TABLE IPA_ALERTA
 (
   ID                   BIGINT                          NOT NULL,
-  TEXT                 character varying(256)          NOT NULL,
+  TEXT                 character varying(1024)          NOT NULL,
   ERROR                character varying(2048),
   LLEGIDA              boolean                         NOT NULL,
   CONTINGUT_ID         bigint,
