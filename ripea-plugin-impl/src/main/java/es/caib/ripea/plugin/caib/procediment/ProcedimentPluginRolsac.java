@@ -37,8 +37,8 @@ public class ProcedimentPluginRolsac implements ProcedimentPlugin {
 	public ProcedimentDto findAmbCodiSia(
 			String codiDir3, 
 			String codiSia) throws SistemaExternException {
-		logger.debug("Consulta dels procediments de l'unitat organitzativa (" +
-				"codiSia=" + codiSia + ")");
+		logger.debug("Consulta del procediment pel codi SIA i codiDir3 (" +
+				"codiSia=" + codiSia + "codiDir3=" + codiDir3 + ")");
 		ProcedimientosResponse response = null;
 		try {
 			StringBuilder sb = new StringBuilder(getServiceUrl()+ "/procedimientos");
@@ -89,6 +89,7 @@ public class ProcedimentPluginRolsac implements ProcedimentPlugin {
 					resource(urlAmbMetode).
 					post(String.class);
 			
+			logger.debug("Response get unitat administrativa del rolsac (codi=" + codi + "): " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -172,7 +173,7 @@ public class ProcedimentPluginRolsac implements ProcedimentPlugin {
 				post(ClientResponse.class, body);
 		String json = response.getEntity(String.class);
 		
-//		logger.info(json);
+		logger.debug("Response find procediment rolsac: " + json);
 		return mapper.readValue(
 				json,
 				TypeFactory.defaultInstance().constructType(ProcedimientosResponse.class));
