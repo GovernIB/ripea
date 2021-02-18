@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -137,13 +138,15 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long permisId,
+			@RequestParam(required = false) Long organGestorId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,
-				permisId);
+				permisId,
+				organGestorId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../metaExpedient/" + metaExpedientId + "/permis",

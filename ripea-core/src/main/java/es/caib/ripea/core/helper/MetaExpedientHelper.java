@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -89,19 +90,15 @@ public class MetaExpedientHelper {
 			permisosHelper.filterGrantedAnyList(
 					metaExpedients,
 					new ListObjectIdentifiersExtractor<MetaExpedientEntity>() {
-
-						public List<Long> getObjectIdentifiers(MetaExpedientEntity metaExpedient) {
-							List<Long> ids = new ArrayList<Long>();
-
+						public List<Serializable> getObjectIdentifiers(MetaExpedientEntity metaExpedient) {
+							List<Serializable> ids = new ArrayList<Serializable>();
 							OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
 							while (organGestor != null) {
 								ids.add(organGestor.getId());
-
 								organGestor = organGestor.getPare();
 							}
 							return ids;
 						}
-
 					},
 					OrganGestorEntity.class,
 					new Permission[] { ExtendedPermission.ADMINISTRATION },

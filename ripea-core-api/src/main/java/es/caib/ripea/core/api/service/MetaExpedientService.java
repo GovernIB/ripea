@@ -394,6 +394,8 @@ public interface MetaExpedientService {
 	 *            Atribut id del meta-expedient.
 	 * @param permisId
 	 *            Atribut id del permís que es vol esborrar.
+	 * @param organGestorId
+	 *            Si no és null indica que el permís a esborrar està associat a un òrgan gestor.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -401,7 +403,8 @@ public interface MetaExpedientService {
 	public void permisDelete(
 			Long entitatId,
 			Long id,
-			Long permisId) throws NotFoundException;
+			Long permisId,
+			Long organGestorId) throws NotFoundException;
 
 	 /**
 	  * Consulta els meta-expedients d'una entitat que tenen algún organ gestor asociat de forma paginada.

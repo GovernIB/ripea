@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +70,11 @@ public class PermisosEntitatHelper {
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
-			List<Long> ids = new ArrayList<Long>();
-			for (EntitatDto entitat : entitats)
+			List<Serializable> ids = new ArrayList<Serializable>();
+			for (EntitatDto entitat: entitats) {
 				ids.add(entitat.getId());
-			Map<Long, List<PermisDto>> permisos = permisosHelper.findPermisos(ids, EntitatEntity.class);
+			}
+			Map<Serializable, List<PermisDto>> permisos = permisosHelper.findPermisos(ids, EntitatEntity.class);
 			for (EntitatDto entitat : entitats)
 				entitat.setPermisos(permisos.get(entitat.getId()));
 		}

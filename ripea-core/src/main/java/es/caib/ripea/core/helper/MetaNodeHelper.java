@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -161,14 +162,16 @@ public class MetaNodeHelper {
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
-			List<Long> ids = new ArrayList<Long>();
-			for (MetaNodeDto metaNode: metaNodes)
+			List<Serializable> ids = new ArrayList<Serializable>();
+			for (MetaNodeDto metaNode: metaNodes) {
 				ids.add(metaNode.getId());
-			Map<Long, List<PermisDto>> permisos = permisosHelper.findPermisos(
+			}
+			Map<Serializable, List<PermisDto>> permisos = permisosHelper.findPermisos(
 					ids,
 					MetaNodeEntity.class);
-			for (MetaNodeDto metaNode: metaNodes)
+			for (MetaNodeDto metaNode: metaNodes) {
 				metaNode.setPermisos(permisos.get(metaNode.getId()));
+			}
 		}
 	}
 

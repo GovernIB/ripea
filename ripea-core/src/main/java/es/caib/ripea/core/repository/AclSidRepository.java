@@ -34,11 +34,11 @@ public interface AclSidRepository extends JpaRepository<AclSidEntity, Long> {
 			"    and principal = true")
 	public AclSidEntity getUserSid(@Param("name") String name);
 
-
 	@Query(	"from " +
 			"    AclSidEntity " +
 			"where " +
 			"     sid in (:name) " +
 			" and principal = false")
 	public List<AclSidEntity> findRolesSid(@Param("name") List<String> name);
+
 }

@@ -1,5 +1,6 @@
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import es.caib.ripea.core.security.ExtendedPermission;
 
 @Component
 public class OrganGestorHelper {
-	
+
     @Autowired
     private EntityComprovarHelper entityComprovarHelper;
 
@@ -24,16 +25,20 @@ public class OrganGestorHelper {
     @Autowired
     private PermisosHelper permisosHelper;
 
-	
     public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(Long entitatId) {
     	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
-		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+		List<Serializable> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				ExtendedPermission.ADMINISTRATION);
-		if (objectsIds.isEmpty()) {
+		if (objectsIds == null || objectsIds.isEmpty()) {
 			return new ArrayList<OrganGestorEntity>();
+		} else {
+			List<Long> objectsIdsTypeLong = new ArrayList<Long>();
+			for (Serializable oid: objectsIds) {
+				objectsIdsTypeLong.add((Long)oid);
+			}
+			return organGestorRepository.findByEntitatAndIds(entitat, objectsIdsTypeLong);
 		}
-		return organGestorRepository.findByEntitatAndIds(entitat, objectsIds);		
     }
 
 }

@@ -3,9 +3,11 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +42,10 @@ import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
@@ -52,6 +56,7 @@ import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
@@ -91,6 +96,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+	@Autowired
+	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 
 	@Transactional
 	@Override
@@ -722,34 +729,82 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public List<PermisDto> permisFind(Long entitatId, Long id) {
 		logger.debug(
-				"Consulta dels permisos del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
+				"Consulta dels permisos del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
-		return permisosHelper.findPermisos(id, MetaNodeEntity.class);
+		List<PermisDto> permisos = new ArrayList<PermisDto>();
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
+		List<MetaExpedientOrganGestorEntity> metaExpedientOrgans = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
+		List<Serializable> serializedIds = new ArrayList<Serializable>();
+		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
+			serializedIds.add(metaExpedientOrgan.getId());
+		}
+		Map<Serializable, List<PermisDto>> permisosOrganGestor = permisosHelper.findPermisos(serializedIds, MetaExpedientOrganGestorEntity.class);
+		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
+			for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
+				permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
+				permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
+				permisos.add(permis);
+			}
+		}
+		permisos.addAll(permisosHelper.findPermisos(id, MetaNodeEntity.class));
+		return permisos;
 	}
 
 	@Transactional
 	@Override
 	public void permisUpdate(Long entitatId, Long id, PermisDto permis) {
 		logger.debug(
-				"Modificació del permis del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
-						"permis=" + permis + ")");
+				"Modificació del permis del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + id + ", " +
+				"permis=" + permis + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
-		permisosHelper.updatePermis(id, MetaNodeEntity.class, permis);
+		if (permis.getOrganGestorId() == null) {
+			permisosHelper.updatePermis(id, MetaNodeEntity.class, permis);
+		} else {
+			MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
+			OrganGestorEntity organGestor = organGestorRepository.getOne(permis.getOrganGestorId());
+			MetaExpedientOrganGestorEntity trobat = metaExpedientOrganGestorRepository.findByMetaExpedientAndOrganGestor(
+					metaExpedient,
+					organGestor);
+			Long metaExpedientOrganGestorId;
+			if (trobat == null) {
+				metaExpedientOrganGestorId = metaExpedientOrganGestorRepository.save(
+						MetaExpedientOrganGestorEntity.getBuilder(metaExpedient, organGestor).build()).getId();
+			} else {
+				metaExpedientOrganGestorId = trobat.getId();
+			}
+			permisosHelper.updatePermis(metaExpedientOrganGestorId, MetaExpedientOrganGestorEntity.class, permis);
+		}
 	}
 
 	@Transactional
 	@Override
-	public void permisDelete(Long entitatId, Long id, Long permisId) {
+	public void permisDelete(Long entitatId, Long id, Long permisId, Long organGestorId) {
 		logger.debug(
-				"Eliminació del permis del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
-						"permisId=" + permisId + ")");
+				"Eliminació del permis del meta-expedient (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + id + ", " +
+				"permisId=" + permisId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
-		permisosHelper.deletePermis(id, MetaNodeEntity.class, permisId);
+		if (organGestorId == null) {
+			permisosHelper.deletePermis(id, MetaNodeEntity.class, permisId);
+		} else {
+			MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
+			OrganGestorEntity organGestor = organGestorRepository.getOne(organGestorId);
+			MetaExpedientOrganGestorEntity trobat = metaExpedientOrganGestorRepository.findByMetaExpedientAndOrganGestor(
+					metaExpedient,
+					organGestor);
+			permisosHelper.deletePermis(trobat.getId(), MetaExpedientOrganGestorEntity.class, permisId);
+			metaExpedientOrganGestorRepository.delete(trobat);
+		}
 	}
-	
+
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
 		List<Long> metaExpedientIds = new ArrayList<Long>();
 		for (MetaExpedientDto metaExpedient : metaExpedients) {

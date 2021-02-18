@@ -23,14 +23,12 @@
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisCommand *:disabled").removeAttr('disabled');
 		});
-
 		$("#selectAll").on('change', function() {
 			if ($(this).prop("checked"))
 				$("div.permisosInput :checkbox").prop('checked', true);
 			else
 				$("div.permisosInput :checkbox").prop('checked', false);
 		});
-
 		$("div.permisosInput :checkbox").on('change', function() {
 			var totsSeleccionats = true;
 			$("div.permisosInput :checkbox").each(function() {
@@ -40,13 +38,12 @@
 			$("#selectAll").prop('checked', totsSeleccionats);
 		});
 	});
-
 </script>
 <style>
-	.permisosInput {margin-left: 45px}
+	.permisosInput {
+		margin-left: 45px
+	}
 </style>
-
-
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/permis"/></c:set>
@@ -54,7 +51,18 @@
 		<form:hidden path="id"/>
 		<rip:inputSelect name="principalTipus" textKey="metaexpedient.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
-		
+		<c:if test="${empty metaExpedient.organGestor and (empty permisCommand.id or not empty permisCommand.organGestorId)}">
+			<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+			<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+			<rip:inputSuggest 
+				name="organGestorId"  
+				urlConsultaInicial="${urlConsultaInicial}"
+				urlConsultaLlistat="${urlConsultaLlistat}"
+				textKey="metaexpedient.permis.form.camp.organgestor"
+				disabled="${not empty permisCommand.id}" 
+				suggestValue="id"
+				suggestText="nom"/>
+		</c:if>
 		<rip:inputCheckbox name="selectAll" textKey="metaexpedient.permis.form.camp.all"/>
 		<div class="permisosInput">
 			<rip:inputCheckbox name="create" textKey="metaexpedient.permis.form.camp.creacio"/>

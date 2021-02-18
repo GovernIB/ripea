@@ -200,7 +200,7 @@
  					textKey="metaexpedient.form.camp.organgestor"
  					suggestValue="id"
  					suggestText="nom"
- 					required="${ isRolAdminOrgan }"/>		 
+ 					required="${ isRolAdminOrgan }"/>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
 				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva"/>

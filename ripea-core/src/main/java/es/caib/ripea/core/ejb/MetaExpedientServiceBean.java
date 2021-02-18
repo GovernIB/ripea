@@ -234,11 +234,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public void permisDelete(Long entitatId, Long id, Long permisId) {
+	public void permisDelete(Long entitatId, Long id, Long permisId, Long organGestorId) {
 		delegate.permisDelete(
 				entitatId,
 				id,
-				permisId);
+				permisId,
+				organGestorId);
 	}
 
 	@Override

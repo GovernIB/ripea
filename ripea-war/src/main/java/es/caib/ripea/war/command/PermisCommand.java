@@ -38,6 +38,8 @@ public class PermisCommand {
 	private boolean administration;
 	private boolean selectAll;
 
+	private Long organGestorId;
+
 	public static List<PermisCommand> toPermisCommands(
 			List<PermisDto> dtos) {
 		List<PermisCommand> commands = new ArrayList<PermisCommand>();
@@ -53,15 +55,13 @@ public class PermisCommand {
 	public static PermisCommand asCommand(PermisDto dto) {
 		PermisCommand permisCommand = ConversioTipusHelper.convertir(
 				dto,
-				PermisCommand.class); 
-		
+				PermisCommand.class);
 		permisCommand.setSelectAll(false);
 		if (permisCommand.isCreate() &&
 			permisCommand.isDelete() &&
 			permisCommand.isRead() &&
 			permisCommand.isWrite())
 			permisCommand.setSelectAll(true);
-		
 		return permisCommand;
 	}
 	public static PermisDto asDto(PermisCommand command) {
@@ -74,4 +74,5 @@ public class PermisCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
 }

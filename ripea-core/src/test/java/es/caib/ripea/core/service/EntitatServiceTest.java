@@ -234,7 +234,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 						autenticarUsuari("super");
 						entitatService.deletePermisSuper(
 								creada.getId(),
-								permisos.get(0).getId());
+								(Long)permisos.get(0).getId());
 						permisos = entitatService.findPermisSuper(creada.getId());
 						assertThat(
 								permisos.size(),
@@ -317,7 +317,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 						autenticarUsuari("admin");
 						entitatService.deletePermisAdmin(
 								creada.getId(),
-								permisCreatPerAdmin.getId());
+								(Long)permisCreatPerAdmin.getId());
 						permisosAdmin = entitatService.findPermisAdmin(creada.getId());
 						assertThat(
 								permisosAdmin.size(),
@@ -331,7 +331,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 						permisosSuper = entitatService.findPermisSuper(creada.getId());
 						entitatService.deletePermisSuper(
 								creada.getId(),
-								permisosSuper.get(0).getId());
+								(Long)permisosSuper.get(0).getId());
 						permisosSuper = entitatService.findPermisSuper(creada.getId());
 						assertThat(
 								permisosSuper.size(),
