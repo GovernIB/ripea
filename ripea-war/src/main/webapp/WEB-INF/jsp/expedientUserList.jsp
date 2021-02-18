@@ -142,8 +142,7 @@ $(document).ready(function() {
 	var metaExpedientId = "";
 	var counter = 0;
 	$('#metaExpedientId').on('change', function() {
-		metaExpedientId = $(this).val();
-
+		metaExpedientId = $(this).val() | '${expedientFiltreCommand.metaExpedientId}';
 		if (counter != 0) {
 			
 			if (metaExpedientId) {
@@ -163,15 +162,11 @@ $(document).ready(function() {
 		}
 		counter++;
 
-
-		
 		//select dominis a partir de metaexpedient
 		var dominisRefresh = function(data) {	
 			$('#metaExpedientDominiCodi').empty();
 			$('#metaExpedientDominiCodi').append("<option value=\"\"></option>");
 			for (var i = 0; i < data.length; i++) {
-
-				console.log($('#metaExpedientDominiCodi').val());
 				$('#metaExpedientDominiCodi').append('<option value="' + data[i].codi + '">' + data[i].nom + '</option>');
 			}
 		};
