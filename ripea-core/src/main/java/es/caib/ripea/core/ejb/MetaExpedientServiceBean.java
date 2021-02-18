@@ -72,7 +72,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom"})
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) {

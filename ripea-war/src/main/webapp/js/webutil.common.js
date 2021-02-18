@@ -76,7 +76,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		message = "Unknown Error: (" + jqxhr.status + ", " + thrownError + ")";
 	}*/
 	if (thrownError !== 'abort') {
-		alert(message);
+		console.log(message);
 	}
 });
 
