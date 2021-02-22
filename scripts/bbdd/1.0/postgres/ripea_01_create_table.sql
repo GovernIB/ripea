@@ -333,6 +333,17 @@ CREATE TABLE IPA_EXPEDIENT_REL
   EXPEDIENT_REL_ID   bigint                     NOT NULL
 );
 
+CREATE TABLE IPA_EXPEDIENT_ORGANPARE
+(
+    ID                      bigint NOT NULL,
+    EXPEDIENT_ID            bigint NOT NULL,
+    META_EXPEDIENT_ORGAN_ID bigint NOT NULL,
+    CREATEDDATE          timestamp without time zone,
+    CREATEDBY_CODI       character varying(64),
+    LASTMODIFIEDDATE     timestamp without time zone,
+    LASTMODIFIEDBY_CODI  character varying(64)
+);
+
 
 CREATE TABLE IPA_DOCUMENT
 (

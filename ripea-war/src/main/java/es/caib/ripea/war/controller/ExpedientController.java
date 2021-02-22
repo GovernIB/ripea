@@ -213,7 +213,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return DatatablesHelper.getDatatableResponse(
@@ -970,9 +969,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-
 		ExpedientFiltreCommand filtreCommand = getRelacionarFiltreCommand(request);
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,

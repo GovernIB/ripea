@@ -198,9 +198,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     
     @Override
     public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId) {
-    	
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
     	return conversioTipusHelper.convertirList(
-    			organGestorHelper.findOrganismesEntitatAmbPermis(entitatId),
+    			organGestorHelper.findAmbEntitatPermis(
+    					entitat,
+    					ExtendedPermission.ADMINISTRATION),
 				OrganGestorDto.class);	
     }
     
@@ -217,35 +219,29 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         logger.debug("Consulta com a administrador els permisos dels organs gestors de l'entitat (" + "id="
                 + entitatId + ")");
-
         entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
-
         List<PermisOrganGestorDto> results = new ArrayList<PermisOrganGestorDto>();
         boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
                 new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
         if (!esAdministradorEntitat) {
             return results;
         }
-        
         List<OrganGestorDto> organs;
         if (organId == null) {
         	organs = findByEntitat(entitatId);	
-        
-        }else {
+        } else {
         	organs = new ArrayList<OrganGestorDto>();
         	organs.add(findItem(organId));
         }
-        
-        for (OrganGestorDto o : organs) {
+        for (OrganGestorDto o: organs) {
             List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
-            for (PermisDto p : permisosOrgan) {
+            for (PermisDto p: permisosOrgan) {
                 PermisOrganGestorDto permisOrgan = new PermisOrganGestorDto();
                 try {
                     BeanUtils.copyProperties(permisOrgan, p);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-
                 permisOrgan.setOrganGestor(o);
                 results.add(permisOrgan);
             }

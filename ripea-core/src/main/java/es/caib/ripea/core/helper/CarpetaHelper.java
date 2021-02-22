@@ -44,10 +44,9 @@ public class CarpetaHelper {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ContingutLogHelper contingutLogHelper;
-	
-	
-	
-	
+
+
+
 	public CarpetaDto create(
 			Long entitatId,
 			Long pareId,
@@ -56,7 +55,6 @@ public class CarpetaHelper {
 			Long carpetaId,
 			boolean alreadyCreatedInArxiu,
 			String arxiuUuid) {
-		
 		logger.debug("Creant nova carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "pareId=" + pareId + ", "
@@ -64,17 +62,14 @@ public class CarpetaHelper {
 				+ "carpetaId=" + carpetaId + ", "
 				+ "alreadyCreatedInArxiu=" + alreadyCreatedInArxiu + ", "
 				+ "arxiuUuid=" + arxiuUuid + ")");
-		
 		CarpetaEntity carpetaEntity;
-		
 		boolean throwException = false;
-		if(throwException)
+		if (throwException) {
 			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA IN DB!!!!!! ");
-		
+		}
 		if (alreadyCreatedInDB) {
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		} else {
-
 			// TODO: això causa problemes al intentar obtenir el pare d'un metaexpedient sense pare
 			ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 					entitatId,
@@ -93,30 +88,24 @@ public class CarpetaHelper {
 					nom,
 					null,
 					CarpetaEntity.class);
-			
 			carpetaEntity = CarpetaEntity.getBuilder(
 					nom,
 					pare,
 					pare.getEntitat(),
 					expedient).build();
 			carpetaEntity = carpetaRepository.save(carpetaEntity);
-			
 			pare.addFill(carpetaEntity);
-			
 			contingutRepository.save(pare);
-			
 			// Registra al log la creació de la carpeta
 			contingutLogHelper.logCreacio(
 					carpetaEntity,
 					true,
 					true);
 		}
-		
 		boolean throwException1 = false;
-		if(throwException1)
+		if (throwException1) {
 			throw new RuntimeException("EXCEPION BEFORE CREATING CARPETA IN ARXIU!!!!!! ");
-		
-		
+		}
 		if (alreadyCreatedInArxiu) {
 			carpetaEntity.updateArxiu(arxiuUuid);
 		} else {
@@ -127,12 +116,10 @@ public class CarpetaHelper {
 					false,
 					null);
 		}
-		
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);
 		return dto;
 	}
-	
-	
+
 	public CarpetaDto toCarpetaDto(
 			CarpetaEntity carpeta) {
 		return (CarpetaDto)contingutHelper.toContingutDto(
@@ -146,7 +133,6 @@ public class CarpetaHelper {
 				false);
 	}
 
-	
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);
 
 

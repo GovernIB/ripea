@@ -542,7 +542,7 @@ public class PluginHelper {
 		accioParams.put("tipus", metaExpedient.getNom());
 		accioParams.put("classificacio", metaExpedient.getClassificacioSia());
 		accioParams.put("serieDocumental", metaExpedient.getSerieDocumental());
-		String organCodiDir3 = expedient.getEntitat().getUnitatArrel();
+		String organCodiDir3 = expedient.getOrganGestor().getCodi();
 		accioParams.put("organ", organCodiDir3);
 		accioParams.put("estat", expedient.getEstat().name());
 		long t0 = System.currentTimeMillis();

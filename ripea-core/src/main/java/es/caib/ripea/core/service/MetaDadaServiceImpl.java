@@ -393,36 +393,22 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				false,
 				false, 
 				true);
-		NodeEntity node = entityComprovarHelper.comprovarNode(
-				entitat,
-				nodeId,
-				false,
-				false,
-				false,
-				false);
+		NodeEntity node = entityComprovarHelper.comprovarNode(entitat, nodeId);
 		return conversioTipusHelper.convertirList(
 				metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(node.getMetaNode()),
 				MetaDadaDto.class);
 	}
-	
-	
+
 	@Override
 	public Long findMetaNodeIdByNodeId(
 			Long entitatId,
 			Long nodeId) {
-
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false);
-		NodeEntity node = entityComprovarHelper.comprovarNode(
-				entitat,
-				nodeId,
-				false,
-				false,
-				false,
-				false);
+		NodeEntity node = entityComprovarHelper.comprovarNode(entitat, nodeId);
 		return node.getMetaNode().getId();
 	}
 

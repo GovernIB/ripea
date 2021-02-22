@@ -116,65 +116,50 @@ public class MetaExpedientHelper {
 							auth)) {
 				return new ArrayList<Long>();
 			}
-			
 			OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);			
 			return metaExpedientRepository.findByOrgansGestors(organGestor.getAllChildren());
 		}
-
 	}
-	
-	
-	
+
 	public List<MetaExpedientEntity> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
 			Long organGestorId, 
 			String filtre) {
-
 		return findAmbOrganFiltrePermis(
 				entitatId,
 				organGestorId,
-				new Permission[] {ExtendedPermission.READ},
+				ExtendedPermission.READ,
 				true,
 				filtre);
-		
-
 	}
-	
-	
+
 	public List<MetaExpedientEntity> findAmbOrganFiltrePermis(
 			Long entitatId,
 			Long organGestorId,
-			Permission[] permisos,
+			Permission permis,
 			boolean nomesActius,
 			String filtre) {
-
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
-		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organGestorId);
-		List<MetaExpedientEntity> metaExpedients;
-		if (nomesActius) {
-			metaExpedients = metaExpedientRepository.findByOrganGestorAndActiuAndFiltreTrueOrderByNomAsc(
-					organGestorEntity,
-					filtre == null || "".equals(filtre.trim()),
-					filtre == null ? "" : filtre);
-		} else {
-			metaExpedients = metaExpedientRepository.findByOrganGestorOrderByNomAsc(organGestorEntity);
-		}
-		
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByOrganGestorAndActiuAndFiltreTrueOrderByNomAsc(
+				organGestorEntity,
+				!nomesActius,
+				nomesActius ? true : null,
+				filtre == null || "".equals(filtre.trim()),
+				filtre == null ? "" : filtre);
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
 				entitatId,
 				EntitatEntity.class,
 				new Permission[] { ExtendedPermission.ADMINISTRATION },
 				auth);
-
 		if (!esAdministradorEntitat) {
-			
 			boolean organPermitted = false;
-			List<OrganGestorEntity> organsPermitted = organGestorHelper.findOrganismesEntitatAmbPermis(entitatId);
+			List<OrganGestorEntity> organsPermitted = organGestorHelper.findAmbEntitatPermis(
+					entitat,
+					ExtendedPermission.ADMINISTRATION);
 			if (organsPermitted != null && !organsPermitted.isEmpty()) {
-				for (OrganGestorEntity organGestor : organsPermitted) {
+				for (OrganGestorEntity organGestor: organsPermitted) {
 					if (organGestor.getId().equals(organGestorEntity.getId())) {
 						organPermitted = true;
 					}
@@ -189,59 +174,99 @@ public class MetaExpedientHelper {
 							}
 						},
 						MetaNodeEntity.class,
-						permisos,
+						new Permission[] {permis},
 						auth);
 			}
 		}
-
 		return metaExpedients;
+	}
 
-	}
-	
-	
-	
-	public List<MetaExpedientEntity> findActiusAmbEntitatPermis(
+	public List<MetaExpedientEntity> findAmbEntitatPermis(
 			Long entitatId,
-			Permission[] permisos,
-			String filtreNomOrCodiSia) {
-		return findAmbEntitatOrOrganPermis(
-				entitatId,
-				permisos,
-				true,
-				filtreNomOrCodiSia, 
-				"tothom");		
-	}
-	
-	
-	public List<MetaExpedientEntity> findAmbEntitatOrOrganPermis(
-			Long entitatId,
-			Permission[] permisos,
+			Permission permis,
 			boolean nomesActius,
 			String filtreNomOrCodiSia, 
-			String rolActual) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			boolean isAdminEntitat,
+			boolean isAdminOrgan) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				false, 
 				true);
+		// Cercam els metaExpedients amb permisos assignats directament
+		List<Serializable> metaExpedientIds = permisosHelper.getObjectsIdsWithPermission(
+				MetaExpedientEntity.class,
+				permis);
+		// Cercam els òrgans amb permisos assignats directament
+		List<Serializable> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+				OrganGestorEntity.class,
+				permis);
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndIdInOrOrganGestorIdIn(
+				entitat,
+				!nomesActius,
+				nomesActius ? nomesActius : null,
+				filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
+				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
+				toListLong(metaExpedientIds),
+				toListLong(objectsIds));
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		permisosHelper.filterGrantedAll(
+				metaExpedients,
+				new ObjectIdentifierExtractor<MetaNodeEntity>() {
+					public Long getObjectIdentifier(MetaNodeEntity metaNode) {
+						return metaNode.getId();
+					}
+				},
+				MetaNodeEntity.class,
+				new Permission[] {permis},
+				auth);
+		// Cercam els metaExpedients amb permisos assignats al seu òrgan gestor
+		List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
+				entitat,
+				permis);
+		List<MetaExpedientEntity> metaExpedientsOrgans = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndOrganGestorIn(
+				entitat,
+				!nomesActius,
+				nomesActius ? nomesActius : null,
+				filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
+				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
+				organs.isEmpty(),
+				organs);
+		metaExpedients.addAll(metaExpedientsOrgans);
+		metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
 		
-		List<MetaExpedientEntity> metaExpedients;
-		if (nomesActius) {
-			metaExpedients = metaExpedientRepository.findByEntitatAndActiuTrueAndFiltreOrderByNomAsc(
-					entitat,
-					filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
-					filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia);
-		} else {
-			metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+		
+		
+		
+		
+		boolean onlyToCheckReadPermission = permis == ExtendedPermission.READ;
+		if (!isAdminEntitat && onlyToCheckReadPermission) {
+			permisosHelper.filterGrantedAll(
+					metaExpedients,
+					new ObjectIdentifierExtractor<MetaNodeEntity>() {
+						public Long getObjectIdentifier(MetaNodeEntity metaNode) {
+							return metaNode.getId();
+						}
+					},
+					MetaNodeEntity.class,
+					new Permission[] {permis},
+					auth);
+			if (onlyToCheckReadPermission && isAdminOrgan) {
+				List<OrganGestorEntity> organsAmbPermisAdmin = organGestorHelper.findAmbEntitatPermis(
+						entitat,
+						ExtendedPermission.ADMINISTRATION);
+				if (organsAmbPermisAdmin != null && !organsAmbPermisAdmin.isEmpty()) {
+					List<MetaExpedientEntity> metaExpedientsOrgansAdmin = metaExpedientRepository.findByOrganGestors(
+							entitat,
+							organsAmbPermisAdmin);
+					metaExpedients.addAll(metaExpedientsOrgansAdmin);
+					// remove duplicates
+					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
+				}
+			}
 		}
-
-		
-		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
-
-		
-		if (onlyToCheckReadPermission) {
+		/*if (onlyToCheckReadPermission) {
 			if (rolActual.equals("tothom")) { 
 				permisosHelper.filterGrantedAll(
 						metaExpedients,
@@ -253,7 +278,6 @@ public class MetaExpedientHelper {
 						MetaNodeEntity.class,
 						permisos,
 						auth);
-					
 			} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 				permisosHelper.filterGrantedAll(
 						metaExpedients,
@@ -265,20 +289,16 @@ public class MetaExpedientHelper {
 						MetaNodeEntity.class,
 						permisos,
 						auth);
-
 				List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
 				if (organs != null && !organs.isEmpty()) {
 					List<MetaExpedientEntity> metaExpedientsOfOrgans = metaExpedientRepository.findByOrganGestors(
 							entitat,
 							organs);
-					
 					metaExpedients.addAll(metaExpedientsOfOrgans);
 					// remove duplicates
 					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
-					
 				} 
 			}
-			
 		} else {
 			permisosHelper.filterGrantedAll(
 					metaExpedients,
@@ -290,49 +310,37 @@ public class MetaExpedientHelper {
 					MetaNodeEntity.class,
 					permisos,
 					auth);
-		}
-
-
-			
-		
-
+		}*/
 		return metaExpedients;		
 	}
-	
+
 	public List<ArbreDto<MetaExpedientCarpetaDto>> obtenirPareArbreCarpetesPerMetaExpedient(
 			MetaExpedientEntity metaExpedient,
 			List<ArbreDto<MetaExpedientCarpetaDto>> carpetes) {
 		//crear nova carpeta arrel
 		ArbreDto<MetaExpedientCarpetaDto> carpetaPrincipal = null;
-		
 		List<MetaExpedientCarpetaDto> carpetesMetaExpedient = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedient);
-		
 		if (carpetesMetaExpedient != null && ! carpetesMetaExpedient.isEmpty()) {
 			for (MetaExpedientCarpetaDto metaExpedientCarpeta: carpetesMetaExpedient) {
-				
 				if (metaExpedientCarpeta.getPare() == null) {
 					carpetaPrincipal = new ArbreDto<MetaExpedientCarpetaDto>(true);
-					
 					carpetaPrincipal.setArrel(
 							obtenirArbreCarpetesPerMetaExpedient(
 								metaExpedientCarpeta, 
 								null));
-					
 					carpetes.add(carpetaPrincipal);
 				}
 			}
 		}
-		
 		return carpetes;
 	}
-	
+
 	public ArbreNodeDto<MetaExpedientCarpetaDto> obtenirArbreCarpetesPerMetaExpedient(
 			MetaExpedientCarpetaDto metaExpedientCarpetaDto,
 			ArbreNodeDto<MetaExpedientCarpetaDto> pare) {
 		ArbreNodeDto<MetaExpedientCarpetaDto> currentArbreNode =  new ArbreNodeDto<MetaExpedientCarpetaDto>(
 				pare,
 				metaExpedientCarpetaDto);
-			
 		// crear estructura carpetes a partir del pare actual
 		for (MetaExpedientCarpetaDto fill: metaExpedientCarpetaDto.getFills()) {
 			// recuperar estructura per cada fill recursivament
@@ -343,7 +351,7 @@ public class MetaExpedientHelper {
 		}
 		return currentArbreNode;
 	}
-	
+
 	public void crearEstructuraCarpetes(
 			List<ArbreJsonDto> estructuraCarpetes,
 			MetaExpedientEntity metaExpedient) {
@@ -389,23 +397,18 @@ public class MetaExpedientHelper {
 			}
 		}
 	}
-	
+
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long carpetaIdJstree) {
 		MetaExpedientCarpetaDto carpeta = metaExpedientCarpetaHelper.deleteCarpeta(carpetaIdJstree);
 		return carpeta;
-	} 
-	
-	private boolean onlyToCheckReadPermission(Permission[] permisos) {
-		if (permisos.length == 0 || permisos.length == 1 && permisos[0] == ExtendedPermission.READ) {
-			return true;
-		} else {
-			return false;
-		}
 	}
-	
-	
-	
-	
-	
+
+	private List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
+	}
 
 }
