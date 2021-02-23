@@ -149,20 +149,26 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("ids") Collection<Long> ids);
 
 	@Query( "from " +
-			"    MetaExpedientEntity me " +
+			"    MetaExpedientEntity me join me.metaExpedientOrganGestors meog " +
 			"where " +
 			"    me.entitat = :entitat " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
-			"and (me.id in (:ids) or me.organGestor.id in (:organGestorIds)) ")
-	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndIdInOrOrganGestorIdIn(
+			"and (:esAdminEntitat = true or (me.id in (:idPermesos) " +
+			"     or (:esAdminOrgan = true or :esAdminOrgan = false) " + // TODO esborrar
+			"     or (me.organGestor is not null and me.organGestor.id in (:organIdPermesos)) " +
+			"     or (me.organGestor is null and meog.id in (:metaExpedientOrganIdPermesos))))")
+	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullActiu") boolean esNullActiu,
 			@Param("actiu") Boolean actiu,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,
-			@Param("ids") List<Long> ids,
-			@Param("organGestorIds") List<Long> organsGestorIds);
+			@Param("esAdminEntitat") boolean esAdminEntitat,
+			@Param("esAdminOrgan") boolean esAdminOrgan,
+			@Param("idPermesos") List<Long> idPermesos,
+			@Param("organIdPermesos") List<Long> organIdPermesos,
+			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos);
 
 	@Query( "from " +
 			"    MetaExpedientEntity me " +

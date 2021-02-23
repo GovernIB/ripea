@@ -41,7 +41,6 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 
 @Service
 public class ExpedientEstatServiceImpl implements ExpedientEstatService {
@@ -414,13 +413,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
@@ -479,13 +472,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());

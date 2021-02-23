@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -266,36 +265,36 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerAdmin(Long entitatId) {
-		logger.debug("Consulta de meta-expedients actius de l'entitat per admins (" + "entitatId=" + entitatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		return conversioTipusHelper.convertirList(
-				metaExpedientRepository.findByEntitatAndActiuTrueOrderByNomAsc(entitat),
-				MetaExpedientDto.class);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(Long entitatId) {
 		logger.debug(
 				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
 						")");
-		return findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.CREATE,
-				null,
-				null);
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findAmbEntitatPermis(
+						entitatId,
+						ExtendedPermission.CREATE,
+						true,
+						null, 
+						false,
+						false,
+						null),
+				MetaExpedientDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
-		return findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				null,
-				null);
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findAmbEntitatPermis(
+						entitatId,
+						ExtendedPermission.WRITE,
+						true,
+						null, 
+						false,
+						false,
+						null),
+				MetaExpedientDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -305,11 +304,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			String filtreNomOrCodiSia, 
 			String rolActual) {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
-		return findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.READ,
-				filtreNomOrCodiSia, 
-				rolActual);
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findAmbEntitatPermis(
+						entitatId,
+						ExtendedPermission.READ,
+						true,
+						filtreNomOrCodiSia, 
+						"IPA_ADMIN".equals(rolActual),
+						"IPA_ORGAN_ADMIN".equals(rolActual),
+						null), // TODO especificar organId quan és admin organ
+				MetaExpedientDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -326,11 +330,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		} else {
 			resposta = findByEntitat(entitatId, filtre, paginacioParams);
 		}
-
 		metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());
 		omplirMetaDocumentsPerMetaExpedients(resposta.getContingut());
 		metaNodeHelper.omplirPermisosPerMetaNodes(resposta.getContingut(), true);
-
 		for (MetaExpedientDto metaExpedient : resposta.getContingut()) {
 			MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedient.getId());
 			metaExpedient.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedientEntity));
@@ -750,22 +752,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			metaDocuments.add(conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class));
 		}
 		dto.setMetaDocuments(metaDocuments);
-	}
-
-	private List<MetaExpedientDto> findAmbEntitatPermis(
-			Long entitatId,
-			Permission permis,
-			String filtreNomOrCodiSia, 
-			String rolActual) {
-		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbEntitatPermis(
-						entitatId,
-						permis,
-						true,
-						filtreNomOrCodiSia, 
-						rolActual.equals("IPA_ADMIN"),
-						rolActual.equals("IPA_ORGAN_ADMIN")),
-				MetaExpedientDto.class);
 	}
 
 	private MetaExpedientTascaEntity getMetaExpedientTasca(Long entitatId, Long metaExpedientId, Long id) {

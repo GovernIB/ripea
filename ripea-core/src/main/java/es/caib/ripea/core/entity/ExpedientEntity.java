@@ -170,6 +170,12 @@ public class ExpedientEntity extends NodeEntity {
     @ForeignKey(name = "ipa_organ_gestor_exp_fk")
     private OrganGestorEntity organGestor;
 
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
+
 	public GrupEntity getGrup() {
 		return grup;
 	}

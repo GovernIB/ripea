@@ -99,7 +99,6 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 
@@ -1507,13 +1506,7 @@ public class ContingutServiceImpl implements ContingutService {
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
@@ -1588,13 +1581,7 @@ public class ContingutServiceImpl implements ContingutService {
 					entitat,
 					filtre.getMetaExpedientId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());

@@ -91,7 +91,6 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -727,13 +726,7 @@ public class DocumentServiceImpl implements DocumentService {
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
@@ -811,13 +804,7 @@ public class DocumentServiceImpl implements DocumentService {
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());

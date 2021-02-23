@@ -75,6 +75,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Mètodes comuns per a la gestió d'expedients.
@@ -124,6 +125,8 @@ public class ExpedientHelper {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	public ExpedientEntity create(
 			Long entitatId,
@@ -162,8 +165,15 @@ public class ExpedientHelper {
 						MetaExpedientEntity.class,
 						"La creació d'un expedient de tipus (metaExpedientId=" + metaExpedientId + ") requereix especificar un òrgan gestor");
 			}
-			// TODO comprovar si òrgan gestor està permés
 			organGestor = organGestorRepository.getOne(organGestorId);
+			if (organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, ExtendedPermission.CREATE)) {
+				throw new ValidationException(
+						metaExpedientId,
+						MetaExpedientEntity.class,
+						"L'usuari actual no te permisos per a crear aquest expedient (" +
+						"metaExpedientId=" + metaExpedientId + ", " +
+						"organGestorId=" + organGestorId + ")");
+			}
 		}
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
@@ -228,6 +238,10 @@ public class ExpedientHelper {
 		}
 		// crear carpetes per defecte del tipus d'expedient
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
+		// Crea les relacions expedients i organs pare
+		organGestorHelper.crearExpedientOrganPares(
+				expedient,
+				organGestor);
 		return expedient;
 	}
 

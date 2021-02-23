@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +68,7 @@ import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -813,13 +815,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
@@ -883,13 +879,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatPermis(
-				entitatId,
-				ExtendedPermission.WRITE,
-				false,
-				null, 
-				false,
-				false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
@@ -1340,13 +1330,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false);
 		}
-		// Els meta-expedients permesos son els que tenen assignat permís de lectura directament
+		/*/ Els meta-expedients permesos son els que tenen assignat permís de lectura directament
 		// i també els que pertanyen a un òrgan sobre el que es te assignat permís de lectura.
 		List<MetaExpedientEntity> metaExpedientsPermesos;
-		
-		
-		
-		
 		if (filtre.getOrganGestorId() != null) {
 			metaExpedientsPermesos = metaExpedientHelper.findAmbOrganFiltrePermis(
 					entitatId,
@@ -1363,7 +1349,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual.equals("IPA_ADMIN"),
 					rolActual.equals("IPA_ORGAN_ADMIN"));
 		}
-		if (!metaExpedientsPermesos.isEmpty()) {
+		if (!metaExpedientsPermesos.isEmpty()) {*/
 			UsuariEntity agafatPer = null;
 			if (filtre.isMeusExpedients()) {
 				agafatPer = usuariHelper.getUsuariAutenticat();
@@ -1414,12 +1400,28 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
 			ordenacioMap.put("tipusStr", new String[] { "metaExpedient.nom", "metaExpedient.classificacioSia" });
+			// Cercam els metaExpedients amb permisos assignats directament
+			List<Serializable> metaExpedientIdPermesos = permisosHelper.getObjectsIdsWithPermission(
+					MetaExpedientEntity.class,
+					ExtendedPermission.READ);
+			// Cercam els òrgans amb permisos assignats directament
+			List<Serializable> organIdPermesos = permisosHelper.getObjectsIdsWithPermission(
+					OrganGestorEntity.class,
+					ExtendedPermission.READ);
+			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+			List<Serializable> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(
+					MetaExpedientOrganGestorEntity.class,
+					ExtendedPermission.READ);
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
-			paginaExpedients = expedientRepository.findByEntitatAndFiltre(
+			paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,
-					metaExpedientsPermesos,
+					toListLong(metaExpedientIdPermesos),
+					toListLong(organIdPermesos),
+					toListLong(metaExpedientOrganIdPermesos),
 					metaExpedientFiltre == null,
 					metaExpedientFiltre,
+					organGestorFiltre == null,
+					organGestorFiltre,
 					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
 					filtre.getNumero() == null ? "" : filtre.getNumero(),
 					filtre.getNom() == null || filtre.getNom().isEmpty(),
@@ -1461,14 +1463,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 							return toExpedientDto(source, true);
 						}
 					});
-			for (ExpedientDto expedient : result) {
+			for (ExpedientDto expedient: result) {
 				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(false, expedient.getId()) > 0;
 				expedient.setAlerta(enAlerta);
 			}
 			return result;
-		} else {
+		/*} else {
 			return paginacioHelper.getPaginaDtoBuida(ExpedientDto.class);
-		}
+		}*/
 	}
 
 	private List<Long> findIdsAmbFiltrePaginat(
@@ -1547,6 +1549,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean isPropagarRelacio = Boolean.parseBoolean(
 				PropertiesHelper.getProperties().getProperty("es.caib.ripea.propagar.relacio.expedients"));
 		return isPropagarRelacio;
+	}
+
+	private List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);

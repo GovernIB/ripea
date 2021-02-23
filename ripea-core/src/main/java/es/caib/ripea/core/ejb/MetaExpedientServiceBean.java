@@ -88,19 +88,11 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.findByEntitatCodi(entitatId, codi);
 	}
 
-
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaExpedientDto> findActiusAmbEntitatPerAdmin(
-			Long entitatId) {
-		return delegate.findActiusAmbEntitatPerAdmin(entitatId);
 	}
 
 	@Override

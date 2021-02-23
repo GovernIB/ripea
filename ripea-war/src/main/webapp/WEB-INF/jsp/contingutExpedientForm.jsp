@@ -111,7 +111,6 @@ function refrescarGrups() {
 function refrescarOrgan() {
 	const metaExpedientId = $('#metaNodeId').val();
 	const organ = metaExpedientOrgan[metaExpedientId];
-	console.log('>>> organ', metaExpedientId, organ);
 	if (organ) {
 		$('#organFixed').show();
 		$('#organSelect').hide();
@@ -166,7 +165,6 @@ $(document).ready(function() {
 		</c:choose>
 		<div id="organFixed">
 			<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"><span id="organFixedNom"></span></rip:inputFixed>
-			
 		</div>
 		<div id="organSelect">
 			<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"/>

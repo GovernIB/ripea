@@ -6,7 +6,6 @@ package es.caib.ripea.core.helper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -181,13 +181,25 @@ public class MetaExpedientHelper {
 		return metaExpedients;
 	}
 
+	public List<MetaExpedientEntity> findPermesosAccioMassiva(Long entitatId) {
+		return findAmbEntitatPermis(
+				entitatId,
+				ExtendedPermission.WRITE,
+				true,
+				null,
+				false,
+				false,
+				null);
+	}
+
 	public List<MetaExpedientEntity> findAmbEntitatPermis(
 			Long entitatId,
 			Permission permis,
 			boolean nomesActius,
 			String filtreNomOrCodiSia, 
 			boolean isAdminEntitat,
-			boolean isAdminOrgan) {
+			boolean isAdminOrgan,
+			Long adminOrganOrganId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -195,77 +207,30 @@ public class MetaExpedientHelper {
 				false, 
 				true);
 		// Cercam els metaExpedients amb permisos assignats directament
-		List<Serializable> metaExpedientIds = permisosHelper.getObjectsIdsWithPermission(
+		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaExpedientEntity.class,
-				permis);
+				permis));
 		// Cercam els òrgans amb permisos assignats directament
-		List<Serializable> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
-				permis);
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndIdInOrOrganGestorIdIn(
+				permis));
+		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
+		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+		List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				MetaExpedientOrganGestorEntity.class,
+				permis));
+		organGestorHelper.afegirOrganGestorFillsIds(entitat, metaExpedientOrganIds);
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(
 				entitat,
 				!nomesActius,
 				nomesActius ? nomesActius : null,
 				filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
 				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
-				toListLong(metaExpedientIds),
-				toListLong(objectsIds));
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAll(
-				metaExpedients,
-				new ObjectIdentifierExtractor<MetaNodeEntity>() {
-					public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-						return metaNode.getId();
-					}
-				},
-				MetaNodeEntity.class,
-				new Permission[] {permis},
-				auth);
-		// Cercam els metaExpedients amb permisos assignats al seu òrgan gestor
-		List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
-				entitat,
-				permis);
-		List<MetaExpedientEntity> metaExpedientsOrgans = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndOrganGestorIn(
-				entitat,
-				!nomesActius,
-				nomesActius ? nomesActius : null,
-				filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
-				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
-				organs.isEmpty(),
-				organs);
-		metaExpedients.addAll(metaExpedientsOrgans);
-		metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
-		
-		
-		
-		
-		
-		boolean onlyToCheckReadPermission = permis == ExtendedPermission.READ;
-		if (!isAdminEntitat && onlyToCheckReadPermission) {
-			permisosHelper.filterGrantedAll(
-					metaExpedients,
-					new ObjectIdentifierExtractor<MetaNodeEntity>() {
-						public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-							return metaNode.getId();
-						}
-					},
-					MetaNodeEntity.class,
-					new Permission[] {permis},
-					auth);
-			if (onlyToCheckReadPermission && isAdminOrgan) {
-				List<OrganGestorEntity> organsAmbPermisAdmin = organGestorHelper.findAmbEntitatPermis(
-						entitat,
-						ExtendedPermission.ADMINISTRATION);
-				if (organsAmbPermisAdmin != null && !organsAmbPermisAdmin.isEmpty()) {
-					List<MetaExpedientEntity> metaExpedientsOrgansAdmin = metaExpedientRepository.findByOrganGestors(
-							entitat,
-							organsAmbPermisAdmin);
-					metaExpedients.addAll(metaExpedientsOrgansAdmin);
-					// remove duplicates
-					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
-				}
-			}
-		}
+				isAdminEntitat,
+				isAdminOrgan,
+				metaExpedientIds,
+				organIds,
+				metaExpedientOrganIds);
 		/*if (onlyToCheckReadPermission) {
 			if (rolActual.equals("tothom")) { 
 				permisosHelper.filterGrantedAll(

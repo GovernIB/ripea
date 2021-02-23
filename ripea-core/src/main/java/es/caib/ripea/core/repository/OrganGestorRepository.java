@@ -60,16 +60,30 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where " +
 			"    og.entitat = :entitat " +
 			"and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) " +
-			"and (og.codi in (:codis) " +
-			"     or og.pare.codi in (:codis) " +
-			"     or og.pare.pare.codi in (:codis) " +
-			"     or og.pare.pare.pare.codi in (:codis) " +
-			"     or og.pare.pare.pare.pare.codi in (:codis))")
-	public List<OrganGestorEntity> findByEntitatAndFiltreAndCodiInRecursive4Level(
+			"and (og = :organGestor " +
+			"     or og.pare.id in (:pareIds) " +
+			"     or og.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.pare.id in (:pareIds))")
+	public List<OrganGestorEntity> findByEntitatAndFiltreAndPareIdIn(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,
-			@Param("codis") List<String> codis);
+			@Param("pareIds") List<Long> pareIds);
+
+	@Query("select " +
+			"    og.id " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (og.pare.id in (:pareIds) " +
+			"     or og.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.pare.id in (:pareIds))")
+	public List<Long> findFillsIds(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("pareIds") List<Long> pareIds);
 
 	@Query("from " +
 			"    OrganGestorEntity og " +

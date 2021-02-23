@@ -155,21 +155,6 @@ public interface MetaExpedientService {
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
-
-
-	/**
-	 * Consulta els meta-expedients actius per una entitat pels usuaris admins.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @return La llista de meta-expedients actius per l'entitat especificada.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	public List<MetaExpedientDto> findActiusAmbEntitatPerAdmin(
-			Long entitatId) throws NotFoundException;
-
 	/**
 	 * Consulta els meta-expedients actius per una entitat amb el permis CREATE per
 	 * a l'usuari actual.

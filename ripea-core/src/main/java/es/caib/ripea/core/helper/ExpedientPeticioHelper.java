@@ -62,9 +62,7 @@ public class ExpedientPeticioHelper {
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
 	@Transactional
-	public void crearExpedientsPeticions(
-			List<AnotacioRegistreId> ids) {
-
+	public void crearExpedientsPeticions(List<AnotacioRegistreId> ids) {
 		for (AnotacioRegistreId anotacioRegistreId : ids) {
 			ExpedientPeticioEntity peticio = expedientPeticioRepository.findByIdentificador(anotacioRegistreId.getIndetificador());
 			// only create peticions that were not created before
@@ -95,56 +93,43 @@ public class ExpedientPeticioHelper {
 			}
 		}
 	}
-	
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void canviEstatExpedientPeticio(
 			Long expedientPeticioId,
 			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
-
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateEstat(
 				expedientPeticioEstatEnumDto);
-
 	}
-	
+
 	@Transactional
 	public void addExpedientPeticioConsultaError(
 			Long expedientPeticioId,
 			String errorDescription) {
-
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		
 		expedientPeticioEntity.updateConsultaWsError(true);
 		expedientPeticioEntity.updateConsultaWsErrorDesc(errorDescription);
 		expedientPeticioEntity.updateConsultaWsErrorDate(new Date());
-
 	}
-	
+
 	@Transactional
 	public void removeExpedientPeticioConsultaError(
 			Long expedientPeticioId,
 			String errorDescription) {
-
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		
 		expedientPeticioEntity.updateConsultaWsError(false);
 		expedientPeticioEntity.updateConsultaWsErrorDesc(null);
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
-
 	}
 
 	@Transactional
 	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
-		
-		
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
 				registreEntrada.getEntitatCodi());
 		if (entitat == null) {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
-
-		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
 				registreEntrada.getData().toGregorianCalendar().getTime(),
@@ -182,12 +167,8 @@ public class ExpedientPeticioHelper {
 				usuariNom(registreEntrada.getUsuariNom()).
 				destiDescripcio(registreEntrada.getDestiDescripcio()).
 				build();
-
-		
-		
 		registreRepository.save(registreEntity);
 		expedientPeticioEntity.updateRegistre(registreEntity);
-		
 		// set metaexpedient to which expedient will belong if peticion is accepted
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(
 				entitat,
@@ -208,7 +189,6 @@ public class ExpedientPeticioHelper {
 					metaExpedientEntity, 
 					expedientPeticioEntity.getRegistre().getExpedientNumero());
 		}
-		
 		// set accion to be performed if peticion is accepted
 		if (expedientEntity != null) {
 			expedientPeticioEntity.updateExpedientPeticioAccioEnumDto(
@@ -217,16 +197,13 @@ public class ExpedientPeticioHelper {
 			expedientPeticioEntity.updateExpedientPeticioAccioEnumDto(
 					ExpedientPeticioAccioEnumDto.CREAR);
 		}
-		
 		expedientPeticioRepository.save(expedientPeticioEntity);
-		
 		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
 					crearInteressatEntity(
 							interessat,
 							registreEntity));
 		}
-		
 		for (Annex annex: registreEntrada.getAnnexos()) {
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
@@ -234,12 +211,10 @@ public class ExpedientPeticioHelper {
 							registreEntity));
 		}
 	}
-	
-	
+
 	private RegistreInteressatEntity crearInteressatEntity(
 			Interessat interessat,
 			RegistreEntity registreEntity) {
-		
 		RegistreInteressatEntity representantEntity = null;
 		if (interessat.getRepresentant() != null){
 			representantEntity = RegistreInteressatEntity.getBuilder(	
@@ -264,9 +239,7 @@ public class ExpedientPeticioHelper {
 		 			municipi (interessat.getRepresentant().getMunicipi()).
 		 			organCodi(interessat.getRepresentant().getOrganCodi()).
 					build();
-			
 		}
-
 		RegistreInteressatEntity interessatEntity = RegistreInteressatEntity.getBuilder(	
 		 			interessat.getTipus()).
 		 			adresa (interessat.getAdresa()).
@@ -291,18 +264,11 @@ public class ExpedientPeticioHelper {
 		 			representant(representantEntity).
 		 			registre(registreEntity).
 					build();
-
 		registreInteressatRepository.save(interessatEntity);
-		
-		
 		return interessatEntity;
-		}
-	
-		
-	
-	
+	}
+
 	private RegistreAnnexEntity crearAnnexEntity(Annex annex, RegistreEntity registreEntity) {
-		
 		RegistreAnnexEntity annexEntity = RegistreAnnexEntity.getBuilder(
 				annex.getNom(),
 				annex.getNtiFechaCaptura().toGregorianCalendar().getTime(),
@@ -322,11 +288,10 @@ public class ExpedientPeticioHelper {
 				uuid(annex.getUuid()).
 				firmaNom(annex.getFirmaNom()).
 				build();
-		
 		registreAnnexRepository.save(annexEntity);
-		
 		return annexEntity;
-		}
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioHelper.class);
 
 }
