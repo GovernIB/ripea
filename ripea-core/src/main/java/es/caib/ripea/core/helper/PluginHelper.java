@@ -103,7 +103,6 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.plugin.caib.procediment.Procediment;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;

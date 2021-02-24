@@ -143,7 +143,7 @@
 				<th data-col-name="grupsCount" data-visible="false"></th>
 				<th data-col-name="permisosCount" data-visible="false"></th>
 				
-				<th data-col-name="elements" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
+				<th data-col-name="id" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
 					<script id="cellElementsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-default" data-toggle="dropdown"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.elements"/>&nbsp;<span class="caret"></span></button>
