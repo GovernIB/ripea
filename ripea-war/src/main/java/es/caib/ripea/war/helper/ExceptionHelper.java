@@ -27,7 +27,7 @@ public class ExceptionHelper {
 	}
 	
 	
-	public static Throwable findThrowableInstance(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
+	public static Exception findExceptionInstance(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
 		int i = 0;
 		Throwable exception = null;
 		boolean isTheException = exceptionClass.isInstance(e);
@@ -46,7 +46,7 @@ public class ExceptionHelper {
 			}
 			
 		}
-		return exception;
+		return (Exception) exception;
 	}
 	
 }

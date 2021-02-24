@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
@@ -38,6 +41,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
@@ -128,6 +132,7 @@ public class MetaExpedientController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
 		MetaExpedientDto metaExpedient = null;
 		if (metaExpedientId != null)
 			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
@@ -154,6 +159,43 @@ public class MetaExpedientController extends BaseAdminController {
 		return "metaExpedientForm";
 	}
 
+	
+	@RequestMapping(value = "/importMetaExpedient/{codiSia}", method = RequestMethod.GET)
+	@ResponseBody
+	public JsonResponse importMetaExpedient(
+			HttpServletRequest request,
+			@PathVariable String codiSia,
+			Model model) {
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+			
+			String codiDir3;
+//			codiDir3 = "A04026978";
+//			codiSia = "874212";
+			
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+			if (RolHelper.isRolActualAdministradorOrgan(request) && organActual != null) {
+				codiDir3 = organActual.getCodi();
+			} else {
+				codiDir3 = entitatActual.getUnitatArrel();
+			}
+			
+			return new JsonResponse(metaExpedientService.findProcedimentByCodiSia(entitatActual.getId(), codiDir3, codiSia));
+		} catch (Exception e) {
+			logger.error("Error al importar metaexpedient desde ROLSAC", e);
+			
+			Exception sysExt = ExceptionHelper.findExceptionInstance(e, SistemaExternException.class, 3);
+			if (sysExt != null) {
+				return new JsonResponse(true, sysExt.getMessage());
+			} else {
+				return new JsonResponse(true, e.getMessage());
+			}
+		}
+		
+	}
+	
+	
 	@RequestMapping(value = "/{metaExpedientCarpetaId}/deleteCarpeta", method = RequestMethod.GET)
 	@ResponseBody
 	public void deleteCarpeta(
@@ -197,6 +239,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
 	public String getNewAmbPare(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientCommand command = new MetaExpedientCommand(RolHelper.isRolActualAdministradorOrgan(request));
 		command.setPareId(metaExpedientId);
@@ -280,6 +323,36 @@ public class MetaExpedientController extends BaseAdminController {
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 	
+	
+	@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> findPerLectura(
+			HttpServletRequest request,
+			Model model) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId(), 
+				null, 
+				rolActual);
+		return metaExpedientsPermisLectura;
+	}
+	
+	@RequestMapping(value = "/findPerLectura/{organId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> findPerLectura(
+			HttpServletRequest request,
+			@PathVariable Long organId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
+				entitatActual.getId(),
+				organId, 
+				null);
+		return metaExpedientsPermisLectura;
+	}
+	
 
 	private MetaExpedientFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -303,5 +376,8 @@ public class MetaExpedientController extends BaseAdminController {
 		boolean hasOrganGestor = dto != null ? dto.getOrganGestor() != null : false;
 		model.addAttribute("hasOrganGestor", hasOrganGestor);
 	}
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientController.class);
 
 }

@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -38,6 +39,7 @@ import es.caib.ripea.war.command.ExpedientAssignarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -218,7 +220,7 @@ public class ContingutAdminController extends BaseAdminController {
 	}
 	
 	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.POST)
-	public String expedientTancarPost(
+	public String assignarPost(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@Valid ExpedientAssignarCommand command,
@@ -229,15 +231,36 @@ public class ContingutAdminController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			return "expedientAssignarForm";
 		}
-		expedientService.agafar(
-				entitatActual.getId(),
-				expedientId,
-				command.getUsuariCodi());
 		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../contingut/" + expedientId,
-				"expedient.assignar.controller.assignat.ok");
+		try {
+			expedientService.agafar(
+					entitatActual.getId(),
+					expedientId,
+					command.getUsuariCodi());
+			
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.assignar.controller.assignat.ok");
+			
+		} catch (Exception e) {
+			Exception exc = ExceptionHelper.findExceptionInstance(e, PermissionDeniedException.class, 3);
+			if (exc != null) {
+				PermissionDeniedException perExc = (PermissionDeniedException) exc;
+				if (perExc.getUserName().equals(command.getUsuariCodi()) && perExc.getPermissionName().equals("WRITE")) {
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:../../contingut/" + expedientId,
+							"expedient.assignar.controller.no.permis",
+							new Object[] {command.getUsuariCodi()});
+				} else {
+					throw e;
+				}
+			} else {
+				throw e;
+			}
+		}
+
 	}
 
 	@RequestMapping(value = "/{contingutId}/delete", method = RequestMethod.GET)

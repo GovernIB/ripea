@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -42,6 +43,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
@@ -49,6 +51,7 @@ import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -56,6 +59,7 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.caib.procediment.Procediment;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -91,6 +95,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
 
 	@Transactional
 	@Override
@@ -717,6 +723,34 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 				MetaExpedientTascaDto.class);
 	}
+	
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public ProcedimentDto findProcedimentByCodiSia(
+			Long entitatId,
+			String codiDir3, 
+			String codiSia) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false);
+		ProcedimentDto procedimentDto = pluginHelper.procedimentFindByCodiSia(codiDir3, codiSia);
+		if (procedimentDto != null && procedimentDto.getUnitatOrganitzativaCodi() != null && !procedimentDto.getUnitatOrganitzativaCodi().isEmpty()) {
+			OrganGestorEntity organEntity = organGestorRepository.findByCodiAndEntitat(procedimentDto.getUnitatOrganitzativaCodi(), entitat);
+			if (organEntity != null) {
+				procedimentDto.setOrganId(organEntity.getId());
+			}
+		}
+		return procedimentDto;
+
+	}
+
+	
+
 
 	@Transactional
 	@Override

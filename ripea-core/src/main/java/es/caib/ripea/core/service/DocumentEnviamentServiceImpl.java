@@ -232,6 +232,17 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				publicacio.getTipus().name(),
 				false,
 				false);
+		
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.MODIFICACIO,
+				publicacioEntity,
+				LogObjecteTipusEnumDto.PUBLICACIO,
+				LogTipusEnumDto.CREACIO,
+				publicacio.getAssumpte(),
+				publicacio.getTipus().name(),
+				false,
+				false);
 		return dto;
 	}
 

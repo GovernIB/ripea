@@ -34,6 +34,22 @@ public class DigitalitzacioPerfilDto implements Serializable {
 		this.tipus = tipus;
 	}
 	
+	public DigitalitzacioPerfilDto() {
+	}
+	public DigitalitzacioPerfilDto(
+			String codi,
+			String nom,
+			String descripcio,
+			int tipus) {
+		this.codi = codi;
+		this.nom = nom;
+		this.descripcio = descripcio;
+		this.tipus = tipus;
+	}
+
+
+
+
 	private static final long serialVersionUID = -632750619340383222L;
 
 }

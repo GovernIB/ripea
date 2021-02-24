@@ -257,8 +257,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@RequestParam(value="filter", required = false) String filter,
 			@RequestParam(value="pageSize", required = false) int pageSize,
 			@RequestParam(value="page", required = false) int page){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ResultatDominiDto resultatDomini = null;
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
 		try {
@@ -282,20 +281,13 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi,
 			@PathVariable String dadaValor){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
-//		String resultJson = null;
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ResultatConsultaDto resultatConsulta = null;
-		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi,entitatActual.getId());
-		try {
-			resultatConsulta = dominiService.getSelectedDomini(
-						entitatActual.getId(),
-						domini,
-						dadaValor);
-		} catch (DominiException e) {
-			e.printStackTrace();
-		}
-		
+		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi, entitatActual.getId());
+		resultatConsulta = dominiService.getSelectedDomini(
+					entitatActual.getId(),
+					domini,
+					dadaValor);
 		return resultatConsulta;
 	}
 	
@@ -304,8 +296,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	public Object getDominiMetaExpedientPermisLectura(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId){
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		MetaExpedientDto metaExpedientDto = comprovarAccesMetaExpedient(request, metaExpedientId);		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		MetaExpedientDto metaExpedientDto = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
 		List<DominiDto> dominis = dominiService.findByMetaNodePermisLecturaAndTipusDomini(entitatActual.getId(), metaExpedientDto);		
 		return dominis;
 	}

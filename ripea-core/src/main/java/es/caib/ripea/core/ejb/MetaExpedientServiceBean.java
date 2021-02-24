@@ -21,6 +21,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 
@@ -71,7 +72,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom"})
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) {
@@ -300,6 +301,16 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long entitatId, Long metaExpedientCarpetaId) {
 		return delegate.deleteCarpetaMetaExpedient(entitatId, metaExpedientCarpetaId);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public ProcedimentDto findProcedimentByCodiSia(
+			Long entitatId,
+			String codiDir3, String codiSia) {
+		return delegate.findProcedimentByCodiSia(
+				entitatId, 
+				codiDir3, codiSia);
 	}
 
 }

@@ -23,7 +23,7 @@ public class UnitatsPluginDir3Test {
 	private static final String ENDPOINT_ADDRESS = "http://dev.caib.es/dir3caib";
 	private static final String USERNAME = "$ripea_dir3caib";
 	private static final String PASSWORD = "ripea_dir3caib";
-	private static final String UNITAT_ARREL = "A04019281"; // real:"A04003003";
+	private static final String UNITAT_ARREL = "A04003003"; // real:"A04003003";
 
 	private UnitatsOrganitzativesPlugin plugin;
 

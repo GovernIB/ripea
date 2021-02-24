@@ -236,7 +236,7 @@ public class ContingutHelper {
 								auth));
 			}
 			dto.setNumSeguidors(expedient.getSeguidors().size());
-			
+			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth != null) {
 				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
@@ -798,7 +798,6 @@ public class ContingutHelper {
 			
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					node.getMetaNode(),
-					node.getId(),
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
@@ -1266,8 +1265,8 @@ public class ContingutHelper {
 					entitatActual);
 		
 		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".docx");
-		fitxer.setContentType("application/msword");
+		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".pdf");
+		fitxer.setContentType("application/pdf");
 		if (indexGenerated != null)
 			fitxer.setContingut(indexGenerated);
 		return fitxer;

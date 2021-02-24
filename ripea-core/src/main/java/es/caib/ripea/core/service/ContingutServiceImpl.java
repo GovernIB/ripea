@@ -428,7 +428,6 @@ public class ContingutServiceImpl implements ContingutService {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
-					documentOrigen.getId(),
 					false,
 					false,
 					true,
@@ -538,7 +537,6 @@ public class ContingutServiceImpl implements ContingutService {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
-					documentOrigen.getId(),
 					false,
 					false,
 					true,
@@ -649,7 +647,6 @@ public class ContingutServiceImpl implements ContingutService {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
-					documentOrigen.getId(),
 					false,
 					false,
 					true,
@@ -1424,6 +1421,9 @@ public class ContingutServiceImpl implements ContingutService {
 						break;
 					case A:
 						dto.setPerfil(ArxiuFirmaPerfilEnumDto.A);
+						break;
+					case BASIC:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASIC);
 						break;
 					}
 				}

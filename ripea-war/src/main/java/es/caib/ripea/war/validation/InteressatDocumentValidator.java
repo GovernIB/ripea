@@ -35,7 +35,7 @@ public class InteressatDocumentValidator implements ConstraintValidator<Interess
 			InteressatCommand interessat = (InteressatCommand)value;
 			boolean valid = true;
 			
-			if (interessat.getDocumentNum() != null) {
+			if (interessat.getDocumentNum() != null && !interessat.getDocumentNum().isEmpty()) {
 				if (	!InteressatDocumentTipusEnumDto.CODI_ORIGEN.equals(interessat.getDocumentTipus())
 						&& !InteressatDocumentTipusEnumDto.ALTRES_DE_PERSONA_FISICA.equals(interessat.getDocumentTipus())
 						&& !InteressatDocumentTipusEnumDto.PASSAPORT.equals(interessat.getDocumentTipus())) {
@@ -45,8 +45,11 @@ public class InteressatDocumentValidator implements ConstraintValidator<Interess
 						.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("interessat.form.valid.documentNum"))
 						.addNode("documentNum")
 						.addConstraintViolation();
+						context.disableDefaultConstraintViolation();
 					}
 				}
+			} else if (interessat.getDocumentNum() == null || interessat.getDocumentNum().isEmpty()) {
+				valid = false;
 			}
 			return valid;
 		} catch (final Exception ex) {

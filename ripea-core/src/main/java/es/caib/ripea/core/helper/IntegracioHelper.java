@@ -53,6 +53,8 @@ public class IntegracioHelper {
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	public static final String INTCODI_VIAFIRMA = "VIAFIRMA";
 	public static final String INTCODI_DIGITALITZACIO = "DIGITALITZACIO";
+	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENT";
+	
 	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();

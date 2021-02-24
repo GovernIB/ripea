@@ -288,12 +288,12 @@ public class DominiServiceImpl implements DominiService {
 		List<String> dominisCodis = new ArrayList<String>();
 		List<DominiEntity> dominis = new ArrayList<DominiEntity>();
 		//1. trobar metadades de tipus domini d'aquests metaexpedients
-		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeIdAndTipusOrderByOrdreAsc(
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeIdAndTipusAndActivaTrueOrderByOrdreAsc(
 				metaExpedient.getId(), 
 				MetaDadaTipusEnumDto.DOMINI);
 		//2. recuperar els tipus de domini d'aquestes metadades
 		for (MetaDadaEntity metaDadaEntity : metaDades) {
-			dominisCodis.add(metaDadaEntity.getValor() != null ? metaDadaEntity.getValor(): "");
+			dominisCodis.add(metaDadaEntity.getCodi() != null ? metaDadaEntity.getCodi(): "");
 		}
 		if (!dominisCodis.isEmpty()) {
 			dominis = dominiRepository.findByEntitatAndCodiInOrderByIdAsc(

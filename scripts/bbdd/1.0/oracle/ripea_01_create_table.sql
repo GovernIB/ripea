@@ -2,7 +2,7 @@
 CREATE TABLE IPA_ALERTA
 (
   ID                   	NUMBER(19)             	NOT NULL,
-  TEXT                 	VARCHAR2(256)           NOT NULL,
+  TEXT                 	VARCHAR2(1024)          NOT NULL,
   ERROR                	VARCHAR2(2048),
   LLEGIDA              	NUMBER(1)               NOT NULL,
   CONTINGUT_ID         	NUMBER(19),

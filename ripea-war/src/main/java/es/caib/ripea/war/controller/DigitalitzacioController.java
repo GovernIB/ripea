@@ -5,11 +5,14 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,8 +24,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DigitalitzacioService;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -47,10 +52,23 @@ public class DigitalitzacioController extends BaseUserController {
 	@ResponseBody
 	public List<DigitalitzacioPerfilDto> digitalitzaciGetPerfils(
 			HttpServletRequest request,
+			HttpServletResponse response,
 			Model model) {
-		List<DigitalitzacioPerfilDto> perfils = digitalitzacioService.getPerfilsDisponibles();
-		
+		List<DigitalitzacioPerfilDto> perfils = new ArrayList<DigitalitzacioPerfilDto>();
+		try {
+			perfils = digitalitzacioService.getPerfilsDisponibles();
+			
+		} catch (Exception e) {
+			logger.error("Error al initializar digitalitzacio", e);
+			Exception sisExtExc = ExceptionHelper.findExceptionInstance(e, SistemaExternException.class, 3);
+			if (sisExtExc != null) {
+				perfils.add(new DigitalitzacioPerfilDto("SERVER_ERROR", "SERVER_ERROR", sisExtExc.getMessage(), -1));
+			} else {
+				perfils.add(new DigitalitzacioPerfilDto("SERVER_ERROR", "SERVER_ERROR", e.getMessage(), -1));
+			}
+		}
 		return perfils;
+		
 	}
 	@RequestMapping(value = "/iniciarDigitalitzacio/{codiPerfil}", method = RequestMethod.GET)
 	@ResponseBody
@@ -157,5 +175,6 @@ public class DigitalitzacioController extends BaseUserController {
 				idTransaccio);
 	}	
 
+	private static final Logger logger = LoggerFactory.getLogger(DigitalitzacioController.class);
 
 }
