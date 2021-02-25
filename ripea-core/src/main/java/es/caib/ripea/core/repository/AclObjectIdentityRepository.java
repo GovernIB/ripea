@@ -21,15 +21,15 @@ import es.caib.ripea.core.entity.AclSidEntity;
  */
 public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIdentityEntity, Long> {
 
-	@Query(	"select distinct " +
-			"    oi.objectId " +
+	@Query(	"select " +
+			"    distinct oi.objectId " +
 			"from " +
 			"    AclObjectIdentityEntity oi join oi.entries entry " +
 			"where " +
-			"      oi.classname.classname = :classname   " +
-			" and  entry.sid in (:sids)   " +
-			" and  entry.mask = :mask   " +
-			" and  entry.granting = true   ")
+			"    oi.classname.classname = :classname " +
+			"and entry.sid in (:sids) " +
+			"and entry.mask = :mask " +
+			"and entry.granting = true")
 	public List<Serializable> findObjectsWithPermissions(
 			@Param("classname") String classname, 
 			@Param("sids") List<AclSidEntity> sids, 

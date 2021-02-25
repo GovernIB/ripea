@@ -691,10 +691,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		Map<Serializable, List<PermisDto>> permisosOrganGestor = permisosHelper.findPermisos(serializedIds, MetaExpedientOrganGestorEntity.class);
 		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
-			for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
-				permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
-				permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
-				permisos.add(permis);
+			if (permisosOrganGestor.get(metaExpedientOrgan.getId()) != null) {
+				for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
+					permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
+					permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
+					permisos.add(permis);
+				}
 			}
 		}
 		permisos.addAll(permisosHelper.findPermisos(id, MetaNodeEntity.class));

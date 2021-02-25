@@ -171,7 +171,10 @@ public class PermisosHelper {
 				sids.add(aclSid);
 			}
 		}
-		return aclObjectIdentityRepository.findObjectsWithPermissions(clazz.getName(), sids, permission.getMask());
+		return aclObjectIdentityRepository.findObjectsWithPermissions(
+				clazz.getName(),
+				sids,
+				permission.getMask());
 	}
 
 	/**
