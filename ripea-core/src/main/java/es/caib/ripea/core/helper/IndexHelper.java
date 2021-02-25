@@ -176,11 +176,11 @@ public class IndexHelper {
 			float [] pointColumnWidths;
 			PdfPTable taulaDocuments;
 			if (!isRelacio) {
-				pointColumnWidths = new float[] {4f, 13f, 13f, 15f, 14f, 13f, 19f, 12f, 7f};
-				taulaDocuments = new PdfPTable(9);
+				pointColumnWidths = new float[] {3f, 10f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
+				taulaDocuments = new PdfPTable(10);
 			} else {
-				pointColumnWidths = new float[] {15f, 12f, 14f, 16f, 13f, 19f, 14f, 7f};
-				taulaDocuments = new PdfPTable(8);
+				pointColumnWidths = new float[] {12f, 12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
+				taulaDocuments = new PdfPTable(9);
 			}
 			taulaDocuments.setWidthPercentage(100f);
 			taulaDocuments.setWidths(pointColumnWidths);
@@ -292,6 +292,10 @@ public class IndexHelper {
 			String tituloDoc = arxiuDetall.getMetadadesAddicionals().get("tituloDoc") != null ? arxiuDetall.getMetadadesAddicionals().get("tituloDoc").toString() : "";
 			taulaDocuments.addCell(crearCellaContingut(tituloDoc, null));
 		}
+//		Descripció
+		String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
+		taulaDocuments.addCell(crearCellaContingut(descripcio, null));
+		
 //		Tipus documental
 		String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
 		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null));
@@ -336,7 +340,7 @@ public class IndexHelper {
 //		## [Event per crear el header]
 		HeaderPageEvent headerEvent = new HeaderPageEvent();
 		
-	    Document index = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
+	    Document index = new Document(PageSize.A4.rotate(), 36, 36, 35 + headerEvent.getTableHeight(), 36);
 		PdfWriter writer = PdfWriter.getInstance(index, out);
 //		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
 		
@@ -364,7 +368,7 @@ public class IndexHelper {
 					0, 
 					-1,
 					index.left(),
-					750 + ((index.topMargin() + tableHeight) / 2),
+					505 + ((index.topMargin() + tableHeight) / 2),
                     writer.getDirectContent());
 	    }
 		
@@ -409,6 +413,7 @@ public class IndexHelper {
 			taulaDocuments.addCell(crearCellaCapsalera("Nº"));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nom")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nomnatural")));
+		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.descripcio")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocumental")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocument")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.datacreacio")));
