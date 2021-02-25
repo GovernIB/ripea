@@ -355,7 +355,7 @@ public class ExpedientHelper {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
-			if (carpeta.getContinguts() != null) {
+			if (carpeta != null && carpeta.getContinguts() != null) {
 				for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
 					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
 							contingutArxiu.getNom().equals(docEntity.getNom())) {
