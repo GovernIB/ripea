@@ -208,7 +208,7 @@ public class MetaExpedientHelper {
 				true);
 		// Cercam els metaExpedients amb permisos assignats directament
 		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaExpedientEntity.class,
+				MetaNodeEntity.class,
 				permis));
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
@@ -228,9 +228,12 @@ public class MetaExpedientHelper {
 				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
 				isAdminEntitat,
 				isAdminOrgan,
-				metaExpedientIds,
-				organIds,
-				metaExpedientOrganIds);
+				metaExpedientIds == null || metaExpedientIds.isEmpty(),
+				metaExpedientIds == null || metaExpedientIds.isEmpty() ? null : metaExpedientIds,
+				organIds == null || organIds.isEmpty(),
+				organIds == null || organIds.isEmpty() ? null : organIds,
+				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty(),
+				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds);
 		/*if (onlyToCheckReadPermission) {
 			if (rolActual.equals("tothom")) { 
 				permisosHelper.filterGrantedAll(
@@ -276,7 +279,7 @@ public class MetaExpedientHelper {
 					permisos,
 					auth);
 		}*/
-		return metaExpedients;		
+		return metaExpedients;
 	}
 
 	public List<ArbreDto<MetaExpedientCarpetaDto>> obtenirPareArbreCarpetesPerMetaExpedient(

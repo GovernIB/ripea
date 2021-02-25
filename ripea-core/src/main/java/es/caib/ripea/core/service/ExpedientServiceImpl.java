@@ -1396,28 +1396,30 @@ public class ExpedientServiceImpl implements ExpedientService {
 				rolsCurrentUser = null; // repository does not accept empty list but it accepts null value
 				esNullRolsCurrentUser = true;
 			}
-			Page<ExpedientEntity> paginaExpedients;
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
 			ordenacioMap.put("tipusStr", new String[] { "metaExpedient.nom", "metaExpedient.classificacioSia" });
 			// Cercam els metaExpedients amb permisos assignats directament
-			List<Serializable> metaExpedientIdPermesos = permisosHelper.getObjectsIdsWithPermission(
-					MetaExpedientEntity.class,
-					ExtendedPermission.READ);
+			List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					MetaNodeEntity.class,
+					ExtendedPermission.READ));
 			// Cercam els òrgans amb permisos assignats directament
-			List<Serializable> organIdPermesos = permisosHelper.getObjectsIdsWithPermission(
+			List<Long> organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					OrganGestorEntity.class,
-					ExtendedPermission.READ);
+					ExtendedPermission.READ));
 			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
-			List<Serializable> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(
+			List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
-					ExtendedPermission.READ);
+					ExtendedPermission.READ));
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
-			paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
+			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,
-					toListLong(metaExpedientIdPermesos),
-					toListLong(organIdPermesos),
-					toListLong(metaExpedientOrganIdPermesos),
+					metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty(),
+					metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty() ? null : metaExpedientIdPermesos,
+					organIdPermesos == null || organIdPermesos.isEmpty(),
+					organIdPermesos == null || organIdPermesos.isEmpty() ? null : organIdPermesos,
+					metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty(),
+					metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
 					metaExpedientFiltre == null,
 					metaExpedientFiltre,
 					organGestorFiltre == null,
@@ -1457,7 +1459,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 					paginaExpedients,
 					ExpedientDto.class,
 					new Converter<ExpedientEntity, ExpedientDto>() {
-
 						@Override
 						public ExpedientDto convert(ExpedientEntity source) {
 							return toExpedientDto(source, true);

@@ -75,15 +75,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	List<ExpedientEntity> findExpedientsRelacionats(
 			@Param("expedient") ExpedientEntity expedient);
 
-	@Query(	"from" +
-			"    ExpedientEntity e join e.organGestorPares eogp " +
+	@Query(	"select " +
+			"    distinct e " +
+			"from" +
+			"    ExpedientEntity e left join e.organGestorPares eogp " +
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and (e.metaExpedient.id in (:metaExpedientIdPermesos)" +
-			"     or e.organGestor.id in (:organIdPermesos)" +
-			"     or eogp.metaExpedientOrganGestor.organGestor.id in (:organIdPermesos)" +
-			"     or eogp.metaExpedientOrganGestor.id in (:metaExpedientOrganIdPermesos)) " +
+			"and (" +
+			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and eogp.metaExpedientOrganGestor.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogp.metaExpedientOrganGestor.id in (:metaExpedientOrganIdPermesos))) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
@@ -112,8 +115,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
 			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
+			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos, 
 			@Param("organIdPermesos") List<Long> organIdPermesos,
+			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,

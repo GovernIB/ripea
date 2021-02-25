@@ -99,7 +99,6 @@ function refrescarGrups() {
 						$('#grupId option[value!=""]').remove();
 						$('#grupId').closest('.form-group').hide();
 					}
-	
 				}
 			});
 		} else {
@@ -117,8 +116,7 @@ function refrescarOrgan() {
 		$('#organFixedNom').text(organ.nom);
 		$('#organFixedNom').after($('<input>').attr({
 		    type: 'hidden',
-		    id: 'foo',
-		    name: 'bar',
+		    name: 'organGestorId',
 		    value: organ.id
 		}));
 	} else {
@@ -149,7 +147,6 @@ $(document).ready(function() {
 		<c:when test="${empty expedientCommand.id}"><c:set var="formAction"><rip:modalUrl value="/expedient/new"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientCommand.id}/update"/></c:set></c:otherwise>
 	</c:choose>
-	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -172,10 +169,7 @@ $(document).ready(function() {
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<form:hidden path="gestioAmbGrupsActiva"/>
-		
 		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
-		
-		
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

@@ -110,9 +110,11 @@ public class OrganGestorHelper {
 	public void afegirOrganGestorFillsIds(
 			EntitatEntity entitat,
 			List<Long> pares) {
-		pares.addAll(organGestorRepository.findFillsIds(
-				entitat,
-				pares));
+		if (pares != null && !pares.isEmpty()) {
+			pares.addAll(organGestorRepository.findFillsIds(
+					entitat,
+					pares));
+		}
 	}
 
 	public void afegirMetaExpedientOrganGestorFillsIds(

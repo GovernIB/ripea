@@ -148,16 +148,19 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<Long> findDistinctMetaExpedientIdsByExpedients(
 			@Param("ids") Collection<Long> ids);
 
-	@Query( "from " +
-			"    MetaExpedientEntity me join me.metaExpedientOrganGestors meog " +
+	@Query( "select " +
+			"    distinct me " +
+			"from " +
+			"    MetaExpedientEntity me left join me.metaExpedientOrganGestors meog " +
 			"where " +
 			"    me.entitat = :entitat " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
-			"and (:esAdminEntitat = true or (me.id in (:idPermesos) " +
-			"     or (:esAdminOrgan = true or :esAdminOrgan = false) " + // TODO esborrar
-			"     or (me.organGestor is not null and me.organGestor.id in (:organIdPermesos)) " +
-			"     or (me.organGestor is null and meog.id in (:metaExpedientOrganIdPermesos))))")
+			"and (:esAdminEntitat = true " +
+			"     or (:esAdminOrgan = true and :esAdminOrgan = false) " + // TODO esborrar
+			"     or (:esNullIdPermesos = false and me.id in (:idPermesos)) " +
+			"     or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos)) " +
+			"     or (me.organGestor is null and :esNullMetaExpedientOrganIdPermesos = false and meog.id in (:metaExpedientOrganIdPermesos)) )")
 	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullActiu") boolean esNullActiu,
@@ -166,8 +169,11 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("filtre") String filtre,
 			@Param("esAdminEntitat") boolean esAdminEntitat,
 			@Param("esAdminOrgan") boolean esAdminOrgan,
+			@Param("esNullIdPermesos") boolean hiHaIdPermesos,
 			@Param("idPermesos") List<Long> idPermesos,
+			@Param("esNullOrganIdPermesos") boolean hiHaOrganIdPermesos,
 			@Param("organIdPermesos") List<Long> organIdPermesos,
+			@Param("esNullMetaExpedientOrganIdPermesos") boolean hiHaMetaExpedientOrganIdPermesos,
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos);
 
 	@Query( "from " +
