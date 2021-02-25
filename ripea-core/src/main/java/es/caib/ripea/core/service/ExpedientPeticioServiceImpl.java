@@ -173,8 +173,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return metaExpedientDto;
 	}
-	
-	
+
 	@Transactional
 	@Override
 	public ExpedientDto findByEntitatAndMetaExpedientAndExpedientNumero(
@@ -192,20 +191,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		}
-
 		ExpedientEntity expedientEntity = expedientRepository.findByEntitatAndMetaNodeAndNumero(
 				entitat,
 				metaExpedient,
 				expedientNumero);
-		
 		if (expedientEntity == null) {
 			return null;
 		} else {
@@ -213,8 +204,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					false);
 		}
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientPeticioDto> findByExpedient(

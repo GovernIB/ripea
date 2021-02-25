@@ -1,11 +1,8 @@
 package es.caib.ripea.war.controller;
 
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -137,7 +134,7 @@ public class HistoricController extends BaseAdminController {
 	public Map<String, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
 			HttpServletRequest request,
 			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 
@@ -200,7 +197,7 @@ public class HistoricController extends BaseAdminController {
 
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS, usuarisCodi);
 
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		Map<String, List<HistoricUsuariDto>> response = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
@@ -217,7 +214,7 @@ public class HistoricController extends BaseAdminController {
 		// registram els usuaris consultats a la sessió
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessatsDocNum);
 
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
@@ -238,7 +235,7 @@ public class HistoricController extends BaseAdminController {
 
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessatsDocNum);
 
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		Map<String, List<HistoricInteressatDto>> response = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {

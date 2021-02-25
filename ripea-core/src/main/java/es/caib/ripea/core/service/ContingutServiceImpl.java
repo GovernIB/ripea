@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -100,7 +99,6 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 
@@ -428,6 +426,8 @@ public class ContingutServiceImpl implements ContingutService {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
+					documentOrigen.getId(),
+					null,
 					false,
 					false,
 					true,
@@ -537,6 +537,8 @@ public class ContingutServiceImpl implements ContingutService {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
+					documentOrigen.getId(),
+					null,
 					false,
 					false,
 					true,
@@ -647,6 +649,8 @@ public class ContingutServiceImpl implements ContingutService {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
+					documentOrigen.getId(),
+					null,
 					false,
 					false,
 					true,
@@ -1479,24 +1483,15 @@ public class ContingutServiceImpl implements ContingutService {
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false);
-		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
@@ -1508,26 +1503,14 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false);
 		}
-		
-		
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
-				entitatId,
-				new Permission[] { ExtendedPermission.WRITE },
-				false,
-				null, 
-				"tothom");
-
-		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
-		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
@@ -1546,8 +1529,6 @@ public class ContingutServiceImpl implements ContingutService {
 					dataFi == null,
 					dataFi,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
-	
-	
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					DocumentDto.class,
@@ -1571,32 +1552,21 @@ public class ContingutServiceImpl implements ContingutService {
 					DocumentDto.class);
 		}
 	}
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException {
-
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false);
-		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
@@ -1608,26 +1578,14 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false);
 		}
-		
-		
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					entitat,
 					filtre.getMetaExpedientId());
 		}
-		
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
-				entitatId,
-				new Permission[] { ExtendedPermission.WRITE },
-				false,
-				null, 
-				"tothom");
-
-		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
-		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> idsDocuments = documentRepository.findIdsDocumentsPerFirmaMassiu(
@@ -1645,15 +1603,10 @@ public class ContingutServiceImpl implements ContingutService {
 					dataInici,
 					dataFi == null,
 					dataFi);
-	
-	
 			return idsDocuments;
-			
 		} else {
 			return new ArrayList<>();
 		}
-		
-
 	}
 
 	/*private ContingutEntity contingutHelper.comprovarContingutDinsExpedient(

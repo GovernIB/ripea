@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -142,18 +143,19 @@ public class CacheHelper {
 					ExtendedPermission.READ,
 					ExtendedPermission.ADMINISTRATION},
 				auth);
-		
-		
-		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+		List<Serializable> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				ExtendedPermission.ADMINISTRATION);
 		if (objectsIds != null && !objectsIds.isEmpty()) {
-			List<EntitatEntity> entitatsOfOrgans = entitatRepository.findByOrgansIds(objectsIds);
+			List<Long> objectsIdsTypeLong = new ArrayList<Long>();
+			for (Serializable oid: objectsIds) {
+				objectsIdsTypeLong.add((Long)oid);
+			}
+			List<EntitatEntity> entitatsOfOrgans = entitatRepository.findByOrgansIds(objectsIdsTypeLong);
 			entitats.addAll(entitatsOfOrgans);
 			// remove duplicates
 			entitats = new ArrayList<EntitatEntity>(new HashSet<EntitatEntity>(entitats));
 		}
-
 		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
 				entitats,
 				EntitatDto.class);

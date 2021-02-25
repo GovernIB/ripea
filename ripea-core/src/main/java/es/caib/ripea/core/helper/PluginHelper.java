@@ -103,7 +103,6 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.plugin.caib.procediment.Procediment;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -546,7 +545,7 @@ public class PluginHelper {
 		accioParams.put("tipus", metaExpedient.getNom());
 		accioParams.put("classificacio", metaExpedient.getClassificacioSia());
 		accioParams.put("serieDocumental", metaExpedient.getSerieDocumental());
-		String organCodiDir3 = expedient.getEntitat().getUnitatArrel();
+		String organCodiDir3 = expedient.getOrganGestor().getCodi();
 		accioParams.put("organ", organCodiDir3);
 		accioParams.put("estat", expedient.getEstat().name());
 		long t0 = System.currentTimeMillis();

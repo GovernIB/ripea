@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,7 +37,6 @@ import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -94,8 +91,6 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -697,33 +692,23 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		return docPortafir;
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, 
 				false);
-		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
@@ -735,26 +720,15 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false);
 		}
-		
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
-				entitatId,
-				new Permission[] { ExtendedPermission.WRITE },
-				false,
-				null, 
-				"tothom");
-
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
 		if (!metaExpedientsPermesos.isEmpty()) {
-		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerCustodiarMassiu(
@@ -774,8 +748,6 @@ public class DocumentServiceImpl implements DocumentService {
 					dataFi == null,
 					dataFi,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
-	
-	
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					DocumentDto.class,
@@ -800,32 +772,21 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 	}
 	
-	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException {
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, 
 				false);
-		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
@@ -837,26 +798,14 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false);
 		}
-		
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
-				entitatId,
-				new Permission[] { ExtendedPermission.WRITE },
-				false,
-				null, 
-				"tothom");
-
-		
-		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
-		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> documentsIds = documentRepository.findDocumentsIdsPerCustodiarMassiu(
@@ -874,14 +823,11 @@ public class DocumentServiceImpl implements DocumentService {
 					dataInici,
 					dataFi == null,
 					dataFi);
-	
-	
 			return documentsIds;
 		} else {
 			return new ArrayList<>();
 		}
 	}
-	
 	
 	@Transactional
 	@Override

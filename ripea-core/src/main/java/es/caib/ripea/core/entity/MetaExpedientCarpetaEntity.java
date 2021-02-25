@@ -3,7 +3,6 @@ package es.caib.ripea.core.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -19,7 +18,6 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
-import es.caib.ripea.core.entity.MetaExpedientEntity.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

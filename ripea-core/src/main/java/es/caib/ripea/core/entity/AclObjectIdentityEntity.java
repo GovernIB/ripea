@@ -35,10 +35,10 @@ public class AclObjectIdentityEntity extends AbstractPersistable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "owner_sid", nullable = false)
 	private AclSidEntity ownerSid;
-    @OneToMany(			
-    		mappedBy = "aclObjectIdentity", fetch = FetchType.EAGER)
+	@OneToMany(
+			mappedBy = "aclObjectIdentity", fetch = FetchType.EAGER)
 	private List<AclEntryEntity> entries;
-	
+
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

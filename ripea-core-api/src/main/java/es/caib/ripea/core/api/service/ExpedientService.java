@@ -35,6 +35,8 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat a la qual pertany l'expedient.
 	 * @param metaExpedientId
 	 *            Atribut id del meta-expedient a partir del qual es vol crear l'expedient.
+	 * @param organGestorId
+	 *            Atribut id de l'organ gestor responsable de l'expedient.
 	 * @param pareId
 	 *            Contenidor pare a on es vol crear l'expedient. Pot ser null. Si no és
 	 *            null es crearà com a subexpedient d'un expedient superior.
@@ -57,6 +59,7 @@ public interface ExpedientService {
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
+			Long organGestorId,
 			Long pareId,
 			Integer any,
 			Long sequencia,

@@ -60,7 +60,7 @@ public class PermisosHelper {
 
 	public void assignarPermisUsuari(
 			String userName,
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> objectClass,
 			Permission permission) {
 		assignarPermisos(
@@ -71,7 +71,7 @@ public class PermisosHelper {
 				false);
 	}
 
-	public void assignarPermisRol(String roleName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+	public void assignarPermisRol(String roleName, Serializable objectIdentifier, Class<?> objectClass, Permission permission) {
 		assignarPermisos(
 				new GrantedAuthoritySid(getMapeigRol(roleName)),
 				objectClass,
@@ -82,13 +82,13 @@ public class PermisosHelper {
 
 	public void revocarPermisUsuari(
 			String userName,
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> objectClass,
 			Permission permission) {
 		revocarPermisos(new PrincipalSid(userName), objectClass, objectIdentifier, new Permission[] { permission });
 	}
 
-	public void revocarPermisRol(String roleName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+	public void revocarPermisRol(String roleName, Serializable objectIdentifier, Class<?> objectClass, Permission permission) {
 		revocarPermisos(
 				new GrantedAuthoritySid(getMapeigRol(roleName)),
 				objectClass,
@@ -99,7 +99,7 @@ public class PermisosHelper {
 	public void mourePermisUsuari(
 			String sourceUserName,
 			String targetUserName,
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> objectClass,
 			Permission permission) {
 		assignarPermisos(
@@ -118,7 +118,7 @@ public class PermisosHelper {
 	public void mourePermisRol(
 			String sourceRoleName,
 			String targetRoleName,
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> objectClass,
 			Permission permission) {
 		assignarPermisos(
@@ -135,17 +135,15 @@ public class PermisosHelper {
 	}
 
 	public void filterGrantedAny(
-			Collection<? extends AbstractPersistable<Long>> objects,
+			Collection<? extends AbstractPersistable<Serializable>> objects,
 			Class<?> clazz,
 			Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAny(objects, new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
-
+		filterGrantedAny(objects, new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
 			@Override
-			public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
+			public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
 				return entitat.getId();
 			}
-
 		}, clazz, permissions, auth);
 	}
 
@@ -157,7 +155,7 @@ public class PermisosHelper {
 	 * @param permission Permís que es vol esbrinar si conté
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
-	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
+	public List<Serializable> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
@@ -197,7 +195,7 @@ public class PermisosHelper {
 			Authentication auth) {
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			Serializable objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
 			if (objectIdentifier == null) {
 				it.remove();
 			} else if (!isGrantedAny(objectIdentifier, clazz, permissions, auth))
@@ -226,9 +224,9 @@ public class PermisosHelper {
 			Authentication auth) {
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			List<Long> objectIdentifiers = objectIdentifierExtractor.getObjectIdentifiers(it.next());
+			List<Serializable> objectIdentifiers = objectIdentifierExtractor.getObjectIdentifiers(it.next());
 			boolean hasPermission = false;
-			for (Long id : objectIdentifiers) {
+			for (Serializable id :objectIdentifiers) {
 				if (isGrantedAny(id, clazz, permissions, auth)) {
 					hasPermission = true;
 					break;
@@ -251,16 +249,16 @@ public class PermisosHelper {
 	 * @param permissions Permisos que volem filtrar
 	 * @param auth        Autentificació
 	 */
-	public void filterGrantedAny(Collection<Long> ids, Class<?> clazz, Permission[] permissions, Authentication auth) {
-		Iterator<Long> it = ids.iterator();
+	public void filterGrantedAny(Collection<Serializable> ids, Class<?> clazz, Permission[] permissions, Authentication auth) {
+		Iterator<Serializable> it = ids.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = it.next();
+			Serializable objectIdentifier = it.next();
 			if (!isGrantedAny(objectIdentifier, clazz, permissions, auth))
 				it.remove();
 		}
 	}
 
-	public boolean isGrantedAny(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
+	public boolean isGrantedAny(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
 		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
 		for (int i = 0; i < granted.length; i++) {
 			if (granted[i])
@@ -279,27 +277,25 @@ public class PermisosHelper {
 	 * @param permissions Permisos que volem filtrar
 	 * @param auth        Autentificació
 	 */
-	public void filterGrantedAll(Collection<Long> ids, Class<?> clazz, Permission[] permissions, Authentication auth) {
-		Iterator<Long> it = ids.iterator();
+	public void filterGrantedAll(Collection<Serializable> ids, Class<?> clazz, Permission[] permissions, Authentication auth) {
+		Iterator<Serializable> it = ids.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = it.next();
+			Serializable objectIdentifier = it.next();
 			if (!isGrantedAll(objectIdentifier, clazz, permissions, auth))
 				it.remove();
 		}
 	}
 
 	public void filterGrantedAll(
-			Collection<? extends AbstractPersistable<Long>> objects,
+			Collection<? extends AbstractPersistable<Serializable>> objects,
 			Class<?> clazz,
 			Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAll(objects, new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
-
+		filterGrantedAll(objects, new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
 			@Override
-			public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
+			public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
 				return entitat.getId();
 			}
-
 		}, clazz, permissions, auth);
 	}
 
@@ -312,13 +308,13 @@ public class PermisosHelper {
 			Authentication auth) {
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			Serializable objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
 			if (!isGrantedAll(objectIdentifier, clazz, permissions, auth))
 				it.remove();
 		}
 	}
 
-	public boolean isGrantedAll(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
+	public boolean isGrantedAll(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
 		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
 		boolean result = true;
 		for (int i = 0; i < granted.length; i++) {
@@ -342,7 +338,7 @@ public class PermisosHelper {
 		return result;
 	}
 
-	public List<PermisDto> findPermisos(Long objectIdentifier, Class<?> objectClass) {
+	public List<PermisDto> findPermisos(Serializable objectIdentifier, Class<?> objectClass) {
 		Acl acl = null;
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
@@ -360,27 +356,27 @@ public class PermisosHelper {
 	 * @param objectClass       Classe dels objectes a consular.
 	 * @return Mapa amb tots els permisos de cada objecte del conjunt consultat.
 	 */
-	public Map<Long, List<PermisDto>> findPermisos(List<Long> objectIdentifiers, Class<?> objectClass) {
+	public Map<Serializable, List<PermisDto>> findPermisos(List<Serializable> objectIdentifiers, Class<?> objectClass) {
 		try {
-			Map<Long, List<PermisDto>> resposta = new HashMap<Long, List<PermisDto>>();
+			Map<Serializable, List<PermisDto>> resposta = new HashMap<Serializable, List<PermisDto>>();
 			List<ObjectIdentity> oids = new ArrayList<ObjectIdentity>();
-			for (Long objectIdentifier : objectIdentifiers) {
+			for (Serializable objectIdentifier: objectIdentifiers) {
 				ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 				oids.add(oid);
 			}
 			if (!oids.isEmpty()) {
 				Map<ObjectIdentity, Acl> acls = lookupStrategy.readAclsById(oids, null);
-				for (ObjectIdentity oid : acls.keySet()) {
-					resposta.put((Long)oid.getIdentifier(), findPermisosPerAcl(acls.get(oid)));
+				for (ObjectIdentity oid: acls.keySet()) {
+					resposta.put(oid.getIdentifier(), findPermisosPerAcl(acls.get(oid)));
 				}
 			}
 			return resposta;
 		} catch (NotFoundException nfex) {
-			return new HashMap<Long, List<PermisDto>>();
+			return new HashMap<Serializable, List<PermisDto>>();
 		}
 	}
 
-	public void updatePermis(Long objectIdentifier, Class<?> objectClass, PermisDto permis) {
+	public void updatePermis(Serializable objectIdentifier, Class<?> objectClass, PermisDto permis) {
 		if (PrincipalTipusEnumDto.USUARI.equals(permis.getPrincipalTipus())) {
 			assignarPermisos(
 					new PrincipalSid(permis.getPrincipalNom()),
@@ -398,7 +394,7 @@ public class PermisosHelper {
 		}
 	}
 
-	public void deletePermis(Long objectIdentifier, Class<?> objectClass, Long permisId) {
+	public void deletePermis(Serializable objectIdentifier, Class<?> objectClass, Serializable permisId) {
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			Acl acl = aclService.readAclById(oid);
@@ -411,7 +407,7 @@ public class PermisosHelper {
 		}
 	}
 
-	public void deleteAcl(Long objectIdentifier, Class<?> objectClass) {
+	public void deleteAcl(Serializable objectIdentifier, Class<?> objectClass) {
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			aclService.deleteAcl(oid, true);
@@ -431,7 +427,7 @@ public class PermisosHelper {
 					permis = permisosUsuari.get(principal);
 					if (permis == null) {
 						permis = new PermisDto();
-						permis.setId((Long)ace.getId());
+						permis.setId(ace.getId());
 						permis.setPrincipalNom(principal);
 						permis.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
 						permisosUsuari.put(principal, permis);
@@ -441,7 +437,7 @@ public class PermisosHelper {
 					permis = permisosRol.get(grantedAuthority);
 					if (permis == null) {
 						permis = new PermisDto();
-						permis.setId((Long)ace.getId());
+						permis.setId(ace.getId());
 						permis.setPrincipalNom(grantedAuthority);
 						permis.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
 						permisosRol.put(grantedAuthority, permis);
@@ -521,34 +517,28 @@ public class PermisosHelper {
 			// Si no troba l'ACL no fa res
 		}
 	}
-	
-	
-	
+
 	private boolean[] verificarPermisos(
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> clazz,
 			Permission[] permissions,
 			String usuariCodi) {
-		
 		List<Sid> sids = new ArrayList<Sid>();
 		sids.add(new PrincipalSid(usuariCodi));
-
 		List<String> rolsUsuariActual = pluginHelper.rolsUsuariFindAmbCodi(usuariCodi);
 		for (String rol : rolsUsuariActual) {
 			Sid sid = new GrantedAuthoritySid(getMapeigRol(rol));
 			sids.add(sid);
 		}
-		
 		return verificarPermisos(
 				objectIdentifier,
 				clazz,
 				permissions,
 				sids);
 	}
-	
-	
+
 	private boolean[] verificarPermisos(
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> clazz,
 			Permission[] permissions,
 			List<Sid> sids) {
@@ -571,11 +561,9 @@ public class PermisosHelper {
 		}
 		return granted;
 	}
-	
-	
 
 	private boolean[] verificarPermisos(
-			Long objectIdentifier,
+			Serializable objectIdentifier,
 			Class<?> clazz,
 			Permission[] permissions,
 			Authentication auth) {
@@ -620,13 +608,13 @@ public class PermisosHelper {
 
 	public interface ObjectIdentifierExtractor<T> {
 
-		public Long getObjectIdentifier(T object);
+		public Serializable getObjectIdentifier(T object);
 
 	}
 
 	public interface ListObjectIdentifiersExtractor<T> {
 
-		public List<Long> getObjectIdentifiers(T object);
+		public List<Serializable> getObjectIdentifiers(T object);
 
 	}
 

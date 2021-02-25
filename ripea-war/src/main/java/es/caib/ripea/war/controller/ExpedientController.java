@@ -115,14 +115,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
-		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
-		
 		if (filtreCommand.getOrganGestorId() != null) {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 					entitatActual.getId(),
@@ -134,8 +132,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					null, 
 					rolActual);
 		}
-
-		
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
 				entitatActual.getId());
 		model.addAttribute(
@@ -216,7 +212,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return DatatablesHelper.getDatatableResponse(
@@ -414,20 +409,16 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
-		
 		List<MetaExpedientDto> metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
-		
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
-		
 		model.addAttribute(
 				"grups",
 				metaExpedientService.findGrupsAmbMetaExpedient(
 						entitatActual.getId(),
 						expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId()));
 		command.setGestioAmbGrupsActiva(metaExpedients.get(0).isGestioAmbGrupsActiva());
-		
 		return "contingutExpedientForm";
 	}
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
@@ -449,6 +440,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					command.getMetaNodeId(),
 					command.getMetaNodeDominiId(),
+					command.getOrganGestorId(),
 					null,
 					command.getAny(),
 					null,
@@ -910,7 +902,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"expedient",
@@ -922,10 +913,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
-		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerLectura(
@@ -1027,9 +1016,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-
 		ExpedientFiltreCommand filtreCommand = getRelacionarFiltreCommand(request);
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,

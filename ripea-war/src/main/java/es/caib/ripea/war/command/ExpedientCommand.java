@@ -37,22 +37,12 @@ public class ExpedientCommand extends ContenidorCommand {
 	private Long sequencia;
 	private Long expedientEstatId;
 	protected Long metaNodeDominiId;
+	@NotNull(groups = {Create.class})
+	protected Long organGestorId;
 	private Long grupId;
 
 	private boolean gestioAmbGrupsActiva;
 	
-	public Long getMetaNodeDominiId() {
-		return metaNodeDominiId;
-	}
-	public void setMetaNodeDominiId(Long metaNodeDominiId) {
-		this.metaNodeDominiId = metaNodeDominiId;
-	}
-	public Long getExpedientEstatId() {
-		return expedientEstatId;
-	}
-	public void setExpedientEstatId(Long expedientEstatId) {
-		this.expedientEstatId = expedientEstatId;
-	}
 	public Long getMetaNodeId() {
 		return metaNodeId;
 	}
@@ -76,6 +66,24 @@ public class ExpedientCommand extends ContenidorCommand {
 	}
 	public void setSequencia(Long sequencia) {
 		this.sequencia = sequencia;
+	}
+	public Long getExpedientEstatId() {
+		return expedientEstatId;
+	}
+	public void setExpedientEstatId(Long expedientEstatId) {
+		this.expedientEstatId = expedientEstatId;
+	}
+	public Long getMetaNodeDominiId() {
+		return metaNodeDominiId;
+	}
+	public void setMetaNodeDominiId(Long metaNodeDominiId) {
+		this.metaNodeDominiId = metaNodeDominiId;
+	}
+	public Long getOrganGestorId() {
+		return organGestorId;
+	}
+	public void setOrganGestorId(Long organGestorId) {
+		this.organGestorId = organGestorId;
 	}
 	public Long getGrupId() {
 		return grupId;

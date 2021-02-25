@@ -89,19 +89,11 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.findByEntitatCodi(entitatId, codi);
 	}
 
-
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
-	}
-
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public List<MetaExpedientDto> findActiusAmbEntitatPerAdmin(
-			Long entitatId) {
-		return delegate.findActiusAmbEntitatPerAdmin(entitatId);
 	}
 
 	@Override
@@ -235,11 +227,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public void permisDelete(Long entitatId, Long id, Long permisId) {
+	public void permisDelete(Long entitatId, Long id, Long permisId, Long organGestorId) {
 		delegate.permisDelete(
 				entitatId,
 				id,
-				permisId);
+				permisId,
+				organGestorId);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,6 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 
 @Service
 public class ExpedientEstatServiceImpl implements ExpedientEstatService {
@@ -107,24 +105,14 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					false,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		}
-		
 		Page<ExpedientEstatEntity> paginaExpedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
 					metaExpedient,
-					paginacioHelper.toSpringDataPageable(
-							paginacioParams));
-		 
+					paginacioHelper.toSpringDataPageable(paginacioParams));
 		PaginaDto<ExpedientEstatDto> result = paginacioHelper.toPaginaDto(
 				paginaExpedientEstats,
 				ExpedientEstatDto.class);
-		
 		return result;
 
 	}
@@ -146,18 +134,9 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					false,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		}
-		
-		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
-					metaExpedient);
-		 
+		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient);
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
 				ExpedientEstatDto.class);
@@ -200,18 +179,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				"entitatId=" + entitatId + ", " +
 				"estat=" + estat + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				estat.getMetaExpedientId(),
-				false,
-				false,
-				false,
-				false);
-		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, estat.getMetaExpedientId());
 		int ordre = expedientEstatRepository.countByMetaExpedient(metaExpedient);
-		
-		
 		ExpedientEstatEntity expedientEstat = ExpedientEstatEntity.getBuilder(
 				estat.getCodi(),
 				estat.getNom(),
@@ -220,7 +189,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				metaExpedient,
 				estat.getResponsableCodi()).
 				build();
-		
 		//if inicial of the modified state is true set inicial of other states to false
 		if(estat.isInicial()){
 			List<ExpedientEstatEntity> expedientEstats =  expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient);
@@ -233,7 +201,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		} else {
 			expedientEstat.updateInicial(false);
 		}
-		
 		return conversioTipusHelper.convertir(
 				expedientEstatRepository.save(expedientEstat),
 				ExpedientEstatDto.class);
@@ -248,13 +215,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				"entitatId=" + entitatId + ", " +
 				"estat=" + estat + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				estat.getMetaExpedientId(),
-				false,
-				false,
-				false,
-				false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, estat.getMetaExpedientId());
 		ExpedientEstatEntity expedientEstat = expedientEstatRepository.findOne(estat.getId());
 		expedientEstat.update(
 				estat.getCodi(),
@@ -443,31 +404,16 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false);
-		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
-				entitatId,
-				new Permission[] { ExtendedPermission.WRITE },
-				false,
-				null, 
-				"tothom");
-		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
@@ -487,7 +433,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					dataFi == null,
 					dataFi,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
-	
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					ExpedientDto.class,
@@ -518,35 +463,19 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre) throws NotFoundException {
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false);
-		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false);
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
-				entitatId,
-				new Permission[] { ExtendedPermission.WRITE },
-				false,
-				null, 
-				"tothom");
-		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
-		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
@@ -562,18 +491,12 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					dataFi == null,
 					dataFi);
 			return idsDocuments;
-
 		} else {
 			return new ArrayList<>();
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
 
 	private void canviPosicio(
 			ExpedientEstatEntity estat,

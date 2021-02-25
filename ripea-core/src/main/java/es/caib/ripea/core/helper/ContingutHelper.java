@@ -70,6 +70,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
@@ -539,16 +540,8 @@ public class ContingutHelper {
 		}
 		return (NodeEntity)contingut;
 	}
-	/**
-	 * 
-	 * @param entitatId
-	 * @param contingutId
-	 * @param comprovarPermisRead
-	 * @param comprovarPermisWrite
-	 * @param comprovarPermisCreate
-	 * @param comprovarPermisDelete
-	 * @return contingut with id == @param contingutId
-	 */
+
+
 	public ContingutEntity comprovarContingutDinsExpedientModificable(
 			Long entitatId,
 			Long contingutId,
@@ -598,18 +591,16 @@ public class ContingutHelper {
 		}
 		
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			if(comprovarPermisWrite){
-				ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
+			ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
+			if (comprovarPermisWrite) {
 				// if expedient estat has write permissions don't need to check metaExpedient permissions
-				if (comprovarPermisWrite && expedientEntity.getExpedientEstat()!=null) {
+				if (comprovarPermisWrite && expedientEntity.getExpedientEstat() != null) {
 					if (hasEstatPermissons(expedientEntity.getExpedientEstat().getId()))
 						comprovarPermisWrite = false;
 				}
 			}
-			
-			
-			comprovarPermisosNode(
-					(NodeEntity)contingut,
+			comprovarPermisosExpedient(
+					expedientEntity,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
@@ -658,8 +649,8 @@ public class ContingutHelper {
 				true,
 				false);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			comprovarPermisosNode(
-					(NodeEntity)contingut,
+			comprovarPermisosExpedient(
+					(ExpedientEntity)contingut,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					false,
@@ -788,28 +779,28 @@ public class ContingutHelper {
 	}
 
 
-	public void comprovarPermisosNode(
-			NodeEntity node,
+	private void comprovarPermisosExpedient(
+			ExpedientEntity expedient,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete) {
-		if (node.getMetaNode() != null) {
-			
+		if (expedient.getMetaNode() != null) {
 			entityComprovarHelper.comprovarPermisosMetaNode(
-					node.getMetaNode(),
+					expedient.getMetaNode(),
+					expedient.getId(),
+					expedient.getOrganGestor().getId(),
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
 					comprovarPermisDelete);
 		} else {
 			throw new ValidationException(
-					node.getId(),
+					expedient.getId(),
 					ContingutEntity.class,
-					"El node no te meta-node associat (nodeId=" + node.getId() + ")");
+					"L'expedient no te meta-node associat (expedientId=" + expedient.getId() + ")");
 		}
 	}
-
 
 	public ExpedientEntity getExpedientSuperior(
 			ContingutEntity contingut,
@@ -836,9 +827,10 @@ public class ContingutHelper {
 		if (expedient != null) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (comprovarPermisRead) {
-				entityComprovarHelper.comprovarMetaExpedient(
+				entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 						expedient.getEntitat(),
 						expedient.getMetaExpedient().getId(),
+						null,
 						true,
 						false,
 						false,
@@ -868,8 +860,7 @@ public class ContingutHelper {
 		}
 		return expedient;
 	}
-	
-	
+
 	/**
 	 * checking if expedient estat has modify permissions
 	 * @param estatId
@@ -890,6 +881,7 @@ public class ContingutHelper {
 			MetaExpedientEntity metaExpedient,
 			ContingutEntity pare,
 			EntitatEntity entitat,
+			OrganGestorEntity organGestor,
 			String ntiVersion,
 			String ntiOrgano,
 			Date ntiFechaApertura,
@@ -902,12 +894,10 @@ public class ContingutHelper {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			agafatPer = usuariRepository.getOne(auth.getName());
 		}
-		
 		GrupEntity grupEntity = null;
 		if (grupId != null) {
 			grupEntity = grupRepository.findOne(grupId);
 		}
-		
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom,
 				metaExpedient,
@@ -916,7 +906,8 @@ public class ContingutHelper {
 				"1.0",
 				ntiOrgano,
 				ntiFechaApertura,
-				metaExpedient.getClassificacioSia()).
+				metaExpedient.getClassificacioSia(),
+				organGestor).
 				agafatPer(agafatPer).
 				grup(grupEntity).
 				build();
@@ -1067,18 +1058,15 @@ public class ContingutHelper {
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
 			List<ArxiuFirmaDto> firmes) {
-
 		String serieDocumental = null;
 		ExpedientEntity expedient = contingut.getExpedient();
 		if (expedient != null) {
 			serieDocumental = expedient.getMetaExpedient().getSerieDocumental();
 		}
 		if (pluginHelper.isArxiuPluginActiu()) {
-
 			//##################### EXPEDIENT #####################
 			if (contingut instanceof ExpedientEntity) {
-				pluginHelper.arxiuExpedientActualitzar((ExpedientEntity) contingut);
-
+				pluginHelper.arxiuExpedientActualitzar((ExpedientEntity)contingut);
 			//##################### DOCUMENT #####################
 			} else if (contingut instanceof DocumentEntity) {
 				//No actualizar dins SGD si és un document importat de Regweb
@@ -1093,7 +1081,6 @@ public class ContingutHelper {
 						firmaSeparada,
 						firmes);
 				documentHelper.actualitzarVersionsDocument((DocumentEntity) contingut);
-
 				if (firmes != null) {
 					// Custodia el document firmat
 					((DocumentEntity) contingut).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
@@ -1110,7 +1097,6 @@ public class ContingutHelper {
 							false,
 							false);
 				}
-
 			//##################### CARPETA #####################
 			} else if (contingut instanceof CarpetaEntity) {
 				if (!isCarpetaLogica()) {

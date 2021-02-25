@@ -123,6 +123,18 @@ CREATE TABLE IPA_METAEXP_TASCA
 );
 
 
+CREATE TABLE IPA_METAEXP_ORGAN
+(
+  ID                   bigint NOT NULL,
+  META_EXPEDIENT_ID    bigint NOT NULL,
+  ORGAN_GESTOR_ID      bigint NOT NULL,
+  CREATEDDATE          timestamp without time zone,
+  CREATEDBY_CODI       character varying(64),
+  LASTMODIFIEDDATE     timestamp without time zone,
+  LASTMODIFIEDBY_CODI  character varying(64)
+);
+
+
 CREATE TABLE IPA_METADOCUMENT
 (
   ID                      BIGINT               NOT NULL,
@@ -309,6 +321,7 @@ CREATE TABLE IPA_EXPEDIENT
   SISTRA_CLAU        character varying(100),
   AGAFAT_PER_CODI    character varying(64),
   METAEXPEDIENT_ID   bigint                     NOT NULL,
+  ORGAN_GESTOR_ID    bigint                     NOT NULL,
   EXPEDIENT_ESTAT_ID BIGINT,
   GRUP_ID BIGINT
 );
@@ -318,6 +331,17 @@ CREATE TABLE IPA_EXPEDIENT_REL
 (
   EXPEDIENT_ID       BIGINT                     NOT NULL,
   EXPEDIENT_REL_ID   bigint                     NOT NULL
+);
+
+CREATE TABLE IPA_EXPEDIENT_ORGANPARE
+(
+    ID                      bigint NOT NULL,
+    EXPEDIENT_ID            bigint NOT NULL,
+    META_EXPEDIENT_ORGAN_ID bigint NOT NULL,
+    CREATEDDATE          timestamp without time zone,
+    CREATEDBY_CODI       character varying(64),
+    LASTMODIFIEDDATE     timestamp without time zone,
+    LASTMODIFIEDBY_CODI  character varying(64)
 );
 
 

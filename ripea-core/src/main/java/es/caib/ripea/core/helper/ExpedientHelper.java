@@ -61,6 +61,7 @@ import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -72,7 +73,9 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Mètodes comuns per a la gestió d'expedients.
@@ -97,6 +100,8 @@ public class ExpedientHelper {
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
+	private OrganGestorRepository organGestorRepository;
+	@Autowired
 	private CarpetaHelper carpetaHelper;
 	@Autowired
 	private DocumentHelper documentHelper;
@@ -120,11 +125,14 @@ public class ExpedientHelper {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	public ExpedientEntity create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
+			Long organGestorId,
 			Long pareId,
 			Integer any,
 			Long sequencia,
@@ -139,18 +147,37 @@ public class ExpedientHelper {
 					"No es pot crear un expedient sense un meta-expedient associat");
 		}
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,
 				metaExpedientId,
+				organGestorId,
 				false,
 				false,
 				true,
 				false);
-
+		OrganGestorEntity organGestor;
+		if (metaExpedient.getOrganGestor() != null) {
+			organGestor = metaExpedient.getOrganGestor();
+		} else {
+			if (organGestorId == null) {
+				throw new ValidationException(
+						metaExpedientId,
+						MetaExpedientEntity.class,
+						"La creació d'un expedient de tipus (metaExpedientId=" + metaExpedientId + ") requereix especificar un òrgan gestor");
+			}
+			organGestor = organGestorRepository.getOne(organGestorId);
+			if (organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, ExtendedPermission.CREATE)) {
+				throw new ValidationException(
+						metaExpedientId,
+						MetaExpedientEntity.class,
+						"L'usuari actual no te permisos per a crear aquest expedient (" +
+						"metaExpedientId=" + metaExpedientId + ", " +
+						"organGestorId=" + organGestorId + ")");
+			}
+		}
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
 //		}
-
 		ContingutEntity contingutPare = null;
 		if (pareId != null) {
 			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -173,6 +200,7 @@ public class ExpedientHelper {
 				metaExpedient,
 				contingutPare,
 				metaExpedient.getEntitat(),
+				organGestor,
 				"1.0",
 				metaExpedient.getEntitat().getUnitatArrel(),
 				new Date(),
@@ -181,13 +209,11 @@ public class ExpedientHelper {
 				true,
 				grupId);
 		contingutLogHelper.logCreacio(expedient, false, false);
-		
 		crearDadesPerDefecte(
 				metaExpedient,
 				expedient);
-
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
-		//find inicial state if exists
+		// find inicial state if exists
 		ExpedientEstatEntity estatInicial = null;
 		for (ExpedientEstatEntity expedientEstat : expedientEstats) {
 			if (expedientEstat.isInicial()) {
@@ -197,26 +223,25 @@ public class ExpedientHelper {
 		// set inicial estat if exists
 		if (estatInicial != null) {
 			expedient.updateExpedientEstat(estatInicial);
-
 			// if estat has usuari responsable agafar expedient by this user
 			if (estatInicial.getResponsableCodi() != null) {
 				agafar(expedient, estatInicial.getResponsableCodi());
 				
 			}
 		}
-
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
-
 			if (associarInteressats) {
 				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId);
 			}
 		}
-		
 		// crear carpetes per defecte del tipus d'expedient
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
-		
+		// Crea les relacions expedients i organs pare
+		organGestorHelper.crearExpedientOrganPares(
+				expedient,
+				organGestor);
 		return expedient;
 	}
 
@@ -499,14 +524,9 @@ public class ExpedientHelper {
 	}
 	
 	private void crearDadesPerDefecte(MetaExpedientEntity metaExpedient, ExpedientEntity expedient) {
-		
-		
 		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaExpedient);
-		
 		for (int i = 0; i < metaDades.size(); i++) {
-			
 			if (metaDades.get(i).getValor()!= null && !metaDades.get(i).getValor().isEmpty()) {
-				
 				Object valor;
 				switch (metaDades.get(i).getTipus()) {
 				case BOOLEA:
@@ -534,13 +554,11 @@ public class ExpedientHelper {
 					valor = (String) DadaEntity.getDadaValorPerRetornar(metaDades.get(i), metaDades.get(i).getValor());
 					break;
 				}
-				
 				DadaEntity dada = DadaEntity.getBuilder(
 						metaDades.get(i),
 						expedient,
 						valor,
 						i).build();
-				
 				dadaRepository.save(dada);
 				contingutLogHelper.log(
 						expedient,
@@ -552,9 +570,7 @@ public class ExpedientHelper {
 						dada.getValorComString(),
 						false,
 						false);
-				
 			}
-			
 		}
 	}
 

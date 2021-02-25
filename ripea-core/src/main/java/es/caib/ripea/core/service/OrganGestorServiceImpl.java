@@ -1,11 +1,11 @@
 package es.caib.ripea.core.service;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
@@ -26,6 +26,8 @@ import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -34,6 +36,8 @@ import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
@@ -45,8 +49,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     private EntityComprovarHelper entityComprovarHelper;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
-    @Resource
+    @Autowired
     private OrganGestorRepository organGestorRepository;
+    @Autowired
+    private MetaExpedientRepository metaExpedientRepository;
+    @Autowired
+    private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
     @Autowired
     private PermisosHelper permisosHelper;
     @Autowired
@@ -140,7 +148,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (OrganGestorEntity o : organismesNotInDIR3) {
 			if (o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) {
 				organGestorRepository.delete(o.getId());
-				System.out.println("REMOVED: " + o.getNom());
 			} else {
 				o.setActiu(false);
 				organGestorRepository.flush();
@@ -199,9 +206,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
     
     @Override
     public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId) {
-    	
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
     	return conversioTipusHelper.convertirList(
-    			organGestorHelper.findOrganismesEntitatAmbPermis(entitatId),
+    			organGestorHelper.findAmbEntitatPermis(
+    					entitat,
+    					ExtendedPermission.ADMINISTRATION),
 				OrganGestorDto.class);	
     }
     
@@ -218,35 +227,29 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         logger.debug("Consulta com a administrador els permisos dels organs gestors de l'entitat (" + "id="
                 + entitatId + ")");
-
         entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
-
         List<PermisOrganGestorDto> results = new ArrayList<PermisOrganGestorDto>();
         boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
                 new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
         if (!esAdministradorEntitat) {
             return results;
         }
-        
         List<OrganGestorDto> organs;
         if (organId == null) {
         	organs = findByEntitat(entitatId);	
-        
-        }else {
+        } else {
         	organs = new ArrayList<OrganGestorDto>();
         	organs.add(findItem(organId));
         }
-        
-        for (OrganGestorDto o : organs) {
+        for (OrganGestorDto o: organs) {
             List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
-            for (PermisDto p : permisosOrgan) {
+            for (PermisDto p: permisosOrgan) {
                 PermisOrganGestorDto permisOrgan = new PermisOrganGestorDto();
                 try {
                     BeanUtils.copyProperties(permisOrgan, p);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-
                 permisOrgan.setOrganGestor(o);
                 results.add(permisOrgan);
             }
@@ -303,22 +306,54 @@ public class OrganGestorServiceImpl implements OrganGestorService {
         }
         return organismes;
     }
-    
-    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes)
-    {
-        for (NodeDir3 fill : root.getFills())
-        {
+
+    private void findOrganismesFills(NodeDir3 root, List<OrganGestorDto> organismes) {
+        for (NodeDir3 fill : root.getFills()) {
             OrganGestorDto organisme = new OrganGestorDto();
             organisme.setCodi(fill.getCodi());
             organisme.setNom(fill.getDenominacio());
             organisme.setPareCodi(root.getCodi());
-            
             organismes.add(organisme);
-            
             findOrganismesFills(fill, organismes);
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+	private void findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+			Long entitatId,
+			Long metaExpedientId,
+			Permission permis,
+			String filtre) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		List<OrganGestorEntity> organsGestors;
+		if (metaExpedient.getOrganGestor() != null) {
+			// S'han de retornar els fills de l'òrgan gestor del metaExpedient
+			organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
+					entitat,
+					filtre == null,
+					filtre,
+					Arrays.asList(metaExpedient.getOrganGestor().getId()));
+		} else {
+			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+			List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					MetaExpedientOrganGestorEntity.class,
+					permis));
+			organsGestors = metaExpedientOrganGestorRepository.findOrganGestorByMetaExpedientAndFiltreAndOrganGestorPareIdIn(
+					metaExpedient,
+					filtre == null,
+					filtre,
+					metaExpedientOrganIds);
+		}
+	}
+
+	private List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

@@ -72,7 +72,7 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_id")
-	@ForeignKey(name = "dis_expedient_registre_fk")
+	@ForeignKey(name = "ipa_expedient_registre_fk")
 	private ExpedientEntity expedient;
 	
 	

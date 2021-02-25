@@ -23,9 +23,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
-//	public OrganGestorEntity findByCodi(String codi);
 	public OrganGestorEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
-	
+
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
@@ -34,7 +33,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
-	
+
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where " +
@@ -44,36 +43,60 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("canditats")List<OrganGestorEntity> canditats,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
-	
+
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
-			"where (og.entitat = :entitat)" +
-      " and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
+			"where " +
+			"    (og.entitat = :entitat) " +
+			"and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
 	public Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,
 			Pageable paginacio);
-	
+
 	@Query("from " +
-    		 "    OrganGestorEntity og " +
-    		 "where og.codi in (:codis)")
-	public List<OrganGestorEntity> findByCodiDir3List(@Param("codis") List<String> codis);
-	
+			"    OrganGestorEntity og " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) " +
+			"and (og = :organGestor " +
+			"     or og.pare.id in (:pareIds) " +
+			"     or og.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.pare.id in (:pareIds))")
+	public List<OrganGestorEntity> findByEntitatAndFiltreAndPareIdIn(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,
+			@Param("pareIds") List<Long> pareIds);
+
+	@Query("select " +
+			"    og.id " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (og.pare.id in (:pareIds) " +
+			"     or og.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.id in (:pareIds) " +
+			"     or og.pare.pare.pare.pare.id in (:pareIds))")
+	public List<Long> findFillsIds(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("pareIds") List<Long> pareIds);
+
 	@Query("from " +
-   		 "    OrganGestorEntity og " +
-   		 " where " +
-   		 "     (og.entitat = :entitat)" + 
-   		 " 	and og.id in (:ids)")
+			"    OrganGestorEntity og " +
+			" where " +
+			"    (og.entitat = :entitat) " + 
+			"and og.id in (:ids)")
 	public List<OrganGestorEntity> findByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
 
-	  @Query( "select og.id " + 
-	      "from " +
-	      "    OrganGestorEntity og " +
-	      "where og.codi in (:codi)")
+	@Query(	"select og.id " + 
+			"from " +
+			"    OrganGestorEntity og " +
+			"where" +
+			"    og.codi in (:codi)")
 	public List<Long> findIdsByCodiDir3List(List<String> codi);
-	  
 
-  
 }
-

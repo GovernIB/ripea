@@ -43,7 +43,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document

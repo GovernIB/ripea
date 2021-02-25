@@ -55,7 +55,7 @@ import es.caib.ripea.war.helper.RolHelper;
 public class MetaExpedientController extends BaseAdminController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "MetaExpedientController.session.filtre";
-	
+
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
@@ -70,13 +70,11 @@ public class MetaExpedientController extends BaseAdminController {
 		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
-		
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		return "metaExpedientList";
 	}
-
 
 	@RequestMapping(value = "/filtrar", method = RequestMethod.POST)
 	public String post(
@@ -90,7 +88,6 @@ public class MetaExpedientController extends BaseAdminController {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE);
-
 		} else {
 			if (!bindingResult.hasErrors()) {
 				RequestSessionHelper.actualitzarObjecteSessio(
@@ -101,13 +98,12 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		return "redirect:../metaExpedient";
 	}
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
@@ -115,8 +111,6 @@ public class MetaExpedientController extends BaseAdminController {
 				filtreCommand.asDto(),
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
-
-
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
 		return dtr;
 	}
@@ -144,13 +138,11 @@ public class MetaExpedientController extends BaseAdminController {
 		command.setRolAdminOrgan(RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
-
 		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = null;
 		if (metaExpedientId != null)
 			carpetes = metaExpedientService.findArbreCarpetesMetaExpedient(entitatActual.getId(), metaExpedientId);
 		else
 			carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
-		
 		model.addAttribute("carpetes", carpetes);
 		fillFormModel(
 				request,
@@ -206,7 +198,7 @@ public class MetaExpedientController extends BaseAdminController {
 				entitatActual.getId(),
 				metaExpedientCarpetaId);
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
@@ -219,8 +211,6 @@ public class MetaExpedientController extends BaseAdminController {
 			fillFormModel(request, dto, model);
 			return "metaExpedientForm";
 		}
-		
-				
 		if (command.getId() != null) {
 			metaExpedientService.update(entitatActual.getId(), dto);
 			return getModalControllerReturnValueSuccess(
@@ -248,7 +238,7 @@ public class MetaExpedientController extends BaseAdminController {
 		fillFormModel(request, metaExpedient, model);
 		if (RolHelper.isRolActualAdministrador(request)) {
 			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
-		}else {
+		} else {
 			model.addAttribute(
 					"organsGestors",
 					organGestorService.findAccessiblesUsuariActual(
@@ -323,8 +313,7 @@ public class MetaExpedientController extends BaseAdminController {
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 	
-	
-	@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> findPerLectura(
 			HttpServletRequest request,
@@ -351,8 +340,7 @@ public class MetaExpedientController extends BaseAdminController {
 				organId, 
 				null);
 		return metaExpedientsPermisLectura;
-	}
-	
+	}*/
 
 	private MetaExpedientFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -366,13 +354,11 @@ public class MetaExpedientController extends BaseAdminController {
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
 		}
-
 		return filtreCommand;
 	}
-	
+
 	private void fillFormModel(HttpServletRequest request, MetaExpedientDto dto, Model model) {
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
-		
 		boolean hasOrganGestor = dto != null ? dto.getOrganGestor() != null : false;
 		model.addAttribute("hasOrganGestor", hasOrganGestor);
 	}

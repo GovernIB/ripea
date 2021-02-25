@@ -46,9 +46,33 @@
 				<th data-col-name="principalNom">
 					<spring:message code="organgestor.permis.columna.principal"/>
 				</th>
-				<th data-col-name="administration" data-template="#cellAdministrationTemplate" width="5%">
+				<th data-col-name="create" data-template="#cellPermisCreateTemplate">
+					<spring:message code="organgestor.permis.columna.creacio"/>
+					<script id="cellPermisCreateTemplate" type="text/x-jsrender">
+						{{if create}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="read" data-template="#cellPermisReadTemplate">
+					<spring:message code="organgestor.permis.columna.consulta"/>
+					<script id="cellPermisReadTemplate" type="text/x-jsrender">
+						{{if read}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="write" data-template="#cellPermisWriteTemplate">
+					<spring:message code="organgestor.permis.columna.modificacio"/>
+					<script id="cellPermisWriteTemplate" type="text/x-jsrender">
+						{{if write}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="delete" data-template="#cellPermisDeleteTemplate">
+					<spring:message code="organgestor.permis.columna.eliminacio"/>
+					<script id="cellPermisDeleteTemplate" type="text/x-jsrender">
+						{{if delete}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="administration" data-template="#cellPermisAdministrationTemplate" width="5%">
 					<spring:message code="organgestor.permis.columna.administracio"/>
-					<script id="cellAdministrationTemplate" type="text/x-jsrender">
+					<script id="cellPermisAdministrationTemplate" type="text/x-jsrender">
  						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
@@ -59,6 +83,7 @@
 								<span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span>
  							</button> 
 							<ul class="dropdown-menu">
+								<li><a href="permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="entitat.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
  							</ul>
  						</div>

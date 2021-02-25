@@ -96,7 +96,6 @@ public class OrganGestorPermisController extends BaseUserController {
 			command = PermisOrganGestorCommand.asCommand(permis);
 		else
 			command = new PermisOrganGestorCommand(organId);
-
 		model.addAttribute("permisOrganGestorCommand", command);
 		return "organGestorPermisForm";
 	}

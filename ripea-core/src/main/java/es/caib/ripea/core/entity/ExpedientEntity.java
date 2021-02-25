@@ -147,7 +147,7 @@ public class ExpedientEntity extends NodeEntity {
 	@JoinColumn(name = "expedient_estat_id")
 	@ForeignKey(name = "ipa_expestat_expedient_fk")
 	private ExpedientEstatEntity expedientEstat;
-	
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "ipa_expedient_seguidor",
@@ -160,13 +160,21 @@ public class ExpedientEntity extends NodeEntity {
 			inverseName = "ipa_persona_expseguidor_fk")
 	protected List<UsuariEntity> seguidors = new ArrayList<UsuariEntity>();
 	
-	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "grup_id")
 	@ForeignKey(name = "ipa_grup_expedient_fk")
 	private GrupEntity grup;
-	
-	
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "organ_gestor_id")
+    @ForeignKey(name = "ipa_organ_gestor_exp_fk")
+    private OrganGestorEntity organGestor;
+
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
 
 	public GrupEntity getGrup() {
 		return grup;
@@ -254,6 +262,9 @@ public class ExpedientEntity extends NodeEntity {
 	}
 	public MetaExpedientEntity getMetaExpedient() {
 		return (MetaExpedientEntity)getMetaNode();
+	}
+	public OrganGestorEntity getOrganGestor() {
+		return organGestor;
 	}
 
 	public void update(
@@ -351,7 +362,8 @@ public class ExpedientEntity extends NodeEntity {
 			String ntiVersion,
 			String ntiOrgano,
 			Date ntiFechaApertura,
-			String ntiClasificacionSia) {
+			String ntiClasificacionSia,
+			OrganGestorEntity organGestor) {
 		return new Builder(
 				nom,
 				metaExpedient,
@@ -360,7 +372,8 @@ public class ExpedientEntity extends NodeEntity {
 				ntiVersion,
 				ntiOrgano,
 				ntiFechaApertura,
-				ntiClasificacionSia);
+				ntiClasificacionSia,
+				organGestor);
 	}
 
 	public static class Builder {
@@ -373,7 +386,8 @@ public class ExpedientEntity extends NodeEntity {
 				String ntiVersion,
 				String ntiOrgano,
 				Date ntiFechaApertura,
-				String ntiClasificacionSia) {
+				String ntiClasificacionSia,
+				OrganGestorEntity organGestor) {
 			built = new ExpedientEntity();
 			built.nom = nom;
 			built.metaNode = metaExpedient;
@@ -385,6 +399,7 @@ public class ExpedientEntity extends NodeEntity {
 			built.ntiOrgano = ntiOrgano;
 			built.ntiFechaApertura = ntiFechaApertura;
 			built.ntiClasificacionSia = ntiClasificacionSia;
+			built.organGestor = organGestor;
 			built.estat = ExpedientEstatEnumDto.OBERT;
 			built.tipus = ContingutTipusEnumDto.EXPEDIENT;
 		}
@@ -413,7 +428,8 @@ public class ExpedientEntity extends NodeEntity {
 				"ntiIdentificador: " + this.ntiIdentificador + ", " +
 				"ntiOrgano: " + this.ntiOrgano + ", " +
 				"ntiFechaApertura: " + this.ntiFechaApertura + ", " +
-				"ntiClasificacionSia: " + this.ntiClasificacionSia + "]";
+				"ntiClasificacionSia: " + this.ntiClasificacionSia +
+				"organGestor: " + this.organGestor + "]";
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

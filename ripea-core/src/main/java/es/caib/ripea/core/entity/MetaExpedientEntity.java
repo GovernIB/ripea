@@ -77,6 +77,9 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     @JoinColumn(name = "organ_gestor_id")
     @ForeignKey(name = "ipa_organ_gestor_metaexp_fk")
     private OrganGestorEntity organGestor;
+
+    @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
+    protected Set<MetaExpedientOrganGestorEntity> metaExpedientOrganGestors;
     
     @Column(name = "gestio_amb_grups_activa", nullable = false)
     private boolean gestioAmbGrupsActiva;

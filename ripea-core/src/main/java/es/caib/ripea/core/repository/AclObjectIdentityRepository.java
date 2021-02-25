@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,14 +24,15 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 	@Query(	"select distinct " +
 			"    oi.objectId " +
 			"from " +
-			"    AclObjectIdentityEntity oi JOIN oi.entries entry " +
+			"    AclObjectIdentityEntity oi join oi.entries entry " +
 			"where " +
 			"      oi.classname.classname = :classname   " +
 			" and  entry.sid in (:sids)   " +
 			" and  entry.mask = :mask   " +
 			" and  entry.granting = true   ")
-	public List<Long> findObjectsWithPermissions(
+	public List<Serializable> findObjectsWithPermissions(
 			@Param("classname") String classname, 
 			@Param("sids") List<AclSidEntity> sids, 
 			@Param("mask") Integer mask);
+
 }

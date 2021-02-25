@@ -31,9 +31,7 @@ import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.HistoricService;
-import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.historic.HistoricApiResponse;
@@ -41,22 +39,14 @@ import es.caib.ripea.war.historic.serializers.DAOHistoric;
 import es.caib.ripea.war.historic.serializers.HistoricEntitatSerializer.RegistreEntitat;
 import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RegistreOrganGestor;
 import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RegistresOrganGestor;
-import lombok.extern.slf4j.Slf4j;
 
 @Controller
-@Slf4j
 @RequestMapping("api/historic")
 @Api(value="/rest/historic", description="API de consulta dels històrics d'ús de l'aplicació")
 public class ApiHistoricController extends BaseAdminController {
 
 	@Autowired
 	private HistoricService historicService;
-
-	@Autowired
-	private OrganGestorService organGestorService;
-
-	@Autowired
-	private AplicacioService aplicacioService;
 	
 //	@RequestMapping(value = "/generate", method = RequestMethod.GET, produces = "application/json")
 //	public String generate() {

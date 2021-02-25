@@ -19,8 +19,13 @@
 	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" data-botons-template="#tableButtonsTemplate" class="table table-striped table-bordered" style="width:100%">
 		<thead>
 			<tr>
+				<th data-col-name="ambOrganGestor" data-visible="false"></th>
+				<th data-col-name="organGestorId" data-visible="false"></th>
 				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="metaexpedient.permis.columna.tipus"/></th>
 				<th data-col-name="principalNom"><spring:message code="metaexpedient.permis.columna.principal"/></th>
+				<c:if test="${empty metaExpedient.organGestor}"> 
+					<th data-col-name="organGestorNom"><spring:message code="metaexpedient.permis.columna.organ.gestor"/></th>
+				</c:if>
 				<th data-col-name="create" data-template="#cellPermisCreateTemplate">
 					<spring:message code="metaexpedient.permis.columna.creacio"/>
 					<script id="cellPermisCreateTemplate" type="text/x-jsrender">
@@ -51,7 +56,11 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								{{if !ambOrganGestor}}
 								<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{else}}
+								<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete?organGestorId={{:organGestorId}}" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{/if}}
 							</ul>
 						</div>
 					</script>

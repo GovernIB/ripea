@@ -21,6 +21,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
 /**
@@ -36,7 +37,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			ContingutEntity pare,
 			String nom,
 			int esborrat);
-	
+
 	List<ExpedientEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 
@@ -45,7 +46,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			MetaNodeEntity metaNode,
 			int any,
 			long sequencia);
-	
+
 	@Query(	"from" +
 			"    ExpedientEntity e "
 			+ "where "
@@ -56,8 +57,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("numero") String numero);
-	
-	
+
 	@Query(	"from" +
 			"    ExpedientEntity e "
 			+ "where "
@@ -66,8 +66,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	ExpedientEntity findByEntitatAndNumero(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("numero") String numero);
-	
-	
+
 	@Query(	"select "
 			+ "e.relacionatsAmb from" +
 			"    ExpedientEntity e "
@@ -75,21 +74,23 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			+ " e = :expedient")
 	List<ExpedientEntity> findExpedientsRelacionats(
 			@Param("expedient") ExpedientEntity expedient);
-	
-	
-	
-	
-	
 
-	@Query(	"from" +
-			"    ExpedientEntity e " +
+	@Query(	"select " +
+			"    distinct e " +
+			"from" +
+			"    ExpedientEntity e left join e.organGestorPares eogp " +
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
+			"and (" +
+			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and eogp.metaExpedientOrganGestor.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogp.metaExpedientOrganGestor.id in (:metaExpedientOrganIdPermesos))) " +
+			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
+			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
@@ -112,11 +113,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
 			"and (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser)))) "
 			)
-	Page<ExpedientEntity> findByEntitatAndFiltre(
+	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
+			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
+			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
+			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos, 
+			@Param("organIdPermesos") List<Long> organIdPermesos,
+			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
+			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
-			@Param("metaNode") MetaNodeEntity metaNode,	
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("esNullOrganGestor") boolean esNullOrganGestor,
+			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullNom") boolean esNullNom,
@@ -148,10 +156,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			Pageable pageable);
-	
-	
-	
-	
 
 	@Query(	"select" +
 			"    e.id " +
@@ -215,12 +219,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode);
-	
-	
 
-	
-	
-	
 	@Query(	"select " +
 			"    e " +
 			"from " +
@@ -248,7 +247,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			Pageable pageable);
-	
+
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
@@ -275,7 +274,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
-	
+
 //	@Query(	"select" +
 //			"    count(e) " +
 //			"from" +
@@ -285,7 +284,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 //			"and e.metaNode = :metaNode ")
 //	int findByMetaExpedientAndAlertesNotEmpty(
 //			@Param("metaNode") MetaNodeEntity metaNode);
-	
+
 	@Query(	"select" +
 			"    new es.caib.ripea.core.aggregation.MetaExpedientCountAggregation( " +
 			"	     e.metaExpedient, " +
@@ -298,8 +297,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"group by" +
 			"  e.metaExpedient ")
 	List<MetaExpedientCountAggregation> countByAlertesNotEmptyGroupByMetaExpedient();
-	
-	
+
 	@Query(	"select " +
 			"    e " +
 			"from " +
@@ -346,9 +344,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			Pageable pageable);
-	
-	
-	
+
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
@@ -394,10 +390,5 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
-	
-	
 
-	
-	
-	
 }

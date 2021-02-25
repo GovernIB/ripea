@@ -18,6 +18,10 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 <script type="text/javascript">
+var metaExpedientOrgan = {};
+<c:forEach var="metaExpedient" items="${metaExpedients}">
+<c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${metaExpedient.organGestor.nom}'};</c:if>
+</c:forEach>
 function refrescarSequencia() {
 	let metaExpedientId = $('#metaNodeId').val();
 	let any = $('input#any').val();
@@ -70,11 +74,9 @@ function recuperarDominisMetaExpedient() {
 	}
 }
 
-
 function refrescarGrups() {
 	let metaExpedientId = $('#metaNodeId').val();
 	if (metaExpedientId != undefined && metaExpedientId != "") {
-
 		if (id != undefined && id != "") {
 			$.ajax({
 				type: 'GET',
@@ -82,7 +84,6 @@ function refrescarGrups() {
 				success: function(data) {
 					$('#gestioAmbGrupsActiva').val(data);
 					if (data) {
-						
 						$.ajax({
 							type: 'GET',
 							url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
@@ -94,34 +95,49 @@ function refrescarGrups() {
 								}
 							}
 						});
-						
 					} else {
 						$('#grupId option[value!=""]').remove();
 						$('#grupId').closest('.form-group').hide();
 					}
-	
 				}
 			});
-			
 		} else {
 			$('#grupId').prop('disabled', 'disabled');
 		}
 	}
-	
 }
 
+function refrescarOrgan() {
+	const metaExpedientId = $('#metaNodeId').val();
+	const organ = metaExpedientOrgan[metaExpedientId];
+	if (organ) {
+		$('#organFixed').show();
+		$('#organSelect').hide();
+		$('#organFixedNom').text(organ.nom);
+		$('#organFixedNom').after($('<input>').attr({
+		    type: 'hidden',
+		    name: 'organGestorId',
+		    value: organ.id
+		}));
+	} else {
+		$('#organFixed').hide();
+		$('#organSelect').show();
+		$('input', $('#organFixedNom').parent()).remove();
+	}
+}
 
 $(document).ready(function() {
 	$('select#metaNodeId').change(function(event) {
 		refrescarSequencia();
 		refrescarGrups();
+		refrescarOrgan();
 	});
-	refrescarSequencia();
-	refrescarGrups();
-	
 	$('input#any').change(function(event) {
 		refrescarSequencia();
 	});
+	refrescarSequencia();
+	refrescarGrups();
+	refrescarOrgan();
 	$('input#any').trigger('change');
 });
 </script>
@@ -131,7 +147,6 @@ $(document).ready(function() {
 		<c:when test="${empty expedientCommand.id}"><c:set var="formAction"><rip:modalUrl value="/expedient/new"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientCommand.id}/update"/></c:set></c:otherwise>
 	</c:choose>
-	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -145,13 +160,16 @@ $(document).ready(function() {
 				<form:hidden path="metaNodeId"/>
 			</c:otherwise>
 		</c:choose>
+		<div id="organFixed">
+			<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"><span id="organFixedNom"></span></rip:inputFixed>
+		</div>
+		<div id="organSelect">
+			<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"/>
+		</div>
 		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 		<form:hidden path="gestioAmbGrupsActiva"/>
-		
 		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
-		
-		
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
