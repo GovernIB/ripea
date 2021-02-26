@@ -293,12 +293,20 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDadaPermisLectura/domini", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getDominiMetaExpedientPermisLectura(
+	public List<DominiDto> getDominiMetaExpedientPermisLectura(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId){
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaExpedientDto metaExpedientDto = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
 		List<DominiDto> dominis = dominiService.findByMetaNodePermisLecturaAndTipusDomini(entitatActual.getId(), metaExpedientDto);		
+		return dominis;
+	}
+	
+	@RequestMapping(value = "/metaDadaPermisLectura/domini", method = RequestMethod.GET)
+	@ResponseBody
+	public List<DominiDto> getDominisEntitatPermisLectura(HttpServletRequest request){
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
 	}
 

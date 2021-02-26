@@ -313,7 +313,7 @@ public class MetaExpedientController extends BaseAdminController {
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 	
-	/*@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
+	@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> findPerLectura(
 			HttpServletRequest request,
@@ -340,7 +340,7 @@ public class MetaExpedientController extends BaseAdminController {
 				organId, 
 				null);
 		return metaExpedientsPermisLectura;
-	}*/
+	}
 
 	private MetaExpedientFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {

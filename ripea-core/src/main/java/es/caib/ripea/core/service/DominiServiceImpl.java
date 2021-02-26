@@ -184,10 +184,10 @@ public class DominiServiceImpl implements DominiService {
 				false,
 				false, false);
 
-		List<DominiEntity> tipusDocumentals = dominiRepository.findByEntitatOrderByNomAsc(entitat);
+		List<DominiEntity> dominis = dominiRepository.findByEntitatOrderByNomAsc(entitat);
 
 		List<DominiDto> dominisDto = conversioTipusHelper.convertirList(
-				tipusDocumentals,
+				dominis,
 				DominiDto.class);
 		return dominisDto;
 	}

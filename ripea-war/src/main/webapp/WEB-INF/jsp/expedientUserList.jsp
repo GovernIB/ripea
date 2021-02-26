@@ -161,25 +161,23 @@ $(document).ready(function() {
 			}
 		}
 		counter++;
-
-		//select dominis a partir de metaexpedient
-		var dominisRefresh = function(data) {	
-			$('#metaExpedientDominiCodi').empty();
-			$('#metaExpedientDominiCodi').append("<option value=\"\"></option>");
-			for (var i = 0; i < data.length; i++) {
-				$('#metaExpedientDominiCodi').append('<option value="' + data[i].codi + '">' + data[i].nom + '</option>');
-			}
-		};
-		if (metaExpedientId) {
-			var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDadaPermisLectura/domini"/>';
-			$.get(multipleUrl)
-			.done(dominisRefresh)
-			.fail(function() {
-				alert("<spring:message code="error.jquery.ajax"/>");
-			});
-		}
-		
 	});
+
+	var multipleUrl = '<c:url value="/metaExpedient/metaDadaPermisLectura/domini"/>';
+	$.get(multipleUrl)
+		.done(function(data) {
+			var campDomini = $('#metaExpedientDominiCodi');
+			campDomini.empty();
+			campDomini.append("<option value=\"\"></option>");
+			for (var i = 0; i < data.length; i++) {
+				campDomini.append('<option value="' + data[i].codi + '">' + data[i].nom + '</option>');
+			}
+		})
+		.fail(function(e) {
+			console.log(e);
+			alert("<spring:message code="error.jquery.ajax"/>");
+		});
+						
 	$('#metaExpedientId').trigger('change');
 	
 	let pageSizeDominis = 20;		

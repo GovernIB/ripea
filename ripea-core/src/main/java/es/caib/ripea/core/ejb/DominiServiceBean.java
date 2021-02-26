@@ -77,7 +77,7 @@ public class DominiServiceBean implements DominiService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom"})
 	public List<DominiDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegate.findByEntitat(entitatId);
