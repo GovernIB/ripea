@@ -971,6 +971,7 @@ public class PluginHelper {
 								null,
 								contingutPare.getArxiuUuid(),
 								document.getNom(),
+								document.getDescripcio(),
 								document.getMetaDocument().getNom(),
 								false,
 								fitxer,
@@ -1004,6 +1005,7 @@ public class PluginHelper {
 								document.getArxiuUuid(),
 								contingutPare.getArxiuUuid(),
 								document.getNom(),
+								document.getDescripcio(),
 								document.getMetaDocument().getNom(),
 								document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
 								fitxer,
@@ -1388,6 +1390,7 @@ public class PluginHelper {
 							document.getArxiuUuid(),
 							document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
 							document.getNom(),
+							document.getDescripcio(),
 							document.getMetaDocument().getNom(),
 							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
 							fitxerAmbFirma,
@@ -1511,6 +1514,7 @@ public class PluginHelper {
 					document.getArxiuUuid(),
 					document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
 					document.getNom(),
+					document.getDescripcio(),
 					document.getMetaDocument().getNom(),
 					document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
 					fitxer,
@@ -4121,6 +4125,7 @@ public class PluginHelper {
 			String documentUuid,
 			String expedientUuid,
 			String nom,
+			String descripcio,
 			String tipusDocumentNom,
 			boolean documentImportat,
 			FitxerDto fitxer,
@@ -4140,6 +4145,7 @@ public class PluginHelper {
 		String fitxerExtensio = null;
 		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
 		document.setNom(documentNomInArxiu);
+		document.setDescripcio(descripcio);
 		document.setIdentificador(documentUuid);
 		DocumentMetadades metadades = new DocumentMetadades();
 		if (fitxer != null && fitxer.getNomFitxerFirmat() != null) {
