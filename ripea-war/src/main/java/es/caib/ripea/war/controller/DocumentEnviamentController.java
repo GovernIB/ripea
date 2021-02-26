@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -74,9 +75,10 @@ public class DocumentEnviamentController extends BaseUserController {
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private ContingutService contingutService;
-	
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private DadesExternesService dadesExternesService;
 
 	@RequestMapping(value = "/{documentId}/notificar", method = RequestMethod.GET)
 	public String notificarGet(
@@ -553,9 +555,26 @@ public class DocumentEnviamentController extends BaseUserController {
 				ObjectMapper mapper = new ObjectMapper();
 				String notificacions = mapper.writeValueAsString(command.getEnviaments());
 				model.addAttribute("notificacions", notificacions);
+				ombleDadesAdresa(request, model);
 			}
 		}
 		return document.getExpedientPare();
+	}
+	
+	private void ombleDadesAdresa(HttpServletRequest request, Model model) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String paisos = mapper.writeValueAsString(dadesExternesService.findPaisos());
+			model.addAttribute("paisos", paisos);
+		} catch (Exception e) {
+			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.paisos.error"));
+		}
+		try {
+			String provincies = mapper.writeValueAsString(dadesExternesService.findProvincies());
+			model.addAttribute("provincies", provincies);
+		} catch (Exception e) {
+			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.provincies.error"));
+		}
 	}
 
 	private void emplenarModelPublicacio(

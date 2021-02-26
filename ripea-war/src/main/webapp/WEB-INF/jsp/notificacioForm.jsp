@@ -69,7 +69,9 @@ var interessatTipusEnum = [];
 
 $(document).ready(function() {
 	let parentIframe = window.frameElement;
-	let idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+	let idModal;
+	if (parentIframe != null)
+		idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
 	
 	$('form').on('submit', function(){
 		window.parent.addLoading(idModal);
@@ -98,6 +100,13 @@ $(document).ready(function() {
 
 		mostrarNotificacions(notificacionsSeleccionades);
 	});
+	$('#entregaPostal').on('change', function() {
+		if ($(this).is(':checked')) {
+			$('.entrega_postal').removeClass('hidden');
+		} else {
+			$('.entrega_postal').addClass('hidden');
+		}
+	})
 	$('#interessatsIds').trigger('change');
 });
 
@@ -170,6 +179,7 @@ function mostrarNotificacions(notificacions) {
 				'</div> \
 			</div>' +
 			setDestinatari(notificacio) +
+			setEntregaPostal(notificacio) +
 		'</div>';
 			
 		notificacio_div = replaceAll(notificacio_div, "#num_notificacio#", index);
@@ -240,6 +250,97 @@ function setDestinatari(notificacio) {
 	} else {
 		return '';
 	}
+}
+
+function setEntregaPostal(notificacio) {
+	var paisNom, provinciaNom, municipiNom;
+	var paisos = eval(${paisos});
+	var provincies = eval(${provincies});
+
+	$(paisos).each(function(index, pais) {
+		//if selected
+		if (pais.codi == notificacio.titular.pais) {
+    		paisNom = pais.nom
+		}
+    });
+	
+	$(provincies).each(function(index, provincia) {
+		//if selected
+		if (provincia.codi == notificacio.titular.provincia) {
+    		provinciaNom = provincia.nom
+    		$.ajax({
+				type: 'GET',
+				url: "<c:url value="/expedient/municipis/"/>" + provincia.codi,
+				async: false,
+				success: function(municipis) {
+					if (municipis && municipis.length > 0) {
+						municipis.forEach(function(municipi) {
+							if(municipi.codi == notificacio.titular.municipi) {
+								municipiNom = municipi.nom
+							}
+						})
+					}
+				}
+			});
+		}
+    });
+	
+	return '<!---------------------------------------  ENTREGA POSTAL  ---------------------------------------> \
+			<div class="entrega_postal hidden"> \
+				<div class="col-md-12 title-envios"> \
+					<div class="title-container"> \
+						<label><spring:message code="enviament.label.entregapostal"/></label> \
+					</div> \
+					<hr/> \
+				</div> \
+				<div class="personaForm"> \
+					<!----  PAIS ----> \
+					<div class="col-md-6"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.paisNom"><spring:message code="notificacio.form.entregapostal.camp.pais"/></label> \
+							<div class="controls col-xs-8"> \
+								<input disabled="true" id="enviaments[#num_notificacio#].titular.paisNom" name="enviaments[#num_notificacio#].titular.paisNom" class="form-control " type="text" value="' + paisNom +'"> \
+							</div> \
+						</div> \
+					</div> \
+					<!----  PROVINCIA ----> \
+					<div class="col-md-6"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.provinciaNom"><spring:message code="notificacio.form.entregapostal.camp.provincia"/></label> \
+							<div class="controls col-xs-8"> \
+								<input disabled="true" id="enviaments[#num_notificacio#].titular.provinciaNom" name="enviaments[#num_notificacio#].titular.provinciaNom" class="form-control " type="text" value="' + provinciaNom +'"> \
+							</div> \
+						</div> \
+					</div> \
+					<!---- MUNICIPI ----> \
+					<div class="col-md-6"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.municipiNom"><spring:message code="notificacio.form.entregapostal.camp.municipi"/></label> \
+							<div class="controls col-xs-8"> \
+								<input disabled="true" id="enviaments[#num_notificacio#].titular.municipiNom" name="enviaments[#num_notificacio#].titular.municipiNom" class="form-control " type="text" value="' + municipiNom +'"> \
+							</div> \
+						</div> \
+					</div> \
+					<!---- POSTAL ----> \
+					<div class="col-md-6"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.codiPostal"><spring:message code="notificacio.form.entregapostal.camp.codipostal"/></label> \
+							<div class="controls col-xs-8"> \
+								<input disabled="true" id="enviaments[#num_notificacio#].titular.codiPostal" name="enviaments[#num_notificacio#].titular.codiPostal" class="form-control " type="text" value="' + (notificacio.titular.codiPostal != null ? notificacio.titular.codiPostal : "") +'"> \
+							</div> \
+						</div> \
+					</div> \
+					<!---- ADRECA ----> \
+					<div class="col-md-12"> \
+						<div class="form-group"> \
+							<label class="control-label col-xs-2 " for="enviaments[#num_notificacio#].titular.adresa"><spring:message code="notificacio.form.entregapostal.camp.adresa"/></label> \
+							<div class="controls col-xs-10"> \
+								<textarea disabled="true" id="enviaments[#num_notificacio#].titular.adresa" name="enviaments[#num_notificacio#].titular.adresa" class="form-control ">' + (notificacio.titular.adresa != null ? notificacio.titular.adresa : "") +'</textarea> \
+							</div> \
+						</div> \
+					</div> \
+				</div> \
+			</div>';
 }
 
 function getTipusInteressat(interessat) {
