@@ -5,6 +5,11 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<%
+pageContext.setAttribute(
+		"dadesUsuariActual",
+		es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
+%>
 <c:set var="titol">
 	<spring:message code="expedientPeticio.form.acceptar.titol" />
 </c:set>
@@ -17,11 +22,18 @@
 <link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
-<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>	
+<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+<style type="text/css">
+.fa-circle-o-notch {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+</style>
 <script>
 $(document).ready(function(){
 
-	if ('${accio}' == 'CREAR') {
+	if ('${accio}' != 'CREAR') {
 		$('#input-accio-crear').removeClass('hidden');
 		$('#input-accio-incorporar').addClass('hidden');
 	} else {
@@ -34,14 +46,21 @@ $(document).ready(function(){
 		$('#expedientId').select2('val', '', true);
 		$('#expedientId option[value!=""]').remove();
 		
+		$('#expedientId').next().find('span.select2-selection__arrow').addClass('fa fa-spin fa-circle-o-notch  fa-1x').removeClass('select2-selection__arrow');
+		
 		if (tipus != "") {
 			$.get("<c:url value="/expedientPeticio/expedients/"/>"+${entitatId}+"/"+tipus)
 			.done(function(data){
 				for (var i = 0; i < data.length; i++) {
-					$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					if (data[i].agafat && data[i].agafatPer.codi === '${dadesUsuariActual.codi}')
+						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					else
+						$('#expedientId').append('<option value="' + data[i].id + '" disabled>' + data[i].nom + '</option>');
 				}
+				$('#expedientId').next().find('span.fa-circle-o-notch').addClass('select2-selection__arrow').removeClass('fa fa-spin fa-circle-o-notch  fa-1x');
 			})
 			.fail(function() {
+				$('#expedientId').next().find('span.fa-circle-o-notch').addClass('select2-selection__arrow').removeClass('fa fa-spin fa-circle-o-notch  fa-1x');
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
 		}
