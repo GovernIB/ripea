@@ -176,11 +176,22 @@ public class IndexHelper {
 			float [] pointColumnWidths;
 			PdfPTable taulaDocuments;
 			if (!isRelacio) {
-				pointColumnWidths = new float[] {3f, 10f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
-				taulaDocuments = new PdfPTable(10);
+				if (isMostrarCampsAddicionals()) {
+					pointColumnWidths = new float[] {3f, 10f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
+					taulaDocuments = new PdfPTable(10);
+				} else {
+					pointColumnWidths = new float[] {3f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
+					taulaDocuments = new PdfPTable(9);
+				}
+				
 			} else {
-				pointColumnWidths = new float[] {12f, 12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
-				taulaDocuments = new PdfPTable(9);
+				if (isMostrarCampsAddicionals()) {
+					pointColumnWidths = new float[] {12f, 12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
+					taulaDocuments = new PdfPTable(9);
+				} else {
+					pointColumnWidths = new float[] {12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
+					taulaDocuments = new PdfPTable(8);
+				}
 			}
 			taulaDocuments.setWidthPercentage(100f);
 			taulaDocuments.setWidths(pointColumnWidths);
@@ -281,56 +292,56 @@ public class IndexHelper {
 //		Nº
 		String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
 		if (!isRelacio)
-			taulaDocuments.addCell(crearCellaContingut(nextVal, null));
+			taulaDocuments.addCell(crearCellaContingut(nextVal, false));
 		
 //		Nom document
 		String nom = document.getNom() != null ? document.getNom() : "";
-		taulaDocuments.addCell(crearCellaContingut(nom, null));
+		taulaDocuments.addCell(crearCellaContingut(nom, false));
 		
-		if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+		if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
 //			Nom natural
 			String tituloDoc = arxiuDetall.getMetadadesAddicionals().get("tituloDoc") != null ? arxiuDetall.getMetadadesAddicionals().get("tituloDoc").toString() : "";
-			taulaDocuments.addCell(crearCellaContingut(tituloDoc, null));
+			taulaDocuments.addCell(crearCellaContingut(tituloDoc, false));
 		}
 //		Descripció
 		String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
-		taulaDocuments.addCell(crearCellaContingut(descripcio, null));
+		taulaDocuments.addCell(crearCellaContingut(descripcio, false));
 		
 //		Tipus documental
 		String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
-		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null));
+		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, false));
 		
 //		Tipus document
 		String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
-		taulaDocuments.addCell(crearCellaContingut(tipusDocument, null));
+		taulaDocuments.addCell(crearCellaContingut(tipusDocument, false));
 
 //		Data creació
 		SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
 		String dataCreacio = document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "";
-		taulaDocuments.addCell(crearCellaContingut(dataCreacio, null));
+		taulaDocuments.addCell(crearCellaContingut(dataCreacio, false));
 		
-		
-		if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
-//			Enllaç csv
-			String csv = arxiuDetall.getMetadadesAddicionals().get("csv") != null ? getCsvUrl() + arxiuDetall.getMetadadesAddicionals().get("csv").toString() : null;
-			String csvLink = csv != null ? csv : "";
-			taulaDocuments.addCell(crearCellaContingut(csv, csvLink));
+//		Enllaç csv
+		String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
+		if (csv.isEmpty() && arxiuDetall != null && !arxiuDetall.getMetadadesAddicionals().isEmpty()) {
+			String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
+			csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
 		}
+		taulaDocuments.addCell(crearCellaContingut(csv, true));
 		
 //		Data captura
 		String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
-		taulaDocuments.addCell(crearCellaContingut(dataCaptura, null));	
+		taulaDocuments.addCell(crearCellaContingut(dataCaptura, false));	
 		
 //		Custodiat / Notificat
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
 		boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
 		
 		if (hasNotificacions) {
-			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.notificat"), null));
+			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.notificat"), false));
 		} else if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), null));
+			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), false));
 		} else {
-			taulaDocuments.addCell(crearCellaContingut("-", null));
+			taulaDocuments.addCell(crearCellaContingut("-", false));
 		}
 	}
 	
@@ -407,12 +418,13 @@ public class IndexHelper {
 		}
 	}
 
-	private void crearCapsaleraTaula(PdfPTable taulaDocuments, boolean isRelacio) {
+	private void crearCapsaleraTaula(PdfPTable taulaDocuments, boolean isRelacio) throws NoSuchFileException, IOException {
 		logger.debug("Generant la capçalera de la taula de documents");
 		if (!isRelacio)
 			taulaDocuments.addCell(crearCellaCapsalera("Nº"));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nom")));
-		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nomnatural")));
+		if (isMostrarCampsAddicionals())
+			taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nomnatural")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.descripcio")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocumental")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocument")));
@@ -435,7 +447,7 @@ public class IndexHelper {
 		return titolCell;
 	}
 	
-	private PdfPCell crearCellaContingut(String titol, String link) {
+	private PdfPCell crearCellaContingut(String titol, boolean isLink) {
 		PdfPCell titolCell = new PdfPCell();
 		String titolEnviamentMessage = titol;
 		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, frutiger6);
@@ -447,8 +459,8 @@ public class IndexHelper {
 		titolCell.addElement(titolParagraph);
 		titolCell.setPaddingBottom(6f);
 		titolCell.setBorderWidth((float) 0.5);
-		if (link != null) {
-			titolCell.setCellEvent(new LinkInCell(link));
+		if (titol != null && !titol.isEmpty() && isLink) {
+			titolCell.setCellEvent(new LinkInCell(titol));
 		}
 		return titolCell;
 	}
@@ -487,6 +499,10 @@ public class IndexHelper {
 	private String getCsvUrl() throws NoSuchFileException, IOException {
 		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.ripea.documents.validacio.url");
 		return filePath;
+	}
+	
+	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(IndexHelper.class);
