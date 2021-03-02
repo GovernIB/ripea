@@ -2100,6 +2100,8 @@ function showLoadingModal(message) {
 									data-toggle="datatable"
 									data-url="<c:url value="/expedientPeticio/${contingut.id}/datatable"/>"
 									data-paging-enabled="false"
+									data-default-order="3" 
+									data-default-dir="desc"
 									data-agrupar="5"
 									class="table table-bordered table-striped"
 									style="width:100%">
@@ -2107,6 +2109,7 @@ function showLoadingModal(message) {
 										<tr>
 											<th data-col-name="id" data-visible="false"></th>
 											<th data-col-name="registre.extracte" data-orderable="false" width="25%"><spring:message code="contingut.anotacions.columna.extracte"/></th>
+											<th data-col-name="registre.origenRegistreNumero" data-orderable="false" width="25%"><spring:message code="contingut.anotacions.columna.numero"/></th>
 											<th data-col-name="registre.data" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.anotacions.columna.data"/></th>
 											<th data-col-name="registre.destiDescripcio" data-orderable="false" width="25%"><spring:message code="contingut.anotacions.columna.destiDescripcio"/></th>
 	
