@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
-	<c:when test="${empty documentNotificacioCommand.id}"><c:set var="titol"><spring:message code="publicacio.form.titol.crear"/></c:set></c:when>
+	<c:when test="${empty documentPublicacioCommand.id}"><c:set var="titol"><spring:message code="publicacio.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="publicacio.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -22,10 +22,9 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/document/${documentPublicacioCommand.documentId}/publicar"/></c:set>
 	<c:choose>
 		<c:when test="${empty documentPublicacioCommand.id}"><c:set var="formAction"><rip:modalUrl value="/document/${documentPublicacioCommand.documentId}/publicar"/></c:set></c:when>
-		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/publicacio/${documentPublicacioCommand.id}"/></c:set></c:otherwise>
+		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/document/${documentPublicacioCommand.documentId}/publicacio/${documentPublicacioCommand.id}"/></c:set></c:otherwise>
 	</c:choose>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentPublicacioCommand" role="form">
 		<rip:inputHidden name="id"/>
