@@ -232,9 +232,6 @@
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
-				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
-				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
-				
 				<div class="form-group">
 					<label class="control-label col-xs-4" for="classificacioSia"><spring:message code="metaexpedient.form.camp.classificacio.sia"/> *</label>
 					<div class="col-xs-6">
@@ -244,7 +241,9 @@
 						<button id="importMetaExpedient" type="button" class="btn btn-info"><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
 					</div>
 				</div>
-								
+				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
+				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
+				
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
 				<c:if test="${not isRolAdminOrgan}">
 					<div class="form-group">
