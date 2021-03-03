@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.plugin.portafirmes;
 
+import java.util.List;
+
 /**
  * Document o annex per enviar al portafirmes.
  * 
@@ -14,6 +16,7 @@ public class PortafirmesDocument {
 	private String descripcio;
 	private boolean firmat;
 	private String arxiuNom;
+	private String arxiuMime;
 	private byte[] arxiuContingut;
 
 	private boolean custodiat;
@@ -21,7 +24,10 @@ public class PortafirmesDocument {
 	private String custodiaUrl;
 	private String arxiuUuid;
 	private String expedientUuid;
-
+	private String tipusFirma;
+	
+	private List<PortafirmesDocumentFirmant> firmants;
+	
 	public String getTitol() {
 		return titol;
 	}
@@ -45,6 +51,12 @@ public class PortafirmesDocument {
 	}
 	public void setArxiuNom(String arxiuNom) {
 		this.arxiuNom = arxiuNom;
+	}
+	public String getArxiuMime() {
+		return arxiuMime;
+	}
+	public void setArxiuMime(String arxiuMime) {
+		this.arxiuMime = arxiuMime;
 	}
 	public byte[] getArxiuContingut() {
 		return arxiuContingut;
@@ -82,7 +94,18 @@ public class PortafirmesDocument {
 	public void setExpedientUuid(String expedientUuid) {
 		this.expedientUuid = expedientUuid;
 	}
-	
+	public String getTipusFirma() {
+		return tipusFirma;
+	}
+	public void setTipusFirma(String tipusFirma) {
+		this.tipusFirma = tipusFirma;
+	}
+	public List<PortafirmesDocumentFirmant> getFirmants() {
+		return firmants;
+	}
+	public void setFirmants(List<PortafirmesDocumentFirmant> firmants) {
+		this.firmants = firmants;
+	}
 	public String getArxiuExtensio() {
 		int index = arxiuNom.lastIndexOf(".");
 		if (index != -1) {

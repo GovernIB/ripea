@@ -445,6 +445,48 @@ public class DocumentHelper {
 //		}
 		return fitxer;
 	}
+	
+	public FitxerDto getFitxerAssociatFirmat(
+			DocumentEntity document,
+			String versio) {
+		FitxerDto fitxer = null;
+		if (document.getArxiuUuid() != null) {
+			if (pluginHelper.isArxiuPluginActiu()) {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setNom(document.getFitxerNom());
+				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+						document,
+						null,
+						versio,
+						true,
+						false);
+				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_ARXIU,
+						"S'està intentant obtenir l'arxiu associat a un document pujat a l'arxiu i el plugin d'arxiu no està activat");
+			}
+		} else {
+			fitxer = new FitxerDto();
+			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						document.getGesDocFirmatId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+						streamAnnex);
+				fitxer.setContingut(streamAnnex.toByteArray());
+				fitxer.setNom(document.getNomFitxerFirmat());
+				fitxer.setContentType(document.getFitxerContentType());
+			} else {
+				fitxer.setNom(document.getFitxerNom());
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setContingut(document.getFitxerContingut());
+			}
+			
+		}
+		return fitxer;
+	}
 
 	@SuppressWarnings("incomplete-switch")
 	public byte[] getContingutFromArxiuDocument(Document arxiuDocument) {

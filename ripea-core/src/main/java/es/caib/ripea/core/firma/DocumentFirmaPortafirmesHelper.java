@@ -2,6 +2,8 @@ package es.caib.ripea.core.firma;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -13,6 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
@@ -48,6 +54,7 @@ import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.PortafirmesBlockInfoRepository;
 import es.caib.ripea.core.repository.PortafirmesBlockRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 
 @Component
@@ -345,10 +352,34 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					// Si el document no ha estat custodiat pel portafirmes
 					// actualitza la informació de firma a l'arxiu.
 					FitxerDto fitxer = new FitxerDto();
-					fitxer.setNom(document.getFitxerNom());
-					fitxer.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
-					fitxer.setContingut(portafirmesDocument.getArxiuContingut());
-					fitxer.setContentType("application/pdf");
+					ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
+					if (portafirmesDocument.getTipusFirma().equals("PAdES")) {
+						fitxer.setNom(document.getFitxerNom());
+						fitxer.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
+						fitxer.setContingut(portafirmesDocument.getArxiuContingut());
+						fitxer.setContentType("application/pdf");
+					} else {
+						fitxer = documentHelper.getFitxerAssociatFirmat(
+								document, 
+								null);
+						arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
+						arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
+						arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
+						arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+						arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+						
+						List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+						for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
+							ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+							detall.setData(firmant.getData());
+							detall.setEmissorCertificat(firmant.getEmissorCertificat());
+							detall.setResponsableNif(firmant.getResponsableNif());
+							detall.setResponsableNom(firmant.getResponsableNom());
+							detalls.add(detall);
+						}
+						arxiuFirma.setDetalls(detalls);
+						arxiuFirma.setAutofirma(true);
+					}
 					// Si no ha estat custodiat
 					if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
 						documentPortafirmes.updateProcessat(
@@ -366,11 +397,17 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						}
 					
 						try {
-						
-							String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
-									document,
-									fitxer);
-							
+							String custodiaDocumentId = null;
+							if (portafirmesDocument.getTipusFirma().equals("PAdES")) {
+								custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
+										document,
+										fitxer);
+							} else {
+								custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaCades(
+										document, 
+										fitxer, 
+										Arrays.asList(arxiuFirma));
+							}
 							document.updateInformacioCustodia(
 									new Date(),
 									custodiaDocumentId,

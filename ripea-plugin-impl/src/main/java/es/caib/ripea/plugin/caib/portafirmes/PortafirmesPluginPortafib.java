@@ -37,6 +37,7 @@ import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSigna
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureRequestWithSignBlockList;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignedFile;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSigner;
+import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignerInfo;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimpleJersey;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleBlock;
@@ -75,6 +76,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxEstat;
@@ -180,7 +182,20 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			
 			PortafirmesDocument downloadedDocument = new PortafirmesDocument();
 			downloadedDocument.setArxiuNom(fitxerDescarregat.getSignedFile().getNom());
+			downloadedDocument.setArxiuMime(fitxerDescarregat.getSignedFile().getMime());
 			downloadedDocument.setArxiuContingut(fitxerDescarregat.getSignedFile().getData());
+			downloadedDocument.setTipusFirma(fitxerDescarregat.getSignedFileInfo().getSignType());
+			
+			List<PortafirmesDocumentFirmant> firmants = new ArrayList<PortafirmesDocumentFirmant>();
+			for (FirmaAsyncSimpleSignerInfo signer: fitxerDescarregat.getSignedFileInfo().getSignersInfo()) {
+				PortafirmesDocumentFirmant firmant = new PortafirmesDocumentFirmant();
+				firmant.setData(signer.getSignDate());
+				firmant.setResponsableNif(signer.getEniSignerAdministrationId());
+				firmant.setResponsableNom(signer.getEniSignerName());
+				firmant.setEmissorCertificat(signer.getIssuerCert());
+				firmants.add(firmant);
+			}
+			downloadedDocument.setFirmants(firmants);
 			return downloadedDocument;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
