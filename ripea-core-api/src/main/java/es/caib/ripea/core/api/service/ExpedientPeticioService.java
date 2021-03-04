@@ -48,8 +48,10 @@ public interface ExpedientPeticioService {
 
 	RegistreDto findRegistreById(Long registreId);
 
-	List<ExpedientPeticioDto> findByExpedient(Long entitatId,
-			Long expedientId);
+	List<ExpedientPeticioDto> findByExpedientAmbFiltre(
+			Long entitatId,
+			Long expedientId,
+			PaginacioParamsDto paginacioParams);
 
 	ExpedientDto findByEntitatAndMetaExpedientAndExpedientNumero(Long entitatId,
 			Long metaExpedientId,

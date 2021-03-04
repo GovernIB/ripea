@@ -117,9 +117,11 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientPeticioDto> findByExpedient(Long entitatId,
-			Long expedientId) {
-		return delegate.findByExpedient(entitatId, expedientId);
+	public List<ExpedientPeticioDto> findByExpedientAmbFiltre(
+			Long entitatId,
+			Long expedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findByExpedientAmbFiltre(entitatId, expedientId, paginacioParams);
 	}
 
 	@Override

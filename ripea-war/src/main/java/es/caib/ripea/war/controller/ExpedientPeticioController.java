@@ -210,9 +210,10 @@ public class ExpedientPeticioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				expedientPeticioService.findByExpedient(
+				expedientPeticioService.findByExpedientAmbFiltre(
 						entitatActual.getId(),
-						expedientId));		
+						expedientId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
 	}
 
 	@RequestMapping(value = "/rebutjar/{expedientPeticioId}", method = RequestMethod.GET)

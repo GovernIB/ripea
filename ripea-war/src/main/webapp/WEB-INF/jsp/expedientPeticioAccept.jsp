@@ -94,12 +94,12 @@ $(document).ready(function(){
 
 		<rip:inputSelect name="metaExpedientId" textKey="expedientPeticio.form.acceptar.camp.metaExpedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true"
-			optionTextAttribute="nom"/>
+			optionTextAttribute="nom" optionMinimumResultsForSearch="6"/>
 			
 		<div id="input-accio-incorporar" class="hidden">
 			<rip:inputSelect name="expedientId"
 				textKey="expedientPeticio.form.acceptar.camp.expedient" required="true" 
-	 			optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" /> 
+	 			optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="6"/> 
 		</div>
 		<div id="input-accio-crear" class="hidden">
 			<rip:inputText name="newExpedientTitol" textKey="expedientPeticio.form.acceptar.camp.newExpedientTitol"

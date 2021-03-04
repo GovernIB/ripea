@@ -28,7 +28,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	
 	
 	List<ExpedientPeticioEntity> findByExpedient(
-			ExpedientEntity expedient);
+			ExpedientEntity expedient,
+			Pageable pageable);
 
 	@Query("from" +
 			"    ExpedientPeticioEntity e " +

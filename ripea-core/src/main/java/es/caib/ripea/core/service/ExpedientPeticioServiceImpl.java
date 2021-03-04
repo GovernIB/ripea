@@ -207,9 +207,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientPeticioDto> findByExpedient(
+	public List<ExpedientPeticioDto> findByExpedientAmbFiltre(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId,
+			PaginacioParamsDto paginacioParams) {
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -218,8 +219,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				false,
 				false);
-
-		return conversioTipusHelper.convertirList(expedientPeticioRepository.findByExpedient(expedient),
+		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByExpedient(
+				expedient, 
+				paginacioHelper.toSpringDataPageable(paginacioParams));
+		return conversioTipusHelper.convertirList(
+				peticions,
 				ExpedientPeticioDto.class);
 	}
 
