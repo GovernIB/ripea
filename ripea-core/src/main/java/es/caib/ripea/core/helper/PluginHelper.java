@@ -4708,7 +4708,7 @@ public class PluginHelper {
 			ntiTipoDocumental = documentArxiu.getMetadades().getTipusDocumentalAddicional();
 		}
 		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
-		String ntiCsv = null;
+		String ntiCsvFirma = null;
 		String ntiCsvRegulacion = null;
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
 			FirmaTipus firmaTipus = null;
@@ -4750,7 +4750,7 @@ public class PluginHelper {
 			for (Firma firma : documentArxiu.getFirmes()) {
 				if (firma.getTipus() == FirmaTipus.CSV) {
 					ntiCsvRegulacion = firma.getCsvRegulacio();
-					ntiCsv = firma.getContingut() != null ? new String(firma.getContingut()) : null;
+					ntiCsvFirma = firma.getContingut() != null ? new String(firma.getContingut()) : null;
 				}
 			}
 		}
@@ -4764,7 +4764,7 @@ public class PluginHelper {
 				ntiTipoDocumental,
 				documentArxiu.getMetadades().getIdentificadorOrigen(),
 				ntiTipoFirma,
-				ntiCsv,
+				ntiCsvFirma != null ? ntiCsvFirma : documentArxiu.getMetadades().getCsv(),
 				ntiCsvRegulacion);
 	}
 	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
