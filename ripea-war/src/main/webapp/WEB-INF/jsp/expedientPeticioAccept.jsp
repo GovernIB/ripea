@@ -33,7 +33,7 @@ pageContext.setAttribute(
 <script>
 $(document).ready(function(){
 
-	if ('${accio}' != 'CREAR') {
+	if ('${accio}' == 'CREAR') {
 		$('#input-accio-crear').removeClass('hidden');
 		$('#input-accio-incorporar').addClass('hidden');
 	} else {

@@ -293,7 +293,11 @@ public class EntityComprovarHelper {
 		if (HibernateHelper.isProxy(metaExpedient)) {
 			metaExpedient = HibernateHelper.deproxy(metaExpedient);
 		}
-		if (!entitat.equals(metaExpedient.getEntitat())) {
+		EntitatEntity metaExpedientEntitat = metaExpedient.getEntitat();
+		if (HibernateHelper.isProxy(metaExpedientEntitat)) {
+			metaExpedientEntitat = HibernateHelper.deproxy(metaExpedient.getEntitat());
+		}
+		if (!entitat.equals(metaExpedientEntitat)) {
 			throw new ValidationException(metaExpedientId, MetaExpedientEntity.class,
 			        "L'entitat especificada (id=" + entitat.getId()
 			                + ") no coincideix amb l'entitat del meta-expedient");
@@ -355,7 +359,14 @@ public class EntityComprovarHelper {
 		if (metaDocument == null) {
 			throw new NotFoundException(metaDocumentId, MetaDocumentEntity.class);
 		}
-		if (!entitat.equals(metaDocument.getEntitat())) {
+		if (HibernateHelper.isProxy(metaDocument)) {
+			metaDocument = HibernateHelper.deproxy(metaDocument);
+		}
+		EntitatEntity metaDocumentEntitat = metaDocument.getEntitat();
+		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
+			metaDocumentEntitat = HibernateHelper.deproxy(metaDocumentEntitat);
+		}
+		if (!entitat.equals(metaDocumentEntitat)) {
 			throw new ValidationException(metaDocumentId, MetaDocumentEntity.class,
 			        "L'entitat especificada (id=" + entitat.getId()
 			                + ") no coincideix amb l'entitat del meta-document");
@@ -375,7 +386,11 @@ public class EntityComprovarHelper {
 		if (metaDocument == null) {
 			throw new NotFoundException(id, MetaDocumentEntity.class);
 		}
-		if (!entitat.equals(metaDocument.getEntitat())) {
+		EntitatEntity metaDocumentEntitat = metaDocument.getEntitat();
+		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
+			metaDocumentEntitat = HibernateHelper.deproxy(metaDocumentEntitat);
+		}
+		if (!entitat.equals(metaDocumentEntitat)) {
 			throw new ValidationException(id, MetaDocumentEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
 		}

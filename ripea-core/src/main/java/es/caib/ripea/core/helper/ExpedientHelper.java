@@ -302,7 +302,7 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public DocumentEntity crearDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity;
 		ExpedientEntity expedientEntity;

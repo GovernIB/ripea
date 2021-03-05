@@ -94,7 +94,7 @@ public class ExpedientPeticioHelper {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public void canviEstatExpedientPeticio(
 			Long expedientPeticioId,
 			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
