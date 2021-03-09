@@ -24,13 +24,13 @@ public class MetaExpedientFiltreCommand {
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public void setClassificacioSia(String classificacioSia) {
-		this.classificacioSia = classificacioSia.trim();
+		this.classificacioSia = classificacioSia != null ? classificacioSia.trim() : null;
 	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;

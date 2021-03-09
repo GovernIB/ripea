@@ -46,25 +46,25 @@ public class ExpedientPeticioFiltreCommand {
 		return procediment;
 	}
 	public void setProcediment(String procediment) {
-		this.procediment = procediment.trim();
+		this.procediment = procediment != null ? procediment.trim() : null;
 	}
 	public String getNumero() {
 		return numero;
 	}
 	public void setNumero(String numero) {
-		this.numero = numero.trim();
+		this.numero = numero != null ? numero.trim() : null;
 	}
 	public String getExtracte() {
 		return extracte;
 	}
 	public void setExtracte(String extracte) {
-		this.extracte = extracte.trim();
+		this.extracte = extracte != null ? extracte.trim() : null;
 	}
 	public String getDestinacio() {
 		return destinacio;
 	}
 	public void setDestinacio(String destinacio) {
-		this.destinacio = destinacio.trim();
+		this.destinacio = destinacio != null ? destinacio.trim() : null;
 	}
 	public Date getDataInicial() {
 		return dataInicial;

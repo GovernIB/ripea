@@ -69,7 +69,7 @@ public class DadaCommand {
 		return valorText;
 	}
 	public void setValorText(String valorText) {
-		this.valorText = valorText.trim();
+		this.valorText = valorText != null ? valorText.trim() : null;
 	}
 	public Date getValorData() {
 		return valorData;

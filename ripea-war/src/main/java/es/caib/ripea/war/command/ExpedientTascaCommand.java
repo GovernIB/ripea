@@ -32,7 +32,7 @@ public class ExpedientTascaCommand {
 		return metaExpedientTascaDescripcio;
 	}
 	public void setMetaExpedientTascaDescripcio(String metaExpedientTascaDescripcio) {
-		this.metaExpedientTascaDescripcio = metaExpedientTascaDescripcio.trim();
+		this.metaExpedientTascaDescripcio = metaExpedientTascaDescripcio != null ? metaExpedientTascaDescripcio.trim() : null;
 	}
 	public Long getMetaExpedientTascaId() {
 		return metaExpedientTascaId;
@@ -44,7 +44,7 @@ public class ExpedientTascaCommand {
 		return responsableCodi;
 	}
 	public void setResponsableCodi(String responsableCodi) {
-		this.responsableCodi = responsableCodi.trim();
+		this.responsableCodi = responsableCodi != null ? responsableCodi.trim() : null;
 	}
 	public Date getDataInici() {
 		return dataInici;
@@ -62,7 +62,7 @@ public class ExpedientTascaCommand {
 		return comentari;
 	}
 	public void setComentari(String comentari) {
-		this.comentari = comentari.trim();
+		this.comentari = comentari != null ? comentari.trim() : null;
 	}
 	
 	public static ExpedientTascaCommand asCommand(ExpedientTascaDto dto) {

@@ -78,13 +78,13 @@ public class ContingutMassiuFiltreCommand {
 		return metaDada;
 	}
 	public void setMetaDada(String metaDada) {
-		this.metaDada = metaDada.trim();
+		this.metaDada = metaDada != null ? metaDada.trim() : null;
 	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public Date getDataInici() {
 		return dataInici;

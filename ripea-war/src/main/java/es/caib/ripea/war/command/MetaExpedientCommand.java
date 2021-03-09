@@ -72,27 +72,27 @@ public class MetaExpedientCommand {
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 
 	public void setClassificacioSia(String classificacioSia) {
-		this.classificacioSia = classificacioSia.trim();
+		this.classificacioSia = classificacioSia != null ? classificacioSia.trim() : null;
 	}
 
 	public void setSerieDocumental(String serieDocumental) {
-		this.serieDocumental = serieDocumental.trim();
+		this.serieDocumental = serieDocumental != null ? serieDocumental.trim() : null;
 	}
 
 	public void setExpressioNumero(String expressioNumero) {
-		this.expressioNumero = expressioNumero.trim();
+		this.expressioNumero = expressioNumero != null ? expressioNumero.trim() : null;
 	}
 
 	public void setOrganGestorId(Long organGestorId) {
@@ -124,7 +124,7 @@ public class MetaExpedientCommand {
 	}
 
 	public void setEstructuraCarpetesJson(String estructuraCarpetesJson) {
-		this.estructuraCarpetesJson = estructuraCarpetesJson.trim();
+		this.estructuraCarpetesJson = estructuraCarpetesJson != null ? estructuraCarpetesJson.trim() : null;
 	}
 
 	public MetaExpedientCommand(boolean isRolOrgan) {

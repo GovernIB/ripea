@@ -60,7 +60,7 @@ public class PortafirmesEnviarCommand {
 	}
 
 	public void setPortafirmesEnviarFluxId(String portafirmesEnviarFluxId) {
-		this.portafirmesEnviarFluxId = portafirmesEnviarFluxId.trim();
+		this.portafirmesEnviarFluxId = portafirmesEnviarFluxId != null ? portafirmesEnviarFluxId.trim() : null;
 	}
 
 	public String getPortafirmesFluxNom() {
@@ -68,7 +68,7 @@ public class PortafirmesEnviarCommand {
 	}
 
 	public void setPortafirmesFluxNom(String portafirmesFluxNom) {
-		this.portafirmesFluxNom = portafirmesFluxNom.trim();
+		this.portafirmesFluxNom = portafirmesFluxNom != null ? portafirmesFluxNom.trim() : null;
 	}
 
 	public String getPortafirmesFluxDescripcio() {
@@ -76,7 +76,7 @@ public class PortafirmesEnviarCommand {
 	}
 
 	public void setPortafirmesFluxDescripcio(String portafirmesFluxDescripcio) {
-		this.portafirmesFluxDescripcio = portafirmesFluxDescripcio.trim();
+		this.portafirmesFluxDescripcio = portafirmesFluxDescripcio != null ? portafirmesFluxDescripcio.trim() : null;
 	}
 
 	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
@@ -109,7 +109,7 @@ public class PortafirmesEnviarCommand {
 		return motiu;
 	}
 	public void setMotiu(String motiu) {
-		this.motiu = motiu.trim();
+		this.motiu = motiu != null ? motiu.trim() : null;
 	}
 	public PortafirmesPrioritatEnumDto getPrioritat() {
 		return prioritat;

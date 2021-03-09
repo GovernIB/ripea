@@ -19,7 +19,7 @@ public class ExpedientMassiuTancamentCommand {
 	}
 
 	public void setMotiu(String motiu) {
-		this.motiu = motiu.trim();
+		this.motiu = motiu != null ? motiu.trim() : null;
 	}
 
 

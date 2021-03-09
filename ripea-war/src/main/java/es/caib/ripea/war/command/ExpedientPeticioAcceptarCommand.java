@@ -52,7 +52,7 @@ public class ExpedientPeticioAcceptarCommand {
 		return newExpedientTitol;
 	}
 	public void setNewExpedientTitol(String newExpedientTitol) {
-		this.newExpedientTitol = newExpedientTitol.trim();
+		this.newExpedientTitol = newExpedientTitol != null ? newExpedientTitol.trim() : null;
 	}
 	public int getAny() {
 		return any;

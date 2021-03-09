@@ -32,19 +32,19 @@ public class MetaExpedientDominiCommand {
 		return codi;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public String getDescripcio() {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 
 	public static MetaExpedientDominiCommand asCommand(MetaExpedientDominiDto dto) {

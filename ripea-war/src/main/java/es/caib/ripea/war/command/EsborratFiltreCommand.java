@@ -28,13 +28,13 @@ public class EsborratFiltreCommand {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public String getUsuariCodi() {
 		return usuariCodi;
 	}
 	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi.trim();
+		this.usuariCodi = usuariCodi != null ? usuariCodi.trim() : null;
 	}
 	public Date getDataInici() {
 		return dataInici;

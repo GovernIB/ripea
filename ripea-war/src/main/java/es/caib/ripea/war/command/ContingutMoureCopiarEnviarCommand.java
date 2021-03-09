@@ -46,7 +46,7 @@ public class ContingutMoureCopiarEnviarCommand {
 		return comentariEnviar;
 	}
 	public void setComentariEnviar(String comentariEnviar) {
-		this.comentariEnviar = comentariEnviar.trim();
+		this.comentariEnviar = comentariEnviar != null ? comentariEnviar.trim() : null;
 	}
 
 	@Override

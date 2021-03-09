@@ -130,31 +130,31 @@ public class InteressatCommand  {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public String getLlinatge1() {
 		return llinatge1;
 	}
 	public void setLlinatge1(String llinatge1) {
-		this.llinatge1 = llinatge1.trim();
+		this.llinatge1 = llinatge1 != null ? llinatge1.trim() : null;
 	}
 	public String getLlinatge2() {
 		return llinatge2;
 	}
 	public void setLlinatge2(String llinatge2) {
-		this.llinatge2 = llinatge2.trim();
+		this.llinatge2 = llinatge2 != null ? llinatge2.trim() : null;
 	}
 	public String getRaoSocial() {
 		return raoSocial;
 	}
 	public void setRaoSocial(String raoSocial) {
-		this.raoSocial = raoSocial.trim();
+		this.raoSocial = raoSocial != null ? raoSocial.trim() : null;
 	}
 	public String getOrganCodi() {
 		return organCodi;
 	}
 	public void setOrganCodi(String organCodi) {
-		this.organCodi = organCodi.trim();
+		this.organCodi = organCodi != null ? organCodi.trim() : null;
 	}
 	public InteressatDocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
@@ -172,55 +172,55 @@ public class InteressatCommand  {
 		return documentNum;
 	}
 	public void setDocumentNum(String documentNum) {
-		this.documentNum = documentNum.trim();
+		this.documentNum = documentNum != null ? documentNum.trim() : null;
 	}
 	public String getPais() {
 		return pais;
 	}
 	public void setPais(String pais) {
-		this.pais = pais.trim();
+		this.pais = pais != null ? pais.trim() : null;
 	}
 	public String getProvincia() {
 		return provincia;
 	}
 	public void setProvincia(String provincia) {
-		this.provincia = provincia.trim();
+		this.provincia = provincia != null ? provincia.trim() : null;
 	}
 	public String getMunicipi() {
 		return municipi;
 	}
 	public void setMunicipi(String municipi) {
-		this.municipi = municipi.trim();
+		this.municipi = municipi != null ? municipi.trim() : null;
 	}
 	public String getAdresa() {
 		return adresa;
 	}
 	public void setAdresa(String adresa) {
-		this.adresa = adresa.trim();
+		this.adresa = adresa != null ? adresa.trim() : null;
 	}
 	public String getCodiPostal() {
 		return codiPostal;
 	}
 	public void setCodiPostal(String codiPostal) {
-		this.codiPostal = codiPostal.trim();
+		this.codiPostal = codiPostal != null ? codiPostal.trim() : null;
 	}
 	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
-		this.email = email.trim();
+		this.email = email != null ? email.trim() : null;
 	}
 	public String getTelefon() {
 		return telefon;
 	}
 	public void setTelefon(String telefon) {
-		this.telefon = telefon.trim();
+		this.telefon = telefon != null ? telefon.trim() : null;
 	}
 	public String getObservacions() {
 		return observacions;
 	}
 	public void setObservacions(String observacions) {
-		this.observacions = observacions.trim();
+		this.observacions = observacions != null ? observacions.trim() : null;
 	}
 	public InteressatIdiomaEnumDto getPreferenciaIdioma() {
 		return preferenciaIdioma;
@@ -251,37 +251,37 @@ public class InteressatCommand  {
 		return filtreCodiDir3;
 	}
 	public void setFiltreCodiDir3(String filtreCodiDir3) {
-		this.filtreCodiDir3 = filtreCodiDir3.trim();
+		this.filtreCodiDir3 = filtreCodiDir3 != null ? filtreCodiDir3.trim() : null;
 	}
 	public String getFiltreDenominacio() {
 		return filtreDenominacio;
 	}
 	public void setFiltreDenominacio(String filtreDenominacio) {
-		this.filtreDenominacio = filtreDenominacio.trim();
+		this.filtreDenominacio = filtreDenominacio != null ? filtreDenominacio.trim() : null;
 	}
 	public String getFiltreNivellAdministracio() {
 		return filtreNivellAdministracio;
 	}
 	public void setFiltreNivellAdministracio(String filtreNivellAdministracio) {
-		this.filtreNivellAdministracio = filtreNivellAdministracio.trim();
+		this.filtreNivellAdministracio = filtreNivellAdministracio != null ? filtreNivellAdministracio.trim() : null;
 	}
 	public String getFiltreComunitat() {
 		return filtreComunitat;
 	}
 	public void setFiltreComunitat(String filtreComunitat) {
-		this.filtreComunitat = filtreComunitat.trim();
+		this.filtreComunitat = filtreComunitat != null ? filtreComunitat.trim() : null;
 	}
 	public String getFiltreProvincia() {
 		return filtreProvincia;
 	}
 	public void setFiltreProvincia(String filtreProvincia) {
-		this.filtreProvincia = filtreProvincia.trim();
+		this.filtreProvincia = filtreProvincia != null ? filtreProvincia.trim() : null;
 	}
 	public String getFiltreLocalitat() {
 		return filtreLocalitat;
 	}
 	public void setFiltreLocalitat(String filtreLocalitat) {
-		this.filtreLocalitat = filtreLocalitat.trim();
+		this.filtreLocalitat = filtreLocalitat != null ? filtreLocalitat.trim() : null;
 	}
 	public Boolean getFiltreArrel() {
 		return filtreArrel;
@@ -293,7 +293,7 @@ public class InteressatCommand  {
 		return organNom;
 	}
 	public void setOrganNom(String organNom) {
-		this.organNom = organNom.trim();
+		this.organNom = organNom != null ? organNom.trim() : null;
 	}
 	public static InteressatCommand asCommand(InteressatDto dto) {
 		InteressatCommand command = ConversioTipusHelper.convertir(

@@ -105,15 +105,15 @@ public class MetaDocumentCommand {
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 
 	public void setGlobalExpedient(boolean globalExpedient) {
@@ -129,11 +129,11 @@ public class MetaDocumentCommand {
 	}
 
 	public void setPortafirmesDocumentTipus(String portafirmesDocumentTipus) {
-		this.portafirmesDocumentTipus = portafirmesDocumentTipus.trim();
+		this.portafirmesDocumentTipus = portafirmesDocumentTipus != null ? portafirmesDocumentTipus.trim() : null;
 	}
 
 	public void setPortafirmesFluxId(String portafirmesFluxId) {
-		this.portafirmesFluxId = portafirmesFluxId.trim();
+		this.portafirmesFluxId = portafirmesFluxId != null ? portafirmesFluxId.trim() : null;
 	}
 
 	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
@@ -145,7 +145,7 @@ public class MetaDocumentCommand {
 	}
 
 	public void setPortafirmesCustodiaTipus(String portafirmesCustodiaTipus) {
-		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus.trim();
+		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus != null ? portafirmesCustodiaTipus.trim() : null;
 	}
 
 	public void setFirmaPassarelaActiva(boolean firmaPassarelaActiva) {
@@ -153,7 +153,7 @@ public class MetaDocumentCommand {
 	}
 
 	public void setFirmaPassarelaCustodiaTipus(String firmaPassarelaCustodiaTipus) {
-		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus.trim();
+		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus != null ? firmaPassarelaCustodiaTipus.trim() : null;
 	}
 
 	public void setPlantilla(MultipartFile plantilla) {
@@ -173,7 +173,7 @@ public class MetaDocumentCommand {
 	}
 
 	public void setNtiTipoDocumental(String ntiTipoDocumental) {
-		this.ntiTipoDocumental = ntiTipoDocumental.trim();
+		this.ntiTipoDocumental = ntiTipoDocumental != null ? ntiTipoDocumental.trim() : null;
 	}
 
 	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
@@ -193,7 +193,7 @@ public class MetaDocumentCommand {
 	}
 
 	public void setPlantillaNom(String plantillaNom) {
-		this.plantillaNom = plantillaNom.trim();
+		this.plantillaNom = plantillaNom != null ? plantillaNom.trim() : null;
 	}
 
 }

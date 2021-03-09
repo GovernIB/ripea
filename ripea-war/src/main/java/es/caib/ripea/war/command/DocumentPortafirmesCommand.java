@@ -55,7 +55,7 @@ public class DocumentPortafirmesCommand {
 		return assumpte;
 	}
 	public void setAssumpte(String assumpte) {
-		this.assumpte = assumpte.trim();
+		this.assumpte = assumpte != null ? assumpte.trim() : null;
 	}
 	public PortafirmesPrioritatEnumDto getPrioritat() {
 		return prioritat;
@@ -73,7 +73,7 @@ public class DocumentPortafirmesCommand {
 		return observacions;
 	}
 	public void setObservacions(String observacions) {
-		this.observacions = observacions.trim();
+		this.observacions = observacions != null ? observacions.trim() : null;
 	}
 	public List<Long> getAnnexos() {
 		return annexos;

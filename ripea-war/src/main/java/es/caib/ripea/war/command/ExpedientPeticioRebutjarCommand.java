@@ -31,7 +31,7 @@ public class ExpedientPeticioRebutjarCommand {
 	}
 	public void setObservacions(
 			String observacions) {
-		this.observacions = observacions.trim();
+		this.observacions = observacions != null ? observacions.trim() : null;
 	}
 
 	@Override

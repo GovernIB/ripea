@@ -63,10 +63,10 @@ public class ExpedientFiltreCommand {
 		this.metaExpedientId = metaExpedientId;
 	}
 	public void setMetaExpedientDominiCodi(String metaExpedientDominiCodi) {
-		this.metaExpedientDominiCodi = metaExpedientDominiCodi.trim();
+		this.metaExpedientDominiCodi = metaExpedientDominiCodi != null ? metaExpedientDominiCodi.trim() : null;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public void setDataCreacioInici(Date dataCreacioInici) {
 		this.dataCreacioInici = dataCreacioInici;
@@ -75,7 +75,7 @@ public class ExpedientFiltreCommand {
 		this.dataCreacioFi = dataCreacioFi;
 	}
 	public void setNumero(String numero) {
-		this.numero = numero.trim();
+		this.numero = numero != null ? numero.trim() : null;
 	}
 	public void setExpedientEstatId(Long expedientEstatId) {
 		this.expedientEstatId = expedientEstatId;
@@ -93,10 +93,10 @@ public class ExpedientFiltreCommand {
 		this.tipusId = tipusId;
 	}
 	public void setInteressat(String interessat) {
-		this.interessat = interessat.trim();
+		this.interessat = interessat != null ? interessat.trim() : null;
 	}
 	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
-		this.metaExpedientDominiValor = metaExpedientDominiValor.trim();
+		this.metaExpedientDominiValor = metaExpedientDominiValor != null ? metaExpedientDominiValor.trim() : null;
 	}
 
 }

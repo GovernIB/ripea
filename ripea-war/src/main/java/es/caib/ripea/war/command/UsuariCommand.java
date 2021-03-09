@@ -37,31 +37,31 @@ public class UsuariCommand implements Serializable {
 		return codi;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public String getNif() {
 		return nif;
 	}
 	public void setNif(String nif) {
-		this.nif = nif.trim();
+		this.nif = nif != null ? nif.trim() : null;
 	}
 	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
-		this.email = email.trim();
+		this.email = email != null ? email.trim() : null;
 	}
 	public String getIdioma() {
 		return idioma;
 	}
 	public void setIdioma(String idioma) {
-		this.idioma = idioma.trim();
+		this.idioma = idioma != null ? idioma.trim() : null;
 	}
 	public String[] getRols() {
 		return rols;

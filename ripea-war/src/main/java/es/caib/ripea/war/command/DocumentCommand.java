@@ -84,7 +84,7 @@ public class DocumentCommand extends ContenidorCommand {
 		return ubicacio;
 	}
 	public void setUbicacio(String ubicacio) {
-		this.ubicacio = ubicacio.trim();
+		this.ubicacio = ubicacio != null ? ubicacio.trim() : null;
 	}
 	public Long getMetaNodeId() {
 		return metaNodeId;
@@ -126,19 +126,19 @@ public class DocumentCommand extends ContenidorCommand {
 		return escanejatTempId;
 	}
 	public void setEscanejatTempId(String escanejatTempId) {
-		this.escanejatTempId = escanejatTempId.trim();
+		this.escanejatTempId = escanejatTempId != null ? escanejatTempId.trim() : null;
 	}
 	public String getFitxerContentType() {
 		return fitxerContentType;
 	}
 	public void setFitxerContentType(String fitxerContentType) {
-		this.fitxerContentType = fitxerContentType.trim();
+		this.fitxerContentType = fitxerContentType != null ? fitxerContentType.trim() : null;
 	}
 	public String getFitxerNom() {
 		return fitxerNom;
 	}
 	public void setFitxerNom(String fitxerNom) {
-		this.fitxerNom = fitxerNom.trim();
+		this.fitxerNom = fitxerNom != null ? fitxerNom.trim() : null;
 	}
 	public byte[] getFitxerContingut() {
 		return fitxerContingut;
@@ -150,25 +150,25 @@ public class DocumentCommand extends ContenidorCommand {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 	/*public Date getDataCaptura() {
 		return dataCaptura;
 	}
 	public void setDataCaptura(Date dataCaptura) {
-		this.dataCaptura = dataCaptura.trim();
+		this.dataCaptura = dataCaptura != null ? dataCaptura.trim() : null;
 	}
 	public String getNtiOrgano() {
 		return ntiOrgano;
 	}
 	public void setNtiOrgano(String ntiOrgano) {
-		this.ntiOrgano = ntiOrgano.trim();
+		this.ntiOrgano = ntiOrgano != null ? ntiOrgano.trim() : null;
 	}
 	public NtiOrigenEnumDto getNtiOrigen() {
 		return ntiOrigen;
 	}
 	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
-		this.ntiOrigen = ntiOrigen.trim();
+		this.ntiOrigen = ntiOrigen != null ? ntiOrigen.trim() : null;
 	}*/
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
@@ -180,13 +180,13 @@ public class DocumentCommand extends ContenidorCommand {
 		return ntiTipoDocumental;
 	}
 	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
-		this.ntiTipoDocumental = ntiTipoDocumental.trim();
+		this.ntiTipoDocumental = ntiTipoDocumental != null ? ntiTipoDocumental.trim() : null;
 	}*/
 	public String getNtiIdDocumentoOrigen() {
 		return ntiIdDocumentoOrigen;
 	}
 	public void setNtiIdDocumentoOrigen(String ntiIdDocumentoOrigen) {
-		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen.trim();
+		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen != null ? ntiIdDocumentoOrigen.trim() : null;
 	}
 
 	public DocumentTipusFirmaEnumDto getTipusFirma() {

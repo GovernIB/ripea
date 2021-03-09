@@ -52,19 +52,19 @@ public class MetaExpedientTascaCommand {
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 
 	public void setResponsable(String responsable) {
-		this.responsable = responsable.trim();
+		this.responsable = responsable != null ? responsable.trim() : null;
 	}
 
 	public void setActiva(boolean activa) {

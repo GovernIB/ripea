@@ -91,10 +91,10 @@ public class MetaDadaCommand {
 		this.id = id;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public void setTipus(MetaDadaTipusEnumDto tipus) {
 		this.tipus = tipus;
@@ -103,7 +103,7 @@ public class MetaDadaCommand {
 		this.multiplicitat = multiplicitat;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 	public void setEntitatId(Long entitatId) {
 		this.entitatId = entitatId;
@@ -112,7 +112,7 @@ public class MetaDadaCommand {
 		this.metaNodeId = metaNodeId;
 	}
 	public void setDomini(String domini) {
-		this.domini = domini.trim();
+		this.domini = domini != null ? domini.trim() : null;
 	}
 	public void setValorSencer(Long valorSencer) {
 		this.valorSencer = valorSencer;
@@ -130,6 +130,6 @@ public class MetaDadaCommand {
 		this.valorBoolea = valorBoolea;
 	}
 	public void setValorString(String valorString) {
-		this.valorString = valorString.trim();
+		this.valorString = valorString != null ? valorString.trim() : null;
 	}
 }

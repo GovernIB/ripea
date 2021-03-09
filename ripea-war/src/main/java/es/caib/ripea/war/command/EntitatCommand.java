@@ -45,13 +45,13 @@ public class EntitatCommand {
 		return capsaleraColorLletra;
 	}
 	public void setCapsaleraColorLletra(String capsaleraColorLletra) {
-		this.capsaleraColorLletra = capsaleraColorLletra.trim();
+		this.capsaleraColorLletra = capsaleraColorLletra != null ? capsaleraColorLletra.trim() : null;
 	}
 	public String getCapsaleraColorFons() {
 		return capsaleraColorFons;
 	}
 	public void setCapsaleraColorFons(String capsaleraColorFons) {
-		this.capsaleraColorFons = capsaleraColorFons.trim();
+		this.capsaleraColorFons = capsaleraColorFons != null ? capsaleraColorFons.trim() : null;
 	}
 	public MultipartFile getLogoImg() {
 		return logoImg;
@@ -69,25 +69,25 @@ public class EntitatCommand {
 		return codi;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 	public String getCif() {
 		return cif;
 	}
 	public void setCif(String cif) {
-		this.cif = cif.trim();
+		this.cif = cif != null ? cif.trim() : null;
 	}
 	public String getUnitatArrel() {
 		return unitatArrel;
 	}
 	public void setUnitatArrel(String unitatArrel) {
-		this.unitatArrel = unitatArrel.trim();
+		this.unitatArrel = unitatArrel != null ? unitatArrel.trim() : null;
 	}
 
 	public static List<EntitatCommand> toEntitatCommands(

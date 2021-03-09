@@ -78,7 +78,7 @@ public class PermisCommand {
 	}
 
 	public void setPrincipalNom(String principalNom) {
-		this.principalNom = principalNom.trim();
+		this.principalNom = principalNom != null ? principalNom.trim() : null;
 	}
 
 	public void setPrincipalTipus(PrincipalTipusEnumDto principalTipus) {

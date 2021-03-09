@@ -30,7 +30,7 @@ public class ExpedientPeticioIncorporarCommand {
 		this.id = id;
 	}
 	public String getObservacions() {
-		return observacions.trim();
+		return observacions != null ? observacions.trim() : null;
 	}
 	public void setObservacions(
 			String observacions) {

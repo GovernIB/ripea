@@ -72,23 +72,23 @@ public class ViaFirmaEnviarCommand {
 	}
 
 	public void setTitol(String titol) {
-		this.titol = titol.trim();
+		this.titol = titol != null ? titol.trim() : null;
 	}
 
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 
 	public void setCodiUsuariViaFirma(String codiUsuariViaFirma) {
-		this.codiUsuariViaFirma = codiUsuariViaFirma.trim();
+		this.codiUsuariViaFirma = codiUsuariViaFirma != null ? codiUsuariViaFirma.trim() : null;
 	}
 
 	public void setCodisUsuariViaFirma(String codisUsuariViaFirma) {
-		this.codisUsuariViaFirma = codisUsuariViaFirma.trim();
+		this.codisUsuariViaFirma = codisUsuariViaFirma != null ? codisUsuariViaFirma.trim() : null;
 	}
 
 	public void setDispositiuViaFirma(String dispositiuViaFirma) {
-		this.dispositiuViaFirma = dispositiuViaFirma.trim();
+		this.dispositiuViaFirma = dispositiuViaFirma != null ? dispositiuViaFirma.trim() : null;
 	}
 
 	public void setInteressatId(Long interessatId) {
@@ -96,19 +96,19 @@ public class ViaFirmaEnviarCommand {
 	}
 
 	public void setSignantNif(String signantNif) {
-		this.signantNif = signantNif.trim();
+		this.signantNif = signantNif != null ? signantNif.trim() : null;
 	}
 
 	public void setSignantNom(String signantNom) {
-		this.signantNom = signantNom.trim();
+		this.signantNom = signantNom != null ? signantNom.trim() : null;
 	}
 
 	public void setObservacions(String observacions) {
-		this.observacions = observacions.trim();
+		this.observacions = observacions != null ? observacions.trim() : null;
 	}
 
 	public void setFirmaParcial(String firmaParcial) {
-		this.firmaParcial = firmaParcial.trim();
+		this.firmaParcial = firmaParcial != null ? firmaParcial.trim() : null;
 	}
 
 }

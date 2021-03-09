@@ -30,7 +30,7 @@ public class ExpedientTancarCommand extends ContenidorCommand {
 		return motiu;
 	}
 	public void setMotiu(String motiu) {
-		this.motiu = motiu.trim();
+		this.motiu = motiu != null ? motiu.trim() : null;
 	}
 	public Long[] getDocumentsPerFirmar() {
 		return documentsPerFirmar;

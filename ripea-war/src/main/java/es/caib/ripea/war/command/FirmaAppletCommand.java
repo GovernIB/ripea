@@ -27,7 +27,7 @@ public class FirmaAppletCommand {
 		return identificador;
 	}
 	public void setIdentificador(String identificador) {
-		this.identificador = identificador.trim();
+		this.identificador = identificador != null ? identificador.trim() : null;
 	}
 	public MultipartFile getArxiu() {
 		return arxiu;

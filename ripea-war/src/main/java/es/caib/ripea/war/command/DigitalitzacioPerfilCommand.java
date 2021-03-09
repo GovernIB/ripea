@@ -24,7 +24,7 @@ public class DigitalitzacioPerfilCommand {
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi.trim();
+		this.codi = codi != null ? codi.trim() : null;
 	}
 
 	public String getNom() {
@@ -32,7 +32,7 @@ public class DigitalitzacioPerfilCommand {
 	}
 
 	public void setNom(String nom) {
-		this.nom = nom.trim();
+		this.nom = nom != null ? nom.trim() : null;
 	}
 
 	public String getDescripcio() {
@@ -40,7 +40,7 @@ public class DigitalitzacioPerfilCommand {
 	}
 
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio.trim();
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 	
 	public static DigitalitzacioPerfilCommand asCommand(DigitalitzacioPerfilDto dto) {
