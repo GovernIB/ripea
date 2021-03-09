@@ -12,14 +12,13 @@ import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Command per a enviar documents al portafirmes.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Getter 
 public class ViaFirmaEnviarCommand {
 
 	@Size(max=256)
@@ -70,6 +69,46 @@ public class ViaFirmaEnviarCommand {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public void setTitol(String titol) {
+		this.titol = titol.trim();
+	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio.trim();
+	}
+
+	public void setCodiUsuariViaFirma(String codiUsuariViaFirma) {
+		this.codiUsuariViaFirma = codiUsuariViaFirma.trim();
+	}
+
+	public void setCodisUsuariViaFirma(String codisUsuariViaFirma) {
+		this.codisUsuariViaFirma = codisUsuariViaFirma.trim();
+	}
+
+	public void setDispositiuViaFirma(String dispositiuViaFirma) {
+		this.dispositiuViaFirma = dispositiuViaFirma.trim();
+	}
+
+	public void setInteressatId(Long interessatId) {
+		this.interessatId = interessatId;
+	}
+
+	public void setSignantNif(String signantNif) {
+		this.signantNif = signantNif.trim();
+	}
+
+	public void setSignantNom(String signantNom) {
+		this.signantNom = signantNom.trim();
+	}
+
+	public void setObservacions(String observacions) {
+		this.observacions = observacions.trim();
+	}
+
+	public void setFirmaParcial(String firmaParcial) {
+		this.firmaParcial = firmaParcial.trim();
 	}
 
 }

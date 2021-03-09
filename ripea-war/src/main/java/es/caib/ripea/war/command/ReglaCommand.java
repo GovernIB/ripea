@@ -55,13 +55,13 @@ public class ReglaCommand {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom;
+		this.nom = nom.trim();
 	}
 	public String getDescripcio() {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
+		this.descripcio = descripcio.trim();
 	}
 	public ReglaTipusEnumDto getTipus() {
 		return tipus;
@@ -73,13 +73,13 @@ public class ReglaCommand {
 		return assumpteCodi;
 	}
 	public void setAssumpteCodi(String assumpteCodi) {
-		this.assumpteCodi = assumpteCodi;
+		this.assumpteCodi = assumpteCodi.trim();
 	}
 	public String getUnitatCodi() {
 		return unitatCodi;
 	}
 	public void setUnitatCodi(String unitatCodi) {
-		this.unitatCodi = unitatCodi;
+		this.unitatCodi = unitatCodi.trim();
 	}
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
@@ -109,19 +109,19 @@ public class ReglaCommand {
 		return backofficeUrl;
 	}
 	public void setBackofficeUrl(String backofficeUrl) {
-		this.backofficeUrl = backofficeUrl;
+		this.backofficeUrl = backofficeUrl.trim();
 	}
 	public String getBackofficeUsuari() {
 		return backofficeUsuari;
 	}
 	public void setBackofficeUsuari(String backofficeUsuari) {
-		this.backofficeUsuari = backofficeUsuari;
+		this.backofficeUsuari = backofficeUsuari.trim();
 	}
 	public String getBackofficeContrasenya() {
 		return backofficeContrasenya;
 	}
 	public void setBackofficeContrasenya(String backofficeContrasenya) {
-		this.backofficeContrasenya = backofficeContrasenya;
+		this.backofficeContrasenya = backofficeContrasenya.trim();
 	}
 	public Integer getBackofficeIntents() {
 		return backofficeIntents;

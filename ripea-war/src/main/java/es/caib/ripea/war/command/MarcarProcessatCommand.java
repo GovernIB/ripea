@@ -21,7 +21,7 @@ public class MarcarProcessatCommand {
 	}
 
 	public void setMotiu(String motiu) {
-		this.motiu = motiu;
+		this.motiu = motiu.trim();
 	}
 
 	@Override

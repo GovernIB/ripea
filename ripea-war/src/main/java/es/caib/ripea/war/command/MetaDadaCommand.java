@@ -21,7 +21,6 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDadaNoRepetit;
 import es.caib.ripea.war.validation.CodiMetaDadaNomValid;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Command per al manteniment de meta-dades.
@@ -29,7 +28,6 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
-@Setter
 @CodiMetaDadaNomValid
 @CodiMetaDadaNoRepetit(
 		campId = "id",
@@ -89,5 +87,49 @@ public class MetaDadaCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public void setCodi(String codi) {
+		this.codi = codi.trim();
+	}
+	public void setNom(String nom) {
+		this.nom = nom.trim();
+	}
+	public void setTipus(MetaDadaTipusEnumDto tipus) {
+		this.tipus = tipus;
+	}
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio.trim();
+	}
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
+	public void setMetaNodeId(Long metaNodeId) {
+		this.metaNodeId = metaNodeId;
+	}
+	public void setDomini(String domini) {
+		this.domini = domini.trim();
+	}
+	public void setValorSencer(Long valorSencer) {
+		this.valorSencer = valorSencer;
+	}
+	public void setValorFlotant(Double valorFlotant) {
+		this.valorFlotant = valorFlotant;
+	}
+	public void setValorImport(BigDecimal valorImport) {
+		this.valorImport = valorImport;
+	}
+	public void setValorData(Date valorData) {
+		this.valorData = valorData;
+	}
+	public void setValorBoolea(Boolean valorBoolea) {
+		this.valorBoolea = valorBoolea;
+	}
+	public void setValorString(String valorString) {
+		this.valorString = valorString.trim();
+	}
 }

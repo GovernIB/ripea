@@ -53,7 +53,7 @@ public class ExpedientCommand extends ContenidorCommand {
 		return tancatMotiu;
 	}
 	public void setTancatMotiu(String tancatMotiu) {
-		this.tancatMotiu = tancatMotiu;
+		this.tancatMotiu = tancatMotiu.trim();
 	}
 	public int getAny() {
 		return any;

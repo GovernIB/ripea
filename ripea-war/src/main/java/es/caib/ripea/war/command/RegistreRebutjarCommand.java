@@ -32,7 +32,7 @@ public class RegistreRebutjarCommand {
 		return motiu;
 	}
 	public void setMotiu(String motiu) {
-		this.motiu = motiu;
+		this.motiu = motiu.trim();
 	}
 
 	@Override

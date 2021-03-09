@@ -37,13 +37,13 @@ public class TipusDocumentalCommand {
 		return codi;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi;
+		this.codi = codi.trim();
 	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom;
+		this.nom = nom.trim();
 	}
 	public Long getEntitatId() {
 		return entitatId;

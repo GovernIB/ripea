@@ -16,9 +16,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class ExpedientPeticioRebutjarCommand {
 	
 	private Long id;
-
-	
-	
 	@NotEmpty @Size(max=1024)
 	private String observacions;
 
@@ -26,19 +23,15 @@ public class ExpedientPeticioRebutjarCommand {
 	public Long getId() {
 		return id;
 	}
-
-	public void setId(
-			Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
-
 	public String getObservacions() {
 		return observacions;
 	}
-
 	public void setObservacions(
 			String observacions) {
-		this.observacions = observacions;
+		this.observacions = observacions.trim();
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class ExpedientEstatCommand {
 	}
 
 	public void setResponsableCodi(String responsableCodi) {
-		this.responsableCodi = responsableCodi;
+		this.responsableCodi = responsableCodi.trim();
 	}
 
 	public boolean isInicial() {
@@ -63,7 +63,7 @@ public class ExpedientEstatCommand {
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi;
+		this.codi = codi.trim();
 	}
 
 	public String getNom() {
@@ -71,7 +71,7 @@ public class ExpedientEstatCommand {
 	}
 
 	public void setNom(String nom) {
-		this.nom = nom;
+		this.nom = nom.trim();
 	}
 
 	public int getOrdre() {
@@ -87,7 +87,7 @@ public class ExpedientEstatCommand {
 	}
 
 	public void setColor(String color) {
-		this.color = color;
+		this.color = color.trim();
 	}
 	
 	public static ExpedientEstatCommand asCommand(ExpedientEstatDto dto) {

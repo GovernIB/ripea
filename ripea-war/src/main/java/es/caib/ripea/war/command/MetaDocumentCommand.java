@@ -22,14 +22,14 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
 import es.caib.ripea.war.validation.PortafirmesDocumentTipusNotEmpty;
 import es.caib.ripea.war.validation.ResponsableNotEmpty;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Command per al manteniment de meta-documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Data
+@Getter
 @ResponsableNotEmpty
 @PortafirmesDocumentTipusNotEmpty
 @CodiMetaDocumentNoRepetit(
@@ -98,6 +98,102 @@ public class MetaDocumentCommand {
 		return ConversioTipusHelper.convertir(
 				command,
 				MetaDocumentDto.class);
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setCodi(String codi) {
+		this.codi = codi.trim();
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom.trim();
+	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio.trim();
+	}
+
+	public void setGlobalExpedient(boolean globalExpedient) {
+		this.globalExpedient = globalExpedient;
+	}
+
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
+	}
+
+	public void setFirmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
+		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
+	}
+
+	public void setPortafirmesDocumentTipus(String portafirmesDocumentTipus) {
+		this.portafirmesDocumentTipus = portafirmesDocumentTipus.trim();
+	}
+
+	public void setPortafirmesFluxId(String portafirmesFluxId) {
+		this.portafirmesFluxId = portafirmesFluxId.trim();
+	}
+
+	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
+		this.portafirmesResponsables = portafirmesResponsables;
+	}
+
+	public void setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus) {
+		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
+	}
+
+	public void setPortafirmesCustodiaTipus(String portafirmesCustodiaTipus) {
+		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus.trim();
+	}
+
+	public void setFirmaPassarelaActiva(boolean firmaPassarelaActiva) {
+		this.firmaPassarelaActiva = firmaPassarelaActiva;
+	}
+
+	public void setFirmaPassarelaCustodiaTipus(String firmaPassarelaCustodiaTipus) {
+		this.firmaPassarelaCustodiaTipus = firmaPassarelaCustodiaTipus.trim();
+	}
+
+	public void setPlantilla(MultipartFile plantilla) {
+		this.plantilla = plantilla;
+	}
+
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
+
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
+
+	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
+		this.ntiOrigen = ntiOrigen;
+	}
+
+	public void setNtiTipoDocumental(String ntiTipoDocumental) {
+		this.ntiTipoDocumental = ntiTipoDocumental.trim();
+	}
+
+	public void setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+	}
+
+	public void setFirmaBiometricaActiva(boolean firmaBiometricaActiva) {
+		this.firmaBiometricaActiva = firmaBiometricaActiva;
+	}
+
+	public void setBiometricaLectura(boolean biometricaLectura) {
+		this.biometricaLectura = biometricaLectura;
+	}
+
+	public void setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+		this.portafirmesFluxTipus = portafirmesFluxTipus;
+	}
+
+	public void setPlantillaNom(String plantillaNom) {
+		this.plantillaNom = plantillaNom.trim();
 	}
 
 }

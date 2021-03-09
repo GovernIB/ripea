@@ -29,13 +29,13 @@ public class AnotacioRegistreFiltreCommand {
 		return unitatOrganitzativa;
 	}
 	public void setUnitatOrganitzativa(String unitatOrganitzativa) {
-		this.unitatOrganitzativa = unitatOrganitzativa;
+		this.unitatOrganitzativa = unitatOrganitzativa.trim();
 	}
 	public String getBustia() {
 		return bustia;
 	}
 	public void setBustia(String bustia) {
-		this.bustia = bustia;
+		this.bustia = bustia.trim();
 	}
 	public Date getDataCreacioInici() {
 		return dataCreacioInici;

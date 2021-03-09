@@ -19,72 +19,53 @@ public class ExpedientPeticioAcceptarCommand {
 	private Long expedientId;
 	
 	private String newExpedientTitol;
-	
-	
 	private int any;
-	
 	private boolean associarInteressats;
-	
 	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
-	
 	
 	
 	public ExpedientPeticioAccioEnumDto getExpedientPeticioAccioEnumDto() {
 		return expedientPeticioAccioEnumDto;
 	}
-
 	public void setExpedientPeticioAccioEnumDto(ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
 		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
 	}
-
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
 	}
-
 	public void setMetaExpedientId(Long metaExpedientId) {
 		this.metaExpedientId = metaExpedientId;
 	}
-
 	public Long getExpedientId() {
 		return expedientId;
 	}
-
 	public void setExpedientId(Long expedientId) {
 		this.expedientId = expedientId;
 	}
-
 	public String getNewExpedientTitol() {
 		return newExpedientTitol;
 	}
-
 	public void setNewExpedientTitol(String newExpedientTitol) {
-		this.newExpedientTitol = newExpedientTitol;
+		this.newExpedientTitol = newExpedientTitol.trim();
 	}
-
 	public int getAny() {
 		return any;
 	}
-
 	public void setAny(int any) {
 		this.any = any;
 	}
-
 	public boolean isAssociarInteressats() {
 		return associarInteressats;
 	}
-
 	public void setAssociarInteressats(boolean associarInteressats) {
 		this.associarInteressats = associarInteressats;
 	}
-
 
 	@Override
 	public String toString() {

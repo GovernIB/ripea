@@ -26,13 +26,13 @@ public class PassarelaFirmaEnviarCommand {
 		return motiu;
 	}
 	public void setMotiu(String motiu) {
-		this.motiu = motiu;
+		this.motiu = motiu.trim();
 	}
 	public String getLloc() {
 		return lloc;
 	}
 	public void setLloc(String lloc) {
-		this.lloc = lloc;
+		this.lloc = lloc.trim();
 	}
 	public MultipartFile getFirma() {
 		return firma;

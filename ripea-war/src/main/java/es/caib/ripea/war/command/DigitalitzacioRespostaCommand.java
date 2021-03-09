@@ -22,7 +22,7 @@ public class DigitalitzacioRespostaCommand {
 		return errorDescripcio;
 	}
 	public void setErrorDescripcio(String errorDescripcio) {
-		this.errorDescripcio = errorDescripcio;
+		this.errorDescripcio = errorDescripcio.trim();
 	}
 	public byte[] getDocumentEscanejat() {
 		return documentEscanejat;

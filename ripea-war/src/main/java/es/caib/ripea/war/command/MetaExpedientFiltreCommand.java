@@ -4,9 +4,9 @@ import es.caib.ripea.core.api.dto.MetaExpedientActiuEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class MetaExpedientFiltreCommand {
 
 	private String codi;
@@ -22,4 +22,24 @@ public class MetaExpedientFiltreCommand {
 				this,
 				MetaExpedientFiltreDto.class);
 	}
+
+	public void setCodi(String codi) {
+		this.codi = codi.trim();
+	}
+	public void setNom(String nom) {
+		this.nom = nom.trim();
+	}
+	public void setClassificacioSia(String classificacioSia) {
+		this.classificacioSia = classificacioSia.trim();
+	}
+	public void setOrganGestorId(Long organGestorId) {
+		this.organGestorId = organGestorId;
+	}
+	public void setActiu(MetaExpedientActiuEnumDto actiu) {
+		this.actiu = actiu;
+	}
+	public void setAmbit(MetaExpedientAmbitEnumDto ambit) {
+		this.ambit = ambit;
+	}
+	
 }

@@ -4,7 +4,6 @@
 package es.caib.ripea.war.command;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -14,11 +13,18 @@ import lombok.ToString;
  */
 
 @Getter
-@Setter
 @ToString
 public class OrganGestorFiltreCommand {
 
 	private String codi;
 	private String nom;
+	
+	public void setCodi(String codi) {
+		this.codi = codi.trim();
+	}
+	public void setNom(String nom) {
+		this.nom = nom.trim();
+	}
 
+	
 }

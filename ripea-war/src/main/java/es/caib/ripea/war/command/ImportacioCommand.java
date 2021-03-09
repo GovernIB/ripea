@@ -39,13 +39,13 @@ public class ImportacioCommand {
 		this.pareId = pareId;
 	}
 	public void setNumeroRegistre(String numeroRegistre) {
-		this.numeroRegistre = numeroRegistre;
+		this.numeroRegistre = numeroRegistre.trim();
 	}
 	public String getDataPresentacio() {
 		return dataPresentacio;
 	}
 	public void setDataPresentacio(String dataPresentacio) {
-		this.dataPresentacio = dataPresentacio;
+		this.dataPresentacio = dataPresentacio.trim();
 	}
 	public static ImportacioCommand asCommand(ImportacioDto dto) {
 		ImportacioCommand command = ConversioTipusHelper.convertir(

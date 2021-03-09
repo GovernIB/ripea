@@ -899,7 +899,7 @@ public class ContingutHelper {
 			grupEntity = grupRepository.findOne(grupId);
 		}
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
-				nom,
+				nom.trim(),
 				metaExpedient,
 				pare,
 				entitat,

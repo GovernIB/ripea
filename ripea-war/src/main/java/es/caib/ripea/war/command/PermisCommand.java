@@ -16,14 +16,13 @@ import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Command per al manteniment de permisos.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Getter
 public class PermisCommand {
 
 	private Long id;
@@ -73,6 +72,45 @@ public class PermisCommand {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setPrincipalNom(String principalNom) {
+		this.principalNom = principalNom.trim();
+	}
+
+	public void setPrincipalTipus(PrincipalTipusEnumDto principalTipus) {
+		this.principalTipus = principalTipus;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
+	public void setWrite(boolean write) {
+		this.write = write;
+	}
+
+	public void setCreate(boolean create) {
+		this.create = create;
+	}
+
+	public void setDelete(boolean delete) {
+		this.delete = delete;
+	}
+
+	public void setAdministration(boolean administration) {
+		this.administration = administration;
+	}
+
+	public void setSelectAll(boolean selectAll) {
+		this.selectAll = selectAll;
+	}
+
+	public void setOrganGestorId(Long organGestorId) {
+		this.organGestorId = organGestorId;
 	}
 
 }

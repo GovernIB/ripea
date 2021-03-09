@@ -50,7 +50,7 @@ public class ArxiuExpedientAgafarCommand {
 		return usuariCodi;
 	}
 	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
+		this.usuariCodi = usuariCodi.trim();
 	}
 
 	@Override

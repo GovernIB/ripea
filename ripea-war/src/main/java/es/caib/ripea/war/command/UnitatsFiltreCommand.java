@@ -45,31 +45,31 @@ public class UnitatsFiltreCommand {
 		return codi;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi;
+		this.codi = codi.trim();
 	}
 	public String getNivellAdministracio() {
 		return nivellAdministracio;
 	}
 	public void setNivellAdministracio(String nivellAdministracio) {
-		this.nivellAdministracio = nivellAdministracio;
+		this.nivellAdministracio = nivellAdministracio.trim();
 	}
 	public String getComunitat() {
 		return comunitat;
 	}
 	public void setComunitat(String comunitat) {
-		this.comunitat = comunitat;
+		this.comunitat = comunitat.trim();
 	}
 	public String getProvincia() {
 		return provincia;
 	}
 	public void setProvincia(String provincia) {
-		this.provincia = provincia;
+		this.provincia = provincia.trim();
 	}
 	public String getLocalitat() {
 		return localitat;
 	}
 	public void setLocalitat(String localitat) {
-		this.localitat = localitat;
+		this.localitat = localitat.trim();
 	}
 	public boolean isUnitatArrel() {
 		return unitatArrel;
@@ -81,7 +81,7 @@ public class UnitatsFiltreCommand {
 		return denominacio;
 	}
 	public void setDenominacio(String denominacio) {
-		this.denominacio = denominacio;
+		this.denominacio = denominacio.trim();
 	}
 
 }

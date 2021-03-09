@@ -11,7 +11,6 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientTascaNoRepetit;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Command per a les tasques del meta-expedient.
@@ -19,7 +18,6 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
-@Setter
 @CodiMetaExpedientTascaNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId", campMetaExpedientId = "metaExpedientId")
 public class MetaExpedientTascaCommand {
 
@@ -49,7 +47,51 @@ public class MetaExpedientTascaCommand {
         return ConversioTipusHelper.convertir(command, MetaExpedientTascaDto.class);
     }
 
-    public interface Create {
+    public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setCodi(String codi) {
+		this.codi = codi.trim();
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom.trim();
+	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio.trim();
+	}
+
+	public void setResponsable(String responsable) {
+		this.responsable = responsable.trim();
+	}
+
+	public void setActiva(boolean activa) {
+		this.activa = activa;
+	}
+
+	public void setDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
+
+	public void setEstatIdCrearTasca(Long estatIdCrearTasca) {
+		this.estatIdCrearTasca = estatIdCrearTasca;
+	}
+
+	public void setEstatIdFinalitzarTasca(Long estatIdFinalitzarTasca) {
+		this.estatIdFinalitzarTasca = estatIdFinalitzarTasca;
+	}
+
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
+
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
+
+	public interface Create {
     }
 
     public interface Update {

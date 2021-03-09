@@ -33,72 +33,56 @@ public class ExpedientPeticioFiltreCommand {
 	public ExpedientPeticioAccioEnumDto getAccioEnum() {
 		return accioEnum;
 	}
-
 	public void setAccioEnum(ExpedientPeticioAccioEnumDto accioEnum) {
 		this.accioEnum = accioEnum;
 	}
-
 	public ExpedientPeticioEstatViewEnumDto getEstat() {
 		return estat;
 	}
-
 	public void setEstat(ExpedientPeticioEstatViewEnumDto estat) {
 		this.estat = estat;
 	}
-
+	public String getProcediment() {
+		return procediment;
+	}
+	public void setProcediment(String procediment) {
+		this.procediment = procediment.trim();
+	}
+	public String getNumero() {
+		return numero;
+	}
+	public void setNumero(String numero) {
+		this.numero = numero.trim();
+	}
+	public String getExtracte() {
+		return extracte;
+	}
+	public void setExtracte(String extracte) {
+		this.extracte = extracte.trim();
+	}
+	public String getDestinacio() {
+		return destinacio;
+	}
+	public void setDestinacio(String destinacio) {
+		this.destinacio = destinacio.trim();
+	}
+	public Date getDataInicial() {
+		return dataInicial;
+	}
+	public void setDataInicial(Date dataInicial) {
+		this.dataInicial = dataInicial;
+	}
+	public Date getDataFinal() {
+		return dataFinal;
+	}
+	public void setDataFinal(Date dataFinal) {
+		this.dataFinal = dataFinal;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
-	public String getProcediment() {
-		return procediment;
-	}
-
-	public void setProcediment(String procediment) {
-		this.procediment = procediment;
-	}
-
-	public String getNumero() {
-		return numero;
-	}
-
-	public void setNumero(String numero) {
-		this.numero = numero;
-	}
-
-	public String getExtracte() {
-		return extracte;
-	}
-
-	public void setExtracte(String extracte) {
-		this.extracte = extracte;
-	}
-
-	public String getDestinacio() {
-		return destinacio;
-	}
-
-	public void setDestinacio(String destinacio) {
-		this.destinacio = destinacio;
-	}
-
-	public Date getDataInicial() {
-		return dataInicial;
-	}
-
-	public void setDataInicial(Date dataInicial) {
-		this.dataInicial = dataInicial;
-	}
-
-	public Date getDataFinal() {
-		return dataFinal;
-	}
-
-	public void setDataFinal(Date dataFinal) {
-		this.dataFinal = dataFinal;
-	}
-
 	public static ExpedientPeticioFiltreCommand asCommand(ExpedientPeticioFiltreDto dto) {
 		return ConversioTipusHelper.convertir(dto,
 				ExpedientPeticioFiltreCommand.class);

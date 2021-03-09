@@ -16,7 +16,7 @@ public class ExpedientAssignarCommand {
 		return usuariCodi;
 	}
 	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
+		this.usuariCodi = usuariCodi.trim();
 	}
 
 

@@ -25,13 +25,13 @@ public class GrupCommand {
         return rol;
     }
     public void setRol(String rol) {
-        this.rol = rol;
+        this.rol = rol.trim();
     }
     public String getDescripcio() {
         return descripcio;
     }
     public void setDescripcio(String descripcio) {
-        this.descripcio = descripcio;
+        this.descripcio = descripcio.trim();
     }
     public static GrupCommand asCommand(GrupDto dto) {
         return ConversioTipusHelper.convertir(dto, GrupCommand.class);

@@ -44,19 +44,19 @@ public class DominiCommand {
 		return codi;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi;
+		this.codi = codi.trim();
 	}
 	public String getNom() {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom;
+		this.nom = nom.trim();
 	}
 	public String getDescripcio() {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
+		this.descripcio = descripcio.trim();
 	}
 	public Long getEntitatId() {
 		return entitatId;
@@ -68,19 +68,19 @@ public class DominiCommand {
 		return consulta;
 	}
 	public void setConsulta(String consulta) {
-		this.consulta = consulta;
+		this.consulta = consulta.trim();
 	}
 	public String getCadena() {
 		return cadena;
 	}
 	public void setCadena(String cadena) {
-		this.cadena = cadena;
+		this.cadena = cadena.trim();
 	}
 	public String getContrasenya() {
 		return contrasenya;
 	}
 	public void setContrasenya(String contrasenya) {
-		this.contrasenya = contrasenya;
+		this.contrasenya = contrasenya.trim();
 	}
 	
 	public static DominiCommand asCommand(DominiDto dto) {

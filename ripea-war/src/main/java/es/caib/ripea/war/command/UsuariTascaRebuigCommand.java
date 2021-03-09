@@ -24,8 +24,7 @@ public class UsuariTascaRebuigCommand {
 		return id;
 	}
 
-	public void setId(
-			Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -34,7 +33,7 @@ public class UsuariTascaRebuigCommand {
 	}
 
 	public void setMotiu(String motiu) {
-		this.motiu = motiu;
+		this.motiu = motiu.trim();
 	}
 
 	@Override

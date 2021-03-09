@@ -22,20 +22,16 @@ public class ExpedientPeticioIncorporarCommand {
 	@NotEmpty @Size(max=1024)
 	private String observacions;
 
-	
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(
 			Long id) {
 		this.id = id;
 	}
-
 	public String getObservacions() {
-		return observacions;
+		return observacions.trim();
 	}
-
 	public void setObservacions(
 			String observacions) {
 		this.observacions = observacions;

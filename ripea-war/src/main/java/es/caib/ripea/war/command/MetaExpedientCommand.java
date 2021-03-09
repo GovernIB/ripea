@@ -21,14 +21,14 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
 import es.caib.ripea.war.validation.OrganGestorMetaExpedientNotNull;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Command per al manteniment de meta-expedients.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Data
+@Getter
 @CodiMetaExpedientNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
 @OrganGestorMetaExpedientNotNull
 public class MetaExpedientCommand {
@@ -67,6 +67,66 @@ public class MetaExpedientCommand {
 
     private String estructuraCarpetesJson;
     
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setCodi(String codi) {
+		this.codi = codi.trim();
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom.trim();
+	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio.trim();
+	}
+
+	public void setClassificacioSia(String classificacioSia) {
+		this.classificacioSia = classificacioSia.trim();
+	}
+
+	public void setSerieDocumental(String serieDocumental) {
+		this.serieDocumental = serieDocumental.trim();
+	}
+
+	public void setExpressioNumero(String expressioNumero) {
+		this.expressioNumero = expressioNumero.trim();
+	}
+
+	public void setOrganGestorId(Long organGestorId) {
+		this.organGestorId = organGestorId;
+	}
+
+	public void setNotificacioActiva(boolean notificacioActiva) {
+		this.notificacioActiva = notificacioActiva;
+	}
+
+	public void setPermetMetadocsGenerals(boolean permetMetadocsGenerals) {
+		this.permetMetadocsGenerals = permetMetadocsGenerals;
+	}
+
+	public void setPareId(Long pareId) {
+		this.pareId = pareId;
+	}
+
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
+
+	public void setRolAdminOrgan(boolean isRolAdminOrgan) {
+		this.isRolAdminOrgan = isRolAdminOrgan;
+	}
+
+	public void setGestioAmbGrupsActiva(boolean gestioAmbGrupsActiva) {
+		this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
+	}
+
+	public void setEstructuraCarpetesJson(String estructuraCarpetesJson) {
+		this.estructuraCarpetesJson = estructuraCarpetesJson.trim();
+	}
+
 	public MetaExpedientCommand(boolean isRolOrgan) {
 		this.isRolAdminOrgan = isRolOrgan;
 	}

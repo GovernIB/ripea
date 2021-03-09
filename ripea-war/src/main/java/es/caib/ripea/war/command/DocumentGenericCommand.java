@@ -64,13 +64,13 @@ public class DocumentGenericCommand extends ContenidorCommand {
 		return fitxerContentType;
 	}
 	public void setFitxerContentType(String fitxerContentType) {
-		this.fitxerContentType = fitxerContentType;
+		this.fitxerContentType = fitxerContentType.trim();
 	}
 	public String getFitxerNom() {
 		return fitxerNom;
 	}
 	public void setFitxerNom(String fitxerNom) {
-		this.fitxerNom = fitxerNom;
+		this.fitxerNom = fitxerNom.trim();
 	}
 	public byte[] getFitxerContingut() {
 		return fitxerContingut;
@@ -82,7 +82,7 @@ public class DocumentGenericCommand extends ContenidorCommand {
 		return escanejatTempId;
 	}
 	public void setEscanejatTempId(String escanejatTempId) {
-		this.escanejatTempId = escanejatTempId;
+		this.escanejatTempId = escanejatTempId.trim();
 	}
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
@@ -94,7 +94,7 @@ public class DocumentGenericCommand extends ContenidorCommand {
 		return ntiIdDocumentoOrigen;
 	}
 	public void setNtiIdDocumentoOrigen(String ntiIdDocumentoOrigen) {
-		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;
+		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen.trim();
 	}
 	public static DocumentGenericCommand asCommand(DocumentDto dto) {
 		DocumentGenericCommand command = ConversioTipusHelper.convertir(

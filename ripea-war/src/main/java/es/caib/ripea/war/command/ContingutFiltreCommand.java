@@ -39,7 +39,7 @@ public class ContingutFiltreCommand {
 		return nom;
 	}
 	public void setNom(String nom) {
-		this.nom = nom;
+		this.nom = nom.trim();
 	}
 	public ContingutTipusEnumDto getTipus() {
 		return tipus;
@@ -69,7 +69,7 @@ public class ContingutFiltreCommand {
 		return usuariCreacio;
 	}
 	public void setUsuariCreacio(String usuariCreacio) {
-		this.usuariCreacio = usuariCreacio;
+		this.usuariCreacio = usuariCreacio.trim();
 	}
 	public ContenidorFiltreOpcionsEsborratEnum getOpcionsEsborrat() {
 		return opcionsEsborrat;

@@ -81,13 +81,13 @@ public class DocumentNotificacionsCommand {
 		return assumpte;
 	}
 	public void setAssumpte(String assumpte) {
-		this.assumpte = assumpte;
+		this.assumpte = assumpte.trim();
 	}
 	public String getObservacions() {
 		return observacions;
 	}
 	public void setObservacions(String observacions) {
-		this.observacions = observacions;
+		this.observacions = observacions.trim();
 	}
 	public Date getDataProgramada() {
 		return dataProgramada;

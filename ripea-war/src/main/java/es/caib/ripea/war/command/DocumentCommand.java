@@ -84,7 +84,7 @@ public class DocumentCommand extends ContenidorCommand {
 		return ubicacio;
 	}
 	public void setUbicacio(String ubicacio) {
-		this.ubicacio = ubicacio;
+		this.ubicacio = ubicacio.trim();
 	}
 	public Long getMetaNodeId() {
 		return metaNodeId;
@@ -126,19 +126,19 @@ public class DocumentCommand extends ContenidorCommand {
 		return escanejatTempId;
 	}
 	public void setEscanejatTempId(String escanejatTempId) {
-		this.escanejatTempId = escanejatTempId;
+		this.escanejatTempId = escanejatTempId.trim();
 	}
 	public String getFitxerContentType() {
 		return fitxerContentType;
 	}
 	public void setFitxerContentType(String fitxerContentType) {
-		this.fitxerContentType = fitxerContentType;
+		this.fitxerContentType = fitxerContentType.trim();
 	}
 	public String getFitxerNom() {
 		return fitxerNom;
 	}
 	public void setFitxerNom(String fitxerNom) {
-		this.fitxerNom = fitxerNom;
+		this.fitxerNom = fitxerNom.trim();
 	}
 	public byte[] getFitxerContingut() {
 		return fitxerContingut;
@@ -150,25 +150,25 @@ public class DocumentCommand extends ContenidorCommand {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
+		this.descripcio = descripcio.trim();
 	}
 	/*public Date getDataCaptura() {
 		return dataCaptura;
 	}
 	public void setDataCaptura(Date dataCaptura) {
-		this.dataCaptura = dataCaptura;
+		this.dataCaptura = dataCaptura.trim();
 	}
 	public String getNtiOrgano() {
 		return ntiOrgano;
 	}
 	public void setNtiOrgano(String ntiOrgano) {
-		this.ntiOrgano = ntiOrgano;
+		this.ntiOrgano = ntiOrgano.trim();
 	}
 	public NtiOrigenEnumDto getNtiOrigen() {
 		return ntiOrigen;
 	}
 	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
-		this.ntiOrigen = ntiOrigen;
+		this.ntiOrigen = ntiOrigen.trim();
 	}*/
 	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
 		return ntiEstadoElaboracion;
@@ -180,13 +180,13 @@ public class DocumentCommand extends ContenidorCommand {
 		return ntiTipoDocumental;
 	}
 	public void setNtiTipoDocumental(DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental) {
-		this.ntiTipoDocumental = ntiTipoDocumental;
+		this.ntiTipoDocumental = ntiTipoDocumental.trim();
 	}*/
 	public String getNtiIdDocumentoOrigen() {
 		return ntiIdDocumentoOrigen;
 	}
 	public void setNtiIdDocumentoOrigen(String ntiIdDocumentoOrigen) {
-		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen;
+		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen.trim();
 	}
 
 	public DocumentTipusFirmaEnumDto getTipusFirma() {

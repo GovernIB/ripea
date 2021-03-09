@@ -11,7 +11,6 @@ import es.caib.ripea.core.api.dto.MetaExpedientMetaDocumentDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Command per al manteniment de les meta-documents dels
@@ -19,7 +18,7 @@ import lombok.Setter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Getter
 public class MetaExpedientMetaDocumentCommand {
 
 	private Long id;
@@ -47,5 +46,18 @@ public class MetaExpedientMetaDocumentCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public void setMetaDocumentId(Long metaDocumentId) {
+		this.metaDocumentId = metaDocumentId;
+	}
+	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
+		this.multiplicitat = multiplicitat;
+	}
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
+	
 
 }

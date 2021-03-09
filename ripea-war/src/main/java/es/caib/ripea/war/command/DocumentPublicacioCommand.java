@@ -69,7 +69,7 @@ public class DocumentPublicacioCommand {
 		return assumpte;
 	}
 	public void setAssumpte(String assumpte) {
-		this.assumpte = assumpte;
+		this.assumpte = assumpte.trim();
 	}
 	public Date getDataPublicacio() {
 		return dataPublicacio;
@@ -81,7 +81,7 @@ public class DocumentPublicacioCommand {
 		return observacions;
 	}
 	public void setObservacions(String observacions) {
-		this.observacions = observacions;
+		this.observacions = observacions.trim();
 	}
 
 	public static DocumentPublicacioCommand asCommand(DocumentPublicacioDto dto) {
