@@ -1429,6 +1429,27 @@ public class ContingutServiceImpl implements ContingutService {
 					case BASIC:
 						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASIC);
 						break;
+					case Basic:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.Basic);
+						break;
+					case BASELINE_B_LEVEL:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASELINE_B_LEVEL);
+						break;
+					case BASELINE_LTA_LEVEL:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASELINE_LTA_LEVEL);
+						break;
+					case BASELINE_LT_LEVEL:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASELINE_LT_LEVEL);
+						break;
+					case BASELINE_T:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASELINE_T);
+						break;
+					case BASELINE_T_LEVEL:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.BASELINE_T_LEVEL);
+						break;
+					case LTA:
+						dto.setPerfil(ArxiuFirmaPerfilEnumDto.LTA);
+						break;	
 					}
 				}
 				dto.setFitxerNom(firma.getFitxerNom());
