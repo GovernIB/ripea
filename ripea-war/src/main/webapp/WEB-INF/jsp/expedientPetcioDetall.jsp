@@ -397,23 +397,24 @@ tr.clicable {
 											</a>
 										</td>
 									</tr>
-									<tr>
-										<td colspan="2">
-											<div class="panel panel-default">
-												<div class="panel-heading">
-													<h3 class="panel-title">
-														<span class="fa fa-certificate"></span>
-														<spring:message code="registre.annex.detalls.camp.firmes"/>
-														<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapse-registre-firmes-${annex.id}"><span class="fa fa-chevron-down"></span></button>
-													</h3>
+									<c:if test="${not empty annex.firmaTipus}">
+										<tr>
+											<td colspan="2">
+												<div class="panel panel-default">
+													<div class="panel-heading">
+														<h3 class="panel-title">
+															<span class="fa fa-certificate"></span>
+															<spring:message code="registre.annex.detalls.camp.firmes"/>
+															<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapse-registre-firmes-${annex.id}"><span class="fa fa-chevron-down"></span></button>
+														</h3>
+													</div>
+													<div id="collapse-registre-firmes-${annex.id}" class="panel-collapse collapse collapse-annex collapse-registre-firmes" role="tabpanel" data-annex-id="${annex.id}"> 
+									
+													</div> 
 												</div>
-												<div id="collapse-registre-firmes-${annex.id}" class="panel-collapse collapse collapse-annex collapse-registre-firmes" role="tabpanel" data-annex-id="${annex.id}"> 
-								
-												</div> 
-											</div>
-										</td>
-									</tr>
-								
+											</td>
+										</tr>
+									</c:if>
 								</table>
  							</div> 
 						</div>

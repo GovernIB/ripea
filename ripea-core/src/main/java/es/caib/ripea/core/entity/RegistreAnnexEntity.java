@@ -54,12 +54,12 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	@Column(name = "firma_contingut")
 	private byte[] firmaContingut;
 	@Enumerated(EnumType.STRING)
-	@Column(name = "firma_perfil", length = 4)
+	@Column(name = "firma_perfil", length = 20)
 	private FirmaPerfil firmaPerfil;
 	@Column(name = "firma_tamany")
 	private long firmaTamany;
 	@Enumerated(EnumType.STRING)
-	@Column(name = "firma_tipus", length = 4)
+	@Column(name = "firma_tipus", length = 10)
 	private FirmaTipus firmaTipus;
 	@Column(name = "firma_nom", length = 80)
 	private String firmaNom;

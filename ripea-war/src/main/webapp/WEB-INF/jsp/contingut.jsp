@@ -1229,6 +1229,11 @@ function recuperarResultatDomini(
 	            processResults: function (data, params) {
 	                params.page = params.page || 1;
 	                var dominis = [];
+	                // empty option
+	                dominis.push({
+                        id: "", 
+                        text: ""
+                    })
 	                for (let i = 0; i < data.resultat.length; i++) {
 	                	dominis.push({
 	                        id: data.resultat[i].id, 

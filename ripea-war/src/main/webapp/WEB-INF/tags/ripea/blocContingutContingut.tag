@@ -159,7 +159,7 @@
 							<c:if test="${fill.document && (fill.estat == 'CUSTODIAT' || (fill.estat == 'FIRMAT' && fill.errorEnviamentPortafirmes && fill.gesDocFirmatId != null) || fill.estat == 'ADJUNT_FIRMAT')}"><span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'FIRMAT' && fill.gesDocFirmatId != null}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span></c:if>
 							<c:if test="${fill.document && (fill.estat == 'REDACCIO' || fill.estat == 'ADJUNT_FIRMAT') && fill.gesDocAdjuntId != null}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span></c:if>
-							<c:if test="${fill.document && fill.estat == 'DEFINITIU' && fill.documentTipus != 'IMPORTAT'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
+							<c:if test="${fill.document && fill.estat == 'DEFINITIU'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
 							<c:if test="${fill.document && fill.ambNotificacions}">
 								<c:choose>
 									<c:when test="${!fill.errorDarreraNotificacio && (fill.estatDarreraNotificacio == 'PENDENT' or fill.estatDarreraNotificacio == 'REGISTRADA')}">

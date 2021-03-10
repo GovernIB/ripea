@@ -35,6 +35,7 @@ import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -368,9 +369,40 @@ public class ExpedientHelper {
 			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
 
 		}
-
-		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-		
+		if (registreAnnexEntity.getFirmaTipus() != null) {
+			docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+			switch (registreAnnexEntity.getFirmaTipus()) {
+			case CSV:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF01);
+				break;
+			case XADES_DET:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF02);
+				break;
+			case XADES_ENV:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF03);
+				break;
+			case CADES_DET:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF04);
+				break;
+			case CADES_ATT:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF05);
+				break;
+			case PADES:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF06);
+				break;
+			case SMIME:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF07);
+				break;
+			case ODT:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF08);
+				break;
+			case OOXML:
+				docEntity.setNtiTipoFirma(DocumentNtiTipoFirmaEnumDto.TF09);
+				break;
+			}
+		} else {
+			docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
+		}
 		// ############################## MOVE DOCUMENT IN ARXIU
 		// ##########################################
 		// put arxiu uuid of annex
@@ -588,7 +620,7 @@ public class ExpedientHelper {
 
 	private DocumentDto toDocumentDto(RegistreAnnexEntity registreAnnexEntity) {
 		DocumentDto document = new DocumentDto();
-		document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		document.setDocumentTipus(DocumentTipusEnumDto.IMPORTAT);
 		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
 		document.setData(new Date());
 		document.setNom(registreAnnexEntity.getTitol());

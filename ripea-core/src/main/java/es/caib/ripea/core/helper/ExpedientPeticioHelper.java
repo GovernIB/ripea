@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
@@ -288,6 +287,12 @@ public class ExpedientPeticioHelper {
 				uuid(annex.getUuid()).
 				firmaNom(annex.getFirmaNom()).
 				build();
+		if (annex.getFirmaTipus() != null) {
+			annexEntity.updateFirmaTipus(annex.getFirmaTipus());
+		}
+		if (annex.getFirmaPerfil() != null) {
+			annexEntity.updateFirmaPerfil(annexEntity.getFirmaPerfil());
+		}
 		registreAnnexRepository.save(annexEntity);
 		return annexEntity;
 	}

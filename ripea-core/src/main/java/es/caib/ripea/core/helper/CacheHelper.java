@@ -367,6 +367,12 @@ public class CacheHelper {
 			throw new DominiException(
 					"No s'ha pogut recuperar el resultat de consulta: " + e.getMessage(),
 					e.getCause());
+		} finally {
+			try {
+				jdbcTemplate.getDataSource().getConnection().close();
+			} catch (SQLException ex) {
+				logger.error("Hi ha hagut un error tancant la connexió JDBC", ex);
+			}
 		}
 		return resultat;
 	}
@@ -408,6 +414,12 @@ public class CacheHelper {
 			throw new DominiException(
 					"No s'ha pogut recuperar el resultat de consulta: " + e.getMessage(),
 					e.getCause());
+		} finally {
+			try {
+				jdbcTemplate.getDataSource().getConnection().close();
+			} catch (SQLException ex) {
+				logger.error("Hi ha hagut un error tancant la connexió JDBC", ex);
+			}
 		}
 		return resultat.get(0);
 	}
