@@ -357,25 +357,26 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre,
+			String rolActual,
+			ContingutMassiuFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
-		return delegate.findDocumentsPerCustodiarMassiu(entitatId, filtre, paginacioParams);
+		return delegate.findDocumentsPerCustodiarMassiu(entitatId, rolActual, filtre, paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Set<Long> ids) {
-		return delegate.portafirmesReintentar(entitatId, ids);
+			Set<Long> ids, String rolActual) {
+		return delegate.portafirmesReintentar(entitatId, ids, rolActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException {
-		return delegate.findDocumentsIdsPerCustodiarMassiu(entitatId, filtre);
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException {
+		return delegate.findDocumentsIdsPerCustodiarMassiu(entitatId, filtre, rolActual);
 	}
 
 	@Override

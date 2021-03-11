@@ -156,6 +156,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
+				false, 
 				false);
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
@@ -198,7 +199,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		ContingutEntity pare = null;
 		if (documentDto.getPareId() != null) {
 			contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -207,6 +208,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false,
+					false, 
 					false);	
 		} 
 		
@@ -251,7 +253,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -359,7 +361,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -397,7 +399,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndTipus(
 				entitat, 
 				expedient,
@@ -536,7 +538,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		
 		
 		try {
@@ -576,7 +578,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 
 		firmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
@@ -596,6 +598,7 @@ public class DocumentServiceImpl implements DocumentService {
 				documentId,
 				false,
 				true,
+				false,
 				false,
 				false);
 
@@ -631,7 +634,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		return firmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
@@ -642,19 +645,26 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Set<Long> ids) {
+			Set<Long> ids, 
+			String rolActual) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
 				+ "entitatId=" + entitatId + ", "
 				+ "ids=" + ids + ")");
 		
 		for (Long id : ids) {
+			boolean checkPerMassiuAdmin = false;
+			if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+				checkPerMassiuAdmin = true;
+			} 
+			
 			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
 					entitatId,
 					id,
 					false,
 					true,
 					false,
-					false);
+					false, 
+					checkPerMassiuAdmin);
 			Exception exception = firmaPortafirmesHelper.portafirmesReintentar(
 					entitatId,
 					document);
@@ -697,14 +707,15 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
+			String rolActual,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
 				false, 
-				false);
+				false, 
+				true);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -718,7 +729,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false,
-					false);
+					false, false);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -726,7 +737,15 @@ public class DocumentServiceImpl implements DocumentService {
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
+		
+
+		boolean nomesAgafats = true;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			nomesAgafats = false;
+
+		} 
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
@@ -734,6 +753,7 @@ public class DocumentServiceImpl implements DocumentService {
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerCustodiarMassiu(
 					entitat,
 					metaExpedientsPermesos, 
+					nomesAgafats,
 					auth.getName(),
 					metaExpedient == null,
 					metaExpedient,
@@ -776,13 +796,20 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+			ContingutMassiuFiltreDto filtre, 
+			String rolActual) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, 
 				false);
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+
+		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -796,7 +823,8 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false,
-					false);
+					false, 
+					checkPerMassiuAdmin);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -804,13 +832,19 @@ public class DocumentServiceImpl implements DocumentService {
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
+		
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> documentsIds = documentRepository.findDocumentsIdsPerCustodiarMassiu(
 					entitat,
 					metaExpedientsPermesos, 
+					!checkPerMassiuAdmin,
+					auth.getName(),
 					metaExpedient == null,
 					metaExpedient,
 					expedient == null,
@@ -843,7 +877,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
@@ -882,7 +916,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					true,
 					false,
-					false);
+					false, false);
 			if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 				throw new ValidationException(
 						document.getId(),
@@ -969,7 +1003,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -1189,7 +1223,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					true,
 					false,
-					false);
+					false, false);
 			
 			firmaAppletHelper.processarFirmaClient(
 					identificador,

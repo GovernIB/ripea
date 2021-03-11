@@ -142,6 +142,7 @@
 				<th data-col-name="expedientTasquesCount" data-visible="false"></th>
 				<th data-col-name="grupsCount" data-visible="false"></th>
 				<th data-col-name="permisosCount" data-visible="false"></th>
+
 				<th data-col-name="id" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
 					<script id="cellElementsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

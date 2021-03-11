@@ -276,11 +276,11 @@ public class ContingutServiceBean implements ContingutService {
 	@RolesAllowed("tothom")
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre)
+			ContingutMassiuFiltreDto filtre, String rolActual)
 			throws NotFoundException {
 		return delegate.findIdsDocumentsPerFirmaMassiu(
 				entitatId,
-				filtre);
+				filtre, rolActual);
 	}
 
 	@Override
@@ -288,11 +288,13 @@ public class ContingutServiceBean implements ContingutService {
 	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) throws NotFoundException {
 		return delegate.findDocumentsPerFirmaMassiu(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, 
+				rolActual);
 	}
 
 	@Override

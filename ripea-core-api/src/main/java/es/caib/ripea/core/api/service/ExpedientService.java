@@ -156,6 +156,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param metaExpedientId
 	 *            id del metaExpedient
+	 * @param checkPerMassiuAdmin TODO
 	 * @return Llista dels expeidents trobats
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -163,7 +164,7 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<ExpedientSelectorDto> findPerUserAndTipus(
 			Long entitatId,
-			Long metaExpedientId) throws NotFoundException;
+			Long metaExpedientId, boolean checkPerMassiuAdmin) throws NotFoundException;
 
 	/**
 	 * Consulta la llista d'ids d'expedient segons el filtre.
@@ -258,6 +259,7 @@ public interface ExpedientService {
 	 *            Motiu de la finalització de l'expedient.
 	 * @param documentsPerFirmar
 	 *            Els documents a firmar abans de tancar l'expedient.
+	 * @param checkPerMassiuAdmin TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws ExpedientTancarSenseDocumentsDefinitiusException
@@ -268,7 +270,7 @@ public interface ExpedientService {
 			Long entitatId,
 			Long id,
 			String motiu,
-			Long[] documentsPerFirmar) throws NotFoundException, ExpedientTancarSenseDocumentsDefinitiusException;
+			Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) throws NotFoundException, ExpedientTancarSenseDocumentsDefinitiusException;
 
 	/**
 	 * Torna a l'estat obert un expedient tancat.
@@ -425,11 +427,11 @@ public interface ExpedientService {
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<Long> findIdsExpedientsPerTancamentMassiu(Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException;
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
 	void agafar(

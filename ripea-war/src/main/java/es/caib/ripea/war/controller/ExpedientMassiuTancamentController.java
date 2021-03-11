@@ -36,10 +36,12 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/massiu/tancament")
-public class ExpedientMassiuTancamentController extends BaseUserOAdminController {
+public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganController {
 	
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientMassiuTancamentController.session.filtre";
-	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientMassiuTancamentController.session.seleccio";
+	private static final String SESSION_ATTRIBUTE_SELECCIO_USER = "ExpedientMassiuTancamentController.session.seleccio.user";
+	private static final String SESSION_ATTRIBUTE_SELECCIO_ADMIN = "ExpedientMassiuTancamentController.session.seleccio.admin";
+	private static final String SESSION_ATTRIBUTE_SELECCIO_ORGAN = "ExpedientMassiuTancamentController.session.seleccio.organ";
 
 
 	@Autowired
@@ -62,11 +64,19 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
-						SESSION_ATTRIBUTE_SELECCIO));
+						getSessionAttributeSelecio(request)));
 
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), checkPerMassiuAdmin, rolActual));
 
 		return "expedientMassiuTancamentList";
 	}
@@ -96,16 +106,17 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 		
-		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
 					 expedientService.findExpedientsPerTancamentMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request)),
+								DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual),
 					 "id",
-					 SESSION_ATTRIBUTE_SELECCIO);
+					 getSessionAttributeSelecio(request));
 		} catch (Exception e) {
 			throw e;
 		}
@@ -122,12 +133,12 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		if (seleccio == null) {
 			seleccio = new HashSet<Long>();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
-					SESSION_ATTRIBUTE_SELECCIO,
+					getSessionAttributeSelecio(request),
 					seleccio);
 		}
 		if (ids != null) {
@@ -137,10 +148,13 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+			String rolActual = (String)request.getSession().getAttribute(
+					SESSION_ATTRIBUTE_ROL_ACTUAL);
+			
 			seleccio.addAll(
 					expedientService.findIdsExpedientsPerTancamentMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand)));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
 		}
 		return seleccio.size();
 	}
@@ -153,12 +167,12 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		if (seleccio == null) {
 			seleccio = new HashSet<Long>();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
-					SESSION_ATTRIBUTE_SELECCIO,
+					getSessionAttributeSelecio(request),
 					seleccio);
 		}
 		if (ids != null) {
@@ -185,7 +199,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		
 		if (seleccio == null || seleccio.isEmpty()) {
 			model.addAttribute("portafirmes", false);
@@ -223,21 +237,21 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		
 		for (Long expedientId : seleccio) {
 			expedientService.tancar(
 					entitatActual.getId(),
 					expedientId,
 					command.getMotiu(),
-					null);
+					null, false);
 			
 		}
 		
 		seleccio.clear();
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO,
+				getSessionAttributeSelecio(request),
 				seleccio);
 		
 		return getModalControllerReturnValueSuccess(
@@ -247,6 +261,22 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminController
 	}
 	
 	
+	
+	private String getSessionAttributeSelecio(HttpServletRequest request) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String sessionAttribute;
+		if (rolActual.equals("tothom")) {
+			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_USER;
+		} else if (rolActual.equals("IPA_ADMIN")) {
+			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_ADMIN;
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN")){
+			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_ORGAN;
+		} else {
+			throw new RuntimeException("No rol permitido");
+		}
+		return sessionAttribute;
+	}
 	
 	
 	

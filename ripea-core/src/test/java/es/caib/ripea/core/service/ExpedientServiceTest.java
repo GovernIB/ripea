@@ -423,7 +423,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						ExpedientDto expedientAmbEstat = expedientEstatService.changeEstatOfExpedient(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								estatCreat.getId());
+								estatCreat.getId(), 
+								false);
 						ExpedientEstatDto estatExpedient = expedientAmbEstat.getExpedientEstat();
 						assertNotNull(estatExpedient);
 						assertEquals(estatPerCrear.getCodi(), estatExpedient.getCodi());
@@ -547,7 +548,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 									entitatCreada.getId(),
 									expedientCreat.getId(),
 									"Motiu de tancament",
-									null);
+									null, false);
 							fail("No s'ha de poder tancar un expedient sense documents definitius");
 						} catch (ValidationException ignored) {
 						}
@@ -563,7 +564,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								"Motiu de tancament",
-								null);
+								null, false);
 						ExpedientDto expedientTancat = expedientService.findById(
 								entitatCreada.getId(),
 								expedientCreat.getId());

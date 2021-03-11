@@ -102,7 +102,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		if (! checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
@@ -169,7 +169,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				true, 
 				false, 
 				false, 
-				false);
+				false, false);
 		List<CarpetaEntity> carpetesEntity = carpetaRepository.findByPare(expedient);
 		for (CarpetaEntity carpetaEntity : carpetesEntity) {
 			carpetes.add(carpetaHelper.toCarpetaDto(carpetaEntity));

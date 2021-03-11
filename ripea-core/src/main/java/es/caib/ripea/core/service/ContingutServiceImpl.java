@@ -165,7 +165,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		contingutHelper.comprovarNomValid(
 				contingut.getPare(),
 				nom,
@@ -206,7 +206,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false);
+				false, true);
 		// Esborra les dades no especificades
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {
@@ -243,7 +243,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				true);
+				true, false);
 
 
 		return contingutHelper.deleteReversible(
@@ -396,14 +396,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				true);
+				true, false);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -431,19 +431,19 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					true,
-					false);
+					false, false);
 		}
 		// Es comprova que el tipus d'expedient orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false);
+				false, false);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false);
+				false, false);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -507,14 +507,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false);
+				false, false);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -542,19 +542,19 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					true,
-					false);
+					false, false);
 		}
 		// Es comprova que el tipus d'expedient orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false);
+				false, false);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false);
+				false, false);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -619,14 +619,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false);
+				false, false);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -654,19 +654,19 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					true,
-					false);
+					false, false);
 		}
 		// Es comprova que el tipus d'expedient orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false);
+				false, false);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false);
+				false, false);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -1503,12 +1503,21 @@ public class ContingutServiceImpl implements ContingutService {
 	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
-				false, false);
+				false,
+				true);
+
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -1522,7 +1531,8 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false,
-					false);
+					false, 
+					checkPerMassiuAdmin);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1530,7 +1540,7 @@ public class ContingutServiceImpl implements ContingutService {
 					entitat,
 					filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
@@ -1578,12 +1588,19 @@ public class ContingutServiceImpl implements ContingutService {
 	@Override
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+			ContingutMassiuFiltreDto filtre, 
+			String rolActual) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -1597,7 +1614,8 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false,
-					false);
+					false, 
+					checkPerMassiuAdmin);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1605,7 +1623,7 @@ public class ContingutServiceImpl implements ContingutService {
 					entitat,
 					filtre.getMetaExpedientId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());

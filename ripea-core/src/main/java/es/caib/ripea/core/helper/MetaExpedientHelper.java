@@ -181,7 +181,7 @@ public class MetaExpedientHelper {
 		return metaExpedients;
 	}
 
-	public List<MetaExpedientEntity> findPermesosAccioMassiva(Long entitatId) {
+	public List<MetaExpedientEntity> findPermesosAccioMassiva(Long entitatId, String rolActual) {
 		return findAmbEntitatPermis(
 				entitatId,
 				ExtendedPermission.WRITE,
@@ -189,7 +189,9 @@ public class MetaExpedientHelper {
 				null,
 				false,
 				false,
-				null);
+				null,
+				rolActual, 
+				true);
 	}
 
 	public List<MetaExpedientEntity> findAmbEntitatPermis(
@@ -199,7 +201,9 @@ public class MetaExpedientHelper {
 			String filtreNomOrCodiSia, 
 			boolean isAdminEntitat,
 			boolean isAdminOrgan,
-			Long adminOrganOrganId) {
+			Long adminOrganOrganId,
+			String rolActual, 
+			boolean checkPerMassiuAdmin) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -234,7 +238,12 @@ public class MetaExpedientHelper {
 				organIds == null || organIds.isEmpty() ? null : organIds,
 				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty(),
 				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds);
-		/*if (onlyToCheckReadPermission) {
+		
+		
+/*		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
+
+		
+		if (onlyToCheckReadPermission || checkPerMassiuAdmin) {
 			if (rolActual.equals("tothom")) { 
 				permisosHelper.filterGrantedAll(
 						metaExpedients,
@@ -246,6 +255,7 @@ public class MetaExpedientHelper {
 						MetaNodeEntity.class,
 						permisos,
 						auth);
+					
 			} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 				permisosHelper.filterGrantedAll(
 						metaExpedients,
@@ -257,16 +267,20 @@ public class MetaExpedientHelper {
 						MetaNodeEntity.class,
 						permisos,
 						auth);
+
 				List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
 				if (organs != null && !organs.isEmpty()) {
 					List<MetaExpedientEntity> metaExpedientsOfOrgans = metaExpedientRepository.findByOrganGestors(
 							entitat,
 							organs);
+					
 					metaExpedients.addAll(metaExpedientsOfOrgans);
 					// remove duplicates
 					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
+					
 				} 
 			}
+			
 		} else {
 			permisosHelper.filterGrantedAll(
 					metaExpedients,
@@ -279,6 +293,7 @@ public class MetaExpedientHelper {
 					permisos,
 					auth);
 		}*/
+		
 		return metaExpedients;
 	}
 

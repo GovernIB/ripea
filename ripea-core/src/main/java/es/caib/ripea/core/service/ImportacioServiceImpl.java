@@ -73,6 +73,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false,
 				false,
+				false, 
 				false);
 
 		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(

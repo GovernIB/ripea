@@ -122,7 +122,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
@@ -245,7 +245,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			interessatRepository.delete(interessat);
@@ -291,7 +291,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			if (interessat.getRepresentant() != null && 
@@ -397,7 +397,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				true,
 				false,
 				false,
-				false);
+				false, false);
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
 		if (nomesAmbNotificacioActiva) {
@@ -432,7 +432,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				true,
 				false,
 				false,
-				false);
+				false, false);
 		return interessatRepository.countByExpedient(
 				expedient);
 	}
@@ -462,7 +462,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				document,
 				false,
 				false,
-				true);
+				true, false);
 		if (expedient == null) {
 			throw new ValidationException(
 					documentId,

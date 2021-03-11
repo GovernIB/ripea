@@ -218,6 +218,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				true,
 				false,
 				false,
+				false, 
 				false);
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByExpedient(
 				expedient, 

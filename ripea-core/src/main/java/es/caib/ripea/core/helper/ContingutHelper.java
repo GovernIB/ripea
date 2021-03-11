@@ -524,14 +524,16 @@ public class ContingutHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		ContingutEntity contingut = comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
-				comprovarPermisDelete);
+				comprovarPermisDelete, 
+				checkPerMassiuAdmin);
 		if (!(contingut instanceof NodeEntity)) {
 			throw new ValidationException(
 					contingut.getId(),
@@ -548,7 +550,8 @@ public class ContingutHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -564,7 +567,8 @@ public class ContingutHelper {
 				contingut,
 				true,
 				false,
-				true);
+				true, 
+				checkPerMassiuAdmin);
 		if (expedient == null) {
 			throw new ValidationException(
 					contingutId,
@@ -572,6 +576,7 @@ public class ContingutHelper {
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
 		
+		if (!checkPerMassiuAdmin) {
 		// Comprova que l'usuari actual te agafat l'expedient
 		UsuariEntity agafatPer = expedient.getAgafatPer();
 		if (agafatPer == null) {
@@ -589,6 +594,8 @@ public class ContingutHelper {
 					"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
 					"usuariActualCodi=" + auth.getName() + ")");
 		}
+		}
+
 		
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
@@ -604,7 +611,8 @@ public class ContingutHelper {
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
-					comprovarPermisDelete);
+					comprovarPermisDelete, 
+					checkPerMassiuAdmin);
 		}
 		return contingut;
 	}
@@ -647,14 +655,14 @@ public class ContingutHelper {
 				contingut,
 				true,
 				true,
-				false);
+				false, false);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			comprovarPermisosExpedient(
 					(ExpedientEntity)contingut,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					false,
-					false);
+					false, false);
 		}
 		return contingut;
 	}
@@ -784,7 +792,8 @@ public class ContingutHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		if (expedient.getMetaNode() != null) {
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					expedient.getMetaNode(),
@@ -793,7 +802,8 @@ public class ContingutHelper {
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
-					comprovarPermisDelete);
+					comprovarPermisDelete, 
+					checkPerMassiuAdmin);
 		} else {
 			throw new ValidationException(
 					expedient.getId(),
@@ -806,7 +816,8 @@ public class ContingutHelper {
 			ContingutEntity contingut,
 			boolean incloureActual,
 			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite) {
+			boolean comprovarPermisWrite, 
+			boolean checkPerMassiuAdmin) {
 		ExpedientEntity expedient = null;
 		if (incloureActual && contingut instanceof ExpedientEntity) {
 			expedient = (ExpedientEntity)contingut;
@@ -834,9 +845,9 @@ public class ContingutHelper {
 						true,
 						false,
 						false,
-						false);
+						false, false);
 			}
-			if (comprovarPermisWrite) {
+			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
 				boolean granted = permisosHelper.isGrantedAll(
 						expedient.getMetaExpedient().getId(),
 						MetaNodeEntity.class,
