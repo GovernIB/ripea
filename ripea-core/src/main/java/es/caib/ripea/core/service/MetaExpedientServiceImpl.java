@@ -54,6 +54,7 @@ import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -132,10 +133,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
-		//crear estructura carpetes per defecte
-		metaExpedientHelper.crearEstructuraCarpetes(
-				metaExpedient.getEstructuraCarpetes(), 
-				metaExpedientEntity);
+		if (metaExpedient.getEstructuraCarpetes() != null) {
+			//crear estructura carpetes per defecte
+			metaExpedientHelper.crearEstructuraCarpetes(
+					metaExpedient.getEstructuraCarpetes(), 
+					metaExpedientEntity);
+		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
 
@@ -168,10 +171,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva());
 		
-		//crear estructura carpetes per defecte
-		metaExpedientHelper.crearEstructuraCarpetes(
-				metaExpedient.getEstructuraCarpetes(), 
-				metaExpedientEntity);
+		if (metaExpedient.getEstructuraCarpetes() != null) {
+			//crear estructura carpetes per defecte
+			metaExpedientHelper.crearEstructuraCarpetes(
+					metaExpedient.getEstructuraCarpetes(), 
+					metaExpedientEntity);
+		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
 
@@ -509,6 +514,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false, 
 				false, 
 				true);
+		if (!isCarpetesDefectaActiva()) {
+			throw new RuntimeException("La creació de carpetes per defecte no està activa");
+		}
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
 		return metaExpedientHelper.obtenirPareArbreCarpetesPerMetaExpedient(metaExpedient,carpetes);
@@ -525,6 +533,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false, 
 				false, 
 				true);
+		if (!isCarpetesDefectaActiva()) {
+			throw new RuntimeException("La creació de carpetes per defecte no està activa");
+		}
 		MetaExpedientCarpetaDto carpeteDeleted = metaExpedientHelper.deleteCarpetaMetaExpedient(metaExpedientCarpetaId);
 		return carpeteDeleted;
 	}
@@ -798,7 +809,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return entity;
 	}
 
-	
+	private boolean isCarpetesDefectaActiva() {
+		return Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.defecte"));
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);
 

@@ -152,9 +152,11 @@ public class MetaExpedientCommand {
 	public MetaExpedientDto asDto() throws JsonMappingException {
 		MetaExpedientDto dto = ConversioTipusHelper.convertir(this, MetaExpedientDto.class);
 		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			List<ArbreJsonDto> listCarpetes = objectMapper.readValue(this.getEstructuraCarpetesJson(), new TypeReference<List<ArbreJsonDto>>(){});
-			dto.setEstructuraCarpetes(listCarpetes);
+			if (getEstructuraCarpetesJson() != null) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				List<ArbreJsonDto> listCarpetes = objectMapper.readValue(getEstructuraCarpetesJson(), new TypeReference<List<ArbreJsonDto>>(){});
+				dto.setEstructuraCarpetes(listCarpetes);
+			}
 		} catch (IOException ex) {
 			throw new JsonMappingException("Hi ha hagut un error en la conversió del json de jstree a List<ArbreJsonDto>", ex);
 		}

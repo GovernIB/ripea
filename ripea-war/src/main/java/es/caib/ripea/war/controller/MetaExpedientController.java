@@ -33,6 +33,7 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.MetaExpedientCommand;
@@ -60,7 +61,9 @@ public class MetaExpedientController extends BaseAdminController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private OrganGestorService organGestorService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
@@ -361,6 +364,7 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		boolean hasOrganGestor = dto != null ? dto.getOrganGestor() != null : false;
 		model.addAttribute("hasOrganGestor", hasOrganGestor);
+		model.addAttribute("isCarpetaDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte")));
 	}
 	
 	
