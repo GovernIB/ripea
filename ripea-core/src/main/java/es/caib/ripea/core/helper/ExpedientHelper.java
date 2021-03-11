@@ -155,6 +155,7 @@ public class ExpedientHelper {
 				false,
 				false,
 				true,
+				false, 
 				false);
 		OrganGestorEntity organGestor;
 		if (metaExpedient.getOrganGestor() != null) {
@@ -176,6 +177,7 @@ public class ExpedientHelper {
 						"organGestorId=" + organGestorId + ")");
 			}
 		}
+
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
 //		}
@@ -187,6 +189,7 @@ public class ExpedientHelper {
 					false,
 					false,
 					true,
+					false, 
 					false);
 		}
 		contingutHelper.comprovarNomValid(contingutPare, nom, null, ExpedientEntity.class);
@@ -533,7 +536,7 @@ public class ExpedientHelper {
 
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
 
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedient.getId() + ")");
 			throw new ValidationException(expedient.getId(), ExpedientEntity.class, "No es pot agafar un expedient no arrel");

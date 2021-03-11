@@ -117,7 +117,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		MetaExpedientEntity metaExpedientPare = null;
 		if (metaExpedient.getPareId() != null) {
-			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
+
+		metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
 		}
 		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
 		MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
@@ -221,7 +222,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	public MetaExpedientDto findById(Long entitatId, Long id) {
 		logger.debug("Consulta del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, id);
+
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
@@ -278,6 +281,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.debug(
 				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
 						")");
+
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatPermis(
 						entitatId,
@@ -286,13 +290,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						null, 
 						false,
 						false,
-						null),
+						null, 
+						null, 
+						false),
 				MetaExpedientDto.class);
+
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId) {
+	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId, boolean checkPerMassiuAdmin, String rolActual) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatPermis(
@@ -302,8 +309,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						null, 
 						false,
 						false,
-						null),
+						null,
+						rolActual,
+						checkPerMassiuAdmin),
 				MetaExpedientDto.class);
+
 	}
 
 	@Transactional(readOnly = true)
@@ -313,6 +323,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			String filtreNomOrCodiSia, 
 			String rolActual) {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
+
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatPermis(
 						entitatId,
@@ -321,8 +332,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtreNomOrCodiSia, 
 						"IPA_ADMIN".equals(rolActual),
 						"IPA_ORGAN_ADMIN".equals(rolActual),
-						null), // TODO especificar organId quan és admin organ
+						null,
+						rolActual,
+						false), // TODO especificar organId quan és admin organ
 				MetaExpedientDto.class);
+
 	}
 
 	@Transactional(readOnly = true)
@@ -471,7 +485,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Consulta el pròxim número de seqüència (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
 						"any=" + any + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, id);
+
 		return metaExpedientHelper.obtenirProximaSequenciaExpedient(metaExpedient, any, false);
 	}
 
@@ -514,10 +530,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false, 
 				false, 
 				true);
+
 		if (!isCarpetesDefectaActiva()) {
 			throw new RuntimeException("La creació de carpetes per defecte no està activa");
 		}
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
 		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
 		return metaExpedientHelper.obtenirPareArbreCarpetesPerMetaExpedient(metaExpedient,carpetes);
 	}
@@ -550,7 +568,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Creant una nova tasca del meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
 						metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
 		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
 		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.findOne(idEstatCrear) : null;
 		Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
@@ -645,7 +665,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Consulta paginada de les tasques del meta-expedient(" + "entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ", " + "paginacioParams=" + paginacioParams + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
 		return paginacioHelper.toPaginaDto(
 				metaExpedientTascaRepository.findByEntitatAndMetaExpedientAndFiltre(
 						entitat,
@@ -692,6 +714,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
@@ -712,6 +735,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		permisos.addAll(permisosHelper.findPermisos(id, MetaNodeEntity.class));
 		return permisos;
+
 	}
 
 	@Transactional
@@ -723,6 +747,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"id=" + id + ", " +
 				"permis=" + permis + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 		if (permis.getOrganGestorId() == null) {
 			permisosHelper.updatePermis(id, MetaNodeEntity.class, permis);
@@ -741,6 +766,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			}
 			permisosHelper.updatePermis(metaExpedientOrganGestorId, MetaExpedientOrganGestorEntity.class, permis);
 		}
+
 	}
 
 	@Transactional
@@ -752,6 +778,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"id=" + id + ", " +
 				"permisId=" + permisId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 		if (organGestorId == null) {
 			permisosHelper.deletePermis(id, MetaNodeEntity.class, permisId);
@@ -764,6 +791,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			permisosHelper.deletePermis(trobat.getId(), MetaExpedientOrganGestorEntity.class, permisId);
 			metaExpedientOrganGestorRepository.delete(trobat);
 		}
+
 	}
 
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
@@ -799,9 +827,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		dto.setMetaDocuments(metaDocuments);
 	}
 
+
+
 	private MetaExpedientTascaEntity getMetaExpedientTasca(Long entitatId, Long metaExpedientId, Long id) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
 		entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
 		MetaExpedientTascaEntity entity = metaExpedientTascaRepository.findOne(id);
 		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
 			throw new NotFoundException(id, MetaExpedientTascaEntity.class);

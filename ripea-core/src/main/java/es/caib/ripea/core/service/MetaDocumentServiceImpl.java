@@ -626,7 +626,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				contingut,
 				true,
 				false,
-				false);
+				false, false);
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 				entitat,
 				expedientSuperior);
@@ -660,7 +660,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				document,
 				true,
 				false,
-				false);
+				false, false);
 		// Han de ser els mateixos que per a la creació però afegit el meta-document
 		// del document que es vol modificar
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
@@ -760,8 +760,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false, false);
+				false,
+				false, 
+				true);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);

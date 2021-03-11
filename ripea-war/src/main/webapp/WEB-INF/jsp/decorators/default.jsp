@@ -343,24 +343,31 @@ body {
 									<spring:message code="decorator.menu.tasques"/>
 									<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
 								</a>						
-										
-								<div class="btn-group">
-									<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>
-									</button>
-									<ul class="dropdown-menu">
-										<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
-										<c:if test="${convertirDefinitiu}">
-										<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
-										</c:if>
-										<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
-										<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
-										<li><a href="<c:url value="/massiu/custodiar"/>"><spring:message code="massiu.custodiar"/></a></li>
-									</ul>
-								</div>
-
 							</c:when>
 						</c:choose>
+						<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">
+							<%---- Acció massiva ----%>	
+							<div class="btn-group">
+								<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
+									<c:if test="${convertirDefinitiu}">
+									<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
+									</c:if>
+									<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
+									<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
+									<li><a href="<c:url value="/massiu/custodiar"/>"><spring:message code="massiu.custodiar"/></a></li>
+								</ul>
+							</div>
+						</c:if>
+						
+						
+						
+						
+						
+						
 						<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">
 							<div class="btn-group">
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="execucions.massives.boto.user"/>&nbsp;<span class="caret caret-white"></span></button>

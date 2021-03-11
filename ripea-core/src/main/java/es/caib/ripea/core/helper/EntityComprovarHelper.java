@@ -312,7 +312,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);
@@ -328,7 +329,8 @@ public class EntityComprovarHelper {
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
-				comprovarPermisDelete);
+				comprovarPermisDelete, 
+				checkPerMassiuAdmin);
 		return metaExpedient;
 	}
 
@@ -490,7 +492,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
@@ -530,7 +533,8 @@ public class EntityComprovarHelper {
 				comprovarPermisRead,
 		        comprovarPermisWrite,
 		        comprovarPermisCreate,
-		        comprovarPermisDelete);
+		        comprovarPermisDelete,
+		        checkPerMassiuAdmin);
 		return expedient;
 	}
 
@@ -697,10 +701,10 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (comprovarPermisRead) {
-			boolean hasToCheckReadPermissions = true;
+		boolean metaExpedientBelongsToEntitatOrOrgansOfUser = true;
 			if (metaNode.getClass() == MetaExpedientEntity.class) {
 				boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
 						metaNode.getEntitat().getId(),
@@ -725,10 +729,13 @@ public class EntityComprovarHelper {
 					}
 				}
 				if (esAdministradorEntitat || metaExpedientBelongsToOrgans) {
-					hasToCheckReadPermissions = false;
+				metaExpedientBelongsToEntitatOrOrgansOfUser = true;
 				}
 			}
-			if (hasToCheckReadPermissions) {
+		if (metaExpedientBelongsToEntitatOrOrgansOfUser) {
+			comprovarPermisRead = false;
+		}
+		if (comprovarPermisRead) {
 				boolean granted = permisosHelper.isGrantedAll(
 						metaNode.getId(),
 						MetaNodeEntity.class,
@@ -742,6 +749,9 @@ public class EntityComprovarHelper {
 							"usuari=" + auth.getName() + ")");*/
 				}
 			}
+		
+		if (checkPerMassiuAdmin && metaExpedientBelongsToEntitatOrOrgansOfUser) {
+			comprovarPermisWrite = false;
 		}
 		if (comprovarPermisWrite) {
 			boolean granted = permisosHelper.isGrantedAll(
@@ -751,10 +761,6 @@ public class EntityComprovarHelper {
 					auth);
 			if (!granted) {
 				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "WRITE");
-				/*throw new SecurityException(
-						"Sense permisos per a modificar el node (" +
-						"id=" + nodeId + ", " +
-				        "usuari=" + auth.getName() + ")");*/
 			}
 		}
 //		if (comprovarPermisCreate) {
@@ -777,10 +783,6 @@ public class EntityComprovarHelper {
 					auth);
 			if (!granted) {
 				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "DELETE");
-				/*throw new SecurityException(
-						"Sense permisos per a esborrar el node (" +
-						"id=" + nodeId + ", " +
-						"usuari=" + auth.getName() + ")");*/
 			}
 		}
 	}

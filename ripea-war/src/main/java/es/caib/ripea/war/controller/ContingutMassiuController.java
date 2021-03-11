@@ -57,7 +57,7 @@ import es.caib.ripea.war.helper.RolHelper;
  */
 @Controller
 @RequestMapping("/massiu")
-public class ContingutMassiuController extends BaseUserOAdminController {
+public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ContingutMassiuController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutMassiuController.session.seleccio";
@@ -101,12 +101,21 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 				getMessage(request, "accio.massiva.boto.crear.portafirmes"));
 		model.addAttribute(
 				filtreCommand);
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), checkPerMassiuAdmin, rolActual));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId());
+			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
 		model.addAttribute(
 				"expedients",
 				expedients);
@@ -198,8 +207,17 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+		
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId());
+			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
 		model.addAttribute(
 				"expedients",
 				expedients);
@@ -311,8 +329,9 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
-		
-		
+
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		try {
 			return DatatablesHelper.getDatatableResponse(
@@ -320,7 +339,8 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 					 contingutService.findDocumentsPerFirmaMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request)),
+								DatatablesHelper.getPaginacioDtoFromRequest(request), 
+								rolActual),
 					 "id",
 					 SESSION_ATTRIBUTE_SELECCIO);
 		} catch (Exception e) {
@@ -337,9 +357,17 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), metaExpedientId);
+			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), metaExpedientId, checkPerMassiuAdmin);
 		return expedients;
 	}
 	
@@ -385,10 +413,14 @@ public class ContingutMassiuController extends BaseUserOAdminController {
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+			
+			String rolActual = (String)request.getSession().getAttribute(
+					SESSION_ATTRIBUTE_ROL_ACTUAL);
+			
 			seleccio.addAll(
 					contingutService.findIdsDocumentsPerFirmaMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand)));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
 		}
 		return seleccio.size();
 	}

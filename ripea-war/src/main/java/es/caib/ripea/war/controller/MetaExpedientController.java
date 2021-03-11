@@ -141,12 +141,15 @@ public class MetaExpedientController extends BaseAdminController {
 		command.setRolAdminOrgan(RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute(command);
 		command.setEntitatId(entitatActual.getId());
-		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = null;
-		if (metaExpedientId != null)
-			carpetes = metaExpedientService.findArbreCarpetesMetaExpedient(entitatActual.getId(), metaExpedientId);
-		else
-			carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
-		model.addAttribute("carpetes", carpetes);
+		boolean isCarpetesDefecte = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte"));
+		if (isCarpetesDefecte) {
+			List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = null;
+			if (metaExpedientId != null)
+				carpetes = metaExpedientService.findArbreCarpetesMetaExpedient(entitatActual.getId(), metaExpedientId);
+			else
+				carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
+			model.addAttribute("carpetes", carpetes);
+		}
 		fillFormModel(
 				request,
 				metaExpedient,

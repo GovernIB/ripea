@@ -612,16 +612,17 @@ public interface DocumentService {
 
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre,
+			String rolActual,
+			ContingutMassiuFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Set<Long> ids);
+			Set<Long> ids, String rolActual);
 
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException;
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
 	public Exception guardarEnArxiuDocumentAdjunt(Long docId);
 

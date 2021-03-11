@@ -77,12 +77,12 @@ public class CarpetaHelper {
 					false,
 					false,
 					false,
-					false);
+					false, false);
 			ExpedientEntity expedient = contingutHelper.getExpedientSuperior(
 					pare,
 					true,
 					false,
-					false);
+					false, false);
 			contingutHelper.comprovarNomValid(
 					pare,
 					nom,

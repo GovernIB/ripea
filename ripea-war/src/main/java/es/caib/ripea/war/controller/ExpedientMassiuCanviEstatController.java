@@ -43,10 +43,12 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/massiu/canviEstat")
-public class ExpedientMassiuCanviEstatController extends BaseUserOAdminController {
+public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganController {
 	
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientCanviEstatMassiuController.session.filtre";
-	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientCanviEstatMassiuController.session.seleccio";
+	private static final String SESSION_ATTRIBUTE_SELECCIO_USER = "ExpedientCanviEstatMassiuController.session.seleccio.user";
+	private static final String SESSION_ATTRIBUTE_SELECCIO_ADMIN = "ExpedientCanviEstatMassiuController.session.seleccio.admin";
+	private static final String SESSION_ATTRIBUTE_SELECCIO_ORGAN = "ExpedientCanviEstatMassiuController.session.seleccio.organ";
 
 
 	@Autowired
@@ -72,11 +74,19 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
-						SESSION_ATTRIBUTE_SELECCIO));
+						getSessionAttributeSelecio(request)));
 
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), checkPerMassiuAdmin, rolActual));
 
 		return "expedientMassiuCanviEstatList";
 	}
@@ -106,6 +116,8 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		try {
 			return DatatablesHelper.getDatatableResponse(
@@ -113,9 +125,9 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 					 expedientEstatService.findExpedientsPerCanviEstatMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request)),
+								DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual),
 					 "id",
-					 SESSION_ATTRIBUTE_SELECCIO);
+					 getSessionAttributeSelecio(request));
 		} catch (Exception e) {
 			throw e;
 		}
@@ -132,12 +144,12 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		if (seleccio == null) {
 			seleccio = new HashSet<Long>();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
-					SESSION_ATTRIBUTE_SELECCIO,
+					getSessionAttributeSelecio(request),
 					seleccio);
 		}
 		if (ids != null) {
@@ -147,10 +159,14 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+			String rolActual = (String)request.getSession().getAttribute(
+					SESSION_ATTRIBUTE_ROL_ACTUAL);
+			
 			seleccio.addAll(
 					expedientEstatService.findIdsExpedientsPerCanviEstatMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand)));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand), 
+							rolActual));
 		}
 		return seleccio.size();
 	}
@@ -163,12 +179,12 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		if (seleccio == null) {
 			seleccio = new HashSet<Long>();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
-					SESSION_ATTRIBUTE_SELECCIO,
+					getSessionAttributeSelecio(request),
 					seleccio);
 		}
 		if (ids != null) {
@@ -192,7 +208,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
 		
 		if (seleccio == null || seleccio.isEmpty()) {
 			model.addAttribute("portafirmes", false);
@@ -239,13 +255,22 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+				getSessionAttributeSelecio(request));
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
 		
 		for (Long expedientId : seleccio) {
 			expedientEstatService.changeEstatOfExpedient(
 					entitatActual.getId(),
 					expedientId,
-					command.getExpedientEstatId()
+					command.getExpedientEstatId(), 
+					checkPerMassiuAdmin
 					);
 		}
 		
@@ -260,6 +285,22 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminControlle
 	
 	
 	
+	
+	private String getSessionAttributeSelecio(HttpServletRequest request) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String sessionAttribute;
+		if (rolActual.equals("tothom")) {
+			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_USER;
+		} else if (rolActual.equals("IPA_ADMIN")) {
+			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_ADMIN;
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN")){
+			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_ORGAN;
+		} else {
+			throw new RuntimeException("No rol permitido");
+		}
+		return sessionAttribute;
+	}
 	
 	
 

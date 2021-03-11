@@ -37,7 +37,7 @@ public interface ExpedientEstatService {
 	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId);
+	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId, boolean checkPerMassiuAdmin);
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(Long entitatId, Long metaExpedientId);
@@ -46,11 +46,11 @@ public interface ExpedientEstatService {
 	PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
 	List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException;
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
 }

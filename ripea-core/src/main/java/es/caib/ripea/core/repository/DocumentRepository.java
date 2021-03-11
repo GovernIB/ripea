@@ -219,7 +219,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (d.estat = 1 or d.estat = 2) "  + 
 			"and d.esborrat = 0 " + 
 			"and d.documentTipus = 0 " +
-			"and d.expedient.agafatPer.codi = :usuariActual " +
+			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
@@ -234,6 +234,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	public Page<DocumentEntity> findDocumentsPerCustodiarMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") String usuariActual,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
@@ -260,6 +261,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (d.estat = 1 or d.estat = 2) "  + 
 			"and d.esborrat = 0 " + 
 			"and d.documentTipus = 0 " +
+			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
@@ -274,6 +276,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("nomesAgafats") boolean nomesAgafats,
+			@Param("usuariActual") String usuariActual,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
 			@Param("esNullExpedient") boolean esNullExpedient,

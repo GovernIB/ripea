@@ -177,11 +177,13 @@ public class IndexHelper {
 			PdfPTable taulaDocuments;
 			if (!isRelacio) {
 				if (isMostrarCampsAddicionals()) {
+
 					pointColumnWidths = new float[] {3f, 10f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
 					taulaDocuments = new PdfPTable(10);
 				} else {
 					pointColumnWidths = new float[] {3f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
 					taulaDocuments = new PdfPTable(9);
+
 				}
 				
 			} else {
@@ -191,6 +193,7 @@ public class IndexHelper {
 				} else {
 					pointColumnWidths = new float[] {12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
 					taulaDocuments = new PdfPTable(8);
+
 				}
 			}
 			taulaDocuments.setWidthPercentage(100f);
@@ -303,9 +306,11 @@ public class IndexHelper {
 			String tituloDoc = arxiuDetall.getMetadadesAddicionals().get("tituloDoc") != null ? arxiuDetall.getMetadadesAddicionals().get("tituloDoc").toString() : "";
 			taulaDocuments.addCell(crearCellaContingut(tituloDoc, false));
 		}
+
 //		Descripció
 		String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
 		taulaDocuments.addCell(crearCellaContingut(descripcio, false));
+
 		
 //		Tipus documental
 		String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
@@ -425,7 +430,9 @@ public class IndexHelper {
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nom")));
 		if (isMostrarCampsAddicionals())
 			taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.nomnatural")));
+
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.descripcio")));
+
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocumental")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocument")));
 		taulaDocuments.addCell(crearCellaCapsalera(messageHelper.getMessage("expedient.service.exportacio.index.datacreacio")));
