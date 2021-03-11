@@ -794,7 +794,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					expedientId,
 					command.getMotiu(),
-					command.getDocumentsPerFirmar());
+					command.getDocumentsPerFirmar(), false);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../contingut/" + expedientId,
@@ -897,7 +897,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		expedientEstatService.changeEstatOfExpedient(
 				entitatActual.getId(),
 				command.getId(),
-				command.getExpedientEstatId()
+				command.getExpedientEstatId(), 
+				false
 				);
 		return getModalControllerReturnValueSuccess(
 				request,

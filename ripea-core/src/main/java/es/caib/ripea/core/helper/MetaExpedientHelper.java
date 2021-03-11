@@ -212,7 +212,7 @@ public class MetaExpedientHelper {
 				permisos,
 				true,
 				filtreNomOrCodiSia, 
-				"tothom");		
+				"tothom", false);		
 	}
 	
 	
@@ -221,7 +221,8 @@ public class MetaExpedientHelper {
 			Permission[] permisos,
 			boolean nomesActius,
 			String filtreNomOrCodiSia, 
-			String rolActual) {
+			String rolActual, 
+			boolean checkPerMassiuAdmin) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -244,7 +245,7 @@ public class MetaExpedientHelper {
 		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
 
 		
-		if (onlyToCheckReadPermission) {
+		if (onlyToCheckReadPermission || checkPerMassiuAdmin) {
 			if (rolActual.equals("tothom")) { 
 				permisosHelper.filterGrantedAll(
 						metaExpedients,
@@ -294,9 +295,6 @@ public class MetaExpedientHelper {
 					permisos,
 					auth);
 		}
-
-
-			
 		
 
 		return metaExpedients;		

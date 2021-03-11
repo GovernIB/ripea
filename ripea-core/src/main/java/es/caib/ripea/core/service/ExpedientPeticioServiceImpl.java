@@ -198,7 +198,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					true,
 					false,
 					false,
-					false);
+					false, false);
 		}
 
 		ExpedientEntity expedientEntity = expedientRepository.findByEntitatAndMetaNodeAndNumero(
@@ -227,7 +227,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				true,
 				false,
 				false,
-				false);
+				false, false);
 
 		return conversioTipusHelper.convertirList(expedientPeticioRepository.findByExpedient(expedient),
 				ExpedientPeticioDto.class);

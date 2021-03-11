@@ -229,7 +229,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    e.entitat = :entitat " +
 			"and e.esborrat = 0 " +
 			"and e.estat = 0 " +
-			"and e.agafatPer = :usuariActual " +
+			"and (:nomesAgafats = false or e.agafatPer = :usuariActual) " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -237,6 +237,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
 	public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
@@ -257,7 +258,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    e.entitat = :entitat " +
 			"and e.esborrat = 0 " +
 			"and e.estat = 0 " +
-			"and e.agafatPer = :usuariActual " +
+			"and (:nomesAgafats = false or e.agafatPer = :usuariActual) " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -265,6 +266,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
 	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
@@ -308,7 +310,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    e.entitat = :entitat " +
 			"and e.esborrat = 0 " +
 			"and e.estat = 0 " +
-			"and e.agafatPer = :usuariActual " +
+			"and (:nomesAgafats = false or e.agafatPer = :usuariActual) " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -335,6 +337,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	public Page<ExpedientEntity> findExpedientsPerTancamentMassiu(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
@@ -354,10 +357,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"from " +
 			"    ExpedientEntity e " +
 			"where " +
-			"    e.entitat = :entitat " +
+			"    e.entitat = :entitat " + 
 			"and e.esborrat = 0 " +
 			"and e.estat = 0 " +
-			"and e.agafatPer = :usuariActual " +
+			"and (:nomesAgafats = false or e.agafatPer = :usuariActual) " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -384,6 +387,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	public List<Long> findIdsExpedientsPerTancamentMassiu(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,

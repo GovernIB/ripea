@@ -113,7 +113,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					false,
 					false,
 					false,
-					false);
+					false, false);
 		}
 		
 		Page<ExpedientEstatEntity> paginaExpedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
@@ -152,7 +152,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					false,
 					false,
 					false,
-					false);
+					false, false);
 		}
 		
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
@@ -184,7 +184,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
@@ -207,7 +207,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		
 		int ordre = expedientEstatRepository.countByMetaExpedient(metaExpedient);
 		
@@ -254,7 +254,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		ExpedientEstatEntity expedientEstat = expedientEstatRepository.findOne(estat.getId());
 		expedientEstat.update(
 				estat.getCodi(),
@@ -284,7 +284,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	public ExpedientDto changeEstatOfExpedient(
 			Long entitatId,
 			Long expedientId,
-			Long expedientEstatId) {
+			Long expedientEstatId, 
+			boolean checkPerMassiuAdmin) {
 		logger.debug("Canviant estat del expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
@@ -294,10 +295,11 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				expedientId,
 				false,
-				false,
 				true,
 				false,
-				false);
+				false,
+				false, 
+				checkPerMassiuAdmin);
 		ExpedientEstatEntity estat;
 		if (expedientEstatId!=null){
 			estat = expedientEstatRepository.findOne(expedientEstatId);
@@ -377,12 +379,12 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				true,
 				false,
-				false);
+				false, false);
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
 				false,
 				false,
-				false);
+				false, false);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
 			throw new ValidationException(
@@ -442,13 +444,15 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	public PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) throws NotFoundException {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false, false);
+				false,
+				false, 
+				true);
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
@@ -458,15 +462,22 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					true,
 					false,
 					false,
-					false);
+					false, false);
 		}
+		boolean checkPerMassiuAdmin = false;
+		boolean nomesAgafats = true;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			nomesAgafats = false;
+			checkPerMassiuAdmin = true;
+		} 
 		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
 				null, 
-				"tothom");
+				rolActual, 
+				checkPerMassiuAdmin);
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -476,6 +487,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
 					entitat,
+					nomesAgafats,
 					usuariActual,
 					metaExpedientsPermesos, 
 					metaExpedient == null,
@@ -517,7 +529,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Override
 	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+			ContingutMassiuFiltreDto filtre, 
+			String rolActual) throws NotFoundException {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -533,15 +546,23 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					true,
 					false,
 					false,
-					false);
+					false, false);
 		}
+		
+		boolean checkPerMassiuAdmin = false;
+		boolean nomesAgafats = true;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			nomesAgafats = false;
+			checkPerMassiuAdmin = true;
+		} 
 		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findAmbEntitatOrOrganPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
 				false,
 				null, 
-				"tothom");
+				rolActual, 
+				checkPerMassiuAdmin);
 		
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -551,6 +572,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
 					entitat,
+					nomesAgafats,
 					usuariActual,
 					metaExpedientsPermesos,
 					metaExpedient == null,

@@ -115,7 +115,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				false,
 				false,
-				false);
+				false, false);
 		
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
@@ -312,7 +312,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
 		

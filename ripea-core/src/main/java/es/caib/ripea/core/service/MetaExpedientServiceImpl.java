@@ -115,7 +115,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					false,
 					false,
 					false,
-					false);
+					false, false);
 		}
 		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
 		MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
@@ -251,7 +251,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
@@ -329,17 +329,17 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.debug(
 				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
 						")");
-		return findActiusAmbEntitatPermis(entitatId, new Permission[] { ExtendedPermission.CREATE }, null, null);
+		return findActiusAmbEntitatPermis(entitatId, new Permission[] { ExtendedPermission.CREATE }, null, null, false);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId) {
+	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId, boolean checkPerMassiuAdmin, String rolActual) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
 		return findActiusAmbEntitatPermis(
 				entitatId,
 				new Permission[] { ExtendedPermission.WRITE },
-				null, null);
+				null, rolActual, checkPerMassiuAdmin);
 	}
 
 	@Transactional(readOnly = true)
@@ -353,7 +353,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitatId,
 				new Permission[] { ExtendedPermission.READ },
 				filtreNomOrCodiSia, 
-				rolActual);
+				rolActual, false);
 	}
 
 	@Transactional(readOnly = true)
@@ -518,7 +518,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		return metaExpedientHelper.obtenirProximaSequenciaExpedient(metaExpedient, any, false);
 	}
 
@@ -571,7 +571,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
 		return metaExpedientHelper.obtenirPareArbreCarpetesPerMetaExpedient(metaExpedient,carpetes);
 	}
@@ -607,7 +607,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 
 		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
 		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.findOne(
@@ -712,7 +712,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false,
 				false,
-				false);
+				false, false);
 		return paginacioHelper.toPaginaDto(
 				metaExpedientTascaRepository.findByEntitatAndMetaExpedientAndFiltre(
 						entitat,
@@ -757,7 +757,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.debug(
 				"Consulta dels permisos del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
+		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false, false);
 		return permisosHelper.findPermisos(id, MetaNodeEntity.class);
 	}
 
@@ -768,7 +768,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Modificació del permis del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
 						"permis=" + permis + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
+		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false, false);
 		permisosHelper.updatePermis(id, MetaNodeEntity.class, permis);
 	}
 
@@ -779,7 +779,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Eliminació del permis del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
 						"permisId=" + permisId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false);
+		entityComprovarHelper.comprovarMetaExpedient(entitat, id, false, false, false, false, false);
 		permisosHelper.deletePermis(id, MetaNodeEntity.class, permisId);
 	}
 	
@@ -820,7 +820,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long entitatId,
 			Permission[] permisos,
 			String filtreNomOrCodiSia, 
-			String rolActual) {
+			String rolActual, 
+			boolean checkPerMassiuAdmin) {
 
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatOrOrganPermis(
@@ -828,13 +829,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						permisos,
 						true,
 						filtreNomOrCodiSia, 
-						rolActual == null ? "tothom" : rolActual),
+						rolActual == null ? "tothom" : rolActual, 
+						checkPerMassiuAdmin),
 				MetaExpedientDto.class);
 	}
 
 	private MetaExpedientTascaEntity getMetaExpedientTasca(Long entitatId, Long metaExpedientId, Long id) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId, false, false, false, false);
+		entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId, false, false, false, false, false);
 		MetaExpedientTascaEntity entity = metaExpedientTascaRepository.findOne(id);
 		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
 			throw new NotFoundException(id, MetaExpedientTascaEntity.class);

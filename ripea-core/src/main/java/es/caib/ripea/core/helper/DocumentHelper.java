@@ -526,14 +526,16 @@ public class DocumentHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientModificable(
 				entitatId,
 				id,
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
-				comprovarPermisDelete);
+				comprovarPermisDelete, 
+				checkPerMassiuAdmin);
 		if (!ContingutTipusEnumDto.DOCUMENT.equals(node.getTipus())) {
 			throw new ValidationException(
 					id,

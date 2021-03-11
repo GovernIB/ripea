@@ -153,8 +153,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			Long id,
 			String motiu,
-			Long[] documentsPerFirmar) {
-		delegate.tancar(entitatId, id, motiu, documentsPerFirmar);
+			Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+		delegate.tancar(entitatId, id, motiu, documentsPerFirmar, checkPerMassiuAdmin);
 	}
 
 	@Override
@@ -211,8 +211,8 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId) throws NotFoundException {
-		return delegate.findPerUserAndTipus(entitatId, metaExpedientId);
+	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId, boolean checkPerMassiuAdmin) throws NotFoundException {
+		return delegate.findPerUserAndTipus(entitatId, metaExpedientId, checkPerMassiuAdmin);
 	}
 
 	@Override
@@ -306,20 +306,20 @@ public class ExpedientServiceBean implements ExpedientService {
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
 		return delegate.findExpedientsPerTancamentMassiu(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, rolActual);
 	}
 	@Override
 	@RolesAllowed("tothom")
 	public List<Long> findIdsExpedientsPerTancamentMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException {
 		return delegate.findIdsExpedientsPerTancamentMassiu(
 				entitatId,
-				filtre);
+				filtre, rolActual);
 	}
 	@Override
 	@RolesAllowed("tothom")

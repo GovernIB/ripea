@@ -240,7 +240,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);
@@ -255,7 +256,8 @@ public class EntityComprovarHelper {
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
-				comprovarPermisDelete);
+				comprovarPermisDelete, 
+				checkPerMassiuAdmin);
 		return metaExpedient;
 	}
 
@@ -273,7 +275,7 @@ public class EntityComprovarHelper {
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
-				comprovarPermisDelete);
+				comprovarPermisDelete, false);
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitat.getId(),
@@ -401,7 +403,7 @@ public class EntityComprovarHelper {
 			        + entitat.getId() + ") no coincideix amb l'entitat del node");
 		}
 		comprovarPermisosMetaNode(node.getMetaNode(), comprovarPermisRead, comprovarPermisWrite, comprovarPermisCreate,
-		        comprovarPermisDelete);
+		        comprovarPermisDelete, false);
 		return node;
 	}
 
@@ -424,7 +426,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
@@ -460,7 +463,7 @@ public class EntityComprovarHelper {
 		}
 
 		comprovarPermisosMetaNode(expedient.getMetaExpedient(), comprovarPermisRead, comprovarPermisWrite,
-		        comprovarPermisCreate, comprovarPermisDelete);
+		        comprovarPermisCreate, comprovarPermisDelete, checkPerMassiuAdmin);
 		return expedient;
 	}
 
@@ -625,55 +628,61 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			boolean comprovarPermisDelete, 
+			boolean checkPerMassiuAdmin) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (comprovarPermisRead) {
-			
-			boolean hasToCheckReadPermissions = true;
-			
-			if (metaNode.getClass() == MetaExpedientEntity.class) {
-				boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
-						metaNode.getEntitat().getId(),
-						EntitatEntity.class,
-						new Permission[] { ExtendedPermission.ADMINISTRATION },
-						auth);
+		
+		
+		boolean metaExpedientBelongsToEntitatOrOrgansOfUser = true;
+		if (metaNode.getClass() == MetaExpedientEntity.class) {
+			boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
+					metaNode.getEntitat().getId(),
+					EntitatEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					auth);
 
-				List<MetaExpedientEntity> metaExpedients = null;
-				List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(metaNode.getEntitat().getId());
-				boolean metaExpedientBelongsToOrgans = false;
-				
-//				## si hi ha òrgans gestors definits
-				if (organs != null && !organs.isEmpty()) {
-					metaExpedients = metaExpedientRepository.findByOrganGestors(
-							metaNode.getEntitat(),
-							organs);
-				}
-				if (metaExpedients != null) {
-					for (MetaExpedientEntity metaExpedientEntity : metaExpedients) {
-						if (metaExpedientEntity.getId().equals(metaNode.getId())) {
-							metaExpedientBelongsToOrgans = true;
-						}
+			List<MetaExpedientEntity> metaExpedients = null;
+			List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(metaNode.getEntitat().getId());
+			boolean metaExpedientBelongsToOrgans = false;
+			
+//			## si hi ha òrgans gestors definits
+			if (organs != null && !organs.isEmpty()) {
+				metaExpedients = metaExpedientRepository.findByOrganGestors(
+						metaNode.getEntitat(),
+						organs);
+			}
+			if (metaExpedients != null) {
+				for (MetaExpedientEntity metaExpedientEntity : metaExpedients) {
+					if (metaExpedientEntity.getId().equals(metaNode.getId())) {
+						metaExpedientBelongsToOrgans = true;
 					}
 				}
+			}
 
-				if (esAdministradorEntitat || metaExpedientBelongsToOrgans) {
-					hasToCheckReadPermissions = false;
-				}
-				
+			if (esAdministradorEntitat || metaExpedientBelongsToOrgans) {
+				metaExpedientBelongsToEntitatOrOrgansOfUser = true;
 			}
 			
-			if (hasToCheckReadPermissions) {
-				boolean granted = permisosHelper.isGrantedAll(
-						metaNode.getId(),
-						MetaNodeEntity.class,
-						new Permission[] { ExtendedPermission.READ },
-						auth);
-				
-				if (!granted) {
-					throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "READ");
-				}
+		}
+		
+		if (metaExpedientBelongsToEntitatOrOrgansOfUser) {
+			comprovarPermisRead = false;
+		}
+		if (comprovarPermisRead) {
+			boolean granted = permisosHelper.isGrantedAll(
+					metaNode.getId(),
+					MetaNodeEntity.class,
+					new Permission[] { ExtendedPermission.READ },
+					auth);
+			
+			if (!granted) {
+				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "READ");
 			}
-
+		}
+		
+		
+		if (checkPerMassiuAdmin && metaExpedientBelongsToEntitatOrOrgansOfUser) {
+			comprovarPermisWrite = false;
 		}
 		if (comprovarPermisWrite) {
 			boolean granted = permisosHelper.isGrantedAll(

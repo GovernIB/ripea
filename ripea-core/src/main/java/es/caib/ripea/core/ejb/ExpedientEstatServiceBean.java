@@ -74,8 +74,8 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId) {
-		return delegate.changeEstatOfExpedient(entitatId, expedientId, expedientEstatId);
+	public ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId, boolean checkPerMassiuAdmin) {
+		return delegate.changeEstatOfExpedient(entitatId, expedientId, expedientEstatId, checkPerMassiuAdmin);
 	}
 
 	@Override
@@ -89,21 +89,21 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 	public PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException {
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
 		return delegate.findExpedientsPerCanviEstatMassiu(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, rolActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException {
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException {
 		return delegate.findIdsExpedientsPerCanviEstatMassiu(
 				entitatId,
-				filtre);
+				filtre, rolActual);
 	}
 
 }

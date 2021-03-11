@@ -484,13 +484,14 @@ public interface ContingutService {
 	 *            Atribut id de l'entitat.
 	 * @param filtre
 	 *            Filtre per a la consulta.
+	 * @param rolActual TODO
 	 * @return La llista amb els ids dels continguts.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
-			ContingutMassiuFiltreDto filtre) throws NotFoundException;
+			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 	
 	/**
 	 * Consulta el amb el programar accions massives
@@ -498,7 +499,7 @@ public interface ContingutService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param filtre del datatable
-	 * 
+	 * @param rolActual TODO
 	 * @return El contingut pendent.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -507,7 +508,7 @@ public interface ContingutService {
 	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 
 	ContingutDto findAmbIdUser(Long entitatId,
 			Long contingutId,
