@@ -1,3 +1,4 @@
+
 /**
  * 
  */
@@ -838,6 +839,60 @@ public class ExpedientHelper {
 				break;
 			case ALTRES:
 				documentNtiTipoDocumental = "TD99";
+				break;
+			case LLEI:
+				documentNtiTipoDocumental = "TD51";
+				break;
+			case MOCIO:
+				documentNtiTipoDocumental = "TD52";
+				break;
+			case INSTRUCCIO:
+				documentNtiTipoDocumental = "TD53";
+				break;
+			case CONVOCATORIA:
+				documentNtiTipoDocumental = "TD54";
+				break;
+			case ORDRE_DIA:
+				documentNtiTipoDocumental = "TD55";
+				break;
+			case INFORME_PONENCIA:
+				documentNtiTipoDocumental = "TD56";
+				break;
+			case DICTAMEN_COMISSIO:
+				documentNtiTipoDocumental = "TD57";
+				break;
+			case INICIATIVA_LEGISLATIVA:
+				documentNtiTipoDocumental = "TD58";
+				break;
+			case PREGUNTA:
+				documentNtiTipoDocumental = "TD59";
+				break;
+			case INTERPELACIO:
+				documentNtiTipoDocumental = "TD60";
+				break;
+			case RESPOSTA:
+				documentNtiTipoDocumental = "TD61";
+				break;
+			case PROPOSICIO_NO_LLEI:
+				documentNtiTipoDocumental = "TD62";
+				break;
+			case ESMENA:
+				documentNtiTipoDocumental = "TD63";
+				break;
+			case PROPOSTA_RESOLUCIO:
+				documentNtiTipoDocumental = "TD64";
+				break;
+			case COMPAREIXENSA:
+				documentNtiTipoDocumental = "TD65";
+				break;
+			case SOLICITUD_INFORMACIO:
+				documentNtiTipoDocumental = "TD66";
+				break;
+			case ESCRIT:
+				documentNtiTipoDocumental = "TD67";
+				break;
+			case PETICIO:
+				documentNtiTipoDocumental = "TD69";
 				break;
 			}
 		}
