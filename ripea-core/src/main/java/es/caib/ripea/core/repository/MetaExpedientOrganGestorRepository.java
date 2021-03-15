@@ -37,18 +37,32 @@ public interface MetaExpedientOrganGestorRepository extends JpaRepository<MetaEx
 	List<Long> findOrganGestorIdByMetaExpedient(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 
+	@Query(	"select " +
+			"    meog.organGestor.id " + 
+			"from " +
+			"    MetaExpedientOrganGestorEntity meog " +
+			"where " +
+			"    meog.id in (:metaExpedientOrganGestorIds) ")
+	List<Long> findOrganGestorIdByMetaExpedientOrganGestorIds(
+			@Param("metaExpedientOrganGestorIds") List<Long> metaExpedientOrganGestorIds);
+
 	@Query("select " +
 			"    meog.organGestor " +
 			"from " +
 			"    MetaExpedientOrganGestorEntity meog " +
+			"    left join meog.organGestor.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
 			"where " +
 			"    meog.metaExpedient = :metaExpedient " +
 			"and (:esNullFiltre = true or lower(meog.organGestor.codi) like lower('%'||:filtre||'%') or lower(meog.organGestor.nom) like lower('%'||:filtre||'%')) " +
 			"and (meog.organGestor.id in (:pareIds) " +
-			"     or meog.organGestor.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.pare.pare.id in (:pareIds))")
+			"     or pare1.id in (:pareIds) " + 
+			"	  or pare2.id in (:pareIds)) " +
+			"	  or pare3.id in (:pareIds)) " +
+			"	  or pare4.id in (:pareIds)) " +
+			"order by meog.organGestor.nom asc")
 	public List<OrganGestorEntity> findOrganGestorByMetaExpedientAndFiltreAndOrganGestorPareIdIn(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullFiltre") boolean esNullFiltre,
@@ -59,12 +73,16 @@ public interface MetaExpedientOrganGestorRepository extends JpaRepository<MetaEx
 			"    meog.id " +
 			"from " +
 			"    MetaExpedientOrganGestorEntity meog " +
+			"    left join meog.organGestor.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
 			"where " +
 			"    meog.metaExpedient.entitat = :entitat " +
-			"and (meog.organGestor.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.pare.pare.id in (:pareIds))")
+			"and (pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds))")
 	public List<Long> findFillsIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pareIds") List<Long> pareIds);

@@ -280,8 +280,12 @@ public class PermisosHelper {
 	 * @param permissions Permisos que volem filtrar
 	 * @param auth        Autentificació
 	 */
-	public void filterGrantedAll(Collection<Serializable> ids, Class<?> clazz, Permission[] permissions, Authentication auth) {
-		Iterator<Serializable> it = ids.iterator();
+	public void filterGrantedAll(
+			Collection<? extends Serializable> ids,
+			Class<?> clazz,
+			Permission[] permissions,
+			Authentication auth) {
+		Iterator<? extends Serializable> it = ids.iterator();
 		while (it.hasNext()) {
 			Serializable objectIdentifier = it.next();
 			if (!isGrantedAll(objectIdentifier, clazz, permissions, auth))
@@ -290,7 +294,7 @@ public class PermisosHelper {
 	}
 
 	public void filterGrantedAll(
-			Collection<? extends AbstractPersistable<Serializable>> objects,
+			Collection<? extends AbstractPersistable<? extends Serializable>> objects,
 			Class<?> clazz,
 			Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

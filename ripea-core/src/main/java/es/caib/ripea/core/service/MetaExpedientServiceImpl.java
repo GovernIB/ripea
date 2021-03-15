@@ -694,7 +694,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false);
 		ProcedimentDto procedimentDto = pluginHelper.procedimentFindByCodiSia(codiDir3, codiSia);
 		if (procedimentDto != null && procedimentDto.getUnitatOrganitzativaCodi() != null && !procedimentDto.getUnitatOrganitzativaCodi().isEmpty()) {
-			OrganGestorEntity organEntity = organGestorRepository.findByCodiAndEntitat(procedimentDto.getUnitatOrganitzativaCodi(), entitat);
+			OrganGestorEntity organEntity = organGestorRepository.findByEntitatAndCodi(entitat, procedimentDto.getUnitatOrganitzativaCodi());
 			if (organEntity != null) {
 				procedimentDto.setOrganId(organEntity.getId());
 			}

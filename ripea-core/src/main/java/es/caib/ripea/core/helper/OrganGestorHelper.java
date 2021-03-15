@@ -89,7 +89,7 @@ public class OrganGestorHelper {
 		List<OrganGestorEntity> organGestorAmbPares = findPares(
 				expedient.getMetaExpedient(),
 				organGestor,
-				false);
+				true);
 		for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
 			MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientAndOrganGestor(
 					expedient.getMetaExpedient(),

@@ -63,6 +63,18 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+			Long entitatId,
+			Long metaExpedientId,
+			String filter) {
+		return delegate.findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+				entitatId,
+				metaExpedientId,
+				filter);
+	}
+
+	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
 		return delegate.syncDir3OrgansGestors(entitatId);
@@ -73,7 +85,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public List<PermisOrganGestorDto> findPermisos(Long entitatId) throws NotFoundException {
 		return delegate.findPermisos(entitatId);
 	}
-	
+
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public List<PermisOrganGestorDto> findPermisos(Long entitatId, Long organId) throws NotFoundException {

@@ -120,6 +120,25 @@ function refrescarOrgan() {
 		    value: organ.id
 		}));
 	} else {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos',
+			success: function(organs) {
+				const selOrgans = $('select#organGestorId');
+				const organGestorId = '${expedientCommand.organGestorId}';
+				selOrgans.empty();
+				if (organs && organs.length > 0) {
+					$.each(organs, function(i, organ) {
+						const selected = (organ.id == organGestorId) ? ' selected' : '';
+						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.nom + '</option>');
+					});
+				}
+				selOrgans.select2({
+					theme: 'bootstrap',
+					width: 'auto'
+				});
+			}
+		});
 		$('#organFixed').hide();
 		$('#organSelect').show();
 		$('input', $('#organFixedNom').parent()).remove();

@@ -6,8 +6,6 @@ package es.caib.ripea.core.helper;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -30,6 +28,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -41,6 +40,7 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
@@ -49,7 +49,6 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -60,40 +59,40 @@ import es.caib.ripea.core.security.ExtendedPermission;
 @Component
 public class EntityComprovarHelper {
 
-	@Resource
+	@Autowired
 	private EntitatRepository entitatRepository;
-	@Resource
+	@Autowired
 	private MetaNodeRepository metaNodeRepository;
-	@Resource
+	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
+	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-	@Resource
+	@Autowired
 	private MetaDadaRepository metaDadaRepository;
-	@Resource
+	@Autowired
 	private NodeRepository nodeRepository;
-	@Resource
+	@Autowired
 	private ContingutRepository contingutRepository;
-	@Resource
+	@Autowired
 	private CarpetaRepository carpetaRepository;
-	@Resource
+	@Autowired
 	private ExpedientRepository expedientRepository;
-	@Resource
+	@Autowired
 	private DocumentRepository documentRepository;
-	@Resource
+	@Autowired
 	private DadaRepository dadaRepository;
-	@Resource
-	private RegistreRepository registreRepository;
-	@Resource
+	@Autowired
 	private InteressatRepository interessatRepository;
-	@Resource
+	@Autowired
 	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Resource
+	@Autowired
 	private DocumentPublicacioRepository documentPublicacioRepository;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
+	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private ExpedientOrganPareRepository expedientOrganPareRepository;
+	@Autowired
+	private PermisosHelper permisosHelper;
     @Autowired
     private OrganGestorHelper organGestorHelper;
 	
@@ -308,7 +307,6 @@ public class EntityComprovarHelper {
 	public MetaExpedientEntity comprovarMetaExpedientPerExpedient(
 			EntitatEntity entitat,
 			Long metaExpedientId,
-			Long organGestorId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
@@ -325,7 +323,6 @@ public class EntityComprovarHelper {
 		comprovarPermisosMetaNode(
 				metaExpedient,
 				metaExpedientId,
-				organGestorId,
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
@@ -529,7 +526,6 @@ public class EntityComprovarHelper {
 		comprovarPermisosMetaNode(
 				expedient.getMetaExpedient(),
 				expedientId,
-				expedient.getOrganGestor().getId(),
 				comprovarPermisRead,
 		        comprovarPermisWrite,
 		        comprovarPermisCreate,
@@ -697,93 +693,119 @@ public class EntityComprovarHelper {
 	public void comprovarPermisosMetaNode(
 			MetaNodeEntity metaNode,
 			Long nodeId,
-			Long organGestorId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
 			boolean checkPerMassiuAdmin) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		boolean metaExpedientBelongsToEntitatOrOrgansOfUser = true;
-			if (metaNode.getClass() == MetaExpedientEntity.class) {
-				boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
-						metaNode.getEntitat().getId(),
-						EntitatEntity.class,
-						new Permission[] { ExtendedPermission.ADMINISTRATION },
-						auth);
-				List<MetaExpedientEntity> metaExpedients = null;
-				List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
+		boolean esExpedient = false;
+		if (metaNode.getClass() == MetaExpedientEntity.class) {
+			esExpedient = true;
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			boolean esAdministradorEntitat = permisosHelper.isGrantedAny(
+					metaNode.getEntitat().getId(),
+					EntitatEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					auth);
+			List<MetaExpedientEntity> metaExpedients = null;
+			List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
+					metaNode.getEntitat(),
+					ExtendedPermission.ADMINISTRATION);
+			boolean metaExpedientBelongsToOrgans = false;
+			if (organs != null && !organs.isEmpty()) {
+				metaExpedients = metaExpedientRepository.findByOrganGestors(
 						metaNode.getEntitat(),
-						ExtendedPermission.ADMINISTRATION);
-				boolean metaExpedientBelongsToOrgans = false;
-				if (organs != null && !organs.isEmpty()) {
-					metaExpedients = metaExpedientRepository.findByOrganGestors(
-							metaNode.getEntitat(),
-							organs);
-				}
-				if (metaExpedients != null) {
-					for (MetaExpedientEntity metaExpedientEntity: metaExpedients) {
-						if (metaExpedientEntity.getId().equals(metaNode.getId())) {
-							metaExpedientBelongsToOrgans = true;
-						}
+						organs);
+			}
+			if (metaExpedients != null) {
+				for (MetaExpedientEntity metaExpedientEntity: metaExpedients) {
+					if (metaExpedientEntity.getId().equals(metaNode.getId())) {
+						metaExpedientBelongsToOrgans = true;
 					}
 				}
-				if (esAdministradorEntitat || metaExpedientBelongsToOrgans) {
-				metaExpedientBelongsToEntitatOrOrgansOfUser = true;
-				}
 			}
+			if (esAdministradorEntitat || metaExpedientBelongsToOrgans) {
+				metaExpedientBelongsToEntitatOrOrgansOfUser = true;
+			}
+		}
 		if (metaExpedientBelongsToEntitatOrOrgansOfUser) {
 			comprovarPermisRead = false;
 		}
 		if (comprovarPermisRead) {
-				boolean granted = permisosHelper.isGrantedAll(
-						metaNode.getId(),
-						MetaNodeEntity.class,
-						new Permission[] { ExtendedPermission.READ },
-						auth);
-				if (!granted) {
-					throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "READ");
-					/*throw new SecurityException(
-							"Sense permisos per accedir al node (" +
-							"id=" + nodeId + ", " +
-							"usuari=" + auth.getName() + ")");*/
-				}
-			}
-		
+			comprovarPermisMetaNode(
+					metaNode,
+					nodeId,
+					esExpedient,
+					ExtendedPermission.READ,
+					"READ");
+		}
 		if (checkPerMassiuAdmin && metaExpedientBelongsToEntitatOrOrgansOfUser) {
 			comprovarPermisWrite = false;
 		}
 		if (comprovarPermisWrite) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaNode.getId(),
-					MetaNodeEntity.class,
-					new Permission[] { ExtendedPermission.WRITE },
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "WRITE");
-			}
+			comprovarPermisMetaNode(
+					metaNode,
+					nodeId,
+					esExpedient,
+					ExtendedPermission.WRITE,
+					"WRITE");
 		}
 //		if (comprovarPermisCreate) {
-//			boolean granted = permisosHelper.isGrantedAll(
-//					metaNode.getId(),
-//					MetaNodeEntity.class,
-//					new Permission[] {ExtendedPermission.WRITE},
-//					auth);
-//			if (!granted) {
-//				throw new SecurityException("Sense permisos per a modificar el node ("
-//						+ "id=" + nodeId + ", "
-//						+ "usuari=" + auth.getName() + ")");
-//			}
+//		comprovarPermisMetaNode(
+//				metaNode,
+//				nodeId,
+//				organGestorId,
+//				esExpedient,
+//				ExtendedPermission.CREATE,
+//				"CREATE");
 //		}
 		if (comprovarPermisDelete) {
-			boolean granted = permisosHelper.isGrantedAll(
-					metaNode.getId(),
-					MetaNodeEntity.class,
-					new Permission[] { ExtendedPermission.DELETE },
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), "DELETE");
-			}
+			comprovarPermisMetaNode(
+					metaNode,
+					nodeId,
+					esExpedient,
+					ExtendedPermission.DELETE,
+					"DELETE");
+		}
+	}
+
+	private void comprovarPermisMetaNode(
+			MetaNodeEntity metaNode,
+			Long nodeId,
+			boolean esExpedient,
+			Permission permission,
+			String permissionName) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		// Per a tenir permís s'ha de donar, com a mínim, un d'aquests casos:
+		// - Permis assignat directament al meta-node
+		// - Permís assignat a l'òrgan del node (o a un dels òrgans pare)
+		// - Permís assignat a la combinació òrgan + meta-node (o a una combinació òrgan pare + meta-node) en el cas en que sigui un expedient comú.
+		boolean grantedDirect = permisosHelper.isGrantedAll(
+				metaNode.getId(),
+				MetaNodeEntity.class,
+				new Permission[] { permission },
+				auth);
+		boolean grantedOrgan = false;
+		if (esExpedient && !grantedDirect) {
+			List<OrganGestorEntity> organsGestors = expedientOrganPareRepository.findOrganGestorByExpedientId(nodeId);
+			permisosHelper.filterGrantedAll(
+					organsGestors,
+					OrganGestorEntity.class,
+					new Permission[] { permission });
+			grantedOrgan = !organsGestors.isEmpty();
+		}
+		boolean grantedOrganMetaNode = false;
+		if (esExpedient && !grantedDirect && !grantedOrgan) {
+			List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = expedientOrganPareRepository.findMetaExpedientOrganGestorByExpedientId(nodeId);
+			permisosHelper.filterGrantedAll(
+					metaExpedientOrgansGestors,
+					MetaExpedientOrganGestorEntity.class,
+					new Permission[] { permission });
+			grantedOrganMetaNode = !metaExpedientOrgansGestors.isEmpty();
+		}
+		if (!grantedDirect && !grantedOrgan && !grantedOrganMetaNode) {
+			throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), permissionName);
 		}
 	}
 

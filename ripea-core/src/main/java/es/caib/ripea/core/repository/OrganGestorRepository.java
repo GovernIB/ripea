@@ -23,7 +23,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
-	public OrganGestorEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+	public OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
@@ -60,11 +60,12 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where " +
 			"    og.entitat = :entitat " +
 			"and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) " +
-			"and (og = :organGestor " +
+			"and (og.id in (:pareIds) " +
 			"     or og.pare.id in (:pareIds) " +
 			"     or og.pare.pare.id in (:pareIds) " +
 			"     or og.pare.pare.pare.id in (:pareIds) " +
-			"     or og.pare.pare.pare.pare.id in (:pareIds))")
+			"     or og.pare.pare.pare.pare.id in (:pareIds)) " +
+			"order by og.nom asc")
 	public List<OrganGestorEntity> findByEntitatAndFiltreAndPareIdIn(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullFiltre") boolean esNullFiltre,

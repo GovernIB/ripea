@@ -77,16 +77,20 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 
 	@Query(	"select " +
 			"    distinct e " +
-			"from" +
-			"    ExpedientEntity e left join e.organGestorPares eogp left join eogp.metaExpedientOrganGestor.organGestor eogpmeog " +
+			"from " +
+			"    ExpedientEntity e " +
+			"    left join e.organGestorPares eogp " +
+			"    left join eogp.metaExpedientOrganGestor eogpmeog " +
+			"    left join eogp.metaExpedientOrganGestor.organGestor eogpmeogog " +
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
 			"and (" +
 			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
 			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
-			"     or (:esNullOrganIdPermesos = false and eogpmeog.id in (:organIdPermesos)) " + 
-			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogp.metaExpedientOrganGestor.id in (:metaExpedientOrganIdPermesos))) " +
+			"     or (:esNullOrganIdPermesos = false and eogpmeogog.id in (:organIdPermesos)) " +
+			// Falta contemplar el cas en el que la combinació meta-expedient + organ de l'expedient està a :metaExpedientOrganIdPermesos
+			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos))) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
@@ -100,7 +104,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
-			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " + 
+			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " +
 			"and (:esNullInteressat = true " +
 			"		or  e.id in (" +
 			"			select interessat.expedient.id " +

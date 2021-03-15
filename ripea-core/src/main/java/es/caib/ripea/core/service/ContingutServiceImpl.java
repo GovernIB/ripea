@@ -427,7 +427,6 @@ public class ContingutServiceImpl implements ContingutService {
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
 					documentOrigen.getId(),
-					null,
 					false,
 					false,
 					true,
@@ -538,7 +537,6 @@ public class ContingutServiceImpl implements ContingutService {
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
 					documentOrigen.getId(),
-					null,
 					false,
 					false,
 					true,
@@ -650,7 +648,6 @@ public class ContingutServiceImpl implements ContingutService {
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					documentOrigen.getMetaDocument(),
 					documentOrigen.getId(),
-					null,
 					false,
 					false,
 					true,

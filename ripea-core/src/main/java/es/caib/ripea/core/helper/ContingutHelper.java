@@ -175,8 +175,6 @@ public class ContingutHelper {
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-		
-		
 		// ##################### EXPEDIENT ##################################
 		if (deproxied instanceof ExpedientEntity) {
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
@@ -214,7 +212,6 @@ public class ContingutHelper {
 					documentRepository.countByExpedientAndEstat(
 							expedient,
 							DocumentEstatEnumDto.CUSTODIAT) > 0);
-			
 			dto.setHasAllDocumentsDefinitiu(documentHelper.hasAllDocumentsDefinitiu(expedient));
 			// expedient estat
 			if (expedient.getExpedientEstat() != null) {
@@ -227,15 +224,21 @@ public class ContingutHelper {
 				dto.setExpedientEstat(conversioTipusHelper.convertir(
 						expedient.getExpedientEstat(),
 						ExpedientEstatDto.class));
-				//omplir permision for expedient estat
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				dto.setUsuariActualWrite(
-						permisosHelper.isGrantedAll(
-								expedient.getExpedientEstat().getId(),
-								ExpedientEstatEntity.class,
-								new Permission[] {ExtendedPermission.WRITE},
-								auth));
 			}
+			try {
+				dto.setUsuariActualWrite(false);
+				entityComprovarHelper.comprovarPermisosMetaNode(
+						expedient.getMetaNode(),
+						expedient.getId(),
+						false,
+						true,
+						false,
+						false, 
+						false);
+				dto.setUsuariActualWrite(true);
+			} catch (PermissionDeniedException ex) {
+			}
+			System.out.println(">>> Permis write expedient " + expedient.getId() + ": " + dto.isUsuariActualWrite());
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -253,7 +256,6 @@ public class ContingutHelper {
 					expedient), InteressatDto.class));
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			resposta = dto;
-
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
@@ -330,13 +332,11 @@ public class ContingutHelper {
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
-			
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
 			resposta = dto;
 		} 
-		
 		// ##################### CONTINGUT ##################################
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
@@ -798,7 +798,6 @@ public class ContingutHelper {
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					expedient.getMetaNode(),
 					expedient.getId(),
-					expedient.getOrganGestor().getId(),
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
@@ -841,7 +840,6 @@ public class ContingutHelper {
 				entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 						expedient.getEntitat(),
 						expedient.getMetaExpedient().getId(),
-						null,
 						true,
 						false,
 						false,

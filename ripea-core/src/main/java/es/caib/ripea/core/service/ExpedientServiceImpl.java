@@ -322,15 +322,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		try {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-
 			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
-
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
 			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
 			expedientPeticioEntity.updateNotificaDistError(null);
-
 		} catch (Exception e) {
 			expedientPeticioEntity.updateNotificaDistError(ExceptionUtils.getStackTrace(e));
 			processatOk = false;
@@ -412,7 +409,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,
 				metaExpedientId,
-				null,
 				false,
 				false,
 				true,
@@ -552,7 +548,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					metaExpedientId,
-					null,
 					true,
 					false,
 					false,
@@ -605,7 +600,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					metaExpedientId,
-					null,
 					false,
 					true,
 					false,
@@ -847,7 +841,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
-					null,
 					true,
 					false,
 					false,
@@ -917,7 +910,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
-					null,
 					true,
 					false,
 					false,
@@ -1128,7 +1120,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					metaExpedientId,
-					null,
 					true,
 					false,
 					false,
@@ -1393,7 +1384,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
-					null,
 					true,
 					false,
 					false,
@@ -1565,7 +1555,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
-					null,
 					true,
 					false,
 					false,

@@ -152,7 +152,6 @@ public class ExpedientHelper {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,
 				metaExpedientId,
-				organGestorId,
 				false,
 				false,
 				true,
@@ -169,7 +168,7 @@ public class ExpedientHelper {
 						"La creació d'un expedient de tipus (metaExpedientId=" + metaExpedientId + ") requereix especificar un òrgan gestor");
 			}
 			organGestor = organGestorRepository.getOne(organGestorId);
-			if (organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, ExtendedPermission.CREATE)) {
+			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, ExtendedPermission.CREATE)) {
 				throw new ValidationException(
 						metaExpedientId,
 						MetaExpedientEntity.class,
