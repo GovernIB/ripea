@@ -78,14 +78,14 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"select " +
 			"    distinct e " +
 			"from" +
-			"    ExpedientEntity e left join e.organGestorPares eogp " +
+			"    ExpedientEntity e left join e.organGestorPares eogp left join eogp.metaExpedientOrganGestor.organGestor eogpmeog " +
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
 			"and (" +
 			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
 			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
-			"     or (:esNullOrganIdPermesos = false and eogp.metaExpedientOrganGestor.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and eogpmeog.id in (:organIdPermesos)) " + 
 			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogp.metaExpedientOrganGestor.id in (:metaExpedientOrganIdPermesos))) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +

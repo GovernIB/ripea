@@ -925,11 +925,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 
-		boolean checkPerMassiuAdmin = false;
 		boolean nomesAgafats = true;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			nomesAgafats = false;
-			checkPerMassiuAdmin = true;
 		} 
 
 		if (!metaExpedientsPermesos.isEmpty()) {
@@ -1399,7 +1397,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					true,
 					false,
 					false,
-					false, false);
+					false,
+					false);
 		}
 		OrganGestorEntity organGestorFiltre = null;
 		if (filtre.getOrganGestorId() != null) {
@@ -1427,12 +1426,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExtendedPermission.READ,
 					false,
 					null, 
-<<<<<<< HEAD
 					rolActual.equals("IPA_ADMIN"),
 					rolActual.equals("IPA_ORGAN_ADMIN"));
-=======
-					rolActual, false);
->>>>>>> refs/heads/ripea-0.9
 		}
 		if (!metaExpedientsPermesos.isEmpty()) {*/
 			UsuariEntity agafatPer = null;
