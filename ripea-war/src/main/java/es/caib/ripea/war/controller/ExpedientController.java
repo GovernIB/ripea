@@ -47,6 +47,7 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
@@ -59,6 +60,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientAssignarCommand;
@@ -102,6 +104,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ExpedientEstatService expedientEstatService;
+	@Autowired
+	private OrganGestorService organGestorService;
 
 	
 	@RequestMapping(method = RequestMethod.GET)
@@ -527,7 +531,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				metaExpedientId);
 	}
 
-	
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean gestioAmbGrupsActiva(
@@ -538,11 +541,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				metaExpedientId).isGestioAmbGrupsActiva();
 	}
-	
-	
-	
-	
-	
+
 	@RequestMapping(value = "/metaExpedient", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> metaExpedients(
@@ -555,25 +554,32 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				null, 
 				rolActual);
 	}
-	
 
-	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> organsGestorsPermesos(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@RequestParam(required = false) String filter) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return organGestorService.findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+				entitatActual.getId(),
+				metaExpedientId,
+				filter);
+	}
+
 	@RequestMapping(value = "/organGestor/{organGestorId}/metaExpedient", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> organGestorMetaExpedients(
 			HttpServletRequest request,
 			@PathVariable Long organGestorId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
 		return metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 				entitatActual.getId(),
 				organGestorId, 
 				null);
 	}
-	
-	
-	
-	
+
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/proximNumeroSequencia/{any}", method = RequestMethod.GET)
 	@ResponseBody
 	public long proximNumeroSequencia(
@@ -586,7 +592,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				metaExpedientId,
 				any);
 	}
-	
+
 	@RequestMapping(value = "/{expedientId}/agafar", method = RequestMethod.GET)
 	public String agafar(
 			HttpServletRequest request,
@@ -597,26 +603,20 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String url = null;
 		try {
-			
 			if (contingutId != null) {
 				url = "redirect:../../contingut/" + contingutId;
 			} else {
 				url = "redirect:../../contingut/" + expedientId;
 			}
-			
 			expedientService.agafarUser(
 					entitatActual.getId(),
 					expedientId);
-
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,
 					"expedient.controller.agafat.ok");
-			
-			
 		} catch (Exception e) {
 			logger.error("Error agafant expedient", e);
-			
 			Exception permisExcepcion = ExceptionHelper.findExceptionInstance(e, PermissionDeniedException.class, 3);
 			if (permisExcepcion != null) {
 				return getAjaxControllerReturnValueError(
@@ -627,7 +627,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			} else {
 				throw e;
 			}
-			
 		}
 	}
 
@@ -644,17 +643,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						expedientId,
 						true,
 						false));
-		
 		boolean hasWritePermisions = expedientService.hasWritePermission(expedientId);
 		model.addAttribute(
 				"hasWritePermisions",
 				hasWritePermisions);
-		
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		model.addAttribute(
 				"usuariActual",
 				usuariActual);
-		
 		return "expedientComentaris";
 	}	
 
@@ -718,7 +714,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			return "expedientAssignarForm";
 		}
-		
 		try {
 			expedientService.agafar(
 					entitatActual.getId(),
@@ -741,14 +736,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				throw e;
 			}
 		}
-		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + expedientId,
 				"expedient.assignar.controller.assignat.ok");
 	}
-	
-	
 
 	@RequestMapping(value = "/{expedientId}/tancar", method = RequestMethod.GET)
 	public String expedientTancarGet(
@@ -858,7 +850,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				} else {
 					command.setExpedientEstatId(null);
 				}
-
 			}
 			
 		} else {

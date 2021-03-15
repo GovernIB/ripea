@@ -57,12 +57,12 @@ public interface OrganGestorService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param filterText
+	 * @param filter
 	 *            Paràmetre de filtre 
 	 * @return Llistat dels organs gestors de l'entitat
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findByEntitat(Long entitatId, String filterText);
+	public List<OrganGestorDto> findByEntitat(Long entitatId, String filter);
 	
 	/**
 	 * Consulta tots els organs gestors de l'entitat actual de forma paginada 
@@ -75,8 +75,9 @@ public interface OrganGestorService {
 	 * @return La pàgina amb els organs gestors
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(Long entitatId,
-                                                                     PaginacioParamsDto paginacioParams);
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
@@ -87,7 +88,65 @@ public interface OrganGestorService {
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
-	
+
+	/**
+	 * Obté un llistat de tots els organs gestors accessibles per a 
+	 * l'usuari actual de l'entitat indicada per paràmetre
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat actual.
+	 * @return
+	 * 			  Llistat de tots els organs gestors accesssibles per a l'entitat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId);
+		
+	/**
+	 * Obté un llistat de tots els organs gestors accessibles per a 
+	 * l'usuari actual de l'entitat indicada per paràmetre
+	 * Selecciona les que tenen el patró espedificat al parametre de filtre al nom o al codi.
+	 *
+	 * @param entitatId
+	 *            Id de l'entitat actual.
+	 * @param filter
+	 *            Paràmetre de filtre 
+	 * @return
+	 * 		      Llistat de tots els organs gestors accesssibles per a l'entitat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findAccessiblesUsuariActual(
+			Long entitatId,
+			Long organGestorId,
+			String filter);
+
+	/**
+	 * Obté un llistat de tots els organs gestors de l'entitat actual pels quals es té algún permís
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat actual.
+	 * @return
+	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId);
+
+	/**
+	 * Obté un llistat de tots els organs gestors de l'entitat actual pels quals es té algún permís
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat actual.
+	 * @param metaExpedientId
+	 *            Id del meta-expedient.
+	 * @param filter
+	 *            text per a filtrar els resultats. 
+	 * @return
+	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+			Long entitatId,
+			Long metaExpedientId,
+			String filter);
 
 	/**
 	 * Consulta els permisos dels distits organs gestors de l'entitat
@@ -130,7 +189,8 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void updatePermis(
 			Long id,
-			PermisDto permis, Long entitatId) throws NotFoundException;
+			PermisDto permis,
+			Long entitatId) throws NotFoundException;
 
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a una entitat com a
@@ -148,43 +208,7 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void deletePermis(
 			Long id,
-			Long permisId, Long entitatId) throws NotFoundException;
+			Long permisId,
+			Long entitatId) throws NotFoundException;
 
-	/**
-	 * Obté un llistat de tots els organs gestors accessibles per a 
-	 * l'usuari actual de l'entitat indicada per paràmetre
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat actual.
-	 * @return
-	 * 			  Llistat de tots els organs gestors accesssibles per a l'entitat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId);
-		
-	/**
-	 * Obté un llistat de tots els organs gestors accessibles per a 
-	 * l'usuari actual de l'entitat indicada per paràmetre
-	 * Selecciona les que tenen el patró espedificat al parametre de filtre al nom o al codi.
-	 *
-	 * @param entitatId
-	 *            Id de l'entitat actual.
-	 * @param filterText
-	 *            Paràmetre de filtre 
-	 * @return
-	 * 		      Llistat de tots els organs gestors accesssibles per a l'entitat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId, String filterText);
-
-	/**
-	 * Obté un llistat de tots els organs gestors de l'entitat actual pels quals es té algún permís
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat actual.
-	 * @return
-	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId);
 }

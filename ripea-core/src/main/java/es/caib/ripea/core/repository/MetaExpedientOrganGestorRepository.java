@@ -48,7 +48,8 @@ public interface MetaExpedientOrganGestorRepository extends JpaRepository<MetaEx
 			"     or meog.organGestor.pare.id in (:pareIds) " +
 			"     or meog.organGestor.pare.pare.id in (:pareIds) " +
 			"     or meog.organGestor.pare.pare.pare.id in (:pareIds) " +
-			"     or meog.organGestor.pare.pare.pare.pare.id in (:pareIds))")
+			"     or meog.organGestor.pare.pare.pare.pare.id in (:pareIds)) " +
+			"order by meog.organGestor.nom asc")
 	public List<OrganGestorEntity> findOrganGestorByMetaExpedientAndFiltreAndOrganGestorPareIdIn(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullFiltre") boolean esNullFiltre,
