@@ -4,6 +4,7 @@
 package es.caib.ripea.core.helper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,6 +88,8 @@ import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
+import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 
 /**
@@ -739,12 +742,18 @@ public class ContingutHelper {
 			// per a poder recuperar-lo posteriorment
 			if (contingut instanceof DocumentEntity) {
 				DocumentEntity document = (DocumentEntity)contingut;
-				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) && document.getGesDocAdjuntId() == null) {
 					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
 				}
+				if (document.getGesDocAdjuntId() == null) {
+					// Elimina contingut a l'arxiu
+					arxiuPropagarEliminacio(contingut);
+				}
+			} else {
+				// Elimina contingut a l'arxiu
+				arxiuPropagarEliminacio(contingut);
 			}
-			// Elimina contingut a l'arxiu
-			arxiuPropagarEliminacio(contingut);
+
 		}
 		// Cancel·lar enviament si el document conté enviaments pendents
 		if (contingut instanceof DocumentEntity) {
@@ -1324,6 +1333,43 @@ public class ContingutHelper {
 			logger.debug("Contingut amb id: " + contingut.getId() + " amb pareId: " + pareId + " marcada com esborrat amb num: " + contingut.getEsborrat());
 		}
 
+	}
+	
+	public FitxerDto fitxerDocumentEsborratLlegir(
+			DocumentEntity document)  {
+		File fContent = new File(getBaseDir() + "/" + document.getId());
+		fContent.getParentFile().mkdirs();
+		if (fContent.exists()) {
+			byte fileContent[] = null;
+			try {
+				FileInputStream inContent = new FileInputStream(fContent);
+				fileContent = new byte[(int)fContent.length()];
+				inContent.read(fileContent);
+				inContent.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} 
+			ArxiuDocumentContingut contingut = new ArxiuDocumentContingut(
+					ArxiuContingutTipusEnum.CONTINGUT,
+					null,
+					fileContent);
+			List<ArxiuDocumentContingut> continguts = new ArrayList<ArxiuDocumentContingut>();
+			continguts.add(contingut);
+			FitxerDto fitxer = new FitxerDto();
+			fitxer.setNom(document.getFitxerNom());
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setContingut(fileContent);
+			return fitxer;
+		} else {
+			return null;
+		}
+	}
+
+	public void fitxerDocumentEsborratEsborrar(
+			DocumentEntity document) {
+		File fContent = new File(getBaseDir() + "/" + document.getId());
+		fContent.getParentFile().mkdirs();
+		fContent.delete();
 	}
 
 	public boolean checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
