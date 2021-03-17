@@ -13,6 +13,7 @@ import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.ExpedientGrup;
 import es.caib.ripea.war.validation.ExpedientNomUnique;
+import es.caib.ripea.war.validation.ExpedientODocumentNom;
 
 /**
  * Command per al manteniment d'expedients.
@@ -28,6 +29,7 @@ import es.caib.ripea.war.validation.ExpedientNomUnique;
 		campNom = "nom",
 		campEntitatId = "entitatId",
 		campPareId = "pareId")
+@ExpedientODocumentNom(groups = {Create.class, Update.class})
 public class ExpedientCommand extends ContenidorCommand {
 
 	@NotNull(groups = {Create.class})
