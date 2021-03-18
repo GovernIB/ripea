@@ -258,9 +258,19 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consulta del valor del propertat amb nom");
 		return PropertiesHelper.getProperties().getProperty(nom);
 	}
+	
+	@Override
+	public Boolean propertyBooleanFindByKey(String key) {
+		logger.debug("Consulta del valor del propietat boolea amb key");
+		Boolean booleanValue = null;
+		String value = PropertiesHelper.getProperties().getProperty(key);
+		if (value != null) {
+			booleanValue = Boolean.parseBoolean(value);
+		}
+		return booleanValue;
+	}
 
-
-
+	
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
 		UsuariDto dto = conversioTipusHelper.convertir(

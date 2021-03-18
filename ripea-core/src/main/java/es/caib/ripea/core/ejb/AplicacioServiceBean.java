@@ -146,4 +146,10 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.findUsuariAmbCodiDades(codi);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	public Boolean propertyBooleanFindByKey(String key) {
+		return delegate.propertyBooleanFindByKey(key);
+	}
+
 }

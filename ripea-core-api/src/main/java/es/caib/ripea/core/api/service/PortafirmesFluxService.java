@@ -65,13 +65,14 @@ public interface PortafirmesFluxService {
 	
 	/**
 	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació
-	 * 
+	 * @param filtrar 
 	 * @param transaccioId
 	 * 				Id de la transacció.
+	 * 
 	 * @return La el id del flux de firma o error.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles();
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(boolean filtrar);
 	
 	/**
 	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació

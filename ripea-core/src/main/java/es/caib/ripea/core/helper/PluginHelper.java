@@ -2629,13 +2629,17 @@ public class PluginHelper {
 	}
 	
 	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
-			String idioma) {
+			UsuariDto usuariActual, boolean filtrar) {
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
 		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
 		try {
-			List<PortafirmesFluxResposta> plantilles = getPortafirmesPlugin().recuperarPlantillesDisponibles(
-					idioma);
+			List<PortafirmesFluxResposta> plantilles = null;
+			 if (filtrar) {
+				plantilles = getPortafirmesPlugin().recuperarPlantillesPerFiltre(usuariActual.getIdioma(), usuariActual.getCodi());
+			} else {
+				plantilles = getPortafirmesPlugin().recuperarPlantillesDisponibles(usuariActual.getIdioma());
+			}
 			
 			if (plantilles != null) {
 				for (PortafirmesFluxResposta plantilla : plantilles) {

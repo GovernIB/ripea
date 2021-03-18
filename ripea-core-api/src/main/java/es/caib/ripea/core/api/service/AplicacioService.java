@@ -176,5 +176,8 @@ public interface AplicacioService {
 	List<UsuariDto> findUsuariAmbTextDades(String text);
 
 	UsuariDto findUsuariAmbCodiDades(String codi);
+	
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	public Boolean propertyBooleanFindByKey(String key);
 
 }

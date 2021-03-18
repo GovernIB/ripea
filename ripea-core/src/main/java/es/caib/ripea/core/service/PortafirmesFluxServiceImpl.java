@@ -14,6 +14,7 @@ import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
@@ -38,14 +39,23 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 			boolean isPlantilla) throws SistemaExternException {
 		logger.debug("(Iniciant flux de firma (" +
 				"urlRedireccio=" + urlReturn + ")");
-		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		
+		UsuariDto usuariDto = aplicacioService.getUsuariActual();
+		String idioma = usuariDto.getIdioma();
+		String usuariCodi = usuariDto.getCodi();
+		
+		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
+		boolean saveUserActual = false;
+		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
+			saveUserActual = true;
+		}
 		
 		PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(
 				idioma,
 				isPlantilla,
 				null,
-				null,
-				true,
+				saveUserActual ? "user=" + usuariCodi : null,
+				!saveUserActual,
 				urlReturn);
 		
 		return transaccioResponse;
@@ -102,10 +112,9 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	}
 	
 	@Override
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles() {
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(boolean filtrar) {
 		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
-		String idioma = aplicacioService.getUsuariActual().getIdioma();
-		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(idioma);
+		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(aplicacioService.getUsuariActual(), filtrar);
 	}
 	
 	@Override
