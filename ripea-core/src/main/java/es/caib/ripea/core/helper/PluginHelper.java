@@ -162,8 +162,8 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats";
-	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts";
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu  
+	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating document that haven't been saved in arxiu
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
