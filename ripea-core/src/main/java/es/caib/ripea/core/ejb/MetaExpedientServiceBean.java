@@ -306,4 +306,14 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				codiDir3, codiSia);
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<MetaExpedientDto> findByCodiSia(
+			Long entitatId,
+			String codiSia) {
+		return findByCodiSia(
+				entitatId, 
+				codiSia);
+	}
+
 }

@@ -433,4 +433,9 @@ public interface MetaExpedientService {
 	public ProcedimentDto findProcedimentByCodiSia(
 			Long entitatId,
 			String codiDir3, String codiSia);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findByCodiSia(
+			Long entitatId,
+			String codiSia);
 }
