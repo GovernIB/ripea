@@ -43,6 +43,7 @@ import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleBlock;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleEditFlowTemplateRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleExternalSigner;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFilterGetAllByFilter;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplate;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateList;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateRequest;
@@ -353,6 +354,28 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		List<PortafirmesFluxResposta> plantilles = new ArrayList<PortafirmesFluxResposta>();
 		try {
 			FlowTemplateSimpleFlowTemplateList resposta = getFluxDeFirmaClient().getAllFlowTemplates(idioma);
+			
+			for (FlowTemplateSimpleKeyValue flowTemplate : resposta.getList()) {
+				PortafirmesFluxResposta plantilla = new PortafirmesFluxResposta();
+				plantilla.setFluxId(flowTemplate.getKey());
+				plantilla.setNom(flowTemplate.getValue());
+				plantilles.add(plantilla);
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut recuperar les plantilles per l'usuari aplicació actual",
+					ex);
+		}
+		return plantilles;
+	}
+	
+	@Override
+	public List<PortafirmesFluxResposta> recuperarPlantillesPerFiltre(String idioma, String descripcio) throws SistemaExternException {
+		List<PortafirmesFluxResposta> plantilles = new ArrayList<PortafirmesFluxResposta>();
+		try {
+			FlowTemplateSimpleFilterGetAllByFilter flowTemplateSimpleFilterGetAllByFilter = new FlowTemplateSimpleFilterGetAllByFilter(idioma, null, descripcio);
+			
+			FlowTemplateSimpleFlowTemplateList resposta = getFluxDeFirmaClient().getAllFlowTemplatesByFilter(flowTemplateSimpleFilterGetAllByFilter);
 			
 			for (FlowTemplateSimpleKeyValue flowTemplate : resposta.getList()) {
 				PortafirmesFluxResposta plantilla = new PortafirmesFluxResposta();

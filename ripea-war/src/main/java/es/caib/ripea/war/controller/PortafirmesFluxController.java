@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,9 +22,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -42,6 +46,8 @@ public class PortafirmesFluxController extends BaseUserController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
+	@Autowired
+	private DocumentService documentService;
 	
 	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
@@ -127,6 +133,43 @@ public class PortafirmesFluxController extends BaseUserController {
 					transactionId);
 		}
 		return "portafirmesModalTancar";
+	}
+	
+	
+	
+	@RequestMapping(value = "/{documentId}/portafirmes/flux/plantilles", method = RequestMethod.GET)
+	@ResponseBody
+	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, @PathVariable Long documentId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<PortafirmesFluxRespostaDto> resposta;
+		
+		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
+		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
+			
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
+			String fluxPerDefecteId = documentService.findById(entitatActual.getId(), documentId).getMetaDocument().getPortafirmesFluxId();
+			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
+				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId);
+				
+				boolean isAlreadyOnList = false;
+				for (PortafirmesFluxRespostaDto respostaDto : resposta) {
+					if (respostaDto.getFluxId().equals(fluxPerDefecteId)) {
+						isAlreadyOnList = true;
+					}
+				}
+				if (!isAlreadyOnList) {
+					PortafirmesFluxRespostaDto portafirmesFluxRespostaDto = new PortafirmesFluxRespostaDto();
+					portafirmesFluxRespostaDto.setFluxId(fluxPerDefecteId);
+					portafirmesFluxRespostaDto.setNom(portafirmesFluxInfoDto.getNom());
+					resposta.add(0, portafirmesFluxRespostaDto);
+				}
+			}
+		} else {
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+		}
+
+		
+		return resposta;
 	}
 	
 	@InitBinder

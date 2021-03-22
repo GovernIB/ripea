@@ -249,7 +249,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
-		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles();
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
 		return resposta;
 	}
 

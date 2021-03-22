@@ -33,6 +33,7 @@ public class ExpedientFiltreDto implements Serializable {
 	
 	private Date dataTancatFi;
 	private boolean meusExpedients;
+	private String agafatPer;
 	private String search;
 	
 	private Long tipusId;

@@ -20,6 +20,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
+import es.caib.ripea.war.validation.MetaExpedientCodiSiaNoRepetit;
 import es.caib.ripea.war.validation.OrganGestorMetaExpedientNotNull;
 import lombok.Getter;
 
@@ -30,6 +31,7 @@ import lombok.Getter;
  */
 @Getter
 @CodiMetaExpedientNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
+@MetaExpedientCodiSiaNoRepetit
 @OrganGestorMetaExpedientNotNull
 public class MetaExpedientCommand {
 

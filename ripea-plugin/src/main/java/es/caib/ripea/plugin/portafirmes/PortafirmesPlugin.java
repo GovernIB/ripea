@@ -250,4 +250,8 @@ public interface PortafirmesPlugin {
 	 */
 	PortafirmesCarrec recuperarCarrec(String carrecId) throws SistemaExternException;
 
+	public List<PortafirmesFluxResposta> recuperarPlantillesPerFiltre(
+			String idioma,
+			String descripcio) throws SistemaExternException;
+
 }

@@ -25,6 +25,7 @@ import es.caib.ripea.war.command.DocumentCommand.UpdateFirmaSeparada;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.ArxiuNoBuit;
 import es.caib.ripea.war.validation.DocumentDigitalExistent;
+import es.caib.ripea.war.validation.ExpedientODocumentNom;
 import es.caib.ripea.war.validation.NomDocumentNoRepetit;
 import es.caib.ripea.war.validation.ValidIfSeparada;
 
@@ -38,6 +39,7 @@ import es.caib.ripea.war.validation.ValidIfSeparada;
 @NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class})
 @DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
 @ValidIfSeparada(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
+@ExpedientODocumentNom(groups = {CreateDigital.class, UpdateDigital.class})
 public class DocumentCommand extends ContenidorCommand {
 
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})

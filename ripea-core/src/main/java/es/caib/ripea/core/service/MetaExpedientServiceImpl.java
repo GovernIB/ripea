@@ -266,6 +266,25 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return resposta;
 	}
 
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaExpedientDto> findByCodiSia(Long entitatId, String codiSia) {
+		logger.debug(
+				"Consulta del meta-expedient per entitat i codi SIA (" + "entitatId=" + entitatId + ", " + "codi=" + codiSia +
+						")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(entitat, codiSia);
+		
+		List<MetaExpedientDto> resposta = null;
+		if (metaExpedients != null) {
+			resposta = conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
+		}
+		return resposta;
+	}
+
+	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findByEntitat(Long entitatId) {

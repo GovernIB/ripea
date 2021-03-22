@@ -180,9 +180,10 @@ public class DominiServiceImpl implements DominiService {
 	public List<DominiDto> findByEntitat(Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false, false);
+				false,
+				false, 
+				true);
 
 		List<DominiEntity> dominis = dominiRepository.findByEntitatOrderByNomAsc(entitat);
 

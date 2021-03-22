@@ -403,17 +403,33 @@ public class DocumentHelper {
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu() && document.getEstat() != DocumentEstatEnumDto.FIRMAT) {
-				fitxer = new FitxerDto();
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setNom(document.getFitxerNom());
-				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-						document,
-						null,
-						versio,
-						true,
-						false);
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			if (pluginHelper.isArxiuPluginActiu()) {
+				
+				if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
+					
+					ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+					pluginHelper.gestioDocumentalGet(
+							document.getGesDocFirmatId(),
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+							streamAnnex);
+					fitxer = new FitxerDto();
+					fitxer.setContingut(streamAnnex.toByteArray());
+					fitxer.setNom(document.getNomFitxerFirmat());
+					fitxer.setContentType(document.getFitxerContentType());
+				} else {
+					
+					fitxer = new FitxerDto();
+					fitxer.setContentType(document.getFitxerContentType());
+					fitxer.setNom(document.getFitxerNom());
+					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+							document,
+							null,
+							versio,
+							true,
+							false);
+					fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+				}
+
 			} else {
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_ARXIU,
@@ -421,22 +437,11 @@ public class DocumentHelper {
 			}
 		} else {
 			fitxer = new FitxerDto();
-			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
-				
-				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-				pluginHelper.gestioDocumentalGet(
-						document.getGesDocFirmatId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
-						streamAnnex);
-				fitxer.setContingut(streamAnnex.toByteArray());
-				fitxer.setNom(document.getNomFitxerFirmat());
-				fitxer.setContentType(document.getFitxerContentType());
-			} else {
-				fitxer.setNom(document.getFitxerNom());
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setContingut(document.getFitxerContingut());
-			}
-			
+
+			fitxer.setNom(document.getFitxerNom());
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setContingut(document.getFitxerContingut());
+		
 		}
 //		if (versio == null && DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
 //			fitxer.setNom(

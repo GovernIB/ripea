@@ -231,7 +231,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
 				entitatId,
 				EntitatEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				auth);
 		if (!esAdministradorEntitat) {
 			return results;
 		}

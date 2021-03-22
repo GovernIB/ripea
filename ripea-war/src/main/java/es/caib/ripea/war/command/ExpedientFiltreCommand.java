@@ -31,6 +31,7 @@ public class ExpedientFiltreCommand {
 	private Date dataTancatInici;
 	private Date dataTancatFi;
 	private boolean meusExpedients;
+	private String agafatPer;
 
 	private Long tipusId;
 	private String interessat;
@@ -97,6 +98,9 @@ public class ExpedientFiltreCommand {
 	}
 	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
 		this.metaExpedientDominiValor = metaExpedientDominiValor != null ? metaExpedientDominiValor.trim() : null;
+	}
+	public void setAgafatPer(String agafatPer) {
+		this.agafatPer = agafatPer != null ? agafatPer.trim() : null;
 	}
 
 }

@@ -569,5 +569,12 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 		}
 	}
 
+	@Override
+	public List<PortafirmesFluxResposta> recuperarPlantillesPerFiltre(String idioma,
+			String descripcio) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

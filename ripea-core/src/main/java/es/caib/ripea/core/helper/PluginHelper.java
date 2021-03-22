@@ -162,8 +162,8 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats";
-	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts";
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu  
+	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating document that haven't been saved in arxiu
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
@@ -2629,13 +2629,17 @@ public class PluginHelper {
 	}
 	
 	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
-			String idioma) {
+			UsuariDto usuariActual, boolean filtrar) {
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
 		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
 		try {
-			List<PortafirmesFluxResposta> plantilles = getPortafirmesPlugin().recuperarPlantillesDisponibles(
-					idioma);
+			List<PortafirmesFluxResposta> plantilles = null;
+			 if (filtrar) {
+				plantilles = getPortafirmesPlugin().recuperarPlantillesPerFiltre(usuariActual.getIdioma(), usuariActual.getCodi());
+			} else {
+				plantilles = getPortafirmesPlugin().recuperarPlantillesDisponibles(usuariActual.getIdioma());
+			}
 			
 			if (plantilles != null) {
 				for (PortafirmesFluxResposta plantilla : plantilles) {

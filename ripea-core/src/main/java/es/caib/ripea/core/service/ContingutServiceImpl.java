@@ -281,6 +281,27 @@ public class ContingutServiceImpl implements ContingutService {
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
+		
+		if (contingut instanceof DocumentEntity) {
+			DocumentEntity documentEntity = (DocumentEntity) contingut;
+			
+			if (documentEntity.getGesDocAdjuntId() != null ) {
+				pluginHelper.gestioDocumentalDelete(
+						documentEntity.getGesDocAdjuntId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+			}
+			if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+				pluginHelper.gestioDocumentalDelete(
+						documentEntity.getGesDocAdjuntFirmaId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+			}
+			
+			if (contingutHelper.fitxerDocumentEsborratLlegir(documentEntity) != null) {
+				contingutHelper.fitxerDocumentEsborratEsborrar(documentEntity);
+			}
+			
+		}
+		
 		contingutRepository.delete(contingut);
 //		// Propaga l'acció a l'arxiu
 //		contingutHelper.arxiuPropagarEliminacio(contingut);
@@ -356,24 +377,24 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 
-		if (!conteDocumentsDefinitius(contingut)) {
+		if (!conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
 
 			// Propaga l'acció a l'arxiu
 			FitxerDto fitxer = null;
 			if (contingut instanceof DocumentEntity) {
 				DocumentEntity document = (DocumentEntity)contingut;
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-					fitxer = fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
+					fitxer = contingutHelper.fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
 				}
 			}
 			contingutHelper.arxiuPropagarModificacio(
 					contingut,
-					null,
+					fitxer,
 					false,
 					false,
 					null);
 			if (fitxer != null) {
-				fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
+				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
 		}
 
@@ -1938,37 +1959,6 @@ public class ContingutServiceImpl implements ContingutService {
 		outContent.close();
 	}*/
 
-	private FitxerDto fitxerDocumentEsborratLlegir(
-			DocumentEntity document) throws IOException {
-		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
-		fContent.getParentFile().mkdirs();
-		if (fContent.exists()) {
-			FileInputStream inContent = new FileInputStream(fContent);
-			byte fileContent[] = new byte[(int)fContent.length()];
-			inContent.read(fileContent);
-			inContent.close();
-			ArxiuDocumentContingut contingut = new ArxiuDocumentContingut(
-					ArxiuContingutTipusEnum.CONTINGUT,
-					null,
-					fileContent);
-			List<ArxiuDocumentContingut> continguts = new ArrayList<ArxiuDocumentContingut>();
-			continguts.add(contingut);
-			FitxerDto fitxer = new FitxerDto();
-			fitxer.setNom(document.getFitxerNom());
-			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(fileContent);
-			return fitxer;
-		} else {
-			return null;
-		}
-	}
-
-	private void fitxerDocumentEsborratEsborrar(
-			DocumentEntity document) {
-		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
-		fContent.getParentFile().mkdirs();
-		fContent.delete();
-	}
 
 	public boolean isCarpetaLogica() {
 		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");

@@ -236,7 +236,7 @@ $(document).ready(function() {
 		type: 'GET',
 		dataType: "json",
 		async: false,
-		url: "<c:url value="/metaExpedient/metaDocument/flux/plantilles"/>",
+		url: "<c:url value="/document/${document.id}/portafirmes/flux/plantilles"/>",
 		success: function(data) {
 			var defaultPortafirmesFluxId = "${portafirmesFluxId}";
 			var plantillaActual = "${portafirmesFluxSeleccionat}";
