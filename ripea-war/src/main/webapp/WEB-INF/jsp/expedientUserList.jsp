@@ -385,16 +385,35 @@ function removeCookie(cname) {
 			<div class="col-md-3">
 				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
 			</div>
+			<c:if test="${rolActual!='tothom'}">	
+				<div class="col-md-3">
+					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<rip:inputSuggest 
+						name="agafatPer" 
+						urlConsultaInicial="${urlConsultaInicial}" 
+						urlConsultaLlistat="${urlConsultaLlistat}" 
+						placeholderKey="expedient.list.user.placeholder.agafatPer"
+						suggestValue="codi"
+						suggestText="codiAndNom"
+						inline="true"
+						required="true"/>
+				</div>
+			</c:if>	
 			<div class="col-md-2">
 				<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-			</div>						
+			</div>		
 			<rip:inputHidden name="meusExpedients"/>
+			
+			<c:if test="${rolActual!='tothom'}"></div><div class="row"></c:if>	
+			
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
+			
 		</div>
 	</form:form>
 	<div class="rmodal"></div>

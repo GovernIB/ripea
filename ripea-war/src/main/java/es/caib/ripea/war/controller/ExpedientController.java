@@ -136,6 +136,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					null, 
 					rolActual);
 		}
+		model.addAttribute(
+				"rolActual",
+				rolActual);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
 				entitatActual.getId());
 		model.addAttribute(
