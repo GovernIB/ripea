@@ -25,7 +25,7 @@ public class ResponsableNotEmptyValidator implements ConstraintValidator<Respons
 	@Override
 	public boolean isValid(final MetaDocumentCommand metaDocument, final ConstraintValidatorContext context) {
 		
-		if (metaDocument.isFirmaPortafirmesActiva() && metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE) && (metaDocument.getPortafirmesResponsables() == null || metaDocument.getPortafirmesResponsables().length==0))
+		if (metaDocument.isFirmaPortafirmesActiva() && metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE) && !metaDocument.isComu() && (metaDocument.getPortafirmesResponsables() == null || metaDocument.getPortafirmesResponsables().length==0))
 			return false;
 		else 
 			return true;

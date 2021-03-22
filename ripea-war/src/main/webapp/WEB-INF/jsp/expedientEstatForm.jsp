@@ -23,6 +23,7 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientEstatCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="metaExpedientId"/>
+		<form:hidden path="comu"/>
 		<rip:inputText name="codi" textKey="expedient.estat.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true"/>
 		<rip:inputText name="color" textKey="expedient.estat.form.camp.color" />
@@ -37,7 +38,7 @@
 			textKey="expedient.estat.form.camp.responsable"
 			suggestValue="codi"
 			suggestText="nom"
-			required="true"/>
+			required="${!expedientEstatCommand.comu}" />
 			
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

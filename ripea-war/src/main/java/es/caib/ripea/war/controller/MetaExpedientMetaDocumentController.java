@@ -120,6 +120,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
+		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);
 		emplenarModelForm(request, model);
 		return "metaExpedientMetaDocumentForm";

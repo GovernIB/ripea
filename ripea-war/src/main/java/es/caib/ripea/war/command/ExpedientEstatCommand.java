@@ -24,8 +24,17 @@ public class ExpedientEstatCommand {
 	private Long metaExpedientId;
 	private boolean inicial;
 	private String responsableCodi;
+	private boolean comu;
 	
 	
+	public boolean isComu() {
+		return comu;
+	}
+
+	public void setComu(boolean isComu) {
+		this.comu = isComu;
+	}
+
 	public String getResponsableCodi() {
 		return responsableCodi;
 	}

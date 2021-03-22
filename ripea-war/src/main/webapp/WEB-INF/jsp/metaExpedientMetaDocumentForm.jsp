@@ -448,6 +448,7 @@ function removeLoading() {
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaExpedientId"/>
+		<form:hidden path="comu"/>
 		<br/>
 		<div class="tab-content content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
@@ -487,7 +488,7 @@ function removeLoading() {
 						suggestValue="codi"
 						suggestText="nom"
 						suggestTextAddicional="nif"
-						required="true"
+						required="${!metaDocumentCommand.comu}"
 						icon="fa fa-star"/>
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				</div>							

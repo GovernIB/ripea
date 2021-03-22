@@ -73,6 +73,8 @@ public class MetaDocumentCommand {
 	private boolean biometricaLectura;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private String plantillaNom;
+	
+	private boolean comu;
 
 	public static List<MetaDocumentCommand> toEntitatCommands(
 			List<MetaDocumentDto> dtos) {
@@ -100,6 +102,15 @@ public class MetaDocumentCommand {
 				MetaDocumentDto.class);
 	}
 
+	public boolean isComu() {
+		return comu;
+	}
+
+	public void setComu(boolean isComu) {
+		this.comu = isComu;
+	}
+
+	
 	public void setId(Long id) {
 		this.id = id;
 	}

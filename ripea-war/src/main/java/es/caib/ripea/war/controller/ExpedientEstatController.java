@@ -104,6 +104,7 @@ public class ExpedientEstatController extends BaseAdminController {
 		else
 			command = new ExpedientEstatCommand();
 		command.setMetaExpedientId(metaExpedientId);
+		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);
 		return "expedientEstatForm";
 	}
@@ -115,10 +116,13 @@ public class ExpedientEstatController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		if (!command.isComu() && (command.getResponsableCodi() == null || command.getResponsableCodi().isEmpty())) {
+			bindingResult.rejectValue("responsableCodi", "NotNull");
+		}
+		
 		if (bindingResult.hasErrors()) {
-//			emplenarModelFormulari(
-//					request,
-//					model);
+
 			return "expedientEstatForm";
 		}
 		if (command.getId() != null) {
@@ -127,7 +131,7 @@ public class ExpedientEstatController extends BaseAdminController {
 					ExpedientEstatCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:expedientEstat/"+command.getMetaExpedientId(),
+					"redirect:expedientEstat/" + command.getMetaExpedientId(),
 					"expedient.estat.controller.modificat.ok");
 		} else {
 			expedientEstatService.createExpedientEstat(
@@ -135,7 +139,7 @@ public class ExpedientEstatController extends BaseAdminController {
 					ExpedientEstatCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:expedientEstat/"+command.getMetaExpedientId(),
+					"redirect:expedientEstat/" + command.getMetaExpedientId(),
 					"expedient.estat.controller.creat.ok");
 		}
 	}
