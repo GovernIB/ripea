@@ -71,6 +71,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			notificacioNotib.setEnviamentDataProgramada(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 			notificacioNotib.setRetard(notificacio.getRetard());
 			notificacioNotib.setCaducitat(toXmlGregorianCalendar(notificacio.getCaducitat()));
+			notificacioNotib.setOrganGestor(notificacio.getOrganGestor());
 			DocumentV2 document = new DocumentV2();
 			document.setArxiuNom(notificacio.getDocumentArxiuNom());
 			if (notificacio.getDocumentArxiuContingut() != null) {

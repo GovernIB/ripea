@@ -35,6 +35,7 @@ public class Notificacio {
 	private String usuariCodi;
 	private ServeiTipusEnumDto serveiTipusEnum;
 	private String numExpedient;
+	private String organGestor;
 	
 	@Override
 	public String toString() {

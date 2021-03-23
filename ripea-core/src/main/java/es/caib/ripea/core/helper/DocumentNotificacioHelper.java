@@ -391,7 +391,8 @@ public class DocumentNotificacioHelper {
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+		if ((!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat()))
+			&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
