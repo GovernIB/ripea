@@ -202,10 +202,18 @@
 									${fill.metaNode.nom}
 								</c:when>
 								<c:when test="${not fill.carpeta && fill.metaNode == null}">
-									<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable col-md-12">
+									<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable col-md-12 hidden">
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
 										<spring:message code="contingut.info.document.tipusdocument"/>
 									</div>
+									<select id="${fill.id}" class="select-tipus-document">
+										<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option>
+										<c:forEach items="${metaDocumentsLeft}" var="metaDocument">
+											<option id="${metaDocument.id}">
+												${metaDocument.nom}
+											</option>
+										</c:forEach>
+									</select>
 								</c:when>
 							</c:choose>
 						</td>

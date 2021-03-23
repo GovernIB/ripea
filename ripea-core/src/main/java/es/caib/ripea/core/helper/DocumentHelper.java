@@ -275,6 +275,61 @@ public class DocumentHelper {
 		return dto;
 	}
 	
+	public boolean updateTipusDocumentDocument(
+			Long entitatId,
+			DocumentEntity documentEntity,
+			Long metaDocumentId,
+			boolean comprovarMetaExpedient) {
+
+		MetaDocumentEntity metaDocument = null;
+		if (metaDocumentId != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					documentEntity.getEntitat(),
+					documentEntity.getMetaDocument() != null ? documentEntity.getMetaDocument().getMetaExpedient() : null,
+					metaDocumentId,
+					false,
+					comprovarMetaExpedient);
+		} else {
+			throw new ValidationException(
+					documentEntity.getId(),
+					DocumentEntity.class,
+					"No es pot actualitzar un document sense un meta-document associat");
+		}
+		documentEntity.updateTipusDocument(
+				metaDocument,
+				metaDocument.getNtiOrigen(),
+				metaDocument.getNtiEstadoElaboracion(),
+				metaDocument.getNtiTipoDocumental());
+		FitxerDto fitxer = null;
+		if (documentEntity.getArxiuUuid() != null) {
+			fitxer = new FitxerDto();
+			fitxer.setContentType(documentEntity.getFitxerContentType());
+			fitxer.setNom(documentEntity.getFitxerNom());
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					documentEntity,
+					null,
+					null,
+					true,
+					false);
+			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+		}
+		// Registra al log la modificació del document
+		contingutLogHelper.log(
+				documentEntity,
+				LogTipusEnumDto.MODIFICACIO,
+				documentEntity.getNom(),
+				null,
+				true,
+				true);
+		contingutHelper.arxiuPropagarModificacio(
+				documentEntity,
+				fitxer,
+				documentEntity.isFirmat(),
+				false,
+				null);
+		return true;
+	}
+	
 	public DocumentEntity crearDocumentDB(
 			DocumentTipusEnumDto documentTipus,
 			String nom,

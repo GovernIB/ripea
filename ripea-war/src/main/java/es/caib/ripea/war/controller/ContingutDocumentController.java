@@ -280,6 +280,22 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 	
+	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument/{tipusDocumentId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean updateTipusDocument(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@PathVariable Long tipusDocumentId,
+			Model model) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return documentService.updateTipusDocumental(
+					entitatActual.getId(), 
+					contingutId, 
+					tipusDocumentId, 
+					false);
+	}
+
+	
 	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarEnArxiuDocumentAdjunt", method = RequestMethod.GET)
 	public String guardarEnArxiuDocumentAdjunt(
 			HttpServletRequest request,

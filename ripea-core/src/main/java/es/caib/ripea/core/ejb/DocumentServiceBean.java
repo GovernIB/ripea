@@ -385,4 +385,14 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.guardarEnArxiuDocumentAdjunt(docId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean updateTipusDocumental(
+			Long entitatId, 
+			Long documentId, 
+			Long tipusDocumentId,
+			boolean comprovarMetaExpedient) {
+		return delegate.updateTipusDocumental(entitatId, documentId, tipusDocumentId, comprovarMetaExpedient);
+	}
+
 }

@@ -405,7 +405,9 @@ body.loading .rmodal {
     border-radius: 4px;
     margin-top: 2px;
 }
-
+.select2-container .selection {
+	width: 100% !important;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -564,8 +566,8 @@ $(document).ready(function() {
 			useNativeClamp: true
 		});
 	});
-	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child)').css('cursor','pointer');
-	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child)').click(function(event) {
+	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').css('cursor','pointer');
+	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').click(function(event) {
 		event.stopPropagation();
 		window.location.href = $('a:first', $(this).parent()).attr('href');
 	});
@@ -1049,6 +1051,33 @@ $(document).ready(function() {
 			$('table tbody', td).append(tableBody);
 			$('table tbody td').webutilModalEval();
 		});
+	});
+	
+	
+	//=== assignar tipus document a document ====
+	var selTipusDocument = $('.select-tipus-document');
+	var select2Options = {
+			theme: 'bootstrap', 
+			width: 'auto', 
+			minimumResultsForSearch: "0"};
+	selTipusDocument.select2(select2Options);
+	
+	selTipusDocument.on('change', function(event){
+		showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
+		var documentId = $(this).attr('id');
+		var tipusDocumentId = $(':selected', $(this)).attr('id');
+		var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument/"/>' + tipusDocumentId;
+		$.ajax({
+			type: 'GET',
+	        url: updateUrl,
+	        success: function(actualitzat) {
+	        	location.reload();
+	        },
+	        error: function(e) {
+	        	alert("Hi ha hagut un error actualitzant el document amb el nou tipus de document");
+	        	location.reload();
+	        }
+	    });	
 	});
 });
 

@@ -626,4 +626,24 @@ public interface DocumentService {
 
 	public Exception guardarEnArxiuDocumentAdjunt(Long docId);
 
+	/**
+	 * Actualitza un document amb un tipus de document nou
+	 * 
+	 * @param entitatId
+	 * 			Id entitat actual
+	 * @param documentId
+	 * 			Id del document a actualitzar
+	 * @param tipusDocumentId
+	 * 			Id del nou tipus de document
+	 * @param comprovarMetaExpedient
+	 * 			Comprovar permisos metaExpedient
+	 * @return true si s'ha actualitzat
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public boolean updateTipusDocumental(
+			Long entitatId, 
+			Long documentId, 
+			Long tipusDocumentId,
+			boolean comprovarMetaExpedient);
+
 }

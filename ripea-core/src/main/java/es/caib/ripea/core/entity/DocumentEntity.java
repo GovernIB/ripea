@@ -145,6 +145,16 @@ public class DocumentEntity extends NodeEntity {
 				DocumentEstatEnumDto.CUSTODIAT.equals(estat);
 	}
 
+	public void updateTipusDocument(
+			MetaDocumentEntity metaDocument, 
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+			String ntiTipoDocumental) {
+		this.metaNode = metaDocument;
+		this.ntiOrigen = ntiOrigen;
+		this.ntiTipoDocumental = ntiTipoDocumental;
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+	}
 	
 	public void update(
 			MetaDocumentEntity metaDocument,

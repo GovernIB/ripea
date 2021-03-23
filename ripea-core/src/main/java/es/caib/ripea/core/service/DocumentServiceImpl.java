@@ -221,6 +221,46 @@ public class DocumentServiceImpl implements DocumentService {
 				documentDto,
 				comprovarMetaExpedient);
 	}
+	
+	@Transactional
+	@Override
+	public boolean updateTipusDocumental(
+			Long entitatId,
+			Long documentId,
+			Long tipusDocumentId,
+			boolean comprovarMetaExpedient) {
+		logger.debug("Actualitzant el tipus de document del document (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + documentId + ", " +
+				"tipusDocument=" + tipusDocumentId + ")");
+		DocumentEntity documentEntity = documentHelper.comprovarDocumentDinsExpedientModificable(
+				entitatId,
+				documentId,
+				false,
+				true,
+				false,
+				false, false);
+		ContingutEntity pare = null;
+		if (documentEntity.getPareId() != null) {
+			contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					documentEntity.getPareId(),
+					false,
+					false,
+					false,
+					false, 
+					false);	
+		} 
+		
+		if (! checkCarpetaUniqueContraint(documentEntity.getNom(), pare, entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
+		return documentHelper.updateTipusDocumentDocument(
+				entitatId,
+				documentEntity,
+				tipusDocumentId,
+				comprovarMetaExpedient);
+	}
 
 	@Transactional(readOnly = true)
 	@Override
