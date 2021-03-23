@@ -103,6 +103,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -3459,6 +3460,12 @@ public class PluginHelper {
 				notificacio.setEmisorDir3Codi(expedientEntity.getEntitat().getUnitatArrel());
 			}
 
+			OrganGestorEntity organGestor = expedientEntity.getOrganGestor();
+			if (organGestor != null) {
+				notificacio.setOrganGestor(organGestor.getCodi());
+			} else {
+				notificacio.setOrganGestor(notificacio.getEmisorDir3Codi());
+			}
 			notificacio.setEnviamentTipus(notificacioDto.getTipus() != null ? EnviamentTipus.valueOf(notificacioDto.getTipus().toString()) : null);
 			notificacio.setConcepte(notificacioDto.getAssumpte());
 			notificacio.setDescripcio(notificacioDto.getObservacions());
