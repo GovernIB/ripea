@@ -309,16 +309,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						null, 
 						false,
 						false,
-						null, 
-						null, 
-						false),
+						null),
 				MetaExpedientDto.class);
 
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId, boolean checkPerMassiuAdmin, String rolActual) {
+	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId, String rolActual) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbEntitatPermis(
@@ -326,11 +324,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						ExtendedPermission.WRITE,
 						true,
 						null, 
-						false,
-						false,
-						null,
-						rolActual,
-						checkPerMassiuAdmin),
+						"IPA_ADMIN".equals(rolActual),
+						"IPA_ORGAN_ADMIN".equals(rolActual),
+						null),
 				MetaExpedientDto.class);
 
 	}
@@ -351,9 +347,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtreNomOrCodiSia, 
 						"IPA_ADMIN".equals(rolActual),
 						"IPA_ORGAN_ADMIN".equals(rolActual),
-						null,
-						rolActual,
-						false), // TODO especificar organId quan és admin organ
+						null), // TODO especificar organId quan és admin organ
 				MetaExpedientDto.class);
 
 	}

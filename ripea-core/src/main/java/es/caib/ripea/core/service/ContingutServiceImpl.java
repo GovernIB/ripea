@@ -1525,7 +1525,7 @@ public class ContingutServiceImpl implements ContingutService {
 			String rolActual) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
+				false,
 				false,
 				false,
 				true);

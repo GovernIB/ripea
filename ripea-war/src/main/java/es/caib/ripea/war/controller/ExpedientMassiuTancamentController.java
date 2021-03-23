@@ -76,7 +76,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), checkPerMassiuAdmin, rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
 
 		return "expedientMassiuTancamentList";
 	}

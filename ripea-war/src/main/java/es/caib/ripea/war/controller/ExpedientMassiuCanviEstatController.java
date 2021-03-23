@@ -86,7 +86,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), checkPerMassiuAdmin, rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
 
 		return "expedientMassiuCanviEstatList";
 	}

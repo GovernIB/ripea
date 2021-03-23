@@ -176,7 +176,6 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param checkPerMassiuAdmin TODO
 	 * @param rolActual TODO
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
 	 * @throws NotFoundException
@@ -184,7 +183,7 @@ public interface MetaExpedientService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(
-			Long entitatId, boolean checkPerMassiuAdmin, String rolActual) throws NotFoundException;
+			Long entitatId, String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-expedients d'una entitat amb el permis READ per

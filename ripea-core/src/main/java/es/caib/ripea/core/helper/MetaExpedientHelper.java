@@ -187,11 +187,9 @@ public class MetaExpedientHelper {
 				ExtendedPermission.WRITE,
 				true,
 				null,
-				false,
-				false,
-				null,
-				rolActual, 
-				true);
+				"IPA_ADMIN".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				null);
 	}
 
 	public List<MetaExpedientEntity> findAmbEntitatPermis(
@@ -201,9 +199,7 @@ public class MetaExpedientHelper {
 			String filtreNomOrCodiSia, 
 			boolean isAdminEntitat,
 			boolean isAdminOrgan,
-			Long adminOrganOrganId,
-			String rolActual, 
-			boolean checkPerMassiuAdmin) {
+			Long adminOrganOrganId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,

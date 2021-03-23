@@ -100,7 +100,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				entitatId,
 				false,
 				false,
-				true, false);
+				false, 
+				true);
 		
 		ExecucioMassivaEntity execucioMassiva = null;
 		

@@ -698,7 +698,7 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
 			boolean checkPerMassiuAdmin) {
-		boolean metaExpedientBelongsToEntitatOrOrgansOfUser = true;
+		boolean metaExpedientBelongsToEntitatOrOrgansOfUser = false;
 		boolean esExpedient = false;
 		if (metaNode.getClass() == MetaExpedientEntity.class) {
 			esExpedient = true;
