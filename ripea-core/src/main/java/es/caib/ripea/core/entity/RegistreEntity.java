@@ -103,7 +103,8 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	private String destiCodi;
 	@Column(name = "desti_descripcio", length = 100)
 	private String destiDescripcio;
-	
+	@Column(name = "justificant_arxiu_uuid", length = 256)
+	private String justificantArxiuUuid;
 	
 	
 
@@ -304,9 +305,14 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 			built.usuariNom = usuariNom;
 			return this;
 		}
-
+		
 		public Builder destiDescripcio(String destiDescripcio) {
 			built.destiDescripcio = destiDescripcio;
+			return this;
+		}
+		
+		public Builder justificantArxiuUuid(String justificantArxiuUuid) {
+			built.justificantArxiuUuid = justificantArxiuUuid;
 			return this;
 		}
 
@@ -600,8 +606,10 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	public void updateAnnexos(List<RegistreAnnexEntity> annexos) {
 		this.annexos = annexos;
 	}
-
-
+	
+	public String getJustificantArxiuUuid() {
+		return justificantArxiuUuid;
+	}
 
 	private static final long serialVersionUID = 1815997738055924981L;
 

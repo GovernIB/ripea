@@ -51,8 +51,9 @@ public class RegistreDto {
 	
 	private List<RegistreInteressatDto> interessats;
 	private List<RegistreAnnexDto> annexos;
-	
+	private String justificantArxiuUuid;
 
+	private RegistreJustificantDto justificant;
 	
 	public Long getId() {
 		return id;
@@ -311,6 +312,18 @@ public class RegistreDto {
 	public void setDestiDescripcio(
 			String destiDescripcio) {
 		this.destiDescripcio = destiDescripcio;
+	}
+	public String getJustificantArxiuUuid() {
+		return justificantArxiuUuid;
+	}
+	public void setJustificantArxiuUuid(String justificantArxiuUuid) {
+		this.justificantArxiuUuid = justificantArxiuUuid;
+	}
+	public RegistreJustificantDto getJustificant() {
+		return justificant;
+	}
+	public void setJustificant(RegistreJustificantDto justificant) {
+		this.justificant = justificant;
 	}
 
 }

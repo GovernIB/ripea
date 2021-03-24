@@ -57,6 +57,8 @@ public interface ExpedientPeticioService {
 			Long metaExpedientId,
 			String expedientNumero);
 
+	FitxerDto getJustificantContent(String arxiuUuid);
+
 
 
 

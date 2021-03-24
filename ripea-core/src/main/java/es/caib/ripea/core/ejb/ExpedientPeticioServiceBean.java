@@ -131,6 +131,11 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 			String expedientNumero) {
 		return delegate.findByEntitatAndMetaExpedientAndExpedientNumero(entitatId, metaExpedientId, expedientNumero);
 	}
+
+	@Override
+	public FitxerDto getJustificantContent(String arxiuUuid) {
+		return delegate.getJustificantContent(arxiuUuid);
+	}
 	
 	
 }

@@ -237,6 +237,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 				}
 			}
+			String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+				expedientHelper.crearDocFromUuid(
+						arxiuUuid, 
+						expedientPeticioEntity.getId());
+			}
 			canviEstatToProcessatPendent(expedientPeticioEntity);
 			if (processatOk) {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
@@ -269,6 +275,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				logger.error(ExceptionUtils.getStackTrace(e));
 				expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
 			}
+		}
+		String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+			expedientHelper.crearDocFromUuid(
+					arxiuUuid, 
+					expedientPeticioEntity.getId());
 		}
 		canviEstatToProcessatPendent(expedientPeticioEntity);
 		if (processatOk) {
@@ -1626,6 +1638,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private boolean isProgaparRelacioActiva() {
 		boolean isPropagarRelacio = Boolean.parseBoolean(
 				PropertiesHelper.getProperties().getProperty("es.caib.ripea.propagar.relacio.expedients"));
+		return isPropagarRelacio;
+	}
+	
+	private boolean isIncorporacioJustificantActiva() {
+		boolean isPropagarRelacio = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporar.justificant"));
 		return isPropagarRelacio;
 	}
 

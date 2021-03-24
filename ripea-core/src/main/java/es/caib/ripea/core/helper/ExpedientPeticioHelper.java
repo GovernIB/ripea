@@ -165,6 +165,7 @@ public class ExpedientPeticioHelper {
 				usuariCodi(registreEntrada.getUsuariCodi()).
 				usuariNom(registreEntrada.getUsuariNom()).
 				destiDescripcio(registreEntrada.getDestiDescripcio()).
+				justificantArxiuUuid(registreEntrada.getJustificantFitxerArxiuUuid()).
 				build();
 		registreRepository.save(registreEntity);
 		expedientPeticioEntity.updateRegistre(registreEntity);

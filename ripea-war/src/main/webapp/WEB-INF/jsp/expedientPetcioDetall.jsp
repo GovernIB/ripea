@@ -68,6 +68,11 @@ tr.clicable {
 				<span class="badge">${fn:length(registre.annexos)}</span>
 			</a>
 		</li>
+		<c:if test="${isIncorporacioJustificantActiva}">
+			<li role="presentation">
+				<a href="#justificant" aria-controls="justificant" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.justificant"/>&nbsp;<span class="badge">${fn:length(registre.interessats)}</span></a>
+			</li>
+		</c:if>
 		<c:if test="${not empty peticio.notificaDistError}">
 			<li role="presentation">
 				<a href="#error" aria-controls="error" role="tab" data-toggle="tab">
@@ -440,22 +445,115 @@ tr.clicable {
 				</c:otherwise>
 			</c:choose>
 		</div>
-		
-		<!------------------------------ TABPANEL ERROR ------------------------------------->
-		<div class="tab-pane" id="error" role="tabpanel">
-			<div>
-				<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
-					<span class="fa fa-exclamation-triangle"></span>
-					<spring:message code="expedientPeticio.detalls.errorNotifacio" />
-					<a href="<c:url value="/expedientPeticio/${peticio.id}/reintentarNotificar"/>"
-						class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
-						<spring:message code="expedientPeticio.detalls.annex.accio.reintentar" /></a>
+		<c:if test="${isIncorporacioJustificantActiva}">
+			<!------------------------------ TABPANEL JUSTIFICANT ------------------------------------->
+			<div class="tab-pane" id="justificant" role="tabpanel">
+				<c:if test="${not empty registre.justificant}">
+					<script type="text/javascript">
+						$(document).ready(function() {
+						    $("#collapse-justificant-firmes").on('show.bs.collapse', function(data){  	
+							    if (!$(this).data("loaded")) {
+							        var annexId = $(this).data("annexId");
+							        $(this).append("<div style='text-align: center; margin-bottom: 60px; margin-top: 60px;''><span class='fa fa-circle-o-notch fa-spin fa-3x'/></div>");
+							        $(this).load("<c:url value="/nodeco/expedientPeticio/justificantFirmaInfo/${registre.id}"/>");
+							        $(this).data("loaded", true);
+							    }
+						    });
+					 	});
+					</script>
+				
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<span class="fa fa-file"></span>
+									${registre.justificant.titol}
+								<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapse-justificant"><span class="fa fa-chevron-down"></span></button>
+							</h3>
+						</div>
+							<div id="collapse-justificant" class="panel-collapse collapse collapse-annex" role="tabpanel" aria-labelledby="dadesJustificant" data-registre-id="${registre.id}"  data-fitxer-arxiu-uuid="${registre.justificant.uuid}">
+							<div>
+								<c:if test="${registre.justificant.estat == 'PENDENT' && not empty registre.justificant.error}">	
+										<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
+											<span class="fa fa-exclamation-triangle"></span>
+											<spring:message code="expedientPeticio.detalls.annex.error" />
+											<a href="<c:url value="/expedientPeticio/justificant/${peticio.id}/reintentar"/>"
+												class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
+												<spring:message code="expedientPeticio.detalls.annex.accio.reintentar" /></a>
+										</div>
+										<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${registre.justificant.error}</pre>
+									</c:if>
+								</div>
+								<table class="table table-bordered">
+								<tbody>														
+									<tr>
+										<td><strong><spring:message code="registre.annex.detalls.camp.eni.data.captura"/></strong></td>
+										<td><c:if test="${not empty registre.justificant.ntiFechaCaptura}"><fmt:formatDate value="${registre.justificant.ntiFechaCaptura}" pattern="dd/MM/yyyy HH:mm:ss"/></c:if></td>
+									</tr>
+									<tr>
+										<td><strong><spring:message code="registre.annex.detalls.camp.eni.origen"/></strong></td>
+										<td><c:if test="${not empty registre.justificant.ntiOrigen}">${registre.justificant.ntiOrigen}</c:if></td>
+									</tr>
+									<tr>
+										<td><strong><spring:message code="registre.annex.detalls.camp.eni.tipus.documental"/></strong></td>
+										<td><c:if test="${not empty registre.justificant.ntiTipoDocumental}"><spring:message code="registre.annex.detalls.camp.ntiTipusDocument.${registre.justificant.ntiTipoDocumental}"/></c:if></td>
+									</tr>
+									<tr>
+										<td><strong><spring:message code="registre.annex.detalls.camp.arxiuuuid"/></strong></td>
+										<td><c:if test="${not empty registre.justificant.uuid}">${registre.justificant.uuid}</c:if></td>
+									</tr>
+								
+									<c:if test="${not empty registre.justificant.observacions}">
+										<tr>
+											<td><strong><spring:message code="registre.annex.detalls.camp.observacions"/></strong></td>
+											<td>${registre.justificant.observacions}</td>
+										</tr>
+									</c:if>
+									<tr>
+										<td><strong><spring:message code="registre.annex.detalls.camp.fitxer"/></strong></td>
+										<td>
+											${registre.justificant.titol}
+											<a href="descarregarJustificant/${registre.id}" class="btn btn-default btn-sm pull-right">
+												<span class="fa fa-download" title="<spring:message code="registre.annex.detalls.camp.fitxer.descarregar"/>"></span>
+											</a>
+										</td>
+									</tr>
+									<c:if test="${not empty registre.justificant.firmaTipus}">
+										<tr>
+											<td colspan="2">
+												<div class="panel panel-default">
+													<div class="panel-heading">
+														<h3 class="panel-title">
+															<span class="fa fa-certificate"></span>
+															<spring:message code="registre.annex.detalls.camp.firmes"/>
+															<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapse-justificant-firmes"><span class="fa fa-chevron-down"></span></button>
+														</h3>
+													</div>
+													<div id="collapse-justificant-firmes" class="panel-collapse collapse collapse-annex collapse-registre-firmes" role="tabpanel"> 
+									
+													</div> 
+												</div>
+											</td>
+										</tr>
+									</c:if>
+								</table>
+	 						</div> 
+						</div>
+					</c:if>
 				</div>
-				<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${peticio.notificaDistError}</pre>
+			</c:if>
+			<!------------------------------ TABPANEL ERROR ------------------------------------->
+			<div class="tab-pane" id="error" role="tabpanel">
+				<div>
+					<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
+						<span class="fa fa-exclamation-triangle"></span>
+						<spring:message code="expedientPeticio.detalls.errorNotifacio" />
+						<a href="<c:url value="/expedientPeticio/${peticio.id}/reintentarNotificar"/>"
+							class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
+							<spring:message code="expedientPeticio.detalls.annex.accio.reintentar" /></a>
+					</div>
+					<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${peticio.notificaDistError}</pre>
+				</div>
 			</div>
-		</div>		
-		
-
 	</div>
 	<div id="modal-botons" class="well">
 		<a href="<c:url value="/bustiaUser"/>" class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>

@@ -22,6 +22,7 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
@@ -34,6 +35,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.RegistreJustificantDto;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -47,6 +49,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -264,6 +267,30 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return fitxer;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto getJustificantContent(String arxiuUuid) {
+		FitxerDto fitxer = new FitxerDto();
+		Document document = null;
+		document = pluginHelper.arxiuDocumentConsultar(
+				null,
+				arxiuUuid,
+				null,
+				true,
+				true);
+
+		if (document != null) {
+			DocumentContingut documentContingut = document.getContingut();
+			if (documentContingut != null) {
+				fitxer.setNom(documentContingut.getArxiuNom());
+				fitxer.setContentType(documentContingut.getTipusMime());
+				fitxer.setContingut(documentContingut.getContingut());
+				fitxer.setTamany(documentContingut.getContingut().length);
+			}
+		}
+		return fitxer;
+	}
 
 	@Transactional(readOnly = true)
 	@Override
@@ -388,11 +415,42 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		ExpedientPeticioDto expedientPeticioDto = conversioTipusHelper.convertir(expedientPeticioEntity,
 				ExpedientPeticioDto.class);
+		
+		String arxiuUuid = expedientPeticioDto.getRegistre().getJustificantArxiuUuid();
+		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+			RegistreJustificantDto justificantInfo = new RegistreJustificantDto();
+			Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
+					null, 
+					arxiuUuid, 
+					null, 
+					false, 
+					false);
+			DocumentDto document = expedientHelper.toDocumentDto(
+					documentDetalls, 
+					expedientPeticioDto.getIdentificador());
+			justificantInfo.setTitol(document.getNom());
+			justificantInfo.setNtiFechaCaptura(document.getDataCaptura());
+			justificantInfo.setNtiOrigen(documentDetalls.getMetadades().getOrigen().name());
+			justificantInfo.setNtiTipoDocumental(documentDetalls.getMetadades().getTipusDocumental().name());
+			justificantInfo.setUuid(document.getArxiuUuid());
+			if (documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
+				justificantInfo.setFirmaPerfil(documentDetalls.getFirmes().get(0).getPerfil().name());
+				justificantInfo.setFirmaTipus(documentDetalls.getFirmes().get(0).getTipus().name());
+			}
+			if (document.getNtiTipoFirma() != null)
+				justificantInfo.setFirmaTipus(document.getNtiTipoFirma().name());
+			expedientPeticioDto.getRegistre().setJustificant(justificantInfo);
+		}
 
 		return expedientPeticioDto;
 
 	}
 
+	private boolean isIncorporacioJustificantActiva() {
+		boolean isPropagarRelacio = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporar.justificant"));
+		return isPropagarRelacio;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
 
 }

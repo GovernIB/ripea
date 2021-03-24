@@ -196,7 +196,7 @@
 							&nbsp;${fill.descripcio}
 						</c:if>
 						</td>
-						<td>
+						<td width="25%">
 							<c:choose>
 								<c:when test="${not fill.carpeta && fill.metaNode != null}">
 									${fill.metaNode.nom}

@@ -32,6 +32,8 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -473,6 +475,157 @@ public class ExpedientHelper {
 		return docEntity;
 	}
 	
+	/**
+	 * Creates document from registre annex
+	 * 
+	 * @param registreAnnexId
+	 * @param expedientPeticioId
+	 * @return
+	 */
+	@Transactional
+	public DocumentEntity crearDocFromUuid(
+			String arxiuUuid, 
+			Long expedientPeticioId) {
+		ExpedientPeticioEntity expedientPeticioEntity;
+		ExpedientEntity expedientEntity;
+		EntitatEntity entitat;
+		CarpetaEntity carpetaEntity = null;
+		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
+
+		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
+				null, 
+				arxiuUuid, 
+				null, 
+				false, 
+				false);
+		//registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
+		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
+		logger.debug(
+				"Creant justificant de expedient peticio (" + "expedientId=" +
+						expedientPeticioEntity.getExpedient().getId() + ", " + "arxiuUuid=" + arxiuUuid +
+						", " + "expedientPeticioId=" + expedientPeticioId + ")");
+
+		// ############################## CREATE CARPETA IN DB AND IN ARXIU
+		// ##########################################
+		boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+		if (isCarpetaActive) {
+			// create carpeta ind db and arxiu if doesnt already exists
+			Long carpetaId = createCarpetaFromExpPeticio(
+					expedientEntity,
+					entitat.getId(),
+					expedientPeticioEntity.getRegistre().getIdentificador());
+			carpetaEntity = carpetaRepository.findOne(carpetaId);
+		}
+
+		// ############################## CREATE DOCUMENT IN DB
+		// ####################################
+		DocumentDto documentDto = toDocumentDto(
+				documentDetalls, 
+				expedientPeticioEntity.getIdentificador());
+		contingutHelper.comprovarNomValid(
+				isCarpetaActive ? carpetaEntity : expedientEntity,
+				documentDto.getNom(),
+				null,
+				DocumentEntity.class);
+		DocumentEntity docEntity = documentHelper.crearDocumentDB(
+				documentDto.getDocumentTipus(),
+				documentDto.getNom(),
+				documentDto.getDescripcio(),
+				documentDto.getData(),
+				documentDto.getDataCaptura(),
+				documentDto.getNtiOrgano(),
+				documentDto.getNtiOrigen(),
+				documentDto.getNtiEstadoElaboracion(),
+				documentDto.getNtiTipoDocumental(),
+				null,
+				isCarpetaActive ? carpetaEntity : expedientEntity,
+				expedientEntity.getEntitat(),
+				expedientEntity,
+				documentDto.getUbicacio(),
+				documentDto.getNtiIdDocumentoOrigen());
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(documentDto.getFitxerNom());
+		fitxer.setContentType(documentDto.getFitxerContentType());
+		fitxer.setContingut(documentDto.getFitxerContingut());
+		if (documentDto.getFitxerContingut() != null) {
+			documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
+			if (documentDto.isAmbFirma()) {
+				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+			}
+		} else {
+			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
+
+		}
+		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+		docEntity.setNtiTipoFirma(documentDto.getNtiTipoFirma());
+		
+		// ############################## MOVE DOCUMENT IN ARXIU
+		// ##########################################
+		// put arxiu uuid of annex
+		docEntity.updateArxiu(documentDto.getArxiuUuid());
+		documentRepository.saveAndFlush(docEntity);
+		if (isCarpetaActive) {
+			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
+			boolean documentExistsInArxiu = false;
+			String documentUuid = null;
+			if (carpeta != null && carpeta.getContinguts() != null) {
+				for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
+					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
+							contingutArxiu.getNom().equals(docEntity.getNom())) {
+						documentExistsInArxiu = true;
+						documentUuid = contingutArxiu.getIdentificador();
+					}
+				}
+			}
+			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
+				carpetaEntity.updateArxiu(documentUuid);
+			}
+			if (!documentExistsInArxiu) {
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
+						docEntity,
+						carpetaEntity,
+						expedientEntity.getArxiuUuid());
+				// if document was dispatched, update uuid to new document
+				if (uuidDesti != null) {
+					docEntity.updateArxiu(uuidDesti);
+				}
+			}
+		} else {
+			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+			boolean documentExistsInArxiu = false;
+			String documentUuid = null;
+			if (expedient.getContinguts() != null) {
+				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
+							contingutArxiu.getNom().equals(docEntity.getNom())) {
+						documentExistsInArxiu = true;
+						documentUuid = contingutArxiu.getIdentificador();
+					}
+				}
+			}
+			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
+				expedientEntity.updateArxiu(documentUuid);
+			}
+			if (!documentExistsInArxiu) {
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
+						docEntity,
+						expedientEntity,
+						expedientEntity.getArxiuUuid());
+				// if document was dispatched, update uuid to new document
+				if (uuidDesti != null) {
+					docEntity.updateArxiu(uuidDesti);
+				}
+			}
+		}
+		// save ntiIdentitficador generated in arxiu in db
+		documentDetalls.getMetadades().getIdentificadorOrigen();
+		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
+		documentRepository.save(docEntity);
+		contingutLogHelper.logCreacio(docEntity, true, true);
+		return docEntity;
+	}
+	
 	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
 		contingutHelper.comprovarNomValid(expedient.getPare(), nom, expedient.getId(), ExpedientEntity.class);
 		String nomOriginal = expedient.getNom();
@@ -640,6 +793,205 @@ public class ExpedientHelper {
 				registreAnnexEntity.getRegistre().getEntitatCodi()).getUnitatArrel();
 		document.setNtiOrgano(codiDir3);
 		return document;
+	}
+	
+	public DocumentDto toDocumentDto(
+			Document documentArxiu, 
+			String numeroRegistre) {
+		DocumentDto document = new DocumentDto();
+		String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
+		String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  numeroRegistre.replace('/', '_')) : documentArxiu.getNom();
+		
+		document.setDocumentTipus(DocumentTipusEnumDto.IMPORTAT);
+		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
+		document.setData(new Date());
+		document.setNom(nomDocument);
+		document.setFitxerNom(documentArxiu.getNom());
+		document.setArxiuUuid(documentArxiu.getIdentificador());
+		document.setDataCaptura(documentArxiu.getMetadades().getDataCaptura());
+		document.setNtiOrigen(getOrigen(documentArxiu));
+		document.setNtiTipoDocumental(getTipusDocumental(documentArxiu));
+		document.setNtiEstadoElaboracion(getEstatElaboracio(documentArxiu));
+		document.setNtiTipoFirma(getNtiTipoFirma(documentArxiu));
+		document.setFitxerContentType(documentArxiu.getContingut().getTipusMime());
+		document.setNtiVersion("1.0");
+		document.setNtiOrgano(getOrgans(documentArxiu));
+		return document;
+	}
+	
+	private String getOrgans(Document documentArxiu) {
+		String organs = null;
+		if (documentArxiu.getMetadades().getOrgans() != null) {
+			List<String> metadadaOrgans = documentArxiu.getMetadades().getOrgans();
+			StringBuilder organsSb = new StringBuilder();
+			boolean primer = true;
+			for (String organ: metadadaOrgans) {
+				organsSb.append(organ);
+				if (primer || metadadaOrgans.size() == 1) {
+					primer = false;
+				} else {
+					organsSb.append(",");
+				}
+			}
+			organs = organsSb.toString();
+		}
+		return organs;
+	}
+	
+	private static DocumentNtiEstadoElaboracionEnumDto getEstatElaboracio(Document document) {
+		DocumentNtiEstadoElaboracionEnumDto estatElaboracio = null;
+
+		switch (document.getMetadades().getEstatElaboracio()) {
+		case ORIGINAL:
+			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE01;
+			break;
+		case COPIA_CF:
+			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE02;
+			break;
+		case COPIA_DP:
+			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE03;
+			break;
+		case COPIA_PR:
+			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE04;
+			break;
+		case ALTRES:
+			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE99;
+			break;
+		}
+		return estatElaboracio;
+	}
+	
+	private static NtiOrigenEnumDto getOrigen(Document document) {
+		NtiOrigenEnumDto origen = null;
+
+		switch (document.getMetadades().getOrigen()) {
+		case CIUTADA:
+			origen = NtiOrigenEnumDto.O0;
+			break;
+		case ADMINISTRACIO:
+			origen = NtiOrigenEnumDto.O1;
+			break;
+		}
+		return origen;
+	}
+	
+	private DocumentNtiTipoFirmaEnumDto getNtiTipoFirma(Document documentArxiu) {
+		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
+		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
+			FirmaTipus firmaTipus = null;
+			for (Firma firma: documentArxiu.getFirmes()) {
+				if (firma.getTipus() != FirmaTipus.CSV) {
+					firmaTipus = firma.getTipus();
+					break;
+				}
+			}
+			switch (firmaTipus) {
+			case CSV:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
+				break;
+			case XADES_DET:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
+				break;
+			case XADES_ENV:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
+				break;
+			case CADES_DET:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
+				break;
+			case CADES_ATT:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
+				break;
+			case PADES:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
+				break;
+			case SMIME:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
+				break;
+			case ODT:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
+				break;
+			case OOXML:
+				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
+				break;
+			}
+		}
+		return ntiTipoFirma;
+	}
+	
+	private static String getTipusDocumental(Document document) {
+		String tipusDocumental = null;
+
+		if (document.getMetadades().getTipusDocumental() != null) {
+			switch (document.getMetadades().getTipusDocumental()) {
+			case RESOLUCIO:
+				tipusDocumental = "TD01";
+				break;
+			case ACORD:
+				tipusDocumental = "TD02";
+				break;
+			case CONTRACTE:
+				tipusDocumental = "TD03";
+				break;
+			case CONVENI:
+				tipusDocumental = "TD04";
+				break;
+			case DECLARACIO:
+				tipusDocumental = "TD05";
+				break;
+			case COMUNICACIO:
+				tipusDocumental = "TD06";
+				break;
+			case NOTIFICACIO:
+				tipusDocumental = "TD07";
+				break;
+			case PUBLICACIO:
+				tipusDocumental = "TD08";
+				break;
+			case JUSTIFICANT_RECEPCIO:
+				tipusDocumental = "TD09";
+				break;
+			case ACTA:
+				tipusDocumental = "TD10";
+				break;
+			case CERTIFICAT:
+				tipusDocumental = "TD11";
+				break;
+			case DILIGENCIA:
+				tipusDocumental = "TD12";
+				break;
+			case INFORME:
+				tipusDocumental = "TD13";
+				break;
+			case SOLICITUD:
+				tipusDocumental = "TD14";
+				break;
+			case DENUNCIA:
+				tipusDocumental = "TD15";
+				break;
+			case ALEGACIO:
+				tipusDocumental = "TD16";
+				break;
+			case RECURS:
+				tipusDocumental = "TD17";
+				break;
+			case COMUNICACIO_CIUTADA:
+				tipusDocumental = "TD18";
+				break;
+			case FACTURA:
+				tipusDocumental = "TD19";
+				break;
+			case ALTRES_INCAUTATS:
+				tipusDocumental = "TD20";
+				break;
+			case ALTRES:
+				tipusDocumental = "TD99";
+				break;
+			}
+		} else if (document.getMetadades().getTipusDocumentalAddicional() != null) {
+			tipusDocumental = document.getMetadades().getTipusDocumentalAddicional();
+		}
+
+		return tipusDocumental;
 	}
 
 	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {

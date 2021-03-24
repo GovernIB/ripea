@@ -37,6 +37,8 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -69,7 +71,9 @@ public class ExpedientPeticioController extends BaseUserController {
 	private MetaExpedientService metaExpedientService;	
 	@Autowired
 	private ExpedientService expedientService;		
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -197,6 +201,7 @@ public class ExpedientPeticioController extends BaseUserController {
 		model.addAttribute(
 				"peticio",
 				expedientPeticioDto);
+		model.addAttribute("isIncorporacioJustificantActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.incorporar.justificant")));
 		return "expedientPetcioDetall";
 	}
 
@@ -413,6 +418,29 @@ public class ExpedientPeticioController extends BaseUserController {
 		}
 		return null;
 	}
+	
+	@RequestMapping(value = "/descarregarJustificant/{registreId}", method = RequestMethod.GET)
+	public String descarregarJustificant(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long registreId) throws IOException {
+		try{
+			RegistreDto registreDto = expedientPeticioService.findRegistreById(
+					registreId);
+			FitxerDto fitxer = expedientPeticioService.getJustificantContent(registreDto.getJustificantArxiuUuid());
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+		} catch (Exception ex) {
+			logger.error("Error descarregant el document", ex);
+			return getModalControllerReturnValueError(
+					request,
+					"/expedientPeticio",
+					"contingut.controller.document.descarregar.error");
+		}
+		return null;
+	}
 
 	@RequestMapping(value = "/firmaInfo/{annexId}", method = RequestMethod.GET)
 	public String firmaInfo(
@@ -431,6 +459,31 @@ public class ExpedientPeticioController extends BaseUserController {
 					"firmes",
 					expedientPeticioService.annexFirmaInfo(
 							registreAnnexDto.getUuid()));
+
+		} catch (Exception ex) {
+			logger.error(
+					"Error recuperant informació de firma",
+					ex);
+			model.addAttribute(
+					"missatgeError",
+					ex.getMessage());
+			return "ajaxErrorPage";
+		}
+		return "registreAnnexFirmes";
+	}
+	
+	@RequestMapping(value = "/justificantFirmaInfo/{registreId}", method = RequestMethod.GET)
+	public String justificantFirmaInfo(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long registreId,
+			Model model) {
+		try {
+			RegistreDto registreDto = expedientPeticioService.findRegistreById(
+					registreId);
+			model.addAttribute(
+					"firmes",
+					expedientPeticioService.annexFirmaInfo(registreDto.getJustificantArxiuUuid()));
 
 		} catch (Exception ex) {
 			logger.error(

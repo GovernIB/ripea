@@ -301,6 +301,7 @@ public class DocumentHelper {
 				metaDocument.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental());
 		FitxerDto fitxer = null;
+		List<ArxiuFirmaDto> firmes = null;
 		if (documentEntity.getArxiuUuid() != null) {
 			fitxer = new FitxerDto();
 			fitxer.setContentType(documentEntity.getFitxerContentType());
@@ -312,6 +313,12 @@ public class DocumentHelper {
 					true,
 					false);
 			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			if (documentEntity.isFirmat()) {
+				firmes = validaFirmaDocument(
+						documentEntity, 
+						fitxer,
+						null);
+			}
 		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
@@ -326,7 +333,7 @@ public class DocumentHelper {
 				fitxer,
 				documentEntity.isFirmat(),
 				false,
-				null);
+				firmes);
 		return true;
 	}
 	
