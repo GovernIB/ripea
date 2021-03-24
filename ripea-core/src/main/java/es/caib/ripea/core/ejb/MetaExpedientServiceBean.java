@@ -311,7 +311,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public List<MetaExpedientDto> findByCodiSia(
 			Long entitatId,
 			String codiSia) {
-		return findByCodiSia(
+		return delegate.findByCodiSia(
 				entitatId, 
 				codiSia);
 	}
