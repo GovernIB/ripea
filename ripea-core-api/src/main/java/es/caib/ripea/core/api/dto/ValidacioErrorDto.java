@@ -16,7 +16,8 @@ public class ValidacioErrorDto implements Serializable {
 	private MetaDadaDto metaDada;
 	private MetaDocumentDto metaDocument;
 	private MultiplicitatEnumDto multiplicitat;
-
+	private boolean documentsWithoutMetaDocument;
+	
 	public ValidacioErrorDto(
 			MetaDadaDto metaDada,
 			MultiplicitatEnumDto multiplicitat) {
@@ -28,6 +29,10 @@ public class ValidacioErrorDto implements Serializable {
 			MultiplicitatEnumDto multiplicitat) {
 		this.metaDocument = metaDocument;
 		this.multiplicitat = multiplicitat;
+	}
+	public ValidacioErrorDto(
+			boolean documentsWithoutMetaDocument) {
+		this.documentsWithoutMetaDocument = documentsWithoutMetaDocument;
 	}
 
 	public MetaDadaDto getMetaDada() {
@@ -48,7 +53,9 @@ public class ValidacioErrorDto implements Serializable {
 	public void setMultiplicitat(MultiplicitatEnumDto multiplicitat) {
 		this.multiplicitat = multiplicitat;
 	}
-
+	public boolean isDocumentsWithoutMetaDocument() {
+		return documentsWithoutMetaDocument;
+	}
 	public boolean isErrorMetaDada() {
 		return metaDada != null;
 	}

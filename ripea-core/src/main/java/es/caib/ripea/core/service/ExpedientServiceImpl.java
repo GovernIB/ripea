@@ -78,6 +78,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -167,9 +168,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private UsuariRepository usuariRepository;
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
-
 
 	@Transactional
 	@Override
@@ -787,6 +789,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false, 
 				checkPerMassiuAdmin);
+		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
+			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
+		}
 		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
 		if (!documentHelper.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
 			throw new ExpedientTancarSenseDocumentsDefinitiusException();

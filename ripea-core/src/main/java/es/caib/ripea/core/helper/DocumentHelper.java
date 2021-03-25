@@ -215,6 +215,7 @@ public class DocumentHelper {
 				documentEntity.getId(),
 				DocumentEntity.class);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
 		String nomOriginal = documentEntity.getNom();
 		documentEntity.update(
 				metaDocument,
@@ -303,6 +304,8 @@ public class DocumentHelper {
 				metaDocument.getNtiOrigen(),
 				metaDocument.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
 		FitxerDto fitxer = null;
 		List<ArxiuFirmaDto> firmes = null;
 		if (documentEntity.getArxiuUuid() != null) {

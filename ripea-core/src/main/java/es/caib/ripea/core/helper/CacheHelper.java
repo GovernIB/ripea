@@ -224,7 +224,22 @@ public class CacheHelper {
 					errors.add(
 							crearValidacioError(
 									metaDocument,
-									metaDocument.getMultiplicitat()));
+									metaDocument.getMultiplicitat(),
+									false));
+			}
+			boolean documentsWithoutMetaDocument = false;
+			for (DocumentEntity document : documents) {
+				if (document.getMetaNode() == null) {
+					documentsWithoutMetaDocument = true;
+					break;
+				}
+			}
+			if (documentsWithoutMetaDocument) {
+				errors.add(
+						crearValidacioError(
+								null,
+								null,
+								true));
 			}
 		}
 		if (!errors.isEmpty()) {
@@ -546,12 +561,17 @@ public class CacheHelper {
 	}
 	private ValidacioErrorDto crearValidacioError(
 			MetaDocumentEntity metaDocument,
-			MultiplicitatEnumDto multiplicitat) {
-		return new ValidacioErrorDto(
-				conversioTipusHelper.convertir(
-						metaDocument,
-						MetaDocumentDto.class),
-				MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
+			MultiplicitatEnumDto multiplicitat,
+			boolean documentsWithoutMetaDocument) {
+		if (documentsWithoutMetaDocument) {
+			return new ValidacioErrorDto(documentsWithoutMetaDocument);
+		} else {
+			return new ValidacioErrorDto(
+					conversioTipusHelper.convertir(
+							metaDocument,
+							MetaDocumentDto.class),
+					MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
+		}
 	}
 	
 	private boolean isOracleVersionGtOrEq12c(JdbcTemplate jdbcTemplate) throws SQLException {

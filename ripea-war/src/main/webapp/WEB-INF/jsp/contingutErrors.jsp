@@ -30,14 +30,21 @@
 			});
 		});
 	</script>
+	<style type="text/css">
+		.altura {
+			height: 60px;
+		}
+	</style>
 </head>
 <body>
 	<c:if test="${!contingut.valid}">
 		<c:set var="hiHaMetaDades" value="${false}"/>
 		<c:set var="hiHaMetaDocuments" value="${false}"/>
+		<c:set var="hiHaDocumentsSenseMetaNode" value="${false}"/>
 		<c:forEach var="error" items="${errors}">
 			<c:if test="${error.errorMetaDada}"><c:set var="hiHaMetaDades" value="${true}"/></c:if>
 			<c:if test="${error.errorMetaDocument}"><c:set var="hiHaMetaDocuments" value="${true}"/></c:if>
+			<c:if test="${error.documentsWithoutMetaDocument}"><c:set var="hiHaDocumentsSenseMetaNode" value="${true}"/></c:if>
 		</c:forEach>
 		<c:if test="${hiHaMetaDades}">
 			<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.falten.metadades"/></h4>
@@ -58,6 +65,11 @@
 					</c:if>
 				</c:forEach>
 			</ul>
+		</c:if>
+		<c:if test="${hiHaDocumentsSenseMetaNode}">
+			<div class="${!hiHaMetaDades && !hiHaMetaDocuments ? 'altura' : ''}">
+				<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.documents.sense.metadocuments"/></h4>
+			</div>
 		</c:if>
 	</c:if>
 	<div id="modal-botons" class="well">
