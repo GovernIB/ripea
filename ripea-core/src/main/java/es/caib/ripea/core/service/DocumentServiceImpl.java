@@ -983,22 +983,24 @@ public class DocumentServiceImpl implements DocumentService {
 					viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
 				}
 			}
-			//Guardar dispositiu associat a l'enviament
-			DispositiuEnviamentEntity dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
-			
-			dispositiuEnviamentRepository.save(dispositiuEnviament);
-			
+			DispositiuEnviamentEntity dispositiuEnviament = null;
+			if (viaFirmaEnviarDto.getViaFirmaDispositiu() != null) {
+				//Guardar dispositiu associat a l'enviament
+				dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
+				
+				dispositiuEnviamentRepository.save(dispositiuEnviament);
+			}
 			//Guardar document a enviar
 			DocumentViaFirmaEntity documentViaFirma = DocumentViaFirmaEntity.getBuilder(
 					DocumentEnviamentEstatEnumDto.PENDENT,
@@ -1006,7 +1008,7 @@ public class DocumentServiceImpl implements DocumentService {
 					viaFirmaEnviarDto.getContrasenyaUsuariViaFirma(),
 					viaFirmaEnviarDto.getTitol(),
 					viaFirmaEnviarDto.getDescripcio(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(),
+					dispositiuEnviament != null ? dispositiuEnviament.getCodi() : null,
 					viaFirmaEnviarDto.getSignantNif(),
 					viaFirmaEnviarDto.getSignantNom(),
 					viaFirmaEnviarDto.getObservacions(),
@@ -1014,7 +1016,9 @@ public class DocumentServiceImpl implements DocumentService {
 					document.getMetaDocument().isBiometricaLectura(),
 					document.getExpedient(),
 					document,
-					viaFirmaEnviarDto.isFirmaParcial()).build();
+					viaFirmaEnviarDto.isFirmaParcial(),
+					viaFirmaEnviarDto.isValidateCodeEnabled(),
+					viaFirmaEnviarDto.getValidateCode()).build();
 			
 			firmaViaFirmaHelper.viaFirmaEnviar(documentViaFirma);
 		

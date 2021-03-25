@@ -52,6 +52,11 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	@Column(name = "vf_observacions")
 	private String observacions;
 	
+	@Column(name = "vf_validate_code_enabled")
+	private boolean validateCodeEnabled;
+	@Column(name = "vf_validate_code")
+	private String validateCode;
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "vf_viafirma_dispositiu")
 	@ForeignKey(name = "ipa_document_enviament_dis_fk")
@@ -102,6 +107,12 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	public boolean isFirmaParcial() {
 		return firmaParcial;
 	}
+	public boolean isValidateCodeEnabled() {
+		return validateCodeEnabled;
+	}
+	public String getValidateCode() {
+		return validateCode;
+	}
 	
 	public void updateEnviat(
 			Date enviatData,
@@ -129,7 +140,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			boolean lecturaObligatoria,
 			ExpedientEntity expedient,
 			DocumentEntity document,
-			boolean firmaParcial) {
+			boolean firmaParcial,
+			boolean validateCodeEnabled,
+			String validateCode) {
 		return new Builder(
 				estat,
 				codiUsuari,
@@ -144,7 +157,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				lecturaObligatoria,
 				expedient,
 				document,
-				firmaParcial);
+				firmaParcial,
+				validateCodeEnabled,
+				validateCode);
 	}
 
 	public static class Builder {
@@ -163,7 +178,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				boolean lecturaObligatoria,
 				ExpedientEntity expedient,
 				DocumentEntity document,
-				boolean firmaParcial) {
+				boolean firmaParcial,
+				boolean validateCodeEnabled,
+				String validateCode) {
 			built = new DocumentViaFirmaEntity();
 			built.inicialitzar();
 			built.assumpte = titol;
@@ -181,6 +198,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			built.expedient = expedient;
 			built.document = document;
 			built.firmaParcial = firmaParcial;
+			built.validateCodeEnabled = validateCodeEnabled;
+			built.validateCode = validateCode;
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;

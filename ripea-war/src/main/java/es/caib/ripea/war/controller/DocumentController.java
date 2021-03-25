@@ -566,8 +566,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				expedientInteressatService.findByExpedient(
 						entitatActual.getId(),
 						document.getExpedientPare().getId(),
-						true));
+						false));
 		model.addAttribute(command);
+		model.addAttribute("isDispositiusEnabled", isViaFirmaDispositiusEnabled());
 		return "viaFirmaForm";
 	}
 	
@@ -745,7 +746,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				expedientInteressatService.findByExpedient(
 						entitatActual.getId(),
 						document.getExpedientPare().getId(),
-						true));
+						false));
+		model.addAttribute("isDispositiusEnabled", isViaFirmaDispositiusEnabled());
 	}
 
 	private void emplenarModelFirmaClient(
@@ -762,6 +764,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			DocumentDto document) {
 		return getMessage(request, "document.controller.viafirma.motiu") + document.getNom() + " [" + document.getMetaNode().getNom() + "]";
+	}
+	
+	private boolean isViaFirmaDispositiusEnabled() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled"));
 	}
 	
 	

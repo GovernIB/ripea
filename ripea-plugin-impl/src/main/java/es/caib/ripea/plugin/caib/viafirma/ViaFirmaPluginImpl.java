@@ -23,6 +23,7 @@ import com.viafirma.documents.sdk.java.model.Notification;
 import com.viafirma.documents.sdk.java.model.Param;
 import com.viafirma.documents.sdk.java.model.Policy;
 import com.viafirma.documents.sdk.java.model.Signature;
+import com.viafirma.documents.sdk.java.model.Workflow;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
@@ -52,8 +53,13 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             Notification notification = new Notification();
             notification.setText(parametresViaFirma.getTitol());
             notification.setDetail(parametresViaFirma.getDescripcio());
-            notification.setDevices(new ArrayList<Device>());
-            notification.getDevices().add(convertToDevice(parametresViaFirma.getViaFirmaDispositiu()));
+            if (parametresViaFirma.isDeviceEnabled()) {
+            	notification.setDevices(new ArrayList<Device>());
+            	notification.getDevices().add(convertToDevice(parametresViaFirma.getViaFirmaDispositiu()));
+            }
+            if (parametresViaFirma.isValidateCodeEnabled()) {
+            	notification.setValidateCode(parametresViaFirma.getValidateCode());
+            }
             message.setNotification(notification);
             
             // Create a template document
@@ -95,7 +101,8 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             observacions.setKey("OBSERVACIONES");
             observacions.setValue(parametresViaFirma.getObservaciones());
             metadataList.add(observacions);
-            evidence.setMetadataList(metadataList);   
+            message.setMetadataList(metadataList);
+            //evidence.setMetadataList(metadataList);   
             policy.getEvidences().add(evidence);
 
             policy.setSignatures(new ArrayList<Signature>());
@@ -110,6 +117,10 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             message.setCallbackURL(getCallBackUrl());
             message.setCallbackAuthorization(generateAuthenticationHeader());
             message.setGroupCode(getGroupCodi());
+            
+            Workflow workFlow = new Workflow();
+            workFlow.setType(com.viafirma.documents.sdk.java.model.Workflow.TypeEnum.APP);
+            message.setWorkflow(workFlow);
             
             String messageCode = getViaFirmaClient(parametresViaFirma.getCodiUsuari(), parametresViaFirma.getContrasenya()).
 				getV3MessagesApi().sendMessage(message);
