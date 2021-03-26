@@ -321,7 +321,7 @@ public class ExpedientHelper {
 			Long carpetaId = createCarpetaFromExpPeticio(
 					expedientEntity,
 					entitat.getId(),
-					expedientPeticioEntity.getRegistre().getIdentificador());
+					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
 
@@ -502,7 +502,7 @@ public class ExpedientHelper {
 			Long carpetaId = createCarpetaFromExpPeticio(
 					expedientEntity,
 					entitat.getId(),
-					expedientPeticioEntity.getRegistre().getIdentificador());
+					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
 
@@ -1284,7 +1284,7 @@ public class ExpedientHelper {
 		return documentNtiTipoDocumental;
 	}
 
-	private Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {
+	public Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {
 		// check if already exists in db
 		boolean carpetaExistsInDB = false;
 		Long carpetaId = null;
