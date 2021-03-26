@@ -810,8 +810,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
 					if (document != null) {
 						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						ArxiuFirmaDto arxiuFirma = documentFirmaServidorFirma.firmar(document, fitxer, motiu);
-						pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
+						documentFirmaServidorFirma.firmar(document, fitxer, motiu);
+						//pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
 					} else {
 						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
 					}
