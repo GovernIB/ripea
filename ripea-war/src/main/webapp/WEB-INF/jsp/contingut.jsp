@@ -1575,7 +1575,7 @@ function showLoadingModal(message) {
 					</c:if>	
 					<c:if test="${contingut.expedient}">
 					
-						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>			
+						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>			
 					</c:if>
 				</ul>
 			</c:if>

@@ -416,7 +416,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
-		List<MetaExpedientDto> metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
+		
+		List<MetaExpedientDto> metaExpedients = null;
+		if (expedientId != null) {
+			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom");
+		} else {
+			metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
+		}
+		
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
@@ -500,7 +507,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+					metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom"));
 			return "contingutExpedientForm";
 		}
 		try {
@@ -509,7 +516,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getId(),
 					command.getNom(),
 					command.getAny(),
-					command.getMetaNodeDominiId());
+					command.getMetaNodeDominiId(), 
+					command.getOrganGestorId());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
@@ -518,7 +526,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+					metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom"));
 			return "contingutExpedientForm";
 		}		
 	}

@@ -3,6 +3,7 @@ package es.caib.ripea.war.controller;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,16 +50,18 @@ public class AjaxOrganGestorController extends BaseAdminController{
 			text = URLDecoder.decode(request.getRequestURI().split("/")[4], StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException e) { }
 		
-		List<OrganGestorDto> organGestorsList;
+		List<OrganGestorDto> organGestorsList = new ArrayList<OrganGestorDto>();
  		if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			organGestorsList = organGestorService.findAccessiblesUsuariActual(
+			organGestorsList = organGestorService.findAccessiblesUsuariActualRolAdmin(
 					entitatActual.getId(),
 					EntitatHelper.getOrganGestorActual(request).getId(),
 					text);
-		} else {
+		} else if (RolHelper.isRolActualAdministrador(request)){
 			organGestorsList = organGestorService.findByEntitat(
 					entitatActual.getId(),
 					text);
+		} else if (RolHelper.isRolActualUsuari(request)) {
+			organGestorsList = organGestorService.findAccessiblesUsuariActualRolUsuari(entitatActual.getId(), text);
 		}
 		
 		if (text == null) {
@@ -67,6 +70,11 @@ public class AjaxOrganGestorController extends BaseAdminController{
 
 		return organGestorsList;
 	}
+	
+	
+	
+	
+	
 		
 	@RequestMapping(value = "/organgestor/item/{id}", method = RequestMethod.GET)
 	@ResponseBody

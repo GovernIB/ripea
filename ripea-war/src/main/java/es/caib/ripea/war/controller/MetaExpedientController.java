@@ -247,7 +247,7 @@ public class MetaExpedientController extends BaseAdminController {
 		} else {
 			model.addAttribute(
 					"organsGestors",
-					organGestorService.findAccessiblesUsuariActual(
+					organGestorService.findAccessiblesUsuariActualRolAdmin(
 							entitatActual.getId(),
 							EntitatHelper.getOrganGestorActual(request).getId()));
 		}

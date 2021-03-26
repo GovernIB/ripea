@@ -15,6 +15,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +133,8 @@ public class ExpedientHelper {
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
 	
+
+	
 	public ExpedientEntity create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -159,26 +162,11 @@ public class ExpedientHelper {
 				true,
 				false, 
 				false);
-		OrganGestorEntity organGestor;
-		if (metaExpedient.getOrganGestor() != null) {
-			organGestor = metaExpedient.getOrganGestor();
-		} else {
-			if (organGestorId == null) {
-				throw new ValidationException(
-						metaExpedientId,
-						MetaExpedientEntity.class,
-						"La creació d'un expedient de tipus (metaExpedientId=" + metaExpedientId + ") requereix especificar un òrgan gestor");
-			}
-			organGestor = organGestorRepository.getOne(organGestorId);
-			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, ExtendedPermission.CREATE)) {
-				throw new ValidationException(
-						metaExpedientId,
-						MetaExpedientEntity.class,
-						"L'usuari actual no te permisos per a crear aquest expedient (" +
-						"metaExpedientId=" + metaExpedientId + ", " +
-						"organGestorId=" + organGestorId + ")");
-			}
-		}
+		
+		OrganGestorEntity organGestor = getOrganGestorForExpedient(
+				metaExpedient,
+				organGestorId,
+				ExtendedPermission.CREATE);
 
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
@@ -655,6 +643,24 @@ public class ExpedientHelper {
 	}
 	
 	
+	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId) {
+		Long id = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
+		
+		OrganGestorEntity organGestorEntity = getOrganGestorForExpedient(expedient.getMetaExpedient(), organGestorId, ExtendedPermission.WRITE);
+		expedient.updateOrganGestor(organGestorEntity);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				(id != (organGestorId)) ? String.valueOf(organGestorId) : null,
+				null,
+				false,
+				false);
+		return expedient;
+	}
+	
+	
+	
+	
 	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
 
 	public String calcularNumero(ExpedientEntity expedient) {
@@ -710,6 +716,34 @@ public class ExpedientHelper {
 		expedient.updateAgafatPer(null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
 	}
+	
+	
+	private OrganGestorEntity getOrganGestorForExpedient(MetaExpedientEntity metaExpedient, Long organGestorId, Permission permis) {
+		
+		OrganGestorEntity organGestor;
+		if (metaExpedient.getOrganGestor() != null) {
+			organGestor = metaExpedient.getOrganGestor();
+		} else {
+			if (organGestorId == null) {
+				throw new ValidationException(
+						metaExpedient.getId(),
+						MetaExpedientEntity.class,
+						"La creació/modificació d'un expedient de tipus (metaExpedientId=" + metaExpedient.getId() + ") requereix especificar un òrgan gestor");
+			}
+			organGestor = organGestorRepository.getOne(organGestorId);
+			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, permis)) {
+				throw new ValidationException(
+						metaExpedient.getId(),
+						MetaExpedientEntity.class,
+						"L'usuari actual no te permisos aquest expedient (" +
+						"permis=" + permis + ", " +
+						"metaExpedientId=" + metaExpedient.getId() + ", " +
+						"organGestorId=" + organGestorId + ")");
+			}
+		}
+		return organGestor;
+	}
+	
 	
 	private void crearDadesPerDefecte(MetaExpedientEntity metaExpedient, ExpedientEntity expedient) {
 		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaExpedient);

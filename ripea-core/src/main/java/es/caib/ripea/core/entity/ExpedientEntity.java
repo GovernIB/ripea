@@ -276,6 +276,10 @@ public class ExpedientEntity extends NodeEntity {
 			int any) {
 		this.any = any;
 	}
+	
+	public void updateOrganGestor(OrganGestorEntity organGestor) {
+		this.organGestor = organGestor;
+	}
 	public void updateAnySequenciaCodi(
 			int any,
 			long sequencia,

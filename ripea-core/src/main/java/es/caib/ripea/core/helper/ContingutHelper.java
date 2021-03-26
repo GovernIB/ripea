@@ -258,6 +258,9 @@ public class ContingutHelper {
 			dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
 					expedient), InteressatDto.class));
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
+			
+			dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
+			
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {

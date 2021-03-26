@@ -99,7 +99,7 @@ public interface OrganGestorService {
 	 * 			  Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId);
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId);
 		
 	/**
 	 * Obté un llistat de tots els organs gestors accessibles per a 
@@ -114,7 +114,7 @@ public interface OrganGestorService {
 	 * 		      Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(
 			Long entitatId,
 			Long organGestorId,
 			String filter);
@@ -210,5 +210,10 @@ public interface OrganGestorService {
 			Long id,
 			Long permisId,
 			Long entitatId) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(
+			Long entitatId,
+			String filter);
 
 }

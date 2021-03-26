@@ -86,5 +86,15 @@ public interface MetaExpedientOrganGestorRepository extends JpaRepository<MetaEx
 	public List<Long> findFillsIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pareIds") List<Long> pareIds);
+	
+
+	
+	@Query("select " +
+			"    meog.organGestor.id " +
+			"from " +
+			"    MetaExpedientOrganGestorEntity meog " +
+			" where " +
+			"    meog.id in (:ids)")
+	public List<Long> findOrgansIdsByEntitatAndIds( @Param("ids") List<Long> ids);
 
 }

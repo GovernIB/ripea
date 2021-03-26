@@ -27,7 +27,8 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -95,7 +96,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, 
+				false);
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
 				filter == null || filter.isEmpty(),
@@ -166,13 +168,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId) {
-		return findAccessiblesUsuariActual(entitatId, organGestorId, null);
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId) {
+		return findAccessiblesUsuariActualRolAdmin(entitatId, organGestorId, null);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId, String filter) {
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId, String filter) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!permisosHelper.isGrantedAny(
 				organGestorId,
@@ -187,6 +189,40 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organGestorsCanditats, filter == null || filter.isEmpty(), filter);
 		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter) {
+		
+		List<OrganGestorEntity> filtrats = new ArrayList<OrganGestorEntity>();
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, 
+				false);
+		
+		// Cercam els metaExpedients amb permisos assignats directament
+		List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				MetaNodeEntity.class,
+				ExtendedPermission.READ));
+		
+		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty()) {
+
+			filtrats = organGestorRepository.findByEntitatAndFiltre(
+					entitat,
+					filter == null || filter.isEmpty(),
+					filter);
+		} else {
+			
+			List<OrganGestorEntity> organGestorsCanditats = entityComprovarHelper.getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
+			filtrats = organGestorRepository.findByCanditatsAndFiltre(organGestorsCanditats, filter == null || filter.isEmpty(), filter);
+		}
+		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
+	}
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override

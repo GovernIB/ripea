@@ -377,7 +377,7 @@ public interface ExpedientService {
 	boolean hasWritePermission(Long expedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId);
+	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryCreateDocFromAnnex(Long registreAnnexId,

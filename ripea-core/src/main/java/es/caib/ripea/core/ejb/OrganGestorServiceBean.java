@@ -106,20 +106,28 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId) {
-		return delegate.findAccessiblesUsuariActual(entitatId, organGestorId);
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId) {
+		return delegate.findAccessiblesUsuariActualRolAdmin(entitatId, organGestorId);
 	}
 	
 	@Override
 	@RolesAllowed("tothom")
-	public List<OrganGestorDto> findAccessiblesUsuariActual(Long entitatId, Long organGestorId, String filterText) {
-		return delegate.findAccessiblesUsuariActual(entitatId, organGestorId, filterText);
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId, String filterText) {
+		return delegate.findAccessiblesUsuariActualRolAdmin(entitatId, organGestorId, filterText);
 	}
 	
 	@Override
 	@RolesAllowed("tothom")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId) {
 		return delegate.findOrganismesEntitatAmbPermis(entitatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(
+			Long entitatId,
+			String filter) {
+		return delegate.findAccessiblesUsuariActualRolUsuari(entitatId, filter);
 	}
 
 }

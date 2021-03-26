@@ -3,7 +3,9 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
@@ -95,6 +98,8 @@ public class EntityComprovarHelper {
 	private PermisosHelper permisosHelper;
     @Autowired
     private OrganGestorHelper organGestorHelper;
+    @Autowired
+    private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,
@@ -195,14 +200,11 @@ public class EntityComprovarHelper {
 		}
 		return organGestor;
 	}
+	
 
-	public OrganGestorEntity comprovarOrganGestor(
+	public OrganGestorEntity comprovarOrganGestorPerRolUsuari(
 			EntitatEntity entitat,
-			Long id,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete) {
+			Long id) {
 		OrganGestorEntity organGestor = organGestorRepository.findOne(id);
 		if (organGestor == null) {
 			throw new NotFoundException(id, OrganGestorEntity.class);
@@ -213,61 +215,70 @@ public class EntityComprovarHelper {
 					MetaNodeEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'òrgan gestor");
 		}
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (comprovarPermisRead) {
-			boolean granted = permisosHelper.isGrantedAll(
-					id,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.READ },
-					auth);
-			if (!granted) {
+		
+		// Cercam els metaExpedients amb permisos assignats directament
+		List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				MetaNodeEntity.class,
+				ExtendedPermission.READ));
+		List<Long> metaExpedientIdPermesosPerEntitat = null;
+		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty()) {
+			metaExpedientIdPermesosPerEntitat = metaExpedientRepository.findIdsByEntitat(entitat, metaExpedientIdPermesos);
+		}
+		
+		if (metaExpedientIdPermesosPerEntitat != null && !metaExpedientIdPermesosPerEntitat.isEmpty()) {
+			//if user has assigned direct permissions for any metaexpedient of entitat, then he has permissions for all organs of this entitat
+		} else {
+			boolean existsInPermitted = false;
+			List<OrganGestorEntity> organGestors = getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
+			
+			for (OrganGestorEntity organGestorEntity : organGestors) {
+				if (organGestorEntity.getId().equals(id)) {
+					existsInPermitted = true;
+				}
+			}
+			
+			if (!existsInPermitted) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				throw new SecurityException(
 						"Sense permisos de consulta sobre l'òrgan gestor (" +
 						"id=" + id + ", " +
 				        "usuari=" + auth.getName() + ")");
 			}
+			
 		}
-		if (comprovarPermisWrite) {
-			boolean granted = permisosHelper.isGrantedAll(
-					id,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.WRITE },
-					auth);
-			if (!granted) {
-				throw new SecurityException(
-						"Sense permisos de modificació sobre l'òrgan gestor (" +
-						"id=" + id + ", " +
-				        "usuari=" + auth.getName() + ")");
-			}
-		}
-		if (comprovarPermisCreate) {
-			boolean granted = permisosHelper.isGrantedAll(
-					id,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.CREATE },
-					auth);
-			if (!granted) {
-				throw new SecurityException(
-						"Sense permisos de creació sobre l'òrgan gestor (" +
-						"id=" + id + ", " +
-				        "usuari=" + auth.getName() + ")");
-			}
-		}
-		if (comprovarPermisDelete) {
-			boolean granted = permisosHelper.isGrantedAll(
-					id,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.DELETE },
-					auth);
-			if (!granted) {
-				throw new SecurityException(
-						"Sense permisos d'eliminació sobre l'òrgan gestor (" +
-						"id=" + id + ", " +
-				        "usuari=" + auth.getName() + ")");
-			}
-		}
+
 		return organGestor;
 	}
+	
+	
+	
+	
+	
+	public List<OrganGestorEntity> getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(EntitatEntity entitat) {
+		
+		// Cercam els òrgans amb permisos assignats directament
+		List<Long> organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				OrganGestorEntity.class,
+				ExtendedPermission.READ));
+		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIdPermesos);
+		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+		List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				MetaExpedientOrganGestorEntity.class,
+				ExtendedPermission.READ));
+		
+		List<Long> organsIdsPerMetaExpedientOrganIdPermesos = metaExpedientOrganGestorRepository.findOrgansIdsByEntitatAndIds(metaExpedientOrganIdPermesos);
+		organGestorHelper.afegirOrganGestorFillsIds(entitat, organsIdsPerMetaExpedientOrganIdPermesos);
+		
+		organIdPermesos.addAll(organsIdsPerMetaExpedientOrganIdPermesos);
+	    List<Long> organsWithoutDuplicates = new ArrayList<Long>(new HashSet<Long>(organIdPermesos));
+		
+	    List<OrganGestorEntity> organGestors = organGestorRepository.findByEntitatAndIds(entitat, organsWithoutDuplicates);
+	    
+	    return organGestors;
+		
+	}
+	
+	
 
 	public MetaNodeEntity comprovarMetaNode(EntitatEntity entitat, Long id) {
 		MetaNodeEntity metaNode = metaNodeRepository.findOne(id);
@@ -807,6 +818,14 @@ public class EntityComprovarHelper {
 		if (!grantedDirect && !grantedOrgan && !grantedOrganMetaNode) {
 			throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), permissionName);
 		}
+	}
+	
+	private List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
 	}
 
 }

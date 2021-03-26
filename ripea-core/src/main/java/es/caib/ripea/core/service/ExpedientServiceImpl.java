@@ -372,7 +372,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId) {
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId) {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
@@ -387,6 +387,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, false);
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
+		expedientHelper.updateOrganGestor(expedient, organGestorId);
 		ExpedientDto dto = toExpedientDto(expedient, true);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
@@ -1404,13 +1405,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		OrganGestorEntity organGestorFiltre = null;
 		if (filtre.getOrganGestorId() != null) {
-			organGestorFiltre = entityComprovarHelper.comprovarOrganGestor(
+			organGestorFiltre = entityComprovarHelper.comprovarOrganGestorPerRolUsuari(
 					entitat,
-					filtre.getOrganGestorId(),
-					true,
-					false,
-					false,
-					false);
+					filtre.getOrganGestorId());
 		}
 		/*/ Els meta-expedients permesos son els que tenen assignat permís de lectura directament
 		// i també els que pertanyen a un òrgan sobre el que es te assignat permís de lectura.
