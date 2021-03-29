@@ -144,12 +144,6 @@
 										<td>${arxiuDetall.eniFormat}</td>
 									</tr>
 								</c:if>
-								<c:if test="${not empty arxiuDetall.eniExtensio}">
-									<tr>
-										<td><strong><spring:message code="contingut.arxiu.camp.eni.format.ext"/></strong></td>
-										<td>${arxiuDetall.eniExtensio}</td>
-									</tr>
-								</c:if>
 								<c:if test="${not empty arxiuDetall.eniInteressats}">
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.interessats"/></strong></td>
