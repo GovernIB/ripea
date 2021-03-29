@@ -241,7 +241,6 @@ public class ContingutHelper {
 				dto.setUsuariActualWrite(true);
 			} catch (PermissionDeniedException ex) {
 			}
-			System.out.println(">>> Permis write expedient " + expedient.getId() + ": " + dto.isUsuariActualWrite());
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
