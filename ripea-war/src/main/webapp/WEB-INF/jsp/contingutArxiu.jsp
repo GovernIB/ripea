@@ -150,6 +150,16 @@
 										<td>${arxiuDetall.eniExtensio}</td>
 									</tr>
 								</c:if>
+								<c:if test="${not empty arxiuDetall.firmes}">
+									<tr>
+										<td><strong><spring:message code="contingut.arxiu.camp.eni.tipus.firma"/></strong></td>
+										<td>
+											<c:forEach var="firma" items="${arxiuDetall.firmes}" varStatus="status">
+												${firma.tipus}<c:if test="${not status.last}">,</c:if>
+											</c:forEach>
+										</td>
+									</tr>
+								</c:if>
 								<c:if test="${not empty arxiuDetall.eniInteressats}">
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.interessats"/></strong></td>
