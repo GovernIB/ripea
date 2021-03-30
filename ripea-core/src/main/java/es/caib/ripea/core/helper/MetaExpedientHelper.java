@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
@@ -20,6 +21,7 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -29,6 +31,7 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
@@ -56,6 +59,8 @@ public class MetaExpedientHelper {
     private OrganGestorHelper organGestorHelper;
     @Autowired
     private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+    @Autowired
+    private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
@@ -191,6 +196,33 @@ public class MetaExpedientHelper {
 				"IPA_ORGAN_ADMIN".equals(rolActual),
 				null);
 	}
+	
+	
+
+	public List<PermisDto> permisFind(Long id) {
+
+		List<PermisDto> permisos = new ArrayList<PermisDto>();
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
+		List<MetaExpedientOrganGestorEntity> metaExpedientOrgans = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
+		List<Serializable> serializedIds = new ArrayList<Serializable>();
+		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
+			serializedIds.add(metaExpedientOrgan.getId());
+		}
+		Map<Serializable, List<PermisDto>> permisosOrganGestor = permisosHelper.findPermisos(serializedIds, MetaExpedientOrganGestorEntity.class);
+		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
+			if (permisosOrganGestor.get(metaExpedientOrgan.getId()) != null) {
+				for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
+					permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
+					permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
+					permisos.add(permis);
+				}
+			}
+		}
+		permisos.addAll(permisosHelper.findPermisos(id, MetaNodeEntity.class));
+		return permisos;
+
+	}
+	
 
 	public List<MetaExpedientEntity> findAmbEntitatPermis(
 			Long entitatId,

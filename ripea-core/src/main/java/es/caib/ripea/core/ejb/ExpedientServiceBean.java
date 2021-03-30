@@ -325,11 +325,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 	@Override
 	@RolesAllowed("tothom")
-	public void agafar(
+	public void assignar(
 			Long entitatId,
 			Long expedientId,
 			String usuariCodi) {
-		delegate.agafar(
+		delegate.assignar(
 				entitatId,
 				expedientId,
 				usuariCodi);

@@ -215,5 +215,10 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(
 			Long entitatId,
 			String filter);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(Long entitatId,
+			Long metaExpedientId,
+			String filter);
 
 }

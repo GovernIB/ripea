@@ -122,7 +122,7 @@ function refrescarOrgan() {
 	} else {
 		$.ajax({
 			type: 'GET',
-			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos/${expedientCommand.id==null}',
 			success: function(organs) {
 				const selOrgans = $('select#organGestorId');
 				const organGestorId = '${expedientCommand.organGestorId}';

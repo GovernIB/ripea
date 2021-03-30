@@ -56,7 +56,6 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -384,7 +383,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false);
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId);
@@ -514,7 +514,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				new Permission[] { ExtendedPermission.WRITE },
 				auth);
 
-		if (!granted && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())) {
+		if (!granted && expedient.getExpedientEstat() != null && entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())) {
 			granted = true;
 		}
 		return granted;
@@ -670,11 +670,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void agafar(
+	public void assignar(
 			Long entitatId,
 			Long expedientId,
 			String usuariCodi) {
-		logger.debug("Agafant l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId + ", " + "usuari=" + usuariCodi + ")");
+		logger.debug("Assignant l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId + ", " + "usuari=" + usuariCodi + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -682,16 +682,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				false, false);
+				false, 
+				false);
 		
-		boolean granted = permisosHelper.isGrantedAll(
-				expedient.getMetaExpedient().getId(),
-				MetaNodeEntity.class,
-				new Permission[] { ExtendedPermission.WRITE },
-				usuariCodi);
-		if (!granted) {
-			throw new PermissionDeniedException(expedient.getMetaExpedient().getId(), MetaExpedientEntity.class, usuariCodi, "WRITE");
-		}
+		entityComprovarHelper.comprovarPermisMetaNode(
+				expedient.getMetaExpedient(),
+				expedient.getId(),
+				true,
+				ExtendedPermission.WRITE,
+				"WRITE",
+				usuariCodi, 
+				true);
 		
 		expedientHelper.agafar(expedient, usuariCodi);
 	}

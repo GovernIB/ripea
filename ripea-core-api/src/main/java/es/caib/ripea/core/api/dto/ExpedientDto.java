@@ -46,6 +46,7 @@ public class ExpedientDto extends NodeDto {
 	private Long expedientEstatId;
 	private Long expedientEstatNextInOrder;
 	private boolean usuariActualWrite;
+	private boolean usuariActualDelete;
 	private boolean peticions;
 	private boolean processatOk;
 	private boolean tasques;

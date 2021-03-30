@@ -130,4 +130,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.findAccessiblesUsuariActualRolUsuari(entitatId, filter);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(Long entitatId,
+			Long metaExpedientId,
+			String filter) {
+		return delegate.findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(entitatId, metaExpedientId, filter);
+	}
+
 }

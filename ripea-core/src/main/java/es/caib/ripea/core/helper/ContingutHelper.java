@@ -241,6 +241,21 @@ public class ContingutHelper {
 				dto.setUsuariActualWrite(true);
 			} catch (PermissionDeniedException ex) {
 			}
+			
+			try {
+				dto.setUsuariActualDelete(false);
+				entityComprovarHelper.comprovarPermisosMetaNode(
+						expedient.getMetaNode(),
+						expedient.getId(),
+						false,
+						false,
+						false,
+						true, 
+						false);
+				dto.setUsuariActualDelete(true);
+			} catch (PermissionDeniedException ex) {
+			}
+
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -659,8 +674,9 @@ public class ContingutHelper {
 		getExpedientSuperior(
 				contingut,
 				true,
-				true,
-				false, false);
+				false,
+				false, 
+				false);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			comprovarPermisosExpedient(
 					(ExpedientEntity)contingut,
@@ -846,7 +862,6 @@ public class ContingutHelper {
 			}
 		}
 		if (expedient != null) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (comprovarPermisRead) {
 				entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 						expedient.getEntitat(),
@@ -854,27 +869,22 @@ public class ContingutHelper {
 						true,
 						false,
 						false,
-						false, false);
+						false, 
+						false);
 			}
 			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
-				boolean granted = permisosHelper.isGrantedAll(
-						expedient.getMetaExpedient().getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.WRITE},
-						auth);
 				
-				// if expedient estat has write permissions don't need to check metaExpedient permissions
-				if (!granted && expedient.getExpedientEstat()!=null) {
-					if (hasEstatPermissons(expedient.getExpedientEstat().getId()))
-						granted = true;
-				}
-				
-				if (!granted) {
-					throw new PermissionDeniedException(
-							expedient.getMetaExpedient().getId(),
-							MetaExpedientEntity.class,
-							auth.getName(),
-							"WRITE");
+				// if user has write permissions to expedient estat don't need to check metaExpedient permissions
+				if (expedient.getExpedientEstat() == null || !hasEstatPermissons(expedient.getExpedientEstat().getId())) {
+
+					comprovarPermisosExpedient(
+							expedient,
+							false,
+							true,
+							false,
+							false, 
+							false);
+					
 				}
 			}
 		}

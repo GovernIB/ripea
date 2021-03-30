@@ -250,6 +250,23 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organsPermesos,
 				OrganGestorDto.class);	
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<OrganGestorDto> findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(
+			Long entitatId,
+			Long metaExpedientId,
+			String filter) {
+		List<OrganGestorEntity> organsPermesos = findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+				entitatId,
+				metaExpedientId,
+				ExtendedPermission.WRITE,
+				filter);
+		return conversioTipusHelper.convertirList(
+				organsPermesos,
+				OrganGestorDto.class);	
+	}
+	
 
 	@Transactional(readOnly = true)
 	@Override

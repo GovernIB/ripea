@@ -320,6 +320,34 @@ public class PermisosHelper {
 				it.remove();
 		}
 	}
+	
+	public void filterGrantedAll(
+			Collection<? extends AbstractPersistable<? extends Serializable>> objects,
+			Class<?> clazz,
+			Permission[] permissions,
+			String usuariCodi) {
+		filterGrantedAll(objects, new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
+			@Override
+			public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
+				return entitat.getId();
+			}
+		}, clazz, permissions, usuariCodi);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void filterGrantedAll(
+			Collection<?> objects,
+			ObjectIdentifierExtractor objectIdentifierExtractor,
+			Class<?> clazz,
+			Permission[] permissions,
+			String usuriCodi) {
+		Iterator<?> it = objects.iterator();
+		while (it.hasNext()) {
+			Serializable objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (!isGrantedAll(objectIdentifier, clazz, permissions, usuriCodi))
+				it.remove();
+		}
+	}
 
 	public boolean isGrantedAll(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
 		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
@@ -333,7 +361,7 @@ public class PermisosHelper {
 		return result;
 	}
 	
-	public boolean isGrantedAll(Long objectIdentifier, Class<?> clazz, Permission[] permissions, String usuariCodi) {
+	public boolean isGrantedAll(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, String usuariCodi) {
 		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, usuariCodi);
 		boolean result = true;
 		for (int i = 0; i < granted.length; i++) {

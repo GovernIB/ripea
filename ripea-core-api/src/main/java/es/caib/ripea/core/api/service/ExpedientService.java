@@ -434,7 +434,7 @@ public interface ExpedientService {
 			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
-	void agafar(
+	void assignar(
 			Long entitatId,
 			Long expedientId,
 			String usuariCodi);

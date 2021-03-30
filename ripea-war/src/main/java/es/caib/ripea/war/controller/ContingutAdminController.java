@@ -233,7 +233,7 @@ public class ContingutAdminController extends BaseAdminController {
 		}
 		
 		try {
-			expedientService.agafar(
+			expedientService.assignar(
 					entitatActual.getId(),
 					expedientId,
 					command.getUsuariCodi());

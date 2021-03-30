@@ -566,17 +566,28 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				rolActual);
 	}
 
-	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos/{perCreacio}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OrganGestorDto> organsGestorsPermesos(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
+			@PathVariable boolean perCreacio,
 			@RequestParam(required = false) String filter) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return organGestorService.findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
-				entitatActual.getId(),
-				metaExpedientId,
-				filter);
+		
+		if (perCreacio) {
+			return organGestorService.findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+					entitatActual.getId(),
+					metaExpedientId,
+					filter);
+		} else {
+			return organGestorService.findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(
+					entitatActual.getId(),
+					metaExpedientId,
+					filter);
+		}
+		
+
 	}
 
 	@RequestMapping(value = "/organGestor/{organGestorId}/metaExpedient", method = RequestMethod.GET)
@@ -726,7 +737,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "expedientAssignarForm";
 		}
 		try {
-			expedientService.agafar(
+			expedientService.assignar(
 					entitatActual.getId(),
 					expedientId,
 					command.getUsuariCodi());

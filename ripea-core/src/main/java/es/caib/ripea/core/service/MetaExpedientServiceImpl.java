@@ -3,11 +3,9 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -726,28 +724,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Consulta dels permisos del meta-expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ")");
+
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
-		List<PermisDto> permisos = new ArrayList<PermisDto>();
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
-		List<MetaExpedientOrganGestorEntity> metaExpedientOrgans = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
-		List<Serializable> serializedIds = new ArrayList<Serializable>();
-		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
-			serializedIds.add(metaExpedientOrgan.getId());
-		}
-		Map<Serializable, List<PermisDto>> permisosOrganGestor = permisosHelper.findPermisos(serializedIds, MetaExpedientOrganGestorEntity.class);
-		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
-			if (permisosOrganGestor.get(metaExpedientOrgan.getId()) != null) {
-				for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
-					permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
-					permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
-					permisos.add(permis);
-				}
-			}
-		}
-		permisos.addAll(permisosHelper.findPermisos(id, MetaNodeEntity.class));
-		return permisos;
+		
+		return metaExpedientHelper.permisFind(id);
 
 	}
 
@@ -802,7 +785,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedient,
 					organGestor);
 			permisosHelper.deletePermis(trobat.getId(), MetaExpedientOrganGestorEntity.class, permisId);
-			metaExpedientOrganGestorRepository.delete(trobat);
+			//metaExpedientOrganGestorRepository.delete(trobat);
 		}
 
 	}
