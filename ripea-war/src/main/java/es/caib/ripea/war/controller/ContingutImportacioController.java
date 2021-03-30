@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.service.ImportacioService;
@@ -122,15 +125,16 @@ public class ContingutImportacioController extends BaseUserController {
 			return "contingutImportacioForm";
 		}
 		if (documentsRepetits > 0) {
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"document.controller.importacio.repetit",
-							new Object[] {documentsRepetits}));
+//			MissatgesHelper.warning(
+//					request, 
+//					getMessage(
+//							request, 
+//							"document.controller.importacio.repetit",
+//							new Object[] {documentsRepetits}));
+			addWarningDocumentExists(request);
 			return modalUrlTancar();
 		}
-	
+		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + contingutId,
@@ -138,6 +142,34 @@ public class ContingutImportacioController extends BaseUserController {
 		
 	}
 
+	private void addWarningDocumentExists(HttpServletRequest request) {
+		List<DocumentDto> documentsAlreadyImported = importacioService.consultaExpedientsAmbImportacio();
+		if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
+				List<ContingutDto> path = documentAlreadyImported.getPath();
+				if (path != null) {
+					sb.append("<li>");
+					int idx = 0;
+					for (ContingutDto pathElement: path) {
+						sb.append("<b>/</b>" + pathElement.getNom());
+						if (idx == path.size() - 1)
+							sb.append("<b>/</b>" + documentAlreadyImported.getNom());
+						idx++;
+					}
+					sb.append("</li>");
+				}
+			}
+			sb.append("</ul>");
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+						request, 
+						"expedientPeticio.controller.acceptat.duplicat.warning",
+						new Object[] {sb.toString()}));
+		}
+	}
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(

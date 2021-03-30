@@ -7,6 +7,7 @@ package es.caib.ripea.core.helper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -132,8 +134,8 @@ public class ExpedientHelper {
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-	
 
+	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	public ExpedientEntity create(
 			Long entitatId,
@@ -296,7 +298,7 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DocumentEntity crearDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity;
 		ExpedientEntity expedientEntity;
@@ -460,6 +462,15 @@ public class ExpedientHelper {
 		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
 		documentRepository.save(docEntity);
 		contingutLogHelper.logCreacio(docEntity, true, true);
+		
+		// comprovar si el justificant s'ha importat anteriorment
+		List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
+		if (documents != null && !documents.isEmpty()) {
+			for (DocumentDto documentAlreadyImported: documents) {
+				expedientsWithImportacio.add(documentAlreadyImported);
+			}
+			throw new DocumentAlreadyImportedException();
+		}		
 		return docEntity;
 	}
 	
@@ -470,7 +481,7 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DocumentEntity crearDocFromUuid(
 			String arxiuUuid, 
 			Long expedientPeticioId) {
@@ -511,6 +522,14 @@ public class ExpedientHelper {
 		DocumentDto documentDto = toDocumentDto(
 				documentDetalls, 
 				expedientPeticioEntity.getIdentificador());
+		// comprovar si el justificant s'ha importat anteriorment
+		List<DocumentDto> documents = documentHelper.findByArxiuUuid(arxiuUuid);
+		if (documents != null && !documents.isEmpty()) {
+			for (DocumentDto documentAlreadyImported: documents) {
+				expedientsWithImportacio.add(documentAlreadyImported);
+			}
+			throw new DocumentAlreadyImportedException();
+		}
 		contingutHelper.comprovarNomValid(
 				isCarpetaActive ? carpetaEntity : expedientEntity,
 				documentDto.getNom(),
@@ -612,6 +631,14 @@ public class ExpedientHelper {
 		documentRepository.save(docEntity);
 		contingutLogHelper.logCreacio(docEntity, true, true);
 		return docEntity;
+	}
+	
+	public void inicialitzarExpedientsWithImportacio() {
+		expedientsWithImportacio = new ArrayList<DocumentDto>();
+	}
+	
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return expedientsWithImportacio;
 	}
 	
 	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
@@ -813,7 +840,7 @@ public class ExpedientHelper {
 		document.setDocumentTipus(DocumentTipusEnumDto.IMPORTAT);
 		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
 		document.setData(new Date());
-		document.setNom(registreAnnexEntity.getTitol());
+		document.setNom(registreAnnexEntity.getTitol() + " - " + registreAnnexEntity.getRegistre().getIdentificador().replace('/', '_'));
 		document.setFitxerNom(registreAnnexEntity.getNom());
 		document.setArxiuUuid(registreAnnexEntity.getUuid());
 		document.setDataCaptura(registreAnnexEntity.getNtiFechaCaptura());

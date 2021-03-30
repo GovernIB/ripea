@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
@@ -376,12 +379,14 @@ public class ExpedientPeticioController extends BaseUserController {
 					command.isAssociarInteressats(),
 					null);
 			processatOk = expedientDto.isProcessatOk();
+			addWarningDocumentExists(request);			
 		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 			processatOk = expedientService.incorporar(
 					entitat.getId(),
 					command.getExpedientId(),
 					expedientPeticioDto.getId(),
 					command.isAssociarInteressats());
+			addWarningDocumentExists(request);
 		}
 		
 		if (!processatOk) {
@@ -396,6 +401,35 @@ public class ExpedientPeticioController extends BaseUserController {
 				request,
 				"redirect:expedientPeticio",
 				"expedientPeticio.controller.acceptat.ok");
+	}
+	
+	private void addWarningDocumentExists(HttpServletRequest request) {
+		List<DocumentDto> documentsAlreadyImported = expedientService.consultaExpedientsAmbImportacio();
+			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
+				List<ContingutDto> path = documentAlreadyImported.getPath();
+				if (path != null) {
+					sb.append("<li>");
+					int idx = 0;
+					for (ContingutDto pathElement: path) {
+						sb.append("<b>/</b>" + pathElement.getNom());
+						if (idx == path.size() - 1)
+							sb.append("<b>/</b>" + documentAlreadyImported.getNom());
+						idx++;
+					}
+					sb.append("</li>");
+				}
+			}
+			sb.append("</ul>");
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+						request, 
+						"expedientPeticio.controller.acceptat.duplicat.warning",
+						new Object[] {sb.toString()}));
+		}
 	}
 
 	@RequestMapping(value = "/descarregarAnnex/{annexId}", method = RequestMethod.GET)

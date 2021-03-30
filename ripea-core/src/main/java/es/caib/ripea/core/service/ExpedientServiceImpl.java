@@ -36,12 +36,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -54,6 +56,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -165,6 +168,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired
 	private UsuariRepository usuariRepository;
 
+	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
 
 	@Transactional
@@ -221,12 +225,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
+			expedientHelper.inicialitzarExpedientsWithImportacio();
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 				try {
 					expedientHelper.crearDocFromAnnex(
 							registeAnnexEntity.getId(),
 							expedientPeticioEntity.getId());
-					
+				} catch (DocumentAlreadyImportedException daid) {
+					logger.warn(daid.getMessage());
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
@@ -238,9 +244,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
 			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-				expedientHelper.crearDocFromUuid(
-						arxiuUuid, 
-						expedientPeticioEntity.getId());
+				try {
+					expedientHelper.crearDocFromUuid(
+							arxiuUuid, 
+							expedientPeticioEntity.getId());
+				} catch (DocumentAlreadyImportedException daid) {
+					logger.warn(daid.getMessage());
+				}
 			}
 			canviEstatToProcessatPendent(expedientPeticioEntity);
 			if (processatOk) {
@@ -251,6 +261,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientDto;
 	}
 
+	@Transactional
 	@Override
 	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats) {
 		logger.debug("Incorporant a l'expedient existent (" +
@@ -260,6 +271,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId);
 		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId);
+		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
 		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			try {
@@ -268,7 +280,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 				expedientHelper.crearDocFromAnnex(
 						registeAnnexEntity.getId(),
-						expedientPeticioEntity.getId());
+						expedientPeticioEntity.getId());	
+			} catch (DocumentAlreadyImportedException daid) {
+				logger.warn(daid.getMessage());
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
@@ -277,9 +291,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-			expedientHelper.crearDocFromUuid(
-					arxiuUuid, 
-					expedientPeticioEntity.getId());
+			try {
+				expedientHelper.crearDocFromUuid(
+						arxiuUuid, 
+						expedientPeticioEntity.getId());
+			} catch (DocumentAlreadyImportedException daid) {
+				logger.warn(daid.getMessage());
+			}
 		}
 		canviEstatToProcessatPendent(expedientPeticioEntity);
 		if (processatOk) {
@@ -293,7 +311,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientPeticioEntity.getId(),
 				ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 	}
-
+	
+	@Override
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return expedientHelper.consultaExpedientsAmbImportacio();
+	}
+	
 	public void notificarICanviEstatToProcessatNotificat(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();

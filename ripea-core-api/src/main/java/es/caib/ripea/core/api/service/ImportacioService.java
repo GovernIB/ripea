@@ -3,8 +3,11 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -34,6 +37,12 @@ public interface ImportacioService {
 			Long entitatId,
 			Long contingutId,
 			ImportacioDto dades) throws ValidationException;
+	/**
+	 * Retorna la llista dels expedients on s'ha importat el document que s'intetna importar actualment
+	 * 
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<DocumentDto> consultaExpedientsAmbImportacio();
 
 
 }

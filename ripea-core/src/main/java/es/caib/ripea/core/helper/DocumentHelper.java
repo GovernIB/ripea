@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
@@ -732,6 +735,25 @@ public class DocumentHelper {
 		return false;
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public List<DocumentDto> findByArxiuUuid(String arxiuUuid) {
+		List<DocumentDto> documentsDto = new ArrayList<DocumentDto>();
+		List<DocumentEntity> documents = documentRepository.findByArxiuUuidAndEsborrat(arxiuUuid, 0);
+		for (DocumentEntity document : documents) {
+			documentsDto.add(
+					(DocumentDto)contingutHelper.toContingutDto(
+							document, 
+							false, 
+							false, 
+							false, 
+							false, 
+							true, 
+							false, 
+							false));
+			
+		}
+		return documentsDto;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 

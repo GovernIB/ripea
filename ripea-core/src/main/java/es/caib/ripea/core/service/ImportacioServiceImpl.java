@@ -63,6 +63,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 	@Autowired
 	private CarpetaRepository carpetaRepository;
 	
+	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
+	
 	@Transactional
 	@Override
 	public int getDocuments(
@@ -98,6 +100,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		}
 		int idx = 1;
 		List<Document> documents = new ArrayList<Document>();
+		expedientsWithImportacio = new ArrayList<DocumentDto>();
 		// ############### IMPORTAR EL DETALL DE CADA DOCUMENT #########
 		outerloop: for (ContingutArxiu contingutArxiu : documentsArxiu) {
 			DocumentEntity entity = null;
@@ -116,14 +119,24 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
 			fitxer.setContingut(documentArxiu.getContingut().getContingut());
 
-			for (ContingutEntity contingut: contingutPare.getFills()) {
-				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
-					if (contingut.getNom().equals(tituloDoc)) {
-						documentsRepetits++;
-						continue outerloop;
-					} 
+			// comprovar si el justificant s'ha importat anteriorment
+			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(contingutArxiu.getIdentificador());
+			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty()) {
+				for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
+					expedientsWithImportacio.add(documentAlreadyImported);
+					documentsRepetits++;
 				}
+				continue outerloop;
+//				throw new DocumentAlreadyImportedException();
 			}
+//			for (ContingutEntity contingut: contingutPare.getFills()) {
+//				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
+//					if (contingut.getNom().equals(tituloDoc)) {
+//						documentsRepetits++;
+//						continue outerloop;
+//					} 
+//				}
+//			}
 			// ############### CREAR CARPETA PARE ON INTRODUIR DOCUMENT #########
 			boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
 			if (isCarpetaActive) {
@@ -197,6 +210,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 			}
 		}
 		return documentsRepetits;
+	}
+	
+	@Override
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return expedientsWithImportacio;
 	}
 	
 	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
