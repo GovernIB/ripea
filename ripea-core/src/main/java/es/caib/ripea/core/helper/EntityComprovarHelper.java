@@ -262,18 +262,18 @@ public class EntityComprovarHelper {
 				ExtendedPermission.READ));
 		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIdPermesos);
 		
-		
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaExpedientOrganGestorEntity.class,
 				ExtendedPermission.READ));
-		List<Long> organsIdsPerMetaExpedientOrganIdPermesos = metaExpedientOrganGestorRepository.findOrganGestorIdByMetaExpedientOrganGestorIds(metaExpedientOrganIdPermesos);
-		organGestorHelper.afegirOrganGestorFillsIds(entitat, organsIdsPerMetaExpedientOrganIdPermesos);
+		if (metaExpedientOrganIdPermesos != null && !metaExpedientOrganIdPermesos.isEmpty()) {
+			List<Long> organsIdsPerMetaExpedientOrganIdPermesos = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestorIds(metaExpedientOrganIdPermesos);
+			organGestorHelper.afegirOrganGestorFillsIds(entitat, organsIdsPerMetaExpedientOrganIdPermesos);
+			organIdPermesos.addAll(organsIdsPerMetaExpedientOrganIdPermesos);
+		}
 		
-		organIdPermesos.addAll(organsIdsPerMetaExpedientOrganIdPermesos);
 	    List<Long> organsWithoutDuplicates = new ArrayList<Long>(new HashSet<Long>(organIdPermesos));
 	    List<OrganGestorEntity> organGestors = organGestorRepository.findByEntitatAndIds(entitat, organsWithoutDuplicates);
-	    
 	    return organGestors;
 		
 	}

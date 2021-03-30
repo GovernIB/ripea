@@ -368,7 +368,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					MetaExpedientOrganGestorEntity.class,
 					permis));
 			if (!metaExpedientOrganIds.isEmpty()) {
-				List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdByMetaExpedientOrganGestorIds(metaExpedientOrganIds);
+				List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestorIds(metaExpedientOrganIds);
 				organsGestors = metaExpedientOrganGestorRepository.findOrganGestorByMetaExpedientAndFiltreAndOrganGestorPareIdIn(
 						metaExpedient,
 						filtre == null,
