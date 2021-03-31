@@ -231,7 +231,13 @@
 						<table class="table table-striped table-bordered">
 							<c:forEach var="metadada" items="${arxiuDetall.metadadesAddicionals}" varStatus="status">
 								<tr>
-									<td width="20%"><strong>${metadada.key}</strong></td>
+									<spring:message code="contingut.arxiu.camp.metadades.enum.${metadada.key}" var="message" text=""/>
+									<c:if test="${not empty message}">
+										<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.enum.${metadada.key}"/></strong></td>
+									</c:if>
+									<c:if test="${empty message}">
+										<td width="20%"><strong>${metadada.key}</strong></td>
+									</c:if>
 									<td>${metadada.value}</td>
 								</tr>
 							</c:forEach>
