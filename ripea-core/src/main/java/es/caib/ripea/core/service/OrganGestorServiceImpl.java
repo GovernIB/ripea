@@ -363,18 +363,26 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					filtre,
 					Arrays.asList(metaExpedient.getOrganGestor().getId()));
 		} else {
-			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
-			List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
+			// Cercam las parelles metaExpedient-organ amb permisos assignats 
+			List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
+			permisosHelper.filterGrantedAll(
+					metaExpedientOrgansGestors,
 					MetaExpedientOrganGestorEntity.class,
-					permis));
-			if (!metaExpedientOrganIds.isEmpty()) {
-				List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestorIds(metaExpedientOrganIds);
-				organsGestors = metaExpedientOrganGestorRepository.findOrganGestorByMetaExpedientAndFiltreAndOrganGestorPareIdIn(
-						metaExpedient,
-						filtre == null,
-						filtre,
+					new Permission[] { permis });
+
+			if (!metaExpedientOrgansGestors.isEmpty()) {
+				List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestors(metaExpedientOrgansGestors);
+				organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
+				
+				organsGestors = organGestorRepository.findByEntitatAndFiltreAndIds(
+						entitat,
+						filtre == null || filtre.isEmpty(),
+						filtre, 
 						organIds);
+				
 			}
+			
+			// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
 			if (organsGestors == null || organsGestors.isEmpty()) {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				boolean metaNodeHasPermis = permisosHelper.isGrantedAll(
