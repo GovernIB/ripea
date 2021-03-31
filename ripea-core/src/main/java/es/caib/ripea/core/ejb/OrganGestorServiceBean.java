@@ -64,14 +64,16 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<OrganGestorDto> findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+	public List<OrganGestorDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
-			String filter) {
-		return delegate.findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+			String filter, 
+			Long expedientId) {
+		return delegate.findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 				entitatId,
 				metaExpedientId,
-				filter);
+				filter, 
+				expedientId);
 	}
 
 	@Override
@@ -130,12 +132,5 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.findAccessiblesUsuariActualRolUsuari(entitatId, filter);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public List<OrganGestorDto> findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(Long entitatId,
-			Long metaExpedientId,
-			String filter) {
-		return delegate.findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(entitatId, metaExpedientId, filter);
-	}
 
 }
