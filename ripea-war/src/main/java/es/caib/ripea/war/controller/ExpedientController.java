@@ -565,28 +565,37 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				null, 
 				rolActual);
 	}
-
-	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos/{perCreacio}", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OrganGestorDto> organsGestorsPermesos(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
-			@PathVariable boolean perCreacio,
 			@RequestParam(required = false) String filter) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		if (perCreacio) {
-			return organGestorService.findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
-					entitatActual.getId(),
-					metaExpedientId,
-					filter);
-		} else {
-			return organGestorService.findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(
-					entitatActual.getId(),
-					metaExpedientId,
-					filter);
-		}
+		return organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+				entitatActual.getId(),
+				metaExpedientId,
+				filter, 
+				null);
+
+	}
+
+	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos/{expedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> organsGestorsPermesos(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable Long expedientId,
+			@RequestParam(required = false) String filter) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+		return organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+				entitatActual.getId(),
+				metaExpedientId,
+				filter, 
+				expedientId);
 
 	}
 

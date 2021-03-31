@@ -71,7 +71,7 @@ public class OrganGestorHelper {
 					true);
 			for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
 				if (permisosHelper.isGrantedAny(
-						organGestor.getId(),
+						organGestorActual.getId(),
 						OrganGestorEntity.class,
 						new Permission[] { permis },
 						SecurityContextHolder.getContext().getAuthentication())) {

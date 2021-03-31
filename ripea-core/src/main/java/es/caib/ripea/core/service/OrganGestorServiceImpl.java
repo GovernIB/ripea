@@ -26,6 +26,7 @@ import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -237,35 +238,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+	public List<OrganGestorDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
-			String filter) {
+			String filter, 
+			Long expedientId) {
 		List<OrganGestorEntity> organsPermesos = findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 				entitatId,
 				metaExpedientId,
-				ExtendedPermission.CREATE,
-				filter);
+				expedientId == null ? ExtendedPermission.CREATE : ExtendedPermission.WRITE,
+				filter, 
+				expedientId);
 		return conversioTipusHelper.convertirList(
 				organsPermesos,
 				OrganGestorDto.class);	
 	}
 	
-	@Transactional(readOnly = true)
-	@Override
-	public List<OrganGestorDto> findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(
-			Long entitatId,
-			Long metaExpedientId,
-			String filter) {
-		List<OrganGestorEntity> organsPermesos = findPermesosByEntitatAndExpedientTipusIdAndFiltre(
-				entitatId,
-				metaExpedientId,
-				ExtendedPermission.WRITE,
-				filter);
-		return conversioTipusHelper.convertirList(
-				organsPermesos,
-				OrganGestorDto.class);	
-	}
 	
 
 	@Transactional(readOnly = true)
@@ -350,7 +338,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			Long entitatId,
 			Long metaExpedientId,
 			Permission permis,
-			String filtre) {
+			String filtre, 
+			Long expedientId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		List<OrganGestorEntity> organsGestors = null;
@@ -403,6 +392,36 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				}
 			}
 		}
+		
+		// if we modify expedient we have to insure that we can still see its organ in dropdown even if permissions were removed 
+		if (expedientId != null) {
+			ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
+					entitatId,
+					expedientId,
+					false,
+					false,
+					false,
+					false,
+					false,
+					false);
+			
+			OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
+			
+			if (organsGestors == null) {
+				organsGestors = new ArrayList<>();
+			}
+			boolean alreadyInTheList = false;
+			for (OrganGestorEntity organGestor : organsGestors) {
+				if (organGestor.getId().equals(organGestorEntity)) {
+					alreadyInTheList = true;
+				}
+			}
+			if (!alreadyInTheList) {
+				organsGestors.add(0, organGestorEntity);
+			}
+		}
+		
+		
 		return organsGestors;
 	}
 

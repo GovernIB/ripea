@@ -139,14 +139,15 @@ public interface OrganGestorService {
 	 *            Id del meta-expedient.
 	 * @param filter
 	 *            text per a filtrar els resultats. 
+	 * @param expedientId TODO
 	 * @return
 	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findPermesosCreacioByEntitatAndExpedientTipusIdAndFiltre(
+	public List<OrganGestorDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
-			String filter);
+			String filter, Long expedientId);
 
 	/**
 	 * Consulta els permisos dels distits organs gestors de l'entitat
@@ -216,9 +217,5 @@ public interface OrganGestorService {
 			Long entitatId,
 			String filter);
 	
-	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findPermesosModificacioByEntitatAndExpedientTipusIdAndFiltre(Long entitatId,
-			Long metaExpedientId,
-			String filter);
 
 }
