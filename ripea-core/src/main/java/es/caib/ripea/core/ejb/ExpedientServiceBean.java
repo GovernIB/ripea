@@ -279,6 +279,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
+	@RolesAllowed("tothom")
 	public boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,

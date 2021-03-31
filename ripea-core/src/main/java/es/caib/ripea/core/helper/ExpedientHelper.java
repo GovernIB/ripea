@@ -298,21 +298,19 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public DocumentEntity crearDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
-		ExpedientPeticioEntity expedientPeticioEntity;
+	@Transactional
+	public DocumentEntity crearDocFromAnnex(Long registreAnnexId, ExpedientPeticioEntity expedientPeticioEntity) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
-		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
+		expedientEntity = expedientPeticioEntity.getExpedient();
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
 				"Creant carpeta i documents de expedient peticio (" + "expedientId=" +
 						expedientPeticioEntity.getExpedient().getId() + ", " + "registreAnnexId=" + registreAnnexId +
-						", " + "expedientPeticioId=" + expedientPeticioId + ")");
+						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
@@ -469,7 +467,6 @@ public class ExpedientHelper {
 			for (DocumentDto documentAlreadyImported: documents) {
 				expedientsWithImportacio.add(documentAlreadyImported);
 			}
-			throw new DocumentAlreadyImportedException();
 		}		
 		return docEntity;
 	}
@@ -481,16 +478,14 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public DocumentEntity crearDocFromUuid(
 			String arxiuUuid, 
-			Long expedientPeticioId) {
-		ExpedientPeticioEntity expedientPeticioEntity;
+			ExpedientPeticioEntity expedientPeticioEntity) {
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
-		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
+		expedientEntity = expedientPeticioEntity.getExpedient();
 
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 				null, 
@@ -503,7 +498,7 @@ public class ExpedientHelper {
 		logger.debug(
 				"Creant justificant de expedient peticio (" + "expedientId=" +
 						expedientPeticioEntity.getExpedient().getId() + ", " + "arxiuUuid=" + arxiuUuid +
-						", " + "expedientPeticioId=" + expedientPeticioId + ")");
+						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
@@ -528,7 +523,6 @@ public class ExpedientHelper {
 			for (DocumentDto documentAlreadyImported: documents) {
 				expedientsWithImportacio.add(documentAlreadyImported);
 			}
-			throw new DocumentAlreadyImportedException();
 		}
 		contingutHelper.comprovarNomValid(
 				isCarpetaActive ? carpetaEntity : expedientEntity,

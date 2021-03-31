@@ -41,6 +41,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
@@ -366,27 +367,49 @@ public class ExpedientPeticioController extends BaseUserController {
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
-			ExpedientDto expedientDto = expedientService.create(
-					entitat.getId(),
-					command.getMetaExpedientId(),
-					null,
-					command.getOrganGestorId(),
-					null,
-					command.getAny(),
-					null,
-					command.getNewExpedientTitol(),
-					expedientPeticioDto.getId(),
-					command.isAssociarInteressats(),
-					null);
-			processatOk = expedientDto.isProcessatOk();
-			addWarningDocumentExists(request);			
+			try {
+				ExpedientDto expedientDto = expedientService.create(
+						entitat.getId(),
+						command.getMetaExpedientId(),
+						null,
+						null,
+						null,
+						command.getAny(),
+						null,
+						command.getNewExpedientTitol(),
+						expedientPeticioDto.getId(),
+						command.isAssociarInteressats(),
+						null);
+				processatOk = expedientDto.isProcessatOk();
+			} catch (Exception ex) {
+				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
+					addWarningDocumentExists(request);
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:expedientPeticio",
+							"expedientPeticio.controller.acceptat.ko");
+				} else {
+					throw ex;
+				}
+			}
 		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
-			processatOk = expedientService.incorporar(
-					entitat.getId(),
-					command.getExpedientId(),
-					expedientPeticioDto.getId(),
-					command.isAssociarInteressats());
-			addWarningDocumentExists(request);
+			try {
+				processatOk = expedientService.incorporar(
+						entitat.getId(),
+						command.getExpedientId(),
+						expedientPeticioDto.getId(),
+						command.isAssociarInteressats());
+			} catch (Exception ex) {
+				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
+					addWarningDocumentExists(request);
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:expedientPeticio",
+							"expedientPeticio.controller.acceptat.ko");
+				} else {
+					throw ex;
+				}
+			}
 		}
 		
 		if (!processatOk) {

@@ -8,7 +8,7 @@ package es.caib.ripea.core.api.exception;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DocumentAlreadyImportedException extends ValidationException {
+public class DocumentAlreadyImportedException extends RuntimeException {
 	
 	public DocumentAlreadyImportedException () {
 		super("El document ha estat importat prèviament");
