@@ -1333,9 +1333,6 @@ public class ContingutServiceImpl implements ContingutService {
 				if (metadades.getFormat() != null) {
 					arxiuDetall.setEniFormat(metadades.getFormat().toString());
 				}
-				if (metadades.getExtensio() != null) {
-					arxiuDetall.setEniExtensio(metadades.getExtensio().toString());
-				}
 				arxiuDetall.setEniDocumentOrigenId(metadades.getIdentificadorOrigen());
 				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
 				if (arxiuDocument.getContingut() != null) {
