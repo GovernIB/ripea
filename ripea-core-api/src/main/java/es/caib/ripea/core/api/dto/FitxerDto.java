@@ -55,7 +55,7 @@ public class FitxerDto implements Serializable {
 	}
 	
 	public String getExtensioFitxerFirmat() {
-		int indexPunt = nomFitxerFirmat.lastIndexOf(".");
+		int indexPunt = nomFitxerFirmat != null ? nomFitxerFirmat.lastIndexOf(".") : -1;
 		if (indexPunt != -1 && indexPunt < nomFitxerFirmat.length() - 1) {
 			return nomFitxerFirmat.substring(indexPunt + 1);
 		} else {

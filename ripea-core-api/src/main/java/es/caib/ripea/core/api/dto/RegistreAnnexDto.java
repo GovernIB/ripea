@@ -22,6 +22,7 @@ public class RegistreAnnexDto {
 	
 	private String ntiOrigen;
 	private String ntiTipoDocumental;
+	private String ntiEstadoElaboracion;
 	private String observacions;
 	private String sicresTipoDocumento;
 	private String sicresValidezDocumento;
@@ -32,7 +33,6 @@ public class RegistreAnnexDto {
 
 	private RegistreAnnexEstatEnumDto estat;
 	private String error;
-
 	
 	public RegistreAnnexEstatEnumDto getEstat() {
 		return estat;
@@ -151,7 +151,15 @@ public class RegistreAnnexDto {
 			String uuid) {
 		this.uuid = uuid;
 	}
+	public String getNtiEstadoElaboracion() {
+		return ntiEstadoElaboracion;
+	}
+	public void setNtiEstadoElaboracion(String ntiEstadoElaboracion) {
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+	}
 	
-
+	public boolean isAmbFirma() {
+		return firmaTipus != null;
+	}
 
 }

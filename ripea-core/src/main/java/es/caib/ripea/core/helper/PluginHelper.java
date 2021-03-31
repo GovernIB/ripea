@@ -3391,8 +3391,14 @@ public class PluginHelper {
 					}
 					CertificateInfo certificateInfo = signatureInfo.getCertificateInfo();
 					if (certificateInfo != null) {
-						detall.setResponsableNif(certificateInfo.getNifResponsable());
-						detall.setResponsableNom(certificateInfo.getNombreApellidosResponsable());
+						if (certificateInfo.getNifResponsable() != null)
+							detall.setResponsableNif(certificateInfo.getNifResponsable());
+						else
+							detall.setResponsableNif(certificateInfo.getNifEntidadSuscriptora());
+						if (certificateInfo.getNombreApellidosResponsable() != null)
+							detall.setResponsableNom(certificateInfo.getNombreApellidosResponsable());
+						else
+							detall.setResponsableNom(certificateInfo.getEntidadSuscriptora());
 						detall.setEmissorCertificat(certificateInfo.getOrganizacionEmisora());
 					}
 					detalls.add(detall);

@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
@@ -451,6 +451,39 @@ public class ExpedientPeticioController extends BaseUserController {
 					"contingut.controller.document.descarregar.error");
 		}
 		return null;
+	}
+	
+	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
+	@ResponseBody
+	public FitxerDto descarregarBase64(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long annexId) throws Exception {
+		FitxerDto fitxer = null;
+		try {
+			fitxer = expedientPeticioService.getAnnexContent(annexId);
+		} catch (Exception ex) {
+			throw new Exception(ex.getMessage());
+		}
+		return fitxer;
+	}
+	
+	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ArxiuFirmaDto> firmaInfoContent(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long annexId,
+			Model model) {
+		List<ArxiuFirmaDto> firmes = null;
+		try {
+			RegistreAnnexDto registreAnnexDto = expedientPeticioService.findAnnexById(
+					annexId);
+			firmes = expedientPeticioService.annexFirmaInfo(registreAnnexDto.getUuid());
+		} catch (Exception ex) {
+			logger.error("Error recuperant informació de firma", ex);
+		}
+		return firmes;
 	}
 	
 	@RequestMapping(value = "/descarregarJustificant/{registreId}", method = RequestMethod.GET)
