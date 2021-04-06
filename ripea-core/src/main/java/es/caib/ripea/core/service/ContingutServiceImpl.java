@@ -3,15 +3,12 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,8 +100,6 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
-import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -1339,23 +1334,19 @@ public class ContingutServiceImpl implements ContingutService {
 				}
 				arxiuDetall.setEniDocumentOrigenId(metadades.getIdentificadorOrigen());
 				
-				Map <String, Object> metadadesAddicionalsAux = new HashMap<String, Object>();
-				for (String key: metadades.getMetadadesAddicionals().keySet()) {
-					if (key.equals("eni:fecha_sellado")){
-						try {
-							DateFormat dfin= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-							DateFormat dfout = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-							Date fechaSellado = dfin.parse(metadades.getMetadadesAddicionals().get(key).toString());
-							String fechaSelladoStr = dfout.format(fechaSellado);
-							metadadesAddicionalsAux.put(key, fechaSelladoStr);
-						} catch (ParseException e) {
-							logger.error(e.getMessage(), e);
-						}	
-					}
-					else 
-						metadadesAddicionalsAux.put(key, metadades.getMetadadesAddicionals().get(key));
+				final String fechaSelladoKey = "eni:fecha_sellado";
+				if (metadades.getMetadadesAddicionals().containsKey(fechaSelladoKey)) {
+					try {
+						DateFormat dfIn= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+						DateFormat dfOut = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+						Date fechaSelladoValor = dfIn.parse(metadades.getMetadadesAddicionals().get(fechaSelladoKey).toString());
+						String fechaSelladoValorStr = dfOut.format(fechaSelladoValor);
+						metadades.getMetadadesAddicionals().put(fechaSelladoKey, fechaSelladoValorStr);
+					} catch (ParseException e) {
+						logger.error(e.getMessage(), e);
+					}		
 				}
-				arxiuDetall.setMetadadesAddicionals(metadadesAddicionalsAux);
+				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
 				
 				if (arxiuDocument.getContingut() != null) {
 					arxiuDetall.setContingutArxiuNom(
