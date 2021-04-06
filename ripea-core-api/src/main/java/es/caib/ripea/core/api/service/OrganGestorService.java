@@ -147,7 +147,8 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
-			String filter, Long expedientId);
+			String filter, 
+			Long expedientId);
 
 	/**
 	 * Consulta els permisos dels distits organs gestors de l'entitat

@@ -23,6 +23,8 @@ public class ExpedientPeticioAcceptarCommand {
 	private boolean associarInteressats;
 	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
 	
+	private Long organGestorId;
+	
 	
 	public ExpedientPeticioAccioEnumDto getExpedientPeticioAccioEnumDto() {
 		return expedientPeticioAccioEnumDto;
@@ -67,6 +69,12 @@ public class ExpedientPeticioAcceptarCommand {
 		this.associarInteressats = associarInteressats;
 	}
 
+	public Long getOrganGestorId() {
+		return organGestorId;
+	}
+	public void setOrganGestorId(Long organGestorId) {
+		this.organGestorId = organGestorId;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(

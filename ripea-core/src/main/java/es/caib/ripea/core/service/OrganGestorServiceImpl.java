@@ -412,7 +412,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			}
 			boolean alreadyInTheList = false;
 			for (OrganGestorEntity organGestor : organsGestors) {
-				if (organGestor.getId().equals(organGestorEntity)) {
+				if (organGestor.getId().equals(organGestorEntity.getId())) {
 					alreadyInTheList = true;
 				}
 			}
