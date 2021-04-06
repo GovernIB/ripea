@@ -38,6 +38,7 @@ import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -64,6 +65,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private UsuariHelper usuariHelper;
 	
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAll() {
@@ -287,14 +290,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (OrganGestorDto o: organs) {
 			List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
 			for (PermisDto p: permisosOrgan) {
-			PermisOrganGestorDto permisOrgan = new PermisOrganGestorDto();
-			try {
-				BeanUtils.copyProperties(permisOrgan, p);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
-			permisOrgan.setOrganGestor(o);
-			results.add(permisOrgan);
+				PermisOrganGestorDto permisOrgan = new PermisOrganGestorDto();
+				try {
+					BeanUtils.copyProperties(permisOrgan, p);
+					permisOrgan.setPrincipalNom(usuariHelper.getUsuariByCodi(p.getPrincipalNom()).getNom());
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					e.printStackTrace();
+				} catch (NotFoundException ex) {
+					logger.debug("No s'ha trobat cap usuari amb el codi " + p.getPrincipalNom());
+				}
+				permisOrgan.setOrganGestor(o);
+				results.add(permisOrgan);
 			}
 		}
 		return results;
