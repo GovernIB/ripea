@@ -53,6 +53,7 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -100,6 +101,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired
+	private UsuariHelper usuariHelper;
 
 	@Transactional
 	@Override
@@ -730,7 +733,17 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 		
-		return metaExpedientHelper.permisFind(id);
+		List<PermisDto> permisLlistAmbNom = metaExpedientHelper.permisFind(id);
+		for (PermisDto permis : permisLlistAmbNom) {
+			try {
+				permis.setPrincipalNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom());
+			}
+			catch (NotFoundException ex) {
+				logger.debug("No s'ha trobat cap usuari amb el codi " + permis.getPrincipalNom());
+			}
+		}
+
+		return permisLlistAmbNom;
 
 	}
 
