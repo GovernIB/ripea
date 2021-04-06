@@ -370,7 +370,7 @@ public class ExpedientPeticioController extends BaseUserController {
 					entitat.getId(),
 					command.getMetaExpedientId(),
 					null,
-					null,
+					command.getOrganGestorId(),
 					null,
 					command.getAny(),
 					null,
@@ -431,7 +431,7 @@ public class ExpedientPeticioController extends BaseUserController {
 						new Object[] {sb.toString()}));
 		}
 	}
-
+	
 	@RequestMapping(value = "/descarregarAnnex/{annexId}", method = RequestMethod.GET)
 	public String descarregarAnnex(
 			HttpServletRequest request,

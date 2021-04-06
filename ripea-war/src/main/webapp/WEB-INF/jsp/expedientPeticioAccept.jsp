@@ -31,6 +31,52 @@ pageContext.setAttribute(
 }
 </style>
 <script>
+var metaExpedientOrgan = {};
+<c:forEach var="metaExpedient" items="${metaExpedients}">
+<c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${metaExpedient.organGestor.nom}'};</c:if>
+</c:forEach>
+
+
+
+function refrescarOrgan() {
+	const metaExpedientId = $('#metaExpedientId').val();
+	const organ = metaExpedientOrgan[metaExpedientId];
+	if (organ) {
+		$('#organFixed').show();
+		$('#organSelect').hide();
+		$('#organFixedNom').text(organ.nom);
+		$('#organFixedNom').after($('<input>').attr({
+		    type: 'hidden',
+		    name: 'organGestorId',
+		    value: organ.id
+		}));
+	} else {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos/${expedientPeticioAcceptarCommand.expedientId!=null ? expedientPeticioAcceptarCommand.expedientId : ''}',
+			success: function(organs) {
+				const selOrgans = $('select#organGestorId');
+				const organGestorId = '${expedientCommand.organGestorId}';
+				selOrgans.empty();
+				if (organs && organs.length > 0) {
+					$.each(organs, function(i, organ) {
+						const selected = (organ.id == organGestorId) ? ' selected' : '';
+						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.nom + '</option>');
+					});
+				}
+				selOrgans.select2({
+					theme: 'bootstrap',
+					width: 'auto'
+				});
+			}
+		});
+		$('#organFixed').hide();
+		$('#organSelect').show();
+		$('input', $('#organFixedNom').parent()).remove();
+	}
+}
+
+
 $(document).ready(function(){
 
 	if ('${accio}' == 'CREAR') {
@@ -64,7 +110,12 @@ $(document).ready(function(){
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
 		}
+
+
+		refrescarOrgan();
+
 	});	
+
 	
 
 	$('input[type=radio][name=expedientPeticioAccioEnumDto]').on('change', function() {
@@ -77,6 +128,8 @@ $(document).ready(function(){
 		}
 		webutilModalAdjustHeight();
 	});
+
+
 });
 
 </script>
@@ -104,9 +157,15 @@ $(document).ready(function(){
 		<div id="input-accio-crear" class="hidden">
 			<rip:inputText name="newExpedientTitol" textKey="expedientPeticio.form.acceptar.camp.newExpedientTitol"
 				required="true" />
+			<div id="organFixed" style="display: none;">
+				<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true"><span id="organFixedNom"></span></rip:inputFixed>
+			</div>
+			<div id="organSelect" style="display: none;">
+				<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true"/>
+			</div>			
 			<rip:inputText name="any" textKey="expedientPeticio.form.acceptar.camp.any" required="true"/> 			
 		</div>
-			
+		
 		<rip:inputCheckbox name="associarInteressats"
  			textKey="expedientPeticio.form.acceptar.camp.associarInteressats"/> 
 			
