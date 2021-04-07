@@ -22,7 +22,7 @@
 					<li role="presentation"><a href="#firmes" aria-controls="firmes" role="tab" data-toggle="tab"><spring:message code="contingut.arxiu.tab.firmes"/> <span class="badge badge-default">${fn:length(arxiuDetall.firmes)}</span></a></li>
 				</c:if>
 				<c:if test="${not empty arxiuDetall.metadadesAddicionals}">
-					<li role="presentation"><a href="#metadades" aria-controls="metadades" role="tab" data-toggle="tab"><spring:message code="contingut.arxiu.tab.metadades"/> <span class="badge badge-default">${fn:length(arxiuDetall.metadadesAddicionals)}</span></a></li>
+					<li role="presentation"><a href="#metadades" aria-controls="metadades" role="tab" data-toggle="tab"><spring:message code="contingut.arxiu.tab.metadades"/> <span class="badge badge-default" id="metadadesSpan"></span></a></li>
 				</c:if>
 			</ul>
 			<br/>
@@ -235,19 +235,21 @@
 				<c:if test="${not empty arxiuDetall.metadadesAddicionals}">
 					<div role="tabpanel" class="tab-pane" id="metadades">
 						<table class="table table-striped table-bordered">
+							<c:set var="contMetadades" value="0" />
 							<c:forEach var="metadada" items="${arxiuDetall.metadadesAddicionals}" varStatus="status">
 								<tr>
 									<spring:message code="contingut.arxiu.camp.metadades.enum.${metadada.key}" var="message" text=""/>
 									<c:if test="${not empty message}">
+										<c:set var="contMetadades" value="${contMetadades + 1}" />
 										<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.enum.${metadada.key}"/></strong></td>
+										<td>${metadada.value}</td>
 									</c:if>
-									<c:if test="${empty message}">
-										<td width="20%"><strong>${metadada.key}</strong></td>
-									</c:if>
-									<td>${metadada.value}</td>
 								</tr>
 							</c:forEach>
 						</table>
+						<script type="text/javascript">
+							$("#metadadesSpan").text(${contMetadades});
+						</script>
 					</div>
 				</c:if>
 			</div>
