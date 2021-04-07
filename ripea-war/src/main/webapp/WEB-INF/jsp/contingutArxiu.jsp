@@ -238,12 +238,21 @@
 							<c:set var="contMetadades" value="0" />
 							<c:forEach var="metadada" items="${arxiuDetall.metadadesAddicionals}" varStatus="status">
 								<tr>
-									<spring:message code="contingut.arxiu.camp.metadades.enum.${metadada.key}" var="message" text=""/>
-									<c:if test="${not empty message}">
-										<c:set var="contMetadades" value="${contMetadades + 1}" />
-										<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.enum.${metadada.key}"/></strong></td>
-										<td>${metadada.value}</td>
-									</c:if>
+									<c:choose>
+										<c:when test="${contingut.document}">
+											<spring:message code="contingut.arxiu.camp.metadades.docu.enum.${metadada.key}" var="message" text=""/>
+											<c:if test="${not empty message}">
+												<c:set var="contMetadades" value="${contMetadades + 1}" />
+												<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.docu.enum.${metadada.key}"/></strong></td>
+												<td>${metadada.value}</td>
+											</c:if>			
+										</c:when>
+										<c:otherwise> <!-- No es docu -->
+											<c:set var="contMetadades" value="${contMetadades + 1}" />
+											<td width="20%"><strong>${metadada.key}</strong></td>
+											<td>${metadada.value}</td>
+										</c:otherwise>	
+									</c:choose>
 								</tr>
 							</c:forEach>
 						</table>
