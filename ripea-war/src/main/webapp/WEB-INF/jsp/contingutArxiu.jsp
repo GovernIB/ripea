@@ -247,7 +247,15 @@
 												<td>${metadada.value}</td>
 											</c:if>			
 										</c:when>
-										<c:otherwise> <!-- No es docu -->
+										<c:when test="${contingut.expedient}">
+											<spring:message code="contingut.arxiu.camp.metadades.exp.enum.${metadada.key}" var="message" text=""/>
+											<c:if test="${not empty message}">
+												<c:set var="contMetadades" value="${contMetadades + 1}" />
+												<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.exp.enum.${metadada.key}"/></strong></td>
+												<td>${metadada.value}</td>
+											</c:if>			
+										</c:when>
+										<c:otherwise>
 											<c:set var="contMetadades" value="${contMetadades + 1}" />
 											<td width="20%"><strong>${metadada.key}</strong></td>
 											<td>${metadada.value}</td>
