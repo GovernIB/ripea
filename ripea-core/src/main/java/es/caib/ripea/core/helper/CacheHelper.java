@@ -552,14 +552,14 @@ public class CacheHelper {
 	public void evictRolsDisponiblesEnAcls() {
 	}
 
-	@Cacheable(value = "anotacionsUsuari", key="#usuariCodi")
-	public long countAnotacionsPendents(String usuariCodi) {
-		logger.debug("Consulta anotacions pendents de processar (usuariCodi=" + usuariCodi + ")");
+	@Cacheable(value = "anotacionsUsuari")
+	public long countAnotacionsPendents() {
+		logger.debug("Consulta anotacions pendents de processar");
 		return expedientPeticioRepository.countAnotacionsPendents();
 	}
 	
-	@CacheEvict(value = "anotacionsUsuari", key="#usuariCodi")
-	public void evictCountAnotacionsPendents(String usuariCodi) {
+	@CacheEvict(value = "anotacionsUsuari")
+	public void evictCountAnotacionsPendents() {
 	}
 	
 	private ValidacioErrorDto crearValidacioError(

@@ -104,8 +104,7 @@ public class ExpedientPeticioHelper {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateEstat(
 				expedientPeticioEstatEnumDto);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		cacheHelper.evictCountAnotacionsPendents(auth.getName());
+		cacheHelper.evictCountAnotacionsPendents();
 	}
 
 	@Transactional

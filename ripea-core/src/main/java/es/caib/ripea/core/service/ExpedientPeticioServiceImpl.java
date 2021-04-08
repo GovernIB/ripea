@@ -367,8 +367,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		cacheHelper.evictCountAnotacionsPendents(auth.getName());
+		cacheHelper.evictCountAnotacionsPendents();
 	}
 
 	@Transactional(readOnly = true)
@@ -455,8 +454,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public long countAnotacionsPendents() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return cacheHelper.countAnotacionsPendents(auth.getName());
+		return cacheHelper.countAnotacionsPendents();
 	}
 
 	private boolean isIncorporacioJustificantActiva() {

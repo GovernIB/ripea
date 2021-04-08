@@ -118,8 +118,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							Estat.REBUDA,
 							"");
 					
-					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-					cacheHelper.evictCountAnotacionsPendents(auth.getName());
+					cacheHelper.evictCountAnotacionsPendents();
 				} catch (Throwable e) {
 					logger.error(
 							"Error consultar i guardar anotació per petició: " +
