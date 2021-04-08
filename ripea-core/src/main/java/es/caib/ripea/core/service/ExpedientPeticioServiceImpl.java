@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
@@ -87,7 +90,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private ExpedientHelper  expedientHelper;
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(Long entitatId,
@@ -362,7 +367,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		cacheHelper.evictCountAnotacionsPendents(auth.getName());
 	}
 
 	@Transactional(readOnly = true)
@@ -444,6 +450,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		return expedientPeticioDto;
 
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public long countAnotacionsPendents() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return cacheHelper.countAnotacionsPendents(auth.getName());
 	}
 
 	private boolean isIncorporacioJustificantActiva() {

@@ -133,8 +133,15 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	}
 
 	@Override
+	@RolesAllowed("tothom")
 	public FitxerDto getJustificantContent(String arxiuUuid) {
 		return delegate.getJustificantContent(arxiuUuid);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public long countAnotacionsPendents() {
+		return delegate.countAnotacionsPendents();
 	}
 	
 	

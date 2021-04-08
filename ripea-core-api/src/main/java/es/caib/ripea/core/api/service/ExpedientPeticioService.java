@@ -59,7 +59,5 @@ public interface ExpedientPeticioService {
 
 	FitxerDto getJustificantContent(String arxiuUuid);
 
-
-
-
+	public long countAnotacionsPendents();
 }

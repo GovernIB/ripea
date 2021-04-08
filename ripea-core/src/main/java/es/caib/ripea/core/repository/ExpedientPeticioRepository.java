@@ -67,6 +67,11 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("accio") ExpedientPeticioAccioEnumDto accio,
 			Pageable pageable);
 
-	
+	@Query(	"select " +
+			"    count(anotacio) " +
+			"from " +
+			"    ExpedientPeticioEntity anotacio " +
+			"where anotacio.estat='PENDENT'")
+	long countAnotacionsPendents();
 
 }

@@ -29,4 +29,5 @@
 	<cache name="enviamentsPortafirmesPendentsPerExpedient" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 	<cache name="notificacionsPendentsPerExpedient" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 	<cache name="rolsDisponiblesEnAcls" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
+	<cache name="anotacionsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 </ehcache>

@@ -54,6 +54,9 @@
 	pageContext.setAttribute(
 			"countTasquesPendent",
 			es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
+	pageContext.setAttribute(
+			"countAnotacionsPendents",
+			es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -336,6 +339,7 @@ body {
 								<%---- Expedients pendents ----%>
 								<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
 									<spring:message code="decorator.menu.expedientPeticions"/>
+									<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
 								</a>
 								
 								<%---- Tasques ----%>								

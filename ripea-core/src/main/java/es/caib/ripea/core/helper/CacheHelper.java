@@ -61,6 +61,7 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -112,7 +113,8 @@ public class CacheHelper {
 	private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired
 	private AclSidRepository aclSidRepository;
-
+	@Resource
+	private ExpedientPeticioRepository expedientPeticioRepository;
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
@@ -550,6 +552,16 @@ public class CacheHelper {
 	public void evictRolsDisponiblesEnAcls() {
 	}
 
+	@Cacheable(value = "anotacionsUsuari", key="#usuariCodi")
+	public long countAnotacionsPendents(String usuariCodi) {
+		logger.debug("Consulta anotacions pendents de processar (usuariCodi=" + usuariCodi + ")");
+		return expedientPeticioRepository.countAnotacionsPendents();
+	}
+	
+	@CacheEvict(value = "anotacionsUsuari", key="#usuariCodi")
+	public void evictCountAnotacionsPendents(String usuariCodi) {
+	}
+	
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,
 			MultiplicitatEnumDto multiplicitat) {

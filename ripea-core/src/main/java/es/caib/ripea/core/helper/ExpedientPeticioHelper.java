@@ -9,8 +9,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
@@ -57,7 +58,9 @@ public class ExpedientPeticioHelper {
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	
 	/*
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
@@ -101,6 +104,8 @@ public class ExpedientPeticioHelper {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateEstat(
 				expedientPeticioEstatEnumDto);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		cacheHelper.evictCountAnotacionsPendents(auth.getName());
 	}
 
 	@Transactional
