@@ -55,7 +55,16 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             notification.setDetail(parametresViaFirma.getDescripcio());
             if (parametresViaFirma.isDeviceEnabled()) {
             	notification.setDevices(new ArrayList<Device>());
-            	notification.getDevices().add(convertToDevice(parametresViaFirma.getViaFirmaDispositiu()));
+            	notification.getDevices().add(
+            			convertToDevice(
+            					parametresViaFirma.getViaFirmaDispositiu(),
+            					null));
+            } else {
+            	notification.setDevices(new ArrayList<Device>());
+            	notification.getDevices().add(
+            			convertToDevice(
+            					null, 
+            					parametresViaFirma.getCodiUsuari()));
             }
             if (parametresViaFirma.isValidateCodeEnabled()) {
             	notification.setValidateCode(parametresViaFirma.getValidateCode());
@@ -210,20 +219,28 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 		return viaFirmaClient;
 	}
 	
-	private Device convertToDevice(ViaFirmaDispositiu viaFiramDispositiu) throws SistemaExternException {
+	private Device convertToDevice(
+			ViaFirmaDispositiu viaFiramDispositiu,
+			String codiUsuari) throws SistemaExternException {
 		Device device = new Device();
 		try {
-			device.setAppCode(viaFiramDispositiu.getCodiAplicacio());
-			device.setCode(viaFiramDispositiu.getCodi());
-			device.setDescription(viaFiramDispositiu.getDescripcio());
-			device.setLocale(viaFiramDispositiu.getLocal());
-			device.setStatus(StatusEnum.valueOf(viaFiramDispositiu.getEstat()));
-			device.setToken(viaFiramDispositiu.getToken());
-			device.setType(com.viafirma.documents.sdk.java.model.Device.TypeEnum.valueOf(viaFiramDispositiu.getTipus()));
-			device.setUniqueIdentifier(viaFiramDispositiu.getIdentificador());
-			device.setUserCode(viaFiramDispositiu.getCodiUsuari());
-			device.setUserEmail(viaFiramDispositiu.getEmailUsuari());
-			device.setUserNationalId(viaFiramDispositiu.getIdentificadorNacional());
+			if (viaFiramDispositiu != null) { //### s'ha informat un dispositiu
+				device.setAppCode(viaFiramDispositiu.getCodiAplicacio());
+				device.setCode(viaFiramDispositiu.getCodi());
+				device.setDescription(viaFiramDispositiu.getDescripcio());
+				device.setLocale(viaFiramDispositiu.getLocal());
+				device.setStatus(StatusEnum.valueOf(viaFiramDispositiu.getEstat()));
+				device.setToken(viaFiramDispositiu.getToken());
+				device.setType(com.viafirma.documents.sdk.java.model.Device.TypeEnum.valueOf(viaFiramDispositiu.getTipus()));
+				device.setUniqueIdentifier(viaFiramDispositiu.getIdentificador());
+				device.setUserCode(viaFiramDispositiu.getCodiUsuari());
+				device.setUserEmail(viaFiramDispositiu.getEmailUsuari());
+				device.setUserNationalId(viaFiramDispositiu.getIdentificadorNacional());
+			} else {
+				device.setAppCode(getAppCodi());
+				device.setCode(codiUsuari);
+				device.setUserCode(codiUsuari);
+			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error en la conversió de firmaDispositiu a Device";
 			throw new SistemaExternException(
@@ -289,6 +306,10 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 	private String getProxyHost() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.viafirma.caib.proxy.host");
+	}
+	private String getAppCodi() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.viafirma.caib.app.codi");
 	}
 	private int getProxyPort() {
 		String proxyPort = PropertiesHelper.getProperties().getProperty(

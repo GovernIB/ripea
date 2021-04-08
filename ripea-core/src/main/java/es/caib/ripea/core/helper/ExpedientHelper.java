@@ -271,7 +271,7 @@ public class ExpedientHelper {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public void relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
 			Long expedientPeticioId,
 			Long expedientId) {
@@ -305,6 +305,8 @@ public class ExpedientHelper {
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
 		expedientEntity = expedientPeticioEntity.getExpedient();
+		if (expedientEntity != null && HibernateHelper.isProxy(expedientEntity))
+			expedientEntity = HibernateHelper.deproxy(expedientEntity);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
