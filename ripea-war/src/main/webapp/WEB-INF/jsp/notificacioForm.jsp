@@ -99,6 +99,7 @@ $(document).ready(function() {
 	    });
 
 		mostrarNotificacions(notificacionsSeleccionades);
+		$('#entregaPostal').trigger('change');
 	});
 	$('#entregaPostal').on('change', function() {
 		if ($(this).is(':checked')) {

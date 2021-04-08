@@ -333,6 +333,31 @@ tr.clicable {
 				</tbody>
 			</table>
 	
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title"><spring:message code="registre.detalls.pipella.informacio.resum"/></h3>
+				</div>
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.docfis"/></strong></td>
+							<td>${registre.docFisicaCodi} - ${registre.docFisicaDescripcio}</td>
+						</tr>
+						<tr>
+							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.desti"/></strong></td>
+							<td>${registre.destiDescripcio} (${registre.destiCodi})</td>
+						</tr>
+						<tr>
+							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.refext"/></strong></td>
+							<td>${registre.refExterna}</td>
+							</tr>
+						<tr>
+							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.numexp"/></strong></td>
+							<td>${registre.expedientNumero}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 			<!------------------- INTERESSATS ------------------->
 			<div class="panel panel-default">
 				<div class="panel-heading">
