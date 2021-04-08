@@ -233,6 +233,12 @@ public class DocumentHelper {
 				document.getNtiCsv(),
 				document.getNtiCsvRegulacion());
 		FitxerDto fitxer = null;
+		if (document.getFitxerContingut() != null && document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+			throw new ValidationException(
+					documentEntity.getId(),
+					DocumentEntity.class,
+					"No es pot actualitzar el contingut d'un document importat");
+		}
 		if (document.getFitxerContingut() != null) {
 			fitxer = new FitxerDto();
 			fitxer.setNom(document.getFitxerNom());
