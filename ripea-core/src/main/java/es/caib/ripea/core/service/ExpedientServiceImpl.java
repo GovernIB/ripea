@@ -1420,6 +1420,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 		resultat.setContingut(baos.toByteArray());
 		return resultat;
 	}
+	
+	@Override
+	@Transactional	
+	public boolean isOrganGestorPermes (Long expedientId) {
+		ExpedientEntity expediente = expedientRepository.findOne(expedientId);
+		
+		return organGestorHelper.isOrganGestorPermes(expediente.getMetaExpedient(), 
+				expediente.getOrganGestor(), 
+				ExtendedPermission.ADMINISTRATION);
+	}
 
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
@@ -1685,14 +1695,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			listLong.add((Long)s); 
 		}
 		return listLong;
-	}
-
-	public boolean isOrganGestorPermes (Long expedientId) {
-		ExpedientEntity expediente = expedientRepository.findOne(expedientId);
-		
-		return organGestorHelper.isOrganGestorPermes(expediente.getMetaExpedient(), 
-				expediente.getOrganGestor(), 
-				ExtendedPermission.ADMINISTRATION);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);

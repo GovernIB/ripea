@@ -447,6 +447,6 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<DocumentDto> consultaExpedientsAmbImportacio();
 	
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ORGAN_ADMIN')")
 	public boolean isOrganGestorPermes (Long expedientId);
 }
