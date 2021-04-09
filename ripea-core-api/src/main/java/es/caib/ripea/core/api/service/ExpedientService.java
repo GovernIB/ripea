@@ -212,7 +212,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public void agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
@@ -446,4 +446,7 @@ public interface ExpedientService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<DocumentDto> consultaExpedientsAmbImportacio();
+	
+	@PreAuthorize("hasRole('IPA_ORGAN_ADMIN')")
+	public boolean isOrganGestorPermes (Long expedientId);
 }

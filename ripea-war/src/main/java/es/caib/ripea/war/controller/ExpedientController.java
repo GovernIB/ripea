@@ -61,6 +61,7 @@ import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientAssignarCommand;
@@ -73,6 +74,7 @@ import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -106,6 +108,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private ExpedientEstatService expedientEstatService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private UsuariHelper usuariHelper;
 
 	
 	@RequestMapping(method = RequestMethod.GET)
@@ -639,9 +643,33 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			} else {
 				url = "redirect:../../contingut/" + expedientId;
 			}
-			expedientService.agafarUser(
-					entitatActual.getId(),
-					expedientId);
+			
+			if (RolHelper.isRolActualAdministrador(request)) {
+				expedientService.agafarAdmin(entitatActual.getId(), 
+									null, 
+									expedientId, 
+									usuariHelper.getUsuariAutenticat().getCodi());
+				
+			}
+			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+				if (expedientService.isOrganGestorPermes(expedientId)) {
+					expedientService.agafarAdmin(entitatActual.getId(), 
+										null, 
+										expedientId, 
+										usuariHelper.getUsuariAutenticat().getCodi());
+
+				}
+				else {
+					expedientService.agafarUser(
+							entitatActual.getId(),
+							expedientId);
+				}
+			}
+			else {
+				expedientService.agafarUser(
+						entitatActual.getId(),
+						expedientId);
+			}
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,
