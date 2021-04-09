@@ -341,4 +341,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return delegate.consultaExpedientsAmbImportacio();
 	}
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public boolean isOrganGestorPermes (Long expedientId) {
+		return delegate.isOrganGestorPermes(expedientId);
+	}
 }

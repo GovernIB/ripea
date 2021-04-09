@@ -88,6 +88,7 @@ import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -167,6 +168,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -742,7 +745,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, false);
 		
 
-		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+		expedientHelper.agafar(expedient, usuariCodi);
 	}
 
 	@Transactional
@@ -1684,6 +1687,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return listLong;
 	}
 
+	public boolean isOrganGestorPermes (Long expedientId) {
+		ExpedientEntity expediente = expedientRepository.findOne(expedientId);
+		
+		return organGestorHelper.isOrganGestorPermes(expediente.getMetaExpedient(), 
+				expediente.getOrganGestor(), 
+				ExtendedPermission.ADMINISTRATION);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);
 
 }
