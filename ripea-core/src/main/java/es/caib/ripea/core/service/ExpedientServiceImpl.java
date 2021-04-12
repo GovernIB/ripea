@@ -1431,15 +1431,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		if (!metaExpedientsPermesos.isEmpty()) {*/
 			UsuariEntity agafatPer = null;
-			if (filtre.getAgafatPer() != null && !filtre.getAgafatPer().isEmpty()) {
-				agafatPer = usuariHelper.getUsuariByCodi(filtre.getAgafatPer());
-			} 
-			if (filtre.isMeusExpedients()) {
-				UsuariEntity auth = usuariHelper.getUsuariAutenticat();
-				if (agafatPer != null && !auth.equals(agafatPer)) {
-					return paginacioHelper.getPaginaDtoBuida(ExpedientDto.class);
+			
+			if (rolActual.equals("tothom")) {
+				if (filtre.isMeusExpedients()) {
+					agafatPer = usuariHelper.getUsuariAutenticat();
 				}
-				agafatPer = auth;
+			} else {
+				if (filtre.getAgafatPer() != null && !filtre.getAgafatPer().isEmpty()) {
+					agafatPer = usuariHelper.getUsuariByCodi(filtre.getAgafatPer());
+				} 
 			}
 			
 			// estats
