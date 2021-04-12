@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
@@ -34,6 +35,7 @@ import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
+import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -49,6 +51,8 @@ public class MetaExpedientHelper {
 	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
+	@Autowired
+	private MetaNodeRepository metaNodeRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
@@ -201,8 +205,14 @@ public class MetaExpedientHelper {
 
 	public List<PermisDto> permisFind(Long id) {
 
+		MetaExpedientEntity metaExpedient = null;
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
+		MetaNodeEntity metaNode = metaNodeRepository.getOne(id);
+		if (metaNode instanceof MetaExpedientEntity) {
+			metaExpedient = (MetaExpedientEntity) metaNode;
+		} else if (metaNode instanceof MetaDocumentEntity){
+			metaExpedient = ((MetaDocumentEntity) metaNode).getMetaExpedient();
+		}
 		List<MetaExpedientOrganGestorEntity> metaExpedientOrgans = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
 		List<Serializable> serializedIds = new ArrayList<Serializable>();
 		for (MetaExpedientOrganGestorEntity metaExpedientOrgan: metaExpedientOrgans) {
