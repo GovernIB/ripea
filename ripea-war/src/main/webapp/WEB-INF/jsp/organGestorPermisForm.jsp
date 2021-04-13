@@ -23,8 +23,29 @@
 			$("form#permisOrganGestorCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisOrganGestorCommand *:disabled").removeAttr('disabled');
 		});
+
+		$("#selectAll").on('change', function() {
+			if ($(this).prop("checked"))
+				$("div.permisosInput :checkbox").prop('checked', true);
+			else
+				$("div.permisosInput :checkbox").prop('checked', false);
+		});
+		$("div.permisosInput :checkbox").on('change', function() {
+			var totsSeleccionats = true;
+			$("div.permisosInput :checkbox").each(function() {
+				  if(!$(this).prop('checked'))
+					  totsSeleccionats = false;
+			});
+			$("#selectAll").prop('checked', totsSeleccionats);
+		});
+		
 	});
 </script>
+<style>
+	.permisosInput {
+		margin-left: 45px
+	}
+</style>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/organgestor/permis"/></c:set>
@@ -42,10 +63,14 @@
 	 	</c:if>					 
 		<rip:inputSelect name="principalTipus" textKey="organgestor.permis.form.camp.tipus" disabled="${not empty permisOrganGestorCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<rip:inputText name="principalNom" textKey="organgestor.permis.form.camp.principal" disabled="${not empty permisOrganGestorCommand.id}" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
-		<rip:inputCheckbox name="create" textKey="organgestor.permis.form.camp.creacio"/>
-		<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
-		<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
-		<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
+		
+		<rip:inputCheckbox name="selectAll" textKey="organgestor.permis.form.camp.all"/>
+		<div class="permisosInput">
+			<rip:inputCheckbox name="create" textKey="organgestor.permis.form.camp.creacio"/>
+			<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
+			<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
+			<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
+		</div>
 		<rip:inputCheckbox name="administration" textKey="organgestor.permis.form.camp.administracio"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
