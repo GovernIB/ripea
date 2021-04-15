@@ -101,7 +101,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		
 		ExecucioMassivaEntity execucioMassiva = null;
 		
@@ -278,7 +278,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				entitatId,
 				false,
 				false,
-				true, false);
+				true, false, false);
 		
 		Pageable paginacio = new PageRequest(pagina, 8, Direction.DESC, "dataInici");		
 		

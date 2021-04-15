@@ -449,7 +449,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		DocumentEntity document = entityComprovarHelper.comprovarDocument(
 				entitat,
 				null,

@@ -17,6 +17,7 @@ import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -35,6 +36,9 @@ public class GrupServiceImpl implements GrupService {
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
+	
 	
 	@Transactional
 	@Override
@@ -47,7 +51,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		
 		GrupEntity enitity = GrupEntity.getBuilder(
 				grupDto.getRol(),
@@ -72,7 +76,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		
 		GrupEntity grupEntity = grupRepository.findOne(grupDto.getId());
 
@@ -98,7 +102,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 
 		GrupEntity grupEntity = grupRepository.findOne(id);
 		
@@ -134,7 +138,7 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				false,
-				false, false);
+				false, false, false);
 
 		Page<GrupEntity> page = grupRepository.findByEntitat(
 				entitat,
@@ -174,7 +178,7 @@ public class GrupServiceImpl implements GrupService {
 	public void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id) {
+			Long id, String rolActual) {
 		logger.debug("Relacionant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
@@ -183,13 +187,17 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		
 		GrupEntity grupEntity = grupRepository.findOne(id);
 		
 		metaExpedientEntity.addGrup(grupEntity);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+		}
 
 	}
 	
@@ -199,7 +207,7 @@ public class GrupServiceImpl implements GrupService {
 	public void desvincularAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id) throws NotFoundException {
+			Long id, String rolActual) throws NotFoundException {
 		logger.debug("Desvinculant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
@@ -208,13 +216,17 @@ public class GrupServiceImpl implements GrupService {
 				entitatId,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		
 		GrupEntity grupEntity = grupRepository.findOne(id);
 		
 		metaExpedientEntity.removeGrup(grupEntity);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+		}
 	}
 	
 	

@@ -6,7 +6,7 @@
 
 <html>
 <head>
-	<title><spring:message code="metaexpedient.list.titol"/></title>
+	<title><spring:message code="metaexpedient.revisio.list.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -46,30 +46,23 @@
 	</script>
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
-	</div>
-	<c:url value="metaExpedient/filtrar" var="formAction"/>
+
+
+	<c:url value="metaExpedientRevisio/filtrar" var="formAction"/>
 	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="metaExpedientFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="codi" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codi"/>
 			</div>		
 			<div class="col-md-4">
+				<rip:inputText name="classificacioSia" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
+			</div>			
+			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
-			<div class="col-md-4">
-				<rip:inputText name="classificacioSia" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
-			</div>
+
 		</div>
 		<div class="row">
-			<div class="col-md-4">
-				<rip:inputSelect 
-						name="actiu" 
-						optionEnum="MetaExpedientActiuEnumDto" 
-						emptyOption="true" 
-						placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
-			</div>
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
@@ -81,20 +74,7 @@
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
  					suggestText="nom" />
-			</div>
-			<div class="col-md-4">
-				<c:if test="${not isRolAdminOrgan}">
-					<rip:inputSelect name="ambit" optionEnum="MetaExpedientAmbitEnumDto" 
-									 emptyOption="true" 
-									 placeholderKey="metaexpedient.list.filtre.camp.ambit" inline="true"/>
-				</c:if>
-			</div>	
-		</div>
-		
-		<div class="row">		
-			<div class="col-md-4">
-				<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
-			</div>	
+			</div>		
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -103,11 +83,11 @@
 			</div>
 		</div>
 	</form:form>
-	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedientRevisio/{{:id}}</script>
 	<table 
 		id="metaexpedients" 
 		data-toggle="datatable" 
-		data-url="<c:url value="/metaExpedient/datatable"/>" 
+		data-url="<c:url value="/metaExpedientRevisio/datatable"/>" 
 		data-info-type="search" 
 		data-default-order="2" 
 		data-default-dir="asc" 
@@ -121,41 +101,9 @@
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
-				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
-				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
+				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>						
 				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
-				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
-					<spring:message code="metaexpedient.list.columna.comu"/>
-					<script id="cellComuTemplate" type="text/x-jsrender">
-						{{if comu}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
-					<spring:message code="metaexpedient.list.columna.actiu"/>
-					<script id="cellActiuTemplate" type="text/x-jsrender">
-						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				
-				<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
-					<spring:message code="metaexpedient.list.columna.revisioEstat"/>
-					<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
-						{{if revisioEstat == 'PENDENT'}}
-							<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
-						{{else revisioEstat == 'REVISAT'}}
-							<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
-						{{else revisioEstat == 'REBUTJAT'}}
-							<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
-						{{/if}}
-					</script>
-				</th>	
-				
-				<!--  <th data-col-name="gestioAmbGrupsActiva" data-template="#cellGestioAmbGrupsActivaTemplate" width="1%">
-					<spring:message code="metaexpedient.list.columna.gestioAmbGrupsActiva"/>
-					<script id="cellGestioAmbGrupsActivaTemplate" type="text/x-jsrender">
-						{{if gestioAmbGrupsActiva}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>	-->
+
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
@@ -180,18 +128,7 @@
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{if !actiu}}
-								<li><a href="metaExpedient/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
-								{{else}}
-								<li><a href="metaExpedient/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
-								{{/if}}
-								<li><a href="metaExpedient/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
+						<a href="metaExpedientRevisio/{{:id}}" class="btn btn-primary" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a>
 					</script>
 				</th>
 			</tr>

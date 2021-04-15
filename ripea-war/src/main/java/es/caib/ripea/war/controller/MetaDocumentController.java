@@ -138,7 +138,9 @@ public class MetaDocumentController extends BaseAdminController {
 	public String delete(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		try {
-			metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId);
+			String rolActual = (String)request.getSession().getAttribute(
+					SESSION_ATTRIBUTE_ROL_ACTUAL);
+			metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId, rolActual);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
@@ -159,8 +161,10 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/{metaDocumentId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true, rolActual);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
@@ -169,8 +173,10 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false, rolActual);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",

@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.PermisCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -42,8 +43,15 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
+		model.addAttribute(
+				"esRevisor",
+				rolActual.equals("IPA_REVISIO"));
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -57,8 +65,12 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				metaExpedientService.permisFind(
@@ -80,7 +92,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long permisId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		model.addAttribute(
 				"metaExpedient",
@@ -113,7 +125,11 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -126,7 +142,12 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		metaExpedientService.permisUpdate(
 				entitatActual.getId(),
 				metaExpedientId,
-				PermisCommand.asDto(command));
+				PermisCommand.asDto(command), 
+				rolActual);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient/" + metaExpedientId + "/permis",
@@ -140,13 +161,22 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			@PathVariable Long permisId,
 			@RequestParam(required = false) Long organGestorId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,
 				permisId,
-				organGestorId);
+				organGestorId, 
+				rolActual);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../metaExpedient/" + metaExpedientId + "/permis",

@@ -263,7 +263,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -327,7 +327,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -817,7 +817,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -900,7 +900,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -936,7 +936,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 //		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 //				entitat,
 //				contingutId);
@@ -959,7 +959,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 //		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 //				entitatId,
 //				contingutId,
@@ -982,7 +982,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				false,
 				false,
-				true, false);
+				true, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -1018,7 +1018,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		MetaNodeEntity metaNode = null;
 		if (filtre.getMetaNodeId() != null) {
 			metaNode = metaNodeRepository.findOne(filtre.getMetaNodeId());
@@ -1105,7 +1105,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		UsuariEntity usuari = null;
 		if (usuariCodi != null && !usuariCodi.isEmpty()) {
 			usuari = usuariRepository.findOne(usuariCodi);
@@ -1163,7 +1163,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
@@ -1538,7 +1538,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				true);
+				true, false);
 
 		
 		boolean checkPerMassiuAdmin = false;
@@ -1622,7 +1622,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		
 		boolean checkPerMassiuAdmin = false;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {

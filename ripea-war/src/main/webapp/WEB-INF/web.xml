@@ -97,6 +97,9 @@
 		<role-name>IPA_API_HIST</role-name>
 	</security-role>
 	<security-role>
+		<role-name>IPA_REVISIO</role-name>
+	</security-role>
+	<security-role>
 		<role-name>tothom</role-name>
 	</security-role>
 
@@ -110,6 +113,7 @@
 			<role-name>IPA_ADMIN</role-name>
 			<role-name>IPA_BSTWS</role-name>
 			<role-name>IPA_ORGAN_ADMIN</role-name>
+			<role-name>IPA_REVISIO</role-name>
 			<role-name>IPA_API_HIST</role-name>			
 			<role-name>tothom</role-name>
 		</auth-constraint>

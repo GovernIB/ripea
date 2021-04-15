@@ -16,7 +16,7 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" data-botons-template="#tableButtonsTemplate" class="table table-striped table-bordered" style="width:100%">
+	<table id="taulaDades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" ${!esRevisor ? 'data-botons-template="#tableButtonsTemplate"' : ''} class="table table-striped table-bordered" style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="ambOrganGestor" data-visible="false"></th>
@@ -50,28 +50,30 @@
 						{{if delete}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{if !ambOrganGestor}}
-								<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-								{{else}}
-								<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete?organGestorId={{:organGestorId}}" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-								{{/if}}
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!esRevisor}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									{{if !ambOrganGestor}}
+									<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{else}}
+									<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete?organGestorId={{:organGestorId}}" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{/if}}
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
 	<script id="tableButtonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right"><a class="btn btn-default" href="../../metaExpedient/${metaExpedient.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.permis.boto.nou.permis"/></a></p>
 	</script>
-	<a href="<c:url value="/metaExpedient?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+	<a href="<c:url value="${!esRevisor ? '/metaExpedient?mantenirPaginacio=true' : '/metaExpedientRevisio?mantenirPaginacio=true'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>
 </body>
 </html>

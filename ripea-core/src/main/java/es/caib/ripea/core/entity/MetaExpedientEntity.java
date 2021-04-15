@@ -11,6 +11,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -23,6 +25,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -95,6 +98,14 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
 	
 
+	
+	@Column(name = "revisio_estat", length = 8)
+	@Enumerated(EnumType.STRING)
+	private MetaExpedientRevisioEstatEnumDto revisioEstat;
+	@Column(name = "revisio_comentari", length = 1024)
+	private String revisioComentari;
+	
+
 	public void addGrup(GrupEntity grup) {
 		grups.add(grup);
 	}
@@ -126,6 +137,14 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.permetMetadocsGenerals = permetMetadocsGenerals;
         this.organGestor = organGestor;
         this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
+
+    }
+	
+	public void updateRevisioEstat(
+			MetaExpedientRevisioEstatEnumDto revisioEstat,
+			String revisioComentari) {
+        this.revisioEstat = revisioEstat;
+        this.revisioComentari = revisioComentari;
     }
 
 	public static Builder getBuilder(
@@ -151,7 +170,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				notificacioActiva,
 				permetMetadocsGenerals,
 				organGestor,
-				gestioAmbGrupsActiva);
+				gestioAmbGrupsActiva
+				);
 	}
 
     public static class Builder {

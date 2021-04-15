@@ -114,7 +114,7 @@ public class EntityComprovarHelper {
 				entitat.getId(),
 				comprovarPermisUsuari,
 				comprovarPermisAdmin,
-				comprovarPermisUsuariOrAdmin, false);
+				comprovarPermisUsuariOrAdmin, false, false);
 	}
 
 	public EntitatEntity comprovarEntitatPerMetaExpedients(Long entitatId) {
@@ -123,7 +123,7 @@ public class EntityComprovarHelper {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 	}
 	
 	public EntitatEntity comprovarEntitat(
@@ -131,7 +131,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisUsuari,
 			boolean comprovarPermisAdmin,
 			boolean comprovarPermisUsuariOrAdmin, 
-			boolean comprovarPermisUsuariOrAdminOrOrgan) throws NotFoundException {
+			boolean comprovarPermisUsuariOrAdminOrOrgan, 
+			boolean comprovarPermisAdminOrOrgan) throws NotFoundException {
 		EntitatEntity entitat = entitatRepository.findOne(entitatId);
 		if (entitat == null) {
 			throw new NotFoundException(entitatId, EntitatEntity.class);
@@ -169,6 +170,19 @@ public class EntityComprovarHelper {
 					entitat,
 					ExtendedPermission.ADMINISTRATION);
 			if (!esAdministradorOLectorEntitat && (organs == null || organs.isEmpty())) {
+				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
+				        "ADMINISTRATION || READ || ORGAN");
+			}
+		}
+		
+		if (comprovarPermisAdminOrOrgan) {
+			boolean esAdministradorEntitat = permisosHelper.isGrantedAny(entitatId,
+			        EntitatEntity.class,
+			        new Permission[] { ExtendedPermission.ADMINISTRATION}, auth);
+			List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
+					entitat,
+					ExtendedPermission.ADMINISTRATION);
+			if (!esAdministradorEntitat && (organs == null || organs.isEmpty())) {
 				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
 				        "ADMINISTRATION || READ || ORGAN");
 			}
@@ -502,7 +516,7 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
 			boolean checkPerMassiuAdmin) {
-		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true);
+		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true, false);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
 			throw new NotFoundException(expedientId, ExpedientEntity.class);

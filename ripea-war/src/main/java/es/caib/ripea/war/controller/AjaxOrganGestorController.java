@@ -44,7 +44,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@RequestMapping(value = "/organgestor/{text}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OrganGestorDto> get(HttpServletRequest request, @PathVariable String text, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		
 		try {
 			text = URLDecoder.decode(request.getRequestURI().split("/")[4], StandardCharsets.UTF_8.name());
@@ -79,7 +79,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@RequestMapping(value = "/organgestor/item/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public OrganGestorDto getItem(HttpServletRequest request, @PathVariable Long id, Model model) {
-		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		
 		try {
 			return organGestorService.findItem(id);

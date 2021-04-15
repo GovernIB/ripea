@@ -23,6 +23,7 @@ public class RolHelper {
 	private static final String ROLE_SUPER = "IPA_SUPER";
 	private static final String ROLE_ADMIN = "IPA_ADMIN";
 	private static final String ROLE_ADMIN_ORGAN = "IPA_ORGAN_ADMIN";
+	private static final String ROLE_REVISOR = "IPA_REVISIO";
 	private static final String ROLE_USER = "tothom";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
@@ -53,6 +54,8 @@ public class RolHelper {
 				rolActual = ROLE_ADMIN_ORGAN;
 			} else if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
 				rolActual = ROLE_SUPER;
+			} else if (request.isUserInRole(ROLE_REVISOR) && rolsDisponibles.contains(ROLE_REVISOR)) {
+				rolActual = ROLE_REVISOR;
 			}
 			if (rolActual != null) {
 				request.getSession().setAttribute(
@@ -72,6 +75,9 @@ public class RolHelper {
 	}
 	public static boolean isRolActualAdministradorOrgan(HttpServletRequest request) {
 		return ROLE_ADMIN_ORGAN.equals(getRolActual(request));
+	}
+	public static boolean isRolActualRevisor(HttpServletRequest request) {
+		return ROLE_REVISOR.equals(getRolActual(request));
 	}
 
 	public static boolean isRolActualUsuari(HttpServletRequest request) {
@@ -94,6 +100,9 @@ public class RolHelper {
 			}
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {
 				rols.add(ROLE_USER);
+			}
+			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_REVISOR)) {
+				rols.add(ROLE_REVISOR);
 			}
 			
 		}

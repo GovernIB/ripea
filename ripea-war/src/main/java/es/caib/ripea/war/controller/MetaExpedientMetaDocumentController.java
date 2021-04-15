@@ -39,6 +39,7 @@ import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per al manteniment de meta-documents asociats a un
@@ -66,13 +67,23 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		model.addAttribute(
+				"esRevisor",
+				rolActual.equals("IPA_REVISIO"));
+		
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
+		
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
+
 		return "metaExpedientMetaDocument";
 	}
 
@@ -81,8 +92,12 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDocumentService.findByMetaExpedient(
@@ -103,7 +118,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
@@ -133,7 +148,10 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@Valid MetaDocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
@@ -147,7 +165,11 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes());
+					command.getPlantilla().getBytes(), rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
@@ -159,7 +181,11 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes());
+					command.getPlantilla().getBytes(), rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
@@ -172,10 +198,18 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
-			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId);
+			
+			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId, rolActual);
+
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
@@ -187,6 +221,43 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					"metadocument.controller.esborrar.error.fk");
 		}
 	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/enable", method = RequestMethod.GET)
+	public String enable(HttpServletRequest request, @PathVariable Long metaExpedientId, @PathVariable Long metaDocumentId) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
+		metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, true, rolActual);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../metaDocument",
+				"metadocument.controller.activat.ok");
+	}
+
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/disable", method = RequestMethod.GET)
+	public String disable(HttpServletRequest request, @PathVariable Long metaExpedientId, @PathVariable Long metaDocumentId) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
+		metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, false, rolActual);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../metaDocument",
+				"metadocument.controller.desactivat.ok");
+	}
+	
 
 	@RequestMapping(value = "/metaDocument/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
@@ -271,7 +342,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	public void emplenarModelForm(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
 		model.addAttribute("isPortafirmesDocumentTipusSuportat", new Boolean(tipus != null));

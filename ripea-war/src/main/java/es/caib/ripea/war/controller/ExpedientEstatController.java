@@ -24,6 +24,7 @@ import es.caib.ripea.war.command.ExpedientEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -44,8 +45,14 @@ public class ExpedientEstatController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		model.addAttribute(
+				"esRevisor",
+				rolActual.equals("IPA_REVISIO"));
+		
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -61,7 +68,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				expedientEstatService.findExpedientEstatByMetaExpedientPaginat(
@@ -90,7 +97,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long estatId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		ExpedientEstatDto estat = null;
 		if (estatId != null) {
 			estat = expedientEstatService.findExpedientEstatById(
@@ -106,16 +113,21 @@ public class ExpedientEstatController extends BaseAdminController {
 		command.setMetaExpedientId(metaExpedientId);
 		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);
+		model.addAttribute("metaExpedientId", metaExpedientId);
 		return "expedientEstatForm";
 	}
 
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	@RequestMapping(value = "/{metaExpedientId}/save", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@Valid ExpedientEstatCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		
 		if (!command.isComu() && (command.getResponsableCodi() == null || command.getResponsableCodi().isEmpty())) {
 			bindingResult.rejectValue("responsableCodi", "NotNull");
@@ -128,7 +140,12 @@ public class ExpedientEstatController extends BaseAdminController {
 		if (command.getId() != null) {
 			expedientEstatService.updateExpedientEstat(
 					entitatActual.getId(),
-					ExpedientEstatCommand.asDto(command));
+					ExpedientEstatCommand.asDto(command), 
+					rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientEstat/" + command.getMetaExpedientId(),
@@ -136,7 +153,12 @@ public class ExpedientEstatController extends BaseAdminController {
 		} else {
 			expedientEstatService.createExpedientEstat(
 					entitatActual.getId(),
-					ExpedientEstatCommand.asDto(command));
+					ExpedientEstatCommand.asDto(command), 
+					rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientEstat/" + command.getMetaExpedientId(),
@@ -150,31 +172,47 @@ public class ExpedientEstatController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long expedientEstatId,
 			@PathVariable int posicio) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		expedientEstatService.moveTo(
 				entitatActual.getId(),
 				metaExpedientId,
 				expedientEstatId,
-				posicio);
+				posicio, 
+				rolActual);
+		
+
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:expedientEstat/"+metaExpedientId,
+				"redirect:expedientEstat",
 				null);
 	}
 
-	@RequestMapping(value = "/{expedientEstatId}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/{expedientEstatId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
 			@PathVariable Long expedientEstatId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		try {
 			expedientEstatService.deleteExpedientEstat(
 					entitatActual.getId(),
-					expedientEstatId);
+					expedientEstatId, 
+					rolActual);
 		}catch (Exception e) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class))
 				return getAjaxControllerReturnValueError(request, "redirect:expedientEstat", 
 						"expedient.estat.controller.esborrat.error.restriccio");
+		}
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
 				request,

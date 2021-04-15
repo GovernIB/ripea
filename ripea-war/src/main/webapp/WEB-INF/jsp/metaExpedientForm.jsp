@@ -225,6 +225,9 @@
 			<c:if test="${isCarpetaDefecte}">
 				<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 			</c:if>
+			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
+				<li role="presentation"><a href="#revisioEstat" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
+			</c:if>
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -285,6 +288,21 @@
 						<input id="add_folder" onclick="addFolder();" type="button" class="btn btn-default" value="<spring:message code="metaexpedient.form.camp.estructura.subcarpeta"/>">
 						<input id="add_parent_folder" onclick="addParentFolder();" type="button" class="btn btn-info" value="<spring:message code="metaexpedient.form.camp.estructura.carpeta"/>">
 					</div>
+				</div>
+			</c:if>
+			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
+				<div role="revisioEstat" class="tab-pane" id="revisioEstat">
+					
+					<dl class="dl-horizontal">
+						<dt><spring:message code="metaexpedient.revisio.form.camp.estatRevisio"/></dt>
+						<dd>${metaExpedientCommand.revisioEstat}</dd>
+						<c:if test="${not empty metaExpedientCommand.revisioComentari}">
+							<div style="margin-top: 15px;">
+								<dt><spring:message code="metaexpedient.revisio.form.camp.comentari"/></dt>
+								<dd><pre style="height:300px"><c:out value="${metaExpedientCommand.revisioComentari}" escapeXml="true"/></pre></dd>
+							</div>
+						</c:if>
+					</dl>
 				</div>
 			</c:if>
 		</div>

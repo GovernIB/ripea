@@ -431,7 +431,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false, 
 				false, 
 				false, 
-				true);
+				true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -755,7 +755,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false, 
 				false, 
-				true);
+				true, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -843,7 +843,7 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false, 
-				false);
+				false, false);
 		boolean checkPerMassiuAdmin = false;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			checkPerMassiuAdmin = true;
@@ -1370,7 +1370,7 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
-		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false) : null;
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	

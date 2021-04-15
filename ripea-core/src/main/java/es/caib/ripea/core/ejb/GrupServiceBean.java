@@ -78,11 +78,11 @@ public class GrupServiceBean implements GrupService {
 	@RolesAllowed("tothom")
 	public void relacionarAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
-			Long id) {
+			Long id, String rolActual) {
 		delegate.relacionarAmbMetaExpedient(
 				entitatId,
 				metaExpedientId,
-				id);
+				id, rolActual);
 
 	}
 
@@ -90,11 +90,11 @@ public class GrupServiceBean implements GrupService {
 	@RolesAllowed("tothom")
 	public void desvincularAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
-			Long id) {
+			Long id, String rolActual) {
 		delegate.desvincularAmbMetaExpedient(
 				entitatId,
 				metaExpedientId,
-				id);
+				id, rolActual);
 	}
     
     

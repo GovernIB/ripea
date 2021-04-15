@@ -11,6 +11,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador base que implementa funcionalitats comunes per als controladors
@@ -44,13 +45,13 @@ public class BaseAdminController extends BaseController {
 		return entitat;
 	}
 
-	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(
+	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(
 			HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
-		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans()) {
+		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans() && !RolHelper.isRolActualRevisor(request)) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
 		}
 		return entitat;

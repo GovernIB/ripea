@@ -44,10 +44,12 @@ $(document).ready(function() {
 </script>	
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
-	</div>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-default-order="0" data-default-dir="asc" data-info-type="search" data-drag-enabled="true" class="table table-striped table-bordered">
+	<c:if test="${!esRevisor}">
+		<div class="text-right" data-toggle="botons-titol">
+			<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
+		</div>
+	</c:if>
+	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-default-order="0" data-default-dir="asc" data-info-type="search" ${!esRevisor ? 'data-drag-enabled="true"' : ''} class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th data-col-name="ordre" data-visible="false"></th>
@@ -62,22 +64,24 @@ $(document).ready(function() {
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="metaDada/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{if !activa}}
-								<li><a href="metaDada/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
-								{{else}}
-								<li><a href="metaDada/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
-								{{/if}}
-								<li><a href="metaDada/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metadada.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!esRevisor}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="metaDada/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									{{if !activa}}
+									<li><a href="metaDada/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+									{{else}}
+									<li><a href="metaDada/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+									{{/if}}
+									<li><a href="metaDada/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metadada.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
@@ -86,7 +90,7 @@ $(document).ready(function() {
 			<a href="<c:url value="${header.referer}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 		</c:when>
 		<c:otherwise>
-			<a href="<c:url value="/metaExpedient?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+			<a href="<c:url value="${!esRevisor ? '/metaExpedient?mantenirPaginacio=true' : '/metaExpedientRevisio?mantenirPaginacio=true'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 		</c:otherwise>
 	</c:choose>
 	<div class="clearfix"></div>

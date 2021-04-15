@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
@@ -69,6 +70,11 @@ public class MetaExpedientCommand {
 
     private String estructuraCarpetesJson;
     
+	private MetaExpedientRevisioEstatEnumDto revisioEstat;
+	private String revisioComentari;
+    
+	
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -169,6 +175,14 @@ public class MetaExpedientCommand {
 			dto.setOrganGestor(organ);
 		}
 		return dto;
+	}
+
+	public void setRevisioEstat(MetaExpedientRevisioEstatEnumDto revisioEstat) {
+		this.revisioEstat = revisioEstat;
+	}
+
+	public void setRevisioComentari(String revisioComentari) {
+		this.revisioComentari = revisioComentari != null ? revisioComentari.trim() : null;
 	}
 
 }

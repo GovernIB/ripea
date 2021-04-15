@@ -43,6 +43,9 @@
   			"isRolActualAdministradorOrgan",
   			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
 	pageContext.setAttribute(
+  			"isRolActualRevisor",
+  			es.caib.ripea.war.helper.RolHelper.isRolActualRevisor(request));
+	pageContext.setAttribute(
 			"isRolActualUsuari",
 			es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
 	pageContext.setAttribute(
@@ -310,11 +313,17 @@ body {
 												<spring:message code="decorator.menu.accions.massives.admin"/>
 											</a>
 										</li>
-																				<li>
+										<li>
 											<a href="<c:url value="/historic"/>" data-maximized="true">
 												<spring:message code="decorator.menu.accions.estadistiques"/>
 											</a>
 										</li>
+										<%---- Revisió d'expedients ----%>
+										<li>
+											<a href="<c:url value="/metaExpedientRevisio"/>">
+													<spring:message code="decorator.menu.revisioExpedients"/>
+											</a>
+										</li>										
 									</ul>
 								</div>
 							</c:when>
@@ -367,9 +376,12 @@ body {
 							</div>
 						</c:if>
 						
-						
-						
-						
+						<c:if test="${isRolActualRevisor}">
+							<%---- Revisió d'expedients ----%>
+							<a href="<c:url value="/metaExpedientRevisio"/>"class="btn btn-primary">
+									<spring:message code="decorator.menu.revisioExpedients"/>
+							</a>
+						</c:if>
 						
 						
 						<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">

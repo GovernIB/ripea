@@ -19,7 +19,7 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/expedientEstat/save"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/expedientEstat/${metaExpedientId}/save"/></c:set>
 	<!-- Es redimensiona l'altura de la modal perquè quan «Usuari responsable» ofereix molts resultats, no deixa veure el camp d'escriptura. -->
 	<div style="height: 350px;">
 		<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientEstatCommand">

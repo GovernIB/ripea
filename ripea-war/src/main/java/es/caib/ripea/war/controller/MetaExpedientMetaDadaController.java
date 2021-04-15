@@ -40,6 +40,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -63,14 +64,24 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		model.addAttribute(
+				"esRevisor",
+				rolActual.equals("IPA_REVISIO"));
+		
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
 		
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
+
 		return "metaDadaList";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/datatable", method = RequestMethod.GET)
@@ -79,8 +90,14 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				metaDadaService.findByMetaNodePaginat(
@@ -98,7 +115,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaNodeId,
 			@PathVariable Long metaDadaId,
 			@PathVariable int posicio) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		metaDadaService.moveTo(
 				entitatActual.getId(),
 				metaNodeId,
@@ -123,7 +140,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDadaDto metaDada = null;
 		if (metaDadaId != null)
@@ -151,16 +168,23 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			return "metaDadaForm";
 		}
+
 		if (command.getId() != null) {
 			metaDadaService.update(
 					entitatActual.getId(),
 					metaExpedientId,
-					MetaDadaCommand.asDto(command));
+					MetaDadaCommand.asDto(command), rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDada",
@@ -169,7 +193,11 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			metaDadaService.create(
 					entitatActual.getId(),
 					metaExpedientId,
-					MetaDadaCommand.asDto(command));
+					MetaDadaCommand.asDto(command), rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDada",
@@ -183,13 +211,22 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
 				metaDadaId,
-				true);
+				true, 
+				rolActual);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
@@ -200,13 +237,22 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
 				metaDadaId,
-				false);
+				false, 
+				rolActual);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
@@ -218,13 +264,22 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
 			metaDadaService.delete(
 					entitatActual.getId(),
 					metaExpedientId,
-					metaDadaId);
+					metaDadaId, 
+					rolActual);
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDada",
@@ -242,7 +297,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	public List<DominiDto> getDominis(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;

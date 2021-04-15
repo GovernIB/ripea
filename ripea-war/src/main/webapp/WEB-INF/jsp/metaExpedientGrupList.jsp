@@ -30,20 +30,21 @@
 						{{if relacionat}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						{{if !relacionat}}
-							<a href="grup/{{:id}}/relacionar" class="btn btn-success"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="comu.boto.relacionar"/></a>
-							
-						{{else}}
-							<a href="grup/{{:id}}/desvincular" class="btn btn-success"><span class="fa fa-unlink"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desvincular"/></a>
-						{{/if}}
-					</script>
-				</th>
-
+				<c:if test="${!esRevisor}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							{{if !relacionat}}
+								<a href="grup/{{:id}}/relacionar" class="btn btn-success"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="comu.boto.relacionar"/></a>
+								
+							{{else}}
+								<a href="grup/{{:id}}/desvincular" class="btn btn-success"><span class="fa fa-unlink"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desvincular"/></a>
+							{{/if}}
+						</script>
+					</th>
+				</c:if>
 				
 			</tr>
 		</thead>
 	</table>
-	<a href="<c:url value="/metaExpedient?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span> <spring:message code="comu.boto.tornar"/></a>
+	<a href="<c:url value="${!esRevisor ? '/metaExpedient?mantenirPaginacio=true' : '/metaExpedientRevisio?mantenirPaginacio=true'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span> <spring:message code="comu.boto.tornar"/></a>
 </body>
