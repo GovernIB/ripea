@@ -23,6 +23,7 @@ import com.viafirma.documents.sdk.java.model.Notification;
 import com.viafirma.documents.sdk.java.model.Param;
 import com.viafirma.documents.sdk.java.model.Policy;
 import com.viafirma.documents.sdk.java.model.Signature;
+import com.viafirma.documents.sdk.java.model.Signature.CertificationLevelEnum;
 import com.viafirma.documents.sdk.java.model.Workflow;
 
 import es.caib.ripea.plugin.SistemaExternException;
@@ -119,6 +120,7 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             signature.setType(com.viafirma.documents.sdk.java.model.Signature.TypeEnum.SERVER);
             signature.setHelpText("Server signature");
             signature.setTypeFormatSign(com.viafirma.documents.sdk.java.model.Signature.TypeFormatSignEnum.PADES_LTA);
+            signature.setCertificationLevel(CertificationLevelEnum.NOT_CERTIFIED);
             policy.getSignatures().add(signature);
 
             message.getPolicies().add(policy);
