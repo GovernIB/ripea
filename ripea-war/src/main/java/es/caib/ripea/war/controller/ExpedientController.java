@@ -61,7 +61,6 @@ import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientAssignarCommand;
@@ -108,8 +107,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private ExpedientEstatService expedientEstatService;
 	@Autowired
 	private OrganGestorService organGestorService;
-	@Autowired
-	private UsuariHelper usuariHelper;
 
 	
 	@RequestMapping(method = RequestMethod.GET)
@@ -648,7 +645,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				expedientService.agafarAdmin(entitatActual.getId(), 
 									null, 
 									expedientId, 
-									usuariHelper.getUsuariAutenticat().getCodi());
+									aplicacioService.getUsuariActual().getCodi());
 				
 			}
 			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
@@ -656,7 +653,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					expedientService.agafarAdmin(entitatActual.getId(), 
 										null, 
 										expedientId, 
-										usuariHelper.getUsuariAutenticat().getCodi());
+										aplicacioService.getUsuariActual().getCodi());
 
 				}
 				else {
