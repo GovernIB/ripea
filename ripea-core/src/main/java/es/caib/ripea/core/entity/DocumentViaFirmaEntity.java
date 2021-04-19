@@ -53,7 +53,7 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	private String observacions;
 	
 	@Column(name = "vf_validate_code_enabled")
-	private boolean validateCodeEnabled;
+	private Boolean validateCodeEnabled;
 	@Column(name = "vf_validate_code")
 	private String validateCode;
 	
@@ -62,8 +62,11 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	@ForeignKey(name = "ipa_document_enviament_dis_fk")
 	protected DispositiuEnviamentEntity dispositiuEnviament;
 	
+	@Column(name = "vf_rebre_correu")
+	private Boolean rebreCorreu;
+	
 	@Column(name = "firma_parcial")
-	private boolean firmaParcial;
+	private Boolean firmaParcial;
 	
 	public String getCodiUsuari() {
 		return codiUsuari;
@@ -104,14 +107,17 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	public void updateMessageCode(String messageCode) {
 		this.messageCode = messageCode;
 	}
-	public boolean isFirmaParcial() {
-		return firmaParcial;
+	public Boolean isFirmaParcial() {
+		return firmaParcial != null ? firmaParcial : false;
 	}
-	public boolean isValidateCodeEnabled() {
-		return validateCodeEnabled;
+	public Boolean isValidateCodeEnabled() {
+		return validateCodeEnabled != null ? validateCodeEnabled : false;
 	}
 	public String getValidateCode() {
 		return validateCode;
+	}
+	public Boolean isRebreCorreu() {
+		return rebreCorreu != null ? rebreCorreu : false;
 	}
 	
 	public void updateEnviat(
@@ -142,7 +148,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			DocumentEntity document,
 			boolean firmaParcial,
 			boolean validateCodeEnabled,
-			String validateCode) {
+			String validateCode,
+			boolean rebreCorreu) {
 		return new Builder(
 				estat,
 				codiUsuari,
@@ -159,7 +166,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				document,
 				firmaParcial,
 				validateCodeEnabled,
-				validateCode);
+				validateCode,
+				rebreCorreu);
 	}
 
 	public static class Builder {
@@ -180,7 +188,8 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				DocumentEntity document,
 				boolean firmaParcial,
 				boolean validateCodeEnabled,
-				String validateCode) {
+				String validateCode,
+				boolean rebreCorreu) {
 			built = new DocumentViaFirmaEntity();
 			built.inicialitzar();
 			built.assumpte = titol;
@@ -200,6 +209,7 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			built.firmaParcial = firmaParcial;
 			built.validateCodeEnabled = validateCodeEnabled;
 			built.validateCode = validateCode;
+			built.rebreCorreu = rebreCorreu;
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;

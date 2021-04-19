@@ -266,6 +266,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Canvi d'estat de notificacions";
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_TASCA) {
 				header =  "Canvi d'estat de tasques";
+			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
+				header =  "Canvi d'estat de documents enviat a ViaFirma";
 			}
 			
 			text += header + "\n";

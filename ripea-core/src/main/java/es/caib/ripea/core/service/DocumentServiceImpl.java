@@ -1018,7 +1018,8 @@ public class DocumentServiceImpl implements DocumentService {
 					document,
 					viaFirmaEnviarDto.isFirmaParcial(),
 					viaFirmaEnviarDto.isValidateCodeEnabled(),
-					viaFirmaEnviarDto.getValidateCode()).build();
+					viaFirmaEnviarDto.getValidateCode(),
+					viaFirmaEnviarDto.isRebreCorreu()).build();
 			
 			firmaViaFirmaHelper.viaFirmaEnviar(documentViaFirma);
 		

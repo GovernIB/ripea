@@ -213,6 +213,7 @@ $(document).ready(function() {
 		<rip:inputSelect name="firmaParcial" textKey="contenidor.document.biometrica.camp.firmaparcial"  required="true"/>
 		<rip:inputCheckbox name="validateCodeEnabled" textKey="contenidor.document.biometrica.camp.validatecode.check"/>
 		<rip:inputText name="validateCode" textKey="contenidor.document.biometrica.camp.validatecode" required="true"/>
+		<rip:inputCheckbox name="rebreCorreu" textKey="contenidor.document.biometrica.camp.correu"/>
 		<rip:inputTextarea name="observacions" textKey="contenidor.document.biometrica.camp.observacions"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.biometrica.enviar"/></button>
