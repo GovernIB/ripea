@@ -329,13 +329,13 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		return resultatDomini;
 	}
 	
-	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}/{dadaValor}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}/valor", method = RequestMethod.GET)
 	@ResponseBody
 	public ResultatConsultaDto getDomini(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi,
-			@PathVariable String dadaValor){
+			@RequestParam(value="dadaValor", required = false) String dadaValor){
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ResultatConsultaDto resultatConsulta = null;
 		DominiDto domini = dominiService.findByCodiAndEntitat(dominiCodi, entitatActual.getId());
