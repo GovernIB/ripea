@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -184,6 +185,12 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 			Long expedientId,
 			Long notificacioId) {
 		return delegate.notificacioFindAmbIdAndExpedient(entitatId, expedientId, notificacioId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Map<String, String> consultaErrorsNotificacio() {
+		return delegate.consultaErrorsNotificacio();
 	}
 
 }

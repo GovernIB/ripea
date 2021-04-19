@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -97,6 +98,12 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				true);
 		documentNotificacioHelper.crear(notificacioDto, documentEntity);
+	}
+	
+	@Transactional
+	@Override
+	public Map<String, String> consultaErrorsNotificacio() {
+		return documentNotificacioHelper.consultaErrorsNotificacio();
 	}
 
 	@Transactional

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -120,6 +121,17 @@ public class DocumentEnviamentController extends BaseUserController {
 					documentId,
 					DocumentNotificacionsCommand.asDto(command));
 
+			Map<String, String> errorsNotib = documentEnviamentService.consultaErrorsNotificacio();
+			if (!errorsNotib.isEmpty()) {
+				for (Map.Entry<String, String> errorNotib: errorsNotib.entrySet()) {
+					MissatgesHelper.error(
+							request, 
+							getMessage(
+									request, 
+									"document.controller.notificacio.ko", 
+									new Object[] {errorNotib.getKey(), errorNotib.getValue()}));
+				}
+			}
 			return this.getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + documentId,

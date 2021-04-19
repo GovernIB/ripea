@@ -4,6 +4,7 @@
 package es.caib.ripea.core.api.service;
 
 import java.util.List;
+import java.util.Map;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
@@ -238,6 +239,8 @@ public interface DocumentEnviamentService {
 	DocumentNotificacioDto notificacioFindAmbIdAndExpedient(Long entitatId,
 			Long expedientId,
 			Long notificacioId);
+
+	Map<String, String> consultaErrorsNotificacio();
 	
 //	/**
 //	 * Actualitza l'estat de les notificacions pendents de forma periòdica.
