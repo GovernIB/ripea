@@ -140,8 +140,8 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public long countAnotacionsPendents() {
-		return delegate.countAnotacionsPendents();
+	public long countAnotacionsPendents(Long entitatId) {
+		return delegate.countAnotacionsPendents(entitatId);
 	}
 	
 	

@@ -20,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +30,7 @@ import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
@@ -117,8 +116,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							anotacioRegistreId,
 							Estat.REBUDA,
 							"");
-					
-					cacheHelper.evictCountAnotacionsPendents();
+					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
+					if (entitatAnotacio != null)
+						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 				} catch (Throwable e) {
 					logger.error(
 							"Error consultar i guardar anotació per petició: " +

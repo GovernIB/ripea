@@ -71,7 +71,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    count(anotacio) " +
 			"from " +
 			"    ExpedientPeticioEntity anotacio " +
-			"where anotacio.estat='PENDENT'")
-	long countAnotacionsPendents();
+			"where anotacio.estat='PENDENT' " + 
+			"and :entitatActual = anotacio.registre.entitat")
+	long countAnotacionsPendents(@Param("entitatActual") EntitatEntity entitatActual);
 
 }

@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -367,7 +365,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		cacheHelper.evictCountAnotacionsPendents();
+		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
+		if (entitatAnotacio != null)
+			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 	}
 
 	@Transactional(readOnly = true)
@@ -453,8 +453,15 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public long countAnotacionsPendents() {
-		return cacheHelper.countAnotacionsPendents();
+	public long countAnotacionsPendents(Long entitatId) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, 
+				false, 
+				false);
+		return cacheHelper.countAnotacionsPendents(entitatActual);
 	}
 
 	private boolean isIncorporacioJustificantActiva() {
