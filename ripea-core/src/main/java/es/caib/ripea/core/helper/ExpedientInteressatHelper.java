@@ -14,6 +14,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
@@ -36,7 +37,8 @@ public class ExpedientInteressatHelper {
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	
+	@Autowired
+	private ExpedientInteressatService expedientInteressatService;
 	
 	@Transactional
 	public InteressatDto create(
@@ -175,6 +177,91 @@ public class ExpedientInteressatHelper {
 							InteressatDto.class);
 	}
 	
+	@Transactional
+	public InteressatDto update(
+			Long entitatId,
+			Long expedientId,
+			Long interessatId,
+			InteressatDto interessatDto,
+			boolean propagarArxiu,
+			InteressatDto representantDto){
+		
+		logger.debug("Actualitzant interessat ("
+				+ "entitatId=" + entitatId + ", "
+				+ "expedientId=" + expedientId + ", "
+				+ "interessatId=" + interessatId + ")");
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				true,
+				false,
+				true,
+				false,
+				false, false);
+		InteressatEntity interessatEntity = entityComprovarHelper.comprovarInteressat(
+				expedient, 
+				interessatId); 
+		if (interessatEntity == null) {
+			throw new NotFoundException(
+					interessatId,
+					InteressatEntity.class);
+		}
+		
+		//### Actualitza la informació de l'interessat
+		expedientInteressatService.update(
+				entitatId,
+				expedientId,
+				interessatDto);
+		
+		//### Actualitza la informació del representant
+		if (representantDto != null && interessatEntity.getRepresentant() != null) {
+			expedientInteressatService.update(
+					entitatId,
+					expedientId,
+					interessatId,
+					representantDto);
+		}
+		
+		//### Crear nou representant de l'interessat
+		if (representantDto != null && interessatEntity.getRepresentant() == null) {
+			expedientInteressatService.create(
+					entitatId,
+					expedientId,
+					interessatId,
+					representantDto,
+					true);
+		}
+		
+		//### Esborra un representant si no s'ha informat en la petició
+		if (representantDto == null && interessatEntity.getRepresentant() != null) {
+			expedientInteressatService.delete(
+					entitatId, 
+					expedientId, 
+					interessatId, 
+					interessatEntity.getRepresentant().getId());
+		}
+		
+		if (propagarArxiu) {
+			pluginHelper.arxiuExpedientActualitzar(expedient);
+		}
+		
+		// Registra al log la modificació de l'interessat
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				interessatEntity,
+				LogObjecteTipusEnumDto.INTERESSAT,
+				LogTipusEnumDto.MODIFICACIO,
+				interessatEntity.getIdentificador(),
+				null,
+				false,
+				false);
+		
+		return conversioTipusHelper.convertir(
+							interessatRepository.save(interessatEntity),
+							InteressatDto.class);
+	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 	

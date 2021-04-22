@@ -55,7 +55,6 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
-import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -248,30 +247,42 @@ public class ExpedientHelper {
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
 		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
 			boolean alreadyExists = false;
-			for (InteressatEntity existingInteressat : existingInteressats) {
-				if (existingInteressat.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero()))
+			InteressatEntity existingInteressat = null;
+			for (InteressatEntity interessatExpedient : existingInteressats) {
+				if (interessatExpedient.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero())) {
 					alreadyExists = true;
+					existingInteressat = interessatExpedient;
+				}
 			}
 			if (!alreadyExists) {
 				InteressatDto createdInteressat = expedientInteressatHelper.create(
 						entitatId,
 						expedientId,
 						null,
-						toInteressatDto(registreInteressatEntity),
+						toInteressatDto(registreInteressatEntity, null),
 						true);
 				if (registreInteressatEntity.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
 							expedientId,
 							createdInteressat.getId(),
-							toInteressatDto(registreInteressatEntity.getRepresentant()),
+							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
 							true);
 				}
+			} else {
+				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();
+				expedientInteressatHelper.update(
+						entitatId, 
+						expedientId, 
+						existingInteressat.getId(), 
+						toInteressatDto(registreInteressatEntity, existingInteressat.getId()), 
+						true,
+						registreInteressatEntity.getRepresentant() != null ? toInteressatDto(representant, existingInteressat.getRepresentant().getId()) : null);
 			}
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
 			Long expedientPeticioId,
 			Long expedientId) {
@@ -1051,7 +1062,7 @@ public class ExpedientHelper {
 		return tipusDocumental;
 	}
 
-	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
+	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity, Long existingInteressatId) {
 		InteressatDto interessatDto = null;
 		switch (registreInteressatEntity.getTipus()) {
 		case PERSONA_FISICA:
@@ -1072,6 +1083,7 @@ public class ExpedientHelper {
 			interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
 			interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
 			interessatPersonaFisicaDto.setLlinatge2(registreInteressatEntity.getLlinatge2());
+			interessatPersonaFisicaDto.setId(existingInteressatId);
 			interessatDto = interessatPersonaFisicaDto;
 			break;
 		case PERSONA_JURIDICA:
@@ -1090,6 +1102,7 @@ public class ExpedientHelper {
 			interessatPersonaJuridicaDto.setNotificacioAutoritzat(false);
 			interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
 			interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
+			interessatPersonaJuridicaDto.setId(existingInteressatId);
 			interessatDto = interessatPersonaJuridicaDto;
 			break;
 		case ADMINISTRACIO:
@@ -1108,6 +1121,7 @@ public class ExpedientHelper {
 			interessatAdministracioDto.setNotificacioAutoritzat(false);
 			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());
+			interessatAdministracioDto.setId(existingInteressatId);
 			interessatDto = interessatAdministracioDto;
 			break;
 		}

@@ -664,7 +664,12 @@ public class EntityComprovarHelper {
 		if (interessat == null) {
 			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
-		if (expedient != null && !interessat.getExpedient().equals(expedient)) {
+		if (HibernateHelper.isProxy(expedient))
+			expedient = HibernateHelper.deproxy(expedient);
+		ExpedientEntity expedientInteressat = interessat.getExpedient();
+		if (HibernateHelper.isProxy(expedientInteressat))
+			expedientInteressat = HibernateHelper.deproxy(expedientInteressat);
+		if (expedient != null && !expedientInteressat.equals(expedient)) {
 			throw new ValidationException(interessatId, InteressatEntity.class,
 			        "L'expedient especificat (id=" + expedient.getId()
 			                + ") no coincideix amb l'expedeint de l'interessat (id="

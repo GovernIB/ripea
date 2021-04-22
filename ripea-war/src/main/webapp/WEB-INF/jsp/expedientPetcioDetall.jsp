@@ -366,127 +366,127 @@ tr.clicable {
 				<c:choose>
 					<c:when test="${not empty registre.interessats}">
 						<table class="table table-bordered">
-							<thead>
-								<tr>
-									<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.tipus"/></th>
-									<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.document"/></th>
-									<th><spring:message code="registre.detalls.camp.interessat.nom"/></th>
-									<th style="width: 50px;"></th>
+						<thead>
+							<tr>
+								<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.tipus"/></th>
+								<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.document"/></th>
+								<th><spring:message code="registre.detalls.camp.interessat.nom"/></th>
+								<th style="width: 50px;"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="interessat" items="${registre.interessats}" varStatus="status">
+								<tr <c:if test="${status.index%2 == 0}">class="odd"</c:if>>
+									<td>
+										<spring:message code="peticio.registre.interessat.tipus.enum.${interessat.tipus}"/>
+									</td>
+									<td>${interessat.documentTipus}: ${interessat.documentNumero}</td>
+									<c:choose>
+										<c:when test="${interessat.tipus == 'PERSONA_FISICA'}">
+											<td>${interessat.nom} ${interessat.llinatge1} ${interessat.llinatge2}</td>
+										</c:when>
+										<c:otherwise>
+											<td>${interessat.raoSocial}</td>
+										</c:otherwise>
+									</c:choose>
+									<td>
+										<c:if test="${interessat.tipus != 'ADMINISTRACIO'}">
+											<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}">
+												<span class="fa fa-caret-down"></span>
+											</button>
+										</c:if>
+									</td>
 								</tr>
-							</thead>
-							<tbody>
-								<c:forEach var="interessat" items="${registre.interessats}" varStatus="status">
-									<c:if test="${empty interessat.representant}">
-										<tr <c:if test="${status.index%2 == 0}">class="odd"</c:if>>
-											<td>
-												<spring:message code="registre.interessat.tipus.enum.${interessat.tipus}"/>
-											</td>
-											<td>${interessat.documentTipus}: ${interessat.documentNumero}</td>
-											<c:choose>
-												<c:when test="${interessat.tipus == 'PERSONA_FIS'}">
-													<td>${interessat.nom} ${interessat.llinatge1} ${interessat.llinatge2}</td>
-												</c:when>
-												<c:otherwise>
-													<td>${interessat.raoSocial}</td>
-												</c:otherwise>
-											</c:choose>
-											<td>
-												<c:if test="${interessat.tipus != 'ADMINISTRACIO'}">
-													<button type="button" class="btn btn-default desplegable" href="#detalls_resum_interessats_${status.index}" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_resum_interessats_${status.index}">
-														<span class="fa fa-caret-down"></span>
-													</button>
-												</c:if>
-											</td>
-										</tr>
-										<tr class="collapse detall" id="detalls_resum_interessats_${status.index}">
-											<td colspan="4">
-												<div class="row">
-													<div class="col-xs-6">
-														<dl class="dl-horizontal">
-															<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.pais} <c:if test="${not empty interessat.paisCodi}">(${interessat.paisCodi})</c:if></dd>
-															<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provincia} <c:if test="${not empty interessat.provinciaCodi}">(${interessat.provinciaCodi})</c:if></dd>											
-															<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipi} <c:if test="${not empty interessat.municipiCodi}">(${interessat.municipiCodi})</c:if></dd>
-															<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${interessat.adresa}</dd>
-															<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${interessat.cp}</dd>
-														</dl>
-													</div>
-													<div class="col-xs-6">
-														<dl class="dl-horizontal">
-															<dt><spring:message code="interessat.form.camp.email"/></dt><dd>${interessat.email}</dd>
-															<dt><spring:message code="interessat.form.camp.telefon"/></dt><dd>${interessat.telefon}</dd>
-															<dt><spring:message code="interessat.form.camp.observacions"/></dt><dd>${interessat.observacions}</dd>
-														</dl>
-													</div>
-													<c:if test="${not empty interessat.representant}">
-														<c:set var="representant" value="${interessat.representant}"/>
-														<div class="col-xs-12">
-															<table class="table table-bordered">
-																<thead>
-																	<tr><th colspan="4"><spring:message code="registre.interessat.detalls.camp.representant"/></th></tr>
-																	<tr>
-																		<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.tipus"/></th>
-																		<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.document"/></th>
-																		<th><spring:message code="registre.detalls.camp.interessat.nom"/></th>
-																		<th style="width: 50px;"></th>
-																	</tr>
-																</thead>
-																<tbody>
-																	<tr <c:if test="${status.index%2 == 0}">class="odd"</c:if>>
-																		<td>
-																			<spring:message code="registre.interessat.tipus.enum.${representant.tipus}"/>
-																		</td>
-																		<td>${representant.documentTipus}: ${representant.documentNum}</td>
-																		<c:choose>
-																			<c:when test="${representant.tipus == 'PERSONA_FIS'}">
-																				<td>${representant.nom} ${representant.llinatge1} ${representant.llinatge2}</td>
-																			</c:when>
-																			<c:otherwise>
-																				<td>${representant.raoSocial}</td>
-																			</c:otherwise>
-																			</c:choose>
-																		<td>
-																			<c:if test="${representant.tipus != 'ADMINISTRACIO'}">
-																				<button type="button" class="btn btn-default desplegable" href="#detalls_resum_${status.index}_rep" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_resum_${status.index}_rep">
-																					<span class="fa fa-caret-down"></span>
-																				</button>
-																			</c:if>
-																		</td>
-																	</tr>
-																	<tr class="collapse detall" id="detalls_resum_${status.index}_rep">
-																		<td colspan="4">
-																			<div class="row">
-																				<div class="col-xs-6">
-																					<dl class="dl-horizontal">
-																						<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${representant.pais} <c:if test="${not empty representant.paisCodi}">(${representant.paisCodi})</c:if></dd>
-																						<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${representant.provincia} <c:if test="${not empty representant.provinciaCodi}">(${representant.provinciaCodi})</c:if></dd>											
-																						<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${representant.municipi} <c:if test="${not empty representant.municipiCodi}">(${representant.municipiCodi})</c:if></dd>
-																						<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${representant.adresa}</dd>
-																						<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${representant.codiPostal}</dd>
-																					</dl>
-																				</div>
-																				<div class="col-xs-6">
-																					<dl class="dl-horizontal">
-																						<dt><spring:message code="interessat.form.camp.email"/></dt><dd>${representant.email}</dd>
-																						<dt><spring:message code="interessat.form.camp.telefon"/></dt><dd>${representant.telefon}</dd>
-																						<dt><spring:message code="registre.interessat.detalls.camp.emailHabilitat"/></dt><dd>${representant.emailHabilitat}</dd>
-																						<dt><spring:message code="registre.interessat.detalls.camp.canalPreferent"/></dt><dd><c:if test="${not empty representant.canalPreferent}"><spring:message code="registre.interessat.detalls.camp.canalPreferent.${representant.canalPreferent}"/></c:if></dd>
-																						<dt><spring:message code="interessat.form.camp.observacions"/></dt><dd>${representant.observacions}</dd>
-																					</dl>
-																				</div>
-																			</div>
-																		</td>						
-																	</tr>
-																</tbody>
-															</table>
-														</div>
-													</c:if>
+								<tr class="collapse detall" id="detalls_${status.index}">
+									<td colspan="4">
+										<div class="row">
+											<div class="col-xs-6">
+												<dl class="dl-horizontal">
+													<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.pais}</dd>
+													<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provincia}</dd>											
+													<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipi}</dd>
+													<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${interessat.adresa}</dd>
+													<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${interessat.cp}</dd>
+												</dl>
+											</div>
+											<div class="col-xs-6">
+												<dl class="dl-horizontal">
+													<dt><spring:message code="interessat.form.camp.email"/></dt><dd>${interessat.email}</dd>
+													<dt><spring:message code="interessat.form.camp.telefon"/></dt><dd>${interessat.telefon}</dd>
+													<dt><spring:message code="registre.interessat.detalls.camp.canalPreferent"/></dt><dd><c:if test="${not empty interessat.canal}"><spring:message code="registre.interessat.detalls.camp.canalPreferent.${interessat.canal}"/></c:if></dd>
+													<dt><spring:message code="interessat.form.camp.observacions"/></dt><dd>${interessat.observacions}</dd>
+												</dl>
+											</div>
+											
+											<!-- NOU APARTAT REPRESENTANT -->
+											<c:if test="${not empty interessat.representant}">
+												<c:set var="representant" value="${interessat.representant}"/>
+												<div class="col-xs-12">
+													<table class="table table-bordered">
+														<thead>
+															<tr><th colspan="4"><spring:message code="registre.interessat.detalls.camp.representant"/></th></tr>
+															<tr>
+																<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.tipus"/></th>
+																<th style="width: 150px;"><spring:message code="registre.detalls.camp.interessat.document"/></th>
+																<th><spring:message code="registre.detalls.camp.interessat.nom"/></th>
+																<th style="width: 50px;"></th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr <c:if test="${status.index%2 == 0}">class="odd"</c:if>>
+																<td>
+																	<spring:message code="peticio.registre.interessat.tipus.enum.${representant.tipus}"/>
+																</td>
+																<td>${representant.documentTipus}: ${representant.documentNumero}</td>
+																<c:choose>
+																	<c:when test="${representant.tipus == 'PERSONA_FISICA'}">
+																		<td>${representant.nom} ${representant.llinatge1} ${representant.llinatge2}</td>
+																	</c:when>
+																	<c:otherwise>
+																		<td>${representant.raoSocial}</td>
+																	</c:otherwise>
+																</c:choose>
+																<td>
+																	<c:if test="${representant.tipus != 'ADMINISTRACIO'}">
+																		<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}_rep" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}_rep">
+																			<span class="fa fa-caret-down"></span>
+																		</button>
+																	</c:if>
+																</td>
+															</tr>
+															<tr class="collapse detall" id="detalls_${status.index}_rep">
+																<td colspan="4">
+																	<div class="row">
+																		<div class="col-xs-6">
+																			<dl class="dl-horizontal">
+																				<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${representant.pais}</dd>
+																				<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${representant.provincia}</dd>											
+																				<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${representant.municipi}</dd>
+																				<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${representant.adresa}</dd>
+																				<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${representant.cp}</dd>
+																			</dl>
+																		</div>
+																		<div class="col-xs-6">
+																			<dl class="dl-horizontal">
+																				<dt><spring:message code="interessat.form.camp.email"/></dt><dd>${representant.email}</dd>
+																				<dt><spring:message code="interessat.form.camp.telefon"/></dt><dd>${representant.telefon}</dd>
+																				<dt><spring:message code="registre.interessat.detalls.camp.canalPreferent"/></dt><dd><c:if test="${not empty representant.canal}"><spring:message code="registre.interessat.detalls.camp.canalPreferent.${representant.canal}"/></c:if></dd>
+																				<dt><spring:message code="interessat.form.camp.observacions"/></dt><dd>${representant.observacions}</dd>
+																			</dl>
+																		</div>
+																	</div>
+																</td>						
+															</tr>
+														</tbody>
+													</table>
 												</div>
-											</td>						
-										</tr>
-									</c:if>
-								</c:forEach>
-							</tbody>
-						</table>
+											</c:if>
+										</div>
+									</td>						
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
 					</c:when>
 					<c:otherwise>
 						<div class="panel-body">

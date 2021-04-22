@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,10 @@ import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
+import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
@@ -467,6 +470,27 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private boolean isIncorporacioJustificantActiva() {
 		boolean isPropagarRelacio = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporar.justificant"));
 		return isPropagarRelacio;
+	}
+	
+	@Transactional
+	@Override
+	public boolean comprovarExistenciaInteressatsPeticio(Long entitatId, Long expedientId, Long expedientPeticioId) {
+		boolean alreadyExists = false;
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
+		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
+		//### Si alguns dels interessats existeix sol·licitar confirmació usuari
+		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
+			for (InteressatEntity interessatExpedient : existingInteressats) {
+				if (interessatExpedient.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero())) {
+					alreadyExists = true;
+					break;
+				}
+			}
+			if (alreadyExists)
+				break;
+		}
+		return alreadyExists;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);

@@ -350,6 +350,21 @@ public class ExpedientPeticioController extends BaseUserController {
 		return (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitatId, metaExpedientId);
 	}
 
+	@RequestMapping(value = "/comprovarInteressatsPeticio/{expedientId}/{expedientPeticioId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean comprovarInteressatsPeticio(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long expedientPeticioId,
+			Model model) {
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
+		return expedientPeticioService.comprovarExistenciaInteressatsPeticio(
+					entitat.getId(), 
+					expedientId, 
+					expedientPeticioId);
+	}
+	
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
 	public String acceptarPost(
 			HttpServletRequest request,

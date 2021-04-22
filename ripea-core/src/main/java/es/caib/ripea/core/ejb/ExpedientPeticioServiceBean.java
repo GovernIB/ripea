@@ -143,6 +143,12 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	public long countAnotacionsPendents(Long entitatId) {
 		return delegate.countAnotacionsPendents(entitatId);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean comprovarExistenciaInteressatsPeticio(Long entitatId, Long expedientId, Long expedientPeticioId) {
+		return delegate.comprovarExistenciaInteressatsPeticio(entitatId, expedientId, expedientPeticioId);
+	}
 	
 	
 }
