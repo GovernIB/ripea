@@ -231,6 +231,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 				try {
 					expedientHelper.crearDocFromAnnex(
+							expedient.getId(),
 							registeAnnexEntity.getId(),
 							expedientPeticioEntity);
 				} catch (Exception e) {
@@ -247,6 +248,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				try {
 					expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 					expedientHelper.crearDocFromUuid(
+							expedient.getId(),
 							arxiuUuid, 
 							expedientPeticioEntity);
 				} catch (Exception e) {
@@ -255,7 +257,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				}
 				
 			}
-			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty()) {
+			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				throw new DocumentAlreadyImportedException();
 			}
 			canviEstatToProcessatPendent(expedientPeticioEntity);
@@ -285,6 +287,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 				expedientHelper.crearDocFromAnnex(
+						expedientId,
 						registeAnnexEntity.getId(),
 						expedientPeticioEntity);	
 			} catch (Exception e) {
@@ -297,13 +300,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 			try {
 				expedientHelper.crearDocFromUuid(
+						expedientId,
 						arxiuUuid, 
 						expedientPeticioEntity);
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
 		}
-		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty()) {
+		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 			throw new DocumentAlreadyImportedException();
 		}
 		canviEstatToProcessatPendent(expedientPeticioEntity);
@@ -347,7 +351,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		try {
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			expedientHelper.crearDocFromAnnex(registreAnnexId, expedientPeticioEntity);
+			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity);
 
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {
@@ -1676,6 +1680,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 		return expedientDto;
+	}
+	
+	private boolean isIncorporacioDuplicadaPermesa() {
+		boolean isPropagarRelacio = Boolean.parseBoolean(
+				PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporacio.anotacions.duplicada"));
+		return isPropagarRelacio;
 	}
 	
 	private boolean isProgaparRelacioActiva() {
