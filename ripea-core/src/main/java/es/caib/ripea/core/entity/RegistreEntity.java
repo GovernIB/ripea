@@ -117,8 +117,7 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	@OneToMany(
 			mappedBy = "registre",
 			cascade = CascadeType.ALL,
-			orphanRemoval = true,
-			fetch = FetchType.EAGER)
+			orphanRemoval = true)
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
 	
 	

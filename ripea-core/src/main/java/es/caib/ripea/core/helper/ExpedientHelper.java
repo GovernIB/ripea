@@ -271,13 +271,14 @@ public class ExpedientHelper {
 				}
 			} else {
 				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();
+				Long idRepresentant = representant != null ? representant.getId() : null; //modificar o afegir
 				expedientInteressatHelper.update(
 						entitatId, 
 						expedientId, 
 						existingInteressat.getId(), 
 						toInteressatDto(registreInteressatEntity, existingInteressat.getId()), 
 						true,
-						registreInteressatEntity.getRepresentant() != null ? toInteressatDto(representant, existingInteressat.getRepresentant().getId()) : null);
+						representant != null ? toInteressatDto(representant, idRepresentant) : null);
 			}
 		}
 	}
