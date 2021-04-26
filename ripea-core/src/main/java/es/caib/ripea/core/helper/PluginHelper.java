@@ -1386,45 +1386,96 @@ public class PluginHelper {
 				throw new RuntimeException("Mock Exception al custodiar document de portafirmes");
 			}
 			
-			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
-					toArxiuDocument(
-							document.getArxiuUuid(),
-							document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
-							document.getNom(),
-							document.getDescripcio(),
-							document.getMetaDocument().getNom(),
-							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
-							fitxerAmbFirma,
-							true,
-							false,
-							firmes,
+			// Consulta l'arxiu, si ja està definitiu no intentar guardar sobre el mateix
+			Document documentArxiu = getArxiuPlugin().documentDetalls(
+					document.getArxiuUuid(),
+					null,
+					false);
+			
+			// El document ja està firmat a l'Arxiu, es guarda amb un nou uuid
+			if (documentArxiu.getEstat().equals(DocumentEstat.DEFINITIU)) {
+				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
+						toArxiuDocument(
+								null,
+								document.getExpedientPare().getArxiuUuid(),
+								document.getNom(),
+								document.getDescripcio(),
+								document.getMetaDocument().getNom(),
+								false,
+								fitxerAmbFirma,
+								true,
+								false,
+								firmes,
+								null,
+								document.getNtiOrigen(),
+								Arrays.asList(document.getNtiOrgano()),
+								document.getDataCaptura(),
+								document.getNtiEstadoElaboracion(),
+								document.getNtiTipoDocumental(),
+								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental),
+						document.getExpedientPare().getArxiuUuid());
+				if (getArxiuPlugin().suportaMetadadesNti()) {
+					Document documentDetalls = getArxiuPlugin().documentDetalls(
+							documentCreat.getIdentificador(),
 							null,
-							document.getNtiOrigen(),
-							Arrays.asList(document.getNtiOrgano()),
-							document.getDataCaptura(),
-							document.getNtiEstadoElaboracion(),
-							document.getNtiTipoDocumental(),
-							document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
-							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-							serieDocumental));
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
-				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-			if (getArxiuPlugin().suportaMetadadesNti()) {
-				Document documentDetalls = getArxiuPlugin().documentDetalls(
-						documentModificat.getIdentificador(),
-						null,
-						false);
-				propagarMetadadesDocument(
-						documentDetalls,
-						document);
+							false);
+					propagarMetadadesDocument(
+							documentDetalls,
+							document);
+				}
+				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
+					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				document.updateArxiu(documentCreat.getIdentificador());
+				
+				return document.getId().toString();
+
+			} else {
+				
+				ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
+						toArxiuDocument(
+								document.getArxiuUuid(),
+								document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
+								document.getNom(),
+								document.getDescripcio(),
+								document.getMetaDocument().getNom(),
+								document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
+								fitxerAmbFirma,
+								true,
+								false,
+								firmes,
+								null,
+								document.getNtiOrigen(),
+								Arrays.asList(document.getNtiOrgano()),
+								document.getDataCaptura(),
+								document.getNtiEstadoElaboracion(),
+								document.getNtiTipoDocumental(),
+								document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental));
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_ARXIU,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
+				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
+					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				if (getArxiuPlugin().suportaMetadadesNti()) {
+					Document documentDetalls = getArxiuPlugin().documentDetalls(
+							documentModificat.getIdentificador(),
+							null,
+							false);
+					propagarMetadadesDocument(
+							documentDetalls,
+							document);
+				}
+				return document.getId().toString();
+				
 			}
-			return document.getId().toString();
+			
+
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
