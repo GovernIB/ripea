@@ -1535,7 +1535,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
-			ordenacioMap.put("tipusStr", new String[] { "metaExpedient.nom", "metaExpedient.classificacioSia" });
 			// Cercam els metaExpedients amb permisos assignats directament
 			List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaNodeEntity.class,

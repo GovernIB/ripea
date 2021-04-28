@@ -237,15 +237,19 @@
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
-				<div class="form-group">
+				
+				<c:set var="campErrors"><form:errors path="classificacioSia"/></c:set>
+				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 					<label class="control-label col-xs-4" for="classificacioSia"><spring:message code="metaexpedient.form.camp.classificacio.sia"/> *</label>
 					<div class="col-xs-6">
 						<form:input path="classificacioSia" cssClass="form-control" id="classificacioSia" disabled="false"  readonly="false" />	
+						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="classificacioSia"/></p></c:if>
 					</div>
 					<div class="col-xs-2">
 						<button id="importMetaExpedient" type="button" class="btn btn-info"><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
 					</div>
 				</div>
+				
 				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
 				

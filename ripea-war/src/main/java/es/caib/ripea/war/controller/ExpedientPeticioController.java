@@ -381,14 +381,13 @@ public class ExpedientPeticioController extends BaseUserController {
 		boolean processatOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
-		boolean isIncorporacioDuplicadaPermesa = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.incorporacio.anotacions.duplicada"));
 		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
 			try {
 				ExpedientDto expedientDto = expedientService.create(
 						entitat.getId(),
 						command.getMetaExpedientId(),
 						null,
-						null,
+						command.getOrganGestorId(),
 						null,
 						command.getAny(),
 						null,
@@ -398,7 +397,7 @@ public class ExpedientPeticioController extends BaseUserController {
 						null);
 				processatOk = expedientDto.isProcessatOk();
 			} catch (Exception ex) {
-				if (ex.getCause() instanceof DocumentAlreadyImportedException && ! isIncorporacioDuplicadaPermesa) {
+				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
 					addWarningDocumentExists(request);
 					return getModalControllerReturnValueError(
 							request,
@@ -416,7 +415,7 @@ public class ExpedientPeticioController extends BaseUserController {
 						expedientPeticioDto.getId(),
 						command.isAssociarInteressats());
 			} catch (Exception ex) {
-				if (ex.getCause() instanceof DocumentAlreadyImportedException && ! isIncorporacioDuplicadaPermesa) {
+				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
 					addWarningDocumentExists(request);
 					return getModalControllerReturnValueError(
 							request,

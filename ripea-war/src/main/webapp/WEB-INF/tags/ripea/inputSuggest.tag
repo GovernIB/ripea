@@ -64,9 +64,8 @@
 							data-url-param-addicional="${urlParamAddicional}" 
 							/>
 							<a class="input-group-addon btn btn-default ${campPath}_btn" onclick="toggleCarrecs()"><i class="${icon}"></i></a>
-							
-						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 					</div>
+					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				</c:when>
 				<c:otherwise>
 					<form:select path="${campPath}" cssClass="form-control"

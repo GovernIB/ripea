@@ -3,13 +3,11 @@
  */
 package es.caib.ripea.core.service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,6 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
@@ -143,7 +140,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitat,
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
-				metaExpedient.isGestioAmbGrupsActiva()).build();
+				metaExpedient.isGestioAmbGrupsActiva()).
+				expressioNumero(metaExpedient.getExpressioNumero()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte

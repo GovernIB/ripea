@@ -146,6 +146,11 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				entitatActual.getId(),
 				document.getMetaDocument().getId());
+		
+		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && (command.getPortafirmesResponsables() == null || command.getPortafirmesResponsables().length == 0)) {
+			bindingResult.rejectValue("portafirmesResponsables", "NotNull");
+		}
+		
 		if (bindingResult.hasErrors()) {
 			setFluxPredefinit(
 					metaDocument, 

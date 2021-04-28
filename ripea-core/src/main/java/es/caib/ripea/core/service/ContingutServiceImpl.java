@@ -1032,19 +1032,26 @@ public class ContingutServiceImpl implements ContingutService {
 		boolean tipusDocument = true;
 		boolean tipusExpedient = true;
 		if (filtre.getTipus() != null) {
-			tipusCarpeta = false;
-			tipusDocument = false;
 			switch (filtre.getTipus()) {
 			case CARPETA:
 				tipusCarpeta = true;
+				tipusDocument = false;
+				tipusExpedient = false;
 				break;
 			case DOCUMENT:
+				tipusCarpeta = false;
 				tipusDocument = true;
+				tipusExpedient = false;
 				break;
 			case EXPEDIENT:
+				tipusCarpeta = false;
+				tipusDocument = false;
 				tipusExpedient = true;
 				break;
 			case REGISTRE:
+				tipusCarpeta = false;
+				tipusDocument = false;
+				tipusExpedient = false;
 				break;
 			}
 		}
