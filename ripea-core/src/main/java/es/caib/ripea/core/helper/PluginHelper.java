@@ -18,13 +18,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
-import org.fundaciobit.plugins.validatesignature.api.CertificateInfo;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -3440,17 +3440,17 @@ public class PluginHelper {
 					} else {
 						detall.setData(signatureInfo.getSignDate());
 					}
-					CertificateInfo certificateInfo = signatureInfo.getCertificateInfo();
+					InformacioCertificat certificateInfo = signatureInfo.getCertificateInfo();
 					if (certificateInfo != null) {
 						if (certificateInfo.getNifResponsable() != null)
 							detall.setResponsableNif(certificateInfo.getNifResponsable());
 						else
-							detall.setResponsableNif(certificateInfo.getNifEntidadSuscriptora());
-						if (certificateInfo.getNombreApellidosResponsable() != null)
-							detall.setResponsableNom(certificateInfo.getNombreApellidosResponsable());
+							detall.setResponsableNif(certificateInfo.getEntitatSubscriptoraNif());
+						if (certificateInfo.getNomCompletResponsable() != null)
+							detall.setResponsableNom(certificateInfo.getNomCompletResponsable());
 						else
-							detall.setResponsableNom(certificateInfo.getEntidadSuscriptora());
-						detall.setEmissorCertificat(certificateInfo.getOrganizacionEmisora());
+							detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
+						detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
 					}
 					detalls.add(detall);
 				}
