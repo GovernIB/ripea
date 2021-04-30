@@ -1,4 +1,4 @@
-
+-- #694 Nou perfil Revisor de tipus d'expedient
 ALTER TABLE IPA_METAEXPEDIENT
 ADD (
     REVISIO_ESTAT CHARACTER VARYING(8),
