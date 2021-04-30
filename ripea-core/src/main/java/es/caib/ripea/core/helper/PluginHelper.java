@@ -18,13 +18,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
-import org.fundaciobit.plugins.validatesignature.api.CertificateInfo;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -92,6 +92,7 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
@@ -1385,45 +1386,96 @@ public class PluginHelper {
 				throw new RuntimeException("Mock Exception al custodiar document de portafirmes");
 			}
 			
-			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
-					toArxiuDocument(
-							document.getArxiuUuid(),
-							document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
-							document.getNom(),
-							document.getDescripcio(),
-							document.getMetaDocument().getNom(),
-							document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
-							fitxerAmbFirma,
-							true,
-							false,
-							firmes,
+			// Consulta l'arxiu, si ja està definitiu no intentar guardar sobre el mateix
+			Document documentArxiu = getArxiuPlugin().documentDetalls(
+					document.getArxiuUuid(),
+					null,
+					false);
+			
+			// El document ja està firmat a l'Arxiu, es guarda amb un nou uuid
+			if (documentArxiu.getEstat().equals(DocumentEstat.DEFINITIU)) {
+				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
+						toArxiuDocument(
+								null,
+								document.getExpedientPare().getArxiuUuid(),
+								document.getNom(),
+								document.getDescripcio(),
+								document.getMetaDocument().getNom(),
+								false,
+								fitxerAmbFirma,
+								true,
+								false,
+								firmes,
+								null,
+								document.getNtiOrigen(),
+								Arrays.asList(document.getNtiOrgano()),
+								document.getDataCaptura(),
+								document.getNtiEstadoElaboracion(),
+								document.getNtiTipoDocumental(),
+								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental),
+						document.getExpedientPare().getArxiuUuid());
+				if (getArxiuPlugin().suportaMetadadesNti()) {
+					Document documentDetalls = getArxiuPlugin().documentDetalls(
+							documentCreat.getIdentificador(),
 							null,
-							document.getNtiOrigen(),
-							Arrays.asList(document.getNtiOrgano()),
-							document.getDataCaptura(),
-							document.getNtiEstadoElaboracion(),
-							document.getNtiTipoDocumental(),
-							document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
-							DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-							serieDocumental));
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
-				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-			if (getArxiuPlugin().suportaMetadadesNti()) {
-				Document documentDetalls = getArxiuPlugin().documentDetalls(
-						documentModificat.getIdentificador(),
-						null,
-						false);
-				propagarMetadadesDocument(
-						documentDetalls,
-						document);
+							false);
+					propagarMetadadesDocument(
+							documentDetalls,
+							document);
+				}
+				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
+					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				document.updateArxiu(documentCreat.getIdentificador());
+				
+				return document.getId().toString();
+
+			} else {
+				
+				ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
+						toArxiuDocument(
+								document.getArxiuUuid(),
+								document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
+								document.getNom(),
+								document.getDescripcio(),
+								document.getMetaDocument().getNom(),
+								document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
+								fitxerAmbFirma,
+								true,
+								false,
+								firmes,
+								null,
+								document.getNtiOrigen(),
+								Arrays.asList(document.getNtiOrgano()),
+								document.getDataCaptura(),
+								document.getNtiEstadoElaboracion(),
+								document.getNtiTipoDocumental(),
+								document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
+								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
+								serieDocumental));
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_ARXIU,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
+				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))
+					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				if (getArxiuPlugin().suportaMetadadesNti()) {
+					Document documentDetalls = getArxiuPlugin().documentDetalls(
+							documentModificat.getIdentificador(),
+							null,
+							false);
+					propagarMetadadesDocument(
+							documentDetalls,
+							document);
+				}
+				return document.getId().toString();
+				
 			}
-			return document.getId().toString();
+			
+
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -3388,11 +3440,17 @@ public class PluginHelper {
 					} else {
 						detall.setData(signatureInfo.getSignDate());
 					}
-					CertificateInfo certificateInfo = signatureInfo.getCertificateInfo();
+					InformacioCertificat certificateInfo = signatureInfo.getCertificateInfo();
 					if (certificateInfo != null) {
-						detall.setResponsableNif(certificateInfo.getNifResponsable());
-						detall.setResponsableNom(certificateInfo.getNombreApellidosResponsable());
-						detall.setEmissorCertificat(certificateInfo.getOrganizacionEmisora());
+						if (certificateInfo.getNifResponsable() != null)
+							detall.setResponsableNif(certificateInfo.getNifResponsable());
+						else
+							detall.setResponsableNif(certificateInfo.getEntitatSubscriptoraNif());
+						if (certificateInfo.getNomCompletResponsable() != null)
+							detall.setResponsableNom(certificateInfo.getNomCompletResponsable());
+						else
+							detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
+						detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
 					}
 					detalls.add(detall);
 				}
@@ -3871,18 +3929,20 @@ public class PluginHelper {
 				fitxerOriginal,
 				null);
 		try {
-			viaFirmaDispositiu.setCodi(documentViaFirmaEntity.getDispositiuEnviament().getCodi());
-			viaFirmaDispositiu.setCodiAplicacio(documentViaFirmaEntity.getDispositiuEnviament().getCodiAplicacio());
-			viaFirmaDispositiu.setCodiUsuari(documentViaFirmaEntity.getDispositiuEnviament().getCodiUsuari());
-			viaFirmaDispositiu.setDescripcio(documentViaFirmaEntity.getDispositiuEnviament().getDescripcio());
-			viaFirmaDispositiu.setEmailUsuari(documentViaFirmaEntity.getDispositiuEnviament().getEmailUsuari());
-			viaFirmaDispositiu.setEstat(documentViaFirmaEntity.getDispositiuEnviament().getEstat());
-			viaFirmaDispositiu.setIdentificador(documentViaFirmaEntity.getDispositiuEnviament().getIdentificador());
-			viaFirmaDispositiu.setIdentificadorNacional(documentViaFirmaEntity.getDispositiuEnviament().getIdentificadorNacional());
-			viaFirmaDispositiu.setLocal(documentViaFirmaEntity.getDispositiuEnviament().getLocal());
-			viaFirmaDispositiu.setTipus(documentViaFirmaEntity.getDispositiuEnviament().getTipus());
-			viaFirmaDispositiu.setToken(documentViaFirmaEntity.getDispositiuEnviament().getToken());
-
+			DispositiuEnviamentEntity dispositiu = documentViaFirmaEntity.getDispositiuEnviament();
+			if (dispositiu != null) {
+				viaFirmaDispositiu.setCodi(dispositiu.getCodi());
+				viaFirmaDispositiu.setCodiAplicacio(dispositiu.getCodiAplicacio());
+				viaFirmaDispositiu.setCodiUsuari(dispositiu.getCodiUsuari());
+				viaFirmaDispositiu.setDescripcio(dispositiu.getDescripcio());
+				viaFirmaDispositiu.setEmailUsuari(dispositiu.getEmailUsuari());
+				viaFirmaDispositiu.setEstat(dispositiu.getEstat());
+				viaFirmaDispositiu.setIdentificador(dispositiu.getIdentificador());
+				viaFirmaDispositiu.setIdentificadorNacional(dispositiu.getIdentificadorNacional());
+				viaFirmaDispositiu.setLocal(dispositiu.getLocal());
+				viaFirmaDispositiu.setTipus(dispositiu.getTipus());
+				viaFirmaDispositiu.setToken(dispositiu.getToken());
+			}
 			String encodedBase64 = new String(Base64.encodeBase64(fitxerConvertit.getContingut()));
 			parametresViaFirma.setContingut(encodedBase64);
 			parametresViaFirma.setCodiUsuari(documentViaFirmaEntity.getCodiUsuari());
@@ -3895,6 +3955,9 @@ public class PluginHelper {
 			parametresViaFirma.setSignantNif(documentViaFirmaEntity.getSignantNif());
 			parametresViaFirma.setSignantNom(documentViaFirmaEntity.getSignantNom());
 			parametresViaFirma.setObservaciones(documentViaFirmaEntity.getObservacions());
+			parametresViaFirma.setValidateCodeEnabled(documentViaFirmaEntity.isValidateCodeEnabled());
+			parametresViaFirma.setValidateCode(documentViaFirmaEntity.getValidateCode());
+			parametresViaFirma.setDeviceEnabled(getPropertyViaFirmaDispositius());
 			
 			viaFirmaResponse = getViaFirmaPlugin().uploadDocument(parametresViaFirma);
 		} catch (Exception ex) {
@@ -5380,7 +5443,10 @@ public class PluginHelper {
 		return PropertiesHelper.getProperties().getAsBoolean(
 				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
-
+	private boolean getPropertyViaFirmaDispositius() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled");
+	}
+	
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
 		this.arxiuPlugin = arxiuPlugin;
 	}

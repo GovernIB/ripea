@@ -52,13 +52,21 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	@Column(name = "vf_observacions")
 	private String observacions;
 	
+	@Column(name = "vf_validate_code_enabled")
+	private Boolean validateCodeEnabled;
+	@Column(name = "vf_validate_code")
+	private String validateCode;
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "vf_viafirma_dispositiu")
 	@ForeignKey(name = "ipa_document_enviament_dis_fk")
 	protected DispositiuEnviamentEntity dispositiuEnviament;
 	
+	@Column(name = "vf_rebre_correu")
+	private Boolean rebreCorreu;
+	
 	@Column(name = "firma_parcial")
-	private boolean firmaParcial;
+	private Boolean firmaParcial;
 	
 	public String getCodiUsuari() {
 		return codiUsuari;
@@ -99,8 +107,17 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	public void updateMessageCode(String messageCode) {
 		this.messageCode = messageCode;
 	}
-	public boolean isFirmaParcial() {
-		return firmaParcial;
+	public Boolean isFirmaParcial() {
+		return firmaParcial != null ? firmaParcial : false;
+	}
+	public Boolean isValidateCodeEnabled() {
+		return validateCodeEnabled != null ? validateCodeEnabled : false;
+	}
+	public String getValidateCode() {
+		return validateCode;
+	}
+	public Boolean isRebreCorreu() {
+		return rebreCorreu != null ? rebreCorreu : false;
 	}
 	
 	public void updateEnviat(
@@ -129,7 +146,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			boolean lecturaObligatoria,
 			ExpedientEntity expedient,
 			DocumentEntity document,
-			boolean firmaParcial) {
+			boolean firmaParcial,
+			boolean validateCodeEnabled,
+			String validateCode,
+			boolean rebreCorreu) {
 		return new Builder(
 				estat,
 				codiUsuari,
@@ -144,7 +164,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				lecturaObligatoria,
 				expedient,
 				document,
-				firmaParcial);
+				firmaParcial,
+				validateCodeEnabled,
+				validateCode,
+				rebreCorreu);
 	}
 
 	public static class Builder {
@@ -163,7 +186,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				boolean lecturaObligatoria,
 				ExpedientEntity expedient,
 				DocumentEntity document,
-				boolean firmaParcial) {
+				boolean firmaParcial,
+				boolean validateCodeEnabled,
+				String validateCode,
+				boolean rebreCorreu) {
 			built = new DocumentViaFirmaEntity();
 			built.inicialitzar();
 			built.assumpte = titol;
@@ -181,6 +207,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			built.expedient = expedient;
 			built.document = document;
 			built.firmaParcial = firmaParcial;
+			built.validateCodeEnabled = validateCodeEnabled;
+			built.validateCode = validateCode;
+			built.rebreCorreu = rebreCorreu;
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;

@@ -19,16 +19,21 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -55,6 +60,8 @@ public class EmailHelper {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EmailPendentEnviarRepository emailPendentEnviarRepository;
+	@Autowired
+	private PermisosHelper permisosHelper;
 	
 	public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
@@ -128,6 +135,40 @@ public class EmailHelper {
 			mailSender.send(missatge);
 		}
 	}
+	
+	
+	public void canviEstatRevisioMetaExpedient(
+			MetaExpedientEntity metaExpedientEntity, 
+			List<String> destinataris) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de revisio");
+		
+		String from = getRemitent();
+		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de tipus d'expedient";
+		String comentari = "";
+		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
+			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
+		}
+		String text = 
+				"Informació del tipus d'expedient:\n" +
+						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
+						"\tTipus d'expedient nom: " + metaExpedientEntity.getNom() + "\n" +
+						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+						comentari ;
+						
+		
+
+		String[] to = destinataris.toArray(new String[destinataris.size()]);
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setFrom(from);
+		missatge.setTo(to);
+		missatge.setSubject(subject);
+		missatge.setText(text);
+		logger.debug(missatge.toString());
+		mailSender.send(missatge);
+
+	}
+	
+	
 
 	public void canviEstatDocumentPortafirmes(
 			DocumentPortafirmesEntity documentPortafirmes) {
@@ -197,6 +238,76 @@ public class EmailHelper {
 						subject,
 						text,
 						EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES)
+						.build();
+				emailPendentEnviarRepository.save(enitity);
+			}
+		}
+	}
+	
+	public void canviEstatDocumentViaFirma(
+			DocumentViaFirmaEntity documentViaFirma) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de document a ViaFirma (" +
+			"documentViaFirma=" + documentViaFirma.getId() + ")");
+		
+		DocumentEntity document = documentViaFirma.getDocument();
+		String enviamentCreatedByCodi = documentViaFirma.getCreatedBy().getCodi();
+		ExpedientEntity expedient = document.getExpedient();
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				enviamentCreatedByCodi,
+				null);
+		
+		String from = getRemitent();
+		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a ViaFirma";
+		String estat = (documentViaFirma.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentViaFirma.getEstat().toString();
+
+		String text = 
+				"Informació del document:\n" +
+						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+						"\tExpedient nom: " + expedient.getNom() + "\n" +
+						"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+						"\tDocument nom: " + document.getNom() + "\n" +
+						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+						"Estat del document:" + estat + "\n" +
+						getEnllacExpedient(expedient.getId());
+						
+		
+		List<String> destinatarisAgrupats = new ArrayList<String>();
+		List<String> destinatarisNoAgrupats = new ArrayList<String>();
+		
+		for (DadesUsuari responsable : responsables) {
+			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
+				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
+				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
+					destinatarisAgrupats.add(responsable.getEmail());
+				} else {
+					destinatarisNoAgrupats.add(responsable.getEmail());
+				}
+			}
+		}
+		
+		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
+			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(from);
+			missatge.setTo(to);
+			missatge.setSubject(subject);
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
+		
+		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
+			for (String dest : destinatarisAgrupats) {
+				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
+						from,
+						dest,
+						subject,
+						text,
+						EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA)
 						.build();
 				emailPendentEnviarRepository.save(enitity);
 			}
@@ -368,6 +479,7 @@ public class EmailHelper {
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
 		return baseUrl != null ? enllacExpedient : "";
 	}
+	
 	
 	private Set<DadesUsuari> getGestors(
 			boolean isTasca,

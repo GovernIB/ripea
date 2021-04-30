@@ -213,19 +213,23 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				null,
 				false,
 				false);
-		if (interessat instanceof InteressatPersonaFisicaDto) {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatPersonaFisicaDto.class);
-		} else if (interessat instanceof InteressatPersonaJuridicaDto) {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatPersonaJuridicaDto.class);
-		} else {
-			return conversioTipusHelper.convertir(
-					interessatRepository.save(interessatEntity),
-					InteressatAdministracioDto.class);
-		}
+//		##### Hi ha un mapeig dins conversioTipusHelper ###
+//		if (interessat instanceof InteressatPersonaFisicaDto) {
+//			return conversioTipusHelper.convertir(
+//					interessatEntity,
+//					InteressatPersonaFisicaDto.class);
+//		} else if (interessat instanceof InteressatPersonaJuridicaDto) {
+//			return conversioTipusHelper.convertir(
+//					interessatEntity,
+//					InteressatPersonaJuridicaDto.class);
+//		} else {
+//			return conversioTipusHelper.convertir(
+//					interessatEntity,
+//					InteressatAdministracioDto.class);
+//		}
+		return conversioTipusHelper.convertir(
+				interessatEntity,
+				InteressatDto.class);
 	}
 
 	@Transactional
@@ -340,19 +344,19 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
 				null,
 				id);
-		
-		if (interessat instanceof InteressatPersonaFisicaEntity)
-			return conversioTipusHelper.convertir(
-					interessat,
-					InteressatPersonaFisicaDto.class);
-		else if (interessat instanceof InteressatPersonaJuridicaEntity)
-			return conversioTipusHelper.convertir(
-					interessat,
-					InteressatPersonaJuridicaDto.class);
-		else if (interessat instanceof InteressatAdministracioEntity)
-			return conversioTipusHelper.convertir(
-					interessat,
-					InteressatAdministracioDto.class);
+//		##### Hi ha un mapeig dins conversioTipusHelper ###
+//		if (interessat instanceof InteressatPersonaFisicaEntity)
+//			return conversioTipusHelper.convertir(
+//					(InteressatPersonaFisicaEntity)interessat,
+//					InteressatPersonaFisicaDto.class);
+//		else if (interessat instanceof InteressatPersonaJuridicaEntity)
+//			return conversioTipusHelper.convertir(
+//					interessat,
+//					InteressatPersonaJuridicaDto.class);
+//		else if (interessat instanceof InteressatAdministracioEntity)
+//			return conversioTipusHelper.convertir(
+//					interessat,
+//					InteressatAdministracioDto.class);
 		
 		return conversioTipusHelper.convertir(
 				interessat,
@@ -449,7 +453,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		DocumentEntity document = entityComprovarHelper.comprovarDocument(
 				entitat,
 				null,

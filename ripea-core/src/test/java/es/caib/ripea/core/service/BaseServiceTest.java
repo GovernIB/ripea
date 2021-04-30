@@ -128,13 +128,13 @@ public class BaseServiceTest {
 						if (element instanceof MetaExpedientDto) {
 							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
 									entitatId,
-									(MetaExpedientDto) element);
+									(MetaExpedientDto) element, null);
 							elementsCreats.add(metaExpedientCreat);
 							if (((MetaExpedientDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
 									metaExpedientService.permisUpdate(entitatId,
 											metaExpedientCreat.getId(),
-											permis);
+											permis, "tothom");
 								}
 							}
 							id = metaExpedientCreat.getId();
@@ -145,13 +145,13 @@ public class BaseServiceTest {
 									(MetaDocumentDto)element,
 									PLANTILLA_NOM,
 									PLANTILLA_CONTTYPE,
-									PLANTILLA_CONTINGUT);
+									PLANTILLA_CONTINGUT, null);
 							elementsCreats.add(metaDocumentCreat);
 							if (((MetaDocumentDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaDocumentDto)element).getPermisos()) {
 									metaExpedientService.permisUpdate(entitatId,
 											metaDocumentCreat.getId(),
-											permis);
+											permis, "tothom");
 								}
 							}
 							id = metaDocumentCreat.getId();
@@ -159,7 +159,7 @@ public class BaseServiceTest {
 							MetaDadaDto metaDadaCreada = metaDadaService.create(
 									entitatId,
 									((MetaExpedientDto)elementsCreats.get(1)).getId(),
-									(MetaDadaDto) element);
+									(MetaDadaDto) element, "tothom");
 							elementsCreats.add(metaDadaCreada);
 							id = metaDadaCreada.getId();
 						} else {
@@ -196,12 +196,12 @@ public class BaseServiceTest {
 					metaDadaService.delete(
 							entitatId,
 							metaExpedientId,
-							((MetaDadaDto)element).getId());
+							((MetaDadaDto)element).getId(), "tothom");
 				} else if (element instanceof MetaDocumentDto) {
 					metaDocumentService.delete(
 							entitatId,
 							metaExpedientId,
-							((MetaDocumentDto)element).getId());
+							((MetaDocumentDto)element).getId(), "tothom");
 				} else if (element instanceof MetaExpedientDto) {
 					metaExpedientService.delete(
 							entitatId,

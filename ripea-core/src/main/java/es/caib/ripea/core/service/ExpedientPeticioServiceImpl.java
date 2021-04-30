@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,11 @@ import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
+import es.caib.ripea.core.entity.RegistreInteressatEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
@@ -87,7 +91,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private ExpedientHelper  expedientHelper;
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(Long entitatId,
@@ -105,7 +111,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("numero",
@@ -191,7 +197,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
@@ -362,7 +368,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
+		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
+		if (entitatAnotacio != null)
+			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 	}
 
 	@Transactional(readOnly = true)
@@ -445,10 +453,44 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return expedientPeticioDto;
 
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public long countAnotacionsPendents(Long entitatId) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, 
+				false, 
+				false);
+		return cacheHelper.countAnotacionsPendents(entitatActual);
+	}
 
 	private boolean isIncorporacioJustificantActiva() {
 		boolean isPropagarRelacio = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporar.justificant"));
 		return isPropagarRelacio;
+	}
+	
+	@Transactional
+	@Override
+	public boolean comprovarExistenciaInteressatsPeticio(Long entitatId, Long expedientId, Long expedientPeticioId) {
+		boolean alreadyExists = false;
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
+		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
+		//### Si alguns dels interessats existeix sol·licitar confirmació usuari
+		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
+			for (InteressatEntity interessatExpedient : existingInteressats) {
+				if (interessatExpedient.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero())) {
+					alreadyExists = true;
+					break;
+				}
+			}
+			if (alreadyExists)
+				break;
+		}
+		return alreadyExists;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);

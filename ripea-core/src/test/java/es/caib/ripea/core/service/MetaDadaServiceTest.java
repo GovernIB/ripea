@@ -160,7 +160,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						MetaDadaDto modificada = metaDadaService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								metaDadaUpdate);
+								metaDadaUpdate, "tothom");
 						assertNotNull(modificada);
 						assertNotNull(modificada.getId());
 						assertEquals(
@@ -191,7 +191,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 						MetaDadaDto esborrada = metaDadaService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								metadadaCreada.getId());
+								metadadaCreada.getId(), "tothom");
 						comprovarMetaDadaCoincideix(
 								metaDadaCreate,
 								esborrada);
@@ -226,7 +226,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								metadadaCreada.getId(),
-								false);
+								false, "tothom");
 						assertEquals(
 								false,
 								desactivada.isActiva());
@@ -234,7 +234,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								metadadaCreada.getId(),
-								true);
+								true, "tothom");
 						assertEquals(
 								true,
 								activada.isActiva());
@@ -284,7 +284,7 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 							metaDadaService.create(
 									entitatCreada.getId(),
 									expedientCreat.getId(),
-									metaDadaCreate);
+									metaDadaCreate, "tothom");
 						} catch (DataIntegrityViolationException ex) {
 							// Excepció esperada
 						}

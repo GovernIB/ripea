@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
@@ -21,8 +23,18 @@ import es.caib.ripea.core.entity.TipusDocumentalEntity;
 public interface TipusDocumentalRepository extends JpaRepository<TipusDocumentalEntity, Long> {
 
 	List<TipusDocumentalEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	
+	
+	
+	@Query(	"from " +
+			"    TipusDocumentalEntity tipusDocumental " +
+			"where " +
+			"    tipusDocumental.entitat = :entitat " +
+			"and (:esNullFiltre = true or lower(tipusDocumental.codi) like lower('%'||:filtre||'%') or lower(tipusDocumental.nom) like lower('%'||:filtre||'%')) ")
 	Page<TipusDocumentalEntity> findByEntitat(
-			EntitatEntity entitat, 
+			@Param("entitat") EntitatEntity entitat, 
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,	
 			Pageable pageable);
 	TipusDocumentalEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 

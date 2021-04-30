@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
@@ -278,6 +279,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
+	@RolesAllowed("tothom")
 	public boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
@@ -333,5 +335,15 @@ public class ExpedientServiceBean implements ExpedientService {
 				entitatId,
 				expedientId,
 				usuariCodi);
+	}
+	@Override
+	@RolesAllowed("tothom")
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return delegate.consultaExpedientsAmbImportacio();
+	}
+	@Override
+	@RolesAllowed("IPA_ORGAN_ADMIN")
+	public boolean isOrganGestorPermes (Long expedientId) {
+		return delegate.isOrganGestorPermes(expedientId);
 	}
 }

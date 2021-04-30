@@ -18,9 +18,11 @@ import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
@@ -39,6 +41,10 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	private DocumentHelper documentHelper;
 	@Autowired
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired
+	private AlertaHelper alertaHelper;
+	@Autowired
+	private EmailHelper emailHelper;
 
 	public void viaFirmaEnviar(DocumentViaFirmaEntity documentViaFirma) throws SistemaExternException {
 		DocumentEntity document = documentViaFirma.getDocument();
@@ -73,6 +79,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	public Exception viaFirmaProcessar(
 			DocumentViaFirmaEntity documentViaFirma) {
 		DocumentEntity document = documentViaFirma.getDocument();
+		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
 			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
@@ -214,6 +221,19 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				return ex;
+			}
+		}
+
+		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat) || ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat) || 
+				ViaFirmaCallbackEstatEnumDto.EXPIRED.equals(callbackEstat) || ViaFirmaCallbackEstatEnumDto.ERROR.equals(callbackEstat)) {
+			DocumentEstatEnumDto documentEstatNou = document.getEstat();
+			if (documentEstatAnterior != DocumentEstatEnumDto.CUSTODIAT && (documentEstatAnterior != documentEstatNou)) {
+				alertaHelper.crearAlerta(
+						"[ViaFirma] La firma del document " + document.getNom() + " ha finalitzat amb estat: " + callbackEstat,
+						null,
+						document.getExpedient().getId());
+				if (documentViaFirma.isRebreCorreu())
+					emailHelper.canviEstatDocumentViaFirma(documentViaFirma);
 			}
 		}
 		return null;

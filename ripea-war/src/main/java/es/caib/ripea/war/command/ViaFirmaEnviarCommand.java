@@ -11,14 +11,17 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.ViaFirma;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per a enviar documents al portafirmes.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter 
+@Getter @Setter
+@ViaFirma
 public class ViaFirmaEnviarCommand {
 
 	@Size(max=256)
@@ -28,7 +31,6 @@ public class ViaFirmaEnviarCommand {
 	@NotEmpty
 	private String codiUsuariViaFirma;
 	private String codisUsuariViaFirma;
-	@NotEmpty
 	private String dispositiuViaFirma;
 	private Long interessatId;
 	@NotEmpty
@@ -39,6 +41,9 @@ public class ViaFirmaEnviarCommand {
 	private String observacions;
 	
 	private String firmaParcial;
+	private Boolean validateCodeEnabled;
+	private String validateCode;
+	private Boolean rebreCorreu;
 	
 	public static ViaFirmaEnviarDto asDto(ViaFirmaEnviarCommand command) {
 		ViaFirmaEnviarDto viaFirmaEnviar = ConversioTipusHelper.convertir(
@@ -71,14 +76,6 @@ public class ViaFirmaEnviarCommand {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	public void setTitol(String titol) {
-		this.titol = titol != null ? titol.trim() : null;
-	}
-
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio != null ? descripcio.trim() : null;
-	}
-
 	public void setCodiUsuariViaFirma(String codiUsuariViaFirma) {
 		this.codiUsuariViaFirma = codiUsuariViaFirma != null ? codiUsuariViaFirma.trim() : null;
 	}
@@ -90,11 +87,9 @@ public class ViaFirmaEnviarCommand {
 	public void setDispositiuViaFirma(String dispositiuViaFirma) {
 		this.dispositiuViaFirma = dispositiuViaFirma != null ? dispositiuViaFirma.trim() : null;
 	}
-
-	public void setInteressatId(Long interessatId) {
-		this.interessatId = interessatId;
+	public String getDispositiuViaFirma() {
+		return dispositiuViaFirma;
 	}
-
 	public void setSignantNif(String signantNif) {
 		this.signantNif = signantNif != null ? signantNif.trim() : null;
 	}
@@ -106,9 +101,13 @@ public class ViaFirmaEnviarCommand {
 	public void setObservacions(String observacions) {
 		this.observacions = observacions != null ? observacions.trim() : null;
 	}
-
 	public void setFirmaParcial(String firmaParcial) {
 		this.firmaParcial = firmaParcial != null ? firmaParcial.trim() : null;
 	}
-
+	public Boolean isValidateCodeEnabled() {
+		return validateCodeEnabled;
+	}
+	public Boolean isRebreCorreu() {
+		return rebreCorreu;
+	}
 }

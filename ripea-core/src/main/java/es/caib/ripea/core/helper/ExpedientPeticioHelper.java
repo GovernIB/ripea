@@ -56,7 +56,9 @@ public class ExpedientPeticioHelper {
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	
 	/*
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
@@ -98,8 +100,10 @@ public class ExpedientPeticioHelper {
 			Long expedientPeticioId,
 			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		expedientPeticioEntity.updateEstat(
-				expedientPeticioEstatEnumDto);
+		expedientPeticioEntity.updateEstat(expedientPeticioEstatEnumDto);
+		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
+		if (entitatAnotacio != null)
+			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 	}
 
 	@Transactional

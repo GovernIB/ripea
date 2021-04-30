@@ -23,6 +23,8 @@ import com.viafirma.documents.sdk.java.model.Notification;
 import com.viafirma.documents.sdk.java.model.Param;
 import com.viafirma.documents.sdk.java.model.Policy;
 import com.viafirma.documents.sdk.java.model.Signature;
+import com.viafirma.documents.sdk.java.model.Signature.CertificationLevelEnum;
+import com.viafirma.documents.sdk.java.model.Workflow;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.utils.PropertiesHelper;
@@ -52,8 +54,22 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             Notification notification = new Notification();
             notification.setText(parametresViaFirma.getTitol());
             notification.setDetail(parametresViaFirma.getDescripcio());
-            notification.setDevices(new ArrayList<Device>());
-            notification.getDevices().add(convertToDevice(parametresViaFirma.getViaFirmaDispositiu()));
+            if (parametresViaFirma.isDeviceEnabled()) {
+            	notification.setDevices(new ArrayList<Device>());
+            	notification.getDevices().add(
+            			convertToDevice(
+            					parametresViaFirma.getViaFirmaDispositiu(),
+            					null));
+            } else {
+            	notification.setDevices(new ArrayList<Device>());
+            	notification.getDevices().add(
+            			convertToDevice(
+            					null, 
+            					parametresViaFirma.getCodiUsuari()));
+            }
+            if (parametresViaFirma.isValidateCodeEnabled()) {
+            	notification.setValidateCode(parametresViaFirma.getValidateCode());
+            }
             message.setNotification(notification);
             
             // Create a template document
@@ -95,7 +111,8 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             observacions.setKey("OBSERVACIONES");
             observacions.setValue(parametresViaFirma.getObservaciones());
             metadataList.add(observacions);
-            evidence.setMetadataList(metadataList);   
+            message.setMetadataList(metadataList);
+            //evidence.setMetadataList(metadataList);   
             policy.getEvidences().add(evidence);
 
             policy.setSignatures(new ArrayList<Signature>());
@@ -103,6 +120,7 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             signature.setType(com.viafirma.documents.sdk.java.model.Signature.TypeEnum.SERVER);
             signature.setHelpText("Server signature");
             signature.setTypeFormatSign(com.viafirma.documents.sdk.java.model.Signature.TypeFormatSignEnum.PADES_LTA);
+            signature.setCertificationLevel(CertificationLevelEnum.NOT_CERTIFIED);
             policy.getSignatures().add(signature);
 
             message.getPolicies().add(policy);
@@ -110,6 +128,10 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
             message.setCallbackURL(getCallBackUrl());
             message.setCallbackAuthorization(generateAuthenticationHeader());
             message.setGroupCode(getGroupCodi());
+            
+            Workflow workFlow = new Workflow();
+            workFlow.setType(com.viafirma.documents.sdk.java.model.Workflow.TypeEnum.APP);
+            message.setWorkflow(workFlow);
             
             String messageCode = getViaFirmaClient(parametresViaFirma.getCodiUsuari(), parametresViaFirma.getContrasenya()).
 				getV3MessagesApi().sendMessage(message);
@@ -199,20 +221,28 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 		return viaFirmaClient;
 	}
 	
-	private Device convertToDevice(ViaFirmaDispositiu viaFiramDispositiu) throws SistemaExternException {
+	private Device convertToDevice(
+			ViaFirmaDispositiu viaFiramDispositiu,
+			String codiUsuari) throws SistemaExternException {
 		Device device = new Device();
 		try {
-			device.setAppCode(viaFiramDispositiu.getCodiAplicacio());
-			device.setCode(viaFiramDispositiu.getCodi());
-			device.setDescription(viaFiramDispositiu.getDescripcio());
-			device.setLocale(viaFiramDispositiu.getLocal());
-			device.setStatus(StatusEnum.valueOf(viaFiramDispositiu.getEstat()));
-			device.setToken(viaFiramDispositiu.getToken());
-			device.setType(com.viafirma.documents.sdk.java.model.Device.TypeEnum.valueOf(viaFiramDispositiu.getTipus()));
-			device.setUniqueIdentifier(viaFiramDispositiu.getIdentificador());
-			device.setUserCode(viaFiramDispositiu.getCodiUsuari());
-			device.setUserEmail(viaFiramDispositiu.getEmailUsuari());
-			device.setUserNationalId(viaFiramDispositiu.getIdentificadorNacional());
+			if (viaFiramDispositiu != null) { //### s'ha informat un dispositiu
+				device.setAppCode(viaFiramDispositiu.getCodiAplicacio());
+				device.setCode(viaFiramDispositiu.getCodi());
+				device.setDescription(viaFiramDispositiu.getDescripcio());
+				device.setLocale(viaFiramDispositiu.getLocal());
+				device.setStatus(StatusEnum.valueOf(viaFiramDispositiu.getEstat()));
+				device.setToken(viaFiramDispositiu.getToken());
+				device.setType(com.viafirma.documents.sdk.java.model.Device.TypeEnum.valueOf(viaFiramDispositiu.getTipus()));
+				device.setUniqueIdentifier(viaFiramDispositiu.getIdentificador());
+				device.setUserCode(viaFiramDispositiu.getCodiUsuari());
+				device.setUserEmail(viaFiramDispositiu.getEmailUsuari());
+				device.setUserNationalId(viaFiramDispositiu.getIdentificadorNacional());
+			} else {
+				device.setAppCode(getAppCodi());
+				device.setCode(codiUsuari);
+				device.setUserCode(codiUsuari);
+			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error en la conversió de firmaDispositiu a Device";
 			throw new SistemaExternException(
@@ -278,6 +308,10 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
 	private String getProxyHost() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.ripea.plugin.viafirma.caib.proxy.host");
+	}
+	private String getAppCodi() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.ripea.plugin.viafirma.caib.app.codi");
 	}
 	private int getProxyPort() {
 		String proxyPort = PropertiesHelper.getProperties().getProperty(

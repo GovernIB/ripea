@@ -40,8 +40,7 @@ $(document).ready(function() {
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right"><a class="btn btn-default" href="${metaExpedient.id}/new" data-toggle="modal" data-datatable-id="regles" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="expedient.estat.list.boto.nou"/></a></p>
 	</script>
-	<table id="estats" data-toggle="datatable" data-url="<c:url value="/expedientEstat/${metaExpedient.id}/datatable"/>" data-drag-enabled="true"  data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered" style="width:100%"
-	data-botons-template="#botonsTemplate">
+	<table id="estats" data-toggle="datatable" data-url="<c:url value="/expedientEstat/${metaExpedient.id}/datatable"/>" ${!esRevisor ? 'data-drag-enabled="true"' : ''}  data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered" style="width:100%" ${!esRevisor ? 'data-botons-template="#botonsTemplate"' : ''}>
 
 		<thead>
 			<tr>
@@ -59,20 +58,22 @@ $(document).ready(function() {
 				</th>				
 				<th data-col-name="responsableCodi" data-orderable="false"><spring:message code="expedient.estat.form.camp.responsable"/></th>
 				
-				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							</ul>
-						</div>
-					</script>
-				</th>
+				<c:if test="${!esRevisor}">
+					<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</ul>
+							</div>
+						</script>
+					</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
 	
-	<a href="<c:url value="/metaExpedient?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+	<a href="<c:url value="${!esRevisor ? '/metaExpedient?mantenirPaginacio=true' : '/metaExpedientRevisio?mantenirPaginacio=true'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 </body>

@@ -22,7 +22,7 @@
 					<li role="presentation"><a href="#firmes" aria-controls="firmes" role="tab" data-toggle="tab"><spring:message code="contingut.arxiu.tab.firmes"/> <span class="badge badge-default">${fn:length(arxiuDetall.firmes)}</span></a></li>
 				</c:if>
 				<c:if test="${not empty arxiuDetall.metadadesAddicionals}">
-					<li role="presentation"><a href="#metadades" aria-controls="metadades" role="tab" data-toggle="tab"><spring:message code="contingut.arxiu.tab.metadades"/> <span class="badge badge-default">${fn:length(arxiuDetall.metadadesAddicionals)}</span></a></li>
+					<li role="presentation"><a href="#metadades" aria-controls="metadades" role="tab" data-toggle="tab"><spring:message code="contingut.arxiu.tab.metadades"/> <span class="badge badge-default" id="metadadesSpan"></span></a></li>
 				</c:if>
 			</ul>
 			<br/>
@@ -144,12 +144,18 @@
 										<td>${arxiuDetall.eniFormat}</td>
 									</tr>
 								</c:if>
-								<c:if test="${not empty arxiuDetall.eniExtensio}">
+
+								<c:if test="${not empty arxiuDetall.firmes}">
 									<tr>
-										<td><strong><spring:message code="contingut.arxiu.camp.eni.format.ext"/></strong></td>
-										<td>${arxiuDetall.eniExtensio}</td>
+										<td><strong><spring:message code="contingut.arxiu.camp.eni.tipus.firma"/></strong></td>
+										<td>
+											<c:forEach var="firma" items="${arxiuDetall.firmes}" varStatus="status">
+												${firma.tipus}<c:if test="${not status.last}">,</c:if>
+											</c:forEach>
+										</td>
 									</tr>
 								</c:if>
+
 								<c:if test="${not empty arxiuDetall.eniInteressats}">
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.interessats"/></strong></td>
@@ -229,13 +235,38 @@
 				<c:if test="${not empty arxiuDetall.metadadesAddicionals}">
 					<div role="tabpanel" class="tab-pane" id="metadades">
 						<table class="table table-striped table-bordered">
+							<c:set var="contMetadades" value="0" />
 							<c:forEach var="metadada" items="${arxiuDetall.metadadesAddicionals}" varStatus="status">
 								<tr>
-									<td width="20%"><strong>${metadada.key}</strong></td>
-									<td>${metadada.value}</td>
+									<c:choose>
+										<c:when test="${contingut.document}">
+											<spring:message code="contingut.arxiu.camp.metadades.docu.enum.${metadada.key}" var="message" text=""/>
+											<c:if test="${not empty message}">
+												<c:set var="contMetadades" value="${contMetadades + 1}" />
+												<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.docu.enum.${metadada.key}"/></strong></td>
+												<td>${metadada.value}</td>
+											</c:if>			
+										</c:when>
+										<c:when test="${contingut.expedient}">
+											<spring:message code="contingut.arxiu.camp.metadades.exp.enum.${metadada.key}" var="message" text=""/>
+											<c:if test="${not empty message}">
+												<c:set var="contMetadades" value="${contMetadades + 1}" />
+												<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.exp.enum.${metadada.key}"/></strong></td>
+												<td>${metadada.value}</td>
+											</c:if>			
+										</c:when>
+										<c:otherwise>
+											<c:set var="contMetadades" value="${contMetadades + 1}" />
+											<td width="20%"><strong>${metadada.key}</strong></td>
+											<td>${metadada.value}</td>
+										</c:otherwise>	
+									</c:choose>
 								</tr>
 							</c:forEach>
 						</table>
+						<script type="text/javascript">
+							$("#metadadesSpan").text(${contMetadades});
+						</script>
 					</div>
 				</c:if>
 			</div>

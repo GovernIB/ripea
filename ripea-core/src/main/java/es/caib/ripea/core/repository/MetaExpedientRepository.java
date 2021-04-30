@@ -13,6 +13,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -46,7 +48,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
-			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
+			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
+			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	List<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullCodi") boolean esNullCodi,
@@ -61,6 +64,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("esNullAmbit") boolean esNullAmbit,
 			@Param("comuns") boolean comuns,
+			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
+			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
 			Sort sort);
 
 	@Query(	"from " +
@@ -72,7 +77,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
-			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)")
+			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
+			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullCodi") boolean esNullCodi,
@@ -87,6 +93,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("organGestor") OrganGestorEntity organGestor,	
 			@Param("esNullAmbit") boolean esNullAmbit,
 			@Param("comuns") boolean comuns,
+			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
+			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
 			Pageable pageable);
 
 	@Query( "from " +
@@ -98,7 +106,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
-			"and me.id in (:ids)")
+			"and me.id in (:ids)" + 
+			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	List<MetaExpedientEntity> findByOrganGestor(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullCodi") boolean esNullCodi,
@@ -112,6 +121,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
 			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("ids") List<Long> ids,
+			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
+			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
 			Sort sort);
 
 	@Query( "from " +
@@ -123,7 +134,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
-			"and me.id in (:ids)")
+			"and me.id in (:ids)" + 
+			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	Page<MetaExpedientEntity> findByOrganGestor(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullCodi") boolean esNullCodi,
@@ -137,6 +149,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
 			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("ids") List<Long> ids,
+			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
+			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
 			Pageable pageable);
 
 	@Query(	"select" +
@@ -154,7 +168,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    MetaExpedientEntity me left join me.metaExpedientOrganGestors meog " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:esNullActiu = true or me.actiu = :actiu and (me.revisioEstat is null or me.revisioEstat = 'REVISAT')) " +
 			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
 			"and (:esAdminEntitat = true " +
 			"     or (:esAdminOrgan = true and :esAdminOrgan = false) " + // TODO esborrar
@@ -189,6 +203,16 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("actiu") Boolean actiu,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
+	
+	
+	@Query(	"from " +
+			"    MetaExpedientEntity me " +
+			"where " +
+			"    me.entitat = :entitat " +
+			"and (me.revisioEstat = :revisioEstat) ")
+	List<MetaExpedientEntity> findByRevisioEstat(
+			@Param("entitat") EntitatEntity entitat, 
+			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat);
 
 	List<MetaExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 

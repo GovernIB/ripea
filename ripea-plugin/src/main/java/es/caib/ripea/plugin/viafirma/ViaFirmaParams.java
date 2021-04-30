@@ -24,6 +24,8 @@ public class ViaFirmaParams implements Serializable {
 	private String signantNom;
 	private String expedientCodi;
 	private String observaciones;
-
+	private boolean validateCodeEnabled;
+	private String validateCode;
+	private boolean isDeviceEnabled;
 	private static final long serialVersionUID = 7518162775992143312L;
 }

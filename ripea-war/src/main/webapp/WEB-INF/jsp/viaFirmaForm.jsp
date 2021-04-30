@@ -22,6 +22,12 @@
 .firstColumn {
 	cursor: default;
 }
+.title > label {
+	color: #757575;
+}
+.title > hr {
+	margin-top: 0;
+}
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -37,7 +43,7 @@ $(document).ready(function() {
 				if (data.length == 1) {
 					$.each(data, function(i, val) {
 						selUsuaris.attr('disabled', 'true');
-						selUsuaris.append("<option value=\"" + val.codi + "\" selected='true'>" + val.codi + "</option>");
+						selUsuaris.append("<option value=\"" + val.codi + "\" selected='true'>" + val.descripcio + " [" + val.codi + "]"+ "</option>");
 						usuariViaFirma = val.codi;
 						$('#codiUsuariViaFirma').val(usuariViaFirma);
 						$('select#codisUsuariViaFirma').trigger('change', [{usuariViaFirma:usuariViaFirma}]);
@@ -163,6 +169,18 @@ $(document).ready(function() {
 	var data = {id: true, text: 'Si'};
 	var newOption = new Option(data.text, data.id, false, false);
 	firmaParcialSel.append(newOption).trigger('change');
+	
+	var valdiateCodeEnabledInput = $('#validateCodeEnabled');
+	var validateCodeField = $('#validateCode').closest('.form-group');
+	validateCodeField.hide();
+	valdiateCodeEnabledInput.on('change', function() {
+		if($(this).is(':checked')) {
+			validateCodeField.show();
+		} else {
+			validateCodeField.hide();
+		}
+	});
+	valdiateCodeEnabledInput.trigger('change');
 });
 
 </script>
@@ -170,15 +188,32 @@ $(document).ready(function() {
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/viafirma/upload"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="viaFirmaEnviarCommand" role="form">
+		<div class="title">
+			<label><spring:message code="contenidor.document.biometrica.dades"/></label>
+			<hr>
+		</div>
 		<rip:inputText name="titol" textKey="contenidor.document.biometrica.camp.motiu" />
 		<rip:inputText name="descripcio" textKey="contenidor.document.biometrica.camp.descripcio" />
 		<rip:inputHidden name="codiUsuariViaFirma"/>
 		<rip:inputSelect name="codisUsuariViaFirma" textKey="contenidor.document.biometrica.camp.usuari"  required="true"/>
-		<rip:inputSelect name="dispositiuViaFirma" textKey="contenidor.document.biometrica.camp.dispositiu" required="true"/>
+		<c:if test="${isDispositiusEnabled}">
+			<rip:inputSelect name="dispositiuViaFirma" textKey="contenidor.document.biometrica.camp.dispositiu" required="true"/>
+		</c:if>
+		<div class="title">
+			<label><spring:message code="contenidor.document.biometrica.dades.interessat"/></label>
+			<hr>
+		</div>
 		<rip:inputSelect name="interessatId" textKey="contenidor.document.biometrica.camp.interessat" emptyOption="true" emptyOptionTextKey="contenidor.document.biometrica.camp.interessat.nou" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador"/>
 		<rip:inputText name="signantNom" textKey="contenidor.document.biometrica.camp.interessat.nom" required="true"/>
 		<rip:inputText name="signantNif" textKey="contenidor.document.biometrica.camp.interessat.nif" required="true"/>
+		<div class="title">
+			<label><spring:message code="contenidor.document.biometrica.dades.altres"/></label>
+			<hr>
+		</div>
 		<rip:inputSelect name="firmaParcial" textKey="contenidor.document.biometrica.camp.firmaparcial"  required="true"/>
+		<rip:inputCheckbox name="validateCodeEnabled" textKey="contenidor.document.biometrica.camp.validatecode.check"/>
+		<rip:inputText name="validateCode" textKey="contenidor.document.biometrica.camp.validatecode" required="true"/>
+		<rip:inputCheckbox name="rebreCorreu" textKey="contenidor.document.biometrica.camp.correu"/>
 		<rip:inputTextarea name="observacions" textKey="contenidor.document.biometrica.camp.observacions"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="contenidor.document.biometrica.enviar"/></button>

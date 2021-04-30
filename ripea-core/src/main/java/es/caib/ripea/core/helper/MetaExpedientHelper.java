@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -38,6 +41,7 @@ import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
  * Utilitats comunes pels meta-expedients.
@@ -65,7 +69,12 @@ public class MetaExpedientHelper {
     private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
     @Autowired
     private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private EmailHelper emailHelper;
+    @Autowired
+    private PluginHelper pluginHelper;
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
@@ -92,7 +101,7 @@ public class MetaExpedientHelper {
 	}
 
 	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId, Long organGestorId) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (organGestorId == null) {
 			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);			
@@ -247,7 +256,8 @@ public class MetaExpedientHelper {
 				false,
 				false,
 				false, 
-				true);
+				true, 
+				false);
 		// Cercam els metaExpedients amb permisos assignats directament
 		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaNodeEntity.class,
@@ -334,6 +344,36 @@ public class MetaExpedientHelper {
 		
 		return metaExpedients;
 	}
+	
+
+	
+	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
+
+		if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
+			metaExpedientEntity.updateRevisioEstat(
+					MetaExpedientRevisioEstatEnumDto.PENDENT,
+					null);
+			
+			List<String> emails = new ArrayList<>();
+			List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
+			for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
+				emails.add(dadesUsuari.getEmail());
+			}
+			List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+			for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
+				emails.add(dadesUsuari.getEmail());
+			}
+			emails = new ArrayList<>(new HashSet<>(emails));
+			
+			
+			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, emails);
+		}
+		
+	}
+
+	
 
 	public List<ArbreDto<MetaExpedientCarpetaDto>> obtenirPareArbreCarpetesPerMetaExpedient(
 			MetaExpedientEntity metaExpedient,

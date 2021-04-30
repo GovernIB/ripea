@@ -30,6 +30,7 @@ import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
@@ -115,8 +116,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							anotacioRegistreId,
 							Estat.REBUDA,
 							"");
-					
-
+					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
+					if (entitatAnotacio != null)
+						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 				} catch (Throwable e) {
 					logger.error(
 							"Error consultar i guardar anotació per petició: " +
@@ -264,6 +266,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Canvi d'estat de notificacions";
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_TASCA) {
 				header =  "Canvi d'estat de tasques";
+			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
+				header =  "Canvi d'estat de documents enviat a ViaFirma";
 			}
 			
 			text += header + "\n";

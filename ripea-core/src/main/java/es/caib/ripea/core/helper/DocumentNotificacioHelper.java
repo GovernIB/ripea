@@ -1,7 +1,9 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,12 +77,15 @@ public class DocumentNotificacioHelper {
 	@Autowired
 	private ContingutHelper contingutHelper;
 	
+	public static Map<String, String> notificacionsWithError = new HashMap<String, String>();
+	
 	public void crear(
 			DocumentNotificacioDto notificacioDto, 
 			DocumentEntity documentEntity) {
 //		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
+		notificacionsWithError = new HashMap<String, String>();
 		for (Long interessatId : notificacioDto.getInteressatsIds()) {
 			
 			InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
@@ -127,6 +132,8 @@ public class DocumentNotificacioHelper {
 					notificacioEntity.updateEnviatError(
 							respostaEnviar.getErrorDescripcio(),
 							respostaEnviar.getIdentificador());
+					
+					notificacionsWithError.put(interessat.getDocumentNum(), respostaEnviar.getErrorDescripcio());
 				} else {
 					cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 					notificacioEntity.updateEnviat(
@@ -156,6 +163,10 @@ public class DocumentNotificacioHelper {
 			
 			logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
 		}
+	}
+	
+	public Map<String, String> consultaErrorsNotificacio() {
+		return notificacionsWithError;
 	}
 	
 	public DocumentNotificacioDto update (DocumentNotificacioDto notificacio, DocumentEntity document) {

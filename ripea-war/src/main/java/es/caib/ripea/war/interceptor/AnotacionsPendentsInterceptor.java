@@ -1,0 +1,31 @@
+package es.caib.ripea.war.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import es.caib.ripea.war.helper.AnotacionsPendentsHelper;
+
+public class AnotacionsPendentsInterceptor extends HandlerInterceptorAdapter {
+
+	
+	@Autowired
+	private ExpedientPeticioService expedientPeticioService;
+
+
+
+	@Override
+	public boolean preHandle(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Object handler) throws Exception {
+		AnotacionsPendentsHelper.countAnotacionsPendents(
+				request,
+				expedientPeticioService);
+		return true;
+	}
+	
+}

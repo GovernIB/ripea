@@ -91,7 +91,7 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getId(),
 				false,
 				false,
-				false, false);
+				false, false, false);
 		entity.update(
 				entitat.getCodi(),
 				entitat.getNom(),
@@ -134,7 +134,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		entitat.updateActiva(activa);
 		return conversioTipusHelper.convertir(
 				entitat,
@@ -152,7 +152,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		entitatRepository.delete(entitat);
 		permisosHelper.deleteAcl(
 				entitat.getId(),
@@ -171,7 +171,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		EntitatDto dto = conversioTipusHelper.convertir(
 				entitat,
 				EntitatDto.class);
@@ -257,7 +257,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		return permisosHelper.findPermisos(
 				id,
 				EntitatEntity.class);
@@ -275,7 +275,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		permisosHelper.updatePermis(
 				id,
 				EntitatEntity.class,
@@ -294,7 +294,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		permisosHelper.deletePermis(
 				id,
 				EntitatEntity.class,
@@ -312,7 +312,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
 				id,
 				EntitatEntity.class,
@@ -341,7 +341,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
 				id,
 				EntitatEntity.class,
@@ -371,7 +371,7 @@ public class EntitatServiceImpl implements EntitatService {
 				id,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
 				id,
 				EntitatEntity.class,

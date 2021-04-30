@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
@@ -38,6 +41,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
@@ -346,6 +350,21 @@ public class ExpedientPeticioController extends BaseUserController {
 		return (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitatId, metaExpedientId);
 	}
 
+	@RequestMapping(value = "/comprovarInteressatsPeticio/{expedientId}/{expedientPeticioId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean comprovarInteressatsPeticio(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long expedientPeticioId,
+			Model model) {
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
+		return expedientPeticioService.comprovarExistenciaInteressatsPeticio(
+					entitat.getId(), 
+					expedientId, 
+					expedientPeticioId);
+	}
+	
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
 	public String acceptarPost(
 			HttpServletRequest request,
@@ -363,25 +382,49 @@ public class ExpedientPeticioController extends BaseUserController {
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
-			ExpedientDto expedientDto = expedientService.create(
-					entitat.getId(),
-					command.getMetaExpedientId(),
-					null,
-					command.getOrganGestorId(),
-					null,
-					command.getAny(),
-					null,
-					command.getNewExpedientTitol(),
-					expedientPeticioDto.getId(),
-					command.isAssociarInteressats(),
-					null);
-			processatOk = expedientDto.isProcessatOk();
+			try {
+				ExpedientDto expedientDto = expedientService.create(
+						entitat.getId(),
+						command.getMetaExpedientId(),
+						null,
+						command.getOrganGestorId(),
+						null,
+						command.getAny(),
+						null,
+						command.getNewExpedientTitol(),
+						expedientPeticioDto.getId(),
+						command.isAssociarInteressats(),
+						null);
+				processatOk = expedientDto.isProcessatOk();
+			} catch (Exception ex) {
+				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
+					addWarningDocumentExists(request);
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:expedientPeticio",
+							"expedientPeticio.controller.acceptat.ko");
+				} else {
+					throw ex;
+				}
+			}
 		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
-			processatOk = expedientService.incorporar(
-					entitat.getId(),
-					command.getExpedientId(),
-					expedientPeticioDto.getId(),
-					command.isAssociarInteressats());
+			try {
+				processatOk = expedientService.incorporar(
+						entitat.getId(),
+						command.getExpedientId(),
+						expedientPeticioDto.getId(),
+						command.isAssociarInteressats());
+			} catch (Exception ex) {
+				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
+					addWarningDocumentExists(request);
+					return getModalControllerReturnValueError(
+							request,
+							"redirect:expedientPeticio",
+							"expedientPeticio.controller.acceptat.ko");
+				} else {
+					throw ex;
+				}
+			}
 		}
 		
 		if (!processatOk) {
@@ -396,6 +439,35 @@ public class ExpedientPeticioController extends BaseUserController {
 				request,
 				"redirect:expedientPeticio",
 				"expedientPeticio.controller.acceptat.ok");
+	}
+	
+	private void addWarningDocumentExists(HttpServletRequest request) {
+		List<DocumentDto> documentsAlreadyImported = expedientService.consultaExpedientsAmbImportacio();
+			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
+				List<ContingutDto> path = documentAlreadyImported.getPath();
+				if (path != null) {
+					sb.append("<li>");
+					int idx = 0;
+					for (ContingutDto pathElement: path) {
+						sb.append("<b>/</b>" + pathElement.getNom());
+						if (idx == path.size() - 1)
+							sb.append("<b>/</b>" + documentAlreadyImported.getNom());
+						idx++;
+					}
+					sb.append("</li>");
+				}
+			}
+			sb.append("</ul>");
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+						request, 
+						"expedientPeticio.controller.acceptat.duplicat.warning",
+						new Object[] {sb.toString()}));
+		}
 	}
 	
 	@RequestMapping(value = "/descarregarAnnex/{annexId}", method = RequestMethod.GET)
@@ -417,6 +489,39 @@ public class ExpedientPeticioController extends BaseUserController {
 					"contingut.controller.document.descarregar.error");
 		}
 		return null;
+	}
+	
+	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
+	@ResponseBody
+	public FitxerDto descarregarBase64(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long annexId) throws Exception {
+		FitxerDto fitxer = null;
+		try {
+			fitxer = expedientPeticioService.getAnnexContent(annexId);
+		} catch (Exception ex) {
+			throw new Exception(ex.getMessage());
+		}
+		return fitxer;
+	}
+	
+	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ArxiuFirmaDto> firmaInfoContent(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long annexId,
+			Model model) {
+		List<ArxiuFirmaDto> firmes = null;
+		try {
+			RegistreAnnexDto registreAnnexDto = expedientPeticioService.findAnnexById(
+					annexId);
+			firmes = expedientPeticioService.annexFirmaInfo(registreAnnexDto.getUuid());
+		} catch (Exception ex) {
+			logger.error("Error recuperant informació de firma", ex);
+		}
+		return firmes;
 	}
 	
 	@RequestMapping(value = "/descarregarJustificant/{registreId}", method = RequestMethod.GET)

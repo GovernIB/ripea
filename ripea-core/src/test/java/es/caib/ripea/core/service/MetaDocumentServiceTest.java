@@ -181,7 +181,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								metaDocumentUpdate,
 								"document.pdf",
 								"application/pdf",
-								PLANTILLA_CONTINGUT);
+								PLANTILLA_CONTINGUT, "tothom");
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -214,7 +214,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 						MetaDocumentDto esborrat = metaDocumentService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								metaDocumentCreat.getId());
+								metaDocumentCreat.getId(), "tothom");
 						comprovarMetaDocumentCoincideix(
 								metaDocumentCreate,
 								esborrat);
@@ -249,7 +249,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								metaDocumentCreat.getId(),
-								false);
+								false, "tothom");
 						assertEquals(
 								false,
 								desactivat.isActiu());
@@ -257,7 +257,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								metaDocumentCreat.getId(),
-								true);
+								true, "tothom");
 						assertEquals(
 								true,
 								activat.isActiu());
@@ -285,7 +285,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 									metaDocumentCreate,
 									null,
 									null,
-									null);
+									null, null);
 						} catch (DataIntegrityViolationException ex) {
 							// Excepció esperada
 						}

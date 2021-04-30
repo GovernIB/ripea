@@ -30,13 +30,17 @@ import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ImportacioService;
+import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.PropertiesHelper;
+import es.caib.ripea.core.repository.CarpetaRepository;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.
@@ -54,6 +58,12 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	@Autowired
+	private CarpetaRepository carpetaRepository;
+	
+	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	@Transactional
 	@Override
@@ -75,7 +85,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false, 
 				false);
-
+		// ############### RECUPERAR DOCUMENTS DEL NUMERO D REGISTRE INTRDUIT #########
 		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(
 				dades.getNumeroRegistre(),
 				dades.getDataPresentacioFormatted(),
@@ -90,8 +100,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 		}
 		int idx = 1;
 		List<Document> documents = new ArrayList<Document>();
+		expedientsWithImportacio = new ArrayList<DocumentDto>();
+		// ############### IMPORTAR EL DETALL DE CADA DOCUMENT #########
 		outerloop: for (ContingutArxiu contingutArxiu : documentsArxiu) {
 			DocumentEntity entity = null;
+			CarpetaEntity carpetaEntity = null;
 			Document documentArxiu = pluginHelper.importarDocument(
 					expedientSuperior.getArxiuUuid(),
 					contingutArxiu.getIdentificador(),
@@ -106,15 +119,41 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
 			fitxer.setContingut(documentArxiu.getContingut().getContingut());
 
-			for (ContingutEntity contingut: contingutPare.getFills()) {
-				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
-					if (contingut.getNom().equals(tituloDoc)) {
-						documentsRepetits++;
-						continue outerloop;
-					} 
+			// comprovar si el justificant s'ha importat anteriorment
+			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(contingutArxiu.getIdentificador());
+			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty()) {
+				for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
+					expedientsWithImportacio.add(documentAlreadyImported);
+					documentsRepetits++;
 				}
+				continue outerloop;
+//				throw new DocumentAlreadyImportedException();
+			}
+//			for (ContingutEntity contingut: contingutPare.getFills()) {
+//				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
+//					if (contingut.getNom().equals(tituloDoc)) {
+//						documentsRepetits++;
+//						continue outerloop;
+//					} 
+//				}
+//			}
+			// ############### CREAR CARPETA PARE ON INTRODUIR DOCUMENT #########
+			boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+			if (isCarpetaActive) {
+				// create carpeta ind db and arxiu if doesnt already exists
+				Long carpetaId = expedientHelper.createCarpetaFromExpPeticio(
+						expedientSuperior,
+						entitatId,
+						"Registre entrada: " + dades.getNumeroRegistre());
+				carpetaEntity = carpetaRepository.findOne(carpetaId);
 			}
 			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')) : documentArxiu.getNom();
+			contingutHelper.comprovarNomValid(
+					isCarpetaActive ? carpetaEntity : expedientSuperior,
+					nomDocument,
+					null,
+					DocumentEntity.class);
+			// ############### CREAR DOCUMENT A LA BBDD #########
 			entity = documentHelper.crearDocumentDB(
 					DocumentTipusEnumDto.IMPORTAT,
 					nomDocument,
@@ -127,7 +166,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 					getEstatElaboracio(documentArxiu),
 					getTipusDocumental(documentArxiu),
 					null, //metaDocumentEntity
-					contingutPare,
+					isCarpetaActive ? carpetaEntity : contingutPare,
 					contingutPare.getEntitat(),
 					expedientSuperior,
 					null,
@@ -144,6 +183,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			} else {
 				entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 			}
+			// ############### ACTUALITZAR METADADES NTI #########
 			entity.updateArxiu(documentArxiu.getIdentificador());
 			entity.updateNtiIdentificador(documentArxiu.getMetadades().getIdentificador());
 			entity.updateNti(
@@ -170,6 +210,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 			}
 		}
 		return documentsRepetits;
+	}
+	
+	@Override
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return expedientsWithImportacio;
 	}
 	
 	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";

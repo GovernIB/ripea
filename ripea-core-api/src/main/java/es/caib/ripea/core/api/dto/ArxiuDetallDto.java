@@ -27,7 +27,6 @@ public class ArxiuDetallDto extends ArxiuContingutDto {
 	private DocumentNtiTipoDocumentalEnumDto eniTipusDocumental;
 	private String eniTipusDocumentalAddicional;
 	private String eniFormat;
-	private String eniExtensio;
 	private String eniDocumentOrigenId;
 	private String serieDocumental;
 
@@ -116,12 +115,6 @@ public class ArxiuDetallDto extends ArxiuContingutDto {
 	}
 	public void setEniFormat(String eniFormat) {
 		this.eniFormat = eniFormat;
-	}
-	public String getEniExtensio() {
-		return eniExtensio;
-	}
-	public void setEniExtensio(String eniExtensio) {
-		this.eniExtensio = eniExtensio;
 	}
 	public String getEniDocumentOrigenId() {
 		return eniDocumentOrigenId;

@@ -7,6 +7,7 @@ package es.caib.ripea.core.helper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -132,8 +133,8 @@ public class ExpedientHelper {
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-	
 
+	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	public ExpedientEntity create(
 			Long entitatId,
@@ -153,7 +154,7 @@ public class ExpedientHelper {
 					ExpedientEntity.class,
 					"No es pot crear un expedient sense un meta-expedient associat");
 		}
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,
 				metaExpedientId,
@@ -246,25 +247,38 @@ public class ExpedientHelper {
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
 		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
 			boolean alreadyExists = false;
-			for (InteressatEntity existingInteressat : existingInteressats) {
-				if (existingInteressat.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero()))
+			InteressatEntity existingInteressat = null;
+			for (InteressatEntity interessatExpedient : existingInteressats) {
+				if (interessatExpedient.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero())) {
 					alreadyExists = true;
+					existingInteressat = interessatExpedient;
+				}
 			}
 			if (!alreadyExists) {
 				InteressatDto createdInteressat = expedientInteressatHelper.create(
 						entitatId,
 						expedientId,
 						null,
-						toInteressatDto(registreInteressatEntity),
+						toInteressatDto(registreInteressatEntity, null),
 						true);
 				if (registreInteressatEntity.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
 							expedientId,
 							createdInteressat.getId(),
-							toInteressatDto(registreInteressatEntity.getRepresentant()),
+							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
 							true);
 				}
+			} else {
+				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();
+				Long idRepresentant = representant != null ? representant.getId() : null; //modificar o afegir
+				expedientInteressatHelper.update(
+						entitatId, 
+						expedientId, 
+						existingInteressat.getId(), 
+						toInteressatDto(registreInteressatEntity, existingInteressat.getId()), 
+						true,
+						representant != null ? toInteressatDto(representant, idRepresentant) : null);
 			}
 		}
 	}
@@ -293,24 +307,23 @@ public class ExpedientHelper {
 	 * Creates document from registre annex
 	 * 
 	 * @param registreAnnexId
+	 * @param expedientId 
 	 * @param expedientPeticioId
 	 * @return
 	 */
 	@Transactional
-	public DocumentEntity crearDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
-		ExpedientPeticioEntity expedientPeticioEntity;
+	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, ExpedientPeticioEntity expedientPeticioEntity) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
-		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
+		expedientEntity = expedientRepository.findOne(expedientId);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
 				"Creant carpeta i documents de expedient peticio (" + "expedientId=" +
-						expedientPeticioEntity.getExpedient().getId() + ", " + "registreAnnexId=" + registreAnnexId +
-						", " + "expedientPeticioId=" + expedientPeticioId + ")");
+						expedientId + ", " + "registreAnnexId=" + registreAnnexId +
+						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
@@ -321,7 +334,7 @@ public class ExpedientHelper {
 			Long carpetaId = createCarpetaFromExpPeticio(
 					expedientEntity,
 					entitat.getId(),
-					expedientPeticioEntity.getRegistre().getIdentificador());
+					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
 
@@ -460,11 +473,20 @@ public class ExpedientHelper {
 		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
 		documentRepository.save(docEntity);
 		contingutLogHelper.logCreacio(docEntity, true, true);
+		
+		// comprovar si el justificant s'ha importat anteriorment
+		List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
+		if (documents != null && !documents.isEmpty()) {
+			for (DocumentDto documentAlreadyImported: documents) {
+				expedientsWithImportacio.add(documentAlreadyImported);
+			}
+		}		
 		return docEntity;
 	}
 	
 	/**
 	 * Creates document from registre annex
+	 * @param expedientId 
 	 * 
 	 * @param registreAnnexId
 	 * @param expedientPeticioId
@@ -472,15 +494,13 @@ public class ExpedientHelper {
 	 */
 	@Transactional
 	public DocumentEntity crearDocFromUuid(
+			Long expedientId, 
 			String arxiuUuid, 
-			Long expedientPeticioId) {
-		ExpedientPeticioEntity expedientPeticioEntity;
+			ExpedientPeticioEntity expedientPeticioEntity) {
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
-		expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		expedientEntity = expedientRepository.findOne(expedientPeticioEntity.getExpedient().getId());
-
+		expedientEntity = expedientRepository.findOne(expedientId);
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 				null, 
 				arxiuUuid, 
@@ -491,8 +511,8 @@ public class ExpedientHelper {
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
 				"Creant justificant de expedient peticio (" + "expedientId=" +
-						expedientPeticioEntity.getExpedient().getId() + ", " + "arxiuUuid=" + arxiuUuid +
-						", " + "expedientPeticioId=" + expedientPeticioId + ")");
+						expedientId + ", " + "arxiuUuid=" + arxiuUuid +
+						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
@@ -502,7 +522,7 @@ public class ExpedientHelper {
 			Long carpetaId = createCarpetaFromExpPeticio(
 					expedientEntity,
 					entitat.getId(),
-					expedientPeticioEntity.getRegistre().getIdentificador());
+					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador());
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
 
@@ -511,6 +531,13 @@ public class ExpedientHelper {
 		DocumentDto documentDto = toDocumentDto(
 				documentDetalls, 
 				expedientPeticioEntity.getIdentificador());
+		// comprovar si el justificant s'ha importat anteriorment
+		List<DocumentDto> documents = documentHelper.findByArxiuUuid(arxiuUuid);
+		if (documents != null && !documents.isEmpty()) {
+			for (DocumentDto documentAlreadyImported: documents) {
+				expedientsWithImportacio.add(documentAlreadyImported);
+			}
+		}
 		contingutHelper.comprovarNomValid(
 				isCarpetaActive ? carpetaEntity : expedientEntity,
 				documentDto.getNom(),
@@ -612,6 +639,14 @@ public class ExpedientHelper {
 		documentRepository.save(docEntity);
 		contingutLogHelper.logCreacio(docEntity, true, true);
 		return docEntity;
+	}
+	
+	public void inicialitzarExpedientsWithImportacio() {
+		expedientsWithImportacio = new ArrayList<DocumentDto>();
+	}
+	
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return expedientsWithImportacio;
 	}
 	
 	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
@@ -813,7 +848,7 @@ public class ExpedientHelper {
 		document.setDocumentTipus(DocumentTipusEnumDto.IMPORTAT);
 		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
 		document.setData(new Date());
-		document.setNom(registreAnnexEntity.getTitol());
+		document.setNom(registreAnnexEntity.getTitol() + " - " + registreAnnexEntity.getRegistre().getIdentificador().replace('/', '_'));
 		document.setFitxerNom(registreAnnexEntity.getNom());
 		document.setArxiuUuid(registreAnnexEntity.getUuid());
 		document.setDataCaptura(registreAnnexEntity.getNtiFechaCaptura());
@@ -1028,7 +1063,7 @@ public class ExpedientHelper {
 		return tipusDocumental;
 	}
 
-	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity) {
+	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity, Long existingInteressatId) {
 		InteressatDto interessatDto = null;
 		switch (registreInteressatEntity.getTipus()) {
 		case PERSONA_FISICA:
@@ -1049,6 +1084,7 @@ public class ExpedientHelper {
 			interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
 			interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
 			interessatPersonaFisicaDto.setLlinatge2(registreInteressatEntity.getLlinatge2());
+			interessatPersonaFisicaDto.setId(existingInteressatId);
 			interessatDto = interessatPersonaFisicaDto;
 			break;
 		case PERSONA_JURIDICA:
@@ -1067,6 +1103,7 @@ public class ExpedientHelper {
 			interessatPersonaJuridicaDto.setNotificacioAutoritzat(false);
 			interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
 			interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
+			interessatPersonaJuridicaDto.setId(existingInteressatId);
 			interessatDto = interessatPersonaJuridicaDto;
 			break;
 		case ADMINISTRACIO:
@@ -1085,6 +1122,7 @@ public class ExpedientHelper {
 			interessatAdministracioDto.setNotificacioAutoritzat(false);
 			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());
+			interessatAdministracioDto.setId(existingInteressatId);
 			interessatDto = interessatAdministracioDto;
 			break;
 		}
@@ -1284,7 +1322,7 @@ public class ExpedientHelper {
 		return documentNtiTipoDocumental;
 	}
 
-	private Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {
+	public Long createCarpetaFromExpPeticio(ExpedientEntity expedientEntity, Long entitatId, String nom) {
 		// check if already exists in db
 		boolean carpetaExistsInDB = false;
 		Long carpetaId = null;

@@ -291,10 +291,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
 	
-	
-	
-
-	
+	public List<DocumentEntity> findByArxiuUuidAndEsborrat(String arxiuUuid, int esborrat);
 	
 //	@Query(	"select " +
 //			"    d " +

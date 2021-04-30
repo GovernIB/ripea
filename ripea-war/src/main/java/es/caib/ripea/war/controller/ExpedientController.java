@@ -73,6 +73,7 @@ import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -639,9 +640,33 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			} else {
 				url = "redirect:../../contingut/" + expedientId;
 			}
-			expedientService.agafarUser(
-					entitatActual.getId(),
-					expedientId);
+			
+			if (RolHelper.isRolActualAdministrador(request)) {
+				expedientService.agafarAdmin(entitatActual.getId(), 
+									null, 
+									expedientId, 
+									aplicacioService.getUsuariActual().getCodi());
+				
+			}
+			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+				if (expedientService.isOrganGestorPermes(expedientId)) {
+					expedientService.agafarAdmin(entitatActual.getId(), 
+										null, 
+										expedientId, 
+										aplicacioService.getUsuariActual().getCodi());
+
+				}
+				else {
+					expedientService.agafarUser(
+							entitatActual.getId(),
+							expedientId);
+				}
+			}
+			else {
+				expedientService.agafarUser(
+						entitatActual.getId(),
+						expedientId);
+			}
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,

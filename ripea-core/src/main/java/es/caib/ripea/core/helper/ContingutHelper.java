@@ -577,7 +577,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -666,7 +666,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -698,7 +698,7 @@ public class ContingutHelper {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);

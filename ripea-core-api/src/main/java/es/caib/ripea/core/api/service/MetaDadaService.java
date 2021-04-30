@@ -28,6 +28,7 @@ public interface MetaDadaService {
 	 *            Id del meta-node.
 	 * @param metaDada
 	 *            Informació de la meta-dada a crear.
+	 * @param rolActual TODO
 	 * @return La MetaDada creada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -36,7 +37,7 @@ public interface MetaDadaService {
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada) throws NotFoundException;
+			MetaDadaDto metaDada, String rolActual) throws NotFoundException;
 
 	/**
 	 * Actualitza la informació de la meta-dada que tengui el mateix
@@ -48,6 +49,7 @@ public interface MetaDadaService {
 	 *            Id del meta-node.
 	 * @param metaDada
 	 *            Informació de la meta-dada a modificar.
+	 * @param rolActual TODO
 	 * @return La meta-dada modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -56,7 +58,7 @@ public interface MetaDadaService {
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada) throws NotFoundException;
+			MetaDadaDto metaDada, String rolActual) throws NotFoundException;
 
 	/**
 	 * Esborra la meta-dada amb el mateix id que l'especificat.
@@ -65,6 +67,7 @@ public interface MetaDadaService {
 	 *            Id de l'entitat.
 	 * @param id
 	 *            Atribut id de la meta-dada a esborrar.
+	 * @param rolActual TODO
 	 * @return La meta-dada esborrada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -73,7 +76,7 @@ public interface MetaDadaService {
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
-			Long id) throws NotFoundException;
+			Long id, String rolActual) throws NotFoundException;
 
 	/**
 	 * Marca com a activa/inactiva la meta-dada amb el mateix id
@@ -88,6 +91,7 @@ public interface MetaDadaService {
 	 * @param activa
 	 *            true si la meta-dada es vol activar o false en cas
 	 *            contrari.
+	 * @param rolActual TODO
 	 * @return La meta-dada modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -97,7 +101,7 @@ public interface MetaDadaService {
 			Long entitatId,
 			Long metaNodeId,
 			Long id,
-			boolean activa) throws NotFoundException;
+			boolean activa, String rolActual) throws NotFoundException;
 
 	/**
 	 * Mou una meta-dada del meta-expedient una posició cap amunt.

@@ -59,7 +59,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		if (! suportaMetaDocumentalsAddicionals())
 			throw new ValidationException(
 					"<creacio>",
@@ -88,7 +88,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		if (! suportaMetaDocumentalsAddicionals())
 			throw new ValidationException(
 					"<creacio>",
@@ -124,7 +124,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		if (! suportaMetaDocumentalsAddicionals())
 			throw new ValidationException(
 					"<creacio>",
@@ -164,10 +164,12 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 
 		Page<TipusDocumentalEntity> page = tipusDocumentalRepository.findByEntitat(
 				entitat,
+				paginacioParams.getFiltre() == null,
+				paginacioParams.getFiltre(),
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 
 		return paginacioHelper.toPaginaDto(
@@ -183,7 +185,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 
 		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
 		List<TipusDocumentalDto> tipusDocumentalsDto =  conversioTipusHelper.convertirList(
@@ -205,7 +207,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 
 		TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 				codi, 

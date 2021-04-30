@@ -37,7 +37,7 @@ import es.caib.ripea.war.validation.ValidIfSeparada;
 
 @ArxiuNoBuit(groups = {CreateDigital.class, CreateFirmaSeparada.class})
 @NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class})
-@DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
+//@DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
 @ValidIfSeparada(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 @ExpedientODocumentNom(groups = {CreateDigital.class, UpdateDigital.class})
 public class DocumentCommand extends ContenidorCommand {

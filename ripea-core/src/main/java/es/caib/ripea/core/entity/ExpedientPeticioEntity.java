@@ -70,7 +70,7 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "registre_id")
 	protected RegistreEntity registre;
 	
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_id")
 	@ForeignKey(name = "ipa_expedient_registre_fk")
 	private ExpedientEntity expedient;

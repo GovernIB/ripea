@@ -3,9 +3,10 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,8 +100,6 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
-import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -264,7 +263,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -328,7 +327,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -818,7 +817,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -901,7 +900,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -937,7 +936,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 //		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 //				entitat,
 //				contingutId);
@@ -960,7 +959,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 //		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
 //				entitatId,
 //				contingutId,
@@ -983,7 +982,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				false,
 				false,
-				true, false);
+				true, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
 				contingutId);
@@ -1019,7 +1018,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		MetaNodeEntity metaNode = null;
 		if (filtre.getMetaNodeId() != null) {
 			metaNode = metaNodeRepository.findOne(filtre.getMetaNodeId());
@@ -1033,19 +1032,26 @@ public class ContingutServiceImpl implements ContingutService {
 		boolean tipusDocument = true;
 		boolean tipusExpedient = true;
 		if (filtre.getTipus() != null) {
-			tipusCarpeta = false;
-			tipusDocument = false;
 			switch (filtre.getTipus()) {
 			case CARPETA:
 				tipusCarpeta = true;
+				tipusDocument = false;
+				tipusExpedient = false;
 				break;
 			case DOCUMENT:
+				tipusCarpeta = false;
 				tipusDocument = true;
+				tipusExpedient = false;
 				break;
 			case EXPEDIENT:
+				tipusCarpeta = false;
+				tipusDocument = false;
 				tipusExpedient = true;
 				break;
 			case REGISTRE:
+				tipusCarpeta = false;
+				tipusDocument = false;
+				tipusExpedient = false;
 				break;
 			}
 		}
@@ -1106,7 +1112,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		UsuariEntity usuari = null;
 		if (usuariCodi != null && !usuariCodi.isEmpty()) {
 			usuari = usuariRepository.findOne(usuariCodi);
@@ -1164,7 +1170,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
@@ -1195,7 +1201,7 @@ public class ContingutServiceImpl implements ContingutService {
 				}
 				arxiuDetall.setEniInteressats(metadades.getInteressats());
 				arxiuDetall.setEniOrgans(metadades.getOrgans());
-				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
+				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());		
 			}
 		} else if (contingut instanceof DocumentEntity) {
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
@@ -1333,11 +1339,22 @@ public class ContingutServiceImpl implements ContingutService {
 				if (metadades.getFormat() != null) {
 					arxiuDetall.setEniFormat(metadades.getFormat().toString());
 				}
-				if (metadades.getExtensio() != null) {
-					arxiuDetall.setEniExtensio(metadades.getExtensio().toString());
-				}
 				arxiuDetall.setEniDocumentOrigenId(metadades.getIdentificadorOrigen());
+				
+				final String fechaSelladoKey = "eni:fecha_sellado";
+				if (metadades.getMetadadesAddicionals().containsKey(fechaSelladoKey)) {
+					try {
+						DateFormat dfIn= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+						DateFormat dfOut = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+						Date fechaSelladoValor = dfIn.parse(metadades.getMetadadesAddicionals().get(fechaSelladoKey).toString());
+						String fechaSelladoValorStr = dfOut.format(fechaSelladoValor);
+						metadades.getMetadadesAddicionals().put(fechaSelladoKey, fechaSelladoValorStr);
+					} catch (ParseException e) {
+						logger.error(e.getMessage(), e);
+					}		
+				}
 				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
+				
 				if (arxiuDocument.getContingut() != null) {
 					arxiuDetall.setContingutArxiuNom(
 							arxiuDocument.getContingut().getArxiuNom());
@@ -1528,7 +1545,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				true);
+				true, false);
 
 		
 		boolean checkPerMassiuAdmin = false;
@@ -1612,7 +1629,7 @@ public class ContingutServiceImpl implements ContingutService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		
 		boolean checkPerMassiuAdmin = false;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {

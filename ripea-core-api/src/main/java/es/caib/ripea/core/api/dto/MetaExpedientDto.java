@@ -36,6 +36,9 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     
     private boolean gestioAmbGrupsActiva;
     
+	private MetaExpedientRevisioEstatEnumDto revisioEstat;
+	private String revisioComentari;
+	
 	public boolean isComu() {
 		if (organGestor == null) {
 			return true;

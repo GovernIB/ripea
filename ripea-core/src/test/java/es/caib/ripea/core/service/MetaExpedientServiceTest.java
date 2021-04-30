@@ -157,7 +157,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						metaExpedientUpdate.setId(metaExpedientCreat.getId());
 						MetaExpedientDto modificat = metaExpedientService.update(
 								entitatCreada.getId(),
-								metaExpedientUpdate);
+								metaExpedientUpdate, null);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -216,14 +216,14 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						MetaExpedientDto desactivat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
-								false);
+								false, "tothom");
 						assertEquals(
 								false,
 								desactivat.isActiu());
 						MetaExpedientDto activat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
-								true);
+								true, "tothom");
 						assertEquals(
 								true,
 								activat.isActiu());

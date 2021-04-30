@@ -3,6 +3,7 @@ package es.caib.ripea.war.command;
 import es.caib.ripea.core.api.dto.MetaExpedientActiuEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ public class MetaExpedientFiltreCommand {
 	private Long organGestorId;
 	private MetaExpedientActiuEnumDto actiu;
 	private MetaExpedientAmbitEnumDto ambit;
+	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	
 
 	public MetaExpedientFiltreDto asDto() {
@@ -40,6 +42,9 @@ public class MetaExpedientFiltreCommand {
 	}
 	public void setAmbit(MetaExpedientAmbitEnumDto ambit) {
 		this.ambit = ambit;
+	}
+	public void setRevisioEstat(MetaExpedientRevisioEstatEnumDto revisioEstat) {
+		this.revisioEstat = revisioEstat;
 	}
 	
 }

@@ -19,10 +19,13 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -58,13 +61,15 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private MetaNodeHelper metaNodeHelper;
+	@Resource
+	private MetaExpedientHelper metaExpedientHelper;
 
 	@Transactional
 	@Override
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada) {
+			MetaDadaDto metaDada, String rolActual) {
 		logger.debug("Creant una nova meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -101,6 +106,16 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				metaNode).
 				descripcio(metaDada.getDescripcio()).
 				build();
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			Long metaExpedientId = null;
+			if (metaNode instanceof MetaExpedientEntity) {
+				metaExpedientId = metaNode.getId();
+			} else if (metaNode instanceof MetaDocumentEntity) {
+				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
+			}
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+		}
 		return conversioTipusHelper.convertir(
 				metaDadaRepository.save(entity),
 				MetaDadaDto.class);
@@ -111,7 +126,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada) {
+			MetaDadaDto metaDada, String rolActual) {
 		logger.debug("Actualitzant meta-dada existent (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -148,6 +163,16 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				valor,
 				metaDada.getDescripcio(),
 				metaDada.isReadOnly());
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			Long metaExpedientId = null;
+			if (metaNode instanceof MetaExpedientEntity) {
+				metaExpedientId = metaNode.getId();
+			} else if (metaNode instanceof MetaDocumentEntity) {
+				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
+			}
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+		}
 		return conversioTipusHelper.convertir(
 				entity,
 				MetaDadaDto.class);
@@ -158,7 +183,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
-			Long id) {
+			Long id, String rolActual) {
 		logger.debug("Esborrant meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -167,11 +192,25 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
+		
+		
 		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
 				entitat,
 				metaNode,
 				id);
 		metaDadaRepository.delete(metaDada);
+		
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			Long metaExpedientId = null;
+			if (metaNode instanceof MetaExpedientEntity) {
+				metaExpedientId = metaNode.getId();
+			} else if (metaNode instanceof MetaDocumentEntity) {
+				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
+			}
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+		}
+
 		return conversioTipusHelper.convertir(
 				metaDada,
 				MetaDadaDto.class);
@@ -183,7 +222,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			Long entitatId,
 			Long metaNodeId,
 			Long id,
-			boolean activa) {
+			boolean activa, String rolActual) {
 		logger.debug("Actualitzant propietat activa de la meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -198,6 +237,16 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				metaNode,
 				id);
 		metaDada.updateActiva(activa);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			Long metaExpedientId = null;
+			if (metaNode instanceof MetaExpedientEntity) {
+				metaExpedientId = metaNode.getId();
+			} else if (metaNode instanceof MetaDocumentEntity) {
+				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
+			}
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+		}
 		return conversioTipusHelper.convertir(
 				metaDada,
 				MetaDadaDto.class);
@@ -370,7 +419,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitatId,
 				false,
 				true,
-				false, false);
+				false, false, false);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
@@ -392,7 +441,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		NodeEntity node = entityComprovarHelper.comprovarNode(entitat, nodeId);
 		return conversioTipusHelper.convertirList(
 				metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(node.getMetaNode()),
@@ -407,7 +456,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		NodeEntity node = entityComprovarHelper.comprovarNode(entitat, nodeId);
 		return node.getMetaNode().getId();
 	}

@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -54,6 +53,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -75,6 +75,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -87,6 +88,7 @@ import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -164,12 +166,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private UsuariRepository usuariRepository;
-
-
+	@Autowired
+	private CacheHelper cacheHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
+	
+	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
 	@Transactional
 	@Override
-	public ExpedientDto create(
+	public ExpedientDto create (
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
@@ -221,12 +227,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
+			expedientHelper.inicialitzarExpedientsWithImportacio();
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 				try {
 					expedientHelper.crearDocFromAnnex(
+							expedient.getId(),
 							registeAnnexEntity.getId(),
-							expedientPeticioEntity.getId());
-					
+							expedientPeticioEntity);
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
@@ -238,9 +245,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
 			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-				expedientHelper.crearDocFromUuid(
-						arxiuUuid, 
-						expedientPeticioEntity.getId());
+				try {
+					expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+					expedientHelper.crearDocFromUuid(
+							expedient.getId(),
+							arxiuUuid, 
+							expedientPeticioEntity);
+				} catch (Exception e) {
+					processatOk = false;
+					logger.info(ExceptionUtils.getStackTrace(e));
+				}
+				
+			}
+			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
+				throw new DocumentAlreadyImportedException();
 			}
 			canviEstatToProcessatPendent(expedientPeticioEntity);
 			if (processatOk) {
@@ -251,6 +269,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientDto;
 	}
 
+	@Transactional
 	@Override
 	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats) {
 		logger.debug("Incorporant a l'expedient existent (" +
@@ -260,6 +279,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId);
 		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId);
+		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
 		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			try {
@@ -267,8 +287,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 				expedientHelper.crearDocFromAnnex(
+						expedientId,
 						registeAnnexEntity.getId(),
-						expedientPeticioEntity.getId());
+						expedientPeticioEntity);	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
@@ -277,9 +298,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-			expedientHelper.crearDocFromUuid(
-					arxiuUuid, 
-					expedientPeticioEntity.getId());
+			try {
+				expedientHelper.crearDocFromUuid(
+						expedientId,
+						arxiuUuid, 
+						expedientPeticioEntity);
+			} catch (Exception e) {
+				logger.error(ExceptionUtils.getStackTrace(e));
+			}
+		}
+		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
+			throw new DocumentAlreadyImportedException();
 		}
 		canviEstatToProcessatPendent(expedientPeticioEntity);
 		if (processatOk) {
@@ -293,7 +322,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientPeticioEntity.getId(),
 				ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 	}
-
+	
+	@Override
+	public List<DocumentDto> consultaExpedientsAmbImportacio() {
+		return expedientHelper.consultaExpedientsAmbImportacio();
+	}
+	
 	public void notificarICanviEstatToProcessatNotificat(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
@@ -311,11 +345,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
 		boolean processatOk = true;
 		try {
-			expedientHelper.crearDocFromAnnex(registreAnnexId, expedientPeticioId);
+			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity);
 
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {
@@ -418,7 +454,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,
 				metaExpedientId,
@@ -452,7 +488,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Obtenint els comentaris pel contingut (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
 						")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -475,7 +511,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Obtenint els comentaris pel expedient (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
 						")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -530,7 +566,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, rolActual);
 	}
 
@@ -545,7 +581,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, "tothom");
 	}
 
@@ -555,7 +591,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients(" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
@@ -607,7 +643,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients segons el tipus per usuaris (" + "entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
@@ -646,7 +682,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els ids d'expedient segons el filtre (" + "entitatId=" + entitatId + ", " + "filtre=" +
 						filtre + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		return findIdsAmbFiltrePaginat(entitatId, filtre, false, true);
 	}
 
@@ -713,7 +749,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, false);
 		
 
-		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+		expedientHelper.agafar(expedient, usuariCodi);
 	}
 
 	@Transactional
@@ -764,6 +800,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false, 
 				checkPerMassiuAdmin);
+		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
+			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
+		}
 		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
 		if (!documentHelper.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
 			throw new ExpedientTancarSenseDocumentsDefinitiusException();
@@ -782,8 +821,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
 					if (document != null) {
 						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						ArxiuFirmaDto arxiuFirma = documentFirmaServidorFirma.firmar(document, fitxer, motiu);
-						pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
+						documentFirmaServidorFirma.firmar(document, fitxer, motiu);
+						//pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
 					} else {
 						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
 					}
@@ -841,7 +880,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		
 		boolean checkPerMassiuAdmin = false;
 		boolean nomesAgafats = true;
@@ -918,7 +957,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
@@ -1128,7 +1167,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String format) throws IOException {
 		logger.debug(
 				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		List<Long> metaExpedientIds = metaExpedientRepository.findDistinctMetaExpedientIdsByExpedients(expedientIds);
 		for (Long metaExpedientId : metaExpedientIds) {
 			entityComprovarHelper.comprovarMetaExpedientPerExpedient(
@@ -1242,7 +1281,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId +
 						")");
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -1370,7 +1409,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Exportant índex dels expedients seleccionats (" + "entitatId=" + entitatId + ", " + "expedientIds=" +
 						expedientIds + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
 
@@ -1385,6 +1424,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 		resultat.setContingut(baos.toByteArray());
 		return resultat;
 	}
+	
+	@Override
+	@Transactional	
+	public boolean isOrganGestorPermes (Long expedientId) {
+		ExpedientEntity expediente = expedientRepository.findOne(expedientId);
+		
+		return organGestorHelper.isOrganGestorPermes(expediente.getMetaExpedient(), 
+				expediente.getOrganGestor(), 
+				ExtendedPermission.ADMINISTRATION);
+	}
 
 	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
@@ -1392,7 +1441,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			PaginacioParamsDto paginacioParams,
 			Long expedientId, 
 			String rolActual) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedientFiltre = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
@@ -1486,7 +1535,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
-			ordenacioMap.put("tipusStr", new String[] { "metaExpedient.nom", "metaExpedient.classificacioSia" });
 			// Cercam els metaExpedients amb permisos assignats directament
 			List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaNodeEntity.class,
@@ -1567,7 +1615,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			boolean accesAdmin,
 			boolean comprovarAccesMetaExpedients) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, (!accesAdmin), accesAdmin, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, (!accesAdmin), accesAdmin, false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
@@ -1633,6 +1681,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientDto;
 	}
 	
+	private boolean isIncorporacioDuplicadaPermesa() {
+		boolean isPropagarRelacio = Boolean.parseBoolean(
+				PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporacio.anotacions.duplicada"));
+		return isPropagarRelacio;
+	}
+	
 	private boolean isProgaparRelacioActiva() {
 		boolean isPropagarRelacio = Boolean.parseBoolean(
 				PropertiesHelper.getProperties().getProperty("es.caib.ripea.propagar.relacio.expedients"));
@@ -1651,7 +1705,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return listLong;
 	}
-
+	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);
 
 }

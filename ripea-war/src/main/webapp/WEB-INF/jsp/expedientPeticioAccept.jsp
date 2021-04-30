@@ -129,9 +129,30 @@ $(document).ready(function(){
 		webutilModalAdjustHeight();
 	});
 
-
+	$('#btnSave').on('click', function() {
+		var showConfirm = false;
+		var expedientId = $('#expedientId').val();
+		if (expedientId != null && expedientId != '') {
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedientPeticio/comprovarInteressatsPeticio/"/>' + expedientId + '/${expedientPeticioId}',
+				async: false,
+				success: function(data) {
+					showConfirm = data;
+				}
+			});
+		}
+		
+		if (showConfirm) {
+			var overrideInteressat = confirm("<spring:message code="expedientPeticio.form.acceptar.confirm"/>");
+			if (overrideInteressat) {
+				$('#expedientPeticioAcceptarForm').submit();
+			}
+		} else {
+			$('#expedientPeticioAcceptarForm').submit();
+		}
+	});
 });
-
 </script>
 
 </head>
@@ -139,8 +160,7 @@ $(document).ready(function(){
 	<c:set var="formAction">
 		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
 	</c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal"
-		commandName="expedientPeticioAcceptarCommand">
+	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
 		<form:hidden path="id" />
 
 		<rip:inputRadio name="expedientPeticioAccioEnumDto" textKey="expedientPeticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
@@ -170,7 +190,7 @@ $(document).ready(function(){
  			textKey="expedientPeticio.form.acceptar.camp.associarInteressats"/> 
 			
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success">
+			<button id="btnSave" type="button" class="btn btn-success">
 				<span class="fa fa-save"></span>
 				<spring:message code="comu.boto.guardar" />
 			</button>

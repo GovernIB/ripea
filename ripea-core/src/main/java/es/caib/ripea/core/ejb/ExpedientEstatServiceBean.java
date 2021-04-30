@@ -40,14 +40,14 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
-		return delegate.createExpedientEstat(entitatId, estat);
+	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual) {
+		return delegate.createExpedientEstat(entitatId, estat, rolActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat) {
-		return delegate.updateExpedientEstat(entitatId, estat);
+	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual) {
+		return delegate.updateExpedientEstat(entitatId, estat, rolActual);
 	}
 
 	@Override
@@ -56,14 +56,14 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 			Long entitatId,
 			Long metaExpedientId,
 			Long expedientEstatId,
-			int posicio) throws NotFoundException {
-		return delegate.moveTo(entitatId, metaExpedientId, expedientEstatId, posicio);
+			int posicio, String rolActual) throws NotFoundException {
+		return delegate.moveTo(entitatId, metaExpedientId, expedientEstatId, posicio, rolActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId) throws NotFoundException {
-		return delegate.deleteExpedientEstat(entitatId, expedientEstatId);
+	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual) throws NotFoundException {
+		return delegate.deleteExpedientEstat(entitatId, expedientEstatId, rolActual);
 	}
 
 	@Override

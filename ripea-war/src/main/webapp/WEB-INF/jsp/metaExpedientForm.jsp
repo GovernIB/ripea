@@ -225,6 +225,9 @@
 			<c:if test="${isCarpetaDefecte}">
 				<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 			</c:if>
+			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
+				<li role="presentation"><a href="#revisioEstat" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
+			</c:if>
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -234,15 +237,19 @@
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
-				<div class="form-group">
+				
+				<c:set var="campErrors"><form:errors path="classificacioSia"/></c:set>
+				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 					<label class="control-label col-xs-4" for="classificacioSia"><spring:message code="metaexpedient.form.camp.classificacio.sia"/> *</label>
 					<div class="col-xs-6">
 						<form:input path="classificacioSia" cssClass="form-control" id="classificacioSia" disabled="false"  readonly="false" />	
+						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="classificacioSia"/></p></c:if>
 					</div>
 					<div class="col-xs-2">
 						<button id="importMetaExpedient" type="button" class="btn btn-info"><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
 					</div>
 				</div>
+				
 				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
 				
@@ -285,6 +292,21 @@
 						<input id="add_folder" onclick="addFolder();" type="button" class="btn btn-default" value="<spring:message code="metaexpedient.form.camp.estructura.subcarpeta"/>">
 						<input id="add_parent_folder" onclick="addParentFolder();" type="button" class="btn btn-info" value="<spring:message code="metaexpedient.form.camp.estructura.carpeta"/>">
 					</div>
+				</div>
+			</c:if>
+			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
+				<div role="revisioEstat" class="tab-pane" id="revisioEstat">
+					
+					<dl class="dl-horizontal">
+						<dt><spring:message code="metaexpedient.revisio.form.camp.estatRevisio"/></dt>
+						<dd>${metaExpedientCommand.revisioEstat}</dd>
+						<c:if test="${not empty metaExpedientCommand.revisioComentari}">
+							<div style="margin-top: 15px;">
+								<dt><spring:message code="metaexpedient.revisio.form.camp.comentari"/></dt>
+								<dd><pre style="height:300px"><c:out value="${metaExpedientCommand.revisioComentari}" escapeXml="true"/></pre></dd>
+							</div>
+						</c:if>
+					</dl>
 				</div>
 			</c:if>
 		</div>

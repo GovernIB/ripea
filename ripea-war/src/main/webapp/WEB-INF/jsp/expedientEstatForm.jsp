@@ -19,31 +19,34 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/expedientEstat/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientEstatCommand">
-		<form:hidden path="id"/>
-		<form:hidden path="metaExpedientId"/>
-		<form:hidden path="comu"/>
-		<rip:inputText name="codi" textKey="expedient.estat.form.camp.codi" required="true"/>
-		<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true"/>
-		<rip:inputText name="color" textKey="expedient.estat.form.camp.color" />
-		<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial"/>
-		
-		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-		<rip:inputSuggest 
-			name="responsableCodi" 
-			urlConsultaInicial="${urlConsultaInicial}" 
-			urlConsultaLlistat="${urlConsultaLlistat}" 
-			textKey="expedient.estat.form.camp.responsable"
-			suggestValue="codi"
-			suggestText="nom"
-			required="${!expedientEstatCommand.comu}" />
+	<c:set var="formAction"><rip:modalUrl value="/expedientEstat/${metaExpedientId}/save"/></c:set>
+	<!-- Es redimensiona l'altura de la modal perquè quan «Usuari responsable» ofereix molts resultats, no deixa veure el camp d'escriptura. -->
+	<div style="height: 350px;">
+		<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientEstatCommand">
+			<form:hidden path="id"/>
+			<form:hidden path="metaExpedientId"/>
+			<form:hidden path="comu"/>
+			<rip:inputText name="codi" textKey="expedient.estat.form.camp.codi" required="true"/>
+			<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true"/>
+			<rip:inputText name="color" textKey="expedient.estat.form.camp.color" />
+			<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial"/>
 			
-		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-		</div>
-	</form:form>
+			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+			<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+			<rip:inputSuggest 
+				name="responsableCodi" 
+				urlConsultaInicial="${urlConsultaInicial}" 
+				urlConsultaLlistat="${urlConsultaLlistat}" 
+				textKey="expedient.estat.form.camp.responsable"
+				suggestValue="codi"
+				suggestText="nom"
+				required="${!expedientEstatCommand.comu}" />
+				
+			<div id="modal-botons">
+				<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+				<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			</div>
+		</form:form>
+	</div>
 </body>
 </html>

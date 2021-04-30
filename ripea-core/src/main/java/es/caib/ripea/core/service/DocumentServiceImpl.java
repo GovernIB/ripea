@@ -431,7 +431,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false, 
 				false, 
 				false, 
-				true);
+				true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -755,7 +755,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false, 
 				false, 
-				true);
+				true, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -843,7 +843,7 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false,
 				false, 
-				false);
+				false, false);
 		boolean checkPerMassiuAdmin = false;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			checkPerMassiuAdmin = true;
@@ -983,22 +983,24 @@ public class DocumentServiceImpl implements DocumentService {
 					viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
 				}
 			}
-			//Guardar dispositiu associat a l'enviament
-			DispositiuEnviamentEntity dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
-			
-			dispositiuEnviamentRepository.save(dispositiuEnviament);
-			
+			DispositiuEnviamentEntity dispositiuEnviament = null;
+			if (viaFirmaEnviarDto.getViaFirmaDispositiu() != null) {
+				//Guardar dispositiu associat a l'enviament
+				dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
+						viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
+				
+				dispositiuEnviamentRepository.save(dispositiuEnviament);
+			}
 			//Guardar document a enviar
 			DocumentViaFirmaEntity documentViaFirma = DocumentViaFirmaEntity.getBuilder(
 					DocumentEnviamentEstatEnumDto.PENDENT,
@@ -1006,7 +1008,7 @@ public class DocumentServiceImpl implements DocumentService {
 					viaFirmaEnviarDto.getContrasenyaUsuariViaFirma(),
 					viaFirmaEnviarDto.getTitol(),
 					viaFirmaEnviarDto.getDescripcio(),
-					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(),
+					dispositiuEnviament != null ? dispositiuEnviament.getCodi() : null,
 					viaFirmaEnviarDto.getSignantNif(),
 					viaFirmaEnviarDto.getSignantNom(),
 					viaFirmaEnviarDto.getObservacions(),
@@ -1014,7 +1016,10 @@ public class DocumentServiceImpl implements DocumentService {
 					document.getMetaDocument().isBiometricaLectura(),
 					document.getExpedient(),
 					document,
-					viaFirmaEnviarDto.isFirmaParcial()).build();
+					viaFirmaEnviarDto.isFirmaParcial(),
+					viaFirmaEnviarDto.isValidateCodeEnabled(),
+					viaFirmaEnviarDto.getValidateCode(),
+					viaFirmaEnviarDto.isRebreCorreu()).build();
 			
 			firmaViaFirmaHelper.viaFirmaEnviar(documentViaFirma);
 		
@@ -1366,7 +1371,7 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
-		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false) : null;
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	

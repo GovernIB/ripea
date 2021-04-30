@@ -83,7 +83,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				false,
 				false,
-				false, false);
+				false, false, false);
 		ExpedientEstatEntity estat =  expedientEstatRepository.findOne(id);
 		ExpedientEstatDto dto = conversioTipusHelper.convertir(
 				estat,
@@ -131,7 +131,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
@@ -155,7 +155,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
@@ -175,7 +175,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Override
 	public ExpedientEstatDto createExpedientEstat(
 			Long entitatId,
-			ExpedientEstatDto estat) {
+			ExpedientEstatDto estat, String rolActual) {
 		logger.debug("Creant un nou estat d'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"estat=" + estat + ")");
@@ -202,6 +202,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		} else {
 			expedientEstat.updateInicial(false);
 		}
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+		}
 		return conversioTipusHelper.convertir(
 				expedientEstatRepository.save(expedientEstat),
 				ExpedientEstatDto.class);
@@ -211,7 +215,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Override
 	public ExpedientEstatDto updateExpedientEstat(
 			Long entitatId,
-			ExpedientEstatDto estat) {
+			ExpedientEstatDto estat, String rolActual) {
 		logger.debug("Actualitzant estat d'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"estat=" + estat + ")");
@@ -235,6 +239,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			expedientEstat.updateInicial(true);
 		} else {
 			expedientEstat.updateInicial(false);
+		}
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstat,
@@ -310,7 +318,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Transactional
 	public ExpedientEstatDto deleteExpedientEstat(
 			Long entitatId,
-			Long expedientEstatId) throws NotFoundException {
+			Long expedientEstatId, 
+			String rolActual) throws NotFoundException {
 		logger.debug("Esborrant esta del expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientEstatId=" + expedientEstatId + ")");
@@ -320,6 +329,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			throw new ValidationException("");
 		}
 		expedientEstatRepository.delete(entity);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, entity.getMetaExpedient().getId());
+		}
 		return conversioTipusHelper.convertir(
 				entity,
 				ExpedientEstatDto.class);
@@ -385,7 +398,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			Long entitatId,
 			Long metaExpedientId,
 			Long expedientEstatId,
-			int posicio) throws NotFoundException {
+			int posicio, String rolActual) throws NotFoundException {
 		logger.debug("Movent estat del expedient a la posició especificada ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientEstatId=" + expedientEstatId + ", "
@@ -415,7 +428,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				false,
 				false, 
-				true);
+				true, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
@@ -481,7 +494,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				entitatId,
 				true,
 				false,
-				false, false);
+				false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
