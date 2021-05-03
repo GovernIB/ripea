@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.helper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,7 +82,11 @@ public class EntitatHelper {
 
 	public static boolean isUsuariActualTeOrgans(HttpServletRequest request) {
 		EntitatDto entitat = getEntitatActual(request);
-		return entitat.isUsuariActualTeOrgans();
+		if (entitat != null) {
+			return entitat.isUsuariActualTeOrgans();
+		} else {
+			return false;
+		}
 	}
 
 	private static void canviEntitatActual(
@@ -98,7 +103,11 @@ public class EntitatHelper {
 	
 	public static List<OrganGestorDto> findOrganGestorsAccessibles(HttpServletRequest request) {
 		EntitatDto entitat = getEntitatActual(request);
-		return entitat.getOrgansGestors();
+		if (entitat != null) {
+			return entitat.getOrgansGestors();
+		} else {
+			return new ArrayList<OrganGestorDto>();
+		}
 	}
 	
 	public static OrganGestorDto getOrganGestorActual(HttpServletRequest request) {

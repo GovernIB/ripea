@@ -8,6 +8,9 @@
 	</parent>
 	<artifactId>ripea-core</artifactId>
 	<packaging>ejb</packaging>
+	<properties>
+		<liquibase.version>4.3.3</liquibase.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -287,40 +290,40 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-            <groupId>com.viafirma</groupId>
-            <artifactId>documents-sdk-java</artifactId>
-            <version>3.5.140</version>
-            <exclusions>
-            	<exclusion>
-            		<groupId>log4j</groupId>
-            		<artifactId>log4j</artifactId>
-            	</exclusion>
-            	<exclusion>
-            		<groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-core</artifactId>
-            	</exclusion>
-            	<exclusion>
-            		<groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-classic</artifactId>
-            	</exclusion>
-            </exclusions>
+			<groupId>com.viafirma</groupId>
+			<artifactId>documents-sdk-java</artifactId>
+			<version>3.5.140</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-     	<dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.12</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf.tool</groupId>
-            <artifactId>xmlworker</artifactId>
-            <version>1.1.1</version>
-        </dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf.tool</groupId>
+			<artifactId>xmlworker</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
@@ -331,11 +334,11 @@
 					<artifactId>plugin-arxiu-apb</artifactId>
 					<version>1.0.0</version>
 					<exclusions>
-		        		<exclusion>
-		        			<groupId>org.fundaciobit.plugins</groupId>
+						<exclusion>
+							<groupId>org.fundaciobit.plugins</groupId>
 							<artifactId>plugin-arxiu-api</artifactId>
-		        		</exclusion>
-					</exclusions>	
+						</exclusion>
+					</exclusions>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -369,6 +372,35 @@
 						<format>true</format>
 					</componentProperties>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<configuration>
+					<propertyFile>liquibase/liquibase.properties</propertyFile>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-core</artifactId>
+						<version>${liquibase.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.liquibase.ext</groupId>
+						<artifactId>liquibase-hibernate5</artifactId>
+						<version>${liquibase.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework.data</groupId>
+						<artifactId>spring-data-jpa</artifactId>
+						<version>${spring-data-jpa.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>jakarta.validation</groupId>
+						<artifactId>jakarta.validation-api</artifactId>
+						<version>2.0.2</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 		<resources>

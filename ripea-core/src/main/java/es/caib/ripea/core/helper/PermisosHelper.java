@@ -171,10 +171,14 @@ public class PermisosHelper {
 				sids.add(aclSid);
 			}
 		}
-		return aclObjectIdentityRepository.findObjectsWithPermissions(
-				clazz.getName(),
-				sids,
-				permission.getMask());
+		if (!sids.isEmpty()) {
+			return aclObjectIdentityRepository.findObjectsWithPermissions(
+					clazz.getName(),
+					sids,
+					permission.getMask());
+		} else {
+			return new ArrayList<Serializable>();
+		}
 	}
 
 	/**

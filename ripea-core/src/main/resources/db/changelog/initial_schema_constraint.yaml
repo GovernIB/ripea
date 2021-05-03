@@ -1,0 +1,1221 @@
+databaseChangeLog:
+- changeSet:
+    id: init-constraint-1
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_expedient_peticio
+        constraintName: ipa_exp_pet_exp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-2
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_exp_comment
+        constraintName: ipa_exp_com_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-3
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_cont_comment
+        constraintName: ipa_cont_com_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-4
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_cont_comment
+        constraintName: ipa_cont_com_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-5
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contingut_id
+        baseTableName: ipa_cont_comment
+        constraintName: ipa_cont_com_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_contingut
+- changeSet:
+    id: init-constraint-6
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metaexpedient_metadocument
+        constraintName: ipa_mexp_mdoc_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-7
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metaexpedient_metadocument
+        constraintName: ipa_mexp_mdoc_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-8
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: agafat_per_codi
+        baseTableName: ipa_expedient
+        constraintName: ipa_expedient_agafatper_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-9
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contingut_id
+        baseTableName: ipa_alerta
+        constraintName: ipa_alerta_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_contingut
+- changeSet:
+    id: init-constraint-10
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ipa_carpeta
+        constraintName: ipa_carpeta_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_contingut
+- changeSet:
+    id: init-constraint-11
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contingut_id
+        baseTableName: ipa_massiva_contingut
+        constraintName: ipa_massiva_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_contingut
+- changeSet:
+    id: init-constraint-12
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ipa_node
+        constraintName: ipa_node_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_contingut
+- changeSet:
+    id: init-constraint-13
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contmov_id
+        baseTableName: ipa_contingut
+        constraintName: ipa_contingut_contmov_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_cont_mov
+- changeSet:
+    id: init-constraint-14
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contmov_id
+        baseTableName: ipa_cont_log
+        constraintName: ipa_cont_log_cont_mov_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_cont_mov
+- changeSet:
+    id: init-constraint-15
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_enviament_id
+        baseTableName: ipa_document_enviament_doc
+        constraintName: ipa_docenv_doc_docenv_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_document_enviament
+- changeSet:
+    id: init-constraint-16
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_id
+        baseTableName: ipa_document_enviament_doc
+        constraintName: ipa_docenv_doct_document_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_document
+- changeSet:
+    id: init-constraint-17
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_id
+        baseTableName: ipa_document_enviament
+        constraintName: ipa_doc_env_document_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_document
+- changeSet:
+    id: init-constraint-18
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: vf_viafirma_dispositiu
+        baseTableName: ipa_document_enviament
+        constraintName: ipa_doc_env_doc_env_dis_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_document_enviament_dis
+- changeSet:
+    id: init-constraint-19
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_contingut
+        constraintName: ipa_contingut_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-20
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_domini
+        constraintName: ipa_domini_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-21
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_grup
+        constraintName: ipa_grup_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-22
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_metadada
+        constraintName: ipa_metadada_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-23
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_metanode
+        constraintName: ipa_metanode_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-24
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_organ_gestor
+        constraintName: ipa_organ_gestor_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-25
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_registre
+        constraintName: ipa_registre_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-26
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_tipus_documental
+        constraintName: ipa_tipus_docmntl_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-27
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: execucio_massiva_id
+        baseTableName: ipa_massiva_contingut
+        constraintName: ipa_mas_con_exe_mas_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_execucio_massiva
+- changeSet:
+    id: init-constraint-28
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_contingut
+        constraintName: ipa_contingut_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-29
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_document_enviament
+        constraintName: ipa_doc_env_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-30
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_expedient_interessat
+        constraintName: ipa_exp_int_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-31
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_expedient_rel
+        constraintName: ipa_exp_rel_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-32
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_expedient_seguidor
+        constraintName: ipa_exp_seg_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-33
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_interessat
+        constraintName: ipa_interessat_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-34
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_estat_id
+        baseTableName: ipa_expedient
+        constraintName: ipa_expedient_exp_estat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient_estat
+- changeSet:
+    id: init-constraint-35
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_expedient_organpare
+        constraintName: ipa_exp_orgpare_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-36
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_organ_id
+        baseTableName: ipa_expedient_organpare
+        constraintName: ipa_exp_orgpare_mexp_org_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexp_organ
+- changeSet:
+    id: init-constraint-37
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_expedient_organpare
+        constraintName: ipa_exp_orgpare_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-38
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_expedient_organpare
+        constraintName: ipa_exp_orgpare_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-39
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_rel_id
+        baseTableName: ipa_expedient_rel
+        constraintName: ipa_exp_rel_exprel_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-40
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_exp_comment
+        constraintName: ipa_exp_com_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-41
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ipa_expedient_tasca
+        constraintName: ipa_exp_tasca_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient
+- changeSet:
+    id: init-constraint-42
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: grup_id
+        baseTableName: ipa_expedient
+        constraintName: ipa_expedient_grup_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_grup
+- changeSet:
+    id: init-constraint-43
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: grup_id
+        baseTableName: ipa_metaexpedient_grup
+        constraintName: ipa_mexp_grup_grup_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_grup
+- changeSet:
+    id: init-constraint-44
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ipa_historic
+        constraintName: ipa_historic_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_entitat
+- changeSet:
+    id: init-constraint-45
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ipa_historic
+        constraintName: ipa_historic_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-46
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_id
+        baseTableName: ipa_historic
+        constraintName: ipa_historic_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_organ_gestor
+- changeSet:
+    id: init-constraint-47
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: usuari_codi
+        baseTableName: ipa_hist_exp_usuari
+        constraintName: ipa_hist_exp_usu_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-48
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: interessat_id
+        baseTableName: ipa_expedient_interessat
+        constraintName: ipa_exp_int_interessat_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_interessat
+- changeSet:
+    id: init-constraint-49
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metadada_id
+        baseTableName: ipa_dada
+        constraintName: ipa_dada_metadada_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metadada
+- changeSet:
+    id: init-constraint-50
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metadada_id
+        baseTableName: ipa_metanode_metadada
+        constraintName: ipa_mnode_mdada_metadada_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metadada
+- changeSet:
+    id: init-constraint-51
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexp_tasca_id
+        baseTableName: ipa_expedient_tasca
+        constraintName: ipa_exp_tasca_mext_tasca_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexp_tasca
+- changeSet:
+    id: init-constraint-52
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ipa_expedient_estat
+        constraintName: ipa_exp_est_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-53
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ipa_expedient
+        constraintName: ipa_expedient_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-54
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ipa_metadocument
+        constraintName: ipa_metadoc_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-55
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ipa_metaexpedient_metadocument
+        constraintName: ipa_metaexp_metadoc_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-56
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ipa_metaexpedient_GRUP
+        constraintName: ipa_METAEXP_METAEXPGRUP_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-57
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ipa_metaexp_organ
+        constraintName: ipa_mexp_org_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-58
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ipa_metaexp_seq
+        constraintName: ipa_metaexp_seq_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-59
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ipa_metaexp_tasca
+        constraintName: ipa_metaexp_tasca_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-60
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: estat_crear_tasca_id
+        baseTableName: ipa_metaexp_tasca
+        constraintName: ipa_mexp_tasca_exp_est_cre_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient_estat
+- changeSet:
+    id: init-constraint-61
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ESTAT_FINALITZAR_TASCA_id
+        baseTableName: ipa_metaexp_tasca
+        constraintName: ipa_mexp_tasca_exp_est_fi_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_expedient_estat
+- changeSet:
+    id: init-constraint-62
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metanode_id
+        baseTableName: ipa_metanode_metadada
+        constraintName: ipa_mnode_mdada_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metanode
+- changeSet:
+    id: init-constraint-63
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_node_id
+        baseTableName: ipa_metadada
+        constraintName: ipa_metadada_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metanode
+- changeSet:
+    id: init-constraint-64
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ipa_metadocument
+        constraintName: ipa_metadoc_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metanode
+- changeSet:
+    id: init-constraint-65
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ipa_metaexpedient
+        constraintName: ipa_metaexp_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metanode
+- changeSet:
+    id: init-constraint-66
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metanode_id
+        baseTableName: ipa_node
+        constraintName: ipa_node_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metanode
+- changeSet:
+    id: init-constraint-67
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: node_id
+        baseTableName: ipa_dada
+        constraintName: ipa_dada_node_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_node
+- changeSet:
+    id: init-constraint-68
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ipa_document
+        constraintName: ipa_document_node_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_node
+- changeSet:
+    id: init-constraint-69
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ipa_expedient
+        constraintName: ipa_expedient_node_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_node
+- changeSet:
+    id: init-constraint-70
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_gestor_id
+        baseTableName: ipa_expedient
+        constraintName: ipa_expedient_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_organ_gestor
+- changeSet:
+    id: init-constraint-71
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_gestor_id
+        baseTableName: ipa_metaexpedient
+        constraintName: ipa_metaexp_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_organ_gestor
+- changeSet:
+    id: init-constraint-72
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_gestor_id
+        baseTableName: ipa_metaexp_organ
+        constraintName: ipa_metaexp_organ_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_organ_gestor
+- changeSet:
+    id: init-constraint-73
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: pare_id
+        baseTableName: ipa_contingut
+        constraintName: ipa_contingut_pare_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_contingut
+- changeSet:
+    id: init-constraint-74
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: pare_id
+        baseTableName: ipa_cont_log
+        constraintName: ipa_cont_log_pare_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_cont_log
+- changeSet:
+    id: init-constraint-75
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PARE_id
+        baseTableName: ipa_metaexpedient
+        constraintName: ipa_metaexpedient_pare_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+- changeSet:
+    id: init-constraint-76
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: seguidor_codi
+        baseTableName: ipa_expedient_seguidor
+        constraintName: ipa_exp_seg_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-77
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: registre_id
+        baseTableName: ipa_registre_annex
+        constraintName: ipa_reg_annex_registre_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_registre
+- changeSet:
+    id: init-constraint-78
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: registre_id
+        baseTableName: ipa_registre_interessat
+        constraintName: ipa_reg_int_registre_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_registre
+- changeSet:
+    id: init-constraint-79
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: registre_id
+        baseTableName: ipa_expedient_peticio
+        constraintName: ipa_exp_pet_registre_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_registre
+- changeSet:
+    id: init-constraint-80
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: remitent_codi
+        baseTableName: ipa_cont_mov
+        constraintName: ipa_cont_mov_remitent_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-81
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: representant_id
+        baseTableName: ipa_interessat
+        constraintName: ipa_interessat_repres_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_interessat
+- changeSet:
+    id: init-constraint-82
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ripea_user_codi
+        baseTableName: ipa_usuari_viafirma_ripea
+        constraintName: ipa_usu_viaf_rip_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-83
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_enviament_id
+        baseTableName: ipa_portafirmes_block
+        constraintName: ipa_port_block_doc_env_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_document_enviament
+- changeSet:
+    id: init-constraint-84
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: portafirmes_block_id
+        baseTableName: ipa_portafirmes_block_INFO
+        constraintName: ipa_port_blo_info_pot_blo_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_portafirmes_block
+- changeSet:
+    id: init-constraint-85
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: responsable_codi
+        baseTableName: ipa_expedient_tasca
+        constraintName: ipa_exp_tasca_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-86
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_alerta
+        constraintName: ipa_alerta_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-87
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_contingut
+        constraintName: ipa_contingut_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-88
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_cont_log
+        constraintName: ipa_cont_log_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-89
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_cont_mov
+        constraintName: ipa_cont_mov_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-90
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_dada
+        constraintName: ipa_dada_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-91
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_document_enviament
+        constraintName: ipa_doc_env_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-92
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_entitat
+        constraintName: ipa_entitat_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-93
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_massiva_contingut
+        constraintName: ipa_mass_cont_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-94
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_execucio_massiva
+        constraintName: ipa_exe_mass_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-95
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_exp_comment
+        constraintName: ipa_exp_com_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-96
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_interessat
+        constraintName: ipa_interessat_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-97
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metanode_metadada
+        constraintName: ipa_mnode_mdada_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-98
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metadada
+        constraintName: ipa_metadada_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-99
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metaexp_seq
+        constraintName: ipa_metaexp_seq_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-100
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metaexp_tasca
+        constraintName: ipa_mexp_tasca_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-101
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metanode
+        constraintName: ipa_metanode_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-102
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_alerta
+        constraintName: ipa_alerta_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-103
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_contingut
+        constraintName: ipa_contingut_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-104
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_cont_log
+        constraintName: ipa_cont_log_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-105
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_cont_mov
+        constraintName: ipa_cont_mov_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-106
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_dada
+        constraintName: ipa_dada_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-107
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_document_enviament
+        constraintName: ipa_doc_env_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-108
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_entitat
+        constraintName: ipa_entitat_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-109
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_massiva_contingut
+        constraintName: ipa_mass_cont_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-110
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_execucio_massiva
+        constraintName: ipa_exe_mass_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-111
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_interessat
+        constraintName: ipa_interessat_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-112
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metanode_metadada
+        constraintName: ipa_mnode_mdada_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-113
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metadada
+        constraintName: ipa_metadada_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-114
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metaexp_seq
+        constraintName: ipa_metaexp_seq_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-115
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metaexp_tasca
+        constraintName: ipa_mexp_tasca_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-116
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metanode
+        constraintName: ipa_metanode_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+- changeSet:
+    id: init-constraint-117
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: viafirma_user_codi
+        baseTableName: ipa_usuari_viafirma_ripea
+        constraintName: ipa_usu_viaf_rip_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_viafirma_usuari
+- changeSet:
+    id: init-constraint-118
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: sid, principal
+        constraintName: ipa_acl_sid_uk
+        tableName: ipa_acl_sid
+    - addUniqueConstraint:
+        columnNames: class
+        constraintName: ipa_acl_class_uk
+        tableName: ipa_acl_class
+    - addUniqueConstraint:
+        columnNames: object_id_class, object_id_identity
+        constraintName: ipa_acl_oid_uk
+        tableName: ipa_acl_object_identity
+    - addForeignKeyConstraint:
+        baseColumnNames: parent_object
+        baseTableName: ipa_acl_object_identity
+        constraintName: ipa_acl_oid_parent_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_acl_object_identity
+    - addForeignKeyConstraint:
+        baseColumnNames: object_id_class
+        baseTableName: ipa_acl_object_identity
+        constraintName: ipa_acl_oid_class_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_acl_class
+    - addForeignKeyConstraint:
+        baseColumnNames: owner_sid
+        baseTableName: ipa_acl_object_identity
+        constraintName: ipa_acl_oid_owner_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_acl_sid
+    - addUniqueConstraint:
+        columnNames: acl_object_identity, ace_order
+        constraintName: ipa_acl_entry_uk
+        tableName: ipa_acl_entry
+    - addForeignKeyConstraint:
+        baseColumnNames: acl_object_identity
+        baseTableName: ipa_acl_entry
+        constraintName: ipa_acl_entry_object_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_acl_object_identity
+    - addForeignKeyConstraint:
+        baseColumnNames: sid
+        baseTableName: ipa_acl_entry
+        constraintName: ipa_acl_entry_acl_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_acl_sid

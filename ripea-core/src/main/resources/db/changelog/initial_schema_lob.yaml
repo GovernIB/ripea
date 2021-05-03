@@ -1,0 +1,47 @@
+databaseChangeLog:
+- changeSet:
+    id: lob-1
+    author: limit (generated)
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_document MOVE LOB(fitxer_contingut) STORE AS ipa_document_fitxcont_lob(TABLESPACE ripea_lob INDEX ipa_document_fitxcont_lob_i);
+- changeSet:
+    id: lob-2
+    author: limit (generated)
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_entitat MOVE LOB(logo_img) STORE AS ipa_entitat_logo_lob(TABLESPACE ripea_lob INDEX ipa_entitat_logo_lob_i);
+- changeSet:
+    id: lob-3
+    author: limit (generated)
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_metadocument MOVE LOB(plantilla_contingut) STORE AS ipa_metadoc_plancont_lob(TABLESPACE ripea_lob INDEX ipa_metadoc_plancont_lob_i);
+- changeSet:
+    id: lob-4
+    author: limit (generated)
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_registre MOVE LOB(exposa) STORE AS ipa_registre_exposa_lob(TABLESPACE ripea_lob INDEX ipa_registre_exposa_lob_i);
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_registre MOVE LOB(solicita) STORE AS ipa_registre_solicita_lob(TABLESPACE ripea_lob INDEX ipa_registre_solicita_lob_i);
+- changeSet:
+    id: lob-5
+    author: limit (generated)
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_registre_annex MOVE LOB(contingut) STORE AS ipa_reg_annx_cont_lob(TABLESPACE ripea_lob INDEX ipa_reg_annx_cont_lob_i);
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ipa_registre_annex MOVE LOB(firma_contingut) STORE AS ipa_reg_annx_firmacont_lob(TABLESPACE ripea_lob INDEX ipa_reg_annx_firmacont_lob_i);
