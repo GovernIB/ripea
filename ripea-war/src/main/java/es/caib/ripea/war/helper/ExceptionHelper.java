@@ -1,5 +1,7 @@
 package es.caib.ripea.war.helper;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 public class ExceptionHelper {
 
 	/**
@@ -48,5 +50,13 @@ public class ExceptionHelper {
 		}
 		return (Exception) exception;
 	}
+	
+	
+	
+	public static Throwable getRootCauseOrItself(Throwable e) {
+
+		return ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
+	}
+	
 	
 }

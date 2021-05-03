@@ -79,7 +79,7 @@ function refrescarOrgan() {
 
 $(document).ready(function(){
 
-	if ('${accio}' == 'CREAR') {
+	if ('${expedientPeticioAcceptarCommand.accio}' == 'CREAR') {
 		$('#input-accio-crear').removeClass('hidden');
 		$('#input-accio-incorporar').addClass('hidden');
 	} else {
@@ -118,7 +118,7 @@ $(document).ready(function(){
 
 	
 
-	$('input[type=radio][name=expedientPeticioAccioEnumDto]').on('change', function() {
+	$('input[type=radio][name=accio]').on('change', function() {
 		if ($(this).val() == 'CREAR') {
 			$('#input-accio-crear').removeClass('hidden');
 			$('#input-accio-incorporar').addClass('hidden');
@@ -163,7 +163,7 @@ $(document).ready(function(){
 	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
 		<form:hidden path="id" />
 
-		<rip:inputRadio name="expedientPeticioAccioEnumDto" textKey="expedientPeticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<rip:inputRadio name="accio" textKey="expedientPeticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
 		<rip:inputSelect name="metaExpedientId" textKey="expedientPeticio.form.acceptar.camp.metaExpedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true"

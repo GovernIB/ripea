@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
@@ -42,6 +42,7 @@ import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
@@ -53,6 +54,7 @@ import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -271,71 +273,10 @@ public class ExpedientPeticioController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
-		ExpedientDto expedient = null;
-		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
-		model.addAttribute(
-				"entitatId",
-				entitat.getId());
-		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitat.getId(), 
-				null, 
-				"tothom");
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedients);
-		MetaExpedientDto metaExpedientDto = expedientPeticioService.findMetaExpedientByEntitatAndProcedimentCodi(
-				expedientPeticioDto.getRegistre().getEntitatCodi(),
-				expedientPeticioDto.getRegistre().getProcedimentCodi());
-		List<ExpedientDto> expedients = null;
-		// if exists metaExpedient with matching codi procediment
-		if (metaExpedientDto!=null) {
-			boolean hasPermissions = false;
-			for(MetaExpedientDto metaExpDto : metaExpedients) {
-				if (metaExpDto.getId().equals(metaExpedientDto.getId())) {
-					hasPermissions = true;
-				}
-			}
-			// if current user has create permissions for this metaexpedient
-			if (hasPermissions) {
-				command.setMetaExpedientId(metaExpedientDto.getId());
-				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId());
-				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
-				if (expedientNumero != null && !expedientNumero.isEmpty()) {
-					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(
-							entitat.getId(),
-							metaExpedientDto.getId(),
-							expedientNumero);
-					
-					if (expedient == null) {
-						MissatgesHelper.warning(
-								request, 
-								getMessage(
-										request, 
-										"expedientPeticio.form.acceptar.expedient.noTorbat"));
-					}
-				}
-			}
-		}
-		command.setExpedientPeticioAccioEnumDto(expedient != null ? ExpedientPeticioAccioEnumDto.INCORPORAR : ExpedientPeticioAccioEnumDto.CREAR);
-		model.addAttribute(
-				"accio",
-				expedient != null ? ExpedientPeticioAccioEnumDto.INCORPORAR : ExpedientPeticioAccioEnumDto.CREAR);
-		command.setExpedientId(expedient != null ? expedient.getId() : null);
-		model.addAttribute(
-				"expedients",
-				expedients);
-		model.addAttribute("accios",
-				EnumHelper.getOptionsForEnum(ExpedientPeticioAccioEnumDto.class,
-						"expedient.peticio.accio.enum."));
-		command.setId(expedientPeticioDto.getId());
-		command.setAssociarInteressats(true);
-//		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
-		command.setAny(Calendar.getInstance().get(Calendar.YEAR));
-		model.addAttribute(
-				"expedientPeticioAcceptarCommand",
-				command);
+		omplirModel(expedientPeticioId, request, model, command);
+
 		return "expedientPeticioAccept";
 
 	}
@@ -372,16 +313,28 @@ public class ExpedientPeticioController extends BaseUserController {
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
+		if (command.getMetaExpedientId() == null) {
+			bindingResult.rejectValue("metaExpedientId", "NotNull");
+		}
+		if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR && command.getExpedientId() == null) {
+			bindingResult.rejectValue("expedientId", "NotNull");
+		}
+		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR ) {
+			if (command.getNewExpedientTitol() == null || command.getNewExpedientTitol().isEmpty()) {
+				bindingResult.rejectValue("newExpedientTitol", "NotNull");
+			}
+			if (command.getAny() == 0) {
+				bindingResult.rejectValue("any", "NotNull");
+			}
+		}
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-			"expedientPeticioAcceptarCommand",
-			command);
-			return "expedientPeticioAcceptNoExp";
+			omplirModel(expedientPeticioId, request, model, command);
+			return "expedientPeticioAccept";
 		}
 		boolean processatOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
-		if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.CREAR) {
+		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 			try {
 				ExpedientDto expedientDto = expedientService.create(
 						entitat.getId(),
@@ -404,10 +357,24 @@ public class ExpedientPeticioController extends BaseUserController {
 							"redirect:expedientPeticio",
 							"expedientPeticio.controller.acceptat.ko");
 				} else {
-					throw ex;
+					
+					Throwable throwable = ExceptionHelper.getRootCauseOrItself(ex);
+					if (throwable instanceof PermissionDeniedException) {
+						PermissionDeniedException perExc = (PermissionDeniedException) throwable;
+						if (perExc.getPermissionName().equals("WRITE")) {
+							return getModalControllerReturnValueError(
+									request,
+									"redirect:expedientPeticio",
+									"expedientPeticio.controller.acceptar.no.permis",
+									new Object[] { perExc.getUserName() });
+						
+						} else {
+							throw ex;
+						}
+					}
 				}
 			}
-		} else if (command.getExpedientPeticioAccioEnumDto() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
+		} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 			try {
 				processatOk = expedientService.incorporar(
 						entitat.getId(),
@@ -422,7 +389,21 @@ public class ExpedientPeticioController extends BaseUserController {
 							"redirect:expedientPeticio",
 							"expedientPeticio.controller.acceptat.ko");
 				} else {
-					throw ex;
+					
+					Throwable throwable = ExceptionHelper.getRootCauseOrItself(ex);
+					if (throwable instanceof PermissionDeniedException) {
+						PermissionDeniedException perExc = (PermissionDeniedException) throwable;
+						if (perExc.getPermissionName().equals("WRITE")) {
+							return getModalControllerReturnValueError(
+									request,
+									"redirect:expedientPeticio",
+									"expedientPeticio.controller.acceptar.no.permis",
+									new Object[] { perExc.getUserName() });
+						
+						} else {
+							throw ex;
+						}
+					}
 				}
 			}
 		}
@@ -643,6 +624,78 @@ public class ExpedientPeticioController extends BaseUserController {
 					filtreCommand);
 		}
 		return filtreCommand;
+	}
+	
+	private void omplirModel(
+			Long expedientPeticioId,
+			HttpServletRequest request,
+			Model model, 
+			ExpedientPeticioAcceptarCommand command) {
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+
+		ExpedientDto expedient = null;
+		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
+		model.addAttribute(
+				"entitatId",
+				entitat.getId());
+		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitat.getId(), 
+				null, 
+				"tothom");
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedients);
+		MetaExpedientDto metaExpedientDto = expedientPeticioService.findMetaExpedientByEntitatAndProcedimentCodi(
+				expedientPeticioDto.getRegistre().getEntitatCodi(),
+				expedientPeticioDto.getRegistre().getProcedimentCodi());
+		List<ExpedientDto> expedients = null;
+		// if exists metaExpedient with matching codi procediment
+		if (metaExpedientDto!=null) {
+			boolean hasPermissions = false;
+			for(MetaExpedientDto metaExpDto : metaExpedients) {
+				if (metaExpDto.getId().equals(metaExpedientDto.getId())) {
+					hasPermissions = true;
+				}
+			}
+			// if current user has create permissions for this metaexpedient
+			if (hasPermissions) {
+				command.setMetaExpedientId(metaExpedientDto.getId());
+				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId());
+				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
+				if (expedientNumero != null && !expedientNumero.isEmpty()) {
+					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(
+							entitat.getId(),
+							metaExpedientDto.getId(),
+							expedientNumero);
+					
+					if (expedient == null) {
+						MissatgesHelper.warning(
+								request, 
+								getMessage(
+										request, 
+										"expedientPeticio.form.acceptar.expedient.noTorbat"));
+					}
+				}
+			}
+		}
+		if (command.getAccio() == null) {
+			command.setAccio(expedient != null ? ExpedientPeticioAccioEnumDto.INCORPORAR : ExpedientPeticioAccioEnumDto.CREAR);
+		}
+
+		command.setExpedientId(expedient != null ? expedient.getId() : null);
+		model.addAttribute(
+				"expedients",
+				expedients);
+		model.addAttribute("accios",
+				EnumHelper.getOptionsForEnum(ExpedientPeticioAccioEnumDto.class,
+						"expedient.peticio.accio.enum."));
+		command.setId(expedientPeticioDto.getId());
+		command.setAssociarInteressats(true);
+//		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
+		command.setAny(Calendar.getInstance().get(Calendar.YEAR));
+		model.addAttribute(
+				"expedientPeticioAcceptarCommand",
+				command);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioController.class);

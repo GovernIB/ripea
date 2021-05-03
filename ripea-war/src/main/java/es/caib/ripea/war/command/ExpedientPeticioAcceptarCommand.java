@@ -21,16 +21,16 @@ public class ExpedientPeticioAcceptarCommand {
 	private String newExpedientTitol;
 	private int any;
 	private boolean associarInteressats;
-	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
+	private ExpedientPeticioAccioEnumDto accio;
 	
 	private Long organGestorId;
 	
-	
-	public ExpedientPeticioAccioEnumDto getExpedientPeticioAccioEnumDto() {
-		return expedientPeticioAccioEnumDto;
+
+	public ExpedientPeticioAccioEnumDto getAccio() {
+		return accio;
 	}
-	public void setExpedientPeticioAccioEnumDto(ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
-		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
+	public void setAccio(ExpedientPeticioAccioEnumDto accio) {
+		this.accio = accio;
 	}
 	public Long getId() {
 		return id;
