@@ -26,6 +26,8 @@
 		<dir3caib.version>1.0.7</dir3caib.version>
 		<pdfbox.version>2.0.12</pdfbox.version>
 		<notib.version>1.1.8</notib.version>
+		<docker.image.prefix>280421</docker.image.prefix>
+		<docker.image.name>${project.artifactId}</docker.image.name>
 		<skipTests>true</skipTests>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -94,6 +96,30 @@
 					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
 				</configuration>
 				<version>2.2.0</version>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.33.0</version>
+				<configuration>
+					<verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}/${docker.image.name}</name>
+							<alias>ripea</alias>
+							<build>
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<dockerFile>Dockerfile</dockerFile>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+						</image>
+					</images>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
