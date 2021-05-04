@@ -53,11 +53,12 @@
 
 	<servlet>
 		<servlet-name>ripea</servlet-name>
-		<servlet-class>es.caib.ripea.war.webdav.WebdavDispatcherServlet</servlet-class>
+		<!--servlet-class>es.caib.ripea.war.webdav.WebdavDispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>webdav-prefix</param-name>
 			<param-value>/webdav</param-value>
-		</init-param>
+		</init-param-->
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
