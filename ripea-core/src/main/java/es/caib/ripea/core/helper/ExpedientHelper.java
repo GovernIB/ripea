@@ -54,6 +54,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -228,7 +229,7 @@ public class ExpedientHelper {
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
 			if (associarInteressats) {
-				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId);
+				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE);
 			}
 		}
 		// crear carpetes per defecte del tipus d'expedient
@@ -241,7 +242,7 @@ public class ExpedientHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId) {
+	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
@@ -260,14 +261,16 @@ public class ExpedientHelper {
 						expedientId,
 						null,
 						toInteressatDto(registreInteressatEntity, null),
-						true);
+						true, 
+						permission);
 				if (registreInteressatEntity.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
 							expedientId,
 							createdInteressat.getId(),
 							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
-							true);
+							true, 
+							permission);
 				}
 			} else {
 				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();

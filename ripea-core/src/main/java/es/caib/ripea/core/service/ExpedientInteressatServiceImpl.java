@@ -18,6 +18,7 @@ import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -84,7 +85,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				expedientId,
 				interessatId,
 				interessat,
-				propagarArxiu);
+				propagarArxiu, 
+				PermissionEnumDto.WRITE);
 	}
 
 	@Transactional
