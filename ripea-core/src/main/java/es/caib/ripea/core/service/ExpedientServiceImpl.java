@@ -53,6 +53,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -278,7 +279,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"expedientPeticioId=" + expedientPeticioId + ")");
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId);
-		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId);
+		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE);
 		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
 		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {

@@ -19,7 +19,7 @@ public class ExpedientPeticioDto {
 	private ExpedientPeticioEstatEnumDto estat;
 	private RegistreDto registre;
 	private String metaExpedientNom;
-	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
+	private ExpedientPeticioAccioEnumDto accio;
 	private String notificaDistError;
 
 	@SuppressWarnings("incomplete-switch")
@@ -96,13 +96,11 @@ public class ExpedientPeticioDto {
 			RegistreDto registre) {
 		this.registre = registre;
 	}
-	public ExpedientPeticioAccioEnumDto getExpedientPeticioAccioEnumDto() {
-		return expedientPeticioAccioEnumDto;
+	public ExpedientPeticioAccioEnumDto getAccio() {
+		return accio;
 	}
-	public void setExpedientPeticioAccioEnumDto(
-			ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
-		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
+	public void setAccio(ExpedientPeticioAccioEnumDto accio) {
+		this.accio = accio;
 	}
-
 
 }

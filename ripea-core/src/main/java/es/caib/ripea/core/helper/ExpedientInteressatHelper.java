@@ -12,6 +12,7 @@ import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -46,7 +47,8 @@ public class ExpedientInteressatHelper {
 			Long expedientId,
 			Long interessatId, //interessatId to which representant will be related to
 			InteressatDto interessat,
-			boolean propagarArxiu){
+			boolean propagarArxiu, 
+			PermissionEnumDto permission){
 		
 		if (interessatId != null) {
 			logger.debug("Creant nou representant ("
@@ -64,10 +66,11 @@ public class ExpedientInteressatHelper {
 				entitatId,
 				expedientId,
 				true,
-				false,
-				true,
-				false,
-				false, false);
+				permission.equals(PermissionEnumDto.READ),
+				permission.equals(PermissionEnumDto.WRITE),
+				permission.equals(PermissionEnumDto.CREATE),
+				permission.equals(PermissionEnumDto.DELETE), 
+				false);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
