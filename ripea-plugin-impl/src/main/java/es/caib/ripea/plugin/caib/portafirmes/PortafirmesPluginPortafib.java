@@ -638,19 +638,38 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 								signer.setSignerNom(externalSigner.getName() + " " + externalSigner.getSurnames());
 								signer.setSignerCodi(" ");
 							} else {
-								UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
-								if (usuariEntitat != null) {
-									String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
-									UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
-									if (usuariPersona != null) {
-										signer.setSignerId(usuariPersona.getNif());
-										signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-										signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+								String intermediateServerUsername = flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername();
+								String positionInTheCompany = flowTemplateSimpleSignature.getSigner().getPositionInTheCompany();
+								if (intermediateServerUsername != null) {
+									UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(intermediateServerUsername);
+									if (usuariEntitat != null) {
+										String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
+										UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+										if (usuariPersona != null) {
+											signer.setSignerId(usuariPersona.getNif());
+											signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+											signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+										} else {
+											throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+										}
 									} else {
-										throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
-									}
-								} else {
-									throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
+										throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + intermediateServerUsername);
+									} 
+								} else if (positionInTheCompany != null) {
+									CarrecWs carrec = getUsuariEntitatWs().getCarrec(positionInTheCompany);
+									if (carrec != null) {
+										String usuariPersonaId = carrec.getUsuariPersonaID();
+										UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+										if (usuariPersona != null) {
+											signer.setSignerId(usuariPersona.getNif());
+											signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+											signer.setSignerNom(carrec.getCarrecName());
+										} else {
+											throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+										}
+									} else {
+										throw new SistemaExternException("No s'ha trobat cap càrrec amb codi " + positionInTheCompany);
+									} 
 								}
 							}
 							signers.add(signer);
@@ -739,9 +758,13 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 							for (FlowTemplateSimpleReviser flowTemplateSimpleReviser : flowTemplateSimpleSignature.getRevisers()) {
 								FirmaAsyncSimpleReviser reviser = new FirmaAsyncSimpleReviser();
 								
+								String intermediateServerUsername = flowTemplateSimpleReviser.getIntermediateServerUsername();
+								String positionInTheCompany = flowTemplateSimpleReviser.getPositionInTheCompany();
+								if (intermediateServerUsername != null)
+									reviser.setIntermediateServerUsername(intermediateServerUsername);
+								if (positionInTheCompany != null)
+									reviser.setPositionInTheCompany(positionInTheCompany);
 								reviser.setAdministrationID(flowTemplateSimpleReviser.getAdministrationID());
-								reviser.setIntermediateServerUsername(flowTemplateSimpleReviser.getIntermediateServerUsername());
-								reviser.setPositionInTheCompany(flowTemplateSimpleReviser.getPositionInTheCompany());
 								reviser.setRequired(flowTemplateSimpleReviser.isRequired());
 								reviser.setUsername(flowTemplateSimpleReviser.getUsername());
 		
@@ -767,8 +790,12 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 		
 								signer.setExternalSigner(externalSigner);
 							}
-							signer.setIntermediateServerUsername(flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername());
-							signer.setPositionInTheCompany(flowTemplateSimpleSignature.getSigner().getPositionInTheCompany());
+							String intermediateServerUsername = flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername();
+							String positionInTheCompany = flowTemplateSimpleSignature.getSigner().getPositionInTheCompany();
+							if (intermediateServerUsername != null)
+								signer.setIntermediateServerUsername(intermediateServerUsername);
+							if (positionInTheCompany != null)
+								signer.setPositionInTheCompany(positionInTheCompany);
 							signer.setUsername(flowTemplateSimpleSignature.getSigner().getUsername());
 							
 							signature.setSigner(signer);
