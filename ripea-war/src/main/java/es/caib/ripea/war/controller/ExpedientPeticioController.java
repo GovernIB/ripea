@@ -368,9 +368,13 @@ public class ExpedientPeticioController extends BaseUserController {
 									"expedientPeticio.controller.acceptar.no.permis",
 									new Object[] { perExc.getUserName() });
 						
-						} else {
-							throw ex;
-						}
+						} 
+					} else {
+						logger.error("Error al crear expedient per anotacio", ex);
+						return getModalControllerReturnValueErrorMessageText(
+								request,
+								"redirect:expedientPeticio",
+								throwable.getMessage());
 					}
 				}
 			}
@@ -400,9 +404,13 @@ public class ExpedientPeticioController extends BaseUserController {
 									"expedientPeticio.controller.acceptar.no.permis",
 									new Object[] { perExc.getUserName() });
 						
-						} else {
-							throw ex;
-						}
+						} 
+					} else {
+						logger.error("Error al incorporar anotacio al expedient", ex);
+						return getModalControllerReturnValueErrorMessageText(
+								request,
+								"redirect:expedientPeticio",
+								throwable.getMessage());
 					}
 				}
 			}
