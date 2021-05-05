@@ -20,6 +20,7 @@
 		<xdocreport.version>2.0.2</xdocreport.version>
 		<bouncycastle.version>1.46</bouncycastle.version>
 		<cxf.version>2.2.12</cxf.version> 
+		<io.milton.version>2.8.0.3</io.milton.version> 
 		<slf4j.version>1.5.11</slf4j.version>
 		<portafib.version>1.1</portafib.version>
 		<regweb.version>3.0.5</regweb.version>

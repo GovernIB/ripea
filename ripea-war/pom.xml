@@ -82,22 +82,22 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.2</version>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>io.milton</groupId>
 			<artifactId>milton-api</artifactId>
-			<version>2.7.2.4</version>
+			<version>${io.milton.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.milton</groupId>
 			<artifactId>milton-server-ce</artifactId>
-			<version>2.7.2.4</version>
+			<version>${io.milton.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>mail</artifactId>
 					<groupId>javax.mail</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.fundaciobit.plugins</groupId>
 			<artifactId>plugins-api</artifactId>

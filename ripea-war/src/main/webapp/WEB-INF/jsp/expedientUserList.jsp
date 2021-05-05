@@ -142,7 +142,7 @@ $(document).ready(function() {
 	var metaExpedientId = "";
 	var counter = 0;
 	$('#metaExpedientId').on('change', function() {
-		metaExpedientId = $(this).val() | '${expedientFiltreCommand.metaExpedientId}';
+		metaExpedientId = $(this).val() ? $(this).val() : '${expedientFiltreCommand.metaExpedientId}';
 		if (counter != 0) {
 			
 			if (metaExpedientId) {

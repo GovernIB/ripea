@@ -863,7 +863,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		List<PermisDto> permisLlistAmbNom = metaExpedientHelper.permisFind(id);
 		for (PermisDto permis : permisLlistAmbNom) {
 			try {
-				permis.setPrincipalNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom());
+				permis.setPrincipalNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom() + " (" + permis.getPrincipalNom() + ")");
 			}
 			catch (NotFoundException ex) {
 				logger.debug("No s'ha trobat cap usuari amb el codi " + permis.getPrincipalNom());
