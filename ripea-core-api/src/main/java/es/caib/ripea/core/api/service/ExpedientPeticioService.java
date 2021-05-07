@@ -19,7 +19,7 @@ public interface ExpedientPeticioService {
 	PaginaDto<ExpedientPeticioDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+			PaginacioParamsDto paginacioParams, boolean isAdmin);
 
 	ExpedientPeticioDto findOne(
 			Long expedientPeticioId);
@@ -59,7 +59,7 @@ public interface ExpedientPeticioService {
 
 	FitxerDto getJustificantContent(String arxiuUuid);
 
-	public long countAnotacionsPendents(Long entitatId);
+	public long countAnotacionsPendents(Long entitatId, boolean isAdmin);
 
 	boolean comprovarExistenciaInteressatsPeticio(
 			Long entitatId, 

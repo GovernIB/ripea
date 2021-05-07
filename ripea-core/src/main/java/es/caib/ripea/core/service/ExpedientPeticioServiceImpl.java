@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,7 @@ import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
@@ -93,12 +96,15 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private ExpedientHelper  expedientHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(Long entitatId,
+	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, boolean isAdmin) {
 		logger.debug("Consultant els expedient peticions segons el filtre (" +
 				"entitatId=" +
 				entitatId +
@@ -118,11 +124,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				new String[] { "codi", "any", "sequencia" });
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios;
 
-		// enum with states accesibles from filter in the view (without creat state)
+		// enum with states accesibles from filter in the view (without create state)
 		ExpedientPeticioEstatViewEnumDto estatView = filtre.getEstat();
 
+		
+		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitatId); 
+		
 		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
+				isAdmin,
+				createWritePermIds,
 				filtre.getProcediment() == null ||
 						filtre.getProcediment().isEmpty(),
 				filtre.getProcediment(),
@@ -456,7 +467,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public long countAnotacionsPendents(Long entitatId) {
+	public long countAnotacionsPendents(Long entitatId, boolean isAdmin) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
@@ -464,7 +475,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false, 
 				false, 
 				false);
-		return cacheHelper.countAnotacionsPendents(entitatActual);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return cacheHelper.countAnotacionsPendents(entitatActual, isAdmin, auth.getName());
 	}
 
 	private boolean isIncorporacioJustificantActiva() {
@@ -493,6 +505,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return alreadyExists;
 	}
 	
+	
+	
+
+	
+
+
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
 
 }

@@ -23,11 +23,9 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
-import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
@@ -36,13 +34,18 @@ import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
@@ -284,6 +287,7 @@ public class ConversioTipusHelper {
 						return source.getId();
 					}
 				});	
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<HistoricExpedientAggregation, HistoricExpedientDto>() {
 					@Override
@@ -327,6 +331,20 @@ public class ConversioTipusHelper {
 						target.setNumExpedientsCreatsTotal(source.getNumExpedientsCreatsTotal());
 						target.setNumExpedientsTancats(source.getNumExpedientsTancats());
 						target.setNumExpedientsTancatsTotal(source.getNumExpedientsTancatsTotal());
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientPeticioEntity, ExpedientPeticioDto>() {
+					@Override
+					public ExpedientPeticioDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioDto> destinationType) {
+						ExpedientPeticioDto target = new ExpedientPeticioDto();
+						target.setId(source.getId());
+						target.setRegistre(convertir(source.getRegistre(), RegistreDto.class));
+						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
+						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setEstat(source.getEstat());
 						return target;
 					}
 				});	

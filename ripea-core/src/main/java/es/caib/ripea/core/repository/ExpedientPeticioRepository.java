@@ -35,6 +35,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity e " +
 			"where " +
 			"e.registre.entitat = :entitat " +
+			"and (:isAdmin = true or e.metaExpedient.id in (:idMetaExpedientPermesos)) " +
 			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullExtracte = true or lower(e.registre.extracte) like lower('%'||:extracte||'%')) " +
@@ -49,6 +50,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			)
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("isAdmin") boolean isAdmin,
+			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
 			@Param("esNullProcediment") boolean esNullProcediment,
 			@Param("procediment") String procediment,
 			@Param("esNullNumero") boolean esNullNumero,
@@ -68,11 +71,17 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			Pageable pageable);
 
 	@Query(	"select " +
-			"    count(anotacio) " +
+			"    count(pet) " +
 			"from " +
-			"    ExpedientPeticioEntity anotacio " +
-			"where anotacio.estat='PENDENT' " + 
-			"and :entitatActual = anotacio.registre.entitat")
-	long countAnotacionsPendents(@Param("entitatActual") EntitatEntity entitatActual);
+			"    ExpedientPeticioEntity pet " +
+			"where " +
+			":entitatActual = pet.registre.entitat " +
+			"and (:isAdmin = true or pet.metaExpedient.id in (:idMetaExpedientPermesos)) " +
+			"and :entitatActual = pet.registre.entitat " +
+			"and pet.estat='PENDENT' " )
+	long countAnotacionsPendents(
+			@Param("entitatActual") EntitatEntity entitatActual,
+			@Param("isAdmin") boolean isAdmin,
+			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos);
 
 }

@@ -111,12 +111,49 @@ $(document).ready(function(){
 			});
 		}
 
-
 		refrescarOrgan();
+
+		var createPermis;
+		var writePermis;
+
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedientPeticio/comprovarPermisCreate/"/>' + tipus,
+			async: false,
+			success: function(data) {
+				createPermis = data;
+			}
+		});
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedientPeticio/comprovarPermisWrite/"/>' + tipus,
+			async: false,
+			success: function(data) {
+				writePermis = data;
+			}
+		});
+
+		if (createPermis && writePermis) {
+		    $('#accio1').parent().show();
+		    $('#accio2').parent().show();
+
+		} else if (createPermis) {
+		    $('#accio1').parent().show();
+		    $('#accio2').parent().hide();
+		    $("#accio1").click();
+
+		} else if (writePermis) {
+		    $('#accio2').parent().show();
+		    $('#accio1').parent().hide();
+		    $("#accio2").click();
+		}
+
+		
 
 	});	
 
-	
+	$('#metaExpedientId').trigger('change');
+
 
 	$('input[type=radio][name=accio]').on('change', function() {
 		if ($(this).val() == 'CREAR') {

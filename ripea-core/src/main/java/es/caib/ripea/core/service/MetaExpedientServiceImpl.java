@@ -32,10 +32,12 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -439,6 +441,33 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				MetaExpedientDto.class);
 
 	}
+	
+	@Override
+	public List<MetaExpedientDto> findCreateWritePerm(
+			Long entitatId,
+			boolean isAdmin) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				false);
+		List<MetaExpedientEntity> metaExpedients;
+
+		
+		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitatId); 
+		
+		metaExpedients = metaExpedientRepository.findMetaExpedientsByIds(
+				entitat,
+				createWritePermIds,
+				isAdmin);
+
+		return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
+
+	}
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -644,6 +673,38 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}
 
+	
+	@Transactional
+	@Override
+	public boolean comprovarPermisosMetaExpedient(
+			Long entitatId, 
+			Long metaExpedientId,
+			PermissionEnumDto permission) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				false, 
+				false, 
+				false, 
+				false, 
+				false);
+		
+		boolean permitted = true;
+		try {
+			entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+					entitat,
+					metaExpedientId,
+					permission == PermissionEnumDto.READ,
+					permission == PermissionEnumDto.WRITE,
+					permission == PermissionEnumDto.CREATE,
+					permission == PermissionEnumDto.DELETE,
+					false);
+		} catch (PermissionDeniedException ex) {
+			permitted = false;
+		}
+		return permitted;
+	}
+	
+	
 	@Transactional
 	@Override
 	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(
@@ -863,7 +924,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		List<PermisDto> permisLlistAmbNom = metaExpedientHelper.permisFind(id);
 		for (PermisDto permis : permisLlistAmbNom) {
 			try {
-				permis.setPrincipalNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom());
+				permis.setPrincipalNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom() + " (" + permis.getPrincipalNom() + ")");
 			}
 			catch (NotFoundException ex) {
 				logger.debug("No s'ha trobat cap usuari amb el codi " + permis.getPrincipalNom());

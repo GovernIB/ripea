@@ -285,6 +285,11 @@ body {
 							<c:when test="${isRolActualAdministrador}">
 								<%---- Expedients ----%>
 								<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>								
+								<%---- Annotacions pendents ----%>
+								<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+									<spring:message code="decorator.menu.expedientPeticions"/>
+									<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
+								</a>
 								<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
@@ -345,7 +350,7 @@ body {
 										<spring:message code="decorator.menu.expedients"/>
 								</a>
 								
-								<%---- Expedients pendents ----%>
+								<%---- Annotacions pendents ----%>
 								<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
 									<spring:message code="decorator.menu.expedientPeticions"/>
 									<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>

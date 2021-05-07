@@ -21,6 +21,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -339,6 +340,26 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long entitatId,
 			Long id) {
 		return delegate.isMetaExpedientPendentRevisio(entitatId, id);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public boolean comprovarPermisosMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PermissionEnumDto permission) {
+		return delegate.comprovarPermisosMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				permission);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<MetaExpedientDto> findCreateWritePerm(
+			Long entitatId,
+			boolean isAdmin) {
+		return delegate.findCreateWritePerm(entitatId, isAdmin);
 	}
 
 }
