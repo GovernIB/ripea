@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 03/05/21 14:17
+-- Ran at: 07/05/21 12:58
 -- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.3.3
 -- *********************************************************************
@@ -987,4 +987,3 @@ GRANT SELECT ON ipa_acl_class_seq TO www_ripea;
 GRANT SELECT ON ipa_acl_oid_seq TO www_ripea;
 
 GRANT SELECT ON ipa_acl_entry_seq TO www_ripea;
-
