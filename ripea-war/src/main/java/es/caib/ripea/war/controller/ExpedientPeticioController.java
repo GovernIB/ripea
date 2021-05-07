@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
@@ -65,7 +66,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/expedientPeticio")
-public class ExpedientPeticioController extends BaseUserController {
+public class ExpedientPeticioController extends BaseUserOAdminController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
 
@@ -118,12 +119,14 @@ public class ExpedientPeticioController extends BaseUserController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientPeticioFiltreCommand expedientPeticioFiltreCommand = getFiltreCommand(request);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				expedientPeticioService.findAmbFiltre(
 						entitatActual.getId(),
 						ExpedientPeticioFiltreCommand.asDto(expedientPeticioFiltreCommand),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+						DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual.equals("IPA_ADMIN")),
 				"id");
 	}
 
@@ -305,6 +308,27 @@ public class ExpedientPeticioController extends BaseUserController {
 					expedientId, 
 					expedientPeticioId);
 	}
+	
+	@RequestMapping(value = "/comprovarPermisCreate/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean comprovarPermisCreate(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.CREATE);
+	}
+	
+	@RequestMapping(value = "/comprovarPermisWrite/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean comprovarPermisWrite(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.WRITE);
+	}
+	
 	
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
 	public String acceptarPost(
@@ -646,10 +670,11 @@ public class ExpedientPeticioController extends BaseUserController {
 		model.addAttribute(
 				"entitatId",
 				entitat.getId());
-		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findActiusAmbEntitatPerLectura(
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(
 				entitat.getId(), 
-				null, 
-				"tothom");
+				rolActual.equals("IPA_ADMIN"));
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
@@ -668,22 +693,22 @@ public class ExpedientPeticioController extends BaseUserController {
 			// if current user has create permissions for this metaexpedient
 			if (hasPermissions) {
 				command.setMetaExpedientId(metaExpedientDto.getId());
-				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId());
-				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
-				if (expedientNumero != null && !expedientNumero.isEmpty()) {
-					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(
-							entitat.getId(),
-							metaExpedientDto.getId(),
-							expedientNumero);
-					
-					if (expedient == null) {
-						MissatgesHelper.warning(
-								request, 
-								getMessage(
-										request, 
-										"expedientPeticio.form.acceptar.expedient.noTorbat"));
-					}
-				}
+//				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId());
+//				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
+//				if (expedientNumero != null && !expedientNumero.isEmpty()) {
+//					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(
+//							entitat.getId(),
+//							metaExpedientDto.getId(),
+//							expedientNumero);
+//					
+//					if (expedient == null) {
+//						MissatgesHelper.warning(
+//								request, 
+//								getMessage(
+//										request, 
+//										"expedientPeticio.form.acceptar.expedient.noTorbat"));
+//					}
+//				}
 			}
 		}
 		if (command.getAccio() == null) {

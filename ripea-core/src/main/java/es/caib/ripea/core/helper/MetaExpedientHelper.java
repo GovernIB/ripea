@@ -22,7 +22,6 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -462,6 +461,50 @@ public class MetaExpedientHelper {
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long carpetaIdJstree) {
 		MetaExpedientCarpetaDto carpeta = metaExpedientCarpetaHelper.deleteCarpeta(carpetaIdJstree);
 		return carpeta;
+	}
+	
+	
+	
+	public List<Long> getIdsCreateWritePermesos(Long entitatId) {
+		
+		List<Long> createPermIds = getIds(
+				findAmbEntitatPermis(
+					entitatId,
+					ExtendedPermission.CREATE,
+					true,
+					null,
+					false,
+					false,
+					null));
+
+		List<Long> writePermIds = getIds(
+				findAmbEntitatPermis(
+					entitatId,
+					ExtendedPermission.WRITE,
+					true,
+					null,
+					false,
+					false,
+					null));
+
+		List<Long> createWritePermIds = new ArrayList<>(); 
+		createWritePermIds.addAll(createPermIds);
+		createWritePermIds.addAll(writePermIds);
+		createWritePermIds = new ArrayList<>(new HashSet<>(createWritePermIds));
+		if (createWritePermIds.isEmpty()) {
+			createWritePermIds = null;
+		}
+		
+		return createWritePermIds;
+		
+	}
+	
+	public List<Long> getIds(List<MetaExpedientEntity> entities) {
+		List<Long> ids = new ArrayList<>();
+		for (MetaExpedientEntity entity : entities) {
+			ids.add(entity.getId());
+		}
+		return ids;
 	}
 
 	private List<Long> toListLong(List<Serializable> original) {

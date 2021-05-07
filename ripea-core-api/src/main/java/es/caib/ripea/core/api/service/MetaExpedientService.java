@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
@@ -461,6 +462,17 @@ public interface MetaExpedientService {
 	boolean isMetaExpedientPendentRevisio(
 			Long entitatId,
 			Long id);
+	
+	@PreAuthorize("hasRole('tothom')")
+	boolean comprovarPermisosMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PermissionEnumDto permission);
+
+	@PreAuthorize("hasRole('tothom')")
+	List<MetaExpedientDto> findCreateWritePerm(
+			Long entitatId,
+			boolean isAdmin);
 	
 	
 }

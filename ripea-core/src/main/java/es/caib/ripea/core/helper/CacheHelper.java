@@ -115,6 +115,8 @@ public class CacheHelper {
 	private AclSidRepository aclSidRepository;
 	@Resource
 	private ExpedientPeticioRepository expedientPeticioRepository;
+	@Resource
+	private MetaExpedientHelper metaExpedientHelper;
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
@@ -552,16 +554,19 @@ public class CacheHelper {
 	public void evictRolsDisponiblesEnAcls() {
 	}
 
-	@Cacheable(value = "anotacionsUsuari", key="#entitat")
-	public long countAnotacionsPendents(EntitatEntity entitat) {
+	@Cacheable(value = "anotacionsUsuari", key="{#entitat, #isAdmin, #usuariCodi}")
+	public long countAnotacionsPendents(EntitatEntity entitat, boolean isAdmin, String usuariCodi) {
 		logger.debug("Consulta anotacions pendents de processar");
-		return expedientPeticioRepository.countAnotacionsPendents(entitat);
+		
+		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitat.getId()); 
+		
+		return expedientPeticioRepository.countAnotacionsPendents(entitat, isAdmin, createWritePermIds);
 	}
 	
-	@CacheEvict(value = "anotacionsUsuari", key="#entitat")
+	@CacheEvict(value = "anotacionsUsuari", key="{#entitat, #isAdmin, #usuariCodi}", allEntries=true)
 	public void evictCountAnotacionsPendents(EntitatEntity entitat) {
 	}
-	
+
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,
 			MultiplicitatEnumDto multiplicitat) {

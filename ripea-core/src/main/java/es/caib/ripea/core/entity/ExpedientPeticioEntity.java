@@ -59,9 +59,11 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	private String notificaDistError;
 	
 	
-
-	@Column(name = "meta_expedient_nom", length = 256)
-	private String metaExpedientNom;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "metaexpedient_id")
+	@ForeignKey(name = "ipa_exp_pet_metaexp_fk")
+	private MetaExpedientEntity metaExpedient;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "exp_peticio_accio", length = 20)
 	private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
@@ -114,9 +116,7 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 			Date consultaWsErrorDate) {
 		this.consultaWsErrorDate = consultaWsErrorDate;
 	}
-	public String getMetaExpedientNom() {
-		return metaExpedientNom;
-	}
+
 	public ExpedientPeticioAccioEnumDto getExpedientPeticioAccioEnumDto() {
 		return expedientPeticioAccioEnumDto;
 	}
@@ -134,10 +134,6 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	public void updateClauAcces(
 			String clauAcces) {
 		this.clauAcces = clauAcces;
-	}
-	public void updateMetaExpedientNom(
-			String metaExpedientNom) {
-		this.metaExpedientNom = metaExpedientNom;
 	}
 	public void updateExpedientPeticioAccioEnumDto(
 			ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
@@ -164,7 +160,12 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	public String getClauAcces() {
 		return clauAcces;
 	}
-
+	public void updateMetaExpedient(MetaExpedientEntity metaExpedient) {
+		this.metaExpedient = metaExpedient;
+	}
+	public MetaExpedientEntity getMetaExpedient() {
+		return metaExpedient;
+	}
 	public static Builder getBuilder(
 			String identificador,
 			String clauAcces,
@@ -188,10 +189,6 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 			built.estat = estat;
 		}
 		
-		public Builder metaExpedientNom(String metaExpedientNom) {
-			built.metaExpedientNom = metaExpedientNom;
-			return this;
-		}
 		public Builder expedientPeticioAccioEnumDto(ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
 			built.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
 			return this;

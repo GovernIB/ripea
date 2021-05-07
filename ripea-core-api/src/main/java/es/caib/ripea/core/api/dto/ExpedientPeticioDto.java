@@ -18,6 +18,7 @@ public class ExpedientPeticioDto {
 	private Date dataAlta;
 	private ExpedientPeticioEstatEnumDto estat;
 	private RegistreDto registre;
+	private Long metaExpedientId;
 	private String metaExpedientNom;
 	private ExpedientPeticioAccioEnumDto accio;
 	private String notificaDistError;
@@ -102,5 +103,12 @@ public class ExpedientPeticioDto {
 	public void setAccio(ExpedientPeticioAccioEnumDto accio) {
 		this.accio = accio;
 	}
+	public Long getMetaExpedientId() {
+		return metaExpedientId;
+	}
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
+	
 
 }

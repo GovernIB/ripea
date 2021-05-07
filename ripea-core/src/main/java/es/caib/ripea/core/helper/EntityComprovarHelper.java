@@ -785,15 +785,16 @@ public class EntityComprovarHelper {
 					null, 
 					true);
 		}
-//		if (comprovarPermisCreate) {
-//		comprovarPermisMetaNode(
-//				metaNode,
-//				nodeId,
-//				organGestorId,
-//				esExpedient,
-//				ExtendedPermission.CREATE,
-//				"CREATE");
-//		}
+		if (comprovarPermisCreate) {
+		comprovarPermisMetaNode(
+				metaNode,
+				nodeId,
+				esExpedient,
+				ExtendedPermission.CREATE,
+				"CREATE",
+				null, 
+				true);
+		}
 		if (comprovarPermisDelete) {
 			comprovarPermisMetaNode(
 					metaNode,

@@ -178,16 +178,13 @@ public class ExpedientPeticioHelper {
 				entitat,
 				expedientPeticioEntity.getRegistre().getProcedimentCodi());
 		MetaExpedientEntity metaExpedientEntity = null;
-		String metaExpedientNom = null;
 		if (!metaExpedients.isEmpty()) {
 			metaExpedientEntity = metaExpedients.get(0);
-			metaExpedientNom = metaExpedientEntity.getNom();
 		}
-		expedientPeticioEntity.updateMetaExpedientNom(
-				metaExpedientNom);
+		expedientPeticioEntity.updateMetaExpedient(
+				metaExpedientEntity);
 		ExpedientEntity expedientEntity = null;
 		if (metaExpedientEntity != null) {
-
 			expedientEntity = expedientRepository.findByEntitatAndMetaNodeAndNumero(
 					entitat,
 					metaExpedientEntity, 
