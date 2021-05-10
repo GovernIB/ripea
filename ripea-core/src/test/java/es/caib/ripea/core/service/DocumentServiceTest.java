@@ -358,6 +358,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								new Long(documentPortafirmes.getPortafirmesId()),
 								PortafirmesCallbackEstatEnumDto.FIRMAT,
 								null,
+								null,
 								null);
 						assertNull(callbackException);
 						DocumentDto documentFirmat = documentService.findById(

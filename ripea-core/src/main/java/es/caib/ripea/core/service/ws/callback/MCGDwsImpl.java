@@ -90,7 +90,8 @@ public class MCGDwsImpl implements MCGDws {
 						documentId,
 						estatEnum,
 						motiuRebuig,
-						administrationId);
+						administrationId,
+						null);
 				if (ex == null) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,

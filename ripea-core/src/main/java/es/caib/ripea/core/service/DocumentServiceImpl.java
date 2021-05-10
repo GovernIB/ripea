@@ -653,11 +653,12 @@ public class DocumentServiceImpl implements DocumentService {
 			long portafirmesId,
 			PortafirmesCallbackEstatEnumDto callbackEstat,
 			String motiuRebuig,
-			String administrationId) {
+			String administrationId,
+			String name) {
 		logger.debug("Processant petició del callback ("
 				+ "portafirmesId=" + portafirmesId + ", "
 				+ "callbackEstat=" + callbackEstat + ")");
-		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId);
+		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId, name);
 	}
 
 	@Transactional

@@ -12,6 +12,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -57,6 +58,11 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	@Column(name = "pf_motiu_rebuig")
 	private String motiuRebuig;
 	
+	@Transient
+	private String name;
+	@Transient
+	private String administrationId;
+	
 	public String[] getResponsables() {
 		if (responsables != null) {
 			return responsables.split(",");
@@ -83,6 +89,14 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 		this.motiuRebuig = motiuRebuig;
 	}
 
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateAdministrationId(String administrationId) {
+		this.administrationId = administrationId;
+	}
+	
 	public static Builder getBuilder(
 			DocumentEnviamentEstatEnumDto estat,
 			String assumpte,
