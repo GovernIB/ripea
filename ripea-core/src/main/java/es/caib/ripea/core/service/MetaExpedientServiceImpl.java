@@ -154,6 +154,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+		} else {
+			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
 		}
 		
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
