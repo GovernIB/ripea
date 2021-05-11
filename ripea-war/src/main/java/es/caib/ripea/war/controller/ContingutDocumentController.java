@@ -79,6 +79,7 @@ import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DocumentHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -282,17 +283,26 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	
 	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument/{tipusDocumentId}", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean updateTipusDocument(
+	public JsonResponse updateTipusDocument(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@PathVariable Long tipusDocumentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return documentService.updateTipusDocumental(
+		
+		try {
+			documentService.updateTipusDocumental(
 					entitatActual.getId(), 
 					contingutId, 
 					tipusDocumentId, 
 					false);
+			return new JsonResponse(new Boolean(true));
+			
+		} catch (Exception e) {
+			logger.error("Error actualitzant el document amb el nou tipus de document", e);
+			return new JsonResponse(true, e.getMessage());
+		}
+		
 	}
 
 	

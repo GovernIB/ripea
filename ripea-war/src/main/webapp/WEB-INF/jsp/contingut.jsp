@@ -1063,21 +1063,30 @@ $(document).ready(function() {
 	selTipusDocument.select2(select2Options);
 	
 	selTipusDocument.on('change', function(event){
-		showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
-		var documentId = $(this).attr('id');
+
 		var tipusDocumentId = $(':selected', $(this)).attr('id');
-		var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument/"/>' + tipusDocumentId;
-		$.ajax({
-			type: 'GET',
-	        url: updateUrl,
-	        success: function(actualitzat) {
-	        	location.reload();
-	        },
-	        error: function(e) {
-	        	alert("Hi ha hagut un error actualitzant el document amb el nou tipus de document");
-	        	location.reload();
-	        }
-	    });	
+		if (tipusDocumentId) {
+			showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
+			var documentId = $(this).attr('id');
+			
+			var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument/"/>' + tipusDocumentId;
+			$.ajax({
+				type: 'GET',
+		        url: updateUrl,
+		        success: function(json) {
+		        	if (json.error) {
+		        		$('div.modal').modal('hide');
+						$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
+		        	} else {
+						location.reload();
+					}
+		        },
+		        error: function(e) {
+		        	alert("Hi ha hagut un error actualitzant el document amb el nou tipus de document");
+		        	location.reload();
+		        }
+		    });	
+		}
 	});
 });
 
