@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 11/05/21 08:20
+-- Ran at: 11/05/21 11:15
 -- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.3.3
 -- *********************************************************************
@@ -832,13 +832,29 @@ CREATE SEQUENCE ipa_acl_oid_seq START WITH 1;
 CREATE SEQUENCE ipa_acl_entry_seq START WITH 1;
 
 -- Changeset db/changelog/initial_schema_trigger.yaml::init-trigger-1::limit (generated)
-CREATE OR REPLACE TRIGGER ipa_acl_sid_idgen BEFORE INSERT ON ipa_acl_sid FOR EACH ROW BEGIN SELECT ipa_acl_sid_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+CREATE OR REPLACE TRIGGER ipa_acl_sid_idgen BEFORE INSERT ON ipa_acl_sid FOR EACH ROW BEGIN SELECT ipa_acl_sid_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
 
-CREATE OR REPLACE TRIGGER ipa_acl_class_idgen BEFORE INSERT ON ipa_acl_class FOR EACH ROW BEGIN SELECT ipa_acl_class_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+END;
 
-CREATE OR REPLACE TRIGGER ipa_acl_oid_idgen BEFORE INSERT ON ipa_acl_object_identity FOR EACH ROW BEGIN SELECT ipa_acl_oid_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+/ SHOW ERRORS;
 
-CREATE OR REPLACE TRIGGER ipa_acl_entry_idgen BEFORE INSERT ON ipa_acl_entry FOR EACH ROW BEGIN SELECT ipa_acl_entry_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+CREATE OR REPLACE TRIGGER ipa_acl_class_idgen BEFORE INSERT ON ipa_acl_class FOR EACH ROW BEGIN SELECT ipa_acl_class_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+
+END;
+
+/ SHOW ERRORS;
+
+CREATE OR REPLACE TRIGGER ipa_acl_oid_idgen BEFORE INSERT ON ipa_acl_object_identity FOR EACH ROW BEGIN SELECT ipa_acl_oid_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+
+END;
+
+/ SHOW ERRORS;
+
+CREATE OR REPLACE TRIGGER ipa_acl_entry_idgen BEFORE INSERT ON ipa_acl_entry FOR EACH ROW BEGIN SELECT ipa_acl_entry_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+
+END;
+
+/ SHOW ERRORS;
 
 -- Changeset db/changelog/initial_schema_lob.yaml::lob-1::limit (generated)
 ALTER TABLE ipa_document MOVE LOB(fitxer_contingut) STORE AS ipa_document_fitxcont_lob(TABLESPACE ripea_lob INDEX ipa_document_fitxcont_lob_i);
