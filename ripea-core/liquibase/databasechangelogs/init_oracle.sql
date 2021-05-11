@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 07/05/21 12:58
+-- Ran at: 11/05/21 08:20
 -- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.3.3
 -- *********************************************************************
@@ -817,7 +817,7 @@ CREATE INDEX ipa_metaexp_seq_lastmodby_fk_i ON ipa_metaexp_seq(lastmodifiedby_co
 
 -- Changeset db/changelog/initial_schema_index.yaml::init-index-87::null
 -- Changeset db/changelog/initial_schema_sequence.yaml::init-sequence-1::limit (generated)
-CREATE SEQUENCE ipa_hibernate_sequence START WITH 1;
+CREATE SEQUENCE ipa_hibernate_seq START WITH 1;
 
 -- Changeset db/changelog/initial_schema_sequence.yaml::init-sequence-2::limit (generated)
 CREATE SEQUENCE ipa_acl_sid_seq START WITH 1;
@@ -859,7 +859,7 @@ ALTER TABLE ipa_registre_annex MOVE LOB(contingut) STORE AS ipa_reg_annx_cont_lo
 
 ALTER TABLE ipa_registre_annex MOVE LOB(firma_contingut) STORE AS ipa_reg_annx_firmacont_lob(TABLESPACE ripea_lob INDEX ipa_reg_annx_firmacont_lob_i);
 
--- Changeset db/changelog/initial_schema_grant.yaml::init-trigger-1::limit (generated)
+-- Changeset db/changelog/initial_schema_grant.yaml::init-grant-1::limit (generated)
 GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_alerta TO www_ripea;
 
 GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_carpeta TO www_ripea;
@@ -987,3 +987,16 @@ GRANT SELECT ON ipa_acl_class_seq TO www_ripea;
 GRANT SELECT ON ipa_acl_oid_seq TO www_ripea;
 
 GRANT SELECT ON ipa_acl_entry_seq TO www_ripea;
+
+-- Changeset db/changelog/changes/0.9.83/694.yaml::1620634795427-1::limit
+update ipa_metaexpedient set revisio_estat = 'REVISAT' where revisio_estat is null;
+
+-- Changeset db/changelog/changes/0.9.83/767.yaml::1620384142961-1::limit
+ALTER TABLE ipa_expedient_peticio DROP COLUMN meta_expedient_nom;
+
+ALTER TABLE ipa_expedient_peticio ADD metaexpedient_id NUMBER(19);
+
+ALTER TABLE ipa_expedient_peticio ADD CONSTRAINT ipa_exp_pet_metaexp_fk FOREIGN KEY (metaexpedient_id) REFERENCES ipa_metaexpedient (id);
+
+update ipa_expedient_peticio set metaexpedient_id = (select ipa_metaexpedient.id from ipa_metaexpedient where clasif_sia = (select procediment_codi from ipa_registre where ipa_registre.id = ipa_expedient_peticio.registre_id));
+
