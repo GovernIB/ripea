@@ -1203,7 +1203,13 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			return documentDetalls;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			String msg = "";
+			if (ex.getCause() != null && !ex.getCause().equals(ex)) {
+				msg = ex.getMessage() + ": " + ex.getCause().getMessage();
+			} else {
+				msg = ex.getMessage();
+			}
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + msg;
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
