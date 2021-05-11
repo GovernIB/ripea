@@ -189,8 +189,13 @@ public class EmailHelper {
 		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes";
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String rebutjMotiu = "";
+		String responsableRebuig = "";
 		if (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.REBUTJAT) {
 			rebutjMotiu = "\tMotiu: " + documentPortafirmes.getMotiuRebuig() + "\n";
+			if (documentPortafirmes.getName() != null)
+				responsableRebuig = "\tResponsable del rebuig: " + documentPortafirmes.getName() + " (" + documentPortafirmes.getAdministrationId() + ")" + "\n\n";
+			else
+				responsableRebuig = "\tResponsable del rebuig: " + documentPortafirmes.getAdministrationId() + "\n\n";
 		}
 		String text = 
 				"Informació del document:\n" +
@@ -202,6 +207,7 @@ public class EmailHelper {
 						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 						"Estat del document:" + estat + "\n" +
 						rebutjMotiu +
+						responsableRebuig +
 						getEnllacExpedient(expedient.getId());
 						
 		

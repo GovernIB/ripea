@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -240,6 +239,18 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    (me.entitat = :entitat) " + 
 			"and me.id in (:ids)")
 	public List<Long> findIdsByEntitat(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
+	
+	@Query(	"select" +
+			"    me " +
+			"from" +
+			"    MetaExpedientEntity me " +
+			" where " +
+			"    me.entitat = :entitat " + 
+			"and (:isAdmin = true or me.id in (:ids))")
+	public List<MetaExpedientEntity> findMetaExpedientsByIds(	
+			@Param("entitat") EntitatEntity entitat, 
+			@Param("ids") List<Long> ids, 
+			@Param("isAdmin") boolean isAdmin);
 	
 	
 	

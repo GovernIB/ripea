@@ -65,7 +65,8 @@
 			$( "#checkbox-metaexpedient-comu" ).change(function () {
 				if(this.checked) {
 					selectOrganGestorContainer.hide();
-					
+					$("select#organGestorId").val(null);
+					$("select#organGestorId").trigger("change");
 			    } else {
 			    	selectOrganGestorContainer.show();
 			    }

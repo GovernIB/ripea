@@ -5,13 +5,41 @@ databaseChangeLog:
     changes:
     - sql:
         dbms: oracle
-        sql: CREATE OR REPLACE TRIGGER ipa_acl_sid_idgen BEFORE INSERT ON ipa_acl_sid FOR EACH ROW BEGIN SELECT ipa_acl_sid_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+        sql: "CREATE OR REPLACE TRIGGER ipa_acl_sid_idgen
+BEFORE INSERT ON ipa_acl_sid
+FOR EACH ROW
+  BEGIN
+    SELECT ipa_acl_sid_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+  END;
+/
+SHOW ERRORS;"
     - sql:
         dbms: oracle
-        sql: CREATE OR REPLACE TRIGGER ipa_acl_class_idgen BEFORE INSERT ON ipa_acl_class FOR EACH ROW BEGIN SELECT ipa_acl_class_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+        sql: "CREATE OR REPLACE TRIGGER ipa_acl_class_idgen
+BEFORE INSERT ON ipa_acl_class
+FOR EACH ROW
+  BEGIN
+    SELECT ipa_acl_class_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+  END;
+/
+SHOW ERRORS;"
     - sql:
         dbms: oracle
-        sql: CREATE OR REPLACE TRIGGER ipa_acl_oid_idgen BEFORE INSERT ON ipa_acl_object_identity FOR EACH ROW BEGIN SELECT ipa_acl_oid_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+        sql: "CREATE OR REPLACE TRIGGER ipa_acl_oid_idgen
+BEFORE INSERT ON ipa_acl_object_identity
+FOR EACH ROW
+  BEGIN
+    SELECT ipa_acl_oid_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+  END;
+/
+SHOW ERRORS;"
     - sql:
         dbms: oracle
-        sql: CREATE OR REPLACE TRIGGER ipa_acl_entry_idgen BEFORE INSERT ON ipa_acl_entry FOR EACH ROW BEGIN SELECT ipa_acl_entry_seq.NEXTVAL INTO :NEW.ID FROM DUAL END;
+        sql: "CREATE OR REPLACE TRIGGER ipa_acl_entry_idgen
+BEFORE INSERT ON ipa_acl_entry
+FOR EACH ROW
+  BEGIN
+    SELECT ipa_acl_entry_seq.NEXTVAL INTO :NEW.ID FROM DUAL;
+  END;
+/
+SHOW ERRORS;"

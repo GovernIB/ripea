@@ -565,7 +565,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			long portafirmesId,
 			PortafirmesCallbackEstatEnumDto callbackEstat,
 			String motiuRebuig,
-			String administrationId) {
+			String administrationId,
+			String name) {
 		logger.debug("Processant petició del callback ("
 				+ "portafirmesId=" + portafirmesId + ", "
 				+ "callbackEstat=" + callbackEstat + ")");
@@ -588,6 +589,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		if (!estatFinal) {
 			documentPortafirmes.updateCallbackEstat(callbackEstat);
 			documentPortafirmes.updateMotiuRebuig(motiuRebuig);
+			documentPortafirmes.updateAdministrationId(administrationId);
+			documentPortafirmes.updateName(name);
 			return portafirmesProcessar(documentPortafirmes);
 		} else {
 			return null;

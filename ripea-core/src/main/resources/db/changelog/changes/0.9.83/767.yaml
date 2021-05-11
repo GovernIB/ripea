@@ -1,0 +1,21 @@
+databaseChangeLog:
+- changeSet:
+    id: 1620384142961-1
+    author: limit
+    changes:
+    - dropColumn:
+        columnName: meta_expedient_nom
+        tableName: ipa_expedient_peticio
+    - addColumn:
+        tableName: ipa_expedient_peticio
+        column:
+          name: metaexpedient_id
+          type: number(19)
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ipa_expedient_peticio
+        constraintName: ipa_exp_pet_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+    - sql:
+        sql: update ipa_expedient_peticio set metaexpedient_id = (select ipa_metaexpedient.id from ipa_metaexpedient where clasif_sia = (select procediment_codi from ipa_registre where ipa_registre.id = ipa_expedient_peticio.registre_id));

@@ -169,8 +169,9 @@ public class DocumentServiceBean implements DocumentService {
 			long documentId,
 			PortafirmesCallbackEstatEnumDto estat,
 			String motiuRebuig,
-			String administrationId) {
-		return delegate.portafirmesCallback(documentId, estat, motiuRebuig, administrationId);
+			String administrationId,
+			String name) {
+		return delegate.portafirmesCallback(documentId, estat, motiuRebuig, administrationId, name);
 	}
 
 	@Override

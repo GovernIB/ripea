@@ -94,14 +94,17 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 		if (estatEnum != null) {
 			try {
 				String administrationId = null;
+				String name = null;
 				if (event.getActor() != null) {
 					administrationId = event.getActor().getAdministrationID();
+					name = event.getActor().getName();
 				}
 				Exception ex = documentService.portafirmesCallback(
 						documentId,
 						estatEnum,
 						motiuRebuig,
-						administrationId);
+						administrationId,
+						name);
 				if (ex == null) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,

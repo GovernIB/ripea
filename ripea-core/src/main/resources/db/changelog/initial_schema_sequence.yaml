@@ -4,7 +4,7 @@ databaseChangeLog:
     author: limit (generated)
     changes:
     - createSequence:
-        sequenceName: ipa_hibernate_sequence
+        sequenceName: ipa_hibernate_seq
         startValue: 1
 - changeSet:
     id: init-sequence-2

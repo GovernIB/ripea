@@ -43,11 +43,11 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, boolean isAdmin) {
 		return delegate.findAmbFiltre(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, isAdmin);
 	}
 
 	@Override
@@ -140,8 +140,8 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public long countAnotacionsPendents(Long entitatId) {
-		return delegate.countAnotacionsPendents(entitatId);
+	public long countAnotacionsPendents(Long entitatId, boolean isAdmin) {
+		return delegate.countAnotacionsPendents(entitatId, isAdmin);
 	}
 
 	@Override
