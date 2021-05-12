@@ -117,23 +117,29 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
 				true,
 				false,
-				false, false, false);
+				false, 
+				false, 
+				false);
 
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("numero",
-				new String[] { "codi", "any", "sequencia" });
+		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios;
 
 		// enum with states accesibles from filter in the view (without create state)
 		ExpedientPeticioEstatViewEnumDto estatView = filtre.getEstat();
-
 		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
+		}
 		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitatId); 
 		
 		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
 				isAdmin,
 				createWritePermIds,
+				metaExpedient == null,
+				metaExpedient,
 				filtre.getProcediment() == null ||
 						filtre.getProcediment().isEmpty(),
 				filtre.getProcediment(),
@@ -164,7 +170,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return result;
 
 	}
-
 
 
 	

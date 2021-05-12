@@ -34,40 +34,44 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 	cursor: pointer;
 }
 </style>
-<script>
 
-
-</script>
 </head>
 <body>
 	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
 
 		<div class="row">
-			<div class="col-md-9">
-				<div class="row">
-					<div class="col-md-4">
-						<rip:inputText name="numero" inline="true" placeholderKey="expedientPeticio.list.placeholder.numero"/>
-					</div>	
-					<div class="col-md-4">
-						<rip:inputText name="extracte" inline="true" placeholderKey="expedientPeticio.list.placeholder.extracte"/>
-					</div>	
-					<div class="col-md-4">							
-						<rip:inputText name="destinacio" inline="true" placeholderKey="expedientPeticio.list.placeholder.destinacio"/>
-					</div>	
-				</div>
-				<div class="row">
-					<div class="col-md-4">							
-						<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataInicial"/>
-					</div>	
-					<div class="col-md-4">							
-						<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataFinal"/>
-					</div>	
-					<div class="col-md-4">							
-						<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.estat"/>
-					</div>					
-				</div>
+			<div class="col-md-4">
+				<rip:inputText name="numero" inline="true" placeholderKey="expedientPeticio.list.placeholder.numero"/>
+			</div>	
+			<div class="col-md-4">
+				<rip:inputText name="extracte" inline="true" placeholderKey="expedientPeticio.list.placeholder.extracte"/>
+			</div>	
+			<div class="col-md-4">					
+				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaInicial"/>
+				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+						name="destinacio"  
+						urlConsultaInicial="${urlConsultaInicial}"
+						urlConsultaLlistat="${urlConsultaLlistat}"
+						placeholderKey="expedientPeticio.list.placeholder.destinacio"
+						suggestValue="codi"
+						suggestText="nom"
+						inline="true"/>	
+			</div>	
+		</div>
+		<div class="row">
+			<div class="col-md-4">					
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedientPeticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>
-			
+			<div class="col-md-4">							
+				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataInicial"/>
+			</div>	
+			<div class="col-md-4">							
+				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataFinal"/>
+			</div>	
+			<div class="col-md-4">							
+				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.estat"/>
+			</div>					
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -94,7 +98,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedientPeticio.list.columna.data"/></th>
 				<th data-col-name="registre.extracte"><spring:message code="expedientPeticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiDescripcio"><spring:message code="expedientPeticio.list.columna.destiNom"/></th>
-				<th data-col-name="metaExpedientNom"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
+				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
 				<th data-col-name="estatView" data-orderable="false"><spring:message code="expedientPeticio.list.columna.estat"/></th>
 
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

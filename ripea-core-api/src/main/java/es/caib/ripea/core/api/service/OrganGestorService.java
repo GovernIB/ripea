@@ -217,6 +217,11 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(
 			Long entitatId,
 			String filter);
+
+	@PreAuthorize("hasRole('tothom')")
+	public OrganGestorDto findItemByEntitatAndCodi(
+			Long entitatId,
+			String codi);
 	
 
 }
