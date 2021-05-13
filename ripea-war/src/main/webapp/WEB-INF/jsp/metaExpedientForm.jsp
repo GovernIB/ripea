@@ -59,10 +59,9 @@
 	<c:if test="${not isRolAdminOrgan}">
 		<script type="text/javascript">
 		var novesCarpetes = [];
-		var hasOrganGestor = ${hasOrganGestor};
 		$(document).ready(function() {
 			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
-			$( "#checkbox-metaexpedient-comu" ).change(function () {
+			$( "#comu" ).change(function () {
 				if(this.checked) {
 					selectOrganGestorContainer.hide();
 					$("select#organGestorId").val(null);
@@ -71,8 +70,7 @@
 			    	selectOrganGestorContainer.show();
 			    }
 		  	});
-			if (!hasOrganGestor) {
-				$( "#checkbox-metaexpedient-comu" ).prop("checked", true);
+			if ($("#comu").is(":checked")) {
 				selectOrganGestorContainer.hide();
 			}
 		});
@@ -172,18 +170,18 @@
 				
 				if (codiSia != null && codiSia != "") {
 					$.get("<c:url value="/metaExpedient/importMetaExpedient/"/>" + codiSia)
-					.done(function(data){
-						if (data.error) {
-							$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + data.errorMsg + '</div>');
+					.done(function(json){
+						if (json.error) {
+							$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + json.errorMsg + '</div>');
 
 						} else {
-							if (data.data){
-								data = data.data;
+							if (json.data){
+								data = json.data;
 								$('#nom').val(data.nom);
 								$('#descripcio').val(data.resum);
 								
-								if ($("#checkbox-metaexpedient-comu:checked").val() != data.comu) {
-									$("#checkbox-metaexpedient-comu").click();
+								if ($("#comu:checked").val() != data.comu) {
+									$("#comu").click();
 								}
 								if (!data.comu) {
 									$('#organGestorId').data('currentValue', data.organId);
@@ -255,17 +253,8 @@
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
 				
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
-				<c:if test="${not isRolAdminOrgan}">
-					<div class="form-group">
-						<label class="control-label col-xs-4" for="checkbox-metaexpedient-comu"><spring:message code="metaexpedient.form.camp.comu"/></label>
-						<div class="controls col-xs-8">
-							<div class="checkbox">
-						    <label>
-								<input type="checkbox" id="checkbox-metaexpedient-comu" value="1">
-					    	</label>
-					    	</div>
-						</div>
-					</div>						
+				<c:if test="${not isRolAdminOrgan}">		
+					<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu"/>				
 				</c:if>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
@@ -276,7 +265,7 @@
  					textKey="metaexpedient.form.camp.organgestor"
  					suggestValue="id"
  					suggestText="nom"
- 					required="${ isRolAdminOrgan }"/>
+ 					required="true"/>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
 				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva"/>
