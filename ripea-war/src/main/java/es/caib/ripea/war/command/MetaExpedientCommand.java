@@ -72,13 +72,12 @@ public class MetaExpedientCommand {
     
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	private String revisioComentari;
-    
 	
+	private boolean comu = true;
 	
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 	public void setCodi(String codi) {
 		this.codi = codi != null ? codi.trim() : null;
 	}
@@ -183,6 +182,10 @@ public class MetaExpedientCommand {
 
 	public void setRevisioComentari(String revisioComentari) {
 		this.revisioComentari = revisioComentari != null ? revisioComentari.trim() : null;
+	}
+
+	public void setComu(boolean comu) {
+		this.comu = comu;
 	}
 
 }

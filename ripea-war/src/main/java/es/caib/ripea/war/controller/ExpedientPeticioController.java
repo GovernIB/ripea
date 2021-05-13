@@ -87,6 +87,18 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			Model model) {
 		model.addAttribute(
 				getFiltreCommand(request));
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+				entitatActual.getId(), 
+				null, 
+				rolActual);
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientsPermisLectura);
+		
 		return "expedientPeticioList";
 	}
 

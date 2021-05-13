@@ -68,12 +68,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Autowired
 	private UsuariHelper usuariHelper;
 	
+	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAll() {
 		List<OrganGestorEntity> organs = organGestorRepository.findAll();
 		return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 	}
-
+	
+	@Override
 	@Transactional(readOnly = true)
 	public OrganGestorDto findItem(Long id) {
 		OrganGestorEntity organGestor = organGestorRepository.findOne(id);
@@ -83,7 +85,20 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
 		return resposta;
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public OrganGestorDto findItemByEntitatAndCodi(Long entitatId, String codi) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		OrganGestorEntity organGestor = organGestorRepository.findByEntitatAndCodi(entitat, codi);
+		if (organGestor == null) {
+			throw new NotFoundException(codi, OrganGestorEntity.class);
+		}
+		OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
+		return resposta;
+	}
 
+	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findByEntitat(Long entitatId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);

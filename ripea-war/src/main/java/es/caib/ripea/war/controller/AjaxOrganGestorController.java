@@ -70,11 +70,6 @@ public class AjaxOrganGestorController extends BaseAdminController{
 
 		return organGestorsList;
 	}
-	
-	
-	
-	
-	
 		
 	@RequestMapping(value = "/organgestor/item/{id}", method = RequestMethod.GET)
 	@ResponseBody
@@ -87,4 +82,34 @@ public class AjaxOrganGestorController extends BaseAdminController{
 			return null;
 		} 
 	}
+	
+	
+	@RequestMapping(value = "/organgestorcodi", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> getAmbCodi(HttpServletRequest request, Model model) {
+		return get(request, null, model);
+	}
+	
+	@RequestMapping(value = "/organgestorcodi/{text}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> getAmbCodi(HttpServletRequest request, @PathVariable String text, Model model) {
+		return get(request, text, model);
+	}
+		
+	@RequestMapping(value = "/organgestorcodi/item/{codi}", method = RequestMethod.GET)
+	@ResponseBody
+	public OrganGestorDto getItemAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		
+		try {
+			return organGestorService.findItemByEntitatAndCodi(entitatActual.getId(), codi);
+		} catch (NotFoundException e) {
+			return null;
+		} 
+	}
+	
+	
+	
+	
+	
 }

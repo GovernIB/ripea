@@ -29,7 +29,6 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
@@ -228,11 +227,13 @@ public class MetaExpedientController extends BaseAdminController {
 			Model model) throws JsonMappingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		MetaExpedientDto dto = command.asDto();
+		if (!command.isComu() && command.getOrganGestorId() == null) {
+			bindingResult.rejectValue("organGestorId", "NotNull");
+		}
 		if (bindingResult.hasErrors()) {
 			fillFormModel(request, dto, model);
 			return "metaExpedientForm";
 		}
-		
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 

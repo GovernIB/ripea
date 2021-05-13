@@ -23,8 +23,16 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	private Date dataInicial;
 	private Date dataFinal;
 	private ExpedientPeticioEstatViewEnumDto estat;
+	private Long metaExpedientId;
 
+	
+	public Long getMetaExpedientId() {
+		return metaExpedientId;
+	}
 
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
 
 	public ExpedientPeticioAccioEnumDto getAccioEnum() {
 		return accioEnum;

@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 
@@ -36,10 +37,11 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"where " +
 			"e.registre.entitat = :entitat " +
 			"and (:isAdmin = true or e.metaExpedient.id in (:idMetaExpedientPermesos)) " +
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
 			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullExtracte = true or lower(e.registre.extracte) like lower('%'||:extracte||'%')) " +
-			"and (:esNullDestinacio = true or lower(e.registre.destiDescripcio) like lower('%'||:destinacio||'%')) " + 
+			"and (:esNullDestinacio = true or e.registre.destiCodi = :destinacio) " + 
 			"and (:esNullDataInicial = true or e.registre.data >= :dataInicial) " +
 			"and (:esNullDataFinal = true or e.registre.data <= :dataFinal) " +
 			"and (:esNullEstat = true or " +
@@ -52,6 +54,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isAdmin") boolean isAdmin,
 			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullProcediment") boolean esNullProcediment,
 			@Param("procediment") String procediment,
 			@Param("esNullNumero") boolean esNullNumero,
