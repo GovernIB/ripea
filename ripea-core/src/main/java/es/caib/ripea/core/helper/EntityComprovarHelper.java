@@ -286,7 +286,7 @@ public class EntityComprovarHelper {
 			organIdPermesos.addAll(organsIdsPerMetaExpedientOrganIdPermesos);
 		}
 		
-	    List<Long> organsWithoutDuplicates = new ArrayList<Long>(new HashSet<Long>(organIdPermesos));
+		List<Long> organsWithoutDuplicates = !organIdPermesos.isEmpty() ? new ArrayList<Long>(new HashSet<Long>(organIdPermesos)) : null;
 	    List<OrganGestorEntity> organGestors = organGestorRepository.findByEntitatAndIds(entitat, organsWithoutDuplicates);
 	    return organGestors;
 		
