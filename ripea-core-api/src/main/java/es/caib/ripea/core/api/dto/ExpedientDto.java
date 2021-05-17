@@ -72,7 +72,7 @@ public class ExpedientDto extends NodeDto {
 	}
 	
 	public String getTipusStr() {
-		return this.getMetaNode().getNom() + " - " + this.getMetaExpedient().getClassificacioSia();
+		return this.getMetaNode() != null ? this.getMetaNode().getNom() + " - " + this.getMetaExpedient().getClassificacioSia() : null;
 	}
 
 	protected ExpedientDto copiarContenidor(ContingutDto original) {

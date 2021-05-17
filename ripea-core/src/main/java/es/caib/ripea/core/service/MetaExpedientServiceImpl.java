@@ -444,6 +444,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	}
 	
+	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
