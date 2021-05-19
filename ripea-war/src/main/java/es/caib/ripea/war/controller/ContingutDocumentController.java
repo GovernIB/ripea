@@ -420,6 +420,31 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				null);
 		return AjaxHelper.generarAjaxFormOk(detallSignants);
 	}
+	
+	
+	
+	@RequestMapping(value = "/{pareId}/document/{documentId}/returnFitxer", method = RequestMethod.GET)
+	@ResponseBody
+	public JsonResponse returnFitxer(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+
+			FitxerDto convertit = documentService.convertirPdfPerFirmaClient(
+					entitatActual.getId(),
+					documentId);
+
+			return new JsonResponse(convertit);
+				
+			} catch (Exception e) {
+				logger.error("Error al visualitzar document", e);
+				return new JsonResponse(true, e.getMessage());
+			}
+	}
+	
 
 	@RequestMapping(value = "/{pareId}/document/{documentId}/descarregar", method = RequestMethod.GET)
 	public String descarregar(
