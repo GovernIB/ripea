@@ -211,7 +211,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter) {
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter, boolean directOrganPermisRequired) {
 		
 		List<OrganGestorEntity> filtrats = new ArrayList<OrganGestorEntity>();
 		
@@ -220,14 +220,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				true,
 				false,
 				false, 
-				false, false);
+				false, 
+				false);
 		
 		// Cercam els metaExpedients amb permisos assignats directament
 		List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaNodeEntity.class,
 				ExtendedPermission.READ));
 		
-		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty()) {
+		// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
+		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty() && !directOrganPermisRequired) {
 
 			filtrats = organGestorRepository.findByEntitatAndFiltre(
 					entitat,
@@ -236,6 +238,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} else {
 			
 			List<OrganGestorEntity> organGestorsCanditats = entityComprovarHelper.getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
+			organGestorsCanditats = !organGestorsCanditats.isEmpty() ? organGestorsCanditats : null;
 			filtrats = organGestorRepository.findByCanditatsAndFiltre(organGestorsCanditats, filter == null || filter.isEmpty(), filter);
 		}
 		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);

@@ -54,6 +54,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -601,7 +602,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					true,
 					false,
 					false,
-					false, false);
+					false, 
+					false);
 		}
 		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(entitat, metaExpedient);
 		List<ExpedientDto> expedientsDto = new ArrayList<>();
@@ -613,25 +615,31 @@ public class ExpedientServiceImpl implements ExpedientService {
 				auth);
 		// if meta expedient has write permissions add all expedients
 		if (entityComprovarHelper.hasMetaExpedientWritePermissons(metaExpedientId)) {
-			for (ContingutEntity exp : expedientsEnt) {
-				expedientsDto.add(
-						(ExpedientDto)contingutHelper.toContingutDto(exp, true, true, true, false, true, false, false));
+			for (ContingutEntity cont : expedientsEnt) {
+				ExpedientEntity exp = (ExpedientEntity)cont;
+				ExpedientDto expedient = new ExpedientDto();
+				expedient.setId(exp.getId());
+				expedient.setNom(exp.getNom());
+				expedient.setAgafatPer(
+						conversioTipusHelper.convertir(
+								exp.getAgafatPer(),
+								UsuariDto.class));
+				expedientsDto.add(expedient);
 			}
 		} else { // if not add only expedients having estat with permisions
-			for (ContingutEntity exp : expedientsEnt) {
-				ExpedientEntity expedient = (ExpedientEntity)exp;
-				if (expedient.getExpedientEstat() != null &&
-						entityComprovarHelper.hasEstatWritePermissons(expedient.getExpedientEstat().getId())) {
-					expedientsDto.add(
-							(ExpedientDto)contingutHelper.toContingutDto(
-									exp,
-									true,
-									true,
-									true,
-									false,
-									true,
-									false,
-									false));
+			for (ContingutEntity cont : expedientsEnt) {
+				ExpedientEntity exp = (ExpedientEntity)cont;
+				if (exp.getExpedientEstat() != null &&
+						entityComprovarHelper.hasEstatWritePermissons(exp.getExpedientEstat().getId())) {
+					ExpedientDto expedient = new ExpedientDto();
+					expedient.setId(exp.getId());
+					expedient.setNom(exp.getNom());
+					expedient.setAgafatPer(
+							conversioTipusHelper.convertir(
+									exp.getAgafatPer(),
+									UsuariDto.class));
+					expedientsDto.add(expedient);
+
 				}
 			}
 		}

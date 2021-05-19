@@ -293,7 +293,7 @@ public class ExpedientHelper {
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public void updateNotificarError(Long expedientPeticioId, String error) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateNotificaDistError(error);
