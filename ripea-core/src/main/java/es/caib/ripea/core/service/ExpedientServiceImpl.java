@@ -812,6 +812,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}
+		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
+			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
+		}
 		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
 		if (!documentHelper.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
 			throw new ExpedientTancarSenseDocumentsDefinitiusException();
