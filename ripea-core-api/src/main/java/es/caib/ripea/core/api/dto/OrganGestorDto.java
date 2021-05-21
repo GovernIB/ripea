@@ -32,5 +32,9 @@ public class OrganGestorDto extends AuditoriaDto {
         else
             return permisos.size();
     }
+    
+    public String getCodiINom() {
+    	return codi + " - " + nom;
+    }
        
 }

@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
@@ -28,7 +29,7 @@ public class ExportacioDocHistoric {
 
 	public byte[] convertDadesEntitat(
 			EntitatDto entitat,
-			List<HistoricExpedientDto> dades) throws IOException, XDocReportException {
+			List<HistoricExpedientDto> dades, HistoricTipusEnumDto tipusAgrupament) throws IOException, XDocReportException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
 		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_entitat_ca.odt");
@@ -39,6 +40,7 @@ public class ExportacioDocHistoric {
 		FieldsMetadata metadata = new FieldsMetadata();
 		metadata.setTemplateEngineKind("Velocity");
 		metadata.addFieldAsList("dades.data");
+		metadata.addFieldAsList("dades.mesNom");
 		metadata.addFieldAsList("dades.numExpedientsCreats");
 		metadata.addFieldAsList("dades.numExpedientsCreatsTotal");
 		metadata.addFieldAsList("dades.numExpedientsTancats");
@@ -49,6 +51,7 @@ public class ExportacioDocHistoric {
 
 		// 3) Create Java model context
 		IContext context = report.createContext();
+		context.put("tipusAgrupament", tipusAgrupament);
 		context.put("entitat", entitat);
 		context.put("dades", dades);
 		context.put("dateFormatter", new DateTool());
@@ -64,7 +67,7 @@ public class ExportacioDocHistoric {
 	}
 
 	public byte[] convertDadesOrgansGestors(
-			Map<OrganGestorDto, List<HistoricExpedientDto>> dades) throws XDocReportException, IOException {
+			Map<OrganGestorDto, List<HistoricExpedientDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws XDocReportException, IOException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
 		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_organ_ca.odt");
@@ -73,6 +76,7 @@ public class ExportacioDocHistoric {
 		IContext context = report.createContext();
 		context.put("dades", dades);
 		context.put("dateFormatter", new DateTool());
+		context.put("tipusAgrupament", tipusAgrupament);
 
 		// 3) Generate report by merging Java model with the ODT and convert it to PDF
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -82,7 +86,7 @@ public class ExportacioDocHistoric {
 	}
 
 	public byte[] convertDadesUsuaris(
-			Map<String, List<HistoricUsuariDto>> dades) throws XDocReportException, IOException {
+			Map<String, List<HistoricUsuariDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws XDocReportException, IOException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
 		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_usuaris_ca.odt");
@@ -91,6 +95,7 @@ public class ExportacioDocHistoric {
 		IContext context = report.createContext();
 		context.put("dades", dades);
 		context.put("dateFormatter", new DateTool());
+		context.put("tipusAgrupament", tipusAgrupament);
 
 		// 3) Generate report by merging Java model with the ODT and convert it to PDF
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -100,7 +105,7 @@ public class ExportacioDocHistoric {
 	}
 
 	public byte[] convertDadesInteressats(
-			Map<String, List<HistoricInteressatDto>> dades) throws XDocReportException, IOException {
+			Map<String, List<HistoricInteressatDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws XDocReportException, IOException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
 		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_interessats_ca.odt");
@@ -109,6 +114,7 @@ public class ExportacioDocHistoric {
 		IContext context = report.createContext();
 		context.put("dades", dades);
 		context.put("dateFormatter", new DateTool());
+		context.put("tipusAgrupament", tipusAgrupament);
 
 		// 3) Generate report by merging Java model with the ODT and convert it to PDF
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();

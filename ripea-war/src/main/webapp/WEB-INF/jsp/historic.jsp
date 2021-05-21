@@ -330,7 +330,16 @@
 					'<thead>' +
 						'<tr>';
 			var tableFooter = '</tbody></table>';
-			tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
+
+			<c:choose>
+				<c:when test="${historicFiltreCommand.tipusAgrupament=='DIARI'}">
+					tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
+				</c:when>
+				<c:otherwise>
+					tableHeader += '<th><spring:message code="historic.taula.header.mes"/></th>';
+				</c:otherwise>
+			</c:choose>
+			
 			
 			columns.forEach(function(c){
 				tableHeader += '<th>' + c + '</th>';
@@ -352,7 +361,7 @@
 			for (var i = 0; i < dates.length; i++ ){
 				var date = dates[i];
 				var row = '<tr>';
-				row += '<td data-sort="' + moment(date, 'DD-MM-YYYY') + '">' +  date + '</td>'
+				row += '<td data-sort="' + moment(date, 'DD-MM-YYYY') + '">' +  getDate(date) + '</td>'
 				columns.forEach(function(c){
 					var attrname = metricsDefinition[metric]['attrname'];
 					var value = data[c][i][attrname] != null ? data[c][i][attrname] : 0;
@@ -364,6 +373,33 @@
 			
 			return tableHeader + tableBody + tableFooter;
 		}
+
+		function getDate(date){
+			<c:choose>
+				<c:when test="${historicFiltreCommand.tipusAgrupament=='DIARI'}">
+					return date;
+				</c:when>
+				<c:otherwise>
+
+					mes = date.substring(3, 5);
+					mes = mes.replace(/^0+/, '');
+						
+					if (mes == 1) return '<spring:message code="mes.1"/>';
+					else if (mes == 2) return '<spring:message code="mes.2"/>';
+					else if (mes == 3) return '<spring:message code="mes.3"/>';
+					else if (mes == 4) return '<spring:message code="mes.4"/>';
+					else if (mes == 5) return '<spring:message code="mes.5"/>';
+					else if (mes == 6) return '<spring:message code="mes.6"/>';
+					else if (mes == 7) return '<spring:message code="mes.7"/>';
+					else if (mes == 8) return '<spring:message code="mes.8"/>';
+					else if (mes == 9) return '<spring:message code="mes.9"/>';
+					else if (mes == 10) return '<spring:message code="mes.10"/>';
+					else if (mes == 11) return '<spring:message code="mes.11"/>';
+					else if (mes == 12) return '<spring:message code="mes.12"/>';
+				</c:otherwise>
+			</c:choose>
+		}
+		
 		
 		function createChartMetric(data, metric, colors) {
 			var columns = Object.keys(data);
@@ -372,7 +408,7 @@
 				data[c] = data[c].sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')));
 			});
 			
-			var dates = data[columns[0]].map(item => item.data);
+			var dates = data[columns[0]].map(item => getDate(item.data));
 			
 			var datasets = []
 			columns.forEach(function(c){
@@ -459,7 +495,7 @@
 		        	console.log(response);
 		        	response.sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')))
 		        	if (response.length > 0) {
-			        	var yLabels = response.map(item => item.data);
+			        	var yLabels = response.map(item => getDate(item.data));
 			        	
 			            chart.data.labels = yLabels;
 			            metriques.forEach(function(metrica){
@@ -916,6 +952,26 @@
 				$("#historicFiltreCommand").submit();
 			});
 		});
+
+		
+		$(document).ready(function() {
+			$("#dadesMostrar").on('change', function() {
+				var select2Options = {
+						theme: 'bootstrap', 
+						width: 'auto', 
+						minimumResultsForSearch: "0"};
+				if($(this).val()=='ENTITAT') {
+					$('#exportFormat option[value="csv"]').prop('disabled', false);
+					$('#exportFormat').select2(select2Options);
+				} else {
+					$('#exportFormat option[value="csv"]').prop('disabled', true);
+					$('#exportFormat').select2(select2Options);
+				}
+			});
+
+			$('#dadesMostrar').trigger('change');
+		});
+		
 		
 	</script>
 </head>
@@ -940,7 +996,7 @@
 					inline="true" 
  					placeholderKey="historic.filtre.organsGestors"
  					suggestValue="id"
- 					suggestText="nom"/>
+ 					suggestText="codiINom"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputSuggest
@@ -1021,7 +1077,42 @@
 						style="width:100%">
 						<thead>
 							<tr>
-								<th data-col-name="data" data-type="date" data-converter="date" nowrap><spring:message code="historic.taula.header.data"/></th>
+								<c:choose>
+									<c:when test="${historicFiltreCommand.tipusAgrupament=='DIARI'}">
+										<th data-col-name="data" data-type="date" data-converter="date" nowrap><spring:message code="historic.taula.header.data"/></th>
+									</c:when>
+									<c:otherwise>
+										<th data-col-name="mes" data-type="date" data-converter="date" data-template="#cellMesTemplate" nowrap><spring:message code="historic.taula.header.mes"/>
+											<script id="cellMesTemplate" type="text/x-jsrender">
+												{{if mes == 1}}
+													<spring:message code="mes.1"/>
+												{{else mes == 2}}
+													<spring:message code="mes.2"/>
+												{{else mes == 3}}
+													<spring:message code="mes.3"/>
+												{{else mes == 4}}
+													<spring:message code="mes.4"/>
+												{{else mes == 5}}
+													<spring:message code="mes.5"/>
+												{{else mes == 6}}
+													<spring:message code="mes.6"/>
+												{{else mes == 7}}
+													<spring:message code="mes.7"/>
+												{{else mes == 8}}
+													<spring:message code="mes.8"/>
+												{{else mes == 9}}
+													<spring:message code="mes.9"/>
+												{{else mes == 10}}
+													<spring:message code="mes.10"/>
+												{{else mes == 11}}
+													<spring:message code="mes.11"/>
+												{{else mes == 12}}
+													<spring:message code="mes.12"/>
+												{{/if}}
+										</script>
+										</th>
+									</c:otherwise>
+								</c:choose>
 								<th data-col-name="numExpedientsCreats" data-orderable="false"><spring:message code="historic.taula.header.numExpedientsCreats"/></th>
 								<th data-col-name="numExpedientsCreatsTotal" data-orderable="false"><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>
 			<%-- 					<th data-col-name="numExpedientsOberts" data-orderable="false"><spring:message code="historic.taula.header.numExpedientsOberts"/></th> --%>
@@ -1127,13 +1218,14 @@
 		<div class="row">
 			<div class="col-md-8"></div>
 			<div class="col-md-2">
-				<select name="format" class="form-control" style="width:100%"
+				<select id="exportFormat"  name="format" class="form-control" style="width:100%"
 						data-minimumresults="-1"
 						data-toggle="select2">
 							<option value="json">json</option>
 							<option value="xlsx">xlsx</option>
 							<option value="odf">odf</option>
 							<option value="xml">xml</option>
+							<option value="csv">csv</option>
 				</select>
 			</div>
 			<div class="col-md-2">

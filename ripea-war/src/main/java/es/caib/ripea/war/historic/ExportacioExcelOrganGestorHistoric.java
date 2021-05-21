@@ -18,6 +18,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 
 public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric {
 
@@ -36,11 +37,11 @@ public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric 
 
 	public byte[] convertDadesOrgansGestors(
 			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades,
-			List<OrganGestorDto> organsGestors) throws IOException {
+			List<OrganGestorDto> organsGestors, HistoricTipusEnumDto tipusAgrupament) throws IOException {
 
 		for (HistoricMetriquesEnumDto metricEnum : metriques) {
 			HSSFSheet sheet = wb.createSheet(metricEnum.toString());
-			createOrgansGestorsHeader(organsGestors, sheet);
+			createOrgansGestorsHeader(organsGestors, sheet, tipusAgrupament);
 			List<Date> dates = new ArrayList<Date>(dades.keySet());
 			int rowNum = 1;
 			for (Date data : dates) {
@@ -48,7 +49,13 @@ public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric 
 					HSSFRow xlsRow = sheet.createRow(rowNum);
 					HSSFCell cellData = xlsRow.createCell(0);
 					cellData.setCellValue(data);
-					cellData.setCellStyle(cellDataStyle);
+					
+					if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+						cellData.setCellValue(data);
+						cellData.setCellStyle(cellDataStyle);
+					} else {
+						cellData.setCellValue(ExportacioHelper.getMesNom(data));
+					}
 
 					int colNum = 1;
 					for (OrganGestorDto organGestor : organsGestors) {
@@ -78,7 +85,7 @@ public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric 
 		return bytes;
 	}
 
-	private void createOrgansGestorsHeader(Collection<OrganGestorDto> organsGestors, HSSFSheet sheet) {
+	private void createOrgansGestorsHeader(Collection<OrganGestorDto> organsGestors, HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;
 
@@ -98,7 +105,11 @@ public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric 
 		HSSFCell cell;
 
 		cell = xlsRow.createCell(colNum++);
-		cell.setCellValue(new HSSFRichTextString("Data"));
+		if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+			cell.setCellValue(new HSSFRichTextString("Data"));
+		} else {
+			cell.setCellValue(new HSSFRichTextString("Mes"));
+		}
 		cell.setCellStyle(headerStyle);
 
 		for (OrganGestorDto organGestor : organsGestors) {

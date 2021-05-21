@@ -19,32 +19,54 @@ import lombok.Setter;
 
 public class HistoricEntitatSerializer {
 
-
 	@XmlRootElement(name = "registres-entitat")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootEntitat implements Serializable {
-//		@XmlJavaTypeAdapter(DateAdapter.class)
-//		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-//		public Date generationDate;
-//		@XmlElementWrapper(name = "registres")
+		public RootEntitat() {}
+	}
+
+	@XmlRootElement(name = "registres-entitat")
+	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
+	public static class RootEntitatDiari extends RootEntitat implements Serializable{
+
 		@XmlElement(name = "registre")
-		public List<RegistreEntitat> registres;
+		public List<RegistreEntitatDiari> registres;
 				
-		public RootEntitat(List<RegistreEntitat> registres) {
+		public RootEntitatDiari(List<RegistreEntitatDiari> registres) {
 			super();
-//			this.generationDate = new Date();
 			this.registres = registres;
 		}
+		public RootEntitatDiari() {}
 		
-		public RootEntitat() {}
-		
+	}
+	
+	@XmlRootElement(name = "registres-entitat")
+	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
+	public static class RootEntitatMensual extends RootEntitat implements Serializable{
+
+		@XmlElement(name = "registre")
+		public List<RegistreEntitatMensual> registres;
+				
+		public RootEntitatMensual(List<RegistreEntitatMensual> registres) {
+			super();
+			this.registres = registres;
+		}
+		public RootEntitatMensual() {}
 	}
 		
 	@Setter
-	public static class RegistreEntitat extends RegistreExpedient {
+	public static class RegistreEntitatDiari extends RegistreExpedient {
 		@XmlAttribute
 		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
 		public Date data;
 	}
+	
+	@Setter
+	public static class RegistreEntitatMensual extends RegistreExpedient {
+
+		public String mes;
+	}
+	
+	
 }

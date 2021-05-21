@@ -2,9 +2,11 @@ package es.caib.ripea.core.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -83,6 +85,8 @@ public class HistoricServiceImpl implements HistoricService {
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("mes", new String[] { "data" });
 		Page<HistoricExpedientAggregation> pagina = historicExpedientRepository.findByEntitatAndDateRangeGroupedByDate(
 				entitat,
 				filtre.getTipusAgrupament(),
@@ -91,10 +95,10 @@ public class HistoricServiceImpl implements HistoricService {
 				filtre.getIncorporarExpedientsComuns(),
 				!fiteringByMetaExpedients,
 				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
-				filtre.getDataInici(),
-				filtre.getDataFi(),
-				paginacioHelper.toSpringDataPageable(paginacioParams));
-
+				filtre.getDataInici() != null ? filtre.getDataInici() : new GregorianCalendar(2000, Calendar.JANUARY, 01).getTime(),
+				filtre.getDataFi() != null ? filtre.getDataFi() : (new LocalDate()).toDateTimeAtCurrentTime().toDate(),
+				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+		
 		PaginaDto<HistoricExpedientDto> historicEntitatDto = paginacioHelper.toPaginaDto(
 				pagina,
 				HistoricExpedientDto.class);
@@ -103,6 +107,7 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Override
 	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre) {
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
@@ -115,9 +120,10 @@ public class HistoricServiceImpl implements HistoricService {
 				filtre.getIncorporarExpedientsComuns(),
 				!fiteringByMetaExpedients,
 				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
-				filtre.getDataInici(),
-				filtre.getDataFi());
-		historicEntitat = fillEmptyData(filtre, historicEntitat, HistoricExpedientAggregation.class);
+				filtre.getDataInici() != null ? filtre.getDataInici() : new GregorianCalendar(2000, Calendar.JANUARY, 01).getTime(),
+				filtre.getDataFi() != null ? filtre.getDataFi() : (new LocalDate()).toDateTimeAtCurrentTime().toDate());
+		
+		//historicEntitat = fillEmptyData(filtre, historicEntitat, HistoricExpedientAggregation.class);
 		return conversioTipusHelper.convertirList(historicEntitat, HistoricExpedientDto.class);
 	}
 

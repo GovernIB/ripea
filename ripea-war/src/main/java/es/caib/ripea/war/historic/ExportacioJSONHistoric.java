@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.war.historic.serializers.DAOHistoric;
 import es.caib.ripea.war.historic.serializers.HistoricEntitatSerializer.RootEntitat;
@@ -25,24 +26,24 @@ import es.caib.ripea.war.historic.serializers.HistoricUsuariSerializer.RootUsuar
 public class ExportacioJSONHistoric {
 	
 	public byte[] convertDadesEntitat(
-			List<HistoricExpedientDto> dades) throws JAXBException {
-		RootEntitat root = DAOHistoric.mapRegistresEntitat(dades);
+			List<HistoricExpedientDto> dades, HistoricTipusEnumDto tipusAgrupament) throws JAXBException {
+		RootEntitat root = DAOHistoric.mapRegistresEntitat(dades, tipusAgrupament);
 		return convertJSON(root);
 	}
 	
 	public byte[] convertDadesOrgansGestors(
-			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades) throws JAXBException {
-		RootOrganGestors root = DAOHistoric.mapRegistreOrganGestor(dades);
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws JAXBException {
+		RootOrganGestors root = DAOHistoric.mapRegistreOrganGestor(dades, tipusAgrupament);
 		return convertJSON(root);
 	}
 
-	public byte[] convertDadesUsuaris(Map<String, List<HistoricUsuariDto>> dades) throws JAXBException {
-		RootUsuaris root = DAOHistoric.mapRegistresUsuaris(dades);
+	public byte[] convertDadesUsuaris(Map<String, List<HistoricUsuariDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws JAXBException {
+		RootUsuaris root = DAOHistoric.mapRegistresUsuaris(dades, tipusAgrupament);
 		return convertJSON(root);
 	}
 
-	public byte[] convertDadesInteressats(Map<String, List<HistoricInteressatDto>> dades) throws JAXBException {
-		RootInteressats root = DAOHistoric.mapRegistresInteressats(dades);
+	public byte[] convertDadesInteressats(Map<String, List<HistoricInteressatDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws JAXBException {
+		RootInteressats root = DAOHistoric.mapRegistresInteressats(dades, tipusAgrupament);
 		return convertJSON(root);
 	}
 	

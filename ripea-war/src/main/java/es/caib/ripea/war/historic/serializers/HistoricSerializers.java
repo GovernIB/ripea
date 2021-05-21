@@ -38,7 +38,11 @@ public class HistoricSerializers {
 	    @Override
 	    public String marshal(Date v) throws Exception {
 	        synchronized (dateFormat) {
-	            return dateFormat.format(v);
+				if (v != null) {
+					return dateFormat.format(v);
+				} else {
+					return null;
+				}
 	        }
 	    }
 

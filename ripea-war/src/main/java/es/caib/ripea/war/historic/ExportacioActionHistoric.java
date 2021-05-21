@@ -28,6 +28,8 @@ public class ExportacioActionHistoric {
 	private OrganGestorService organGestorService;
 	@Autowired
 	private ExportacioXMLHistoric exportacioXMLHistoric;
+	@Autowired
+	private ExportacioCsvHistoric exportacioCsvHistoric;
 
 	
 	public FitxerDto exportarHistoricEntitat(EntitatDto entitat, HistoricFiltreDto filtre, String format) throws Exception {
@@ -38,20 +40,24 @@ public class ExportacioActionHistoric {
 		FitxerDto fitxer = null;
 		switch (format) {
 		case "json":
-			fileContent = (new ExportacioJSONHistoric()).convertDadesEntitat(dades);
+			fileContent = (new ExportacioJSONHistoric()).convertDadesEntitat(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicEntitat.json", "application/json", fileContent);
 			break;
 		case "xlsx":
-			fileContent = (new ExportacioExcelEntitatHistoric()).convertDadesEntitat(dades);
+			fileContent = (new ExportacioExcelEntitatHistoric()).convertDadesEntitat(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicEntitat.xls", "application/vnd.ms-excel", fileContent);
 			break;
 		case "odf":
-			fileContent = (new ExportacioDocHistoric()).convertDadesEntitat(entitat, dades);
+			fileContent = (new ExportacioDocHistoric()).convertDadesEntitat(entitat, dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicEntitat.ods", "application/vnd.oasis.opendocument.text", fileContent);
 			break;
 		case "xml":
-			fileContent = exportacioXMLHistoric.convertDadesEntitat(dades);
+			fileContent = exportacioXMLHistoric.convertDadesEntitat(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicEntitat.xml", "application/xml", fileContent);
+			break;
+		case "csv":
+			fileContent = exportacioCsvHistoric.convertDadesEntitat(dades, filtre.getTipusAgrupament());
+			fitxer = new FitxerDto("historicEntitat.csv", "application/csv", fileContent);
 			break;
 		default:
 			throw new Exception("Unsuported file format");
@@ -68,7 +74,7 @@ public class ExportacioActionHistoric {
 		if (format.equals("json")) {
 			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(filtre);
 
-			fileContent = (new ExportacioJSONHistoric()).convertDadesOrgansGestors(dades);
+			fileContent = (new ExportacioJSONHistoric()).convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.json", "application/json", fileContent);
 
 		} else if (format.equals("xlsx")) {
@@ -85,17 +91,17 @@ public class ExportacioActionHistoric {
 				organsGestors.add(organDto);
 			}
 			
-			fileContent = (new ExportacioExcelOrganGestorHistoric()).convertDadesOrgansGestors(dades, organsGestors);
+			fileContent = (new ExportacioExcelOrganGestorHistoric()).convertDadesOrgansGestors(dades, organsGestors, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.xls", "application/vnd.ms-excel", fileContent);
 
 		} else if (format.equals("odf")) {
 			Map<OrganGestorDto, List<HistoricExpedientDto>> dades = historicService.getHistoricsByOrganGestor(filtre);
-			fileContent = (new ExportacioDocHistoric()).convertDadesOrgansGestors(dades);
+			fileContent = (new ExportacioDocHistoric()).convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.ods", "application/vnd.oasis.opendocument.text", fileContent);
 
 		} else if (format.equals("xml")) {
 			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(filtre);
-			fileContent = exportacioXMLHistoric.convertDadesOrgansGestors(dades);
+			fileContent = exportacioXMLHistoric.convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.xml", "application/xml", fileContent);
 
 		} else {
@@ -118,19 +124,19 @@ public class ExportacioActionHistoric {
 		FitxerDto fitxer = null;
 		switch (format) {
 		case "json":
-			fileContent = (new ExportacioJSONHistoric()).convertDadesUsuaris(dades);
+			fileContent = (new ExportacioJSONHistoric()).convertDadesUsuaris(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicUsuaris.json", "application/json", fileContent);
 			break;
 		case "xlsx":
-			fileContent = (new ExportacioExcelUsuariHistoric()).convertDadesUsuaris(dades);
+			fileContent = (new ExportacioExcelUsuariHistoric()).convertDadesUsuaris(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicUsuaris.xls", "application/vnd.ms-excel", fileContent);
 			break;
 		case "odf":
-			fileContent = (new ExportacioDocHistoric()).convertDadesUsuaris(dades);
+			fileContent = (new ExportacioDocHistoric()).convertDadesUsuaris(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicUsuaris.ods", "application/vnd.oasis.opendocument.text", fileContent);
 			break;
 		case "xml":
-			fileContent = exportacioXMLHistoric.convertDadesUsuaris(dades);
+			fileContent = exportacioXMLHistoric.convertDadesUsuaris(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicUsuaris.xml", "application/xml", fileContent);
 			break;
 		default:
@@ -152,19 +158,19 @@ public class ExportacioActionHistoric {
 		FitxerDto fitxer = null;
 		switch (format) {
 		case "json":
-			fileContent = (new ExportacioJSONHistoric()).convertDadesInteressats(dades);
+			fileContent = (new ExportacioJSONHistoric()).convertDadesInteressats(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicInteressats.json", "application/json", fileContent);
 			break;
 		case "xlsx":
-			fileContent = (new ExportacioExcelInteressatsHistoric()).convertDadesInteressats(dades);
+			fileContent = (new ExportacioExcelInteressatsHistoric()).convertDadesInteressats(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicInteressats.xls", "application/vnd.ms-excel", fileContent);
 			break;
 		case "odf":
-			fileContent = (new ExportacioDocHistoric()).convertDadesInteressats(dades);
+			fileContent = (new ExportacioDocHistoric()).convertDadesInteressats(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicInteressats.ods", "application/vnd.oasis.opendocument.text", fileContent);
 			break;
 		case "xml":
-			fileContent = exportacioXMLHistoric.convertDadesInteressats(dades);
+			fileContent = exportacioXMLHistoric.convertDadesInteressats(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicInteressats.xml", "application/xml", fileContent);
 			break;
 		default:
