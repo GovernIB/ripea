@@ -180,4 +180,9 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public Boolean propertyBooleanFindByKey(String key);
 
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	boolean propertyBooleanFindByKey(
+			String key,
+			boolean defaultValueIfNull);
+
 }

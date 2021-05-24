@@ -136,19 +136,20 @@
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				
-				<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
-					<spring:message code="metaexpedient.list.columna.revisioEstat"/>
-					<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
-						{{if revisioEstat == 'PENDENT'}}
-							<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
-						{{else revisioEstat == 'REVISAT'}}
-							<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
-						{{else revisioEstat == 'REBUTJAT'}}
-							<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
-						{{/if}}
-					</script>
-				</th>	
+				<c:if test="${isRevisioActiva}">
+					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
+						<spring:message code="metaexpedient.list.columna.revisioEstat"/>
+						<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
+							{{if revisioEstat == 'PENDENT'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
+							{{else revisioEstat == 'REVISAT'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
+							{{else revisioEstat == 'REBUTJAT'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
+							{{/if}}
+						</script>
+					</th>
+				</c:if>
 				
 				<!--  <th data-col-name="gestioAmbGrupsActiva" data-template="#cellGestioAmbGrupsActivaTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.gestioAmbGrupsActiva"/>

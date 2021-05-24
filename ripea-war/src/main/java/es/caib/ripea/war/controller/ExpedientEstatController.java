@@ -143,7 +143,7 @@ public class ExpedientEstatController extends BaseAdminController {
 					ExpedientEstatCommand.asDto(command), 
 					rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -156,7 +156,7 @@ public class ExpedientEstatController extends BaseAdminController {
 					ExpedientEstatCommand.asDto(command), 
 					rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -211,7 +211,7 @@ public class ExpedientEstatController extends BaseAdminController {
 						"expedient.estat.controller.esborrat.error.restriccio");
 		}
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

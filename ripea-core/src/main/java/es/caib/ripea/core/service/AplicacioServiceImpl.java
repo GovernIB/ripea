@@ -269,7 +269,19 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		return booleanValue;
 	}
-
+	
+	@Override
+	public boolean propertyBooleanFindByKey(String key, boolean defaultValueIfNull) {
+		logger.debug("Consulta del valor del propietat boolea amb key");
+		boolean booleanValue;
+		String value = PropertiesHelper.getProperties().getProperty(key);
+		if (value != null) {
+			booleanValue = Boolean.parseBoolean(value);
+		} else {
+			booleanValue = defaultValueIfNull;
+		}
+		return booleanValue;
+	}
 	
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {

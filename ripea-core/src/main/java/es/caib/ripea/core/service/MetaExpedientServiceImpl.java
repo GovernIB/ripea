@@ -4,7 +4,6 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -49,6 +47,7 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.AplicacioHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -68,7 +67,6 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -112,6 +110,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private AplicacioHelper aplicacioHelper;
 
 	@Transactional
 	@Override
@@ -205,7 +205,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public MetaExpedientDto canviarEstatRevisio(Long entitatId, MetaExpedientDto metaExpedient) {
+	public MetaExpedientDto canviarEstatRevisioASellecionat(Long entitatId, MetaExpedientDto metaExpedient) {
 		logger.debug("Canviant estat revicio meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getId());
@@ -218,37 +218,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		
 		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
-			
-			List<String> destinatarisRevisors = new ArrayList<>();
-			List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
-			for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-				destinatarisRevisors.add(dadesUsuari.getEmail());
-			}
-			List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
-			for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
-				destinatarisRevisors.add(dadesUsuari.getEmail());
-			}
-			destinatarisRevisors = new ArrayList<>(new HashSet<>(destinatarisRevisors));
-			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, destinatarisRevisors);
-			
-			
-			List<String> destinatarisOrgans = new ArrayList<>();
-			List<PermisDto> permisosOrgan = permisosHelper.findPermisos(metaExpedientEntity.getOrganGestor().getId(), OrganGestorEntity.class);
-			for (PermisDto p: permisosOrgan) {
-				
-				if (p.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
-					DadesUsuari usuari = pluginHelper.dadesUsuariFindAmbCodi(p.getPrincipalNom());
-					destinatarisOrgans.add(usuari.getEmail());
-				} else {
-					List<DadesUsuari> dadesUsuari = pluginHelper.dadesUsuariFindAmbGrup(p.getPrincipalNom());
-					for (DadesUsuari usuari : dadesUsuari) {
-						destinatarisOrgans.add(usuari.getEmail());
-					}
-				}
-			}
-			destinatarisRevisors = new ArrayList<>(new HashSet<>(destinatarisRevisors));
-			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, destinatarisRevisors);
-			
+
+			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
+
 		}
 
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
@@ -1000,6 +972,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 	}
 
+	@Override
+	public boolean isRevisioActiva() {
+		return metaExpedientHelper.isRevisioActiva();
+	}
+	
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
 		List<Long> metaExpedientIds = new ArrayList<Long>();
 		for (MetaExpedientDto metaExpedient : metaExpedients) {

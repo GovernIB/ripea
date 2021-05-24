@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -35,6 +36,8 @@ public class PermisosEntitatHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private MetaExpedientService metaExpedientService;
 	
 	public void omplirPermisosPerEntitats(List<EntitatDto> entitats, boolean ambLlistaPermisos) {
 		// Filtra les entitats per saber els permisos per a l'usuari actual
@@ -67,6 +70,7 @@ public class PermisosEntitatHelper {
 			entitat.setUsuariActualRead(entitatsRead.contains(entitat));
 			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));		
 			entitat.setOrgansGestors(organGestorService.findOrganismesEntitatAmbPermis(entitat.getId()));
+			entitat.setRevisioActiva(metaExpedientService.isRevisioActiva());
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
