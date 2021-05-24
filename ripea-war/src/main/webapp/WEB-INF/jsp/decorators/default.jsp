@@ -327,7 +327,7 @@ body {
 											</a>
 										</li>
 										<%---- Revisió d'expedients ----%>
-										<c:if test="${isRevisoActiva}">
+										<c:if test="${isRevisioActiva}">
 											<li>
 												<a href="<c:url value="/metaExpedientRevisio"/>">
 														<spring:message code="decorator.menu.revisioExpedients"/>
