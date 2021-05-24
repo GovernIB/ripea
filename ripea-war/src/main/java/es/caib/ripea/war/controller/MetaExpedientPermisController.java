@@ -145,7 +145,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				PermisCommand.asDto(command), 
 				rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getModalControllerReturnValueSuccess(
@@ -174,7 +174,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				organGestorId, 
 				rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

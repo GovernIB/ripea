@@ -111,7 +111,7 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				metaExpedientId,
 				id, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -135,7 +135,7 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				metaExpedientId,
 				id, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

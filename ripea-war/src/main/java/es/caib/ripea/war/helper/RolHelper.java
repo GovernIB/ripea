@@ -101,7 +101,7 @@ public class RolHelper {
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {
 				rols.add(ROLE_USER);
 			}
-			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_REVISOR)) {
+			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_REVISOR) && entitatActual.isRevisioActiva()) {
 				rols.add(ROLE_REVISOR);
 			}
 			

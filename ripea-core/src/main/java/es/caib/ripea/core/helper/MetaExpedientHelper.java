@@ -68,12 +68,13 @@ public class MetaExpedientHelper {
     private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
     @Autowired
     private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-    @Autowired
-    private ConversioTipusHelper conversioTipusHelper;
+
     @Autowired
     private EmailHelper emailHelper;
     @Autowired
-    private PluginHelper pluginHelper;
+    private AplicacioHelper aplicacioHelper;
+    
+    
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
@@ -284,7 +285,8 @@ public class MetaExpedientHelper {
 				organIds == null || organIds.isEmpty(),
 				organIds == null || organIds.isEmpty() ? null : organIds,
 				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty(),
-				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds);
+				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds, 
+				isRevisioActiva());
 		
 		
 /*		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
@@ -347,31 +349,26 @@ public class MetaExpedientHelper {
 
 	
 	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
-
-		if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
-			metaExpedientEntity.updateRevisioEstat(
-					MetaExpedientRevisioEstatEnumDto.PENDENT,
-					null);
-			
-			List<String> emails = new ArrayList<>();
-			List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
-			for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-				emails.add(dadesUsuari.getEmail());
-			}
-			List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
-			for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
-				emails.add(dadesUsuari.getEmail());
-			}
-			emails = new ArrayList<>(new HashSet<>(emails));
-			
-			
-			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, emails);
-		}
 		
-	}
+		boolean property = aplicacioHelper.propertyBooleanFindByKey("es.caib.ripea.metaexpedients.revisio.activa", true);
+		
+		if (property == true) {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
 
+			if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
+				metaExpedientEntity.updateRevisioEstat(
+						MetaExpedientRevisioEstatEnumDto.PENDENT,
+						null);
+				
+				emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
+			}
+		}
+	}
+	
+	public boolean isRevisioActiva() {
+		return aplicacioHelper.propertyBooleanFindByKey("es.caib.ripea.metaexpedients.revisio.activa", true);
+	}
 	
 
 	public List<ArbreDto<MetaExpedientCarpetaDto>> obtenirPareArbreCarpetesPerMetaExpedient(

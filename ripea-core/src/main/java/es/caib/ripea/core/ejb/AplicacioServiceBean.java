@@ -152,4 +152,14 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.propertyBooleanFindByKey(key);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	public boolean propertyBooleanFindByKey(
+			String key,
+			boolean defaultValueIfNull) {
+		return delegate.propertyBooleanFindByKey(
+				key, 
+				defaultValueIfNull);
+	}
+
 }

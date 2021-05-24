@@ -167,7 +167,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					command.getPlantilla().getContentType(),
 					command.getPlantilla().getBytes(), rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -183,7 +183,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					command.getPlantilla().getContentType(),
 					command.getPlantilla().getBytes(), rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -207,7 +207,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			
 			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId, rolActual);
 
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getAjaxControllerReturnValueSuccess(
@@ -231,7 +231,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		
 		metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, true, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -249,7 +249,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		
 		metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, false, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

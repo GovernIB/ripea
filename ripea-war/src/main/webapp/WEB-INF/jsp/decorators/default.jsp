@@ -13,6 +13,9 @@
 			"entitatActual",
 			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
 	pageContext.setAttribute(
+			"isRevisioActiva",
+			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request).isRevisioActiva());
+	pageContext.setAttribute(
 			"sessionOrgansGestors",
 			es.caib.ripea.war.helper.EntitatHelper.findOrganGestorsAccessibles(request));
 	pageContext.setAttribute(
@@ -324,11 +327,13 @@ body {
 											</a>
 										</li>
 										<%---- Revisió d'expedients ----%>
-										<li>
-											<a href="<c:url value="/metaExpedientRevisio"/>">
-													<spring:message code="decorator.menu.revisioExpedients"/>
-											</a>
-										</li>										
+										<c:if test="${isRevisoActiva}">
+											<li>
+												<a href="<c:url value="/metaExpedientRevisio"/>">
+														<spring:message code="decorator.menu.revisioExpedients"/>
+												</a>
+											</li>	
+										</c:if>									
 									</ul>
 								</div>
 							</c:when>

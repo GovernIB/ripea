@@ -188,7 +188,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 					metaExpedientId,
 					MetaExpedientTascaCommand.asDto(command), rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -201,7 +201,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 					metaExpedientId,
 					MetaExpedientTascaCommand.asDto(command), rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -229,7 +229,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 				true, rolActual);
 		
 
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -255,7 +255,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 				false, rolActual);
 		
 
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -281,7 +281,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 				id, rolActual);
 		
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

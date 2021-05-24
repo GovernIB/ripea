@@ -14,13 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -36,6 +35,7 @@ import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -139,8 +139,42 @@ public class EmailHelper {
 	
 	public void canviEstatRevisioMetaExpedient(
 			MetaExpedientEntity metaExpedientEntity, 
-			List<String> destinataris) {
+			Long entitatId) {
 		logger.debug("Enviant correu electrònic per a canvi d'estat de revisio");
+		
+		
+		List<String> emailsNoAgrupats = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
+		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
+			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
+			if (usuari.isRebreEmailsAgrupats()) {
+				emailsAgrupats.add(dadesUsuari.getEmail());
+			} else {
+				emailsNoAgrupats.add(dadesUsuari.getEmail());
+			}
+		}
+		
+		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+		for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
+			boolean granted = permisosHelper.isGrantedAll(
+					entitatId,
+					EntitatEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					dadesUsuari.getCodi());
+			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
+			if (granted && usuari != null) {
+				if (usuari.isRebreEmailsAgrupats()) {
+					emailsAgrupats.add(dadesUsuari.getEmail());
+				} else {
+					emailsNoAgrupats.add(dadesUsuari.getEmail());
+				}
+			}
+		}
+		
+		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
+		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
+		
 		
 		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de tipus d'expedient";
@@ -154,18 +188,32 @@ public class EmailHelper {
 						"\tTipus d'expedient nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
 						comentari ;
-						
 		
+		if (!emailsNoAgrupats.isEmpty()) {
 
-		String[] to = destinataris.toArray(new String[destinataris.size()]);
-		SimpleMailMessage missatge = new SimpleMailMessage();
-		missatge.setFrom(from);
-		missatge.setTo(to);
-		missatge.setSubject(subject);
-		missatge.setText(text);
-		logger.debug(missatge.toString());
-		mailSender.send(missatge);
-
+			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(from);
+			missatge.setTo(to);
+			missatge.setSubject(subject);
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
+		
+		if (!emailsAgrupats.isEmpty()) {
+			
+			for (String email : emailsAgrupats) {
+				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
+						from,
+						email,
+						subject,
+						text,
+						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
+						.build();
+				emailPendentEnviarRepository.save(enitity);
+			}
+		}
 	}
 	
 	

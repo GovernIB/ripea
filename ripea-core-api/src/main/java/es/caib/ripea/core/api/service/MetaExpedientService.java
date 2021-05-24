@@ -450,7 +450,7 @@ public interface MetaExpedientService {
 			String codiSia);
 
 	@PreAuthorize("hasRole('tothom')")
-	public MetaExpedientDto canviarEstatRevisio(
+	public MetaExpedientDto canviarEstatRevisioASellecionat(
 			Long entitatId,
 			MetaExpedientDto metaExpedient);
 
@@ -473,6 +473,9 @@ public interface MetaExpedientService {
 	List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
 			boolean isAdmin);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean isRevisioActiva();
 	
 	
 }

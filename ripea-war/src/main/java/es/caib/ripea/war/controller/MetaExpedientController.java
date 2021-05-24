@@ -78,15 +78,15 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute(command);
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		
-		
 		if (RolHelper.isRolActualAdministrador(request)) {
+			boolean revisioActiva = metaExpedientService.isRevisioActiva();
 			int count = metaExpedientService.countMetaExpedientsPendentRevisar(entitatActual.getId());
-			if (count > 0) {
+			if (revisioActiva && count > 0) {
 				MissatgesHelper.info(request, "<a href=\"metaExpedientRevisio\">" + getMessage(request, "metaexpedient.revisio.admin.pendent.revisar.alerta", new Object[] {count}) + "&nbsp;<i class=\"fa fa-external-link\"></i></a>");
 			}
-			
 		}
 		
+		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
 		
 		return "metaExpedientList";
 	}
@@ -242,7 +242,7 @@ public class MetaExpedientController extends BaseAdminController {
 			
 			metaExpedientService.update(entitatActual.getId(), dto, rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -293,7 +293,7 @@ public class MetaExpedientController extends BaseAdminController {
 				true, 
 				rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -315,7 +315,7 @@ public class MetaExpedientController extends BaseAdminController {
 				false, 
 				rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio) {
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

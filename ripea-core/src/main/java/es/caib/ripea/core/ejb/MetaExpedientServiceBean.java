@@ -319,10 +319,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public MetaExpedientDto canviarEstatRevisio(
+	public MetaExpedientDto canviarEstatRevisioASellecionat(
 			Long entitatId,
 			MetaExpedientDto metaExpedient) {
-		return delegate.canviarEstatRevisio(
+		return delegate.canviarEstatRevisioASellecionat(
 				entitatId, 
 				metaExpedient);
 	}
@@ -360,6 +360,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long entitatId,
 			boolean isAdmin) {
 		return delegate.findCreateWritePerm(entitatId, isAdmin);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public boolean isRevisioActiva() {
+		return delegate.isRevisioActiva();
 	}
 
 }
