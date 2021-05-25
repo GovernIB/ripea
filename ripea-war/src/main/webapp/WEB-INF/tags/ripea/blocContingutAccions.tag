@@ -162,7 +162,7 @@
 					</c:otherwise>
 				</c:choose>
 				<%---- Visualitzar ----%>
-				<li class="${(contingut.document && contingut.gesDocAdjuntId!=null && contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+				<li class="${contingut.gesDocAdjuntId!=null || (contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
