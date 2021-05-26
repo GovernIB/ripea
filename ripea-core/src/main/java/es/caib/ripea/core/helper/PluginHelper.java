@@ -2835,7 +2835,7 @@ public class PluginHelper {
 					convertit.getArxiuContingut());
 			return resposta;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de conversió de documents";
+			String errorDescripcio = "Error al accedir al plugin de conversió de documents: " + ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_CONVERT,
 					accioDescripcio,

@@ -1444,7 +1444,10 @@ function showDocument(arxiuUrl) {
 			
 			if (json.error) {
 				$('#container').removeClass('rmodal_loading');
-				$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: '+ json.errorMsg +'</div></div>');
+				$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
+			} else if (json.warning) {
+				$('#container').removeClass('rmodal_loading');
+				$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
 			} else {
 				response = json.data;
 				var blob = base64toBlob(response.contingut, response.contentType);

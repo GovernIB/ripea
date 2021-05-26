@@ -441,7 +441,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				
 			} catch (Exception e) {
 				logger.error("Error al visualitzar document", e);
-				return new JsonResponse(true, e.getMessage());
+				if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, fr.opensagres.xdocreport.converter.XDocConverterException.class, 5)) {
+					return new JsonResponse(null, true);
+				} else {
+					return new JsonResponse(true, e.getMessage());
+				}
 			}
 	}
 	
