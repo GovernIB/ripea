@@ -109,7 +109,6 @@ function mostrarDocument(fileName) {
 $(document).ready(function() {
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
-	console.log(currentHeight);
 	let rootIframe = window.frameElement;
 	/*let fileName = "${nomDocument}";
 	if (fileName !== '') {
