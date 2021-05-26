@@ -51,11 +51,11 @@
 		<c:if test="${isTasca || (potModificarExpedientPare || (contingut.expedient && contingut.usuariActualWrite)) }">
 			<%---- Modificar... ----%>
 			<c:choose>
-				<c:when test="${contingut.expedient}">
+				<c:when test="${contingut.expedient && contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
-				<c:when test="${(contingut.document and contingut.estat == 'REDACCIO') || (contingut.document and contingut.documentTipus == 'IMPORTAT')}">
+				<c:when test="${((contingut.document and contingut.estat == 'REDACCIO') || (contingut.document and contingut.documentTipus == 'IMPORTAT')) && expedientPareObert}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
@@ -90,9 +90,17 @@
 					<c:set var="mostrarSeparador" value="${false}"/>
 					<li role="separator" class="divider"></li>
 				</c:if>
-
-				<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
-				<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
+				<c:choose>
+					<c:when test="${empty contingut.pare and not empty expedientPare.agafatPer}">
+						<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
+					</c:when>
+					<c:when test="${not expedientAgafatPerUsuariActual}">
+						<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+					</c:when>
+				</c:choose>
+				<c:if test="${contingut.estat == 'OBERT'}">
+					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
+				</c:if>
 				<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
 				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
@@ -107,9 +115,9 @@
 							</c:otherwise>
 						</c:choose>
 					</c:when>
-					<c:otherwise>
+					<c:when test="${contingut.estat == 'TANCAT' && isReobrirPermes}">
 						<li><a href="<c:url value="/expedient/${contingut.id}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
-					</c:otherwise>
+					</c:when>
 				</c:choose>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
@@ -132,7 +140,7 @@
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					</c:when>
 					<c:otherwise>
-						<c:if test="${(contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite)}">
+						<c:if test="${((contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite)) && expedientPareObert}">
 							<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 						</c:if>
 					</c:otherwise>

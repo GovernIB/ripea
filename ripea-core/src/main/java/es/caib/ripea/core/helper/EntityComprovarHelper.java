@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -557,6 +559,30 @@ public class EntityComprovarHelper {
 		        comprovarPermisDelete,
 		        checkPerMassiuAdmin);
 		return expedient;
+	}
+	
+	public void comprovarEstatExpedient(
+			Long entitatId,
+			Long expedientId,
+			ExpedientEstatEnumDto estat) {
+		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true, false);
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		if (expedient == null) {
+			throw new NotFoundException(expedientId, ExpedientEntity.class);
+		}
+		if (expedient.getEsborrat() != 0) {
+			throw new NotFoundException(expedientId, ExpedientEntity.class);
+		}
+		if (!entitat.getId().equals(expedient.getEntitat().getId())) {
+			throw new ValidationException(expedientId, ExpedientEntity.class, "L'entitat especificada (id="
+			        + entitat.getId() + ") no coincideix amb l'entitat de l'expedient");
+		}
+		if (estat.equals(ExpedientEstatEnumDto.OBERT) && !expedient.getEstat().equals(estat)) {
+			throw new ValidationException(expedientId, ContingutEntity.class, "L'expedient no està obert");
+		}
+		if (estat.equals(ExpedientEstatEnumDto.TANCAT) && !expedient.getEstat().equals(estat)) {
+			throw new ValidationException(expedientId, ContingutEntity.class, "L'expedient no està tancat");
+		}
 	}
 
 	/**
