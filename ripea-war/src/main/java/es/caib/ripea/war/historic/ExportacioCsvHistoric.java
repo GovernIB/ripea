@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.core.helper.CsvHelper;
 
 @Component
 public class ExportacioCsvHistoric {
