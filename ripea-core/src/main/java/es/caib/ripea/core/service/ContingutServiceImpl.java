@@ -243,7 +243,9 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true, false);
-
+		if (contingut instanceof ExpedientEntity) {
+			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
+		}
 
 		return contingutHelper.deleteReversible(
 				entitatId,

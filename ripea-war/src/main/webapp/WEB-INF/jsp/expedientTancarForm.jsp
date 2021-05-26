@@ -64,7 +64,7 @@
 		</c:if>
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success" data-noloading="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/></button>
+			<button type="submit" id="btnSubmit" class="btn btn-success" data-noloading="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/></button>
 			<a href="<c:url value="/contingut/${expedient.pare.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
@@ -77,12 +77,17 @@ setTimeout(() => {
 			let countNoSeleccionats = total - countSeleccionats;
 			if (countNoSeleccionats) {
 				if (confirm("<spring:message code="contingut.expedient.tancar.esborranys.confirm"/>")) {
+					window.parent.document.getElementById("btnSubmit").disabled = true;
 					$('#loadingwrap').css('display', 'flex');
 					$('form').css('visibility', 'hidden');
 					return true
 				} else {
 					return false;
 				}
+			} else {
+				window.parent.document.getElementById("btnSubmit").disabled = true;
+				$('#loadingwrap').css('display', 'flex');
+				$('form').css('visibility', 'hidden');
 			}
 		});
 	});

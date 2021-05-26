@@ -423,6 +423,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false, 
 				false);
+		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.OBERT);
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId);
@@ -872,6 +873,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false, 
 				false);
+		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
 		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
 		if (pluginHelper.isArxiuPluginActiu()) {

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -270,6 +271,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				false, 
 				checkPerMassiuAdmin);
+		entityComprovarHelper.comprovarEstatExpedient(entitatId, expedientId, ExpedientEstatEnumDto.OBERT);
 		ExpedientEstatEntity estat;
 		if (expedientEstatId!=null){
 			estat = expedientEstatRepository.findOne(expedientEstatId);
