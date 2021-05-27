@@ -194,7 +194,7 @@ public class EmailHelper {
 			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
 			SimpleMailMessage missatge = new SimpleMailMessage();
 			missatge.setFrom(from);
-			missatge.setTo(to);
+			missatge.setBcc(to);
 			missatge.setSubject(subject);
 			missatge.setText(text);
 			logger.debug(missatge.toString());
