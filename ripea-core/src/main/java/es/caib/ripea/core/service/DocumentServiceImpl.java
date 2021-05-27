@@ -686,13 +686,12 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Set<Long> ids, 
+			Long id, 
 			String rolActual) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
 				+ "entitatId=" + entitatId + ", "
-				+ "ids=" + ids + ")");
-		
-		for (Long id : ids) {
+				+ "ids=" + id + ")");
+
 			boolean checkPerMassiuAdmin = false;
 			if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 				checkPerMassiuAdmin = true;
@@ -711,7 +710,7 @@ public class DocumentServiceImpl implements DocumentService {
 					document);
 			if (exception != null) {
 				return exception;
-			}
+			
 		}
 		return null;
 	}

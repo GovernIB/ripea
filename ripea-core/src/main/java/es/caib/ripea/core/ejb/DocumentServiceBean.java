@@ -4,7 +4,6 @@
 package es.caib.ripea.core.ejb;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -368,8 +367,8 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Set<Long> ids, String rolActual) {
-		return delegate.portafirmesReintentar(entitatId, ids, rolActual);
+			Long id, String rolActual) {
+		return delegate.portafirmesReintentar(entitatId, id, rolActual);
 	}
 
 	@Override
