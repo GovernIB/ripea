@@ -3431,7 +3431,7 @@ public class PluginHelper {
 			sri.setReturnValidationChecks(false);
 			sri.setValidateCertificateRevocation(false);
 			sri.setReturnCertificates(false);
-			sri.setReturnTimeStampInfo(false);
+			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
 			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
