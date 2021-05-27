@@ -2098,6 +2098,7 @@ public class PluginHelper {
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
 		portafirmesDocument.setExpedientUuid(document.getExpedient().getArxiuUuid());
 		portafirmesDocument.setTitol(document.getNom());
+		portafirmesDocument.setDescripcio(document.getDescripcio());
 		portafirmesDocument.setFirmat(
 				false);
 
