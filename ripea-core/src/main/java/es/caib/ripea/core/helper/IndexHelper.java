@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.nio.file.NoSuchFileException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -27,14 +28,19 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfAnnotation;
 import com.itextpdf.text.pdf.PdfBorderArray;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfDate;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPCellEvent;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
@@ -349,7 +355,7 @@ public class IndexHelper {
 		if (hasNotificacions) {
 			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.notificat"), null, false));
 		} else if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-			List<ArxiuFirmaDetallDto> detall = null;
+			Date dataFirma = null;
 			try {
 				if (pluginHelper.isArxiuPluginActiu()) {
 					es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
@@ -358,26 +364,43 @@ public class IndexHelper {
 							null,
 							true,
 							false);
-					List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
-							documentHelper.getContingutFromArxiuDocument(arxiuDocument),
-							documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
-							null);
-					detall = arxiuFirmes.get(0).getDetalls();
+					byte[] contingut = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
+					dataFirma = getDataFirmaFromDocument(contingut);
 				}
 			} catch (Exception ex) {
-				logger.error("Hi ha hagut un error recuperant els detalls de les firmes", ex);
+				logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
 			}
-			if (detall != null && ! detall.isEmpty() && detall.get(0).getData() != null) {
+			if (dataFirma != null) {
 //				Data firma
 				SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-				String dataFirma = document.getCreatedDate() != null ? sdtTime.format(detall.get(0).getData()) : "";
-				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), "(" + dataFirma + ")", false));
+				String dataFirmaFormatted = sdtTime.format(dataFirma);
+				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), "(" + dataFirmaFormatted + ")", false));
 			} else {
 				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), null, false));
 			}
 		} else {
 			taulaDocuments.addCell(crearCellaContingut("-", null, false));
 		}
+	}
+	
+	private Date getDataFirmaFromDocument(byte[] content) throws IOException {
+		Date dataFirma = null;
+		PdfReader reader = new PdfReader(content);
+		AcroFields fields = reader.getAcroFields();
+		
+		List<String> signatureNames = fields.getSignatureNames();
+		if (signatureNames != null) {
+			for (String name: signatureNames) {
+//				### comprovar si és una firma o un segell
+				PdfDictionary dictionary = fields.getSignatureDictionary(name);
+				if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/Sig")) {
+					String dataFirmaStr = dictionary.get(PdfName.M) != null ? dictionary.get(PdfName.M).toString() : null;
+					dataFirma = dataFirmaStr != null ? PdfDate.decode(dataFirmaStr).getTime() : null;
+					break;
+				}
+			}
+		}
+		return dataFirma;
 	}
 	
 	private Document inicialitzaDocument(
