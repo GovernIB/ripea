@@ -814,16 +814,19 @@ $(document).ready(function() {
 	});
 
 	var tableDocuments = document.getElementById('table-documents');
-	var checkItAll = document.getElementById('checkItAll');
 	
-	$('.checkItAll').addClass('disabled');
-	
+	<c:if test="${vistaIcones}">
+		var checkItAll = document.getElementById('checkItAll');
+		$('.checkItAll').addClass('disabled');
+	</c:if>
 	$('#habilitar-mult').on('click', function() {
 		var contenidorContingut = document.getElementById('contenidor-contingut');
 		var inputs = contenidorContingut.querySelectorAll('li>div');
 		
 		if ($(contenidorContingut).hasClass('multiple')) {
-			$('.checkItAll').addClass('disabled');
+			<c:if test="${vistaIcones}">
+				$('.checkItAll').addClass('disabled');
+			</c:if>
 			$(contenidorContingut).removeClass('multiple');
 			$(this).removeClass('active');
 			//Inicialitzar contador i array
@@ -842,7 +845,9 @@ $(document).ready(function() {
 				}
 			}); 
 		} else {
-			$('.checkItAll').removeClass('disabled');
+			<c:if test="${vistaIcones}">
+				$('.checkItAll').removeClass('disabled');
+			</c:if>
 			$(contenidorContingut).addClass('multiple');
 			$(this).addClass('active');
 		}
@@ -852,40 +857,41 @@ $(document).ready(function() {
 	if (tableDocuments != null) {
 		//Vista llista
 		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-		
-		checkItAll.addEventListener('change', function() {
-			if (checkItAll.checked) {
-				inputs.forEach(function(input) {
-					var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
-					$.ajax({
-				        type: "GET",
-				        url: comprovacioUrl,
-				        success: function (isDocument) {
-				        	if (isDocument) {
-				        		input.checked = true;
-								var index = docsIdx.indexOf(parseInt(input.id));
-								if (index < 0) {
-									docsIdx.push(parseInt(input.id));
-								}
-				        	}
-
-							enableDisableButton();
-							selectAll();
-				        }
-					});
-			    });  
-			} else {
-				inputs.forEach(function(input) {
-					input.checked = false;
-					var index = docsIdx.indexOf(parseInt(input.id));
-					if (index > -1) {
-						docsIdx.splice(index, 1);
-					}
-			    });  
-				enableDisableButton();
-				deselectAll();
-			}
-		});
+		<c:if test="${vistaIcones}">
+			checkItAll.addEventListener('change', function() {
+				if (checkItAll.checked) {
+					inputs.forEach(function(input) {
+						var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+						$.ajax({
+					        type: "GET",
+					        url: comprovacioUrl,
+					        success: function (isDocument) {
+					        	if (isDocument) {
+					        		input.checked = true;
+									var index = docsIdx.indexOf(parseInt(input.id));
+									if (index < 0) {
+										docsIdx.push(parseInt(input.id));
+									}
+					        	}
+	
+								enableDisableButton();
+								selectAll();
+					        }
+						});
+				    });  
+				} else {
+					inputs.forEach(function(input) {
+						input.checked = false;
+						var index = docsIdx.indexOf(parseInt(input.id));
+						if (index > -1) {
+							docsIdx.splice(index, 1);
+						}
+				    });  
+					enableDisableButton();
+					deselectAll();
+				}
+			});
+		</c:if>
 	} else {
 		//Vista icones
 		$(checkItAll).on('click', function(){
@@ -1952,7 +1958,7 @@ function closeViewer() {
 							</div>
 							<%---- TABLE/GRID OF CONTINGUTS ----%>
 							<div id="loading">
-								<img src="../img/loading.gif"/>
+								<img src="<c:url value="/img/loading.gif"/>"/>
 							</div>
 							<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
 							

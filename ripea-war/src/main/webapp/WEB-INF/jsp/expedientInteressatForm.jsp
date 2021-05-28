@@ -460,11 +460,11 @@ function canviVisibilitat(tipus) {
 		$('.organ-btn').addClass('ocult');
 		$('#organ-filtre').removeClass('in');
 	}
-	$("label[for='pais']").text("<spring:message code="interessat.form.camp.pais"/>" + (tipus != 3 ? " *" : ""))
-	$("label[for='provincia']").text("<spring:message code="interessat.form.camp.provincia"/>" + (tipus != 3 ? " *" : ""))
-	$("label[for='municipi']").text("<spring:message code="interessat.form.camp.municipi"/>" + (tipus != 3 ? " *" : ""))
-	$("label[for='adresa']").text("<spring:message code="interessat.form.camp.adresa"/>" + (tipus != 3 ? " *" : ""))
-	$("label[for='codiPostal']").text("<spring:message code="interessat.form.camp.codiPostal"/>" + (tipus != 3 ? " *" : ""))
+	$("label[for='pais']").text("<spring:message code="interessat.form.camp.pais"/>")
+	$("label[for='provincia']").text("<spring:message code="interessat.form.camp.provincia"/>")
+	$("label[for='municipi']").text("<spring:message code="interessat.form.camp.municipi"/>")
+	$("label[for='adresa']").text("<spring:message code="interessat.form.camp.adresa"/>")
+	$("label[for='codiPostal']").text("<spring:message code="interessat.form.camp.codiPostal"/>")
 }
 </script>
 </head>
@@ -536,22 +536,22 @@ function canviVisibilitat(tipus) {
 			<div class="col-xs-6">
 				<rip:inputSelect name="pais" textKey="interessat.form.camp.pais" optionItems="${paisos}" 
 								 optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" 
-								 optionMinimumResultsForSearch="6" required="true"/>
+								 optionMinimumResultsForSearch="6"/>
 			</div>
 			<div class="col-xs-6">
 				<rip:inputSelect name="provincia" textKey="interessat.form.camp.provincia" optionItems="${provincies}" 
 								 optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" 
-								 optionMinimumResultsForSearch="6" required="true"/>
+								 optionMinimumResultsForSearch="6"/>
 			</div>
 		</div>
 		<!-- FILA: Municipi i codi postal -->
 		<div class="row">
-			<div class="col-xs-6"><rip:inputSelect name="municipi" textKey="interessat.form.camp.municipi" optionItems="${municipis}" optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" optionMinimumResultsForSearch="6" required="true"/></div>
+			<div class="col-xs-6"><rip:inputSelect name="municipi" textKey="interessat.form.camp.municipi" optionItems="${municipis}" optionTextAttribute="nom" optionValueAttribute="codi" emptyOption="true" optionMinimumResultsForSearch="6"/></div>
 <%-- 			<div class="col-xs-6"><rip:inputText name="municipi" textKey="interessat.form.camp.municipi" required="true"/></div> --%>
-			<div class="col-xs-6"><rip:inputText name="codiPostal" textKey="interessat.form.camp.codiPostal" required="true"/></div>
+			<div class="col-xs-6"><rip:inputText name="codiPostal" textKey="interessat.form.camp.codiPostal"/></div>
 		</div>
 		<!-- FILA: Adressa -->
-		<rip:inputTextarea name="adresa" textKey="interessat.form.camp.adresa" required="true" labelSize="2"/>
+		<rip:inputTextarea name="adresa" textKey="interessat.form.camp.adresa" labelSize="2"/>
 		<!-- FILA: Correu electrònic i telèfon -->
 		<div class="row">
 			<div class="col-xs-6"><rip:inputText name="email" textKey="interessat.form.camp.email"/></div>
