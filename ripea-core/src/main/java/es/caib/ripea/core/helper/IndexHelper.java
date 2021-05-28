@@ -399,7 +399,7 @@ public class IndexHelper {
 			} catch (Exception ex) {
 				logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
 			}
-			if (!datesFirmes.isEmpty()) {
+			if (datesFirmes != null && !datesFirmes.isEmpty()) {
 				SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 //				múltiples firmes
 //				for (Entry<Integer, Date> entry : datesFirmes.entrySet()) {
@@ -442,8 +442,8 @@ public class IndexHelper {
 					String dataFirmaStr = dictionary.get(PdfName.M) != null ? dictionary.get(PdfName.M).toString() : null;
 					Date dataFirma = dataFirmaStr != null ? PdfDate.decode(dataFirmaStr).getTime() : null;
 					datesFirmes.put(idx, dataFirma);
+					idx++;
 				}
-				idx++;
 			}
 		}
 		return datesFirmes;
