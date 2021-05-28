@@ -3,6 +3,8 @@ package es.caib.ripea.core.api.dto;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 
 
 public class ExpedientTascaDto {
@@ -29,6 +31,10 @@ public class ExpedientTascaDto {
 		} else {
 			return "";
 		}
+	}
+	
+	public String getMetaExpedientTascaDescAbrv() {
+		return StringUtils.abbreviate(metaExpedientTasca.getDescripcio(), 70);
 	}
 	public Date getDataLimit() {
 		return dataLimit;

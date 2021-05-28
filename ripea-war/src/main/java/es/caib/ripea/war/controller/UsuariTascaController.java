@@ -181,6 +181,7 @@ public class UsuariTascaController extends BaseUserController {
 		
 		model.addAttribute("tascaId", expedientTascaId);
 		model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
+		model.addAttribute("tascaDescripcio", expedientTascaDto.getMetaExpedientTasca().getDescripcio());
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
 		model.addAttribute("tasca", expedientTascaDto);
 		return "contingut";
