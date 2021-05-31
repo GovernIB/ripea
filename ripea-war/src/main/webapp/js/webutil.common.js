@@ -414,7 +414,8 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    minimumResultsForSearch: $(this).data('minimumresults'),
 		    language: {
 		        noResults: noResultsFunction
-		    }
+		    },
+		    width: '100%',
 		});
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();
@@ -572,7 +573,8 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 								selected: false
 							}));
 				}
-		    }
+		    },
+		    width: '100%',
 		});
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();
