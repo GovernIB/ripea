@@ -8,7 +8,10 @@ import java.nio.file.NoSuchFileException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -47,6 +50,7 @@ import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -68,6 +72,7 @@ public class IndexHelper {
 
 	private Font frutiger7 = FontFactory.getFont("Frutiger", 6, Font.BOLD, new BaseColor(255, 255, 255)); // #7F7F7F
 	private Font frutiger6 = FontFactory.getFont("Frutiger", 6);
+	private Font frutiger5 = FontFactory.getFont("Frutiger", 5);
 	private Font frutiger11TitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font frutiger9TitolBold = FontFactory.getFont("Frutiger", 9, Font.BOLD);
 	private Font frutiger10Italic = FontFactory.getFont("Frutiger", 10, Font.ITALIC, new BaseColor(160, 160, 160));
@@ -349,13 +354,37 @@ public class IndexHelper {
 		taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, false));	
 		
 //		Custodiat / Notificat
+		List<String> subTitols = new ArrayList<String>();
+		DocumentNotificacioEstatEnumCustom estatNotificacio = null;
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
 		boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
-		
+
 		if (hasNotificacions) {
-			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.notificat"), null, false));
-		} else if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-			Date dataFirma = null;
+//			Estat darrera notificació
+			DocumentNotificacioEstatEnumDto estatLastNotificacio = notificacions.get(0).getNotificacioEstat();
+			switch (estatLastNotificacio) {
+				case PENDENT:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.PENDENT;
+					break;
+				case REGISTRADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
+				case ENVIADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
+					break;
+				case FINALITZADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+					break;
+				case PROCESSADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+					break;
+			}
+			
+			if (!document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT))
+				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio), null, false));
+		}
+		
+		if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+			Map<Integer, Date> datesFirmes = null;
 			try {
 				if (pluginHelper.isArxiuPluginActiu()) {
 					es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
@@ -365,42 +394,59 @@ public class IndexHelper {
 							true,
 							false);
 					byte[] contingut = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
-					dataFirma = getDataFirmaFromDocument(contingut);
+					datesFirmes = getDataFirmaFromDocument(contingut);
 				}
 			} catch (Exception ex) {
 				logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
 			}
-			if (dataFirma != null) {
-//				Data firma
+			if (datesFirmes != null && !datesFirmes.isEmpty()) {
 				SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-				String dataFirmaFormatted = sdtTime.format(dataFirma);
-				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), "(" + dataFirmaFormatted + ")", false));
-			} else {
-				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), null, false));
+//				múltiples firmes
+//				for (Entry<Integer, Date> entry : datesFirmes.entrySet()) {
+//					String dataFirma = null;
+//					if (datesFirmes.size() > 1)
+//						dataFirma = "Firma " + entry.getKey() + ": " + sdtTime.format(entry.getValue());
+//					else
+//						dataFirma = sdtTime.format(entry.getValue());
+//					datesFirmesStr.add(dataFirma);
+//				}
+//				la darrera firma
+				String dataFirma = sdtTime.format(datesFirmes.get(datesFirmes.size()));
+				subTitols.add(dataFirma);
+			} 
+			
+			if (hasNotificacions) {
+				String missatgeEstatNotificacio = messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio);
+				subTitols.add(missatgeEstatNotificacio);
 			}
-		} else {
+			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), subTitols, false));
+		} 
+		
+		
+		if (!hasNotificacions && !document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)){
 			taulaDocuments.addCell(crearCellaContingut("-", null, false));
 		}
 	}
 	
-	private Date getDataFirmaFromDocument(byte[] content) throws IOException {
-		Date dataFirma = null;
+	private Map<Integer, Date> getDataFirmaFromDocument(byte[] content) throws IOException {
+		Map<Integer, Date> datesFirmes = new HashMap<Integer, Date>();
 		PdfReader reader = new PdfReader(content);
 		AcroFields fields = reader.getAcroFields();
-		
 		List<String> signatureNames = fields.getSignatureNames();
+		Integer idx = 1;
 		if (signatureNames != null) {
 			for (String name: signatureNames) {
 //				### comprovar si és una firma o un segell
 				PdfDictionary dictionary = fields.getSignatureDictionary(name);
 				if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/Sig")) {
 					String dataFirmaStr = dictionary.get(PdfName.M) != null ? dictionary.get(PdfName.M).toString() : null;
-					dataFirma = dataFirmaStr != null ? PdfDate.decode(dataFirmaStr).getTime() : null;
-					break;
+					Date dataFirma = dataFirmaStr != null ? PdfDate.decode(dataFirmaStr).getTime() : null;
+					datesFirmes.put(idx, dataFirma);
+					idx++;
 				}
 			}
 		}
-		return dataFirma;
+		return datesFirmes;
 	}
 	
 	private Document inicialitzaDocument(
@@ -505,15 +551,17 @@ public class IndexHelper {
 		return titolCell;
 	}
 	
-	private PdfPCell crearCellaContingut(String titol, String subTitol, boolean isLink) {
+	private PdfPCell crearCellaContingut(String titol, List<String> subTitols, boolean isLink) {
 		PdfPCell titolCell = new PdfPCell();
 		Paragraph titolParagraph = new Paragraph(titol, frutiger6);
 		titolParagraph.setAlignment(Element.ALIGN_CENTER);
 		titolCell.addElement(titolParagraph);
-		if (subTitol != null) {
-			Paragraph subTitolParagraph = new Paragraph(subTitol, frutiger6);
-			subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
-			titolCell.addElement(subTitolParagraph);
+		if (subTitols != null && !subTitols.isEmpty()) {
+			for (String subTitol : subTitols) {
+				Paragraph subTitolParagraph = new Paragraph(subTitol, frutiger6);
+				subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
+				titolCell.addElement(subTitolParagraph);
+			}
 		}
 		titolCell.setPaddingBottom(6f);
 		titolCell.setBorderWidth((float) 0.5);
@@ -562,6 +610,8 @@ public class IndexHelper {
 	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
 		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
 	}
+	
+	private enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};
 	
 	private static final Logger logger = LoggerFactory.getLogger(IndexHelper.class);
 
