@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
@@ -349,7 +348,7 @@ public class EntityComprovarHelper {
 		}
 		comprovarPermisosMetaNode(
 				metaExpedient,
-				metaExpedientId,
+				null,
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
@@ -862,11 +861,18 @@ public class EntityComprovarHelper {
 					new Permission[] { permission },
 					auth);
 		}
-		
 
 		boolean grantedOrgan = false;
 		if (esExpedient && !grantedDirect) {
-			List<OrganGestorEntity> organsGestors = expedientOrganPareRepository.findOrganGestorByExpedientId(nodeId);
+			List<OrganGestorEntity> organsGestors = new ArrayList<>();
+			if (nodeId != null) {
+				organsGestors = expedientOrganPareRepository.findOrganGestorByExpedientId(nodeId);
+			} else {
+				OrganGestorEntity organGestorEntity = ((MetaExpedientEntity) metaNode).getOrganGestor();
+				if (organGestorEntity != null) {
+					organsGestors = organGestorRepository.findOrganGestorsPath(organGestorEntity.getId());
+				}
+			}
 			if (usuariCodi != null) {
 				permisosHelper.filterGrantedAll(
 						organsGestors,
@@ -883,7 +889,12 @@ public class EntityComprovarHelper {
 		}
 		boolean grantedOrganMetaNode = false;
 		if (esExpedient && !grantedDirect && !grantedOrgan) {
-			List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = expedientOrganPareRepository.findMetaExpedientOrganGestorByExpedientId(nodeId);
+			List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors;
+			if (nodeId != null) {
+				metaExpedientOrgansGestors = expedientOrganPareRepository.findMetaExpedientOrganGestorByExpedientId(nodeId);
+			} else {
+				metaExpedientOrgansGestors = organGestorRepository.findMetaExpedientOrganGestorsByMetaExpedientId(metaNode.getId());
+			}
 			if (usuariCodi != null) {
 				permisosHelper.filterGrantedAll(
 						metaExpedientOrgansGestors,
