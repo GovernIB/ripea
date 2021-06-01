@@ -418,14 +418,16 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				true, false);
+				true, 
+				false);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
-				false,
-				false, false);
+				true,
+				false, 
+				false);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -442,17 +444,6 @@ public class ContingutServiceImpl implements ContingutService {
 						contingutOrigen.getClass(),
 						"No es poden moure documents firmats");
 			}
-		}
-		// Es comprova que es poden crear elements d'aquest tipus a l'expedient destí
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					documentOrigen.getMetaDocument(),
-					documentOrigen.getId(),
-					false,
-					false,
-					true,
-					false, false);
 		}
 		// Es comprova que el tipus d'expedient orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
@@ -528,14 +519,16 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, false);
+				false, 
+				false);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
-				false,
-				false, false);
+				true,
+				false, 
+				false);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -552,17 +545,6 @@ public class ContingutServiceImpl implements ContingutService {
 						contingutOrigen.getClass(),
 						"No es poden copiar documents firmats");
 			}
-		}
-		// Es comprova que es poden crear elements d'aquest tipus a l'expedient destí
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					documentOrigen.getMetaDocument(),
-					documentOrigen.getId(),
-					false,
-					false,
-					true,
-					false, false);
 		}
 		// Es comprova que el tipus d'expedient orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
@@ -664,17 +646,6 @@ public class ContingutServiceImpl implements ContingutService {
 		//				"No es poden enllaçar documents firmats");
 		//	}
 		//}
-		// Es comprova que es poden crear elements d'aquest tipus a l'expedient destí
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					documentOrigen.getMetaDocument(),
-					documentOrigen.getId(),
-					false,
-					false,
-					true,
-					false, false);
-		}
 		// Es comprova que el tipus d'expedient orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
