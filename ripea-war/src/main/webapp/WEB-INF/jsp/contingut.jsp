@@ -1253,8 +1253,8 @@ function recuperarResultatDomini(
 		metaExpedientId,
 		metaDadaCodi,
 		dadaValor) {
-	var dadaValorUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '/valor"/>';
-	var multipleUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '"/>';
+	var dadaValorUrl = '<c:url value="/metaExpedient/metaDada/domini/' + metaDadaCodi + '/valor"/>';
+	var multipleUrl = '<c:url value="/metaExpedient/metaDada/domini/' + metaDadaCodi + '"/>';
 	var selDomini = $("#" + metaDadaCodi);
 	
 

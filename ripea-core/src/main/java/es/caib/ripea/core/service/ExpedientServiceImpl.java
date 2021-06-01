@@ -1457,6 +1457,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedientFiltre = null;
+		List<Long> metaExpedientIdDomini = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 					entitat,
@@ -1561,6 +1562,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
 					ExtendedPermission.READ));
+			// Cercam metaExpedients amb una meta-dada del domini del filtre
+			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,
@@ -1572,6 +1575,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
 					metaExpedientFiltre == null,
 					metaExpedientFiltre,
+					metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),
+					metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty() ? null : metaExpedientIdDomini,
 					organGestorFiltre == null,
 					organGestorFiltre,
 					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),

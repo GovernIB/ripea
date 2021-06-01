@@ -75,6 +75,6 @@ public interface MetaDadaRepository extends JpaRepository<MetaDadaEntity, Long> 
 			MetaNodeEntity metaExpedient,
 			MultiplicitatEnumDto[] multiplicitats);
 	
-	
+	List<MetaDadaEntity> findByCodi(String codi);
 
 }

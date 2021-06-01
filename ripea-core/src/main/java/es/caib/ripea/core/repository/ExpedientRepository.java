@@ -92,6 +92,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			// Falta contemplar el cas en el que la combinació meta-expedient + organ de l'expedient està a :metaExpedientOrganIdPermesos
 			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos))) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
+			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
@@ -127,6 +128,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("esNullMetaExpedientIdDomini") boolean esNullMetaExpedientIdDomini,
+			@Param("metaExpedientIdDomini") List<Long> metaExpedientIdDomini,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
 			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("esNullNumero") boolean esNullNumero,
