@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.core.api.dto.FitxerTemporalDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
@@ -24,7 +25,6 @@ import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentCommand.UpdateFirmaSeparada;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.ArxiuNoBuit;
-import es.caib.ripea.war.validation.DocumentDigitalExistent;
 import es.caib.ripea.war.validation.ExpedientODocumentNom;
 import es.caib.ripea.war.validation.NomDocumentNoRepetit;
 import es.caib.ripea.war.validation.ValidIfSeparada;
@@ -52,9 +52,11 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date data;
 	private MultipartFile arxiu;
+	private FitxerTemporalDto arxiuTemporal;
 	private DocumentFisicOrigenEnum origen;
 	private boolean ambFirma;
 	private MultipartFile firma;
+	private FitxerTemporalDto firmaTemporal;
 	@NotNull(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 	private DocumentTipusFirmaEnumDto tipusFirma = DocumentTipusFirmaEnumDto.ADJUNT;
 	private String escanejatTempId;
@@ -197,6 +199,13 @@ public class DocumentCommand extends ContenidorCommand {
 	public void setTipusFirma(DocumentTipusFirmaEnumDto tipusFirma) {
 		this.tipusFirma = tipusFirma;
 	}
+	public FitxerTemporalDto getArxiuTemporal() {
+		return arxiuTemporal;
+	}
+	public void setArxiuTemporal(FitxerTemporalDto arxiuTemporal) {
+		this.arxiuTemporal = arxiuTemporal;
+	}
+	
 	public static DocumentCommand asCommand(DocumentDto dto) {
 		DocumentCommand command = ConversioTipusHelper.convertir(
 				dto,
@@ -212,7 +221,11 @@ public class DocumentCommand extends ContenidorCommand {
 				command,
 				DocumentDto.class);
 			
-		if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
+		if (command.getArxiuTemporal() != null) {
+			dto.setFitxerNom(command.getArxiuTemporal().getNom());
+			dto.setFitxerContentType(command.getArxiuTemporal().getContentType());
+			dto.setFitxerContingut(command.getArxiuTemporal().getBytes());
+		} else if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
 			dto.setFitxerNom(command.getArxiu().getOriginalFilename());
 			dto.setFitxerContentType(command.getArxiu().getContentType());
 			dto.setFitxerContingut(command.getArxiu().getBytes());
@@ -221,16 +234,23 @@ public class DocumentCommand extends ContenidorCommand {
 			dto.setFitxerContentType(command.getFitxerContentType());
 			dto.setFitxerContingut(command.getFitxerContingut());
 		}
-
-		if (command.getArxiu() != null && !command.getArxiu().isEmpty() && command.isAmbFirma()) {
-			dto.setFirmaNom(command.getFirma().getOriginalFilename());
-			dto.setFirmaContentType(command.getFirma().getContentType());
-			dto.setFirmaContingut(command.getFirma().getBytes());
-		} else if ((command.getArxiu() == null || command.getArxiu().isEmpty()) && command.isAmbFirma()){
-			dto.setFirmaNom(command.getFitxerNom());
-			dto.setFirmaContentType(command.getFitxerContentType());
-			dto.setFirmaContingut(command.getFitxerContingut());
+		
+		if (command.isAmbFirma()) {
+			if (command.getFirmaTemporal() != null) {
+				dto.setFirmaNom(command.getFirmaTemporal().getNom());
+				dto.setFirmaContentType(command.getFirmaTemporal().getContentType());
+				dto.setFirmaContingut(command.getFirmaTemporal().getBytes());
+			} else if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
+				dto.setFirmaNom(command.getFirma().getOriginalFilename());
+				dto.setFirmaContentType(command.getFirma().getContentType());
+				dto.setFirmaContingut(command.getFirma().getBytes());
+			} else if ((command.getArxiu() == null || command.getArxiu().isEmpty())){
+				dto.setFirmaNom(command.getFitxerNom());
+				dto.setFirmaContentType(command.getFitxerContentType());
+				dto.setFirmaContingut(command.getFitxerContingut());
+			}
 		}
+
 //		else {
 //			dto.setFitxerNom(command.getFitxerNom());
 //			dto.setFitxerContentType(command.getFitxerContentType());
@@ -245,6 +265,13 @@ public class DocumentCommand extends ContenidorCommand {
 			dto.setMetaNode(metaDocument);
 		}
 		return dto;
+	}
+
+	public FitxerTemporalDto getFirmaTemporal() {
+		return firmaTemporal;
+	}
+	public void setFirmaTemporal(FitxerTemporalDto firmaTemporal) {
+		this.firmaTemporal = firmaTemporal;
 	}
 
 	public interface CreateDigital {}

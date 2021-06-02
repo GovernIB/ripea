@@ -79,6 +79,7 @@ import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DocumentHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -98,6 +99,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
 	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
+
 	
 	@Autowired
 	private ServletContext servletContext;
@@ -180,6 +182,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
+		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+				request,
+				command,
+				model);
+		
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 			recuperarResultatEscaneig(
@@ -196,7 +203,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					pareId,
 					model);
-			command.setArxiu(null);
 			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
@@ -232,8 +238,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			} else {
 				throw ex;
 			}
-			
-
+		} finally {
+			FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
 		}
 	}
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
@@ -1006,8 +1012,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		        Long[].class,
 		        new StringArrayPropertyEditor(null)); 
 	}
-
-
+	
 
 	private String createUpdateDocument(
 			HttpServletRequest request,

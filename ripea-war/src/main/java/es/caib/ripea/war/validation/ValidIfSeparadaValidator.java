@@ -3,8 +3,11 @@
  */
 package es.caib.ripea.war.validation;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.war.command.DocumentCommand;
@@ -18,6 +21,10 @@ import es.caib.ripea.war.helper.MessageHelper;
  */
 public class ValidIfSeparadaValidator implements ConstraintValidator<ValidIfSeparada, DocumentCommand> {
 
+	private static final String SESSION_ATTRIBUTE_FRIMA = "ContingutDocumentController.session.firma";
+	@Autowired
+	private HttpServletRequest request;
+	
 	@Override
 	public void initialize(final ValidIfSeparada firmaSeparada) {
 	}
@@ -29,7 +36,7 @@ public class ValidIfSeparadaValidator implements ConstraintValidator<ValidIfSepa
 		boolean valid = true;
 		if (DocumentTipusFirmaEnumDto.SEPARAT.equals(command.getTipusFirma())) {
 			if (command.getId() == null) {
-				valid = command.getFirma() != null && !command.getFirma().isEmpty();
+				valid = (command.getFirma() != null && !command.getFirma().isEmpty()) || request.getSession().getAttribute(SESSION_ATTRIBUTE_FRIMA) != null;
 				if (!valid) {
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("FirmaNoBuida"))
