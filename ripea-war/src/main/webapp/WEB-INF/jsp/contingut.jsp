@@ -29,7 +29,7 @@
 	<rip:modalHead/>
 	<title>
 		<c:choose>
-			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="width: 70%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
+			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
@@ -516,6 +516,7 @@ $(document).ready(function() {
 		$('.esborranys > p').html(newValidacioTxt);
 	} 
 	$("#tascaBtn").appendTo(".panel-heading h2");
+	<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 
 	
 	$("#mostraDetallSignants").click(function(){
