@@ -51,7 +51,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@RequestMapping(value = "/organgestor/item/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public OrganGestorDto getItem(HttpServletRequest request, @PathVariable Long id, Model model) {
-		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		getEntitatActualComprovantPermisAdminUserEntitatOrganOrRevisor(request);
 		
 		try {
 			return organGestorService.findItem(id);
@@ -75,7 +75,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@RequestMapping(value = "/organgestorcodi/item/{codi}", method = RequestMethod.GET)
 	@ResponseBody
 	public OrganGestorDto getItemAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminUserEntitatOrganOrRevisor(request);
 		
 		try {
 			return organGestorService.findItemByEntitatAndCodi(entitatActual.getId(), codi);
@@ -85,7 +85,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	}
 	
 	private List<OrganGestorDto> getWithParam(HttpServletRequest request, String text, Model model, boolean directOrganPermisRequired) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminUserEntitatOrganOrRevisor(request);
 		
 		try {
 			text = URLDecoder.decode(request.getRequestURI().split("/")[4], StandardCharsets.UTF_8.name());

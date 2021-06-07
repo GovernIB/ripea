@@ -230,7 +230,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 					<th data-col-name="expedient" data-visible="false"></th>
 					<th data-col-name="carpeta" data-visible="false"></th>
 					<th data-col-name="document" data-visible="false"></th>
-					<th data-col-name="metaDocument.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
+					<th data-col-name="metaDocument.nom" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
 					<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
 						<spring:message code="accio.massiva.list.column.ubicacio"/>
 						<script id="cellPathTemplate" type="text/x-jsrender">

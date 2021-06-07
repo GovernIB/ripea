@@ -13,7 +13,6 @@
 <head>
 	<title>${titol}</title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/webjars/pdf-js/2.5.207/build/pdf.js"/>"></script>
 	<rip:modalHead/>
@@ -391,13 +390,13 @@ tr.clicable {
 									</c:choose>
 									<td>
 										<c:if test="${interessat.tipus != 'ADMINISTRACIO'}">
-											<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}">
+											<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}_resum" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}_resum">
 												<span class="fa fa-caret-down"></span>
 											</button>
 										</c:if>
 									</td>
 								</tr>
-								<tr class="collapse detall" id="detalls_${status.index}">
+								<tr class="collapse detall" id="detalls_${status.index}_resum">
 									<td colspan="4">
 										<div class="row">
 											<div class="col-xs-6">
@@ -448,13 +447,13 @@ tr.clicable {
 																</c:choose>
 																<td>
 																	<c:if test="${representant.tipus != 'ADMINISTRACIO'}">
-																		<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}_rep" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}_rep">
+																		<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}_rep_resum" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}_rep_resum">
 																			<span class="fa fa-caret-down"></span>
 																		</button>
 																	</c:if>
 																</td>
 															</tr>
-															<tr class="collapse detall" id="detalls_${status.index}_rep">
+															<tr class="collapse detall" id="detalls_${status.index}_rep_resum">
 																<td colspan="4">
 																	<div class="row">
 																		<div class="col-xs-6">

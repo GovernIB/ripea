@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -21,11 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -216,11 +220,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	}
 	
 	
-	
-	
-
-	
-	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/tancar", method = RequestMethod.POST)
 	public String canviarEstatPost(
@@ -239,25 +238,38 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 				request,
 				getSessionAttributeSelecio(request));
 		
-		for (Long expedientId : seleccio) {
-			expedientService.tancar(
-					entitatActual.getId(),
-					expedientId,
-					command.getMotiu(),
-					null, false);
+		try {
 			
+			for (Long expedientId : seleccio) {
+				expedientService.tancar(
+						entitatActual.getId(),
+						expedientId,
+						command.getMotiu(),
+						null, false);
+				
+			}
+			
+			seleccio.clear();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					getSessionAttributeSelecio(request),
+					seleccio);
+			
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../massiu/tancament",
+					"expedient.controller.tancar.massiu.ok");
+			
+		} catch (Exception ex) {
+			logger.error("Error al tancament massiu", ex);
+
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../massiu/tancament",
+					ex.getMessage());
+
 		}
 		
-		seleccio.clear();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				getSessionAttributeSelecio(request),
-				seleccio);
-		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../expedient",
-				"expedient.controller.tancar.massiu.ok");
 	}
 	
 	
@@ -305,5 +317,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		}
 		return filtreCommand;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ExpedientMassiuTancamentController.class);
 
 }

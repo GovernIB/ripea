@@ -19,18 +19,18 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="permis/new" data-toggle="modal" data-datatable-id="permisos"><span class="fa fa-plus"></span>&nbsp;<spring:message code="permis.list.boto.nou.permis"/></a>
 	</div>
-	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
+	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="permis.list.columna.tipus"/></th>
-				<th data-col-name="principalNom"><spring:message code="entitat.permis.columna.principal"/></th>
-				<th data-col-name="administration" data-template="#cellAdministrationTemplate">
+				<th data-col-name="principalTipus" data-orderable="false" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="permis.list.columna.tipus"/></th>
+				<th data-col-name="principalNom" data-orderable="false"><spring:message code="entitat.permis.columna.principal"/></th>
+				<th data-col-name="administration" data-orderable="false" data-template="#cellAdministrationTemplate">
 					<spring:message code="permis.list.columna.administracio"/>
 					<script id="cellAdministrationTemplate" type="text/x-jsrender">
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="read" data-template="#cellReadTemplate">
+				<th data-col-name="read" data-orderable="false" data-template="#cellReadTemplate">
 					<spring:message code="permis.list.columna.usuari"/>
 					<script id="cellReadTemplate" type="text/x-jsrender">
 						{{if read}}<span class="fa fa-check"></span>{{/if}}
