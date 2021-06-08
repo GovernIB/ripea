@@ -43,7 +43,7 @@
 				<th data-col-name="principalTipus">
 					<spring:message code="organgestor.permis.columna.tipus"/>
 				</th>
-				<th data-col-name="principalNom">
+				<th data-col-name="principalCodiNom">
 					<spring:message code="organgestor.permis.columna.principal"/>
 				</th>
 				<th data-col-name="create" data-template="#cellPermisCreateTemplate">

@@ -3,11 +3,14 @@
  */
 package es.caib.ripea.war.validation;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.support.RequestContext;
 
 import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.helper.MessageHelper;
@@ -19,6 +22,8 @@ import es.caib.ripea.war.helper.MessageHelper;
  */
 public class InteressatEmailValidator implements ConstraintValidator<InteressatEmail, Object> {
 
+    @Autowired
+    private HttpServletRequest request;
 
 	@Override
 	public void initialize(final InteressatEmail constraintAnnotation) {
@@ -31,10 +36,10 @@ public class InteressatEmailValidator implements ConstraintValidator<InteressatE
 			InteressatCommand interessat = (InteressatCommand)value;
 			boolean valid = true;
 			
-			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && (interessat.getEmail() == null || interessat.getEmail().isEmpty())) {
+			if ((interessat.getEntregaDeh() != null && interessat.getEntregaDeh() || interessat.getNotificacioAutoritzat() != null && interessat.getNotificacioAutoritzat()) && (interessat.getEmail() == null || interessat.getEmail().isEmpty())) {
 				context
 					.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("interessat.form.valid.email"))
+							MessageHelper.getInstance().getMessage("interessat.form.valid.email", null, new RequestContext(request).getLocale()))
 					.addNode("email")
 					.addConstraintViolation();
 				valid = false;

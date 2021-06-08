@@ -28,6 +28,7 @@ public class PermisCommand {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String principalNom;
+	private String principalCodiNom;
 	@NotNull
 	private PrincipalTipusEnumDto principalTipus;
 	private boolean read;
@@ -111,6 +112,10 @@ public class PermisCommand {
 
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;
+	}
+
+	public void setPrincipalCodiNom(String principalCodiNom) {
+		this.principalCodiNom = principalCodiNom;
 	}
 
 }

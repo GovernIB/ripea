@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 
 /**
@@ -113,5 +114,28 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where" +
 			"    og.codi in (:codi)")
 	public List<Long> findIdsByCodiDir3List(List<String> codi);
+	
+	
+	@Query(	"select " +
+			"    org " + 
+			"from " +
+			"    OrganGestorEntity org " +
+			"    left join org.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    org.id = :organId")
+	List<OrganGestorEntity> findOrganGestorsPath(
+			@Param("organId") Long organId);
+	
+	@Query(	"select " +
+			"    meog " + 
+			"from " +
+			"    MetaExpedientOrganGestorEntity meog " +
+			"where " +
+			"    meog.metaExpedient.id = :metaExpedientId")
+	List<MetaExpedientOrganGestorEntity> findMetaExpedientOrganGestorsByMetaExpedientId(
+			@Param("metaExpedientId") Long metaExpedientId);
 
 }

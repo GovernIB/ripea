@@ -4,7 +4,6 @@
 package es.caib.ripea.core.api.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -621,7 +620,7 @@ public interface DocumentService {
 
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Set<Long> ids, String rolActual);
+			Long id, String rolActual);
 
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,

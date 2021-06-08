@@ -311,7 +311,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				PermisOrganGestorDto permisOrgan = new PermisOrganGestorDto();
 				try {
 					BeanUtils.copyProperties(permisOrgan, p);
-					permisOrgan.setPrincipalNom(usuariHelper.getUsuariByCodi(p.getPrincipalNom()).getNom() + " (" + p.getPrincipalNom() + ")");
+					permisOrgan.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permisOrgan.getPrincipalNom()).getNom() + " (" + permisOrgan.getPrincipalNom() + ")");
+					
 				} catch (IllegalAccessException | InvocationTargetException e) {
 					e.printStackTrace();
 				} catch (NotFoundException ex) {

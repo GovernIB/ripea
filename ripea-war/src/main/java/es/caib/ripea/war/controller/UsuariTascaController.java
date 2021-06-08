@@ -72,6 +72,7 @@ import es.caib.ripea.war.helper.ArxiuTemporalHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -181,6 +182,7 @@ public class UsuariTascaController extends BaseUserController {
 		
 		model.addAttribute("tascaId", expedientTascaId);
 		model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
+		model.addAttribute("tascaDescripcio", expedientTascaDto.getMetaExpedientTasca().getDescripcio());
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
 		model.addAttribute("tasca", expedientTascaDto);
 		return "contingut";
@@ -330,6 +332,13 @@ public class UsuariTascaController extends BaseUserController {
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	
+		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+				request,
+				command,
+				model);
+		
+		
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
 					request,
@@ -354,6 +363,8 @@ public class UsuariTascaController extends BaseUserController {
 					pareId,
 					model);
 			return "contingutDocumentForm";
+		} finally {
+			FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
 		}
 	}
 	

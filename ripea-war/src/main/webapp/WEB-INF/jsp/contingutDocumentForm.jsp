@@ -106,15 +106,26 @@ function mostrarDocument(fileName) {
 	$('.fileinput-filename', $fileinput).append(fileName);
 }
 
+function mostrarFrima(fileName) {
+	$fileinput = $('#firma').closest('.fileinput');
+	$fileinput.removeClass('fileinput-new');
+	$fileinput.addClass('fileinput-exists');
+	$('.fileinput-filename', $fileinput).append(fileName);
+}
+
 $(document).ready(function() {
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
-	console.log(currentHeight);
 	let rootIframe = window.frameElement;
 	/*let fileName = "${nomDocument}";
 	if (fileName !== '') {
 		mostrarDocument(fileName);
 	}*/
+
+	let fileName = "${nomFirma}";
+	if (fileName !== '') {
+		mostrarFrima(fileName);
+	}
 
 	// METADOCUMENT CHANGE
 	$('#metaNodeId').on('change', function() {

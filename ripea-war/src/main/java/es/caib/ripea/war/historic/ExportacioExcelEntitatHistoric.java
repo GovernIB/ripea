@@ -13,6 +13,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 
 public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 	private HistoricMetriquesEnumDto[] metriques = new HistoricMetriquesEnumDto[] {
@@ -25,10 +26,10 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 		super();
 	}
 	
-	public byte[] convertDadesEntitat(List<HistoricExpedientDto> dades) throws IOException {
+	public byte[] convertDadesEntitat(List<HistoricExpedientDto> dades, HistoricTipusEnumDto tipusAgrupament) throws IOException {
 
 
-		createHistoricSheet(dades, "Històric de l'entitat");
+		createHistoricSheet(dades, "Històric de l'entitat", tipusAgrupament);
 		byte[] bytes = wb.getBytes();
 
 		wb.close();
@@ -36,10 +37,10 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 		return bytes;
 	}
 	
-	private HSSFSheet createHistoricSheet(List<HistoricExpedientDto> dades, String sheetname) {
+	private HSSFSheet createHistoricSheet(List<HistoricExpedientDto> dades, String sheetname, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFSheet sheet = wb.createSheet(sheetname);
 
-		createMetriquesHeader(sheet);
+		createMetriquesHeader(sheet, tipusAgrupament);
 
 		int rowNum = 1;
 		for (HistoricExpedientDto historic : dades) {
@@ -47,8 +48,12 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 				HSSFRow xlsRow = sheet.createRow(rowNum);
 
 				HSSFCell cellData = xlsRow.createCell(0);
-				cellData.setCellValue(historic.getData());
-				cellData.setCellStyle(cellDataStyle);
+				if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+					cellData.setCellValue(historic.getData());
+					cellData.setCellStyle(cellDataStyle);
+				} else {
+					cellData.setCellValue(historic.getMesNom());
+				}
 
 				int colNum = 1;
 				for (HistoricMetriquesEnumDto metricEnum : metriques) {
@@ -73,7 +78,7 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 		return sheet;
 	}
 	
-	private void createMetriquesHeader(HSSFSheet sheet) {
+	private void createMetriquesHeader(HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;
 
@@ -91,9 +96,13 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 		// Capçalera
 		HSSFRow xlsRow = sheet.createRow(rowNum++);
 		HSSFCell cell;
-
 		cell = xlsRow.createCell(colNum++);
-		cell.setCellValue(new HSSFRichTextString("Data"));
+		
+		if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+			cell.setCellValue(new HSSFRichTextString("Data"));
+		} else {
+			cell.setCellValue(new HSSFRichTextString("Mes"));
+		}
 		cell.setCellStyle(headerStyle);
 
 		for (HistoricMetriquesEnumDto metricEnum : metriques) {

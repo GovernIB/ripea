@@ -50,7 +50,16 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect name="principalTipus" textKey="metaexpedient.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
-		<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
+		<c:choose>
+			<c:when test="${empty permisCommand.id}">
+				<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal"  placeholderKey="entitat.permis.form.camp.principal"/>
+			</c:when>
+			<c:otherwise>
+				<rip:inputText name="principalCodiNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="true" placeholderKey="entitat.permis.form.camp.principal"/>
+				<form:hidden path="principalNom"/>
+			</c:otherwise>
+		</c:choose>
+		
 		<c:if test="${empty metaExpedient.organGestor and (empty permisCommand.id or not empty permisCommand.organGestorId)}">
 			<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 			<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>

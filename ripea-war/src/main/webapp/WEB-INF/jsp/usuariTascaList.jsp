@@ -30,6 +30,13 @@
 			<tr>
 				<th data-col-name="expedient.nomINumero" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.expedient"/></th>
 				<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
+				<th data-col-name="metaExpedientTasca.descripcio" data-orderable="false" width="30%" data-template="#cellTascaDescripcio" >
+					<spring:message code="expedient.tasca.list.columna.metaExpedientDescripcio"/>
+					<script id="cellTascaDescripcio" type="text/x-jsrender">
+						<span title="{{:metaExpedientTasca.descripcio}}">{{:metaExpedientTascaDescAbrv}}</span>
+					</script>
+				</th>
+				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
 				<th data-col-name="comentari" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>

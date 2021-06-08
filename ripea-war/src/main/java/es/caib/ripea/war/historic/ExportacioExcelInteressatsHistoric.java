@@ -14,6 +14,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 
 public class ExportacioExcelInteressatsHistoric extends ExportacioExcelHistoric {
 
@@ -27,19 +28,23 @@ public class ExportacioExcelInteressatsHistoric extends ExportacioExcelHistoric 
 		super();
 	}
 
-	public byte[] convertDadesInteressats(Map<String, List<HistoricInteressatDto>> dades) throws IOException {
+	public byte[] convertDadesInteressats(Map<String, List<HistoricInteressatDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws IOException {
 
 		for (String codiUsuari : dades.keySet()) {
 			HSSFSheet sheet = wb.createSheet(codiUsuari);
-			tableHeader(sheet);
+			tableHeader(sheet, tipusAgrupament);
 			int rowNum = 1;
 			for (HistoricInteressatDto historic : dades.get(codiUsuari)) {
 				try {
 					HSSFRow xlsRow = sheet.createRow(rowNum);
 
 					HSSFCell cellData = xlsRow.createCell(0);
-					cellData.setCellValue(historic.getData());
-					cellData.setCellStyle(cellDataStyle);
+					if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+						cellData.setCellValue(historic.getData());
+						cellData.setCellStyle(cellDataStyle);
+					} else {
+						cellData.setCellValue(historic.getMesNom());
+					}
 
 					int colNum = 1;
 					for (HistoricMetriquesEnumDto metricEnum : metriques) {
@@ -69,7 +74,7 @@ public class ExportacioExcelInteressatsHistoric extends ExportacioExcelHistoric 
 		return bytes;
 	}
 	
-	private void tableHeader(HSSFSheet sheet) {
+	private void tableHeader(HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;
 
@@ -89,7 +94,11 @@ public class ExportacioExcelInteressatsHistoric extends ExportacioExcelHistoric 
 		HSSFCell cell;
 
 		cell = xlsRow.createCell(colNum++);
-		cell.setCellValue(new HSSFRichTextString("Data"));
+		if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+			cell.setCellValue(new HSSFRichTextString("Data"));
+		} else {
+			cell.setCellValue(new HSSFRichTextString("Mes"));
+		}
 		cell.setCellStyle(headerStyle);
 
 		for (HistoricMetriquesEnumDto metrica : metriques) {

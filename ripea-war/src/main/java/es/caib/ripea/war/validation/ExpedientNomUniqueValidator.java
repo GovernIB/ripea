@@ -52,9 +52,12 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 			final Long entitatId = getLongProperty(value, campEntitatId); 
 			final Long pareId = getLongProperty(value, campPareId); 
 
-			ExpedientDto expedient = expedientService.findByMetaExpedientAndPareAndNomAndEsborrat(entitatId, 
-																								  metaExpedientId, 
-																								  pareId, nom, 0);
+			ExpedientDto expedient = expedientService.findByMetaExpedientAndPareAndNomAndEsborrat(
+					entitatId,
+					metaExpedientId,
+					pareId,
+					nom,
+					0);
 			if (expedient != null) {
 				if (id == null) // creant
 				{
@@ -65,7 +68,9 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 				
 			}
         } catch (final Exception ex) {
-        	LOGGER.error("Error al validar si el codi d'entitat és únic", ex);
+        	LOGGER.error("Error al validar si el nom d'expedient és únic", ex);
+        	context.disableDefaultConstraintViolation();
+        	context.buildConstraintViolationWithTemplate("Error al validar si el nom d''expedient és únic: " + ex.getMessage()).addConstraintViolation();
         	return false;
         }
         return true;

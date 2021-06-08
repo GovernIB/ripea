@@ -303,11 +303,10 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		return dominis;
 	}
 	
-	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDada/domini/{dominiCodi}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResultatDominiDto getDomini(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi,
 			@RequestParam(value="filter", required = false) String filter,
 			@RequestParam(value="pageSize", required = false) int pageSize,
@@ -329,11 +328,10 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		return resultatDomini;
 	}
 	
-	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini/{dominiCodi}/valor", method = RequestMethod.GET)
+	@RequestMapping(value = "/metaDada/domini/{dominiCodi}/valor", method = RequestMethod.GET)
 	@ResponseBody
 	public ResultatConsultaDto getDomini(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
 			@PathVariable String dominiCodi,
 			@RequestParam(value="dadaValor", required = false) String dadaValor){
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);

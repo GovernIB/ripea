@@ -2098,6 +2098,7 @@ public class PluginHelper {
 		PortafirmesDocument portafirmesDocument = new PortafirmesDocument();
 		portafirmesDocument.setExpedientUuid(document.getExpedient().getArxiuUuid());
 		portafirmesDocument.setTitol(document.getNom());
+		portafirmesDocument.setDescripcio(document.getDescripcio());
 		portafirmesDocument.setFirmat(
 				false);
 
@@ -2835,7 +2836,7 @@ public class PluginHelper {
 					convertit.getArxiuContingut());
 			return resposta;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de conversió de documents";
+			String errorDescripcio = "Error al accedir al plugin de conversió de documents: " + ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_CONVERT,
 					accioDescripcio,
@@ -3430,7 +3431,7 @@ public class PluginHelper {
 			sri.setReturnValidationChecks(false);
 			sri.setValidateCertificateRevocation(false);
 			sri.setReturnCertificates(false);
-			sri.setReturnTimeStampInfo(false);
+			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
 			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();

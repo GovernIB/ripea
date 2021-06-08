@@ -169,12 +169,16 @@ $(document).ready(function() {
 			var campDomini = $('#metaExpedientDominiCodi');
 			campDomini.empty();
 			campDomini.append("<option value=\"\"></option>");
-			for (var i = 0; i < data.length; i++) {
-				campDomini.append('<option value="' + data[i].codi + '">' + data[i].nom + '</option>');
-			}
+			data.forEach(function(domini) {
+				if(domini.codi == '${expedientFiltreCommand.metaExpedientDominiCodi}') {
+					campDomini.append('<option value="' + domini.codi + '" selected>' + domini.nom + '</option>');
+					$('#metaExpedientDominiCodi').trigger('change');
+				} else {
+					campDomini.append('<option value="' + domini.codi + '">' + domini.nom + '</option>');
+				}
+			});
 		})
 		.fail(function(e) {
-			console.log(e);
 			alert("<spring:message code="error.jquery.ajax"/>");
 		});
 						
@@ -184,7 +188,7 @@ $(document).ready(function() {
 	$('#metaExpedientDominiCodi').on('change', function() {
 		var selDomini = $("#metaExpedientDominiValor");
 		var dominiCodi= $(this).val();
-		var multipleUrl = '<c:url value="/metaExpedient/'  + metaExpedientId + '/metaDada/domini/' + dominiCodi + '"/>';
+		var multipleUrl = '<c:url value="/metaExpedient/metaDada/domini/' + dominiCodi + '"/>';
 		selDomini.empty();
 		selDomini.append("<option value=\"\"></option>");
 		var select2Options = {
@@ -228,7 +232,6 @@ $(document).ready(function() {
 		selDomini.select2(select2Options);
 	});
 	
-
 	$('#organGestorId').on('change', function() {
 		var organGestorId = $(this).val();
 		findActiusPerLectura(organGestorId);

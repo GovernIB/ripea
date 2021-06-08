@@ -21,6 +21,7 @@ public class HistoricOrganGestorSerializer {
 	@XmlRootElement(name = "registres-organGestor")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootOrganGestors {
+		
 		@XmlAttribute
 		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -29,15 +30,46 @@ public class HistoricOrganGestorSerializer {
 		@XmlElement(name = "registre")
 		public List<RegistresOrganGestor> registres;
 		
-		public RootOrganGestors(List<RegistresOrganGestor> registres) {
-			super();
-			this.generationDate = new Date();
-			this.registres = registres;
-		}
 		public RootOrganGestors() {}
 	}
 	
+	@XmlRootElement(name = "registres-organGestor")
+	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
+	public static class RootOrganGestorsDiari extends RootOrganGestors {
+
+		@XmlElement(name = "registre")
+		public List<RegistresOrganGestorDiari> registres;
+		
+		public RootOrganGestorsDiari(List<RegistresOrganGestorDiari> registres) {
+			super();
+			super.generationDate = new Date();
+			this.registres = registres;
+		}
+		public RootOrganGestorsDiari() {}
+	}
+	
+	@XmlRootElement(name = "registres-organGestor")
+	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
+	public static class RootOrganGestorsMensual extends RootOrganGestors{
+		
+		@XmlElement(name = "registre")
+		public List<RegistresOrganGestorMensual> registres;
+		
+		public RootOrganGestorsMensual(List<RegistresOrganGestorMensual> registres) {
+			super();
+			super.generationDate = new Date();
+			this.registres = registres;
+		}
+		public RootOrganGestorsMensual() {}
+	}
+	
+	
 	public static class RegistresOrganGestor {
+
+		public RegistresOrganGestor() {}
+	}
+	
+	public static class RegistresOrganGestorDiari extends RegistresOrganGestor{
 		@XmlAttribute
 		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
@@ -46,12 +78,27 @@ public class HistoricOrganGestorSerializer {
 		@XmlElement(name = "organ_gestor")
 		public List<RegistreOrganGestor> organGestors;
 		
-		public RegistresOrganGestor(Date data, List<RegistreOrganGestor> organGestors) {
+		public RegistresOrganGestorDiari(Date data, List<RegistreOrganGestor> organGestors) {
 			super();
 			this.data = data;
 			this.organGestors = organGestors;
 		}
-		public RegistresOrganGestor() {}
+		public RegistresOrganGestorDiari() {}
+	}
+	
+	public static class RegistresOrganGestorMensual extends RegistresOrganGestor{
+
+		public String mes;
+
+		@XmlElement(name = "organ_gestor")
+		public List<RegistreOrganGestor> organGestors;
+		
+		public RegistresOrganGestorMensual(String mes, List<RegistreOrganGestor> organGestors) {
+			super();
+			this.mes = mes;
+			this.organGestors = organGestors;
+		}
+		public RegistresOrganGestorMensual() {}
 	}
 
 	public static class RegistreOrganGestor extends Registre {

@@ -36,9 +36,9 @@ import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.historic.HistoricApiResponse;
 import es.caib.ripea.war.historic.serializers.DAOHistoric;
-import es.caib.ripea.war.historic.serializers.HistoricEntitatSerializer.RegistreEntitat;
 import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RegistreOrganGestor;
 import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RegistresOrganGestor;
+import es.caib.ripea.war.historic.serializers.HistoricSerializers.RegistreExpedient;
 
 @Controller
 @RequestMapping("api/historic")
@@ -105,7 +105,7 @@ public class ApiHistoricController extends BaseAdminController {
 
 		List<HistoricExpedientDto> data = historicService.getDadesEntitat(entitatId, filtre.asDto());
 		
-		List<RegistreEntitat> response = ConversioTipusHelper.convertirList(data, RegistreEntitat.class);
+		List<RegistreExpedient> response = ConversioTipusHelper.convertirList(data, RegistreExpedient.class);
 		return new HistoricApiResponse(filtre.asDto(), response);
 	}
 
@@ -199,16 +199,16 @@ public class ApiHistoricController extends BaseAdminController {
 		// Perform query
 		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(
 				filtre.asDto());
-		List<RegistresOrganGestor> registres = DAOHistoric.mapRegistreOrganGestor(dades).registres;
+		List<RegistresOrganGestor> registres = DAOHistoric.mapRegistreOrganGestor(dades, tipusAgrupament).registres;
 		
-		// ordena els registres per data
-		Collections.sort(registres, new Comparator<RegistresOrganGestor>() {
-
-			@Override
-			public int compare(RegistresOrganGestor o1, RegistresOrganGestor o2) {
-				return o2.data.compareTo(o1.data);
-			}
-		});
+//		// ordena els registres per data
+//		Collections.sort(registres, new Comparator<RegistresOrganGestor>() {
+//
+//			@Override
+//			public int compare(RegistresOrganGestor o1, RegistresOrganGestor o2) {
+//				return o2.data.compareTo(o1.data);
+//			}
+//		});
 		
 		return new HistoricApiResponse(filtre.asDto(), registres);
 		 
@@ -317,7 +317,7 @@ public class ApiHistoricController extends BaseAdminController {
 			results.put(codiUsuari, historicService.getDadesUsuari(codiUsuari, filtre.asDto()));
 		}
 
-		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresUsuaris(results).registres);
+		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresUsuaris(results, tipusAgrupament).registres);
 	}
 
 	@RequestMapping(value = "/usuaris/actual", method = RequestMethod.GET, produces = "application/json")
@@ -435,7 +435,7 @@ public class ApiHistoricController extends BaseAdminController {
 			results.put(docNum, historics);
 		}
 
-		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresInteressats(results).registres);
+		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresInteressats(results, tipusAgrupament).registres);
 	}
 
 	@RequestMapping(value = "/interessats/actual", method = RequestMethod.GET, produces = "application/json")

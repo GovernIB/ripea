@@ -22,7 +22,7 @@
 				<th data-col-name="ambOrganGestor" data-visible="false"></th>
 				<th data-col-name="organGestorId" data-visible="false"></th>
 				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="metaexpedient.permis.columna.tipus"/></th>
-				<th data-col-name="principalNom"><spring:message code="metaexpedient.permis.columna.principal"/></th>
+				<th data-col-name="principalCodiNom"><spring:message code="metaexpedient.permis.columna.principal"/></th>
 				<c:if test="${empty metaExpedient.organGestor}"> 
 					<th data-col-name="organGestorNom"><spring:message code="metaexpedient.permis.columna.organ.gestor"/></th>
 				</c:if>

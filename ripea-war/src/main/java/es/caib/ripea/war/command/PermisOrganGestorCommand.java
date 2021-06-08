@@ -32,5 +32,11 @@ public class PermisOrganGestorCommand extends PermisCommand {
 		permisCommand.setOrganGestorId(dto.getOrganGestor().getId());
 		return permisCommand;
 	}
+	
+	public static PermisOrganGestorDto asDto(PermisOrganGestorCommand command) {
+		return ConversioTipusHelper.convertir(
+				command,
+				PermisOrganGestorDto.class);
+	}
 
 }

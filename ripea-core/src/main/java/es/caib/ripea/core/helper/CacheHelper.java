@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import es.caib.ripea.core.api.dto.ComunitatDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
@@ -229,21 +231,28 @@ public class CacheHelper {
 							crearValidacioError(
 									metaDocument,
 									metaDocument.getMultiplicitat(),
-									false));
+									ErrorsValidacioTipusEnumDto.MULTIPLICITAT));
 			}
-			boolean documentsWithoutMetaDocument = false;
 			for (DocumentEntity document : documents) {
 				if (document.getMetaNode() == null) {
-					documentsWithoutMetaDocument = true;
+					errors.add(
+							crearValidacioError(
+									null,
+									null,
+									ErrorsValidacioTipusEnumDto.METADOCUMENT));
 					break;
 				}
 			}
-			if (documentsWithoutMetaDocument) {
-				errors.add(
-						crearValidacioError(
-								null,
-								null,
-								true));
+			
+			for (DocumentEntity document : documents) {
+				if (hasNotificacionsNoFinalitzades(document)) {
+					errors.add(
+							crearValidacioError(
+									null,
+									null,
+									ErrorsValidacioTipusEnumDto.NOTIFICACIONS));
+					break;
+				}
 			}
 		}
 		if (!errors.isEmpty()) {
@@ -520,26 +529,34 @@ public class CacheHelper {
 	@Cacheable(value = "notificacionsPendentsPerExpedient", key="#expedient")
 	public boolean hasNotificacionsPendentsPerExpedient(
 			ExpedientEntity expedient) {
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
+				expedient,
+				0);
 		boolean hasNotificacionsPendents = false;
-		for (ContingutEntity contingut : expedient.getFills()) {
+		for (ContingutEntity contingut : documents) {
 			if (contingut instanceof DocumentEntity) {
-
-				List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentAndNotificacioEstatInAndErrorOrderByCreatedDateAsc(
-						(DocumentEntity) contingut,
-						new DocumentNotificacioEstatEnumDto[] {
-								DocumentNotificacioEstatEnumDto.PENDENT, 
-								DocumentNotificacioEstatEnumDto.ENVIADA, 
-								DocumentNotificacioEstatEnumDto.REGISTRADA
-						},
-						false);
-				//Si hi ha només una notificació pendent sortim del bucle
-				if (notificacionsPendents != null && notificacionsPendents.size() > 0) {
+				DocumentEntity document = (DocumentEntity) contingut;
+				if (hasNotificacionsNoFinalitzades(document)) {
 					hasNotificacionsPendents = true;
 					break;
 				}
 			}
 		}
 		return hasNotificacionsPendents;
+	}
+	
+	private boolean hasNotificacionsNoFinalitzades(DocumentEntity document) {
+		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
+				DocumentNotificacioEstatEnumDto.FINALITZADA, 
+				DocumentNotificacioEstatEnumDto.PROCESSADA));
+		List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
+		//Si la darrera notificació del document no està finalitzada
+		if (notificacionsPendents != null && 
+				notificacionsPendents.size() > 0 &&
+				!estatsFinals.contains(notificacionsPendents.get(0).getNotificacioEstat())) {
+			return true;
+		}
+		return false;
 	}
 	
 	@CacheEvict(value = "notificacionsPendentsPerExpedient", key="#expedient")
@@ -579,16 +596,14 @@ public class CacheHelper {
 	private ValidacioErrorDto crearValidacioError(
 			MetaDocumentEntity metaDocument,
 			MultiplicitatEnumDto multiplicitat,
-			boolean documentsWithoutMetaDocument) {
-		if (documentsWithoutMetaDocument) {
-			return new ValidacioErrorDto(documentsWithoutMetaDocument);
-		} else {
-			return new ValidacioErrorDto(
-					conversioTipusHelper.convertir(
-							metaDocument,
-							MetaDocumentDto.class),
-					MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
-		}
+			ErrorsValidacioTipusEnumDto tipus) {
+		return new ValidacioErrorDto(
+				multiplicitat != null ? conversioTipusHelper.convertir(
+						metaDocument,
+						MetaDocumentDto.class) : null,
+				multiplicitat != null ? MultiplicitatEnumDto.valueOf(multiplicitat.toString()) : null,
+				tipus);
+		
 	}
 	
 	private boolean isOracleVersionGtOrEq12c(JdbcTemplate jdbcTemplate) throws SQLException {

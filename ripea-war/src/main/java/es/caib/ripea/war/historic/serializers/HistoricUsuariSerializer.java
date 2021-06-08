@@ -27,46 +27,116 @@ public class HistoricUsuariSerializer {
 		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 		public Date generationDate;
-		
+
+		public RootUsuaris() {}
 //		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
 		@XmlElement(name = "usuari")
-		public List<RegistresUsuari> registres;
+		public List<RegistresUsuariDiari> registres;
+	}
+	
+	
+	@XmlRootElement(name = "registres-usuaris")
+	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
+	public static class RootUsuarisDiari extends RootUsuaris {
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+		public Date generationDate;
 		
-		public RootUsuaris(List<RegistresUsuari> registres) {
+
+		
+		public RootUsuarisDiari(List<RegistresUsuariDiari> registres) {
 			super();
 			this.generationDate = new Date();
 			this.registres = registres;
 		}
-		public RootUsuaris() {}
+		public RootUsuarisDiari() {}
 	}
 	
+	@XmlRootElement(name = "registres-usuaris")
+	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
+	public static class RootUsuarisMensual extends RootUsuaris{
+		@XmlAttribute
+		@XmlJavaTypeAdapter(DateAdapter.class)
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+		public Date generationDate;
+		
+//		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
+		@XmlElement(name = "usuari")
+		public List<RegistresUsuariMensual> registres;
+		
+		public RootUsuarisMensual(List<RegistresUsuariMensual> registres) {
+			super();
+			this.generationDate = new Date();
+			this.registres = registres;
+		}
+		public RootUsuarisMensual() {}
+	}
+	
+	
+	
 	public static class RegistresUsuari {
+	}
+	
+	public static class RegistresUsuariDiari extends RegistresUsuari{
 		@XmlAttribute(name="codi-usuari")
 		public String user;
 //		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
 		@XmlElement(name = "registre")
-		public List<RegistreUsuari> registres;
+		public List<RegistreUsuariDiari> registres;
 		
-		public RegistresUsuari(String user) {
+		public RegistresUsuariDiari(String user) {
 			super();
 			this.user = user;
 			this.registres = new ArrayList<>();
 		}
-		public RegistresUsuari() {}
+		public RegistresUsuariDiari() {}
 		
-		public void addRegistre(RegistreUsuari registre) {
+		public void addRegistre(RegistreUsuariDiari registre) {
+			this.registres.add(registre);
+		}
+	}
+	
+	public static class RegistresUsuariMensual extends RegistresUsuari {
+		@XmlAttribute(name="codi-usuari")
+		public String user;
+//		@JacksonXmlElementWrapper(localName = "registres", useWrapping = false)
+		@XmlElement(name = "registre")
+		public List<RegistreUsuariMensual> registres;
+		
+		public RegistresUsuariMensual(String user) {
+			super();
+			this.user = user;
+			this.registres = new ArrayList<>();
+		}
+		public RegistresUsuariMensual() {}
+		
+		public void addRegistre(RegistreUsuariMensual registre) {
 			this.registres.add(registre);
 		}
 	}
 	
 	@Setter
 	public static class RegistreUsuari extends Registre {
+	}
+	
+	@Setter
+	public static class RegistreUsuariDiari extends RegistreUsuari {
 		@XmlAttribute
 		@XmlJavaTypeAdapter(DateAdapter.class)
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
 		public Date data;
 		
 		public Long numTasquesTramitades;
-		public RegistreUsuari() {}
+		public RegistreUsuariDiari() {}
+	}
+	
+	@Setter
+	public static class RegistreUsuariMensual extends RegistreUsuari {
+
+		public String mes;
+		
+		public Long numTasquesTramitades;
+		public RegistreUsuariMensual() {}
 	}
 }

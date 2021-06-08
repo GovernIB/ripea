@@ -7,7 +7,11 @@ import java.math.BigDecimal;
 import java.nio.file.NoSuchFileException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -27,18 +31,26 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfAnnotation;
 import com.itextpdf.text.pdf.PdfBorderArray;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfDate;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPCellEvent;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -60,6 +72,7 @@ public class IndexHelper {
 
 	private Font frutiger7 = FontFactory.getFont("Frutiger", 6, Font.BOLD, new BaseColor(255, 255, 255)); // #7F7F7F
 	private Font frutiger6 = FontFactory.getFont("Frutiger", 6);
+	private Font frutiger5 = FontFactory.getFont("Frutiger", 5);
 	private Font frutiger11TitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font frutiger9TitolBold = FontFactory.getFont("Frutiger", 9, Font.BOLD);
 	private Font frutiger10Italic = FontFactory.getFont("Frutiger", 10, Font.ITALIC, new BaseColor(160, 160, 160));
@@ -74,6 +87,10 @@ public class IndexHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired
+	private PluginHelper pluginHelper;
+	@Autowired
+	private DocumentHelper documentHelper;
 	
 	public byte[] generarIndexPerExpedient(
 			ExpedientEntity expedient, 
@@ -177,21 +194,20 @@ public class IndexHelper {
 			PdfPTable taulaDocuments;
 			if (!isRelacio) {
 				if (isMostrarCampsAddicionals()) {
-
-					pointColumnWidths = new float[] {3f, 10f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
+					pointColumnWidths = new float[] {3f, 10f, 10f, 14f, 10f, 12f, 10f, 19f, 10f, 11f};
 					taulaDocuments = new PdfPTable(10);
 				} else {
-					pointColumnWidths = new float[] {3f, 10f, 18f, 10f, 12f, 10f, 19f, 10f, 7f};
+					pointColumnWidths = new float[] {3f, 10f, 14f, 10f, 12f, 10f, 19f, 10f, 11f};
 					taulaDocuments = new PdfPTable(9);
 
 				}
 				
 			} else {
 				if (isMostrarCampsAddicionals()) {
-					pointColumnWidths = new float[] {12f, 12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
+					pointColumnWidths = new float[] {12f, 12f, 17f, 13f, 13f, 11f, 19f, 11f, 11f};
 					taulaDocuments = new PdfPTable(9);
 				} else {
-					pointColumnWidths = new float[] {12f, 21f, 13f, 13f, 11f, 19f, 11f, 7f};
+					pointColumnWidths = new float[] {12f, 17f, 13f, 13f, 11f, 19f, 11f, 11f};
 					taulaDocuments = new PdfPTable(8);
 
 				}
@@ -295,35 +311,35 @@ public class IndexHelper {
 //		Nº
 		String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
 		if (!isRelacio)
-			taulaDocuments.addCell(crearCellaContingut(nextVal, false));
+			taulaDocuments.addCell(crearCellaContingut(nextVal, null, false));
 		
 //		Nom document
 		String nom = document.getNom() != null ? document.getNom() : "";
-		taulaDocuments.addCell(crearCellaContingut(nom, false));
+		taulaDocuments.addCell(crearCellaContingut(nom, null, false));
 		
 		if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
 //			Nom natural
 			String tituloDoc = arxiuDetall.getMetadadesAddicionals().get("tituloDoc") != null ? arxiuDetall.getMetadadesAddicionals().get("tituloDoc").toString() : "";
-			taulaDocuments.addCell(crearCellaContingut(tituloDoc, false));
+			taulaDocuments.addCell(crearCellaContingut(tituloDoc, null, false));
 		}
 
 //		Descripció
 		String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
-		taulaDocuments.addCell(crearCellaContingut(descripcio, false));
+		taulaDocuments.addCell(crearCellaContingut(descripcio, null, false));
 
 		
 //		Tipus documental
 		String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
-		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, false));
+		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null, false));
 		
 //		Tipus document
 		String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
-		taulaDocuments.addCell(crearCellaContingut(tipusDocument, false));
+		taulaDocuments.addCell(crearCellaContingut(tipusDocument, null, false));
 
 //		Data creació
 		SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
 		String dataCreacio = document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "";
-		taulaDocuments.addCell(crearCellaContingut(dataCreacio, false));
+		taulaDocuments.addCell(crearCellaContingut(dataCreacio, null, false));
 		
 //		Enllaç csv
 		String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
@@ -331,23 +347,106 @@ public class IndexHelper {
 			String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
 			csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
 		}
-		taulaDocuments.addCell(crearCellaContingut(csv, true));
+		taulaDocuments.addCell(crearCellaContingut(csv, null, true));
 		
 //		Data captura
 		String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
-		taulaDocuments.addCell(crearCellaContingut(dataCaptura, false));	
+		taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, false));	
 		
 //		Custodiat / Notificat
+		List<String> subTitols = new ArrayList<String>();
+		DocumentNotificacioEstatEnumCustom estatNotificacio = null;
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
 		boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
-		
+
 		if (hasNotificacions) {
-			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.notificat"), false));
-		} else if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), false));
-		} else {
-			taulaDocuments.addCell(crearCellaContingut("-", false));
+//			Estat darrera notificació
+			DocumentNotificacioEstatEnumDto estatLastNotificacio = notificacions.get(0).getNotificacioEstat();
+			switch (estatLastNotificacio) {
+				case PENDENT:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.PENDENT;
+					break;
+				case REGISTRADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
+				case ENVIADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
+					break;
+				case FINALITZADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+					break;
+				case PROCESSADA:
+					estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+					break;
+			}
+			
+			if (!document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT))
+				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio), null, false));
 		}
+		
+		if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+			Map<Integer, Date> datesFirmes = null;
+			try {
+				if (pluginHelper.isArxiuPluginActiu()) {
+					es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+							document,
+							null,
+							null,
+							true,
+							false);
+					byte[] contingut = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
+					datesFirmes = getDataFirmaFromDocument(contingut);
+				}
+			} catch (Exception ex) {
+				logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
+			}
+			if (datesFirmes != null && !datesFirmes.isEmpty()) {
+				SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+//				múltiples firmes
+//				for (Entry<Integer, Date> entry : datesFirmes.entrySet()) {
+//					String dataFirma = null;
+//					if (datesFirmes.size() > 1)
+//						dataFirma = "Firma " + entry.getKey() + ": " + sdtTime.format(entry.getValue());
+//					else
+//						dataFirma = sdtTime.format(entry.getValue());
+//					datesFirmesStr.add(dataFirma);
+//				}
+//				la darrera firma
+				String dataFirma = sdtTime.format(datesFirmes.get(datesFirmes.size()));
+				subTitols.add(dataFirma);
+			} 
+			
+			if (hasNotificacions) {
+				String missatgeEstatNotificacio = messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio);
+				subTitols.add(missatgeEstatNotificacio);
+			}
+			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), subTitols, false));
+		} 
+		
+		
+		if (!hasNotificacions && !document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)){
+			taulaDocuments.addCell(crearCellaContingut("-", null, false));
+		}
+	}
+	
+	private Map<Integer, Date> getDataFirmaFromDocument(byte[] content) throws IOException {
+		Map<Integer, Date> datesFirmes = new HashMap<Integer, Date>();
+		PdfReader reader = new PdfReader(content);
+		AcroFields fields = reader.getAcroFields();
+		List<String> signatureNames = fields.getSignatureNames();
+		Integer idx = 1;
+		if (signatureNames != null) {
+			for (String name: signatureNames) {
+//				### comprovar si és una firma o un segell
+				PdfDictionary dictionary = fields.getSignatureDictionary(name);
+				if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/Sig")) {
+					String dataFirmaStr = dictionary.get(PdfName.M) != null ? dictionary.get(PdfName.M).toString() : null;
+					Date dataFirma = dataFirmaStr != null ? PdfDate.decode(dataFirmaStr).getTime() : null;
+					datesFirmes.put(idx, dataFirma);
+					idx++;
+				}
+			}
+		}
+		return datesFirmes;
 	}
 	
 	private Document inicialitzaDocument(
@@ -443,27 +542,27 @@ public class IndexHelper {
 	
 	private PdfPCell crearCellaCapsalera(String titol) {
 		PdfPCell titolCell = new PdfPCell();
-		String titolEnviamentMessage = titol;
-		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, frutiger7);
+		Paragraph titolParagraph = new Paragraph(titol, frutiger7);
 		titolParagraph.setAlignment(Element.ALIGN_CENTER);
 		titolCell.addElement(titolParagraph);
 		titolCell.setPaddingBottom(6f);
 		titolCell.setBackgroundColor(new BaseColor(166, 166, 166));
 		titolCell.setBorderWidth((float) 0.5);
-		//titolCell.setBorderColor(new BaseColor(166, 166, 166));
 		return titolCell;
 	}
 	
-	private PdfPCell crearCellaContingut(String titol, boolean isLink) {
+	private PdfPCell crearCellaContingut(String titol, List<String> subTitols, boolean isLink) {
 		PdfPCell titolCell = new PdfPCell();
-		String titolEnviamentMessage = titol;
-		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, frutiger6);
-//		Phrase phrase = new Phrase(titolEnviamentMessage, frutiger6);
-//		Anchor anchor = new Anchor(titolEnviamentMessage, frutiger6);
-//		if (link != null)
-//	        anchor.setReference(link);
+		Paragraph titolParagraph = new Paragraph(titol, frutiger6);
 		titolParagraph.setAlignment(Element.ALIGN_CENTER);
 		titolCell.addElement(titolParagraph);
+		if (subTitols != null && !subTitols.isEmpty()) {
+			for (String subTitol : subTitols) {
+				Paragraph subTitolParagraph = new Paragraph(subTitol, frutiger6);
+				subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
+				titolCell.addElement(subTitolParagraph);
+			}
+		}
 		titolCell.setPaddingBottom(6f);
 		titolCell.setBorderWidth((float) 0.5);
 		if (titol != null && !titol.isEmpty() && isLink) {
@@ -511,6 +610,8 @@ public class IndexHelper {
 	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
 		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
 	}
+	
+	private enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};
 	
 	private static final Logger logger = LoggerFactory.getLogger(IndexHelper.class);
 

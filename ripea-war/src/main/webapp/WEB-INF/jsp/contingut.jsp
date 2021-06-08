@@ -29,7 +29,7 @@
 	<rip:modalHead/>
 	<title>
 		<c:choose>
-			<c:when test="${isTasca}">&nbsp;${tascaNom}</c:when>
+			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
@@ -40,6 +40,8 @@
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
 		
+    <script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -52,12 +54,11 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
-	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
-	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/pdf-js/2.5.207/build/pdf.js"/>"></script>
 	<c:if test="${isContingutDetail}">
 		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
@@ -408,6 +409,23 @@ body.loading .rmodal {
 .select2-container .selection {
 	width: 100% !important;
 }
+
+
+.viewer-content {
+	width: 100%;
+	padding-top: 1% !important;
+}
+.viewer-padding {
+	padding: 0% 2% 0% 2%;
+}
+
+.rmodal_loading {
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="../img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -498,6 +516,7 @@ $(document).ready(function() {
 		$('.esborranys > p').html(newValidacioTxt);
 	} 
 	$("#tascaBtn").appendTo(".panel-heading h2");
+	<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 
 	
 	$("#mostraDetallSignants").click(function(){
@@ -796,16 +815,19 @@ $(document).ready(function() {
 	});
 
 	var tableDocuments = document.getElementById('table-documents');
-	var checkItAll = document.getElementById('checkItAll');
 	
-	$('.checkItAll').addClass('disabled');
-	
+	<c:if test="${vistaIcones}">
+		var checkItAll = document.getElementById('checkItAll');
+		$('.checkItAll').addClass('disabled');
+	</c:if>
 	$('#habilitar-mult').on('click', function() {
 		var contenidorContingut = document.getElementById('contenidor-contingut');
 		var inputs = contenidorContingut.querySelectorAll('li>div');
 		
 		if ($(contenidorContingut).hasClass('multiple')) {
-			$('.checkItAll').addClass('disabled');
+			<c:if test="${vistaIcones}">
+				$('.checkItAll').addClass('disabled');
+			</c:if>
 			$(contenidorContingut).removeClass('multiple');
 			$(this).removeClass('active');
 			//Inicialitzar contador i array
@@ -824,7 +846,9 @@ $(document).ready(function() {
 				}
 			}); 
 		} else {
-			$('.checkItAll').removeClass('disabled');
+			<c:if test="${vistaIcones}">
+				$('.checkItAll').removeClass('disabled');
+			</c:if>
 			$(contenidorContingut).addClass('multiple');
 			$(this).addClass('active');
 		}
@@ -834,40 +858,41 @@ $(document).ready(function() {
 	if (tableDocuments != null) {
 		//Vista llista
 		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-		
-		checkItAll.addEventListener('change', function() {
-			if (checkItAll.checked) {
-				inputs.forEach(function(input) {
-					var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
-					$.ajax({
-				        type: "GET",
-				        url: comprovacioUrl,
-				        success: function (isDocument) {
-				        	if (isDocument) {
-				        		input.checked = true;
-								var index = docsIdx.indexOf(parseInt(input.id));
-								if (index < 0) {
-									docsIdx.push(parseInt(input.id));
-								}
-				        	}
-
-							enableDisableButton();
-							selectAll();
-				        }
-					});
-			    });  
-			} else {
-				inputs.forEach(function(input) {
-					input.checked = false;
-					var index = docsIdx.indexOf(parseInt(input.id));
-					if (index > -1) {
-						docsIdx.splice(index, 1);
-					}
-			    });  
-				enableDisableButton();
-				deselectAll();
-			}
-		});
+		<c:if test="${vistaIcones}">
+			checkItAll.addEventListener('change', function() {
+				if (checkItAll.checked) {
+					inputs.forEach(function(input) {
+						var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+						$.ajax({
+					        type: "GET",
+					        url: comprovacioUrl,
+					        success: function (isDocument) {
+					        	if (isDocument) {
+					        		input.checked = true;
+									var index = docsIdx.indexOf(parseInt(input.id));
+									if (index < 0) {
+										docsIdx.push(parseInt(input.id));
+									}
+					        	}
+	
+								enableDisableButton();
+								selectAll();
+					        }
+						});
+				    });  
+				} else {
+					inputs.forEach(function(input) {
+						input.checked = false;
+						var index = docsIdx.indexOf(parseInt(input.id));
+						if (index > -1) {
+							docsIdx.splice(index, 1);
+						}
+				    });  
+					enableDisableButton();
+					deselectAll();
+				}
+			});
+		</c:if>
 	} else {
 		//Vista icones
 		$(checkItAll).on('click', function(){
@@ -1229,8 +1254,8 @@ function recuperarResultatDomini(
 		metaExpedientId,
 		metaDadaCodi,
 		dadaValor) {
-	var dadaValorUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '/valor"/>';
-	var multipleUrl = '<c:url value="/metaExpedient/' + metaExpedientId + '/metaDada/domini/' + metaDadaCodi + '"/>';
+	var dadaValorUrl = '<c:url value="/metaExpedient/metaDada/domini/' + metaDadaCodi + '/valor"/>';
+	var multipleUrl = '<c:url value="/metaExpedient/metaDada/domini/' + metaDadaCodi + '"/>';
 	var selDomini = $("#" + metaDadaCodi);
 	
 
@@ -1378,6 +1403,86 @@ function showLoadingModal(message) {
 	      show: true //Display loader!
 	    });
 }
+
+
+
+
+// ------------------ VISOR ------------------------------
+function showViewer(event, documentId, contingutNom) {
+	if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 6 || event.target.cellIndex === 7)) return;
+    var resumViewer = $('#resum-viewer');
+	// Mostrar/amagar visor
+	if (!resumViewer.is(':visible')) {
+		resumViewer.slideDown(500);
+	} else if (previousDocumentId == undefined || previousDocumentId == documentId) {
+		closeViewer();
+		previousDocumentId = documentId;
+		return;
+	}
+	previousDocumentId = documentId;
+	
+    // Mostrar contingut capçalera visor
+    resumViewer.find('*').not('#container').remove();
+    var viewerContent = '<div class="panel-heading"><spring:message code="contingut.previsualitzacio"/> \
+    					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
+    					 </div>\
+    					 <div class="viewer-content viewer-padding">\
+    						<dl class="dl-horizontal">\
+	        					<dt style="text-align: left;"><spring:message code="contingut.info.nom"/>: </dt><dd>' + contingutNom + '</dd>\
+        					</dl>\
+    					 </div>';
+    resumViewer.prepend(viewerContent);
+    
+
+    // Recuperar i mostrar document al visor
+	var urlDescarrega = "<c:url value="/contingut/${contingut.id}/document/"/>" + documentId + "/returnFitxer";
+	$('#container').attr('src', '');
+	$('#container').addClass('rmodal_loading');
+	showDocument(urlDescarrega);
+}
+
+function showDocument(arxiuUrl) {
+	// Fa la petició a la url de l'arxiu
+	$.ajax({
+		type: 'GET',
+		url: arxiuUrl,
+		responseType: 'arraybuffer',
+		success: function(json) {
+			
+			if (json.error) {
+				$('#container').removeClass('rmodal_loading');
+				$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
+			} else if (json.warning) {
+				$('#container').removeClass('rmodal_loading');
+				$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
+			} else {
+				response = json.data;
+				var blob = base64toBlob(response.contingut, response.contentType);
+	            var file = new File([blob], response.contentType, {type: response.contentType});
+	            link = URL.createObjectURL(file);
+	            
+	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+			    $('#container').removeClass('rmodal_loading');
+			    $('#container').attr('src', viewerUrl);
+			}
+		    
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			$('#container').removeClass('rmodal_loading');
+			alert(thrownError);
+		}
+	});
+}
+
+// Amagar visor
+function closeViewer() {
+	$('#resum-viewer').slideUp(500, function(){
+	});
+}
+
+
+
+
 </script>
 
 </head>
@@ -1854,9 +1959,16 @@ function showLoadingModal(message) {
 							</div>
 							<%---- TABLE/GRID OF CONTINGUTS ----%>
 							<div id="loading">
-								<img src="../img/loading.gif"/>
+								<img src="<c:url value="/img/loading.gif"/>"/>
 							</div>
 							<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							
+							
+							<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >
+								<iframe id="container" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
+							</div>  
+										
+							
 							<c:if test="${isTasca or (expedientAgafatPerUsuariActual and ((contingut.carpeta and contingut.expedientPare.estat != 'TANCAT') or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
 								<div id="drag_container" class="drag_activated">
 									<span class="down fa fa-upload"></span>

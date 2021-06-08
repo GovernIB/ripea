@@ -62,7 +62,16 @@
 			<form:hidden path="organGestorId"/>
 	 	</c:if>					 
 		<rip:inputSelect name="principalTipus" textKey="organgestor.permis.form.camp.tipus" disabled="${not empty permisOrganGestorCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
-		<rip:inputText name="principalNom" textKey="organgestor.permis.form.camp.principal" disabled="${not empty permisOrganGestorCommand.id}" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
+		
+		<c:choose>
+			<c:when test="${empty permisOrganGestorCommand.id}">
+				<rip:inputText name="principalNom" textKey="organgestor.permis.form.camp.principal" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
+			</c:when>
+			<c:otherwise>
+				<rip:inputText name="principalCodiNom" textKey="organgestor.permis.form.camp.principal" disabled="true" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
+				<form:hidden path="principalNom"/>
+			</c:otherwise>
+		</c:choose>
 		
 		<rip:inputCheckbox name="selectAll" textKey="organgestor.permis.form.camp.all"/>
 		<div class="permisosInput">

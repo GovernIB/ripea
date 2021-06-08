@@ -13,6 +13,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
@@ -210,9 +213,6 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 	
 	
 	
-	
-
-	
 	@RequestMapping(value = "/custodiar", method = RequestMethod.GET)
 	public String portafirmesReintentar(
 			HttpServletRequest request) {
@@ -231,13 +231,37 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 					"accio.massiva.seleccio.buida");
 		}
 		
+		int errors = 0;
+		int correctes = 0;
+		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
-		Exception exception = documentService.portafirmesReintentar(
-				entitatActual.getId(),
-				seleccio, 
-				rolActual);
+		for (Long id : seleccio) {
+			Exception exception = null;
+			try {
+				exception = documentService.portafirmesReintentar(
+						entitatActual.getId(),
+						id, 
+						rolActual);
+			} catch (Exception ex) {
+				exception = ex;
+			}
+			if (exception != null ) {
+				logger.error("Error al custodiar document de portafirmes", exception);
+				errors++;
+			} else {
+				correctes++;
+			}
+		
+		}
+		
+		if (correctes > 0){
+			MissatgesHelper.success(request, getMessage(request, "expedient.controller.custodiar.massiu.correctes", new Object[]{correctes}));
+		} 
+		if (errors > 0) {
+			MissatgesHelper.error(request, getMessage(request, "expedient.controller.custodiar.massiu.errors", new Object[]{errors}));
+		} 
 		
 		seleccio.clear();
 		RequestSessionHelper.actualitzarObjecteSessio(
@@ -245,19 +269,7 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 				getSessionAttributeSelecio(request),
 				seleccio);
 		
-		if (exception == null) {
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:/massiu/custodiar",
-					"expedient.controller.custodiar.massiu.ok");
-		} else {
-			return getModalControllerReturnValueError(
-					request,
-					"redirect:/massiu/custodiar",
-					"expedient.controller.custodiar.massiu.error",
-					new Object[] {exception.getMessage()});
-		}
-
+		return "redirect:../custodiar";
 	}
 	
 	
@@ -305,4 +317,6 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 		return filtreCommand;
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(DocumentMassiuCustodiarController.class);
+	
 }

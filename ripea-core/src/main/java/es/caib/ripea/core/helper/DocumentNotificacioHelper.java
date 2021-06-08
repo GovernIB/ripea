@@ -135,6 +135,7 @@ public class DocumentNotificacioHelper {
 					
 					notificacionsWithError.put(interessat.getDocumentNum(), respostaEnviar.getErrorDescripcio());
 				} else {
+					cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
 					cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 					notificacioEntity.updateEnviat(
 							null,
@@ -160,7 +161,8 @@ public class DocumentNotificacioHelper {
 			for (InteressatDto interessatDto : dto.getInteressats()) {
 				destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
 			}
-			
+			cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
+			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 			logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
 		}
 	}
@@ -318,6 +320,7 @@ public class DocumentNotificacioHelper {
 				&& (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
 			emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 		}
+		cacheHelper.evictErrorsValidacioPerNode(documentEnviamentInteressatEntity.getNotificacio().getExpedient());
 		cacheHelper.evictNotificacionsPendentsPerExpedient(documentEnviamentInteressatEntity.getNotificacio().getExpedient());
 	}
 		

@@ -68,6 +68,7 @@ import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
@@ -696,8 +697,19 @@ public class ExpedientHelper {
 		return expedient;
 	}
 	
-	
-	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public List<Long> getMetaExpedientIdDomini(String dominiCodi) {
+		List<Long> metaExpedientIdDomini = new ArrayList<Long>();
+		List<MetaDadaEntity> metaDades = metaDadaRepository.findByCodi(dominiCodi);
+		for (MetaDadaEntity metaDadaEntity : metaDades) {
+			MetaNodeEntity metaNodeEntityDeproxied = HibernateHelper.deproxy(metaDadaEntity.getMetaNode());
+			if (metaNodeEntityDeproxied instanceof MetaExpedientEntity) {
+				MetaExpedientEntity metaExpedient = (MetaExpedientEntity)metaNodeEntityDeproxied;
+				metaExpedientIdDomini.add(metaExpedient.getId());
+			}
+		}
+		return metaExpedientIdDomini;
+	}
 	
 	private MustacheFactory mustacheFactory = new DefaultMustacheFactory();
 
