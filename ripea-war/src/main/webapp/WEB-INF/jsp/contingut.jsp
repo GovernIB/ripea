@@ -588,7 +588,7 @@ $(document).ready(function() {
 	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').css('cursor','pointer');
 	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').click(function(event) {
 		event.stopPropagation();
-		window.location.href = $('a:first', $(this).parent()).attr('href');
+		$('a:first', $(this).parent())[0].click();
 	});
 	$('ul.interessats li').hover(function() {
 		$('a', this).removeClass('hidden');contingut
