@@ -180,7 +180,8 @@ public class DocumentServiceImpl implements DocumentService {
 				document,
 				pare,
 				expedient,
-				metaDocument);
+				metaDocument,
+				true);
 	}
 
 	@Transactional
