@@ -634,13 +634,10 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
 				documentId,
-				false,
 				true,
-				false,
-				false,
 				false);
 
 		return firmaPortafirmesHelper.recuperarBlocksFirmaEnviament(

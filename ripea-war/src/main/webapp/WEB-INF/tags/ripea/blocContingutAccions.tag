@@ -285,7 +285,8 @@
 					</c:if>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				
+			</c:if>
+			<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
 				<%---- Seguiment portafirmes ----%>
 				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMAT') && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>
@@ -299,7 +300,6 @@
 					
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-
 				<%---- Seguiment via firma ----%>
 				<c:if test="${contingut.estat == 'FIRMA_PENDENT_VIAFIRMA' && contingut.documentTipus == 'DIGITAL'}">
 					<li><a href="<c:url value="/document/${contingut.id}/viafirma/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.viafirma.info"/></a></li>
