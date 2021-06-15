@@ -758,17 +758,6 @@ public class DocumentServiceImpl implements DocumentService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		ExpedientEntity expedient = null;
-		if (filtre.getExpedientId() != null) {
-			expedient = entityComprovarHelper.comprovarExpedient(
-					entitat.getId(),
-					filtre.getExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false, false);
-		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
@@ -795,8 +784,8 @@ public class DocumentServiceImpl implements DocumentService {
 					auth.getName(),
 					metaExpedient == null,
 					metaExpedient,
-					expedient == null,
-					expedient,
+					filtre.getExpedientNom() == null,
+					filtre.getExpedientNom(),
 					metaDocument == null,
 					metaDocument,
 					filtre.getNom() == null,

@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,8 +31,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -57,6 +60,8 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private ExpedientService expedientService;
 	@Autowired
@@ -271,6 +276,21 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 		
 		return "redirect:../custodiar";
 	}
+	
+	
+	@RequestMapping(value = "/metaDocuments/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaDocumentDto> findMetaDocuments(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
+		metaDocuments = metaDocumentService.findByMetaExpedient(entitatActual.getId(), metaExpedientId);
+		
+		return metaDocuments;
+	}	
 	
 	
 	private String getSessionAttributeSelecio(HttpServletRequest request) {

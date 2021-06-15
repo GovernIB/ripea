@@ -22,6 +22,7 @@ public class ContingutMassiuFiltreCommand {
 	private ContingutTipusEnumDto tipusElement;
 	private Long metaExpedientId;
 	private Long expedientId;
+	private String expedientNom;
 	private Long metaDocumentId;
 	private String metaDada;
 	private String nom;
@@ -121,5 +122,11 @@ public class ContingutMassiuFiltreCommand {
 	}
 	public void setBloquejarMetaDocument(boolean bloquejarMetaDocument) {
 		this.bloquejarMetaDocument = bloquejarMetaDocument;
+	}
+	public void setExpedientNom(String expedientNom) {
+		this.expedientNom = expedientNom != null ? expedientNom.trim() : null;
+	}
+	public String getExpedientNom() {
+		return expedientNom;
 	}
 }
