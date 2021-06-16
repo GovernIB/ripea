@@ -47,8 +47,10 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaPerfil;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
+import es.caib.ripea.core.api.dto.ArxiuAccioEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
@@ -987,7 +989,7 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental),
+								serieDocumental, null),
 						contingutPare.getArxiuUuid());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Document documentDetalls = getArxiuPlugin().documentDetalls(
@@ -1021,7 +1023,7 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental));
+								serieDocumental, null));
 				document.updateArxiu(null);
 			}
 			integracioHelper.addAccioOk(
@@ -1420,7 +1422,7 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental),
+								serieDocumental, null),
 						document.getExpedientPare().getArxiuUuid());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Document documentDetalls = getArxiuPlugin().documentDetalls(
@@ -1459,7 +1461,7 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental));
+								serieDocumental, null));
 				integracioHelper.addAccioOk(
 						IntegracioHelper.INTCODI_ARXIU,
 						accioDescripcio,
@@ -1587,7 +1589,8 @@ public class PluginHelper {
 					document.getNtiTipoDocumental(),
 					DocumentEstat.DEFINITIU,
 					DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-					serieDocumental);
+					serieDocumental, 
+					ArxiuAccioEnumDto.MODIFICACIO);
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(documentArxiu);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
@@ -4220,7 +4223,8 @@ public class PluginHelper {
 			String ntiTipusDocumental,
 			DocumentEstat estat,
 			boolean enPaper,
-			String serieDocumental) {
+			String serieDocumental, 
+			ArxiuAccioEnumDto arxiuAccio) {
 		Document document = new Document();
 		String fitxerExtensio = null;
 		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
@@ -4276,12 +4280,17 @@ public class PluginHelper {
 					firma.setCsvRegulacio(firmaDto.getCsvRegulacio());
 					document.getFirmes().add(firma);
 				}
-				contingut = new DocumentContingut();
-				contingut.setArxiuNom(fitxer.getNom());
-				contingut.setContingut(fitxer.getContingut());
-				contingut.setTipusMime(fitxer.getContentType());
-				document.setContingut(contingut);
 				
+				if (arxiuAccio != null && arxiuAccio == ArxiuAccioEnumDto.MODIFICACIO && getArxiuPlugin() instanceof ArxiuPluginCaib) {
+					contingut = null;
+				} else {
+					contingut = new DocumentContingut();
+					contingut.setArxiuNom(fitxer.getNom());
+					contingut.setContingut(fitxer.getContingut());
+					contingut.setTipusMime(fitxer.getContentType());
+				}
+				
+				document.setContingut(contingut);
 			}
 			if (getPropertyArxiuMetadadesAddicionalsActiu()) {
 				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
