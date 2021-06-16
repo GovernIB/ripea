@@ -61,6 +61,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
 /**
@@ -126,6 +127,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 		model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
+		model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
 		
 		boolean isEntitatUserAdminOrOrgan;
 		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {

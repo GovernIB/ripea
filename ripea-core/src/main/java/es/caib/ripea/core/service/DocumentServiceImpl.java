@@ -180,7 +180,8 @@ public class DocumentServiceImpl implements DocumentService {
 				document,
 				pare,
 				expedient,
-				metaDocument);
+				metaDocument,
+				true);
 	}
 
 	@Transactional
@@ -633,13 +634,10 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 				entitatId,
 				documentId,
-				false,
 				true,
-				false,
-				false,
 				false);
 
 		return firmaPortafirmesHelper.recuperarBlocksFirmaEnviament(
@@ -760,17 +758,6 @@ public class DocumentServiceImpl implements DocumentService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		ExpedientEntity expedient = null;
-		if (filtre.getExpedientId() != null) {
-			expedient = entityComprovarHelper.comprovarExpedient(
-					entitat.getId(),
-					filtre.getExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false, false);
-		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
@@ -797,8 +784,8 @@ public class DocumentServiceImpl implements DocumentService {
 					auth.getName(),
 					metaExpedient == null,
 					metaExpedient,
-					expedient == null,
-					expedient,
+					filtre.getExpedientNom() == null,
+					filtre.getExpedientNom(),
 					metaDocument == null,
 					metaDocument,
 					filtre.getNom() == null,
