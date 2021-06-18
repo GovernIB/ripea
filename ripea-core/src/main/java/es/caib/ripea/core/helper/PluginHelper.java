@@ -4999,7 +4999,7 @@ public class PluginHelper {
 			perfilFirma = ArxiuFirmaPerfilEnumDto.A;
 			break;
 		case "PAdES-Basic":
-			perfilFirma = ArxiuFirmaPerfilEnumDto.BASIC;
+			perfilFirma = ArxiuFirmaPerfilEnumDto.Basic;
 			break;
 		}
 		return perfilFirma;

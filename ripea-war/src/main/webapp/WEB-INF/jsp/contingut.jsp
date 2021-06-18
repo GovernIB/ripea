@@ -858,7 +858,6 @@ $(document).ready(function() {
 	if (tableDocuments != null) {
 		//Vista llista
 		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-		<c:if test="${vistaIcones}">
 			checkItAll.addEventListener('change', function() {
 				if (checkItAll.checked) {
 					inputs.forEach(function(input) {
@@ -892,7 +891,6 @@ $(document).ready(function() {
 					deselectAll();
 				}
 			});
-		</c:if>
 	} else {
 		//Vista icones
 		$(checkItAll).on('click', function(){
