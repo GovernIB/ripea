@@ -109,6 +109,8 @@ public class PortafirmesEnviarCommand {
 		return motiu;
 	}
 	public void setMotiu(String motiu) {
+		if (motiu != null && motiu.length() > 255)
+			motiu = motiu.substring(0, 251).trim() + "...]";
 		this.motiu = motiu != null ? motiu.trim() : null;
 	}
 	public PortafirmesPrioritatEnumDto getPrioritat() {

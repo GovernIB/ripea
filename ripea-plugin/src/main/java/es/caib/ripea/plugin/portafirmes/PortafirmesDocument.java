@@ -38,6 +38,8 @@ public class PortafirmesDocument {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
+		if (descripcio != null && descripcio.length() > 255)
+			descripcio = descripcio.substring(0, 252).trim() + "...";
 		this.descripcio = descripcio;
 	}
 	public boolean isFirmat() {
