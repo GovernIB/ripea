@@ -429,7 +429,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				false);
 		// Comprova el tipus del contingut que es vol moure
-		if (!(contingutOrigen instanceof DocumentEntity)) {
+		if ((contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),

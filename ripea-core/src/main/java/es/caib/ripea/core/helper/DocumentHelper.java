@@ -74,7 +74,9 @@ public class DocumentHelper {
 			DocumentDto document,
 			ContingutEntity pare,
 			ExpedientEntity expedient,
-			MetaDocumentEntity metaDocument) {
+			MetaDocumentEntity metaDocument,
+			boolean returnDetail) {
+		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
 		}
@@ -183,8 +185,10 @@ public class DocumentHelper {
 			if (rootCause == null) rootCause = ex;
 
 		}
-		
-		DocumentDto dto = toDocumentDto(entity);
+		if (returnDetail)		
+			dto = toDocumentDto(entity);
+		else
+			dto.setId(entity.getId());
 		return dto;
 	}
 	
@@ -325,12 +329,13 @@ public class DocumentHelper {
 					true,
 					false);
 			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			if (documentEntity.isFirmat()) {
-				firmes = validaFirmaDocument(
-						documentEntity, 
-						fitxer,
-						null);
-			}
+//			##no validar firma en actualitzar tipus document
+//			if (documentEntity.isFirmat()) {
+//				firmes = validaFirmaDocument(
+//						documentEntity, 
+//						fitxer,
+//						null);
+//			}
 		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
@@ -343,7 +348,7 @@ public class DocumentHelper {
 		contingutHelper.arxiuPropagarModificacio(
 				documentEntity,
 				fitxer,
-				documentEntity.isFirmat(),
+				false, //##no validar firma en actualitzar tipus document
 				false,
 				firmes);
 		return true;

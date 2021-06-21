@@ -44,9 +44,7 @@ public class RipeaController {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if (entitat == null)
 				throw new SecurityException("No te cap entitat assignada");
-			if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
-				return "redirect:metaExpedient";
-			} else if (RolHelper.isRolActualUsuari(request)) {
+			if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request) || RolHelper.isRolActualUsuari(request)) {
 				return "redirect:expedient";
 			} else if (RolHelper.isRolActualRevisor(request)) {
 				return "redirect:metaExpedientRevisio";

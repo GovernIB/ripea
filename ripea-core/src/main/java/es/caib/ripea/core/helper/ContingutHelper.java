@@ -1216,7 +1216,7 @@ public class ContingutHelper {
 					(DocumentEntity)contingut,
 					desti.getArxiuUuid(),
 					expedientDestiUuid);
-		} else if (contingut instanceof CarpetaEntity) {
+		} else if (contingut instanceof CarpetaEntity && !isCarpetaLogica()) {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingut,
 					desti.getArxiuUuid());

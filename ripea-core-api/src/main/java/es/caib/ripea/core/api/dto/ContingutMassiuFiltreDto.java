@@ -19,6 +19,7 @@ public class ContingutMassiuFiltreDto implements Serializable {
 	private ContingutTipusEnumDto tipusElement;
 	private Long metaExpedientId;
 	private Long expedientId;
+	private String expedientNom;
 	private Long metaDocumentId;
 	private String	metaDada;
 	private String nom;
@@ -103,7 +104,12 @@ public class ContingutMassiuFiltreDto implements Serializable {
 	public void setBloquejarMetaDocument(boolean bloquejarMetaDocument) {
 		this.bloquejarMetaDocument = bloquejarMetaDocument;
 	}
-
+	public String getExpedientNom() {
+		return expedientNom;
+	}
+	public void setExpedientNom(String expedientNom) {
+		this.expedientNom = expedientNom;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

@@ -345,6 +345,7 @@ public class ConversioTipusHelper {
 						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
 						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
 						target.setEstat(source.getEstat());
+						target.setIdentificador(source.getIdentificador());
 						return target;
 					}
 				});	

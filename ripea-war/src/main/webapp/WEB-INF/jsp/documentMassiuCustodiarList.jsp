@@ -50,16 +50,9 @@ $(document).ready(function() {
 			$('#metaDocumentId option[value!=""]').remove();
 			$('#metaDocumentId').select2('val', '', true);
 			if (tipus != undefined && tipus != "") {
-				$.get("<c:url value="/massiu/expedients/"/>" + tipus).done(function(data){
-					
-					for (var i = 0; i < data.length; i++) {
-						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-					}
-				}).fail(function() {
-					alert("<spring:message code="error.jquery.ajax"/>");
-				});
 
-				$.get("<c:url value="/massiu/metaDocuments/"/>" + tipus).done(function(data){
+
+				$.get("<c:url value="/massiu/custodiar/metaDocuments/"/>" + tipus).done(function(data){
 					
 					for (var i = 0; i < data.length; i++) {
 						$('#metaDocumentId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
@@ -172,7 +165,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaExpedient}"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputSelect name="expedientId" optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.expedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
+				<rip:inputText name="expedientNom" placeholderKey="accio.massiva.list.filtre.expedientNom" inline="true"/>
 			</div>
 		</div>
 		<div class="row">
@@ -180,7 +173,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 				<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
+				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.documentNom"/>
 			</div>
 <!-- 			<div class="col-md-4"> -->
 <%-- 				<rip:inputSelect name="metaDada" optionItems="${metaDades}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.metadada" inline="true" disabled="${not empty contingutMassiuFiltreCommand.bloquejarTipusElement}"/> --%>
@@ -219,7 +212,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 			data-url="<c:url value="/massiu/custodiar/datatable"/>"
 			data-filter="#contingutMassiuFiltreCommand"
 			class="table table-bordered table-striped" 
-			data-default-order="7" 
+			data-default-order="8" 
 			data-default-dir="desc"
 			data-botons-template="#botonsTemplate"
 			data-selection-enabled="true"
@@ -227,24 +220,26 @@ function updateSelectionForTipusDocument(currentTipus) {
 			<thead>
 				<tr>
 					<th data-col-name="id" data-visible="false"></th>
+					
 					<th data-col-name="expedient" data-visible="false"></th>
 					<th data-col-name="carpeta" data-visible="false"></th>
 					<th data-col-name="document" data-visible="false"></th>
+					<th data-col-name="pareId" data-visible="false"></th>
+					<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nomDocument"/></th>
 					<th data-col-name="metaDocument.nom" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
 					<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
-						<spring:message code="accio.massiva.list.column.ubicacio"/>
+						<spring:message code="accio.massiva.list.column.expedient"/>
 						<script id="cellPathTemplate" type="text/x-jsrender">
 						{{if path}}{{for path}}/
-							{{if expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
-							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
-							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>{{/if}}
-							{{:nom}}
+							{{if expedient}}<a href="../contingut/{{:id}}"><span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span> {{:nom}}</a>
+							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span> {{:nom}}
+							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span> {{:nom}} {{/if}}
 						{{/for}}{{/if}}
 					</script>
 					</th>
-					<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
+
 					<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
-					<th data-col-name="createdBy.codi" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+					<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 	<%-- 				<th data-col-name="nomPropietariEscriptoriPare" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th> --%>
 				</tr>
 			</thead>

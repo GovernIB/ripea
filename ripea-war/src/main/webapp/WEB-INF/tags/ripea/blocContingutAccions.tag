@@ -28,17 +28,32 @@
 					<c:choose>
 						<%---- Descarregar when clicking row ----%>
 						<c:when test="${isTasca}">
-							<li class="hidden"><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+							<c:choose>
+								<c:when test="${contingut.gesDocAdjuntId!=null || (contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx')}">
+									<li class="hidden"><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+								</c:when>
+								<c:otherwise>
+									<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}, ${tascaId}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+								</c:otherwise>
+							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+							<c:choose>
+								<c:when test="${contingut.gesDocAdjuntId!=null || (contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx')}">
+									<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
+								</c:when>
+								<c:otherwise>
+									<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+								</c:otherwise>
+							</c:choose>							
+							
 							<%---- Consultar ----%>
-							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 						</c:otherwise>
 					</c:choose>	
 				</c:when>
 				<c:otherwise>
-					<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+					<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 				</c:otherwise>
 			</c:choose>
 			<c:set var="mostrarSeparador" value="${true}"/>
@@ -140,7 +155,7 @@
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					</c:when>
 					<c:otherwise>
-						<c:if test="${((contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite)) && expedientPareObert}">
+						<c:if test="${((contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite) || (contingut.carpeta && expedientPare.usuariActualDelete)) && expedientPareObert}">
 							<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 						</c:if>
 					</c:otherwise>
@@ -270,7 +285,8 @@
 					</c:if>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				
+			</c:if>
+			<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
 				<%---- Seguiment portafirmes ----%>
 				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMAT') && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>
@@ -284,7 +300,6 @@
 					
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-
 				<%---- Seguiment via firma ----%>
 				<c:if test="${contingut.estat == 'FIRMA_PENDENT_VIAFIRMA' && contingut.documentTipus == 'DIGITAL'}">
 					<li><a href="<c:url value="/document/${contingut.id}/viafirma/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.viafirma.info"/></a></li>

@@ -49,7 +49,7 @@ public class ModalHelper {
 		}
 	}
 
-	private static boolean isRequestPathModal(
+	public static boolean isRequestPathModal(
 			HttpServletRequest request) {
 		String servletPath = request.getServletPath();
 		return
