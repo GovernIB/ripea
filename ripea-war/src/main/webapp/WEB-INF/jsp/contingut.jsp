@@ -862,23 +862,20 @@ $(document).ready(function() {
 			checkItAll.addEventListener('change', function() {
 				if (checkItAll.checked) {
 					inputs.forEach(function(input) {
-						var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+						/*var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
 						$.ajax({
 					        type: "GET",
 					        url: comprovacioUrl,
-					        success: function (isDocument) {
-					        	if (isDocument) {
-					        		input.checked = true;
-									var index = docsIdx.indexOf(parseInt(input.id));
-									if (index < 0) {
-										docsIdx.push(parseInt(input.id));
-									}
-					        	}
-	
-								enableDisableButton();
-								selectAll();
-					        }
-						});
+					        success: function (isDocument) {*/
+					    input.checked = true;
+						var index = docsIdx.indexOf(parseInt(input.id));
+						if (index < 0) {
+							docsIdx.push(parseInt(input.id));
+						}
+						enableDisableButton();
+						selectAll();
+					        /*}
+						});*/
 				    });  
 				} else {
 					inputs.forEach(function(input) {
@@ -900,8 +897,10 @@ $(document).ready(function() {
 			$(checkItAll).toggleClass('active');
 
 			if ($(checkItAll).hasClass('active') && $(listDocuments).hasClass('multiple')) {
-				elements.forEach(function(input) {
-					var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+				elements.forEach(function(child) {
+					var childParent = $(child.parentElement);
+					var isCarpeta = childParent.hasClass('element-droppable');
+					/*var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
 					$.ajax({
 				        type: "GET",
 				        url: comprovacioUrl,
@@ -917,9 +916,17 @@ $(document).ready(function() {
 							enableDisableButton();
 							selectAll();
 				        }
-					});
-					
-				});  
+					});*/
+					if (!isCarpeta) {
+						$(child).addClass('selectd');
+						var index = docsIdx.indexOf(parseInt(child.id));
+						if (index < 0) {
+							docsIdx.push(parseInt(child.id));
+						}
+					}
+				}); 
+				enableDisableButton();
+				selectAll();
 			} else if ($(listDocuments).hasClass('multiple')) {
 				elements.forEach(function(input) {
 					$(input).removeClass('selectd');
@@ -1186,10 +1193,78 @@ function getEnviamentsDocument(document) {
 }
 
 function enableDisableButton() {
+	var isTotPdfFirmat = true;
+	var isTotPdf = true;
 	var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut"/>';
-	$('#contenidor-contingut ').addClass("disabled");
-	$('#table-documents').addClass("disabled");
 	$('#loading').removeClass('hidden');
+	//lista
+	var tableDocuments = document.getElementById('table-documents');
+	$(tableDocuments).addClass("disabled");
+	//icones
+	var gridDocuments = document.getElementById('contenidor-contingut');
+	$(gridDocuments).addClass("disabled");
+	
+	if (docsIdx != undefined && tableDocuments != undefined) {
+		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+		inputs.forEach(function(input) {
+			var documentId = parseInt(input.id);
+			if (docsIdx.includes(documentId)) {
+				var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
+				var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
+				if (!isFirmatCurrentDocument) {
+					isTotPdfFirmat = false;
+					return false;
+				}
+				if (!isPdfCurrentDocument) {
+					isTotPdf = false;
+				}
+			}
+		});
+
+	} else if (docsIdx != undefined && gridDocuments != undefined) {
+		var list = gridDocuments.querySelectorAll('li');
+		list.forEach(function(child) {
+			var childId = $(child).attr('data-contenidor-id');
+			var documentId = parseInt(childId);
+			if (docsIdx.includes(documentId)) {
+				var isFirmatCurrentDocument = $(child).hasClass('firmat');
+				var isPdfCurrentDocument = $(child).hasClass('isPdf');
+				if (!isFirmatCurrentDocument) {
+					isTotPdfFirmat = false;
+					return false;
+				}
+				if (!isPdfCurrentDocument) {
+					isTotPdf = false;
+				}
+			}
+		});
+	}
+	if (isTotPdfFirmat && isTotPdf) {
+		$('.nomaximized').addClass('hidden'); //zip
+		$('.maximized').removeClass('hidden'); //concatenació
+		$('#notificar-mult').removeClass("disabled");
+		$('#definitiu-mult').addClass("disabled");
+	} else if (isTotPdfFirmat && !isTotPdf) {
+		$('.nomaximized').removeClass('hidden'); //zip
+		$('.maximized').addClass('hidden'); //concatenació
+		$('#notificar-mult').removeClass("disabled");
+		$('#definitiu-mult').addClass("disabled");
+	} else {
+		$('#notificar-mult').addClass("disabled");
+		$('#definitiu-mult').removeClass("disabled");
+	}
+	if (docsIdx.length > 0) {
+		$('#descarregar-mult').removeClass("disabled");
+		$('#moure-mult').removeClass("disabled");
+	} else {
+		$('#descarregar-mult').addClass("disabled");
+		$('#notificar-mult').addClass("disabled");
+		$('#moure-mult').addClass("disabled");
+	}
+	$('#contenidor-contingut ').removeClass("disabled");
+	$('#table-documents').removeClass("disabled");
+	$('#loading').addClass('hidden');
+	/*
 	if (docsIdx != undefined) {
 		$.ajax({
 	        type: "GET",
@@ -1225,6 +1300,7 @@ function enableDisableButton() {
 			}
 	    });
 	}
+	*/
 }
 
 function selectAll() {

@@ -19,7 +19,20 @@
 			<c:forEach var="fill" items="${fills}">
 			<%--  && fill.documentTipus != 'VIRTUAL' --%>
 				<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL') or empty fill.metaNode or fill.metaNode.usuariActualRead}">
-					<li class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if>" data-contenidor-id="${fill.id}">
+					<c:set var="firmat" value="true"/>
+					<c:set var="isPdf" value="true"/> 
+					<script>
+						<c:if test="${fill.document}">
+							<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}">
+								<c:set var="firmat" value="false"/> 
+							</c:if>
+							<c:if test="${fill.fitxerContentType != '' && fill.fitxerContentType != 'application/pdf'}">
+								<c:set var="isPdf" value="false"/> 
+							</c:if>
+						</c:if>
+					</script>
+					
+					<li class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && isPdf}"> isPdf</c:if>" data-contenidor-id="${fill.id}">
 						<div id="${fill.id}" class="thumbnail element-noclick">
 							<div class="text-center">
 								<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true"/> 
@@ -144,7 +157,20 @@
 			<tbody>
 				<c:forEach var="fill" items="${fills}">
 				<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL') or empty fill.metaNode or fill.metaNode.usuariActualRead}">
-					<tr id="info-fill-${fill.id}" class="element-drag-drop element-draggable ui-draggable <c:if test="${not fill.document}"> element-droppable</c:if>" data-contenidor-id="${fill.id}">
+					<c:set var="firmat" value="true"/>
+					<c:set var="isPdf" value="true"/> 
+					<script>
+						<c:if test="${fill.document}">
+							<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}">
+								<c:set var="firmat" value="false"/> 
+							</c:if>
+							<c:if test="${fill.fitxerContentType != '' && fill.fitxerContentType != 'application/pdf'}">
+								<c:set var="isPdf" value="false"/> 
+							</c:if>
+						</c:if>
+					</script>
+					
+					<tr id="info-fill-${fill.id}" class="element-drag-drop element-draggable ui-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && isPdf}"> isPdf</c:if>" data-contenidor-id="${fill.id}">
 						
 						<td>
 						<c:if test="${fill.document}">
