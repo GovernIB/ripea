@@ -26,7 +26,16 @@ $(document).ready(function() {
 	$("#dataPresentacio").mask("99/99/9999 99:99:99",{ 
 		placeholder:"_"
 	});
-	
+	$('#carpetaNom').closest('.form-group').hide();
+	$('input[type=radio][name=destiTipus]').on('change', function() {
+		if ($(this).val() == 'CARPETA_NOVA') {
+			$('#carpetaNom').closest('.form-group').show();
+		} else {
+			$('#carpetaNom').closest('.form-group').hide();
+		}
+		webutilModalAdjustHeight();
+	});
+	$('input[type=radio][name=destiTipus][value=${importacioCommand.destiTipus}]').trigger('change');
 })
 </script>
 </head>
@@ -36,6 +45,8 @@ $(document).ready(function() {
 		<br/>
 		<rip:inputText name="numeroRegistre" textKey="contingut.importacio.form.camp.nom" required="true"/>
 		<rip:inputText name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true" placeholder="__/__/____  __:__:__"/>
+		<rip:inputRadio name="destiTipus" textKey="contingut.importacio.form.camp.desti" botons="true" optionItems="${tipusDestiOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<rip:inputText name="carpetaNom" textKey="contingut.importacio.form.camp.carpeta" required="true"/>
 		<%-- <rip:inputDateTime name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true"/>--%>
 		<br/>
 		<div id="modal-botons" class="well">
