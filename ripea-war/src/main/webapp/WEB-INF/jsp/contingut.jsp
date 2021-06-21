@@ -641,6 +641,7 @@ $(document).ready(function() {
 		activeClass: 'element-target',
 		hoverClass: 'element-hover',
 		drop: function(event, ui) {
+			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 			var origenId = ui.draggable.data('contenidor-id');
 			var destiId = $(this).data('contenidor-id');
 			window.location = origenId + "/moure/" + destiId;
