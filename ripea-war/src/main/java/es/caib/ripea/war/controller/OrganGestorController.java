@@ -4,7 +4,7 @@
 package es.caib.ripea.war.controller;
 
 
-import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -194,16 +194,21 @@ public class OrganGestorController extends BaseUserController {
 		} catch (Exception ex) {
 			logger.error("Error al esborrar organ gestor");
 			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);
-			if (root instanceof SQLException && root.getMessage().contains("IPA_ORGAN_GESTOR_METAEXP_FK")) {
+			if (root instanceof SQLIntegrityConstraintViolationException && root.getMessage().contains("IPA_ORGAN_GESTOR_METAEXP_FK")) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"organgestor.controller.esborrar.error.fk");
+						"organgestor.controller.esborrar.error.fk.metaexp");
+			} else if (root instanceof SQLIntegrityConstraintViolationException && root.getMessage().contains("IPA_ORGAN_GESTOR_EXP_FK")) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"organgestor.controller.esborrar.error.fk.exp");
 			} else {
 				return getAjaxControllerReturnValueErrorMessage(
 						request,
 						"redirect:../../esborrat",
-						ex.getMessage());
+						root.getMessage());
 			}
 		}
 	}
