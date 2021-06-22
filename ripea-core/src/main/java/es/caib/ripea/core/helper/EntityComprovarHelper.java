@@ -124,7 +124,8 @@ public class EntityComprovarHelper {
 				false,
 				false,
 				false, 
-				true, false);
+				true, 
+				false);
 	}
 	
 	public EntitatEntity comprovarEntitat(

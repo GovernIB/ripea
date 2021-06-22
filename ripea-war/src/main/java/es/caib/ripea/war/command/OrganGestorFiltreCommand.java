@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.command;
 
+import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
+import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -25,6 +27,11 @@ public class OrganGestorFiltreCommand {
 	public void setNom(String nom) {
 		this.nom = nom != null ? nom.trim() : null;
 	}
-
+	
+	public OrganGestorFiltreDto asDto() {
+		return ConversioTipusHelper.convertir(
+				this,
+				OrganGestorFiltreDto.class);
+	}
 	
 }

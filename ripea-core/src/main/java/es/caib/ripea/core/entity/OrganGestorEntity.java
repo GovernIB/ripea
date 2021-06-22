@@ -53,6 +53,9 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @Column(name = "actiu")
     private boolean actiu;
     
+    @Column(name = "gestio_direct")
+    private boolean gestioDirect;
+    
     @OneToMany(			
     		mappedBy = "organGestor",
 			fetch = FetchType.LAZY)
@@ -84,6 +87,58 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 			fill.getAllChildren(result);
 		} 
     }
+    
+    
+
+    public static Builder getBuilder(String codi) {
+        return new Builder(codi);
+    }
+    public static class Builder {
+
+        OrganGestorEntity built;
+        Builder(String codi) {
+            built = new OrganGestorEntity();
+            built.codi = codi;
+        }
+
+        public OrganGestorEntity build() {
+            return built;
+        }
+        public Builder nom(String nom) {
+            built.nom = nom;
+            return this;
+        }
+        public Builder entitat(EntitatEntity entitat) {
+            built.entitat = entitat;
+            return this;
+        }
+        public Builder pare(OrganGestorEntity pare) {
+            built.pare = pare;
+            return this;
+        }
+        public Builder actiu(boolean actiu) {
+            built.actiu = actiu;
+            return this;
+        }
+        public Builder gestioDirect(boolean gestioDirect) {
+            built.gestioDirect = gestioDirect;
+            return this;
+        }
+    }
+
+	public void update(
+			String codi,
+			String nom,
+			OrganGestorEntity pare,
+			boolean gestioDirect) {
+		this.codi = codi;
+		this.nom = nom;
+		this.pare = pare;
+		this.gestioDirect = gestioDirect;
+	}
+    
+    
+    
     
     private static final long serialVersionUID = 458331024861203562L;
 

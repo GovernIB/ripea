@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -69,15 +70,16 @@ public interface OrganGestorService {
 	 * i aplicant el filtre.
 	 * 
 	 * @param entitatId Identificador de l'entitat actual
-	 * @param filtre Filtre a aplicar als resultats
+	 * @param filtre TODO
 	 * @param paginacioParams
 	 * 		Paràmetres per a dur a terme la paginació del resultats.
+	 * @param filtre Filtre a aplicar als resultats
 	 * @return La pàgina amb els organs gestors
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId,
-			PaginacioParamsDto paginacioParams);
+			OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
@@ -223,6 +225,26 @@ public interface OrganGestorService {
 	public OrganGestorDto findItemByEntitatAndCodi(
 			Long entitatId,
 			String codi);
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public OrganGestorDto findById(
+			Long entitatId,
+			Long id);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public OrganGestorDto create(
+			Long entitatId,
+			OrganGestorDto organGestorDto);
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public OrganGestorDto update(
+			Long entitatId,
+			OrganGestorDto organGestorDto);
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public void delete(
+			Long entitatId,
+			Long id);
 	
 
 }
