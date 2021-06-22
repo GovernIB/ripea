@@ -40,6 +40,7 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -56,6 +57,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired
+	private ExpedientRepository expedientRepository;
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -233,7 +236,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		organismesNotInDIR3.removeAll(organismesDIR3);
 		for (OrganGestorEntity o : organismesNotInDIR3) {
 			if (!o.isGestioDirect()) {
-				if (o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) {
+				
+				List<MetaExpedientOrganGestorEntity> metaexporg = metaExpedientOrganGestorRepository.findByOrganGestor(o);
+				List<ExpedientEntity> expedients = expedientRepository.findByOrganGestor(o);
+				
+				if ((o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) && (expedients == null || expedients.isEmpty()) && (metaexporg == null || metaexporg.isEmpty())) {
 					organGestorRepository.delete(o.getId());
 				} else {
 					o.setActiu(false);
