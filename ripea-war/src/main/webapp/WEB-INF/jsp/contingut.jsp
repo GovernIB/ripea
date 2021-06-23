@@ -425,7 +425,17 @@ body.loading .rmodal {
                 50% 50% 
                 no-repeat;
 }
-
+.btn-top {
+	position: fixed;
+	z-index: 1000;
+	right: 60px;
+	bottom: 50px;
+	background-color: #FFF;
+	padding: 0 5px 0 5px;
+	border-radius: 5px;
+	cursor: pointer;
+	opacity: 0.1;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -1119,6 +1129,24 @@ $(document).ready(function() {
 		    });	
 		}
 	});
+
+						
+	//scroll top
+	$('.btn-top').on('click', function() {
+		$([document.documentElement, document.body]).animate({
+	        scrollTop: 0
+	    }, 200);
+	});
+	
+	$(document).scroll(function() {
+		var scrollTop = $(document).scrollTop();
+		var opacity = 0.1 + scrollTop / 1500;
+		if (opacity > 0.7)
+			opacity = 0.7;
+		$('.btn-top').css({
+			opacity: opacity
+		});
+	});
 });
 
 function getEnviamentsDocument(document) {
@@ -1514,6 +1542,10 @@ function showViewer(event, documentId, contingutNom) {
 	$('#container').attr('src', '');
 	$('#container').addClass('rmodal_loading');
 	showDocument(urlDescarrega);
+	
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#resum-viewer").offset().top - 110
+    }, 500);
 }
 
 function showDocument(arxiuUrl) {
@@ -2467,6 +2499,9 @@ function closeViewer() {
 				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 			</c:if>
 		</div>
-	</c:if>	
+	</c:if>
+	<div class="btn-top">
+		<span class="fa fa-arrow-up"></span>
+	</div>
 </body>
 </html>
