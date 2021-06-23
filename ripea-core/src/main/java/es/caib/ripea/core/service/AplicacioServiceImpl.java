@@ -112,6 +112,16 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Transactional
 	@Override
+	public void setRolUsuariActual(String rolActual) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("Actualitzant rol de usuari actual");
+
+		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+		usuari.updateRolActual(rolActual);
+	}
+	
+	@Transactional
+	@Override
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
 		logger.debug("Actualitzant configuració de usuari actual");
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());

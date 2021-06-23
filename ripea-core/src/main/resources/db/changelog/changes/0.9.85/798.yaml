@@ -1,0 +1,18 @@
+databaseChangeLog:
+- property:
+    name: char
+    dbms: oracle
+    value: CHAR
+- property:
+    name:  char
+    value: 
+- changeSet:
+    id: 1624438707915
+    author: limit
+    changes:
+    - addColumn:
+        tableName: ipa_usuari
+        column:
+          name: rol_actual
+          type: varchar2(64 ${char})
+          
