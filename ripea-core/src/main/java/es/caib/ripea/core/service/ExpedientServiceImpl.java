@@ -734,11 +734,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		entityComprovarHelper.comprovarPermisMetaNode(
 				expedient.getMetaExpedient(),
 				expedient.getId(),
-				true,
 				ExtendedPermission.WRITE,
 				"WRITE",
-				usuariCodi, 
-				true);
+				usuariCodi);
 		
 		expedientHelper.agafar(expedient, usuariCodi);
 	}

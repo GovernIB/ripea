@@ -396,7 +396,7 @@ public class ContingutHelper {
 		}
 		if (ambPermisos && metaNode != null) {
 			// Omple els permisos
-			metaNodeHelper.omplirPermisosPerMetaNode(metaNode, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(metaNode);
 		}
 		if (resposta != null) {
 			// Omple la informació d'auditoria
