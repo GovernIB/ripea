@@ -538,14 +538,15 @@ $(document).ready(function() {
 				if(data.objecte != null && data.objecte.length > 0){
 					data.objecte.forEach(function(firma){
 						if(firma != null){
+							var firmaDataStr = "";
 							if(firma.responsableNom == null){
 								firma.responsableNom = "";
 							}
 							if(firma.responsableNif == null){
 								firma.responsableNif = "";
 							}
-							if(firma.data == null){
-								firma.data = "";
+							if(firma.data != null){
+								firmaDataStr = new Date(firma.data);
 							}
 							if(firma.emissorCertificat == null){
 								firma.emissorCertificat = "";
@@ -562,7 +563,7 @@ $(document).ready(function() {
 								+ "</td></tr><tr><td><strong>"
 								+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
 								+ "</strong></td><td>"
-								+ firma.data
+								+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
 								+ "</td></tr><tr><td><strong>"
 								+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
 								+ "</strong></td><td>"
