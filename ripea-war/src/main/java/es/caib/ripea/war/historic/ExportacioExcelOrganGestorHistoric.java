@@ -85,6 +85,7 @@ public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric 
 		return bytes;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void createOrgansGestorsHeader(Collection<OrganGestorDto> organsGestors, HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;

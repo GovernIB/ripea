@@ -42,6 +42,7 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
@@ -136,12 +137,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			isEntitatUserAdminOrOrgan = false;
 		}
 		model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
-		
-		model.addAttribute(
-				"metaDocumentsLeft",
-				metaDocumentService.findActiusPerCreacio(
-						entitatActual.getId(),
-						contingutId));
+
+		List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
+				entitatActual.getId(),
+				contingutId);
+		List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
+		List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
+		for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
+			if (metaDocument.isPinbalActiu()) {
+				metaDocumentsPinbal.add(metaDocument);
+			} else {
+				metaDocumentsNoPinbal.add(metaDocument);
+			}
+		}
+		model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
+		model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
+
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
 						"notificacio.enviamentEstat.enum."));

@@ -31,15 +31,19 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
@@ -64,6 +68,8 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -83,6 +89,7 @@ import es.caib.ripea.core.helper.ExceptionHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PinbalHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
@@ -90,6 +97,7 @@ import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
@@ -108,6 +116,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private DispositiuEnviamentRepository dispositiuEnviamentRepository;
 	@Resource
 	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired
+	private InteressatRepository interessatRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -138,6 +148,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private PinbalHelper pinbalHelper;
 	
 	@Transactional
 	@Override
@@ -553,6 +565,111 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 		return pluginHelper.arxiuDocumentVersioImprimible(
 				document);
+	}
+
+	@Transactional
+	@Override
+	public void pinbalNovaConsulta(
+			Long entitatId,
+			Long pareId,
+			Long metaDocumentId,
+			PinbalConsultaDto consulta) {
+		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				pareId,
+				false,
+				false,
+				false,
+				false, 
+				false);
+		ExpedientEntity expedient = pare.getExpedientPare();
+		MetaDocumentEntity metaDocument = null;
+		if (metaDocumentId != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					pare.getEntitat(),
+					expedient.getMetaExpedient(),
+					metaDocumentId,
+					true,
+					true);
+		} else {
+			throw new ValidationException(
+					"<creacio>",
+					DocumentEntity.class,
+					"No es pot fer una petició PINBAL sense un meta-document associat");
+		}
+		if (!metaDocument.isPinbalActiu()) {
+			throw new ValidationException(
+					"<creacio>",
+					DocumentEntity.class,
+					"No es pot fer una petició PINBAL sense un meta-document amb la integració PINBAL activa");
+		}
+		InteressatEntity interessat = interessatRepository.findByExpedientAndId(expedient, consulta.getInteressatId());
+		if (interessat == null) {
+			throw new NotFoundException(consulta.getInteressatId(), InteressatEntity.class);
+		} else if (!(interessat instanceof InteressatPersonaFisicaEntity)) {
+			throw new ValidationException(
+					"<creacio>",
+					DocumentEntity.class,
+					"S'ha especificat un interessat que no és una persona física");
+		}
+		String idPeticion;
+		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPCIWS02) {
+			idPeticion = pinbalHelper.novaPeticioSvddgpciws02(
+					expedient,
+					metaDocument,
+					(InteressatPersonaFisicaEntity)interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment());
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPVIWS02) {
+			idPeticion = pinbalHelper.novaPeticioSvddgpviws02(
+					expedient,
+					metaDocument,
+					(InteressatPersonaFisicaEntity)interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment());
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPASWS01) {
+			idPeticion = pinbalHelper.novaPeticioSvdccaacpasws01(
+					expedient,
+					metaDocument,
+					(InteressatPersonaFisicaEntity)interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment());
+		} else {
+			throw new ValidationException(
+					"<creacio>",
+					DocumentEntity.class,
+					"S'ha especificat un servei PINBAL no suportat: " + metaDocument.getPinbalServei());
+		}
+		DocumentDto document = new DocumentDto();
+		document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
+		StringBuilder nomSencer = new StringBuilder(interessatPf.getNom());
+		if (interessatPf.getLlinatge1() != null) {
+			nomSencer.append(" ");
+			nomSencer.append(interessatPf.getLlinatge1().trim());
+		}
+		if (interessatPf.getLlinatge2() != null) {
+			nomSencer.append(" ");
+			nomSencer.append(interessatPf.getLlinatge2().trim());
+		}
+		document.setNom(idPeticion + " - " + nomSencer.toString());
+		//document.setDescripcio(descripcio);
+		document.setData(new Date());
+		document.setNtiOrgano(expedient.getNtiOrgano());
+		document.setNtiOrigen(NtiOrigenEnumDto.O1);
+		document.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+		document.setNtiTipoDocumental("TD99");
+		/*document.setFitxerNom(fitxerNom);
+		document.setFirmaContentType(firmaContentType);
+		document.setFitxerContingut(fitxerContingut);*/
+		document.setAmbFirma(false);
+		document.setPinbalIdpeticion(idPeticion);
+		documentHelper.crearDocument(
+				document,
+				pare,
+				expedient,
+				metaDocument,
+				true);
 	}
 
 	@Transactional

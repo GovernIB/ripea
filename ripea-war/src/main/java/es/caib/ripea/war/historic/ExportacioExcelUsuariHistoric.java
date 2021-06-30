@@ -1,8 +1,6 @@
 package es.caib.ripea.war.historic;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +77,7 @@ public class ExportacioExcelUsuariHistoric extends ExportacioExcelHistoric {
 		return bytes;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void tableHeader(HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;

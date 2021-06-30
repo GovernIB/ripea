@@ -114,7 +114,8 @@ public class DocumentHelper {
 				pare.getEntitat(),
 				expedient,
 				document.getUbicacio(),
-				document.getNtiIdDocumentoOrigen());
+				document.getNtiIdDocumentoOrigen(),
+				document.getPinbalIdpeticion());
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(document.getFitxerNom());
 		fitxer.setContentType(document.getFitxerContentType());
@@ -369,7 +370,8 @@ public class DocumentHelper {
 			EntitatEntity entitat,
 			ExpedientEntity expedient,
 			String ubicacio,
-			String ntiIdDocumentoOrigen) {
+			String ntiIdDocumentoOrigen,
+			String pinbalIdpeticion) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
 				DocumentEstatEnumDto.REDACCIO,
@@ -388,6 +390,7 @@ public class DocumentHelper {
 				entitat,
 				expedient).
 				ubicacio(ubicacio).
+				pinbalIdpeticion(pinbalIdpeticion).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);
 		calcularIdentificadorDocument(

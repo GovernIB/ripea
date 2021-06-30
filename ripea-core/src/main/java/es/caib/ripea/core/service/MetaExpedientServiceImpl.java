@@ -47,7 +47,6 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.AplicacioHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -110,8 +109,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EmailHelper emailHelper;
-	@Autowired
-	private AplicacioHelper aplicacioHelper;
 
 	@Transactional
 	@Override

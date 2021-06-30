@@ -19,12 +19,14 @@ import lombok.Setter;
 
 public class HistoricEntitatSerializer {
 
+	@SuppressWarnings("serial")
 	@XmlRootElement(name = "registres-entitat")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootEntitat implements Serializable {
 		public RootEntitat() {}
 	}
 
+	@SuppressWarnings("serial")
 	@XmlRootElement(name = "registres-entitat")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootEntitatDiari extends RootEntitat implements Serializable{
@@ -40,6 +42,7 @@ public class HistoricEntitatSerializer {
 		
 	}
 	
+	@SuppressWarnings("serial")
 	@XmlRootElement(name = "registres-entitat")
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RootEntitatMensual extends RootEntitat implements Serializable{
@@ -54,6 +57,7 @@ public class HistoricEntitatSerializer {
 		public RootEntitatMensual() {}
 	}
 		
+	@SuppressWarnings("serial")
 	@Setter
 	public static class RegistreEntitatDiari extends RegistreExpedient {
 		@XmlAttribute
@@ -62,6 +66,7 @@ public class HistoricEntitatSerializer {
 		public Date data;
 	}
 	
+	@SuppressWarnings("serial")
 	@Setter
 	public static class RegistreEntitatMensual extends RegistreExpedient {
 

@@ -234,8 +234,6 @@ databaseChangeLog:
             name: origen_id
             type: BIGINT
         - column:
-            constraints:
-              nullable: false
             name: desti_id
             type: BIGINT
         - column:
@@ -1052,7 +1050,7 @@ databaseChangeLog:
         - column:
             constraints:
               nullable: false
-            name: nti_indentif
+            name: nti_identif
             type: VARCHAR2(52)
         - column:
             constraints:
@@ -2013,7 +2011,7 @@ databaseChangeLog:
             name: plantilla_contingut
             type: BLOB
         - column:
-            name: meta_Expedient_id
+            name: meta_expedient_id
             type: BIGINT
         - column:
             name: global_expedient
@@ -2040,7 +2038,7 @@ databaseChangeLog:
             name: biometrica_lectura
             type: BOOLEAN
         - column:
-            name: meta_docuemnt_tipus_gen
+            name: meta_document_tipus_gen
             type: VARCHAR2(256)
         - column:
             name: portafirmes_fluxtip
@@ -2641,7 +2639,7 @@ databaseChangeLog:
             name: aplicacio_versio
             type: VARCHAR2(15)
         - column:
-            name: assumpte_codi
+            name: assumpte_codi_codi
             type: VARCHAR2(16)
         - column:
             name: assumpte_codi_desc

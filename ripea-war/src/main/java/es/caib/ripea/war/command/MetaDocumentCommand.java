@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -73,6 +74,8 @@ public class MetaDocumentCommand {
 	private boolean biometricaLectura;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private String plantillaNom;
+	private boolean pinbalActiu;
+	private MetaDocumentPinbalServeiEnumDto pinbalServei;
 	
 	private boolean comu;
 
@@ -205,6 +208,14 @@ public class MetaDocumentCommand {
 
 	public void setPlantillaNom(String plantillaNom) {
 		this.plantillaNom = plantillaNom != null ? plantillaNom.trim() : null;
+	}
+
+	public void setPinbalActiu(boolean pinbalActiu) {
+		this.pinbalActiu = pinbalActiu;
+	}
+
+	public void setPinbalServei(MetaDocumentPinbalServeiEnumDto pinbalServei) {
+		this.pinbalServei = pinbalServei;
 	}
 
 }

@@ -113,6 +113,8 @@ public class DocumentEntity extends NodeEntity {
 	private String gesDocAdjuntId;
 	@Column(name = "ges_doc_adjunt_firma_id", length = 256)
 	private String gesDocAdjuntFirmaId;
+	@Column(name = "pinbal_idpeticion", length = 64)
+	private String pinbalIdpeticion;
 	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
@@ -331,6 +333,10 @@ public class DocumentEntity extends NodeEntity {
 		}
 		public Builder ntiCsvRegulacion(String ntiCsvRegulacion) {
 			built.ntiCsvRegulacion = ntiCsvRegulacion;
+			return this;
+		}
+		public Builder pinbalIdpeticion(String pinbalIdpeticion) {
+			built.pinbalIdpeticion = pinbalIdpeticion;
 			return this;
 		}
 		public DocumentEntity build() {

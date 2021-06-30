@@ -1125,6 +1125,7 @@ public class ContingutServiceImpl implements ContingutService {
 				});
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Transactional(readOnly = true)
 	@Override
 	public ArxiuDetallDto getArxiuDetall(
@@ -1757,7 +1758,8 @@ public class ContingutServiceImpl implements ContingutService {
 					entitat,
 					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio(),
-					documentOrigen.getNtiIdDocumentoOrigen());
+					documentOrigen.getNtiIdDocumentoOrigen(),
+					null);
 		}
 		if (creat != null) {
 			if (creat instanceof NodeEntity) {
@@ -1811,7 +1813,8 @@ public class ContingutServiceImpl implements ContingutService {
 					entitat,
 					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio(),
-					uuidDocumentoOrigen);
+					uuidDocumentoOrigen,
+					null);
 		}
 		if (creat != null) {
 			if (creat instanceof DocumentEntity) {

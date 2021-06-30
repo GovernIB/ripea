@@ -105,7 +105,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaExpedient,
 				metaDocument.getNtiOrigen(),
 				metaDocument.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental()).
+				metaDocument.getNtiTipoDocumental(),
+				metaDocument.isPinbalActiu()).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
@@ -118,6 +119,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
 				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
 				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
+				pinbalServei(metaDocument.getPinbalServei()).
 				build();
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
@@ -159,7 +161,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				null,
 				metaDocument.getNtiOrigen(),
 				metaDocument.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental()).
+				metaDocument.getNtiTipoDocumental(),
+				metaDocument.isPinbalActiu()).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
@@ -172,6 +175,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
 				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
 				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
+				pinbalServei(metaDocument.getPinbalServei()).
 				build();
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
@@ -228,7 +232,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isFirmaBiometricaActiva(),
 				metaDocument.isBiometricaLectura(),
-				metaDocument.getPortafirmesFluxTipus());
+				metaDocument.getPortafirmesFluxTipus(),
+				metaDocument.isPinbalActiu(),
+				metaDocument.getPinbalServei());
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
 					plantillaNom,
@@ -285,7 +291,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isFirmaBiometricaActiva(),
 				metaDocument.isBiometricaLectura(),
-				metaDocument.getPortafirmesFluxTipus());
+				metaDocument.getPortafirmesFluxTipus(),
+				metaDocument.isPinbalActiu(),
+				metaDocument.getPinbalServei());
 		
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(

@@ -1933,13 +1933,19 @@ function closeViewer() {
 															</a>
   														</c:when>
 														<c:otherwise>
-	   														<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>"
-															   data-toggle="modal" data-refresh-pagina="true">
+	   														<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true">
 																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 															</a>
 														</c:otherwise>
 													</c:choose>
 													</li>
+													<c:if test="${not empty metaDocumentsPinbalLeft}">
+														<li>
+															<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
+																<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+															</a>
+														</li>
+													</c:if>
 												</c:otherwise>
 											</c:choose>
 											<c:if test="${!isTasca}">

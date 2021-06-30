@@ -74,6 +74,7 @@ public class ExportacioExcelInteressatsHistoric extends ExportacioExcelHistoric 
 		return bytes;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void tableHeader(HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;

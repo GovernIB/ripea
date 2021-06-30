@@ -78,6 +78,7 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 		return sheet;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void createMetriquesHeader(HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;

@@ -365,7 +365,8 @@ public class ExpedientHelper {
 				expedientEntity.getEntitat(),
 				expedientEntity,
 				documentDto.getUbicacio(),
-				documentDto.getNtiIdDocumentoOrigen());
+				documentDto.getNtiIdDocumentoOrigen(),
+				null);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(documentDto.getFitxerNom());
 		fitxer.setContentType(documentDto.getFitxerContentType());
@@ -562,7 +563,8 @@ public class ExpedientHelper {
 				expedientEntity.getEntitat(),
 				expedientEntity,
 				documentDto.getUbicacio(),
-				documentDto.getNtiIdDocumentoOrigen());
+				documentDto.getNtiIdDocumentoOrigen(),
+				null);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(documentDto.getFitxerNom());
 		fitxer.setContentType(documentDto.getFitxerContentType());
@@ -1002,6 +1004,7 @@ public class ExpedientHelper {
 		return ntiTipoFirma;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	private static String getTipusDocumental(Document document) {
 		String tipusDocumental = null;
 

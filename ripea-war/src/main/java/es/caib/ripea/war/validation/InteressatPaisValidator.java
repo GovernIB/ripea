@@ -28,6 +28,7 @@ public class InteressatPaisValidator implements ConstraintValidator<InteressatPa
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 		try {
 			
+			@SuppressWarnings("unused")
 			InteressatCommand interessat = (InteressatCommand)value;
 			boolean valid = true;
 			

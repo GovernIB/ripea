@@ -170,7 +170,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 					contingutPare.getEntitat(),
 					expedientSuperior,
 					null,
-					expedientSuperior.getArxiuUuid());
+					expedientSuperior.getArxiuUuid(),
+					null);
 		
 			if (fitxer != null) {
 				entity.updateFitxer(
@@ -314,6 +315,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		return estatElaboracio;
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	private static String getTipusDocumental(Document document) {
 		String tipusDocumental = null;
 

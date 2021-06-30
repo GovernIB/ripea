@@ -27,6 +27,7 @@
 		<dir3caib.version>1.0.7</dir3caib.version>
 		<pdfbox.version>2.0.12</pdfbox.version>
 		<notib.version>1.1.10</notib.version>
+		<pinbal-client.version>1.4.25</pinbal-client.version>
 		<pluginsib-arxiu.version>2.0.14</pluginsib-arxiu.version>
 		<docker.image.prefix>280421</docker.image.prefix>
 		<docker.image.name>${project.artifactId}</docker.image.name>

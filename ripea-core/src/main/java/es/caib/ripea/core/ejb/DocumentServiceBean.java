@@ -24,6 +24,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -33,6 +34,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.DocumentService;
 
@@ -125,6 +127,20 @@ public class DocumentServiceBean implements DocumentService {
 				entitatId,
 				id,
 				versio);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void pinbalNovaConsulta(
+			Long entitatId,
+			Long pareId,
+			Long metaDocumentId,
+			PinbalConsultaDto consulta) throws NotFoundException, PinbalException {
+		delegate.pinbalNovaConsulta(
+				entitatId, 
+				pareId,
+				metaDocumentId,
+				consulta);
 	}
 
 	@Override

@@ -4704,6 +4704,7 @@ public class PluginHelper {
 		return null;
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	private void propagarMetadadesDocument(
 			Document documentArxiu,
 			DocumentEntity documentDb) {

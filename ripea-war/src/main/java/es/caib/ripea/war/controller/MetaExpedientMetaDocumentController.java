@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
@@ -359,6 +360,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				"isFirmaBiometrica",
 				Boolean.parseBoolean(
 						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
+		model.addAttribute(
+				"pinbalServeiEnumOptions",
+				EnumHelper.getOptionsForEnum(MetaDocumentPinbalServeiEnumDto.class, "pinbal.servei.enum."));
 
 	}
 

@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -98,6 +99,11 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;
 
+	@Column(name = "pinbal_actiu", nullable = false)
+	private boolean pinbalActiu;
+	@Column(name = "pinbal_servei", length = 64)
+	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
 	}
@@ -160,7 +166,13 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public MetaDocumentFirmaFluxTipusEnumDto getPortafirmesFluxTipus() {
 		return portafirmesFluxTipus;
 	}
-	
+	public boolean isPinbalActiu() {
+		return pinbalActiu;
+	}
+	public MetaDocumentPinbalServeiEnumDto getPinbalServei() {
+		return pinbalServei;
+	}
+
 	public void update(
 			String codi,
 			String nom,
@@ -179,7 +191,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String ntiTipoDocumental,
 			boolean firmaBiometricaActiva,
 			boolean biometricaLectura,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
+			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
+			boolean pinbalActiu,
+			MetaDocumentPinbalServeiEnumDto pinbalServei) {
 		update(
 				codi,
 				nom,
@@ -200,6 +214,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.biometricaLectura = biometricaLectura;
 		this.portafirmesFluxTipus = portafirmesFluxTipus;
 		this.codiPropi = codi;
+		this.pinbalActiu = pinbalActiu;
+		this.pinbalServei = pinbalServei;
 	}
 
 	public void updatePlantilla(
@@ -219,7 +235,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			MetaExpedientEntity metaExpedient,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-			String ntiTipoDocumental) {
+			String ntiTipoDocumental,
+			boolean pinbalActiu) {
 		return new Builder(
 				entitat,
 				codi,
@@ -228,7 +245,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				metaExpedient,
 				ntiOrigen,
 				ntiEstadoElaboracion,
-				ntiTipoDocumental);
+				ntiTipoDocumental,
+				pinbalActiu);
 	}
 	public static class Builder {
 		MetaDocumentEntity built;
@@ -240,7 +258,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				MetaExpedientEntity metaExpedient,
 				NtiOrigenEnumDto ntiOrigen,
 				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
-				String ntiTipoDocumental) {
+				String ntiTipoDocumental,
+				boolean pinbalActiu) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;
@@ -256,23 +275,20 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.firmaBiometricaActiva = false;
 			built.biometricaLectura = false;
 			built.codiPropi = codi;
+			built.pinbalActiu = pinbalActiu;
 		}
-		
 		public Builder biometricaLectura(boolean biometricaLectura) {
 			built.biometricaLectura = biometricaLectura;
 			return this;
 		}
-		
 		public Builder firmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
 			built.firmaPortafirmesActiva = firmaPortafirmesActiva;
 			return this;
 		}
-		
 		public Builder firmaBiometricaActiva(boolean firmaBiometricaActiva) {
 			built.firmaBiometricaActiva = firmaBiometricaActiva;
 			return this;
 		}
-		
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;
@@ -307,6 +323,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		}
 		public Builder portafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus) {
 			built.portafirmesFluxTipus = portafirmesFluxTipus;
+			return this;
+		}
+		public Builder pinbalServei(MetaDocumentPinbalServeiEnumDto pinbalServei) {
+			built.pinbalServei = pinbalServei;
 			return this;
 		}
 		public MetaDocumentEntity build() {

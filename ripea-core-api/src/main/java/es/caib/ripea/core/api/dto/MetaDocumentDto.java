@@ -35,7 +35,9 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
-		
+	private boolean pinbalActiu;
+	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

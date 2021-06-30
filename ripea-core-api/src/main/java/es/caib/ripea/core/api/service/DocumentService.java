@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -28,6 +29,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -248,6 +250,27 @@ public interface DocumentService {
 			Long entitatId,
 			Long id,
 			String versio) throws NotFoundException;
+
+	/**
+	 * Crea un nou document associat a una consulta a PINBAL.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param pareId
+	 *            Atribut id del contenidor a on es vol crear el document.
+	 * @param metaDocumentId
+	 *            Atribut id del meta-document.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws PinbalException
+	 *             Si s'han produit errors en la consulta a PINBAL.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void pinbalNovaConsulta(
+			Long entitatId,
+			Long pareId,
+			Long metaDocumentId,
+			PinbalConsultaDto consulta) throws NotFoundException, PinbalException;
 
 	/**
 	 * Envia un document a firmar al portafirmes.
