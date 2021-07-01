@@ -211,6 +211,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	List<ExpedientEntity> findByEntitatAndIdInOrderByIdAsc(
 			EntitatEntity entitat,
 			Collection<Long> id);
+	
+	List<ExpedientEntity> findByOrganGestor(
+			OrganGestorEntity organGestor);
 
 	@Query(	"select" +
 			"    e " +

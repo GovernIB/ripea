@@ -237,6 +237,14 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"from" +
 			"    MetaExpedientEntity me " +
 			" where " +
+			"    (me.entitat = :entitat) ")
+	public List<Long> findAllIdsByEntitat(@Param("entitat") EntitatEntity entitat);
+	
+	@Query(	"select" +
+			"    me.id " +
+			"from" +
+			"    MetaExpedientEntity me " +
+			" where " +
 			"    (me.entitat = :entitat) " + 
 			"and me.id in (:ids)")
 	public List<Long> findIdsByEntitat(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);

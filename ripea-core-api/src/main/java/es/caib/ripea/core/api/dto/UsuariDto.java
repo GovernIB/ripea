@@ -20,6 +20,7 @@ public class UsuariDto implements Serializable {
 	private String idioma;
 	private String[] rols;
 	private boolean rebreEmailsAgrupats;
+	private String rolActual;
 	
 	public boolean isRebreEmailsAgrupats() {
 		return rebreEmailsAgrupats;
@@ -66,6 +67,12 @@ public class UsuariDto implements Serializable {
 	}
 	public void setRols(String[] rols) {
 		this.rols = rols;
+	}
+	public String getRolActual() {
+		return rolActual;
+	}
+	public void setRolActual(String rolActual) {
+		this.rolActual = rolActual;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

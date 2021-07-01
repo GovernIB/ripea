@@ -324,13 +324,13 @@ public class DocumentHelper {
 			fitxer = new FitxerDto();
 			fitxer.setContentType(documentEntity.getFitxerContentType());
 			fitxer.setNom(documentEntity.getFitxerNom());
-			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-					documentEntity,
-					null,
-					null,
-					true,
-					false);
-			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+//			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+//					documentEntity,
+//					null,
+//					null,
+//					true,
+//					false);
+//			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 //			##no validar firma en actualitzar tipus document
 //			if (documentEntity.isFirmat()) {
 //				firmes = validaFirmaDocument(

@@ -403,7 +403,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
 		}
 		return resposta;
 	}
@@ -421,7 +421,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				entitatId,
 				false,
 				false,
-				true, false, false);
+				false, 
+				true, 
+				false);
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				entitat,
 				metaDocumentId);
@@ -431,7 +433,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
 		}
 		return resposta;
 	}	
@@ -473,7 +475,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 										MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
 		}
 		return resposta;
 	}

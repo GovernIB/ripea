@@ -3,22 +3,37 @@
  */
 package es.caib.ripea.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.command.OrganGestorCommand;
+import es.caib.ripea.war.command.OrganGestorFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -28,14 +43,44 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 @Controller
 @RequestMapping("/organgestor")
 public class OrganGestorController extends BaseUserController {
-
+	
+	private static final String SESSION_ATTRIBUTE_FILTRE = "OrganGestorController.session.filtre";
+	
     @Autowired
     private OrganGestorService organGestorService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
+    	
+    	OrganGestorFiltreCommand command = getFiltreCommand(request);
+		model.addAttribute(command);
+    	
         return "organGestor";
     }
+    
+	@RequestMapping(value = "/filtrar", method = RequestMethod.POST)
+	public String post(
+			HttpServletRequest request,
+			@Valid OrganGestorFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+		getEntitatActualComprovantPermisos(request);
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE);
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_FILTRE,
+						filtreCommand);
+			}
+		}
+		return "redirect:../organgestor";
+	}
+    
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
@@ -44,9 +89,13 @@ public class OrganGestorController extends BaseUserController {
 
         try {
             EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+            
+            OrganGestorFiltreCommand filtreCommand = getFiltreCommand(request);
 
-            organs = organGestorService.findOrgansGestorsAmbFiltrePaginat(entitat.getId(),
-                    DatatablesHelper.getPaginacioDtoFromRequest(request));
+			organs = organGestorService.findAmbFiltrePaginat(
+					entitat.getId(),
+					filtreCommand.asDto(),
+					DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request,
                     getMessage(request, "notificacio.controller.entitat.cap.assignada"));
@@ -68,7 +117,8 @@ public class OrganGestorController extends BaseUserController {
 			organGestorService.syncDir3OrgansGestors(entitat.getId());
 			
 		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(
+			logger.error("Error al synchronizacio", e);
+			return getAjaxControllerReturnValueErrorMessage(
 					request,
 					"redirect:../../organgestor",
 					e.getMessage());
@@ -77,6 +127,110 @@ public class OrganGestorController extends BaseUserController {
         return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
                 "organgestor.controller.update.nom.tots.ok");
     }
+    
+
+    
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String getNew(HttpServletRequest request, Model model) {
+		return get(request, null, model);
+	}
+
+	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		OrganGestorDto organ = null;
+		if (organGestorId != null)
+			organ = organGestorService.findById(entitatActual.getId(), organGestorId);
+		if (organ != null)
+			model.addAttribute(OrganGestorCommand.asCommand(organ));
+		else
+			model.addAttribute(new OrganGestorCommand());
+
+		return "organGestorForm";
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public String save(
+			HttpServletRequest request,
+			@Valid OrganGestorCommand command,
+			BindingResult bindingResult,
+			Model model) throws JsonMappingException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		if (bindingResult.hasErrors()) {
+			return "organGestorForm";
+		}
+
+		if (command.getId() != null) {
+			organGestorService.update(entitatActual.getId(), OrganGestorCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:organGestor",
+					"organgestor.controller.modificat.ok");
+		} else {
+			organGestorService.create(entitatActual.getId(), OrganGestorCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:organGestor",
+					"organgestor.controller.creat.ok");
+		}
+	}
+
+	@RequestMapping(value = "/{organGestorId}/delete", method = RequestMethod.GET)
+	public String delete(HttpServletRequest request, @PathVariable Long organGestorId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			organGestorService.delete(
+					entitatActual.getId(),
+					organGestorId);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../organGestor",
+					"organgestor.controller.esborrat.ok");
+		} catch (Exception ex) {
+			logger.error("Error al esborrar organ gestor");
+			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);
+			if (root instanceof SQLIntegrityConstraintViolationException && root.getMessage().contains("IPA_ORGAN_GESTOR_METAEXP_FK")) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"organgestor.controller.esborrar.error.fk.metaexp");
+			} else if (root instanceof SQLIntegrityConstraintViolationException && root.getMessage().contains("IPA_ORGAN_GESTOR_EXP_FK")) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"organgestor.controller.esborrar.error.fk.exp");
+			} else {
+				return getAjaxControllerReturnValueErrorMessage(
+						request,
+						"redirect:../../esborrat",
+						root.getMessage());
+			}
+		}
+	}
+    
+    
+	private OrganGestorFiltreCommand getFiltreCommand(
+			HttpServletRequest request) {
+		OrganGestorFiltreCommand filtreCommand = (OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new OrganGestorFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE,
+					filtreCommand);
+		}
+		return filtreCommand;
+	}
+
+    
+    
 //
 //    @RequestMapping(value = "/permis", method = RequestMethod.GET)
 //    public String permisos(HttpServletRequest request, OrganGestorFiltreCommand command, Model model) {
@@ -158,4 +312,7 @@ public class OrganGestorController extends BaseUserController {
 //        return getAjaxControllerReturnValueSuccess(request, "redirect:../../permis",
 //                "entitat.controller.permis.esborrat.ok");
 //    }
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(OrganGestorController.class);
 }

@@ -277,7 +277,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -304,7 +304,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -321,7 +321,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;

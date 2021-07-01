@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -39,6 +40,7 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -56,6 +58,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Autowired
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired
+	private ExpedientRepository expedientRepository;
+	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
@@ -68,12 +72,85 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Autowired
 	private UsuariHelper usuariHelper;
 	
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAll() {
 		List<OrganGestorEntity> organs = organGestorRepository.findAll();
 		return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public OrganGestorDto findById(Long entitatId, Long id) {
+		logger.debug("Consulta del organ gestor (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
+
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id);
+		OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
+		resposta.setPareId(organGestor.getPare() != null ? organGestor.getPare().getId() : null);
+		return resposta;
+	}
+	
+	@Transactional
+	@Override
+	public OrganGestorDto create(Long entitatId, OrganGestorDto organGestorDto) {
+		logger.debug(
+				"Creant un nou organ (" + "entitatId=" + entitatId + ", " + "organGestor=" + organGestorDto +
+						")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		
+		OrganGestorEntity organPareEntity = null;
+		if (organGestorDto.getPareId() != null) {
+			organPareEntity = organGestorRepository.findOne(organGestorDto.getPareId());
+		}
+		
+		OrganGestorEntity entity = OrganGestorEntity.getBuilder(
+				organGestorDto.getCodi()).
+				nom(organGestorDto.getNom()).
+				entitat(entitat).
+				pare(organPareEntity).
+				gestioDirect(true).
+				build();
+		
+		OrganGestorEntity organGestorEntity = organGestorRepository.save(entity);
+		
+		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
+	}
+
+	@Transactional
+	@Override
+	public OrganGestorDto update(Long entitatId, OrganGestorDto organGestorDto) {
+		logger.debug(
+				"Actualitzant organ gestor existent (" + "entitatId=" + entitatId + ", " + "organGestorDto=" +
+						organGestorDto + ")");
+		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
+		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, organGestorDto.getId());
+		
+		OrganGestorEntity organPareEntity = null;
+		if (organGestorDto.getPareId() != null) {
+			organPareEntity = organGestorRepository.findOne(organGestorDto.getPareId());
+		}
+		
+		organGestorEntity.update(
+				organGestorDto.getCodi(),
+				organGestorDto.getNom(),
+				organPareEntity,
+				true);
+
+		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
+	}
+	
+	@Transactional
+	@Override
+	public void delete(Long entitatId, Long id) {
+		logger.debug("Esborrant organ gestor (id=" + id + ")");
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id);
+		
+		organGestorRepository.delete(organGestor);
+	}
+	
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -145,10 +222,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organDB.setPare(organGestorRepository.findByEntitatAndCodi(entitat, o.getPareCodi()));
 				organGestorRepository.save(organDB);
 			} else { // update it
-				organDB.setNom(o.getNom());
-				organDB.setActiu(true);
-				organDB.setPare(organGestorRepository.findByEntitatAndCodi(entitat, o.getPareCodi()));
-				organGestorRepository.flush();
+				if (!organDB.isGestioDirect()) {
+					organDB.setNom(o.getNom());
+					organDB.setActiu(true);
+					organDB.setPare(organGestorRepository.findByEntitatAndCodi(entitat, o.getPareCodi()));
+					organGestorRepository.flush();
+				}
 			}
 			organismesDIR3.add(organDB);
 		}
@@ -156,11 +235,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		List<OrganGestorEntity> organismesNotInDIR3 = organGestorRepository.findByEntitat(entitat);
 		organismesNotInDIR3.removeAll(organismesDIR3);
 		for (OrganGestorEntity o : organismesNotInDIR3) {
-			if (o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) {
-				organGestorRepository.delete(o.getId());
-			} else {
-				o.setActiu(false);
-				organGestorRepository.flush();
+			if (!o.isGestioDirect()) {
+				
+				List<MetaExpedientOrganGestorEntity> metaexporg = metaExpedientOrganGestorRepository.findByOrganGestor(o);
+				List<ExpedientEntity> expedients = expedientRepository.findByOrganGestor(o);
+				
+				if ((o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) && (expedients == null || expedients.isEmpty()) && (metaexporg == null || metaexporg.isEmpty())) {
+					organGestorRepository.delete(o.getId());
+				} else {
+					o.setActiu(false);
+					organGestorRepository.flush();
+				}
 			}
 		}
 		return true;
@@ -168,14 +253,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId,
+			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
-		Page<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
+		Page<OrganGestorEntity> organs = organGestorRepository.findAmbFiltrePaginat(
 				entitat,
-				paginacioParams.getFiltre() == null,
-				paginacioParams.getFiltre(),
+				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+				filtre.getCodi(),
+				filtre.getNom() == null || filtre.getNom().isEmpty(),
+				filtre.getNom(),
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 		for (OrganGestorDto organ : paginaOrgans.getContingut()) {

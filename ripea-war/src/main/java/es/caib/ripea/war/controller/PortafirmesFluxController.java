@@ -38,7 +38,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/document")
-public class PortafirmesFluxController extends BaseUserController {
+public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 

@@ -4227,7 +4227,9 @@ public class PluginHelper {
 			ArxiuAccioEnumDto arxiuAccio) {
 		Document document = new Document();
 		String fitxerExtensio = null;
-		String documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
+		String documentNomInArxiu = nom;
+		if (!documentImportat)
+			documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
 		document.setNom(documentNomInArxiu);
 		document.setDescripcio(descripcio);
 		document.setIdentificador(documentUuid);

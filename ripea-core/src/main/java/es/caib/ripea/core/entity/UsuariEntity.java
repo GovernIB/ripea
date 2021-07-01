@@ -51,6 +51,9 @@ public class UsuariEntity implements Serializable {
 			inverseJoinColumns = {@JoinColumn(name = "viafirma_user_codi")})
 	private Set<ViaFirmaUsuariEntity> viaFirmaUsuaris = new HashSet<ViaFirmaUsuariEntity>();
 	
+	@Column(name="rol_actual", length = 64)
+	private String rolActual;
+	
 	@Version
 	private long version = 0;
 	
@@ -86,7 +89,9 @@ public class UsuariEntity implements Serializable {
 	public Set<ViaFirmaUsuariEntity> getViaFirmaUsuaris() {
 		return viaFirmaUsuaris;
 	}
-	
+	public String getRolActual() {
+		return rolActual;
+	}
 	public void update(
 			String nom,
 			String nif,
@@ -102,7 +107,9 @@ public class UsuariEntity implements Serializable {
 		this.idioma = idioma;
 	}
 
-
+	public void updateRolActual(String rolActual) {
+		this.rolActual = rolActual;
+	}
 	/**
 	 * Obté el Builder per a crear objectes de tipus Usuari.
 	 * 

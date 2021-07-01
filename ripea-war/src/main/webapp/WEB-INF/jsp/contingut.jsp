@@ -425,7 +425,17 @@ body.loading .rmodal {
                 50% 50% 
                 no-repeat;
 }
-
+.btn-top {
+	position: fixed;
+	z-index: 1000;
+	right: 60px;
+	bottom: 50px;
+	background-color: #FFF;
+	padding: 0 5px 0 5px;
+	border-radius: 5px;
+	cursor: pointer;
+	opacity: 0.1;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -528,14 +538,15 @@ $(document).ready(function() {
 				if(data.objecte != null && data.objecte.length > 0){
 					data.objecte.forEach(function(firma){
 						if(firma != null){
+							var firmaDataStr = "";
 							if(firma.responsableNom == null){
 								firma.responsableNom = "";
 							}
 							if(firma.responsableNif == null){
 								firma.responsableNif = "";
 							}
-							if(firma.data == null){
-								firma.data = "";
+							if(firma.data != null){
+								firmaDataStr = new Date(firma.data);
 							}
 							if(firma.emissorCertificat == null){
 								firma.emissorCertificat = "";
@@ -552,7 +563,7 @@ $(document).ready(function() {
 								+ "</td></tr><tr><td><strong>"
 								+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
 								+ "</strong></td><td>"
-								+ firma.data
+								+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
 								+ "</td></tr><tr><td><strong>"
 								+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
 								+ "</strong></td><td>"
@@ -641,6 +652,7 @@ $(document).ready(function() {
 		activeClass: 'element-target',
 		hoverClass: 'element-hover',
 		drop: function(event, ui) {
+			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 			var origenId = ui.draggable.data('contenidor-id');
 			var destiId = $(this).data('contenidor-id');
 			window.location = origenId + "/moure/" + destiId;
@@ -861,23 +873,20 @@ $(document).ready(function() {
 			checkItAll.addEventListener('change', function() {
 				if (checkItAll.checked) {
 					inputs.forEach(function(input) {
-						var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+						/*var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
 						$.ajax({
 					        type: "GET",
 					        url: comprovacioUrl,
-					        success: function (isDocument) {
-					        	if (isDocument) {
-					        		input.checked = true;
-									var index = docsIdx.indexOf(parseInt(input.id));
-									if (index < 0) {
-										docsIdx.push(parseInt(input.id));
-									}
-					        	}
-	
-								enableDisableButton();
-								selectAll();
-					        }
-						});
+					        success: function (isDocument) {*/
+					    input.checked = true;
+						var index = docsIdx.indexOf(parseInt(input.id));
+						if (index < 0) {
+							docsIdx.push(parseInt(input.id));
+						}
+						enableDisableButton();
+						selectAll();
+					        /*}
+						});*/
 				    });  
 				} else {
 					inputs.forEach(function(input) {
@@ -899,8 +908,10 @@ $(document).ready(function() {
 			$(checkItAll).toggleClass('active');
 
 			if ($(checkItAll).hasClass('active') && $(listDocuments).hasClass('multiple')) {
-				elements.forEach(function(input) {
-					var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
+				elements.forEach(function(child) {
+					var childParent = $(child.parentElement);
+					var isCarpeta = childParent.hasClass('element-droppable');
+					/*var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
 					$.ajax({
 				        type: "GET",
 				        url: comprovacioUrl,
@@ -916,9 +927,17 @@ $(document).ready(function() {
 							enableDisableButton();
 							selectAll();
 				        }
-					});
-					
-				});  
+					});*/
+					if (!isCarpeta) {
+						$(child).addClass('selectd');
+						var index = docsIdx.indexOf(parseInt(child.id));
+						if (index < 0) {
+							docsIdx.push(parseInt(child.id));
+						}
+					}
+				}); 
+				enableDisableButton();
+				selectAll();
 			} else if ($(listDocuments).hasClass('multiple')) {
 				elements.forEach(function(input) {
 					$(input).removeClass('selectd');
@@ -1111,6 +1130,24 @@ $(document).ready(function() {
 		    });	
 		}
 	});
+
+						
+	//scroll top
+	$('.btn-top').on('click', function() {
+		$([document.documentElement, document.body]).animate({
+	        scrollTop: 0
+	    }, 200);
+	});
+	
+	$(document).scroll(function() {
+		var scrollTop = $(document).scrollTop();
+		var opacity = 0.1 + scrollTop / 1500;
+		if (opacity > 0.7)
+			opacity = 0.7;
+		$('.btn-top').css({
+			opacity: opacity
+		});
+	});
 });
 
 function getEnviamentsDocument(document) {
@@ -1185,10 +1222,78 @@ function getEnviamentsDocument(document) {
 }
 
 function enableDisableButton() {
+	var isTotPdfFirmat = true;
+	var isTotPdf = true;
 	var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut"/>';
-	$('#contenidor-contingut ').addClass("disabled");
-	$('#table-documents').addClass("disabled");
 	$('#loading').removeClass('hidden');
+	//lista
+	var tableDocuments = document.getElementById('table-documents');
+	$(tableDocuments).addClass("disabled");
+	//icones
+	var gridDocuments = document.getElementById('contenidor-contingut');
+	$(gridDocuments).addClass("disabled");
+	
+	if (docsIdx != undefined && tableDocuments != undefined) {
+		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+		inputs.forEach(function(input) {
+			var documentId = parseInt(input.id);
+			if (docsIdx.includes(documentId)) {
+				var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
+				var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
+				if (!isFirmatCurrentDocument) {
+					isTotPdfFirmat = false;
+					return false;
+				}
+				if (!isPdfCurrentDocument) {
+					isTotPdf = false;
+				}
+			}
+		});
+
+	} else if (docsIdx != undefined && gridDocuments != undefined) {
+		var list = gridDocuments.querySelectorAll('li');
+		list.forEach(function(child) {
+			var childId = $(child).attr('data-contenidor-id');
+			var documentId = parseInt(childId);
+			if (docsIdx.includes(documentId)) {
+				var isFirmatCurrentDocument = $(child).hasClass('firmat');
+				var isPdfCurrentDocument = $(child).hasClass('isPdf');
+				if (!isFirmatCurrentDocument) {
+					isTotPdfFirmat = false;
+					return false;
+				}
+				if (!isPdfCurrentDocument) {
+					isTotPdf = false;
+				}
+			}
+		});
+	}
+	if (isTotPdfFirmat && isTotPdf) {
+		$('.nomaximized').addClass('hidden'); //zip
+		$('.maximized').removeClass('hidden'); //concatenació
+		$('#notificar-mult').removeClass("disabled");
+		$('#definitiu-mult').addClass("disabled");
+	} else if (isTotPdfFirmat && !isTotPdf) {
+		$('.nomaximized').removeClass('hidden'); //zip
+		$('.maximized').addClass('hidden'); //concatenació
+		$('#notificar-mult').removeClass("disabled");
+		$('#definitiu-mult').addClass("disabled");
+	} else {
+		$('#notificar-mult').addClass("disabled");
+		$('#definitiu-mult').removeClass("disabled");
+	}
+	if (docsIdx.length > 0) {
+		$('#descarregar-mult').removeClass("disabled");
+		$('#moure-mult').removeClass("disabled");
+	} else {
+		$('#descarregar-mult').addClass("disabled");
+		$('#notificar-mult').addClass("disabled");
+		$('#moure-mult').addClass("disabled");
+	}
+	$('#contenidor-contingut ').removeClass("disabled");
+	$('#table-documents').removeClass("disabled");
+	$('#loading').addClass('hidden');
+	/*
 	if (docsIdx != undefined) {
 		$.ajax({
 	        type: "GET",
@@ -1224,6 +1329,7 @@ function enableDisableButton() {
 			}
 	    });
 	}
+	*/
 }
 
 function selectAll() {
@@ -1437,6 +1543,10 @@ function showViewer(event, documentId, contingutNom) {
 	$('#container').attr('src', '');
 	$('#container').addClass('rmodal_loading');
 	showDocument(urlDescarrega);
+	
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#resum-viewer").offset().top - 110
+    }, 500);
 }
 
 function showDocument(arxiuUrl) {
@@ -2396,6 +2506,9 @@ function closeViewer() {
 				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
 			</c:if>
 		</div>
-	</c:if>	
+	</c:if>
+	<div class="btn-top">
+		<span class="fa fa-arrow-up"></span>
+	</div>
 </body>
 </html>

@@ -28,11 +28,14 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
+import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -41,6 +44,8 @@ import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.EntitatRepository;
 
 /**
  * Implementació dels mètodes per importar documents desde l'arxiu.
@@ -62,6 +67,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private CarpetaRepository carpetaRepository;
+	@Autowired
+	private ContingutRepository contingutRepository;
+	@Autowired
+	private EntitatRepository entitatRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
@@ -76,7 +85,14 @@ public class ImportacioServiceImpl implements ImportacioService {
 		ExpedientEntity expedientSuperior;
 		FitxerDto fitxer = new FitxerDto();;
 		int documentsRepetits = 0;
+		boolean crearNovaCarpeta = dades.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA);
 		List<DocumentDto> listDto = new ArrayList<DocumentDto>();
+		
+		ContingutEntity pare =contingutId != null ? contingutRepository.getOne(contingutId) : null;			
+		if (crearNovaCarpeta && !checkCarpetaUniqueContraint(dades.getCarpetaNom(), pare, entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
+		
 		ContingutEntity contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -121,7 +137,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 
 			// comprovar si el justificant s'ha importat anteriorment
 			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(contingutArxiu.getIdentificador());
-			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty()) {
+			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
 					expedientsWithImportacio.add(documentAlreadyImported);
 					documentsRepetits++;
@@ -138,18 +154,18 @@ public class ImportacioServiceImpl implements ImportacioService {
 //				}
 //			}
 			// ############### CREAR CARPETA PARE ON INTRODUIR DOCUMENT #########
-			boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
-			if (isCarpetaActive) {
+//			boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+			if (crearNovaCarpeta) {
 				// create carpeta ind db and arxiu if doesnt already exists
 				Long carpetaId = expedientHelper.createCarpetaFromExpPeticio(
 						expedientSuperior,
 						entitatId,
-						"Registre entrada: " + dades.getNumeroRegistre());
+						dades.getCarpetaNom());
 				carpetaEntity = carpetaRepository.findOne(carpetaId);
 			}
 			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')) : documentArxiu.getNom();
 			contingutHelper.comprovarNomValid(
-					isCarpetaActive ? carpetaEntity : expedientSuperior,
+					crearNovaCarpeta ? carpetaEntity : expedientSuperior,
 					nomDocument,
 					null,
 					DocumentEntity.class);
@@ -166,7 +182,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 					getEstatElaboracio(documentArxiu),
 					getTipusDocumental(documentArxiu),
 					null, //metaDocumentEntity
-					isCarpetaActive ? carpetaEntity : contingutPare,
+					crearNovaCarpeta ? carpetaEntity : contingutPare,
 					contingutPare.getEntitat(),
 					expedientSuperior,
 					null,
@@ -446,6 +462,17 @@ public class ImportacioServiceImpl implements ImportacioService {
 			}
 		}
 		return ntiCsv;
+	}
+	
+	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
+		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.CARPETA);
+	}
+	
+	private boolean isIncorporacioDuplicadaPermesa() {
+		boolean isPropagarRelacio = Boolean.parseBoolean(
+				PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporacio.anotacions.duplicada"));
+		return isPropagarRelacio;
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ImportacioServiceImpl.class);
 

@@ -23,8 +23,10 @@ public class OrganGestorDto extends AuditoriaDto {
     private String nom;
     private String entitatId;
     private String pareCodi;
+    private Long pareId;
     private String entitatNom;
     private List<PermisDto> permisos;
+    private boolean gestioDirect;
 
     public int getPermisosCount() {
         if (permisos == null)
