@@ -932,12 +932,12 @@ public class EntityComprovarHelper {
 			
 
 			if (!grantedDirect && !grantedOrgan && !grantedOrganMetaNode) {
-				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), permissionName);
+				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), usuariCodi != null ? usuariCodi: auth.getName(), permissionName);
 			}
 				
 		} else {
 			if (!grantedDirect) {
-				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), auth.getName(), permissionName);
+				throw new PermissionDeniedException(metaNode.getId(), metaNode.getClass(), usuariCodi != null ? usuariCodi: auth.getName(), permissionName);
 			}
 		}
 

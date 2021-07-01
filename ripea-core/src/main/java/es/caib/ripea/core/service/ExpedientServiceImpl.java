@@ -1468,9 +1468,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		OrganGestorEntity organGestorFiltre = null;
 		if (filtre.getOrganGestorId() != null) {
-			organGestorFiltre = entityComprovarHelper.comprovarOrganGestorPerRolUsuari(
-					entitat,
-					filtre.getOrganGestorId());
+			if (rolActual.equals("IPA_ADMIN")) {
+				organGestorFiltre = entityComprovarHelper.comprovarOrganGestorAdmin(
+						entitat.getId(),
+						filtre.getOrganGestorId());
+			} else {
+				organGestorFiltre = entityComprovarHelper.comprovarOrganGestorPerRolUsuari(
+						entitat,
+						filtre.getOrganGestorId());
+			}
 		}
 		/*/ Els meta-expedients permesos son els que tenen assignat permís de lectura directament
 		// i també els que pertanyen a un òrgan sobre el que es te assignat permís de lectura.

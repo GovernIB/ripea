@@ -554,8 +554,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
-				false, false, false);
+				false,
+				true, 
+				false, 
+				false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);

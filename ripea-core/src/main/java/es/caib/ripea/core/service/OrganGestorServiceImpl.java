@@ -190,10 +190,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			String filter) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
+				false,
+				true, 
 				false, 
-				false, false);
+				false);
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
 				filter == null || filter.isEmpty(),

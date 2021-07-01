@@ -475,9 +475,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	public long countAnotacionsPendents(Long entitatId, boolean isAdmin) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false, 
+				false,
+				true, 
 				false, 
 				false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
