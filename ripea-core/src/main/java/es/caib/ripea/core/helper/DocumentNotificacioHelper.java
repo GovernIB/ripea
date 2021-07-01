@@ -305,6 +305,7 @@ public class DocumentNotificacioHelper {
 					documentEnviamentInteressatEntity.getNotificacio().getDocument().getPare(), 
 					documentEnviamentInteressatEntity.getNotificacio().getDocument().getExpedientPare(), 
 					metaDocument,
+					null,
 					false);
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
 			

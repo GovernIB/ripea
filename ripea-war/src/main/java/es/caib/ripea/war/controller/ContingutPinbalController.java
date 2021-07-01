@@ -91,7 +91,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../contingut/" + pareId,
-				"pinbal.controller.modificat.ok");
+				"pinbal.controller.creat.ok");
 	}
 
 	private void omplirModelFormulari(

@@ -75,6 +75,7 @@ public class DocumentHelper {
 			ContingutEntity pare,
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
+			List<ArxiuFirmaDto> firmes,
 			boolean returnDetail) {
 		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
@@ -120,13 +121,13 @@ public class DocumentHelper {
 		fitxer.setNom(document.getFitxerNom());
 		fitxer.setContentType(document.getFitxerContentType());
 		fitxer.setContingut(document.getFitxerContingut());
-		List<ArxiuFirmaDto> firmes = null;
+		List<ArxiuFirmaDto> firmesValidacio = null;
 		if (document.getFitxerContingut() != null) {
 			actualitzarFitxerDocument(
 					entity,
 					fitxer);
-			if (document.isAmbFirma()) {
-				firmes = validaFirmaDocument(
+			if (document.isAmbFirma() && firmes == null) {
+				firmesValidacio = validaFirmaDocument(
 						entity, 
 						fitxer,
 						document.getFirmaContingut());
@@ -163,7 +164,7 @@ public class DocumentHelper {
 					fitxer,
 					document.isAmbFirma(),
 					document.isFirmaSeparada(),
-					firmes);
+					firmes != null ? firmes : firmesValidacio);
 		
 			if (gestioDocumentalAdjuntId != null ) {
 				pluginHelper.gestioDocumentalDelete(

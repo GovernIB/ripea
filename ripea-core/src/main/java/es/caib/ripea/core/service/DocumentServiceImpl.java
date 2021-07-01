@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,8 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -193,6 +196,7 @@ public class DocumentServiceImpl implements DocumentService {
 				pare,
 				expedient,
 				metaDocument,
+				null,
 				true);
 	}
 
@@ -640,6 +644,7 @@ public class DocumentServiceImpl implements DocumentService {
 					DocumentEntity.class,
 					"S'ha especificat un servei PINBAL no suportat: " + metaDocument.getPinbalServei());
 		}
+		FitxerDto justificant = pinbalHelper.getJustificante(idPeticion);
 		DocumentDto document = new DocumentDto();
 		document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
@@ -653,22 +658,26 @@ public class DocumentServiceImpl implements DocumentService {
 			nomSencer.append(interessatPf.getLlinatge2().trim());
 		}
 		document.setNom(idPeticion + " - " + nomSencer.toString());
-		//document.setDescripcio(descripcio);
 		document.setData(new Date());
 		document.setNtiOrgano(expedient.getNtiOrgano());
 		document.setNtiOrigen(NtiOrigenEnumDto.O1);
 		document.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
 		document.setNtiTipoDocumental("TD99");
-		/*document.setFitxerNom(fitxerNom);
-		document.setFirmaContentType(firmaContentType);
-		document.setFitxerContingut(fitxerContingut);*/
-		document.setAmbFirma(false);
+		document.setFitxerNom(justificant.getNom());
+		document.setFitxerContentType(justificant.getContentType());
+		document.setFitxerContingut(justificant.getContingut());
+		document.setAmbFirma(true);
+		document.setFirmaSeparada(false);
 		document.setPinbalIdpeticion(idPeticion);
+		ArxiuFirmaDto firma = new ArxiuFirmaDto();
+		firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
+		firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 		documentHelper.crearDocument(
 				document,
 				pare,
 				expedient,
 				metaDocument,
+				Arrays.asList(firma),
 				true);
 	}
 

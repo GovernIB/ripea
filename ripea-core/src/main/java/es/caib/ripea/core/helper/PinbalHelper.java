@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.springframework.stereotype.Component;
 
 import es.caib.pinbal.client.recobriment.model.ScspFuncionario;
+import es.caib.pinbal.client.recobriment.model.ScspJustificante;
 import es.caib.pinbal.client.recobriment.model.ScspRespuesta;
 import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimiento;
 import es.caib.pinbal.client.recobriment.model.ScspTitular;
@@ -20,6 +20,7 @@ import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -61,7 +62,7 @@ public class PinbalHelper {
 			} else {
 				throw new PinbalException("[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError());
 			}
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			throw new PinbalException(ex);
 		}
 	}
@@ -87,7 +88,7 @@ public class PinbalHelper {
 			} else {
 				throw new PinbalException("[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError());
 			}
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			throw new PinbalException(ex);
 		}
 	}
@@ -113,7 +114,19 @@ public class PinbalHelper {
 			} else {
 				throw new PinbalException("[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError());
 			}
-		} catch (IOException ex) {
+		} catch (Exception ex) {
+			throw new PinbalException(ex);
+		}
+	}
+
+	public FitxerDto getJustificante(String idPeticion) throws PinbalException {
+		try {
+			ScspJustificante justificante = getClientSvdccaacpasws01().getJustificante(idPeticion);
+			return new FitxerDto(
+					justificante.getNom(),
+					justificante.getContentType(),
+					justificante.getContingut());
+		} catch (Exception ex) {
 			throw new PinbalException(ex);
 		}
 	}
@@ -130,6 +143,8 @@ public class PinbalHelper {
 		solicitud.setNombreSolicitante(entitat.getNom());
 		solicitud.setIdentificadorSolicitante(entitat.getCif());
 		solicitud.setCodigoProcedimiento(metaExpedient.getClassificacioSia());
+		solicitud.setIdentificadorSolicitante("S0711001H");
+		solicitud.setCodigoProcedimiento("CODSVDR_GBA_20121107");
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		solicitud.setFinalidad(finalitat);
 		switch (consentiment) {
@@ -141,7 +156,7 @@ public class PinbalHelper {
 			break;
 		}
 		solicitud.setFuncionario(getFuncionariActual());
-		solicitud.setTitular(getTitularFromInteressat(interessat));
+		solicitud.setTitular(getTitularFromInteressat(interessat, false));
 	}
 
 	private ScspFuncionario getFuncionariActual() {
@@ -151,7 +166,9 @@ public class PinbalHelper {
 		return funcionario;
 	}
 
-	private ScspTitular getTitularFromInteressat(InteressatPersonaFisicaEntity interessat) {
+	private ScspTitular getTitularFromInteressat(
+			InteressatPersonaFisicaEntity interessat,
+			boolean ambNomSencer) {
 		ScspTitular titular = new ScspTitular();
 		switch (interessat.getDocumentTipus()) {
 		case CIF:
@@ -161,7 +178,7 @@ public class PinbalHelper {
 			titular.setTipoDocumentacion(ScspTipoDocumentacion.NIE);
 			break;
 		case NIF:
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.NIF);
+			titular.setTipoDocumentacion(ScspTipoDocumentacion.DNI);
 			break;
 		case PASSAPORT:
 			titular.setTipoDocumentacion(ScspTipoDocumentacion.Pasaporte);
@@ -169,21 +186,22 @@ public class PinbalHelper {
 		default:
 			titular.setTipoDocumentacion(ScspTipoDocumentacion.Otros);
 		}
-		titular.setTipoDocumentacion(ScspTipoDocumentacion.NIF);
 		titular.setDocumentacion(interessat.getDocumentNum());
 		titular.setNombre(interessat.getNom());
 		titular.setApellido1(interessat.getLlinatge1());
 		titular.setApellido2(interessat.getLlinatge2());
-		StringBuilder nomSencer = new StringBuilder(interessat.getNom());
-		if (interessat.getLlinatge1() != null) {
-			nomSencer.append(" ");
-			nomSencer.append(interessat.getLlinatge1().trim());
+		if (ambNomSencer) {
+			StringBuilder nomSencer = new StringBuilder(interessat.getNom());
+			if (interessat.getLlinatge1() != null) {
+				nomSencer.append(" ");
+				nomSencer.append(interessat.getLlinatge1().trim());
+			}
+			if (interessat.getLlinatge2() != null) {
+				nomSencer.append(" ");
+				nomSencer.append(interessat.getLlinatge2().trim());
+			}
+			titular.setNombreCompleto(nomSencer.toString());
 		}
-		if (interessat.getLlinatge2() != null) {
-			nomSencer.append(" ");
-			nomSencer.append(interessat.getLlinatge2().trim());
-		}
-		titular.setNombreCompleto(nomSencer.toString());
 		return titular;
 	}
 
