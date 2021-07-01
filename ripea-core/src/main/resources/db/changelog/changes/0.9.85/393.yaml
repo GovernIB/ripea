@@ -6,10 +6,9 @@ databaseChangeLog:
     - addColumn:
         columns:
         - column:
-            constraints:
-              nullable: false
             name: pinbal_actiu
             type: boolean
+            valueBoolean: false
         - column:
             name: pinbal_servei
             type: integer
