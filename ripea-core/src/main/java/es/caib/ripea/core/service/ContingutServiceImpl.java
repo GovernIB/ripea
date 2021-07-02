@@ -1657,6 +1657,37 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 	}
 
+	@Transactional
+	@Override
+	public void order(
+			Long entitatId, 
+			Long contingutId,
+			Map<Integer, Long> orderedElements)
+			throws NotFoundException, ValidationException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false,
+				false, 
+				false);
+		contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutId,
+				false,
+				true,
+				false,
+				false,
+				false);
+		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
+			Integer ordre = fill.getKey();
+			Long fillId = fill.getValue();
+			
+			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, fillId);
+			contingut.updateOrdre(ordre);
+		}
+	}
+	
 	/*private ContingutEntity contingutHelper.comprovarContingutDinsExpedient(
 			Long entitatId,
 			Long contingutId,

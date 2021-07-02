@@ -328,4 +328,14 @@ public class ContingutServiceBean implements ContingutService {
 				ambPermis);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void order(
+			Long entitatId,
+			Long contingutId, 
+			Map<Integer, Long> orderedElements)
+			throws NotFoundException, ValidationException {
+		delegate.order(entitatId, contingutId, orderedElements);
+	}
+
 }

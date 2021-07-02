@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import es.caib.ripea.core.aggregation.MetaExpedientCountAggregation;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -293,6 +294,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	
 	public List<DocumentEntity> findByArxiuUuidAndEsborrat(String arxiuUuid, int esborrat);
 	
+	public List<DocumentEntity> findByPareAndEsborrat(
+			ContingutEntity pare, 
+			int esborrat);
 //	@Query(	"select " +
 //			"    d " +
 //			"from " +

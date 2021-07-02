@@ -151,7 +151,10 @@
 					<th><spring:message code="contingut.info.tipus"/></th>
 					<th><spring:message code="contingut.info.createl"/></th>
 					<th><spring:message code="contingut.info.creatper"/></th>
-					<th width="10%">&nbsp;</th>
+					<th width="5%">&nbsp;</th>
+					<c:if test="${isOrdenacioPermesa}">
+						<th width="1%">&nbsp;</th>
+					</c:if>
 				</tr>
 			</thead>
 			<tbody>
@@ -248,6 +251,11 @@
 						<td>
 							<rip:blocContingutAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}"  nodeco="${nodeco}"/>
 						</td>
+						<c:if test="${isOrdenacioPermesa}">
+							<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>">
+								<span class="fa fa-sort"></span>
+							</td>
+						</c:if>
 					</tr>
 					<script>
 					$('.info-fill-${fill.id}').change(function() {

@@ -431,7 +431,7 @@ public class ContingutHelper {
 				List<ContingutEntity> fills = contingutRepository.findByPareAndEsborrat(
 						contingut,
 						0,
-						new Sort("createdDate"));
+						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 				if (filtrarFillsSegonsPermisRead) {
 					// Filtra els fills que no tenen permis de lectura
 					Iterator<ContingutEntity> it = fills.iterator();
@@ -1274,11 +1274,13 @@ public class ContingutHelper {
 	
 	public FitxerDto generarIndex(
 			EntitatEntity entitatActual, 
-			ExpedientEntity expedient) throws IOException {
+			ExpedientEntity expedient,
+			boolean exportar) throws IOException {
 		
 		byte[] indexGenerated = indexHelper.generarIndexPerExpedient(
 					expedient,
-					entitatActual);
+					entitatActual,
+					exportar);
 		
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".pdf");
@@ -1411,6 +1413,11 @@ public class ContingutHelper {
 	public boolean isCarpetaLogica() {
 		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
 		return Boolean.valueOf(carpetesLogiques);
+	}
+	
+	public boolean isOrdenacioPermesa() {
+		String isOrdenacioPermesa = PropertiesHelper.getProperties().getProperty("es.caib.ripea.ordenacio.contingut.habilitada");
+		return Boolean.valueOf(isOrdenacioPermesa);
 	}
 
 	private boolean isCertificacioAmbFirma(byte[] certificacioContingut) {

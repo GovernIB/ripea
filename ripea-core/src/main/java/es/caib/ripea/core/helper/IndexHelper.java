@@ -88,10 +88,13 @@ public class IndexHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private DocumentHelper documentHelper;
+	@Autowired
+	private ContingutHelper contingutHelper;
 	
 	public byte[] generarIndexPerExpedient(
 			ExpedientEntity expedient, 
-			EntitatEntity entitatActual) {
+			EntitatEntity entitatActual,
+			boolean exportar) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			Document index = inicialitzaDocument(out);
@@ -105,7 +108,8 @@ public class IndexHelper {
 					index, 
 					expedient, 
 					entitatActual,
-					false);
+					false,
+					exportar);
 			
 //			## Crear un índex per cada expedient relacionat
 			if (!expedient.getRelacionatsAmb().isEmpty() && indexExpedientsRelacionats()) {
@@ -133,7 +137,8 @@ public class IndexHelper {
 							index, 
 							expedient_relacionat, 
 							entitatActual,
-							true);
+							true,
+							exportar);
 				}
 			}
 			
@@ -183,7 +188,8 @@ public class IndexHelper {
 			Document index, 
 			ExpedientEntity expedient,
 			EntitatEntity entitatActual,
-			boolean isRelacio) {
+			boolean isRelacio,
+			boolean exportar) {
 		logger.debug("Generant la taula amb els documents de l'expedient [expedientId=" + expedient.getId() + "]");
 		try {
 //			## [DEFINICIÓ TAULA]
@@ -216,7 +222,7 @@ public class IndexHelper {
 			crearCapsaleraTaula(taulaDocuments, isRelacio);
 			
 //			## [CONTINGUT]
-			crearContingutTaula(taulaDocuments, expedient, entitatActual, isRelacio);
+			crearContingutTaula(taulaDocuments, expedient, entitatActual, isRelacio, exportar);
 			
 			index.add(taulaDocuments);
 			if (!isRelacio)
@@ -230,14 +236,15 @@ public class IndexHelper {
 			PdfPTable taulaDocuments,
 			ExpedientEntity expedient,
 			EntitatEntity entitatActual,
-			boolean isRelacio) throws Exception {
+			boolean isRelacio,
+			boolean exportar) throws Exception {
 		logger.debug("Generant la capçalera de la taula de documents");
 		List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
 			expedient, 
 			0, 
-			new Sort("createdDate"));
+			contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 		BigDecimal num = new BigDecimal(0);
-		
+		BigDecimal sum = new BigDecimal(1);
 		for (ContingutEntity contingut : continguts) {
 			if (num.scale() > 0)
 				num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
@@ -245,7 +252,6 @@ public class IndexHelper {
 			if (contingut instanceof DocumentEntity) {
 				DocumentEntity document = (DocumentEntity) contingut;
 				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
-					BigDecimal sum = new BigDecimal(1);
 					num = num.add(sum);
 					crearNovaFila(
 							taulaDocuments,
@@ -256,42 +262,57 @@ public class IndexHelper {
 				}
 			}
 			if (contingut instanceof CarpetaEntity) {
-				BigDecimal sum = new BigDecimal(1);
-				num = num.add(sum);
-				
-				List<String> estructuraCarpetes = new ArrayList<String>();
-				List<DocumentEntity> documentsCarpeta = new ArrayList<DocumentEntity>();
-				ContingutEntity carpetaActual = contingut;
-				while (carpetaActual instanceof CarpetaEntity) {
-					boolean darreraCarpeta = true;
-					estructuraCarpetes.add(carpetaActual.getNom());
-					
-					for (ContingutEntity contingutCarpetaActual : carpetaActual.getFills()) {
-						if (contingutCarpetaActual instanceof CarpetaEntity) {
-							carpetaActual = contingutCarpetaActual;
-							darreraCarpeta = false;
-						} else {
-							documentsCarpeta.add((DocumentEntity) contingutCarpetaActual);
-						}
-					}
-					for (DocumentEntity document : documentsCarpeta) {
-						if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
-							BigDecimal sum2 = new BigDecimal(0.1);
-							num = num.add(sum2);
-							crearNovaFila(
-									taulaDocuments,
-									document,
-									entitatActual,
-									num,
-									isRelacio);
-						}
-					}
-					documentsCarpeta = new ArrayList<DocumentEntity>();
-					if (darreraCarpeta)
-						break;
+				num = crearFilesCarpetaActual(
+						num, 
+						sum,
+						contingut, 
+						taulaDocuments, 
+						entitatActual, 
+						isRelacio,
+						exportar);
+			}
+		}
+	}
+	
+	private BigDecimal crearFilesCarpetaActual(
+			BigDecimal num, 
+			BigDecimal sum, 
+			ContingutEntity contingut, 
+			PdfPTable taulaDocuments, 
+			EntitatEntity entitatActual, 
+			boolean isRelacio,
+			boolean exportar) throws Exception {
+		ContingutEntity carpetaActual = contingut;
+		
+		List<ContingutEntity> contingutsCarpetaActual = contingutRepository.findByPareAndEsborrat(
+				carpetaActual, 
+				0, 
+				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		
+		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
+			if (contingutCarpetaActual instanceof CarpetaEntity) {
+				num = crearFilesCarpetaActual(
+						num, 
+						sum,
+						contingutCarpetaActual, 
+						taulaDocuments, 
+						entitatActual,  	
+						isRelacio,
+						exportar);
+			} else {
+				DocumentEntity document = (DocumentEntity)contingutCarpetaActual;
+				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+					num = num.add(sum);
+					crearNovaFila(
+							taulaDocuments,
+							document,
+							entitatActual,
+							num,
+							isRelacio);
 				}
 			}
 		}
+		return num;
 	}
 	
 	private void crearNovaFila(
