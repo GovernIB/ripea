@@ -3,12 +3,15 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,11 +25,13 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PinbalConsultaCommand;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 
 /**
  * Controlador per a la gestió de peticions a PINBAL.
@@ -83,15 +88,24 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			return "contingutPinbalForm";
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentService.pinbalNovaConsulta(
-				entitatActual.getId(),
-				pareId,
-				command.getMetaDocumentId(),
-				PinbalConsultaCommand.asDto(command));
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../contingut/" + pareId,
-				"pinbal.controller.creat.ok");
+		try {
+			documentService.pinbalNovaConsulta(
+					entitatActual.getId(),
+					pareId,
+					command.getMetaDocumentId(),
+					PinbalConsultaCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../contingut/" + pareId,
+					"pinbal.controller.creat.ok");
+		} catch (PinbalException ex) {
+			logger.error("Error en la consulta PINBAL", ex);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:../contingut/" + pareId,
+					"pinbal.controller.creat.error",
+					new String[] {ex.getMessage()});
+		}
 	}
 
 	private void omplirModelFormulari(
@@ -127,6 +141,15 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 				EnumHelper.getOptionsForEnum(
 						PinbalConsentimentEnumDto.class,
 						"pinbal.consentiment.enum."));
+		model.addAttribute(
+				"comunitats",
+				Arrays.asList(new HtmlOption("07", "Illes Balears")));
+		model.addAttribute(
+				"provincies",
+				Arrays.asList(new HtmlOption("07", "Illes Balears")));
 	}
+
+	
+	private static final Logger logger = LoggerFactory.getLogger(ContingutPinbalController.class); 
 
 }

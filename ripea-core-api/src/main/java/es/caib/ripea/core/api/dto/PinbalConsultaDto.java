@@ -19,5 +19,7 @@ public class PinbalConsultaDto {
 	private Long interessatId;
 	private String finalitat;
 	private PinbalConsentimentEnumDto consentiment;
+	private String comunitatAutonomaCodi;
+	private String provinciaCodi;
 
 }

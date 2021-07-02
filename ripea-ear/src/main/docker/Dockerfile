@@ -24,6 +24,9 @@ ENV AFIRMA_PASSWORD RIPEA
 ENV NOTIB_URL https://proves.caib.es/notib
 ENV NOTIB_USERNAME \$ripea_notib
 ENV NOTIB_PASSWORD ripea_notib
+ENV PINBAL_URL https://proves.caib.es/pinbal
+ENV PINBAL_USERNAME \$ripea_pinbal
+ENV PINBAL_PASSWORD ripea_pinbal
 EXPOSE 8080
 EXPOSE 8787
 ADD --chown=default:default deploycaib/ /opt/jboss/server/default/deploycaib/

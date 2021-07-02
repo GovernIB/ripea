@@ -637,7 +637,9 @@ public class DocumentServiceImpl implements DocumentService {
 					metaDocument,
 					(InteressatPersonaFisicaEntity)interessat,
 					consulta.getFinalitat(),
-					consulta.getConsentiment());
+					consulta.getConsentiment(),
+					consulta.getComunitatAutonomaCodi(),
+					consulta.getProvinciaCodi());
 		} else {
 			throw new ValidationException(
 					"<creacio>",

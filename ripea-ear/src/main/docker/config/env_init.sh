@@ -3,6 +3,7 @@
 APP_NAME=ripea
 DS_FILE=/opt/jboss/server/default/deploycaib/$APP_NAME-ds.xml
 SERVICE_FILE=/opt/jboss/server/default/deploycaib/$APP_NAME-service.xml
+RUN_CONF=/opt/jboss/bin/run.conf
 
 echo "Substituint variables del datasource"
 if [[ -n "$DATABASE_URL" ]]; then
@@ -109,4 +110,19 @@ if [[ -n "$NOTIB_PASSWORD" ]]; then
 	echo "Substituint NOTIB_PASSWORD per $NOTIB_PASSWORD"
 	sed -i "s/NOTIB_PASSWORD/$NOTIB_PASSWORD/g" $SERVICE_FILE
 fi
+if [[ -n "$PINBAL_URL" ]]; then
+	echo "Substituint PINBAL_URL per $PINBAL"
+	sed -i "s!PINBAL_URL!$PINBAL_URL!g" $SERVICE_FILE
+fi
+if [[ -n "$PINBAL_USERNAME" ]]; then
+	echo "Substituint PINBAL_USERNAME per $PINBAL_USERNAME"
+	sed -i "s/PINBAL_USERNAME/$PINBAL_USERNAME/g" $SERVICE_FILE
+fi
+if [[ -n "$PINBAL_PASSWORD" ]]; then
+	echo "Substituint PINBAL_PASSWORD per $PINBAL_PASSWORD"
+	sed -i "s/PINBAL_PASSWORD/$PINBAL_PASSWORD/g" $SERVICE_FILE
+fi
+
+echo "Configurant truststore"
+echo 'JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=/opt/webapps/truststore.jks -Djavax.net.ssl.trustStorePassword=tecnologies"' >> $RUN_CONF
 

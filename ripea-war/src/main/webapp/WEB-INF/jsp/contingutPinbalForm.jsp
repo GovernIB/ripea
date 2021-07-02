@@ -17,6 +17,22 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+<script>
+const metaDocumentServeiScsp = [];
+<c:forEach var="metaDocument" items="${metaDocuments}">
+metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei}";
+</c:forEach>
+$(document).ready(function() {
+	$('#metaDocumentId').on('change', function() {
+		if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPASWS01") {
+			$('#bloc-datos-especificos').css('display', 'bloc');
+		} else {
+			$('#bloc-datos-especificos').css('display', 'none');
+		}
+	});
+	$('#metaDocumentId').trigger('change');
+});
+</script>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/new"/></c:set>
@@ -27,6 +43,20 @@
 		<rip:inputSelect name="interessatId" textKey="contingut.pinbal.form.camp.interessat" required="true" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" />
 		<rip:inputSelect name="consentiment" textKey="contingut.pinbal.form.camp.consentiment" required="true" optionItems="${consentimentOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<rip:inputTextarea name="finalitat" textKey="contingut.pinbal.form.camp.finalitat" required="true" maxlength="256"/>
+		<div id="bloc-datos-especificos">
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active">
+					<a href="#datos-especificos" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.pinbal.form.datos.especificos"/></a>
+				</li>
+			</ul>
+			<br/>
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" id="datos-especificos">
+					<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
+					<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+				</div>
+			</div>
+		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.enviar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

@@ -30,6 +30,8 @@ public class PinbalConsultaCommand {
 	private String finalitat;
 	@NotNull
 	private PinbalConsentimentEnumDto consentiment;
+	private String comunitatAutonomaCodi;
+	private String provinciaCodi;
 
 	public Long getEntitatId() {
 		return entitatId;
@@ -66,6 +68,18 @@ public class PinbalConsultaCommand {
 	}
 	public void setConsentiment(PinbalConsentimentEnumDto consentiment) {
 		this.consentiment = consentiment;
+	}
+	public String getComunitatAutonomaCodi() {
+		return comunitatAutonomaCodi;
+	}
+	public void setComunitatAutonomaCodi(String comunitatAutonomaCodi) {
+		this.comunitatAutonomaCodi = comunitatAutonomaCodi;
+	}
+	public String getProvinciaCodi() {
+		return provinciaCodi;
+	}
+	public void setProvinciaCodi(String provinciaCodi) {
+		this.provinciaCodi = provinciaCodi;
 	}
 
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {

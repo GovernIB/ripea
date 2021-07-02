@@ -98,7 +98,9 @@ public class PinbalHelper {
 			MetaDocumentEntity metaDocument,
 			InteressatPersonaFisicaEntity interessat,
 			String finalitat,
-			PinbalConsentimentEnumDto consentiment) throws PinbalException {
+			PinbalConsentimentEnumDto consentiment,
+			String comunitatAutonomaCodi,
+			String provinciaCodi) throws PinbalException {
 		SolicitudSvdccaacpasws01 solicitud = new SolicitudSvdccaacpasws01();
 		emplenarSolicitudBase(
 				solicitud,
@@ -107,6 +109,8 @@ public class PinbalHelper {
 				interessat,
 				finalitat,
 				consentiment);
+		solicitud.setCodigoComunidadAutonoma(comunitatAutonomaCodi);
+		solicitud.setCodigoProvincia(provinciaCodi);
 		try {
 			ScspRespuesta respuesta = getClientSvdccaacpasws01().peticionSincrona(Arrays.asList(solicitud));
 			if (respuesta.getAtributos().getEstado().getCodigoEstado().equals("0003")) {
