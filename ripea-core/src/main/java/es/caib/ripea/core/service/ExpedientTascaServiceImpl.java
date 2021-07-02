@@ -393,7 +393,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				document,
 				pare,
 				expedient,
-				metaDocument);
+				metaDocument,
+				null,
+				true);
 	}
 
 	@Transactional

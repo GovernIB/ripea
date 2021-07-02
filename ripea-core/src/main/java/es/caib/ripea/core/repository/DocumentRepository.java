@@ -221,7 +221,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and d.documentTipus = 0 " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
-			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullExpedientNom = true or lower(d.expedient.nom) like lower('%'||:expedientNom||'%')) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
@@ -238,8 +238,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("usuariActual") String usuariActual,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
-			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullExpedientNom") boolean esNullExpedientNom,
+			@Param("expedientNom") String expedientNom,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
 			@Param("metaDocument") MetaNodeEntity metaDocument,
 			@Param("esNullNom") boolean esNullNom,

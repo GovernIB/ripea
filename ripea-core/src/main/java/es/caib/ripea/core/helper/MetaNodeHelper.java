@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaNodeAmbMetaDadesDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
-import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -39,6 +39,8 @@ public class MetaNodeHelper {
 	private PermisosHelper permisosHelper;
 	@Resource
 	private MetaExpedientHelper metaExpedientHelper;
+	@Resource
+	private EntityComprovarHelper entityComprovarHelper;
 
 	public void omplirMetaDadesPerMetaNodes(
 			List<? extends MetaNodeAmbMetaDadesDto> metaNodes) {
@@ -171,39 +173,64 @@ public class MetaNodeHelper {
 	}
 
 	public void omplirPermisosPerMetaNode(
-			MetaNodeDto metaNode,
-			boolean ambLlistaPermisos) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		metaNode.setUsuariActualCreate(
-				permisosHelper.isGrantedAll(
-						metaNode.getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.CREATE},
-						auth));
-		metaNode.setUsuariActualRead(
-				permisosHelper.isGrantedAll(
-						metaNode.getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth));
-		metaNode.setUsuariActualWrite(
-				permisosHelper.isGrantedAll(
-						metaNode.getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.WRITE},
-						auth));
-		metaNode.setUsuariActualDelete(
-				permisosHelper.isGrantedAll(
-						metaNode.getId(),
-						MetaNodeEntity.class,
-						new Permission[] {ExtendedPermission.DELETE},
-						auth));
-		if (ambLlistaPermisos) {
-			List<PermisDto> permisos = permisosHelper.findPermisos(
+			MetaNodeDto metaNode) {
+		
+		try {
+			metaNode.setUsuariActualRead(false);
+			entityComprovarHelper.comprovarPermisosMetaNode(
 					metaNode.getId(),
-					MetaNodeEntity.class);
-			metaNode.setPermisos(permisos);
+					null,
+					true,
+					false,
+					false,
+					false,
+					false);
+			metaNode.setUsuariActualRead(true);
+		} catch (PermissionDeniedException ex) {
 		}
+		
+		try {
+			metaNode.setUsuariActualWrite(false);
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					metaNode.getId(),
+					null,
+					false,
+					true,
+					false,
+					false,
+					false);
+			metaNode.setUsuariActualWrite(true);
+		} catch (PermissionDeniedException ex) {
+		}
+		
+		try {
+			metaNode.setUsuariActualCreate(false);
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					metaNode.getId(),
+					null,
+					false,
+					false,
+					true,
+					false,
+					false);
+			metaNode.setUsuariActualCreate(true);
+		} catch (PermissionDeniedException ex) {
+		}
+		
+		try {
+			metaNode.setUsuariActualDelete(false);
+			entityComprovarHelper.comprovarPermisosMetaNode(
+					metaNode.getId(),
+					null,
+					false,
+					false,
+					false,
+					true,
+					false);
+			metaNode.setUsuariActualDelete(true);
+		} catch (PermissionDeniedException ex) {
+		}
+
 	}
 
 }

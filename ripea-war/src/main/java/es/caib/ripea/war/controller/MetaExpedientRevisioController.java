@@ -6,8 +6,6 @@ package es.caib.ripea.war.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -166,10 +164,5 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		}
 		return filtreCommand;
 	}
-
-
-	
-	
-	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientRevisioController.class);
 
 }

@@ -1,0 +1,11 @@
+databaseChangeLog:
+- changeSet:
+    id: 1623938344291-1
+    author: limit
+    changes:
+    - addColumn:
+        column:
+          name: gestio_direct
+          type: boolean
+          valueBoolean: true
+        tableName: ipa_organ_gestor

@@ -42,6 +42,7 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
@@ -61,6 +62,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
 /**
@@ -126,6 +128,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 		model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
+		model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
 		
 		boolean isEntitatUserAdminOrOrgan;
 		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
@@ -134,12 +137,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			isEntitatUserAdminOrOrgan = false;
 		}
 		model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
-		
-		model.addAttribute(
-				"metaDocumentsLeft",
-				metaDocumentService.findActiusPerCreacio(
-						entitatActual.getId(),
-						contingutId));
+
+		List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
+				entitatActual.getId(),
+				contingutId);
+		List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
+		List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
+		for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
+			if (metaDocument.isPinbalActiu()) {
+				metaDocumentsPinbal.add(metaDocument);
+			} else {
+				metaDocumentsNoPinbal.add(metaDocument);
+			}
+		}
+		model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
+		model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
+
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
 						"notificacio.enviamentEstat.enum."));

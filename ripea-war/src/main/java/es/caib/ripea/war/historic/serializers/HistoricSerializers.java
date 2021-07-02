@@ -10,10 +10,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 public class HistoricSerializers {
 
+	@SuppressWarnings("serial")
 	@Data
+	@EqualsAndHashCode(callSuper=false)
 	@JsonNaming(PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy.class)
 	public static class RegistreExpedient extends Registre  implements Serializable {
 		private Long numDocsSignats;

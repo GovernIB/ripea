@@ -162,8 +162,13 @@
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
 				<th data-col-name="expedientTasquesCount" data-visible="false"></th>
 				<th data-col-name="grupsCount" data-visible="false"></th>
-				<th data-col-name="permisosCount" data-visible="false"></th>
-
+				
+				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
+					<script id="cellPermisosTemplate" type="text/x-jsrender">
+						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+					</script>
+				</th>
+				
 				<th data-col-name="id" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
 					<script id="cellElementsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -174,7 +179,6 @@
 								<li><a href="expedientEstat/{{:id}}"><span class="badge">{{:expedientEstatsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.estats"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/tasca"><span class="badge">{{:expedientTasquesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.tasques"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/grup"><span class="badge">{{:grupsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.grups"/></a></li>
-								<li><a href="metaExpedient/{{:id}}/permis"><span class="badge">{{:permisosCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.permisos"/></a></li>
 							</ul>
 						</div>					
 					</script>

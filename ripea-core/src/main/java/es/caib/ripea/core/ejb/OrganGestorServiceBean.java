@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -56,10 +57,10 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, paginacioParams);
+			OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
@@ -144,6 +145,46 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.findItemByEntitatAndCodi(
 				entitatId, 
 				codi);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public OrganGestorDto findById(
+			Long entitatId,
+			Long id) {
+		return delegate.findById(
+				entitatId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public OrganGestorDto create(
+			Long entitatId,
+			OrganGestorDto organGestorDto) {
+		return delegate.create(
+				entitatId,
+				organGestorDto);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public OrganGestorDto update(
+			Long entitatId,
+			OrganGestorDto organGestorDto) {
+		return delegate.update(
+				entitatId,
+				organGestorDto);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public void delete(
+			Long entitatId,
+			Long id) {
+		 delegate.delete(
+				 entitatId, 
+				 id);
 	}
 
 }

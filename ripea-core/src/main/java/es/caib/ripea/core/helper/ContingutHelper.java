@@ -396,7 +396,7 @@ public class ContingutHelper {
 		}
 		if (ambPermisos && metaNode != null) {
 			// Omple els permisos
-			metaNodeHelper.omplirPermisosPerMetaNode(metaNode, false);
+			metaNodeHelper.omplirPermisosPerMetaNode(metaNode);
 		}
 		if (resposta != null) {
 			// Omple la informació d'auditoria
@@ -1216,7 +1216,7 @@ public class ContingutHelper {
 					(DocumentEntity)contingut,
 					desti.getArxiuUuid(),
 					expedientDestiUuid);
-		} else if (contingut instanceof CarpetaEntity) {
+		} else if (contingut instanceof CarpetaEntity && !isCarpetaLogica()) {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingut,
 					desti.getArxiuUuid());

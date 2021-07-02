@@ -337,6 +337,17 @@ div.dropdown-menu.loading .rmodal_carrecs {
 			var optionRemoved = e.params.args.data.id;
 			$("#portafirmesResponsables option[value='" + optionRemoved + "']").remove();
 		});
+
+		$("#pinbalActiu").on('change', function() {
+			if ($(this).prop("checked")) {
+				$('#pinbalServei').removeAttr('disabled');
+				$('#pinbalServei').parent().parent().css('display', 'block');
+			} else {
+				$('#pinbalServei').attr('disabled', 'disabled');
+				$('#pinbalServei').parent().parent().css('display', 'none');
+			}
+		});
+		$("#pinbalActiu").trigger('change');
 	});
 	
 function toggleCarrecs() {
@@ -444,6 +455,7 @@ function removeLoading() {
 			<c:if test="${isFirmaBiometrica}">
 				<li role="presentation"><a href="#firma-biometrica" aria-controls="firma-biometrica" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.biometrica"/></a></li>
 			</c:if>
+			<li role="presentation"><a href="#pinbal" aria-controls="pinbal" role="tab" data-toggle="tab"><spring:message code="metadocument.form.tab.pinbal"/></a></li>
 		</ul>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
@@ -502,6 +514,10 @@ function removeLoading() {
 					<rip:inputCheckbox name="biometricaLectura" textKey="metadocument.form.camp.biometrica.lectura"/>
 				</div>
 			</c:if>
+			<div role="tabpanel" class="tab-pane" id="pinbal">
+				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu"/>
+				<rip:inputSelect name="pinbalServei" textKey="metadocument.form.camp.pinbal.servei" required="true" optionItems="${pinbalServeiEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+			</div>
 		</div>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

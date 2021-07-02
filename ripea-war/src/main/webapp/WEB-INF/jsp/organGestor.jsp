@@ -16,25 +16,63 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
+
 	<div class="text-right" data-toggle="botons-titol">
 		<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/sync/dir3">
 				<span class="fa fa-refresh"></span>&nbsp; <spring:message code="organgestor.list.boto.actualitzar"/>
 		</a>
 	</div>
-	<table id="permisos" data-toggle="datatable" 
-			data-url="<c:url value="organgestor/datatable"/>" 
-			data-info-type="search" 
-			data-default-order="1" 
-			data-default-dir="asc" 
-			data-botons-template="#botonsTemplate" 
-			class="table table-striped table-bordered" style="width:100%">
+
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="text-right">
+			<a href="<c:url value="/organgestor/new"/>" data-toggle="modal" data-maximized="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="organgestor.list.boto.nou"/></a>
+		</div>
+	</script>
+	<c:url value="organgestor/filtrar" var="formAction"/>
+	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="organGestorFiltreCommand">
+		<div class="row">
+			<div class="col-md-4">
+				<rip:inputText name="codi" inline="true" placeholderKey="organgestor.list.filtre.camp.codi"/>
+			</div>		
+			<div class="col-md-4">
+				<rip:inputText name="nom" inline="true" placeholderKey="organgestor.list.filtre.camp.nom"/>
+			</div>
+
+			<div class="col-md-4 pull-right">
+				<div class="pull-right">
+					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary default"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+				</div>
+			</div>
+		</div>
+	</form:form>
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/organgestor/{{:id}}</script>
+	<table 
+		id="permisos" 
+		data-toggle="datatable" 
+		data-url="<c:url value="organgestor/datatable"/>" 
+		data-search-enabled="false"
+		data-default-order="2" 
+		data-default-dir="asc" 
+		data-botons-template="#botonsTemplate"
+		class="table table-striped table-bordered" 
+		data-rowhref-template="#rowhrefTemplate" 
+		data-rowhref-toggle="modal"
+		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="codi">
+				<th data-col-name="gestioDirect" data-visible="false"></th>
+				<th data-col-name="codi" data-template="#cellCodiTemplate">
 					<spring:message code="organgestor.list.columna.codi"/>
+					<script id="cellCodiTemplate" type="text/x-jsrender">
+						{{:codi}}
+						{{if gestioDirect }}
+							<span class="fa fa-cog" title="<spring:message code="organgestor.list.gestionatRipea"/>"></span>
+						{{/if}}
+					</script>
 				</th>
-				<th data-col-name="nom">
-					<spring:message code="organgestor.list.columna.nom"/>
+				<th data-col-name="nom" >
+					<spring:message code="organgestor.list.columna.nom" />
 				</th>
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
@@ -43,6 +81,17 @@
 				</th>
 				<th data-col-name="permisosCount" data-visible="false">
 					<spring:message code="organgestor.list.columna.nom"/>
+				</th>
+				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="organgestor/{{:id}}" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="organgestor/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+							</ul>
+						</div>
+					</script>
 				</th>
 <!-- 				<th data-col-name="administration" data-template="#cellAdministrationTemplate"> -->
 <%-- 					<spring:message code="entitat.permis.columna.administracio"/> --%>
@@ -71,10 +120,5 @@
 			</tr>
 		</thead>
 	</table>
-	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right">
-			
-		</p>
-	</script>
 </body>
 </html>

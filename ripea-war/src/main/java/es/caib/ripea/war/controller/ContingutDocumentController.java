@@ -480,6 +480,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				return null;
 				
 			} catch (Exception e) {
+				logger.error("Error al descarregar un document", e);
 				
 				if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundDocumentException.class)) {
 					return getAjaxControllerReturnValueError(
@@ -487,12 +488,21 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							"redirect:../../",
 							"document.controller.descarregar.error.arxiuNoTrobat");
 				} else {
-					throw e;
+					
+					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+					
+					if (root.getMessage().contains("connect timed out")) {
+						MissatgesHelper.error(
+								request, 
+								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+					} else {
+						MissatgesHelper.error(
+								request, 
+								getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage());
+					}
+					return "redirect:../../../../contingut/" + pareId;
 				}
-				
-				
 			}
-			
 			
 		} else {
 			MissatgesHelper.error(
@@ -903,32 +913,38 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long contingutId,
 			@PathVariable Long documentId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				documentId,
-				true,
-				false);
-		if (contingut instanceof DocumentDto) {
-			FitxerDto fitxer = documentService.descarregarImprimible(
+
+		try {
+			contingutService.findAmbIdUser(
 					entitatActual.getId(),
 					documentId,
-					null);
-			writeFileToResponse(
-					fitxer.getNom(),
-					fitxer.getContingut(),
-					response);
-			return null;
-		}
-		MissatgesHelper.error(
-				request, 
-				getMessage(
+					true,
+					false);
+				FitxerDto fitxer = documentService.descarregarImprimible(
+						entitatActual.getId(),
+						documentId,
+						null);
+				writeFileToResponse(
+						fitxer.getNom(),
+						fitxer.getContingut(),
+						response);
+				return null;
+		} catch (Exception e) {
+			logger.error("Error al descarregar versio imprimible", e);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			
+			if (root.getMessage().contains("connect timed out")) {
+				MissatgesHelper.error(
 						request, 
-						"document.controller.descarregar.error"));
-		if (contingut.getPare() != null)
-			return "redirect:../../contingut/" + contingutId;
-		else
-			return "redirect:../../expedient";
-
+						getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+			} else {
+				MissatgesHelper.error(
+						request, 
+						getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage());
+			}
+			return "redirect:../../../../contingut/" + contingutId;
+		}
+		
 	}
 	
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/versio/{versio}/descarregar", method = RequestMethod.GET)

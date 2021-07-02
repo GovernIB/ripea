@@ -58,7 +58,16 @@ public class TestHelper {
 				new OrganGestorEntity()).build(); 
 		
 		
-		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(new EntitatEntity(), "codi", "nom", MultiplicitatEnumDto.M_0_1, new MetaExpedientEntity(), NtiOrigenEnumDto.O0, DocumentNtiEstadoElaboracionEnumDto.EE01, "ntiTipoDocumental").build();
+		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(
+				new EntitatEntity(),
+				"codi",
+				"nom",
+				MultiplicitatEnumDto.M_0_1,
+				new MetaExpedientEntity(),
+				NtiOrigenEnumDto.O0,
+				DocumentNtiEstadoElaboracionEnumDto.EE01,
+				"ntiTipoDocumental",
+				false).build();
 		
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				DocumentTipusEnumDto.DIGITAL,
@@ -118,7 +127,16 @@ public class TestHelper {
 				new OrganGestorEntity()).build(); 
 		
 		
-		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(new EntitatEntity(), "codi", "nom", MultiplicitatEnumDto.M_0_1, new MetaExpedientEntity(), NtiOrigenEnumDto.O0, DocumentNtiEstadoElaboracionEnumDto.EE01, "ntiTipoDocumental").build();
+		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(
+				new EntitatEntity(),
+				"codi",
+				"nom",
+				MultiplicitatEnumDto.M_0_1,
+				new MetaExpedientEntity(),
+				NtiOrigenEnumDto.O0,
+				DocumentNtiEstadoElaboracionEnumDto.EE01,
+				"ntiTipoDocumental",
+				false).build();
 		
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				DocumentTipusEnumDto.DIGITAL,

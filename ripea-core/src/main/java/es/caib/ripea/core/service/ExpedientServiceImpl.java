@@ -734,11 +734,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		entityComprovarHelper.comprovarPermisMetaNode(
 				expedient.getMetaExpedient(),
 				expedient.getId(),
-				true,
 				ExtendedPermission.WRITE,
 				"WRITE",
-				usuariCodi, 
-				true);
+				usuariCodi);
 		
 		expedientHelper.agafar(expedient, usuariCodi);
 	}
@@ -1470,9 +1468,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		OrganGestorEntity organGestorFiltre = null;
 		if (filtre.getOrganGestorId() != null) {
-			organGestorFiltre = entityComprovarHelper.comprovarOrganGestorPerRolUsuari(
-					entitat,
-					filtre.getOrganGestorId());
+			if (rolActual.equals("IPA_ADMIN")) {
+				organGestorFiltre = entityComprovarHelper.comprovarOrganGestorAdmin(
+						entitat.getId(),
+						filtre.getOrganGestorId());
+			} else {
+				organGestorFiltre = entityComprovarHelper.comprovarOrganGestorPerRolUsuari(
+						entitat,
+						filtre.getOrganGestorId());
+			}
 		}
 		/*/ Els meta-expedients permesos son els que tenen assignat permís de lectura directament
 		// i també els que pertanyen a un òrgan sobre el que es te assignat permís de lectura.
@@ -1550,10 +1554,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
-			// Cercam els metaExpedients amb permisos assignats directament
-			List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
+			
+			List<Long> metaExpedientIdPermesos = null;
+			if (rolActual.equals("IPA_ADMIN")) {
+				metaExpedientIdPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);
+			} else {
+				// Cercam els metaExpedients amb permisos assignats directament
+				metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+						MetaNodeEntity.class,
+						ExtendedPermission.READ));
+			}
 			// Cercam els òrgans amb permisos assignats directament
 			List<Long> organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					OrganGestorEntity.class,
@@ -1562,6 +1572,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
 					ExtendedPermission.READ));
+			
 			// Cercam metaExpedients amb una meta-dada del domini del filtre
 			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);

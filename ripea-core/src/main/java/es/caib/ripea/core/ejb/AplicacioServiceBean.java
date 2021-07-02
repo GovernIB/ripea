@@ -162,4 +162,10 @@ public class AplicacioServiceBean implements AplicacioService {
 				defaultValueIfNull);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	public void setRolUsuariActual(String rolActual) {
+		delegate.setRolUsuariActual(rolActual);
+	}
+
 }

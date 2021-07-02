@@ -185,4 +185,7 @@ public interface AplicacioService {
 			String key,
 			boolean defaultValueIfNull);
 
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	public void setRolUsuariActual(String rolActual);
+
 }

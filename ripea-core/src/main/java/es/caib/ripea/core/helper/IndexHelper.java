@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -47,8 +46,6 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -72,7 +69,7 @@ public class IndexHelper {
 
 	private Font frutiger7 = FontFactory.getFont("Frutiger", 6, Font.BOLD, new BaseColor(255, 255, 255)); // #7F7F7F
 	private Font frutiger6 = FontFactory.getFont("Frutiger", 6);
-	private Font frutiger5 = FontFactory.getFont("Frutiger", 5);
+	//private Font frutiger5 = FontFactory.getFont("Frutiger", 5);
 	private Font frutiger11TitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font frutiger9TitolBold = FontFactory.getFont("Frutiger", 9, Font.BOLD);
 	private Font frutiger10Italic = FontFactory.getFont("Frutiger", 10, Font.ITALIC, new BaseColor(160, 160, 160));

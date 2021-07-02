@@ -79,10 +79,10 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
-		boolean checkPerMassiuAdmin = false;
+		/*boolean checkPerMassiuAdmin = false;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			checkPerMassiuAdmin = true;
-		} 
+		}*/
 		
 		model.addAttribute(
 				"metaExpedients",

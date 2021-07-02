@@ -7,25 +7,31 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.ImportacioDto;
+import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.Importacio;
 
 /**
  * Command per al manteniment d'importació de documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Importacio
 public class ImportacioCommand {
 
 	@NotEmpty
 	private String numeroRegistre;
-	@NotNull
+	@NotEmpty
 	private String dataPresentacio;
+	
+	private TipusDestiEnumDto destiTipus;
+	
+	private String carpetaNom;
 	
 	protected Long pareId;
 	
@@ -46,6 +52,18 @@ public class ImportacioCommand {
 	}
 	public void setDataPresentacio(String dataPresentacio) {
 		this.dataPresentacio = dataPresentacio != null ? dataPresentacio.trim() : null;
+	}
+	public TipusDestiEnumDto getDestiTipus() {
+		return destiTipus;
+	}
+	public void setDestiTipus(TipusDestiEnumDto destiTipus) {
+		this.destiTipus = destiTipus;
+	}
+	public String getCarpetaNom() {
+		return carpetaNom;
+	}
+	public void setCarpetaNom(String carpetaNom) {
+		this.carpetaNom = carpetaNom;
 	}
 	public static ImportacioCommand asCommand(ImportacioDto dto) {
 		ImportacioCommand command = ConversioTipusHelper.convertir(

@@ -74,7 +74,10 @@ public class DocumentHelper {
 			DocumentDto document,
 			ContingutEntity pare,
 			ExpedientEntity expedient,
-			MetaDocumentEntity metaDocument) {
+			MetaDocumentEntity metaDocument,
+			List<ArxiuFirmaDto> firmes,
+			boolean returnDetail) {
+		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
 		}
@@ -112,18 +115,19 @@ public class DocumentHelper {
 				pare.getEntitat(),
 				expedient,
 				document.getUbicacio(),
-				document.getNtiIdDocumentoOrigen());
+				document.getNtiIdDocumentoOrigen(),
+				document.getPinbalIdpeticion());
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(document.getFitxerNom());
 		fitxer.setContentType(document.getFitxerContentType());
 		fitxer.setContingut(document.getFitxerContingut());
-		List<ArxiuFirmaDto> firmes = null;
+		List<ArxiuFirmaDto> firmesValidacio = null;
 		if (document.getFitxerContingut() != null) {
 			actualitzarFitxerDocument(
 					entity,
 					fitxer);
-			if (document.isAmbFirma()) {
-				firmes = validaFirmaDocument(
+			if (document.isAmbFirma() && firmes == null) {
+				firmesValidacio = validaFirmaDocument(
 						entity, 
 						fitxer,
 						document.getFirmaContingut());
@@ -160,7 +164,7 @@ public class DocumentHelper {
 					fitxer,
 					document.isAmbFirma(),
 					document.isFirmaSeparada(),
-					firmes);
+					firmes != null ? firmes : firmesValidacio);
 		
 			if (gestioDocumentalAdjuntId != null ) {
 				pluginHelper.gestioDocumentalDelete(
@@ -183,8 +187,10 @@ public class DocumentHelper {
 			if (rootCause == null) rootCause = ex;
 
 		}
-		
-		DocumentDto dto = toDocumentDto(entity);
+		if (returnDetail)		
+			dto = toDocumentDto(entity);
+		else
+			dto.setId(entity.getId());
 		return dto;
 	}
 	
@@ -318,19 +324,20 @@ public class DocumentHelper {
 			fitxer = new FitxerDto();
 			fitxer.setContentType(documentEntity.getFitxerContentType());
 			fitxer.setNom(documentEntity.getFitxerNom());
-			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-					documentEntity,
-					null,
-					null,
-					true,
-					false);
-			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			if (documentEntity.isFirmat()) {
-				firmes = validaFirmaDocument(
-						documentEntity, 
-						fitxer,
-						null);
-			}
+//			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+//					documentEntity,
+//					null,
+//					null,
+//					true,
+//					false);
+//			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+//			##no validar firma en actualitzar tipus document
+//			if (documentEntity.isFirmat()) {
+//				firmes = validaFirmaDocument(
+//						documentEntity, 
+//						fitxer,
+//						null);
+//			}
 		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
@@ -343,7 +350,7 @@ public class DocumentHelper {
 		contingutHelper.arxiuPropagarModificacio(
 				documentEntity,
 				fitxer,
-				documentEntity.isFirmat(),
+				false, //##no validar firma en actualitzar tipus document
 				false,
 				firmes);
 		return true;
@@ -364,7 +371,8 @@ public class DocumentHelper {
 			EntitatEntity entitat,
 			ExpedientEntity expedient,
 			String ubicacio,
-			String ntiIdDocumentoOrigen) {
+			String ntiIdDocumentoOrigen,
+			String pinbalIdpeticion) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
 				DocumentEstatEnumDto.REDACCIO,
@@ -383,6 +391,7 @@ public class DocumentHelper {
 				entitat,
 				expedient).
 				ubicacio(ubicacio).
+				pinbalIdpeticion(pinbalIdpeticion).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);
 		calcularIdentificadorDocument(

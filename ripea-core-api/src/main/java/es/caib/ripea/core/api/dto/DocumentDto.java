@@ -64,6 +64,8 @@ public class DocumentDto extends NodeDto {
 	private String gesDocAdjuntId;
 	private String gesDocAdjuntFirmaId;
 	
+	private String pinbalIdpeticion;
+	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
 			return fitxerNom.substring(

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 
 /**
  * Utilitat per a gestionar el canvi de rol de l'usuari actual.
@@ -29,21 +30,37 @@ public class RolHelper {
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
-	public static void processarCanviRols(HttpServletRequest request) {
+	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService) {
 		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
 		if (canviRol != null && canviRol.length() > 0) {
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
 			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
+				aplicacioService.setRolUsuariActual(canviRol);
 			} else if (request.isUserInRole(canviRol)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
+				aplicacioService.setRolUsuariActual(canviRol);
 			}
+		}
+	}
+	
+	public static void setRolActualFromDb(HttpServletRequest request, AplicacioService aplicacioService) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		if (rolActual == null) {
+			rolActual = aplicacioService.getUsuariActual().getRolActual();
+		}
+		if (rolActual != null && !rolActual.isEmpty()) {
+			request.getSession().setAttribute(
+					SESSION_ATTRIBUTE_ROL_ACTUAL,
+					rolActual);
 		}
 	}
 
 	public static String getRolActual(HttpServletRequest request) {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
+
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
 			if (request.isUserInRole(ROLE_USER) && rolsDisponibles.contains(ROLE_USER)) {
