@@ -835,6 +835,16 @@ public class ExpedientHelper {
 					}
 				}
 			}
+			
+			String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+			if (expedientExportacioEni != null) {
+				FitxerDto exportacioEni = new FitxerDto();
+				exportacioEni.setNom(expedient.getNom() + "_exportacio_ENI.xml");
+				exportacioEni.setContentType("application/xml");
+				exportacioEni.setContingut(expedientExportacioEni.getBytes());
+				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+			}
+			
 			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient, exportar);
 			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
 			zos.close();
@@ -891,21 +901,22 @@ public class ExpedientHelper {
 				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
 					FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
 					num = num.add(sum);
-					String rutaDoc = ruta + num + " - "+ document.getNom();
+					String nomDocument = num + " - "+ document.getNom();
+					String rutaDoc = ruta + nomDocument;
 					contingutHelper.crearNovaEntrada(
 							rutaDoc, 
 							fitxer, 
 							zos);
 					if (document.isFirmat()) {
-//						String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
-//						if (documentExportacioEni != null) {
-//							FitxerDto exportacioEni = new FitxerDto();
-//							exportacioEni.setNom("ENI_documents/" + document.getNom() + "_exportacio_ENI.xml");
-//							exportacioEni.setContentType("application/xml");
-//							exportacioEni.setContingut(documentExportacioEni.getBytes());
-//		
-//							contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
-//						}
+						String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+						if (documentExportacioEni != null) {
+							FitxerDto exportacioEni = new FitxerDto();
+							exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
+							exportacioEni.setContentType("application/xml");
+							exportacioEni.setContingut(documentExportacioEni.getBytes());
+		
+							contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+						}
 					}
 				}
 			}

@@ -170,15 +170,15 @@ $(document).ready(function() {
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
-		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true" labelSize="2"/>
 		<c:choose>
 			<c:when test="${empty expedientCommand.id}">
-				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" optionMinimumResultsForSearch="0"/>
+				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" emptyOption="${fn:length(metaExpedients) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" optionMinimumResultsForSearch="0"/>
 			</c:when>
 			<c:otherwise>
 				<form:hidden path="metaNodeId"/>
 			</c:otherwise>
 		</c:choose>
+		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true" labelSize="2"/>
 		<div id="organFixed">
 			<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"><span id="organFixedNom"></span></rip:inputFixed>
 		</div>

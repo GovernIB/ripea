@@ -41,6 +41,9 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 	List<MetaDocumentEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 	
+	List<MetaDocumentEntity> findByMetaExpedientAndActiuTrue(
+			MetaExpedientEntity metaExpedient);
+	
 	List<MetaDocumentEntity> findByMetaExpedientAndMultiplicitatIn(
 			MetaExpedientEntity metaExpedient,
 			MultiplicitatEnumDto[] multiplicitats);

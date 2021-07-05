@@ -51,13 +51,16 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 			final String nom = BeanUtils.getProperty(value, campNom);
 			final Long entitatId = getLongProperty(value, campEntitatId); 
 			final Long pareId = getLongProperty(value, campPareId); 
-
-			ExpedientDto expedient = expedientService.findByMetaExpedientAndPareAndNomAndEsborrat(
+			ExpedientDto expedient = null;
+			
+			if (metaExpedientId != null) {
+				expedient = expedientService.findByMetaExpedientAndPareAndNomAndEsborrat(
 					entitatId,
 					metaExpedientId,
 					pareId,
 					nom,
 					0);
+			}
 			if (expedient != null) {
 				if (id == null) // creant
 				{

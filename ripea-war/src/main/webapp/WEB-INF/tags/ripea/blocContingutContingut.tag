@@ -7,6 +7,10 @@
 <%@ attribute name="mostrarExpedients" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ attribute name="mostrarNoExpedients" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
+<c:set var="expedientPare" value="${contingut.expedientPare}"/>
+<c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
+<c:set var="expedientPareAgafatPerUsuariActual" value="${false}"/>
+<c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientPareAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:choose>
 	<c:when test="${mostrarExpedients and mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsNoRegistres}"/></c:when>
 	<c:when test="${mostrarExpedients and not mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsExpedients}"/></c:when>
@@ -152,7 +156,7 @@
 					<th><spring:message code="contingut.info.createl"/></th>
 					<th><spring:message code="contingut.info.creatper"/></th>
 					<th width="5%">&nbsp;</th>
-					<c:if test="${isOrdenacioPermesa}">
+					<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
 						<th width="1%">&nbsp;</th>
 					</c:if>
 				</tr>
@@ -251,7 +255,7 @@
 						<td>
 							<rip:blocContingutAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}"  nodeco="${nodeco}"/>
 						</td>
-						<c:if test="${isOrdenacioPermesa}">
+						<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
 							<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>">
 								<span class="fa fa-sort"></span>
 							</td>
