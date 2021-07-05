@@ -108,11 +108,10 @@ public class IndexHelper {
 					index, 
 					expedient, 
 					entitatActual,
-					false,
-					exportar);
+					false);
 			
 //			## Crear un índex per cada expedient relacionat
-			if (!expedient.getRelacionatsAmb().isEmpty() && indexExpedientsRelacionats()) {
+			if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
 //				## [TAULA QUE CONTÉ EL TÍTOL 'EXPEDIENTS RELACIONATS']
 				PdfPTable titolRelacioTable = new PdfPTable(1);
 				titolRelacioTable.setWidthPercentage(100);
@@ -127,18 +126,33 @@ public class IndexHelper {
 				titolRelacioTable.addCell(relacioTitolCell);
 				index.add(titolRelacioTable);
 				
-//				## [TÍTOL I TAULA PER CADA RELACIÓ]
-				for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsAmb()) {
-					crearTitol(
-							index, 
-							expedient_relacionat,
-							true);
-					crearTaulaDocuments(
-							index, 
-							expedient_relacionat, 
-							entitatActual,
-							true,
-							exportar);
+				if (!expedient.getRelacionatsAmb().isEmpty()) {
+//					## [TÍTOL I TAULA PER CADA RELACIÓ]
+					for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsAmb()) {
+						crearTitol(
+								index, 
+								expedient_relacionat,
+								true);
+						crearTaulaDocuments(
+								index, 
+								expedient_relacionat, 
+								entitatActual,
+								true);
+					}
+				}
+				if (!expedient.getRelacionatsPer().isEmpty()) {
+//					## [TÍTOL I TAULA PER CADA RELACIÓ]
+					for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsPer()) {
+						crearTitol(
+								index, 
+								expedient_relacionat,
+								true);
+						crearTaulaDocuments(
+								index, 
+								expedient_relacionat, 
+								entitatActual,
+								true);
+					}
 				}
 			}
 			
@@ -188,8 +202,7 @@ public class IndexHelper {
 			Document index, 
 			ExpedientEntity expedient,
 			EntitatEntity entitatActual,
-			boolean isRelacio,
-			boolean exportar) {
+			boolean isRelacio) {
 		logger.debug("Generant la taula amb els documents de l'expedient [expedientId=" + expedient.getId() + "]");
 		try {
 //			## [DEFINICIÓ TAULA]
@@ -222,7 +235,7 @@ public class IndexHelper {
 			crearCapsaleraTaula(taulaDocuments, isRelacio);
 			
 //			## [CONTINGUT]
-			crearContingutTaula(taulaDocuments, expedient, entitatActual, isRelacio, exportar);
+			crearContingutTaula(taulaDocuments, expedient, entitatActual, isRelacio);
 			
 			index.add(taulaDocuments);
 			if (!isRelacio)
@@ -236,8 +249,7 @@ public class IndexHelper {
 			PdfPTable taulaDocuments,
 			ExpedientEntity expedient,
 			EntitatEntity entitatActual,
-			boolean isRelacio,
-			boolean exportar) throws Exception {
+			boolean isRelacio) throws Exception {
 		logger.debug("Generant la capçalera de la taula de documents");
 		List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
 			expedient, 
@@ -268,8 +280,7 @@ public class IndexHelper {
 						contingut, 
 						taulaDocuments, 
 						entitatActual, 
-						isRelacio,
-						exportar);
+						isRelacio);
 			}
 		}
 	}
@@ -280,8 +291,7 @@ public class IndexHelper {
 			ContingutEntity contingut, 
 			PdfPTable taulaDocuments, 
 			EntitatEntity entitatActual, 
-			boolean isRelacio,
-			boolean exportar) throws Exception {
+			boolean isRelacio) throws Exception {
 		ContingutEntity carpetaActual = contingut;
 		
 		List<ContingutEntity> contingutsCarpetaActual = contingutRepository.findByPareAndEsborrat(
@@ -297,8 +307,7 @@ public class IndexHelper {
 						contingutCarpetaActual, 
 						taulaDocuments, 
 						entitatActual,  	
-						isRelacio,
-						exportar);
+						isRelacio);
 			} else {
 				DocumentEntity document = (DocumentEntity)contingutCarpetaActual;
 				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
