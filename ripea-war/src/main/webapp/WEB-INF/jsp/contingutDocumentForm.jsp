@@ -170,6 +170,9 @@ $(document).ready(function() {
 			$('#info-plantilla-si').addClass('hidden');
 		}
 	});
+	if ($('#id').val() == '') {
+		$('#metaNodeId').trigger('change');
+	}
 	$('input[type=checkbox][name=ambFirma]').on('change', function() {
 		if($(this).prop("checked") == true){
 			$('#input-firma').removeClass('hidden');
@@ -352,6 +355,7 @@ function removeLoading() {
 			<spring:message code="contingut.document.form.info.plantilla.si"/>
 			<a href="#" class="btn btn-xs btn-default pull-right"><spring:message code="comu.boto.descarregar"/></a>
 		</div>
+		<c:set var="isPermesModificarCustodiatsVar" value="${documentEstat != 'CUSTODIAT' && documentEstat != 'FIRMAT' && documentEstat != 'FIRMA_PARCIAL'}"/>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
@@ -359,7 +363,7 @@ function removeLoading() {
 		<form:hidden path="origen"/>
 
 		<c:choose>
-			<c:when test="${documentCommand.documentTipus == 'IMPORTAT'}">
+			<c:when test="${documentCommand.documentTipus == 'IMPORTAT' || !isPermesModificarCustodiatsVar}">
 				<c:set var="readOnlyValue" value="true"/>
 			</c:when>
 			<c:otherwise>
@@ -372,8 +376,7 @@ function removeLoading() {
 		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-
-		<c:if test="${documentCommand.documentTipus != 'IMPORTAT'}">
+		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
 				<li role="presentation"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>

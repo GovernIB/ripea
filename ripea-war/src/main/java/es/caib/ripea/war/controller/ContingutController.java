@@ -132,7 +132,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
 		model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
 		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
-		
+		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
 		boolean isEntitatUserAdminOrOrgan;
 		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
 			isEntitatUserAdminOrOrgan = true;

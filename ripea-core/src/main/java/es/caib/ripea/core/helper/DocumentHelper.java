@@ -215,6 +215,15 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
+		if (!isModificacioCustodiatsActiva() && (
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))) {
+			throw new ValidationException(
+					documentEntity.getId(),
+					DocumentEntity.class,
+					"No es pot actualitzar un document custodiat");
+		}
 		contingutHelper.comprovarNomValid(
 				documentEntity.getPare(),
 				document.getNom(),
@@ -781,6 +790,11 @@ public class DocumentHelper {
 		return documentsDto;
 	}
 
+	public boolean isModificacioCustodiatsActiva() {
+		String isModificacioCustodiatsActiva = PropertiesHelper.getProperties().getProperty("es.caib.ripea.document.modificar.custodiats");
+		return Boolean.valueOf(isModificacioCustodiatsActiva);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 
 }
