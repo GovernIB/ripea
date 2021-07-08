@@ -814,6 +814,21 @@ public class EntityComprovarHelper {
 			if (checkPerMassiuAdmin && metaExpedientBelongsToEntitatOrOrgansOfUser) {
 				comprovarPermisWrite = false;
 			}
+			
+//			comprovar si l'expedient està relacionat i és una consulta de LECTURA sobre algún element de l'expedient, llavors no mirar permisos
+			if (nodeId != null) {
+				ContingutEntity contingut = contingutRepository.findOne(nodeId);
+				boolean comprovarNomesLectura = (!comprovarPermisWrite && !comprovarPermisCreate && !comprovarPermisDelete);
+				if (contingut instanceof ExpedientEntity && comprovarNomesLectura) {
+					ExpedientEntity expedient = (ExpedientEntity)contingut;
+					boolean relacionatAmbAlgunExpedient = expedient.getRelacionatsAmb() != null && !expedient.getRelacionatsAmb().isEmpty();
+					boolean relacionatPerAlgunExpedient = expedient.getRelacionatsPer() != null && !expedient.getRelacionatsPer().isEmpty();
+					if (relacionatAmbAlgunExpedient || relacionatPerAlgunExpedient) {
+						comprovarPermisRead = false;
+						comprovarPermisWrite = false;
+					}
+				}
+			}
 		}
 
 		if (comprovarPermisRead) {

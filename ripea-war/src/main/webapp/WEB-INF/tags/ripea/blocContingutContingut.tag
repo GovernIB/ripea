@@ -239,7 +239,7 @@
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
 										<spring:message code="contingut.info.document.tipusdocument"/>
 									</div>
-									<select id="${fill.id}" class="select-tipus-document">
+									<select id="${fill.id}" class="select-tipus-document" ${expedientPareAgafatPerUsuariActual ? '' : 'disabled'}>
 										<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option>
 										<c:forEach items="${metaDocumentsLeft}" var="metaDocument">
 											<option id="${metaDocument.id}">

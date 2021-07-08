@@ -1679,11 +1679,17 @@ function closeViewer() {
 	  		</ul>
 		</div>
 	</c:if>
-	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual}">
+	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual && expedientPare.metaNode.usuariActualRead}">
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
 			<span class="fa fa-info-circle"></span>
 			<spring:message code="contingut.alerta.no.agafat"/>
 			<a href="<c:url value="../expedient/${expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
+		</div>
+	</c:if>
+	<c:if test="${!isTasca && !expedientPare.metaNode.usuariActualRead}">
+		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
+			<span class="fa fa-info-circle"></span>
+			<spring:message code="contingut.alerta.sense.permisos"/>
 		</div>
 	</c:if>
 	<c:if test="${contingut.expedient or contingut.carpeta}">
