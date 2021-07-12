@@ -515,5 +515,26 @@ public interface ContingutService {
 			boolean ambFills,
 			boolean ambVersions,
 			boolean ambPermis);
+	
+	/**
+	 * Assigna el nou ordre als fills d'un contenidor.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contingut.
+	 * @param orderedElements
+	 *            La lista de continguts amb el nou ordre.
+	 * @param contingutId
+	 *            Atribut id de l'expedient pare.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws ValidationException
+	 *             Si ja existeix un altre contingut amb el mateix nom
+	 *             a dins el destí.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void order(
+			Long entitatId,
+			Long contingutId,
+			Map<Integer, Long> orderedElements) throws NotFoundException, ValidationException;
 
 }

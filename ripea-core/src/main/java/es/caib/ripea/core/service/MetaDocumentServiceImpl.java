@@ -722,7 +722,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
 		// Dels meta-documents actius pel meta-expedient només deixa els que
 		// encara es poden afegir segons la multiplicitat.
-		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(
+		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndActiuTrue(
 				expedientSuperior.getMetaExpedient());
 		
 		if (expedientSuperior.getMetaExpedient().isPermetMetadocsGenerals())

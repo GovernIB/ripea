@@ -38,6 +38,8 @@ public abstract class ContingutDto extends AuditoriaDto {
 	private boolean hasFills;
 	protected Date esborratData;
 
+	protected int ordre;
+	
 	public boolean isEsborrat() {
 		return esborrat > 0;
 	}

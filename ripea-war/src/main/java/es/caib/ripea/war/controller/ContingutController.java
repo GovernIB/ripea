@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -129,7 +131,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 		model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
 		model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
-		
+		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
+		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
 		boolean isEntitatUserAdminOrOrgan;
 		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
 			isEntitatUserAdminOrOrgan = true;
@@ -327,6 +330,18 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:../../" + contingutOrigen.getPare().getId(),
 				"contingut.controller.element.mogut.ok");
+	}
+	@RequestMapping(value = "/contingut/{contingutId}/ordenar", method = RequestMethod.POST, consumes="application/json")
+	@ResponseBody
+	public void ordenar(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@RequestBody Map<Integer, Long> orderedElements) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		contingutService.order(
+				entitatActual.getId(), 
+				contingutId, 
+				orderedElements);
 	}
 
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/copiar", method = RequestMethod.GET)

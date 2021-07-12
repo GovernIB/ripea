@@ -1121,6 +1121,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if(document.getFitxerNom() != null) {
 			model.addAttribute("nomDocument", document.getFitxerNom());
 		}
+		model.addAttribute("documentEstat", document.getEstat());
 		omplirModelFormulari(request, command, commandGeneric, contingutId, model);
 	}
 	
@@ -1178,10 +1179,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiTipoDocumentalEnumDto.class,
 						"document.nti.tipdoc.enum."));
-		String propertyEscanejarActiu = aplicacioService.propertyFindByNom("es.caib.ripea.document.nou.escanejar.actiu");
+		boolean propertyEscanejarActiu = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.nou.escanejar.actiu", false);
 		model.addAttribute(
 				"escanejarActiu",
-				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
+				propertyEscanejarActiu);
+		boolean modificacioCustodiatsActiva = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false);
+		model.addAttribute(
+				"isPermesModificarCustodiats",
+				modificacioCustodiatsActiva);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

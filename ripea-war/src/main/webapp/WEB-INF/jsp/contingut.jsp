@@ -436,6 +436,13 @@ body.loading .rmodal {
 	cursor: pointer;
 	opacity: 0.1;
 }
+.sortable-dest {
+	background-image: url(/ripea/img/background-pattern.png);
+}
+.ordre-col {
+    cursor: move;
+    vertical-align: middle !important;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -596,11 +603,22 @@ $(document).ready(function() {
 			useNativeClamp: true
 		});
 	});
-	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').css('cursor','pointer');
-	$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').click(function(event) {
-		event.stopPropagation();
-		$('a:first', $(this).parent())[0].click();
-	});
+	
+	//ordenacio habilitada
+	if (${isOrdenacioPermesa}) {
+		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(4), :nth-child(7))').css('cursor','pointer');
+		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(4), :nth-child(7))').click(function(event) {
+			event.stopPropagation();
+			$('a:first', $(this).parent())[0].click();
+		});
+	} else {
+		//ordenacio per defecte (createdDate)
+		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').css('cursor','pointer');
+		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').click(function(event) {
+			event.stopPropagation();
+			$('a:first', $(this).parent())[0].click();
+		});
+	}
 	$('ul.interessats li').hover(function() {
 		$('a', this).removeClass('hidden');contingut
 	},
@@ -646,7 +664,7 @@ $(document).ready(function() {
 			$('div.element-noclick', this).tooltip('enable');
 		}
 	});
-	$('.element-droppable').droppable({
+	$('.element-droppable').children(":not('.ordre-col')").droppable({
 		accept: '.element-draggable',
 		tolerance: 'pointer',
 		activeClass: 'element-target',
@@ -654,10 +672,61 @@ $(document).ready(function() {
 		drop: function(event, ui) {
 			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 			var origenId = ui.draggable.data('contenidor-id');
-			var destiId = $(this).data('contenidor-id');
+			var destiId = $(this).parent().data('contenidor-id');
 			window.location = origenId + "/moure/" + destiId;
+			dropped = true;
+            $(event.target).addClass('dropped');
 		}
 	});
+	
+	$('.ordre-col').on('mouseover', function() {
+		$('.element-draggable').draggable({ disabled: true });
+		$('.element-draggable').droppable({ disabled: true });
+		$('#table-documents tbody').sortable({
+			handle: ".ordre-col",
+			refreshPositions: true,
+            helper : 'clone',
+			cursor: "move",
+			cursorAt: { left: 5 },
+			opacity: 0.65,
+			placeholder: "sortable-dest",
+			start: function (event, ui) {
+				$(this).attr('data-previndex', ui.item[0].rowIndex);
+	        },
+	        update: function (event, ui) {
+				//showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+				var tableDocuments = document.getElementById('table-documents');
+				$(tableDocuments).addClass("disabled");
+	            $('#loading').removeClass('hidden');
+				var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'data-contenidor-id'});
+	            var filtered = idsInOrder.filter(function (el) {
+	           		return el != '';
+	            });
+	            var orderedElements = new Map();
+				var idx = 1;
+	            filtered.forEach(function(row) {
+	            	orderedElements[idx] = row;
+		            idx++;
+	            });
+
+	            $.ajax({
+			        url: '<c:url value="/contingut/${expedientPare.id}/ordenar"/>',
+			        type: "POST",
+			        contentType: "application/json",
+			        data: JSON.stringify(orderedElements),
+			        success: function (data) {
+			        	location.reload();
+			        }
+				});
+	        }
+	    }).disableSelection();
+	});
+	
+	$('.ordre-col').on('mouseleave', function() {
+		$('.element-draggable').draggable("enable");
+		$('.element-draggable').droppable("enable");
+	});
+	
 	var nodeDadesInputChange = function() {
 		var $pare = $(this).parent();
 		$pare.removeClass('has-success');
@@ -1141,9 +1210,9 @@ $(document).ready(function() {
 	
 	$(document).scroll(function() {
 		var scrollTop = $(document).scrollTop();
-		var opacity = 0.1 + scrollTop / 1500;
-		if (opacity > 0.7)
-			opacity = 0.7;
+		var opacity = 0.4 + scrollTop / 1500;
+		if (opacity > 0.9)
+			opacity = 0.9;
 		$('.btn-top').css({
 			opacity: opacity
 		});
@@ -1513,7 +1582,7 @@ function showLoadingModal(message) {
 
 // ------------------ VISOR ------------------------------
 function showViewer(event, documentId, contingutNom) {
-	if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 6 || event.target.cellIndex === 7)) return;
+	if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 5 || event.target.cellIndex === 6)) return;
     var resumViewer = $('#resum-viewer');
 	// Mostrar/amagar visor
 	if (!resumViewer.is(':visible')) {
@@ -1610,11 +1679,17 @@ function closeViewer() {
 	  		</ul>
 		</div>
 	</c:if>
-	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual}">
+	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual && expedientPare.metaNode.usuariActualRead}">
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
 			<span class="fa fa-info-circle"></span>
 			<spring:message code="contingut.alerta.no.agafat"/>
 			<a href="<c:url value="../expedient/${expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
+		</div>
+	</c:if>
+	<c:if test="${!isTasca && !expedientPare.metaNode.usuariActualRead}">
+		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
+			<span class="fa fa-info-circle"></span>
+			<spring:message code="contingut.alerta.sense.permisos"/>
 		</div>
 	</c:if>
 	<c:if test="${contingut.expedient or contingut.carpeta}">

@@ -104,6 +104,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@OrderBy("createdDate ASC")
 	protected List<AlertaEntity> alertes = new ArrayList<AlertaEntity>();
 	
+	@Column(name = "ordre")
+	protected int ordre;
+	
 	@Transient
 	protected boolean ambNotificacions;
 	@Transient
@@ -150,7 +153,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	public void updateDarrerMoviment(ContingutMovimentEntity darrerMoviment) {
 		this.darrerMoviment = darrerMoviment;
 	}
-
+	public void updateOrdre(int ordre) {
+		this.ordre = ordre;
+	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

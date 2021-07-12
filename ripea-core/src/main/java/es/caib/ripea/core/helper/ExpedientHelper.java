@@ -4,18 +4,23 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -74,6 +79,7 @@ import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.CarpetaRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -135,7 +141,11 @@ public class ExpedientHelper {
 	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-
+	@Autowired
+	private ContingutRepository contingutRepository;
+	@Autowired
+	private MessageHelper messageHelper;
+	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	public ExpedientEntity create(
@@ -769,6 +779,151 @@ public class ExpedientHelper {
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
 	}
 	
+	
+	public FitxerDto exportarExpedient(
+			EntitatEntity entitatActual, 
+			ExpedientEntity expedient, 
+			boolean exportar) throws IOException {
+		FitxerDto resultat = new FitxerDto();
+		if (exportar) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ZipOutputStream zos = new ZipOutputStream(baos);
+			BigDecimal sum = new BigDecimal(1);
+			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
+					expedient,
+					0,
+					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+			BigDecimal num = new BigDecimal(0);
+			for (ContingutEntity contingut : continguts) {
+				if (num.scale() > 0)
+					num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
+				
+				if (contingut instanceof DocumentEntity) {
+					DocumentEntity document = (DocumentEntity)contingut;
+					if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+						num = num.add(sum);
+						String nomDocument = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue()) + " - " + document.getNom();
+						contingutHelper.crearNovaEntrada(nomDocument, fitxer, zos);
+
+						if (document.isFirmat()) {
+							String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+							if (documentExportacioEni != null) {
+								FitxerDto exportacioEni = new FitxerDto();
+								exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
+								exportacioEni.setContentType("application/xml");
+								exportacioEni.setContingut(documentExportacioEni.getBytes());
+		
+								contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+							}
+						}
+					}
+				}
+
+				if (contingut instanceof CarpetaEntity) {
+					String ruta = "";
+					try {
+						num = crearFilesCarpetaActual(
+								num, 
+								sum, 
+								contingut, 
+								entitatActual, 
+								ruta,
+								zos);
+					} catch (Exception ex) {
+						logger.error("Hi ha hagut un error generant l'entrada " + num + " dins del fitxer comprimit", ex);
+					}
+				}
+			}
+			
+			String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+			if (expedientExportacioEni != null) {
+				FitxerDto exportacioEni = new FitxerDto();
+				exportacioEni.setNom(expedient.getNom() + "_exportacio_ENI.xml");
+				exportacioEni.setContentType("application/xml");
+				exportacioEni.setContingut(expedientExportacioEni.getBytes());
+				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+			}
+			
+			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient, exportar);
+			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
+			zos.close();
+			
+			resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".zip");
+			resultat.setContentType("application/zip");
+			resultat.setContingut(baos.toByteArray());
+		} else {
+			resultat = contingutHelper.generarIndex(entitatActual, expedient, exportar);
+		}
+		return resultat;
+	}
+	
+	private BigDecimal crearFilesCarpetaActual(
+			BigDecimal num, 
+			BigDecimal sum, 
+			ContingutEntity contingut, 
+			EntitatEntity entitatActual, 
+			String ruta,
+			ZipOutputStream zos) throws Exception {
+		ContingutEntity carpetaActual = contingut;
+		
+		List<ContingutEntity> contingutsCarpetaActual = contingutRepository.findByPareAndEsborrat(
+				carpetaActual, 
+				0, 
+				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		
+		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
+			if (contingutCarpetaActual instanceof CarpetaEntity) {
+				
+				num = crearFilesCarpetaActual(
+						num, 
+						sum,
+						contingutCarpetaActual, 
+						entitatActual,  
+						ruta,
+						zos);
+			} else {
+				ContingutEntity pare = contingutCarpetaActual.getPare();
+				List<String> estructuraCarpetes = new ArrayList<String>();
+				while (pare instanceof CarpetaEntity) {
+					estructuraCarpetes.add(pare.getNom());
+					if (pare.getPare() instanceof CarpetaEntity)
+						pare = (CarpetaEntity) pare.getPare();
+					else
+						pare = (ExpedientEntity) pare.getPare();
+				}
+
+				Collections.reverse(estructuraCarpetes);
+				for (String folder: estructuraCarpetes) {
+					ruta += folder.replaceAll("[\\/*?\"<>|]", "_").replace(":", "") + "/";
+				}
+				DocumentEntity document = (DocumentEntity)contingutCarpetaActual;
+				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+					FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+					num = num.add(sum);
+					String nomDocument = num + " - "+ document.getNom();
+					String rutaDoc = ruta + nomDocument;
+					contingutHelper.crearNovaEntrada(
+							rutaDoc, 
+							fitxer, 
+							zos);
+					if (document.isFirmat()) {
+						String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+						if (documentExportacioEni != null) {
+							FitxerDto exportacioEni = new FitxerDto();
+							exportacioEni.setNom("ENI_documents/" + nomDocument + "_exportacio_ENI.xml");
+							exportacioEni.setContentType("application/xml");
+							exportacioEni.setContingut(documentExportacioEni.getBytes());
+		
+							contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+						}
+					}
+				}
+			}
+			ruta = "";
+		}
+		return num;
+	}
 	
 	private OrganGestorEntity getOrganGestorForExpedient(MetaExpedientEntity metaExpedient, Long organGestorId, Permission permis) {
 		
