@@ -5,6 +5,8 @@ package es.caib.ripea.core.helper;
 
 import java.util.Arrays;
 
+import es.caib.ripea.core.entity.UsuariEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.pinbal.client.recobriment.model.ScspFuncionario;
@@ -36,6 +38,9 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
  */
 @Component
 public class PinbalHelper {
+
+	@Autowired
+	private UsuariHelper usuariHelper;
 
 	private ClientSvddgpciws02 clientSvddgpciws02;
 	private ClientSvddgpviws02 clientSvddgpviws02;
@@ -165,8 +170,9 @@ public class PinbalHelper {
 
 	private ScspFuncionario getFuncionariActual() {
 		ScspFuncionario funcionario = new ScspFuncionario();
-		funcionario.setNifFuncionario("00000000T");
-		funcionario.setNombreCompletoFuncionario("Funcionari CAIB");
+		UsuariEntity funcionari = usuariHelper.getUsuariAutenticat();
+		funcionario.setNifFuncionario(funcionari.getNif());
+		funcionario.setNombreCompletoFuncionario(funcionari.getNom());
 		return funcionario;
 	}
 
