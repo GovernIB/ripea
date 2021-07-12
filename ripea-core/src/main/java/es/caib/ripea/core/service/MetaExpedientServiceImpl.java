@@ -32,6 +32,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -877,9 +878,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	}
 
-	
-
-
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(Long entitatId, Long id) {
@@ -887,24 +885,22 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Consulta dels permisos del meta-expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ")");
-
-
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
-		
 		List<PermisDto> permisLlistAmbNom = metaExpedientHelper.permisFind(id);
-		for (PermisDto permis : permisLlistAmbNom) {
-			try {
-				permis.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom() + " (" + permis.getPrincipalNom() + ")");
-			}
-			catch (NotFoundException ex) {
-				logger.debug("No s'ha trobat cap usuari amb el codi " + permis.getPrincipalNom());
+		for (PermisDto permis: permisLlistAmbNom) {
+			if (permis.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
+				try {
+					permis.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom() + " (" + permis.getPrincipalNom() + ")");
+				} catch (NotFoundException ex) {
+					logger.debug("No s'ha trobat cap usuari amb el codi " + permis.getPrincipalNom());
+					permis.setPrincipalCodiNom(permis.getPrincipalNom());
+				}
+			} else {
+				permis.setPrincipalCodiNom(permis.getPrincipalNom());
 			}
 		}
-
 		return permisLlistAmbNom;
-
 	}
 
 	@Transactional
