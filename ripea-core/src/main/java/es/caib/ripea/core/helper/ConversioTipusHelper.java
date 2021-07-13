@@ -34,6 +34,8 @@ import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
@@ -105,6 +107,24 @@ public class ConversioTipusHelper {
 						target.setError(source.getError());
 						target.setLlegida(source.getLlegida().booleanValue());
 						target.setContingutId(source.getContingut().getId());
+						return target;
+					}
+				});
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<PermisDto, PermisOrganGestorDto>() {
+					public PermisOrganGestorDto convert(PermisDto source, Type<? extends PermisOrganGestorDto> destinationClass) {
+						PermisOrganGestorDto target = new PermisOrganGestorDto();
+						target.setId(source.getId());
+						target.setPrincipalNom(source.getPrincipalNom());
+						target.setPrincipalCodiNom(source.getPrincipalCodiNom());
+						target.setPrincipalTipus(source.getPrincipalTipus());
+						target.setRead(source.isRead());
+						target.setWrite(source.isWrite());
+						target.setCreate(source.isCreate());
+						target.setDelete(source.isDelete());
+						target.setAdministration(source.isAdministration());
+						target.setOrganGestorId(source.getOrganGestorId());
+						target.setOrganGestorNom(source.getOrganGestorNom());
 						return target;
 					}
 				});
