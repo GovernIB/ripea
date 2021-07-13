@@ -1,13 +1,11 @@
 package es.caib.ripea.core.service;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -397,17 +396,20 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (OrganGestorDto o: organs) {
 			List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
 			for (PermisDto p: permisosOrgan) {
-				PermisOrganGestorDto permisOrgan = new PermisOrganGestorDto();
-				try {
-					BeanUtils.copyProperties(permisOrgan, p);
-					permisOrgan.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permisOrgan.getPrincipalNom()).getNom() + " (" + permisOrgan.getPrincipalNom() + ")");
-					
-				} catch (IllegalAccessException | InvocationTargetException e) {
-					e.printStackTrace();
-				} catch (NotFoundException ex) {
-					logger.debug("No s'ha trobat cap usuari amb el codi " + p.getPrincipalNom());
-				}
+				PermisOrganGestorDto permisOrgan = conversioTipusHelper.convertir(
+						p,
+						PermisOrganGestorDto.class);
 				permisOrgan.setOrganGestor(o);
+				if (p.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
+					try {
+						permisOrgan.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permisOrgan.getPrincipalNom()).getNom() + " (" + permisOrgan.getPrincipalNom() + ")");
+					} catch (NotFoundException ex) {
+						logger.debug("No s'ha trobat cap usuari amb el codi " + permisOrgan.getPrincipalNom());
+						permisOrgan.setPrincipalCodiNom(permisOrgan.getPrincipalNom());
+					}
+				} else {
+					permisOrgan.setPrincipalCodiNom(permisOrgan.getPrincipalNom());
+				}
 				results.add(permisOrgan);
 			}
 		}

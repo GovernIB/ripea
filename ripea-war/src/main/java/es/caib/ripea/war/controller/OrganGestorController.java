@@ -97,6 +97,7 @@ public class OrganGestorController extends BaseUserController {
 					filtreCommand.asDto(),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
+        	logger.error("Error al obtenir el llistat de permisos", e);
             MissatgesHelper.error(request,
                     getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }

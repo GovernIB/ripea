@@ -62,7 +62,7 @@ public class OrganGestorPermisController extends BaseUserController {
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 			permisos = organGestorService.findPermisos(entitat.getId(), organId);
-		} catch (Exception e) {
+		} catch (SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
 		}
 		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
