@@ -4,8 +4,9 @@
 package es.caib.ripea.core.helper;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-import es.caib.ripea.core.entity.UsuariEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.Solicit
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -30,6 +32,7 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 
 /**
  * Mètodes comuns per a gestionar les alertes.
@@ -41,6 +44,10 @@ public class PinbalHelper {
 
 	@Autowired
 	private UsuariHelper usuariHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	private ClientSvddgpciws02 clientSvddgpciws02;
 	private ClientSvddgpviws02 clientSvddgpviws02;
@@ -52,6 +59,7 @@ public class PinbalHelper {
 			InteressatPersonaFisicaEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment) throws PinbalException {
+		long t0 = System.currentTimeMillis();
 		SolicitudSvddgpciws02 solicitud = new SolicitudSvddgpciws02();
 		emplenarSolicitudBase(
 				solicitud,
@@ -62,13 +70,9 @@ public class PinbalHelper {
 				consentiment);
 		try {
 			ScspRespuesta respuesta = getClientSvddgpciws02().peticionSincrona(Arrays.asList(solicitud));
-			if (respuesta.getAtributos().getEstado().getCodigoEstado().equals("0003")) {
-				return respuesta.getAtributos().getIdPeticion();
-			} else {
-				throw new PinbalException("[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError());
-			}
+			return processarScspRespuesta(solicitud, respuesta, "SVDDGPCIWS02", t0);
 		} catch (Exception ex) {
-			throw new PinbalException(ex);
+			throw processarException(solicitud, ex, "SVDDGPCIWS02", t0);
 		}
 	}
 
@@ -78,6 +82,7 @@ public class PinbalHelper {
 			InteressatPersonaFisicaEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment) throws PinbalException {
+		long t0 = System.currentTimeMillis();
 		SolicitudSvddgpviws02 solicitud = new SolicitudSvddgpviws02();
 		emplenarSolicitudBase(
 				solicitud,
@@ -88,13 +93,9 @@ public class PinbalHelper {
 				consentiment);
 		try {
 			ScspRespuesta respuesta = getClientSvddgpviws02().peticionSincrona(Arrays.asList(solicitud));
-			if (respuesta.getAtributos().getEstado().getCodigoEstado().equals("0003")) {
-				return respuesta.getAtributos().getIdPeticion();
-			} else {
-				throw new PinbalException("[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError());
-			}
+			return processarScspRespuesta(solicitud, respuesta, "SVDDGPVIWS02", t0);
 		} catch (Exception ex) {
-			throw new PinbalException(ex);
+			throw processarException(solicitud, ex, "SVDDGPVIWS02", t0);
 		}
 	}
 
@@ -106,6 +107,7 @@ public class PinbalHelper {
 			PinbalConsentimentEnumDto consentiment,
 			String comunitatAutonomaCodi,
 			String provinciaCodi) throws PinbalException {
+		long t0 = System.currentTimeMillis();
 		SolicitudSvdccaacpasws01 solicitud = new SolicitudSvdccaacpasws01();
 		emplenarSolicitudBase(
 				solicitud,
@@ -118,24 +120,38 @@ public class PinbalHelper {
 		solicitud.setCodigoProvincia(provinciaCodi);
 		try {
 			ScspRespuesta respuesta = getClientSvdccaacpasws01().peticionSincrona(Arrays.asList(solicitud));
-			if (respuesta.getAtributos().getEstado().getCodigoEstado().equals("0003")) {
-				return respuesta.getAtributos().getIdPeticion();
-			} else {
-				throw new PinbalException("[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError());
-			}
+			return processarScspRespuesta(solicitud, respuesta, "SVDCCAACPASWS01", t0);
 		} catch (Exception ex) {
-			throw new PinbalException(ex);
+			throw processarException(solicitud, ex, "SVDCCAACPASWS01", t0);
 		}
 	}
 
 	public FitxerDto getJustificante(String idPeticion) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta del justificant";
+		String errorDescripcio = "Excepció en la petició a PINBAL";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idPeticion", idPeticion);
 		try {
 			ScspJustificante justificante = getClientSvdccaacpasws01().getJustificante(idPeticion);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
 			return new FitxerDto(
 					justificante.getNom(),
 					justificante.getContentType(),
 					justificante.getContingut());
 		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio);
 			throw new PinbalException(ex);
 		}
 	}
@@ -164,6 +180,7 @@ public class PinbalHelper {
 			solicitud.setConsentimiento(ScspConsentimiento.Si);
 			break;
 		}
+		solicitud.setIdExpediente(expedientHelper.calcularNumero(expedient));
 		solicitud.setFuncionario(getFuncionariActual());
 		solicitud.setTitular(getTitularFromInteressat(interessat, false));
 	}
@@ -213,6 +230,98 @@ public class PinbalHelper {
 			titular.setNombreCompleto(nomSencer.toString());
 		}
 		return titular;
+	}
+
+	private String processarScspRespuesta(
+			SolicitudBase solicitud,
+			ScspRespuesta respuesta,
+			String serveiScsp,
+			long t0) throws PinbalException {
+		String accioDescripcio = "Petició síncrona";
+		if (respuesta.getAtributos().getEstado().getCodigoEstado().equals("0003")) {
+			Map<String, String> accioParams = getAccioParams(solicitud, serveiScsp);
+			accioParams.put("idPeticion", respuesta.getAtributos().getIdPeticion());
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return respuesta.getAtributos().getIdPeticion();
+		} else {
+			String errorDescripcio = "[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getAccioParams(solicitud, serveiScsp),
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio);
+			throw new PinbalException(errorDescripcio);
+		}
+	}
+
+	private PinbalException processarException(
+			SolicitudBase solicitud,
+			Exception ex, 
+			String serveiScsp,
+			long t0) {
+		String accioDescripcio = "Petició síncrona";
+		String errorDescripcio = "Excepció en la petició a PINBAL";
+		integracioHelper.addAccioError(
+				IntegracioHelper.INTCODI_PINBAL,
+				accioDescripcio,
+				getAccioParams(solicitud, serveiScsp),
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				System.currentTimeMillis() - t0,
+				errorDescripcio,
+				ex);
+		return new PinbalException(ex);
+	}
+
+	private Map<String, String> getAccioParams(
+			SolicitudBase solicitud,
+			String serveiScsp) {
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("serveiScsp", serveiScsp);
+		accioParams.put("identificadorSolicitante", solicitud.getIdentificadorSolicitante());
+		accioParams.put("nombreSolicitante", solicitud.getNombreSolicitante());
+		accioParams.put("codigoProcedimiento", solicitud.getCodigoProcedimiento());
+		accioParams.put("codigoUnidadTramitadora", solicitud.getCodigoUnidadTramitadora());
+		accioParams.put("idExpediente", solicitud.getIdExpediente());
+		if (solicitud.getFuncionario() != null) {
+			accioParams.put(
+					"funcionario.nif",
+					solicitud.getFuncionario().getNifFuncionario());
+			accioParams.put(
+					"funcionario.nombre",
+					solicitud.getFuncionario().getNombreCompletoFuncionario());
+		}
+		if (solicitud.getTitular() != null) {
+			if (solicitud.getTitular().getTipoDocumentacion() != null) {
+				accioParams.put(
+						"titular.tipoDocumentacion",
+						solicitud.getTitular().getTipoDocumentacion().name());
+			}
+			accioParams.put(
+					"titular.documentacion",
+					solicitud.getTitular().getDocumentacion());
+			accioParams.put(
+					"titular.nombre",
+					solicitud.getTitular().getNombre());
+			accioParams.put(
+					"titular.apellido1",
+					solicitud.getTitular().getApellido1());
+			accioParams.put(
+					"titular.apellido2",
+					solicitud.getTitular().getApellido2());
+			if (solicitud.getTitular().getNombreCompleto() != null) {
+				accioParams.put(
+						"titular.nombreCompleto",
+						solicitud.getTitular().getNombreCompleto());
+			}
+		}
+		return accioParams;
 	}
 
 	private ClientSvddgpciws02 getClientSvddgpciws02() {
