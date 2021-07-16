@@ -48,6 +48,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -334,7 +335,8 @@ public class IndexHelper {
 		ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
 				entitatActual.getId(),
 				document.getId());
-		
+		List<String> subTitols = null;
+		SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 //		Nº
 		String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
 		if (!isRelacio)
@@ -346,7 +348,8 @@ public class IndexHelper {
 		
 		if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
 //			Nom natural
-			String tituloDoc = arxiuDetall.getMetadadesAddicionals().get("tituloDoc") != null ? arxiuDetall.getMetadadesAddicionals().get("tituloDoc").toString() : "";
+			Object tituloDocMet = arxiuDetall.getMetadadesAddicionals().get("tituloDoc");
+			String tituloDoc = tituloDocMet != null ? tituloDocMet.toString() : "";
 			taulaDocuments.addCell(crearCellaContingut(tituloDoc, null, false));
 		}
 
@@ -361,7 +364,24 @@ public class IndexHelper {
 		
 //		Tipus document
 		String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
-		taulaDocuments.addCell(crearCellaContingut(tipusDocument, null, false));
+		
+		if (document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+			subTitols = new ArrayList<String>();
+			
+			if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+				Object numRegistreMet = arxiuDetall.getMetadadesAddicionals().get("numRegistre");
+				Object dataRegistreMet = arxiuDetall.getMetadadesAddicionals().get("dataRegistre");
+				if (numRegistreMet != null) {
+					String numRegistre = numRegistreMet != null ? numRegistreMet.toString() : "";
+					subTitols.add(numRegistre);
+				}
+				if (dataRegistreMet != null) {
+					Date dataRegistre = dataRegistreMet != null ? (Date)dataRegistreMet : null;
+					subTitols.add(sdtTime.format(dataRegistre));
+				}
+			}
+		}
+		taulaDocuments.addCell(crearCellaContingut(tipusDocument, subTitols, false));
 
 //		Data creació
 		SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
@@ -381,7 +401,6 @@ public class IndexHelper {
 		taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, false));	
 		
 //		Custodiat / Notificat
-		List<String> subTitols = new ArrayList<String>();
 		DocumentNotificacioEstatEnumCustom estatNotificacio = null;
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
 		boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
@@ -411,6 +430,7 @@ public class IndexHelper {
 		}
 		
 		if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+			subTitols = new ArrayList<String>();
 			Map<Integer, Date> datesFirmes = null;
 			try {
 				if (pluginHelper.isArxiuPluginActiu()) {
@@ -427,7 +447,6 @@ public class IndexHelper {
 				logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
 			}
 			if (datesFirmes != null && !datesFirmes.isEmpty()) {
-				SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 //				múltiples firmes
 //				for (Entry<Integer, Date> entry : datesFirmes.entrySet()) {
 //					String dataFirma = null;
