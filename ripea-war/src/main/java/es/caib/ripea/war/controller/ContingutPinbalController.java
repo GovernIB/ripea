@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.ejb.EJBException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -98,13 +99,17 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 					request,
 					"redirect:../contingut/" + pareId,
 					"pinbal.controller.creat.ok");
-		} catch (PinbalException ex) {
-			logger.error("Error en la consulta PINBAL", ex);
-			return getModalControllerReturnValueError(
-					request,
-					"redirect:../contingut/" + pareId,
-					"pinbal.controller.creat.error",
-					new String[] {ex.getMessage()});
+		} catch (PinbalException | EJBException ex) {
+			if (ex instanceof PinbalException || (ex instanceof EJBException && ex.getCause() != null && ex.getCause() instanceof PinbalException)) {
+				logger.error("Error en la consulta PINBAL", ex);
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../contingut/" + pareId,
+						"pinbal.controller.creat.error",
+						new String[] {ex.getMessage()});
+			} else {
+				throw ex;
+			}
 		}
 	}
 
