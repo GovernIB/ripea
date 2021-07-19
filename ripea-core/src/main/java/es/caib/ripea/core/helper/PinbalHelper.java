@@ -266,8 +266,15 @@ public class PinbalHelper {
 			Exception ex, 
 			String serveiScsp,
 			long t0) {
+		String recobrimentExceptionPrefix = "es.caib.pinbal.client.recobriment.RecobrimentException: ";
 		String accioDescripcio = "Petició síncrona";
-		String errorDescripcio = "Excepció en la petició a PINBAL";
+		String missatge;
+		if (ex.getMessage() != null && ex.getMessage().indexOf(recobrimentExceptionPrefix) != -1) {
+			missatge = ex.getMessage().substring(ex.getMessage().indexOf(recobrimentExceptionPrefix) + recobrimentExceptionPrefix.length());
+		} else {
+			missatge = ex.getMessage();
+		}
+		String errorDescripcio = "Excepció en la petició a PINBAL: " + missatge;
 		integracioHelper.addAccioError(
 				IntegracioHelper.INTCODI_PINBAL,
 				accioDescripcio,
@@ -276,7 +283,9 @@ public class PinbalHelper {
 				System.currentTimeMillis() - t0,
 				errorDescripcio,
 				ex);
-		return new PinbalException(ex);
+		return new PinbalException(
+				missatge,
+				ex);
 	}
 
 	private Map<String, String> getAccioParams(
