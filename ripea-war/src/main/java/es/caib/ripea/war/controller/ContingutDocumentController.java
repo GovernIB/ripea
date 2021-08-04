@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -933,7 +934,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			logger.error("Error al descarregar versio imprimible", e);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			
-			if (root.getMessage().contains("connect timed out")) {
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 				MissatgesHelper.error(
 						request, 
 						getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));

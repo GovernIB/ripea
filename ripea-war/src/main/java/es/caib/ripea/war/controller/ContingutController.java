@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +63,7 @@ import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -106,60 +108,83 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				true);
-		omplirModelPerMostrarContingut(
-				request,
-				entitatActual,
-				contingut,
-				SessioHelper.desmarcarLlegit(request),
-				model);
-		model.addAttribute("isContingutDetail", false);
-		model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
-		model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
-		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
-		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
-		String mostrarPblicar = aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa");
-		model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(mostrarPblicar != null ? mostrarPblicar : "true"));
-		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
-		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
-		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
-		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
-		model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
-		model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
-		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
-		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
-		boolean isEntitatUserAdminOrOrgan;
-		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
-			isEntitatUserAdminOrOrgan = true;
-		} else {
-			isEntitatUserAdminOrOrgan = false;
-		}
-		model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
-
-		List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
-				entitatActual.getId(),
-				contingutId);
-		List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
-		List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
-		for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
-			if (metaDocument.isPinbalActiu()) {
-				metaDocumentsPinbal.add(metaDocument);
+		
+		try {
+		
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			ContingutDto contingut = contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					contingutId,
+					true,
+					true);
+			omplirModelPerMostrarContingut(
+					request,
+					entitatActual,
+					contingut,
+					SessioHelper.desmarcarLlegit(request),
+					model);
+			model.addAttribute("isContingutDetail", false);
+			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
+			model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
+			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
+			String mostrarPblicar = aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa");
+			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(mostrarPblicar != null ? mostrarPblicar : "true"));
+			model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
+			model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
+			model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
+			model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
+			model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
+			model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
+			model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
+			model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
+			boolean isEntitatUserAdminOrOrgan;
+			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
+				isEntitatUserAdminOrOrgan = true;
 			} else {
-				metaDocumentsNoPinbal.add(metaDocument);
+				isEntitatUserAdminOrOrgan = false;
+			}
+			model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
+	
+			List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
+					entitatActual.getId(),
+					contingutId);
+			List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
+			List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
+			for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
+				if (metaDocument.isPinbalActiu()) {
+					metaDocumentsPinbal.add(metaDocument);
+				} else {
+					metaDocumentsNoPinbal.add(metaDocument);
+				}
+			}
+			model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
+			model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
+	
+			model.addAttribute("notificacioEnviamentEstats",
+					EnumHelper.getOptionsForEnum(EnviamentEstat.class,
+							"notificacio.enviamentEstat.enum."));
+			return "contingut";
+		
+		
+		} catch (Exception e) {
+			logger.error("Error al obtenir detalls del contingut", e);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+			} else {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage());
 			}
 		}
-		model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
-		model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
-
-		model.addAttribute("notificacioEnviamentEstats",
-				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
-						"notificacio.enviamentEstat.enum."));
-		return "contingut";
+		
+		
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutId}/delete", method = RequestMethod.GET)
