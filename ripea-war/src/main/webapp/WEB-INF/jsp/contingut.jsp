@@ -1732,6 +1732,11 @@ function closeViewer() {
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
 							
+							<c:if test="${contingut.metaNode.comu}">
+								<dt><spring:message code="contingut.info.organ.gestor"/></dt>
+								<dd>${contingut.organGestorNom}</dd>
+							</c:if>
+							
 							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
 							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 							

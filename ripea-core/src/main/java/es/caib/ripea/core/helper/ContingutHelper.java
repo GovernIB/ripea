@@ -274,6 +274,7 @@ public class ContingutHelper {
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			
 			dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
+			dto.setOrganGestorNom(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getNom() : null);
 			
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
