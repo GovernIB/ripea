@@ -733,15 +733,27 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		expedientService.alliberarUser(
-				entitatActual.getId(),
-				expedientId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../contingut/" + expedientId,
-				"expedient.controller.alliberat.ok");
+		
+		try {
+			model.addAttribute("mantenirPaginacio", true);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			expedientService.alliberarUser(
+					entitatActual.getId(),
+					expedientId);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.controller.alliberat.ok");
+			
+		} catch (Exception e) {
+			logger.error("Error al alliberar un expedient", e);
+			
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					ExceptionHelper.getRootCauseOrItself(e).getMessage());
+
+		}
 	}
 	
 	@RequestMapping(value = "/{expedientId}/assignar", method = RequestMethod.GET)
