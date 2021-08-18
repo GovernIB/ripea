@@ -220,12 +220,20 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					"contingut.controller.element.esborrat.ok");
 
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return getModalControllerReturnValueErrorMessageText(
-					request,
-					url,
-					e.getMessage());
-
+			logger.error("Error al esborrar el contingut", e);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+				
+			} else {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
+			}
 		}
 	}
 
@@ -604,22 +612,43 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				false,
-				false);
-		model.addAttribute("contingut", contingut);
-		if (contingut.isReplicatDinsArxiu()) {
-			model.addAttribute(
-					"arxiuDetall",
-					contingutService.getArxiuDetall(
-							entitatActual.getId(),
-							contingutId));
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			ContingutDto contingut = contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					contingutId,
+					false,
+					false);
+			model.addAttribute("contingut", contingut);
+			if (contingut.isReplicatDinsArxiu()) {
+				model.addAttribute(
+						"arxiuDetall",
+						contingutService.getArxiuDetall(
+								entitatActual.getId(),
+								contingutId));
+			}
+			return "contingutArxiu";
+		} catch (Exception e) {
+			
+			logger.error("Error al consultar informació arxiu", e);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+				
+			} else {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + root.getMessage());
+			}
 		}
-		return "contingutArxiu";
 	}
+	
+	
 
 	@RequestMapping(value = "/contingut/{contingutId}/exportar", method = RequestMethod.GET)
 	public String exportar(
