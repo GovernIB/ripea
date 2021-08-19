@@ -492,7 +492,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					
 					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 					
-					if (root.getMessage().contains("connect timed out")) {
+					if (root.getMessage().contains("timed out")) {
 						MissatgesHelper.error(
 								request, 
 								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));

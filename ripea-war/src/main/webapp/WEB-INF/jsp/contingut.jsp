@@ -1293,6 +1293,8 @@ function getEnviamentsDocument(document) {
 function enableDisableButton() {
 	var isTotPdfFirmat = true;
 	var isTotPdf = true;
+	var isTotDocAdjuntGuardatEnArxiu = true;
+
 	var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut"/>';
 	$('#loading').removeClass('hidden');
 	//lista
@@ -1309,6 +1311,11 @@ function enableDisableButton() {
 			if (docsIdx.includes(documentId)) {
 				var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
 				var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
+				var isDocAdjuntPendentGuardarArxiu = $(input.closest('tr')).hasClass('docAdjuntPendentGuardarArxiu');
+				if (isDocAdjuntPendentGuardarArxiu) {
+					isTotDocAdjuntGuardatEnArxiu = false;
+				}
+				
 				if (!isFirmatCurrentDocument) {
 					isTotPdfFirmat = false;
 					return false;
@@ -1327,6 +1334,11 @@ function enableDisableButton() {
 			if (docsIdx.includes(documentId)) {
 				var isFirmatCurrentDocument = $(child).hasClass('firmat');
 				var isPdfCurrentDocument = $(child).hasClass('isPdf');
+				var isDocAdjuntPendentGuardarArxiu = $(child).hasClass('docAdjuntPendentGuardarArxiu');
+				if (isDocAdjuntPendentGuardarArxiu) {
+					isTotDocAdjuntGuardatEnArxiu = false;
+				}
+				
 				if (!isFirmatCurrentDocument) {
 					isTotPdfFirmat = false;
 					return false;
@@ -1337,6 +1349,11 @@ function enableDisableButton() {
 			}
 		});
 	}
+
+
+
+
+	
 	if (isTotPdfFirmat && isTotPdf) {
 		$('.nomaximized').addClass('hidden'); //zip
 		$('.maximized').removeClass('hidden'); //concatenació
@@ -1347,10 +1364,13 @@ function enableDisableButton() {
 		$('.maximized').addClass('hidden'); //concatenació
 		$('#notificar-mult').removeClass("disabled");
 		$('#definitiu-mult').addClass("disabled");
+	} else if (!isTotDocAdjuntGuardatEnArxiu) {
+		$('#definitiu-mult').addClass("disabled");
 	} else {
 		$('#notificar-mult').addClass("disabled");
 		$('#definitiu-mult').removeClass("disabled");
 	}
+	
 	if (docsIdx.length > 0) {
 		$('#descarregar-mult').removeClass("disabled");
 		$('#moure-mult').removeClass("disabled");

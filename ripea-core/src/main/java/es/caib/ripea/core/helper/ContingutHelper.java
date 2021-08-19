@@ -180,6 +180,9 @@ public class ContingutHelper {
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		// ##################### EXPEDIENT ##################################
 		if (deproxied instanceof ExpedientEntity) {
+			
+			long t1 = System.currentTimeMillis();
+			
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
 			ExpedientDto dto = new ExpedientDto();
 			dto.setEstat(expedient.getEstat());
@@ -276,9 +279,14 @@ public class ContingutHelper {
 			dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 			dto.setOrganGestorNom(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getNom() : null);
 			
+			logger.debug("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
+			
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
+			
+			long t2 = System.currentTimeMillis();
+			
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
 			dto.setDescripcio(document.getDescripcio());
@@ -353,11 +361,15 @@ public class ContingutHelper {
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
+			
+			logger.debug("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
 			resposta = dto;
 		} 
+		
+		long t3 = System.currentTimeMillis();
 		// ##################### CONTINGUT ##################################
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
@@ -495,6 +507,8 @@ public class ContingutHelper {
 				}
 			}
 		}
+		
+		logger.debug("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
 	

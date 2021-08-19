@@ -114,6 +114,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
 			HttpServletRequest request,
 			Model model) {
+		
+		long t0 = System.currentTimeMillis();
+		
+		long t1 = System.currentTimeMillis();
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		if (mantenirPaginacio) {
 			model.addAttribute("mantenirPaginacio", true);
@@ -126,6 +130,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
+
 		if (filtreCommand.getOrganGestorId() != null) {
 			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
 					entitatActual.getId(),
@@ -137,6 +142,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					null, 
 					rolActual);
 		}
+		logger.debug("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
+		long t2 = System.currentTimeMillis();
 		model.addAttribute(
 				"rolActual",
 				rolActual);
@@ -152,6 +159,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
+		
+		logger.debug("findActiusAmbEntitatPerCreacio time:  " + (System.currentTimeMillis() - t2) + " ms");
+		
+		long t3 = System.currentTimeMillis();
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		Long metaExpedientId = (Long)RequestSessionHelper.obtenirObjecteSessio(
@@ -173,6 +184,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 							request, 
 							"expedient.controller.sense.permis.lectura"));
 		}
+		logger.debug("findEstats time:  " + (System.currentTimeMillis() - t3) + " ms");
+		
+		logger.debug("Getting page of expedients time " + (System.currentTimeMillis() - t0) + " ms");
+		
 		return "expedientUserList";
 	}
 
@@ -877,6 +892,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
+		
+		long t0 = System.currentTimeMillis();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatsByMetaExpedient(
@@ -884,7 +901,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				metaExpedientId);
 		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name().toUpperCase(), Long.valueOf(0)));
 		expedientEstatsOptions.addAll(estatsFromDatabase);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name().toUpperCase(), Long.valueOf(-1)));		
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name().toUpperCase(), Long.valueOf(-1)));	
+		
+		logger.debug("findExpedientEstatByMetaExpedient time: " + (System.currentTimeMillis() - t0) + " ms");
 		return expedientEstatsOptions;
 	}
 
