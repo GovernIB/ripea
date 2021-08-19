@@ -30,7 +30,6 @@ ENV PINBAL_PASSWORD ripea_pinbal
 EXPOSE 8080
 EXPOSE 8787
 ADD --chown=default:default deploycaib/ /opt/jboss/server/default/deploycaib/
-ADD --chown=default:default lib/ /opt/jboss/server/default/lib/
 ADD --chown=default:default config/ /opt/webapps/
 RUN chmod +x /opt/webapps/env_init.sh
 COPY --chown=default:default maven/${project.build.finalName}.ear /opt/jboss/server/default/deploycaib/${project.build.finalName}.ear
