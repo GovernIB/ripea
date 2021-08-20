@@ -339,7 +339,7 @@ $(document).ready(function() {
 					</c:if>
 				</div>
 				<div class="buttons_container">
-					<c:if test="${portafirmes.estat == 'ENVIAT'}">
+					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == null}">
 						<c:choose>
 							<c:when test="${isTasca}">
 								<a id="btn_cancelar" href="<rip:modalUrl value="/usuariTasca/${tascaId}/document/${portafirmes.document.id}/portafirmes/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
@@ -399,15 +399,11 @@ $(document).ready(function() {
 		</c:otherwise>
 	</c:choose>
 
-
-
-
-
-
-
-
+	
 	<div id="modal-botons" class="well">
-		<a href="<c:url value="/contenidor/${portafirmes.document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
+			<a href="<c:url value="/contenidor/${portafirmes.document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
 	</div>
+
+
 </body>
 </html>

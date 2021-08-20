@@ -131,4 +131,6 @@ public interface ExpedientTascaService {
 			TascaEstatEnumDto tascaEstatEnumDto,
 			String motiu);
 
+	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
+
 }

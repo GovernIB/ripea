@@ -206,6 +206,17 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	}
 	
 	public DocumentPortafirmesDto portafirmesInfo(
+			Long enviamentId) {
+
+		DocumentPortafirmesEntity enviament = documentPortafirmesRepository.findOne(
+				enviamentId);
+		return conversioTipusHelper.convertir(
+				enviament,
+				DocumentPortafirmesDto.class);
+	}	
+	
+	
+	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
 			DocumentEntity document) {
 		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
@@ -526,21 +537,29 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	
 	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
 			Long entitatId,
-			DocumentEntity document) {
+			DocumentEntity document, 
+			Long enviamentId) {
 		logger.debug("Recuperar els blocks de firma d'un enviament a Portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");
 		List<PortafirmesBlockDto> portafirmesBlockDto = null;
-		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
-				document,
-				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
-		if (enviamentsPendents.size() == 0) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"Aquest document no te enviaments a portafirmes pendents");
+		DocumentPortafirmesEntity documentPortafirmes = null;
+		if (enviamentId != null) {
+			documentPortafirmes = documentPortafirmesRepository.findOne(enviamentId);
+		} else {
+			List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+					document,
+					new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
+			if (enviamentsPendents.size() == 0) {
+				throw new ValidationException(
+						document.getId(),
+						DocumentEntity.class,
+						"Aquest document no te enviaments a portafirmes pendents");
+			}
+			documentPortafirmes = enviamentsPendents.get(0);
 		}
-		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
+		
+		
 		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
 			Collections.sort(portafirmesBlocks, new Comparator<PortafirmesBlockEntity>() {

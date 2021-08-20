@@ -808,7 +808,8 @@ public class UsuariTascaController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		
 		model.addAttribute(
 				"portafirmes",

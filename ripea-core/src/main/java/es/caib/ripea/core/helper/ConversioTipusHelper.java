@@ -37,6 +37,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
@@ -45,6 +46,8 @@ import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
@@ -369,7 +372,72 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentPortafirmesEntity, SeguimentDto>() {
+					@Override
+					public SeguimentDto convert(DocumentPortafirmesEntity source, Type<? extends SeguimentDto> destinationType) {
+						SeguimentDto target = new SeguimentDto();
+						target.setId(source.getId());
+						target.setExpedientNom(source.getExpedient().getNom());
+						target.setDocumentId(source.getDocument().getId());
+						target.setDocumentNom(source.getDocument().getNom());
+						target.setPortafirmesEstat(source.getEstat());
+						target.setDataEnviament(source.getEnviatData());
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentNotificacioEntity, SeguimentDto>() {
+					@Override
+					public SeguimentDto convert(DocumentNotificacioEntity source, Type<? extends SeguimentDto> destinationType) {
+						SeguimentDto target = new SeguimentDto();
+						target.setId(source.getId());
+						target.setExpedientNom(source.getExpedient().getNom());
+						target.setDocumentId(source.getDocument().getId());
+						target.setDocumentNom(source.getDocument().getNom());
+						target.setNotificacioEstat(source.getNotificacioEstat());
+						target.setDataEnviament(source.getCreatedDate().toDate());
+						
+						
+						InteressatEntity destinatari = !source.getDocumentEnviamentInteressats().isEmpty() ? HibernateHelper.deproxy(source.getDocumentEnviamentInteressats().iterator().next().getInteressat()) : null;
+						String destinatariNom = "";
+						if (destinatari != null) {
+							if (destinatari instanceof  InteressatAdministracioEntity) {
+								InteressatAdministracioEntity adm = (InteressatAdministracioEntity) destinatari;
+								destinatariNom = adm.getOrganCodi() + " - " + adm.getOrganNom();
+							} else if (destinatari instanceof  InteressatPersonaFisicaEntity) {
+								InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity) destinatari;
+								destinatariNom = fis.getNom() + " " + fis.getLlinatge1() + " " + (fis.getLlinatge2() != null ? fis.getLlinatge2() : "");
+							} else if (destinatari instanceof  InteressatPersonaJuridicaEntity) {
+								InteressatPersonaJuridicaEntity jur = (InteressatPersonaJuridicaEntity) destinatari;
+								destinatariNom = jur.getRaoSocial();
+							} 
+						}
+						target.setDestinataris(destinatariNom);
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientTascaEntity, SeguimentDto>() {
+					@Override
+					public SeguimentDto convert(ExpedientTascaEntity source, Type<? extends SeguimentDto> destinationType) {
+						SeguimentDto target = new SeguimentDto();
+						target.setId(source.getId());
+						target.setExpedientNom(source.getExpedient().getNom());
+						target.setTascaNom(source.getMetaExpedientTasca().getNom());
+						target.setData(source.getDataInici());
+						target.setResponsableNom(source.getResponsable().getNom());
+						target.setTascaEstat(source.getEstat());
+						return target;
+					}
+				});	
+		
+		
 	}
+	
 
 
 	public <T> T convertir(Object source, Class<T> targetType) {

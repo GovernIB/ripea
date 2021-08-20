@@ -39,6 +39,8 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 	List<MetaExpedientTascaEntity> findByMetaExpedientAndActivaTrue(
 			MetaExpedientEntity metaExpedient);
 	
+	List<MetaExpedientTascaEntity> findByActivaTrue();
+	
 	
 	int countByMetaExpedient(MetaExpedientEntity metaExpedient);
 

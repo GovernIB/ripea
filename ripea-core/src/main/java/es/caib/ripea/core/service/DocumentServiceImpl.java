@@ -758,7 +758,8 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
 			Long entitatId,
-			Long documentId) {
+			Long documentId, 
+			Long enviamentId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ")");
@@ -770,7 +771,8 @@ public class DocumentServiceImpl implements DocumentService {
 
 		return firmaPortafirmesHelper.recuperarBlocksFirmaEnviament(
 				entitatId,
-				document);
+				document, 
+				enviamentId);
 	}
 	
 	@Transactional
@@ -841,13 +843,16 @@ public class DocumentServiceImpl implements DocumentService {
 		return null;
 	}
 	
+
+	
 	
 
 	@Transactional(readOnly = true)
 	@Override
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
-			Long id) {
+			Long id, 
+			Long enviamentId) {
 		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
@@ -856,8 +861,15 @@ public class DocumentServiceImpl implements DocumentService {
 				id,
 				true,
 				false);
+		
+		DocumentPortafirmesDto docPortafir = null;
+		
+		if (enviamentId != null) {
+			docPortafir = firmaPortafirmesHelper.portafirmesInfo(enviamentId);
+		} else {
+			docPortafir = firmaPortafirmesHelper.portafirmesInfo(entitatId, document);
+		}
 
-		DocumentPortafirmesDto docPortafir = firmaPortafirmesHelper.portafirmesInfo(entitatId, document);
 		List<PortafirmesDocumentTipusDto> list = pluginHelper.portafirmesFindDocumentTipus();
 		for (PortafirmesDocumentTipusDto doctipus : list) {
 			if (Long.toString(doctipus.getId()).equals(docPortafir.getDocumentTipus())) {
