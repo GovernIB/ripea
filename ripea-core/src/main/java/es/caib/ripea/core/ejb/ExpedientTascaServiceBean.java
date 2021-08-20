@@ -288,7 +288,7 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 
 	@Override
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId) {
-		return findAmbEntitat(entitatId);
+		return delegate.findAmbEntitat(entitatId);
 	}
 
 }

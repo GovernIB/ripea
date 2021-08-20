@@ -67,6 +67,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 		ordenacioMap.put("documentNom", new String[] { "document.nom" });
 		ordenacioMap.put("estatEnviament", new String[] { "estat" });
 		ordenacioMap.put("dataEnviament", new String[] { "enviatData" });
+		ordenacioMap.put("portafirmesEstat", new String[] { "estat" });
+		
 		
 		Page<DocumentPortafirmesEntity> docsEnvs = documentPortafirmesRepository.findAmbFiltrePaginat(
 				entitat,
