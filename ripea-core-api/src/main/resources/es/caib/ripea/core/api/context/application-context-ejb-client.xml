@@ -119,5 +119,9 @@
 		<jee:local-slsb
 			id="historicService"
 			jndi-name="ripea/HistoricServiceBean/local"
-			business-interface="es.caib.ripea.core.api.service.HistoricService"/>		
+			business-interface="es.caib.ripea.core.api.service.HistoricService"/>
+	<jee:local-slsb
+			id="configService"
+			jndi-name="ripea/ConfigServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ConfigService"/>
 </beans>

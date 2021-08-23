@@ -70,9 +70,8 @@ public class MetaExpedientHelper {
 
     @Autowired
     private EmailHelper emailHelper;
-    @Autowired
-    private AplicacioHelper aplicacioHelper;
-    
+	@Autowired
+	private ConfigHelper configHelper;
     
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
@@ -344,14 +343,12 @@ public class MetaExpedientHelper {
 		
 		return metaExpedients;
 	}
-	
 
-	
 	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId) {
+
+		boolean revisioActiva = configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
 		
-		boolean property = aplicacioHelper.propertyBooleanFindByKey("es.caib.ripea.metaexpedients.revisio.activa", true);
-		
-		if (property == true) {
+		if (revisioActiva) {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
 
@@ -366,7 +363,7 @@ public class MetaExpedientHelper {
 	}
 	
 	public boolean isRevisioActiva() {
-		return aplicacioHelper.propertyBooleanFindByKey("es.caib.ripea.metaexpedients.revisio.activa", true);
+		return configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
 	}
 	
 

@@ -7,15 +7,9 @@ es.caib.ripea.hibernate.dialect=es.caib.ripea.core.dialect.RipeaOracleDialect
 es.caib.ripea.hibernate.show_sql=false
 es.caib.ripea.hibernate.hbm2ddl.auto=none
 es.caib.ripea.base.url=http://localhost:8080/ripea
-es.caib.ripea.node.esborrar.definitiu=false
 es.caib.ripea.document.nou.escanejar.actiu=false
-es.caib.ripea.tasca.notificacio.pendent.periode.execucio=10000
-es.caib.ripea.tasca.regla.pendent.periode.execucio=10000
 es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio=30000
 es.caib.ripea.segonpla.massives.periode.comprovacio=30000
-es.caib.ripea.segonpla.massives.periode.execucio=500
-es.caib.ripea.segonpla.email.bustia.periode.enviament.no.agrupat=300000
-es.caib.ripea.segonpla.email.bustia.cron.enviament.agrupat=0 0 * * * *
 es.caib.ripea.segonpla.email.enviament.agrupat.cron=0 0 * * * *
 
 es.caib.ripea.app.data.dir=/opt/webapps/ripea

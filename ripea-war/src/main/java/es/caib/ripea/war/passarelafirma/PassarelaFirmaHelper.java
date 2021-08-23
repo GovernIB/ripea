@@ -404,44 +404,46 @@ public class PassarelaFirmaHelper {
 	private List<PassarelaFirmaPlugin> plugins;
 	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.passarelafirma.";
 	private List<PassarelaFirmaPlugin> getAllPluginsFromProperties() {
-		if (plugins == null) {
-			String idsStr = aplicacioService.propertyPluginPassarelaFirmaIds();
-			String[] ids = idsStr.split(",");
-			plugins = new ArrayList<PassarelaFirmaPlugin>();
-			for (String id: ids) {
-				String base = PROPERTIES_BASE + id + ".";
-				Properties pluginProperties = aplicacioService.propertyFindByPrefix(base);
-				String nom = pluginProperties.getProperty(base + "nom");
-				String classe = pluginProperties.getProperty(base + "class");
-				String descripcioCurta = pluginProperties.getProperty(base + "desc");
-				log.debug("Configurant plugin a partir de les propietats (" +
-						"propertiesBase=" + base + ", " +
-						"class=" + classe + ", " +
-						"nom=" + nom + ", " +
-						"descripcioCurta=" + descripcioCurta + ")");
-				Properties pluginPropertiesProcessat = new Properties();
-				for (Object propertyObj: pluginProperties.keySet()) {
-					String propertyKey = propertyObj.toString();
-					String value = pluginProperties.getProperty(propertyKey);
-					String nomFinal = propertyKey.substring(base.length());
-					pluginPropertiesProcessat.put(
-							PROPERTIES_BASE + nomFinal,
-							value);
-					log.debug(
-							"Afegint propietat al plugin (" +
-							"pluginNom=" + nom + ", " +
-							"propertyOriginal=" + propertyKey + ", " +
-							"propertyProcessat=" + (PROPERTIES_BASE + nomFinal) + ", " +
-							"valor=" + value + ")");
-				}
-				plugins.add(
-						new PassarelaFirmaPlugin(
-								new Long(id),
-								nom,
-								descripcioCurta,
-								classe,
-								pluginPropertiesProcessat));
+		if (plugins != null) {
+			return plugins;
+
+		}
+		String idsStr = aplicacioService.propertyPluginPassarelaFirmaIds();
+		String[] ids = idsStr.split(",");
+		plugins = new ArrayList<PassarelaFirmaPlugin>();
+		for (String id: ids) {
+			String base = PROPERTIES_BASE + id + ".";
+			Properties pluginProperties = aplicacioService.propertyFindByGroup("FIRMA_PASSARELA-" + id);
+			String nom = pluginProperties.getProperty(base + "nom");
+			String classe = pluginProperties.getProperty(base + "class");
+			String descripcioCurta = pluginProperties.getProperty(base + "desc");
+			log.debug("Configurant plugin a partir de les propietats (" +
+					"propertiesBase=" + base + ", " +
+					"class=" + classe + ", " +
+					"nom=" + nom + ", " +
+					"descripcioCurta=" + descripcioCurta + ")");
+			Properties pluginPropertiesProcessat = new Properties();
+			for (Object propertyObj: pluginProperties.keySet()) {
+				String propertyKey = propertyObj.toString();
+				String value = pluginProperties.getProperty(propertyKey);
+				String nomFinal = propertyKey.substring(base.length());
+				pluginPropertiesProcessat.put(
+						PROPERTIES_BASE + nomFinal,
+						value);
+				log.debug(
+						"Afegint propietat al plugin (" +
+						"pluginNom=" + nom + ", " +
+						"propertyOriginal=" + propertyKey + ", " +
+						"propertyProcessat=" + (PROPERTIES_BASE + nomFinal) + ", " +
+						"valor=" + value + ")");
 			}
+			plugins.add(
+					new PassarelaFirmaPlugin(
+							new Long(id),
+							nom,
+							descripcioCurta,
+							classe,
+							pluginPropertiesProcessat));
 		}
 		return plugins;
 	}

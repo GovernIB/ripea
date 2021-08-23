@@ -48,6 +48,8 @@ public class PinbalHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	private ClientSvddgpciws02 clientSvddgpciws02;
 	private ClientSvddgpviws02 clientSvddgpviws02;
@@ -373,16 +375,16 @@ public class PinbalHelper {
 	}
 
 	private String getPinbalBaseUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.pinbal.base.url");
+		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");
 	}
 	private String getPinbalUser() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.pinbal.user");
+		return configHelper.getConfig("es.caib.ripea.pinbal.user");
 	}
 	private String getPinbalPassword() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.pinbal.password");
+		return configHelper.getConfig("es.caib.ripea.pinbal.password");
 	}
 	private boolean getPinbalBasicAuth() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.pinbal.basic.auth");
+		return configHelper.getAsBoolean("es.caib.ripea.pinbal.basic.auth");
 	}
 
 }

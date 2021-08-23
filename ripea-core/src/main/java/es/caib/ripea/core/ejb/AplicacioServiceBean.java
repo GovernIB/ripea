@@ -127,8 +127,8 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public Properties propertyFindByPrefix(String prefix) {
-		return delegate.propertyFindByPrefix(prefix);
+	public Properties propertyFindByGroup(String codiGrup) {
+		return delegate.propertyFindByGroup(codiGrup);
 	}
 
 	@Override

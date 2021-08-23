@@ -290,6 +290,16 @@ body {
 								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 							</ul>
 						</div>
+						<div class="btn-group">
+							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>">
+										<spring:message code="decorator.menu.config.properties"/>
+									</a>
+								</li>
+							</ul>
+						</div>
 					</c:when>
 					<c:when test="${isRolActualAdministrador}">
 						<%---- Expedients ----%>
