@@ -124,4 +124,8 @@
 			id="seguimentService"
 			jndi-name="ripea/SeguimentServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.SeguimentService"/>
+	<jee:local-slsb
+			id="configService"
+			jndi-name="ripea/ConfigServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.ConfigService"/>
 </beans>

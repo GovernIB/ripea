@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import java.util.List;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,6 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 
 /**
@@ -45,7 +41,8 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
 	
 	
 	@Transactional
@@ -216,8 +213,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	}
 	
 	private boolean suportaMetaDocumentalsAddicionals() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.arxiu.metadocumental.addicional.actiu");
+		return configHelper.getAsBoolean("es.caib.ripea.arxiu.metadocumental.addicional.actiu");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(TipusDocumentalServiceImpl.class);
