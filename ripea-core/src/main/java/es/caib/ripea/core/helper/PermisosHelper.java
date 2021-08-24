@@ -638,7 +638,8 @@ public class PermisosHelper {
 	}
 
 	private String getMapeigRol(String rol) {
-		String propertyMapeig = (String)PropertiesHelper.getProperties().get("es.caib.ripea.mapeig.rol." + rol);
+		String propertyMapeig =
+			(String) ConfigHelper.JBossPropertiesHelper.getProperties().get("es.caib.ripea.mapeig.rol." + rol);
 		if (propertyMapeig != null)
 			return propertyMapeig;
 		else

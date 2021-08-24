@@ -62,7 +62,9 @@ public class EmailHelper {
 	private EmailPendentEnviarRepository emailPendentEnviarRepository;
 	@Autowired
 	private PermisosHelper permisosHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
 			UsuariEntity usuariOriginal,
@@ -529,7 +531,7 @@ public class EmailHelper {
 	}	
 	
 	private String getEnllacExpedient(Long expedientId) {
-		String baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url");		
+		String baseUrl = configHelper.getConfig("es.caib.ripea.base.url");
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
 		return baseUrl != null ? enllacExpedient : "";
 	}
@@ -625,7 +627,7 @@ public class EmailHelper {
 		}
 		String enllacTramitar = "";
 		if (destinitariHasPermisTasca && (estatAnterior == null || expedientTascaEntity.getEstat() == TascaEstatEnumDto.INICIADA || expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT)) {
-			enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + PropertiesHelper.getProperties().getProperty("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n";
+			enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n";
 		}
 		if (estatAnterior == null) {
 			subject = PREFIX_RIPEA + " Nova tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
@@ -704,7 +706,7 @@ public class EmailHelper {
 	}
 
 	private String getRemitent() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.email.remitent");
+		return configHelper.getConfig("es.caib.ripea.email.remitent");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);

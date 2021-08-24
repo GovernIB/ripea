@@ -72,6 +72,7 @@ import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -87,6 +88,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -145,7 +147,11 @@ public class ExpedientHelper {
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private MessageHelper messageHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
+
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	public ExpedientEntity create(
@@ -341,8 +347,7 @@ public class ExpedientHelper {
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
-		boolean isCarpetaActive = Boolean.parseBoolean(
-				PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+		boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaFromExpPeticio(
@@ -360,6 +365,9 @@ public class ExpedientHelper {
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
+//		Recuperar tipus document per defecte
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
+		
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),
 				documentDto.getNom(),
@@ -370,7 +378,7 @@ public class ExpedientHelper {
 				documentDto.getNtiOrigen(),
 				documentDto.getNtiEstadoElaboracion(),
 				documentDto.getNtiTipoDocumental(),
-				null,
+				metaDocument,
 				isCarpetaActive ? carpetaEntity : expedientEntity,
 				expedientEntity.getEntitat(),
 				expedientEntity,
@@ -531,7 +539,7 @@ public class ExpedientHelper {
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
-		boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+		boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaFromExpPeticio(
@@ -558,6 +566,9 @@ public class ExpedientHelper {
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
+//		Recuperar tipus document per defecte
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
+		
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),
 				documentDto.getNom(),
@@ -568,7 +579,7 @@ public class ExpedientHelper {
 				documentDto.getNtiOrigen(),
 				documentDto.getNtiEstadoElaboracion(),
 				documentDto.getNtiTipoDocumental(),
-				null,
+				metaDocument,
 				isCarpetaActive ? carpetaEntity : expedientEntity,
 				expedientEntity.getEntitat(),
 				expedientEntity,

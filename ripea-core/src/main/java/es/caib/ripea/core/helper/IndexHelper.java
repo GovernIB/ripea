@@ -91,7 +91,9 @@ public class IndexHelper {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private ContingutHelper contingutHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public byte[] generarIndexPerExpedient(
 			ExpedientEntity expedient, 
 			EntitatEntity entitatActual,
@@ -640,21 +642,19 @@ public class IndexHelper {
 	}
 	
 	private String getLogo() throws NoSuchFileException, IOException {
-		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.ripea.index.logo");
-		return filePath;
+		return configHelper.getConfig("es.caib.ripea.index.logo");
 	}
 	
 	private boolean indexExpedientsRelacionats() throws NoSuchFileException, IOException {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.index.expedients.relacionats");
+		return configHelper.getAsBoolean("es.caib.ripea.index.expedients.relacionats");
 	}
 	
 	private String getCsvUrl() throws NoSuchFileException, IOException {
-		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.ripea.documents.validacio.url");
-		return filePath;
+		return configHelper.getConfig("es.caib.ripea.documents.validacio.url");
 	}
 	
 	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
+		return configHelper.getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
 	}
 	
 	private enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};

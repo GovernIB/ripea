@@ -20,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import es.caib.ripea.core.helper.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
@@ -74,27 +75,8 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.CsvHelper;
-import es.caib.ripea.core.helper.DateHelper;
-import es.caib.ripea.core.helper.DistribucioHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExpedientHelper;
-import es.caib.ripea.core.helper.ExpedientPeticioHelper;
-import es.caib.ripea.core.helper.MessageHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.OrganGestorHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -169,7 +151,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
 	@Transactional
@@ -1647,20 +1631,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	private boolean isIncorporacioDuplicadaPermesa() {
-		boolean isPropagarRelacio = Boolean.parseBoolean(
-				PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporacio.anotacions.duplicada"));
-		return isPropagarRelacio;
+		return configHelper.getAsBoolean("es.caib.ripea.incorporacio.anotacions.duplicada");
 	}
 	
 	private boolean isProgaparRelacioActiva() {
-		boolean isPropagarRelacio = Boolean.parseBoolean(
-				PropertiesHelper.getProperties().getProperty("es.caib.ripea.propagar.relacio.expedients"));
-		return isPropagarRelacio;
+		return configHelper.getAsBoolean("es.caib.ripea.propagar.relacio.expedients");
 	}
 	
 	private boolean isIncorporacioJustificantActiva() {
-		boolean isPropagarRelacio = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporar.justificant"));
-		return isPropagarRelacio;
+		return configHelper.getAsBoolean("es.caib.ripea.incorporar.justificant");
 	}
 
 	private List<Long> toListLong(List<Serializable> original) {

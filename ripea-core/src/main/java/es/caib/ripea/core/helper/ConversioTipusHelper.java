@@ -77,7 +77,8 @@ public class ConversioTipusHelper {
 
 	@Autowired
 	private ContingutHelper contingutHelper;
-	
+	@Autowired
+	private TascaHelper tascaHelper;
 	public ConversioTipusHelper() {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory.getConverterFactory().registerConverter(
@@ -160,7 +161,7 @@ public class ConversioTipusHelper {
 						target.setMotiuRebuig(source.getMotiuRebuig());
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setDataLimit(source.getDataLimit());
-						target.setShouldNotifyAboutDeadline(TascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
+						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
 						target.setComentari(source.getComentari());
 						return target;
 					}

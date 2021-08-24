@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -21,6 +22,7 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -805,6 +807,41 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocumentRepository.findByMetaExpedientAndFirmaPortafirmesActivaAmbFluxOResponsable(
 						metaExpedient),
 				MetaDocumentDto.class);
+	}
+	
+	@Transactional
+	@Override
+	public void marcarPerDefecte(
+			Long entitatId, 
+			Long metaExpedientId,
+			Long metaDocumentId,
+			boolean remove) throws NotFoundException {
+		logger.debug("Marcant/desmarcant el tipus de document per defecte (" +
+				"entitatId=" + entitatId + ", " +
+				"metaDocumentId=" + metaDocumentId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
+				entitat, 
+				metaDocumentId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
+				entitat, 
+				metaExpedientId);
+//		Recupera els metadocuments del mateix tipus d'expedient
+		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
+		
+		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {
+			if (metaDocumentEntity.isPerDefecte()) {
+				metaDocumentEntity.updatePerDefecte(false);
+			}
+		}
+		if (!remove)
+			currentMetaDocument.updatePerDefecte(true);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentServiceImpl.class);

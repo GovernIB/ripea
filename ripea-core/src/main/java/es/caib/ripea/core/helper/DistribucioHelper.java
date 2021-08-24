@@ -5,6 +5,7 @@ package es.caib.ripea.core.helper;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.distribucio.ws.backofficeintegracio.BackofficeIntegracio;
@@ -15,13 +16,11 @@ import es.caib.distribucio.ws.client.BackofficeIntegracioWsClientFactory;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Component
 public class DistribucioHelper {
-
 	
-	private static String url = PropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.url");
-	private static String usuari = PropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.username");
-	private static String contrasenya = PropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.password");
+	private static String url = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.url");
+	private static String usuari = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.username");
+	private static String contrasenya = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.password");
 	
 	public static BackofficeIntegracio getBackofficeIntegracioServicePort() throws IOException {
 		return BackofficeIntegracioWsClientFactory.getWsClient(

@@ -11,6 +11,7 @@ import javax.ejb.SessionContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,6 +36,8 @@ public class UsuariHelper {
 
 	@Resource
 	private CacheHelper cacheHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 
 
@@ -193,9 +196,7 @@ public class UsuariHelper {
 	
 
 	private String getIdiomaPerDefecte() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.usuari.idioma.defecte",
-				"CA");
+		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(UsuariHelper.class);

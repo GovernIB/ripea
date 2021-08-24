@@ -103,6 +103,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private boolean pinbalActiu;
 	@Column(name = "pinbal_servei", length = 64)
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	
+	@Column(name = "per_defecte")
+	private boolean perDefecte;
 
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
@@ -172,7 +175,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public MetaDocumentPinbalServeiEnumDto getPinbalServei() {
 		return pinbalServei;
 	}
-
+	public boolean isPerDefecte() {
+		return perDefecte;
+	}
+	
 	public void update(
 			String codi,
 			String nom,
@@ -225,6 +231,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.plantillaNom = plantillaNom;
 		this.plantillaContentType = plantillaContentType;
 		this.plantillaContingut = plantillaContingut;
+	}
+
+	public void updatePerDefecte(boolean perDefecte) {
+		this.perDefecte = perDefecte;
 	}
 
 	public static Builder getBuilder(

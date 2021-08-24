@@ -388,4 +388,25 @@ public interface MetaDocumentService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId);
+	
+	/**
+	 * Marca un tipus de document com per defecte per un tipus d'expedient.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Atribut id del tipus d'expedient pare.
+	 * @param metaDocumentId
+	 *            Atribut id del tipus de document a marcar per defecte.
+	 * @param remove
+	 *            true/false indica si desactivar tipus documental per defecte
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void marcarPerDefecte(
+			Long entitatId,
+			Long metaExpedientId,
+			Long metaDocumentId,
+			boolean remove) throws NotFoundException;
 }

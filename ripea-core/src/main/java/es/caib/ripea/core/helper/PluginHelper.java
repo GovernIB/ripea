@@ -197,6 +197,8 @@ public class PluginHelper {
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public List<String> rolsUsuariFindAmbCodi(
 			String usuariCodi) {
@@ -5026,6 +5028,7 @@ public class PluginHelper {
 	}
 
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
+		loadPluginProperties("USUARIS");
 		if (dadesUsuariPlugin == null) {
 			String pluginClass = getPropertyPluginDadesUsuari();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5047,6 +5050,7 @@ public class PluginHelper {
 		return dadesUsuariPlugin;
 	}
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+		loadPluginProperties("ORGANISMES");
 		if (unitatsOrganitzativesPlugin == null) {
 			String pluginClass = getPropertyPluginUnitatsOrganitzatives();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5068,12 +5072,13 @@ public class PluginHelper {
 		return unitatsOrganitzativesPlugin;
 	}
 	private IArxiuPlugin getArxiuPlugin() {
+		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					if (PropertiesHelper.getProperties().isLlegirSystem()) {
+					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class).newInstance(
 								"es.caib.ripea.");
@@ -5082,7 +5087,7 @@ public class PluginHelper {
 								String.class,
 								Properties.class).newInstance(
 								"es.caib.ripea.",
-								PropertiesHelper.getProperties().findAll());
+								configHelper.findAll());
 					}
 				} catch (Exception ex) {
 					throw new SistemaExternException(
@@ -5099,6 +5104,7 @@ public class PluginHelper {
 		return arxiuPlugin;
 	}
 	private PortafirmesPlugin getPortafirmesPlugin() {
+		loadPluginProperties("PORTAFIRMES");
 		if (portafirmesPlugin == null) {
 			String pluginClass = getPropertyPluginPortafirmes();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5120,6 +5126,7 @@ public class PluginHelper {
 		return portafirmesPlugin;
 	}
 	private ConversioPlugin getConversioPlugin() {
+		loadPluginProperties("CONVERSIO");
 		if (conversioPlugin == null) {
 			String pluginClass = getPropertyPluginConversio();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5141,6 +5148,7 @@ public class PluginHelper {
 		return conversioPlugin;
 	}
 	private DigitalitzacioPlugin getDigitalitzacioPlugin() {
+		loadPluginProperties("DIGITALITZACIO");
 		if (digitalitzacioPlugin == null) {
 			String pluginClass = getPropertyPluginDigitalitzacio();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5233,6 +5241,7 @@ public class PluginHelper {
 	}
 
 	private DadesExternesPlugin getDadesExternesPlugin() {
+		loadPluginProperties("DADES_EXT");
 		if (dadesExternesPlugin == null) {
 			String pluginClass = getPropertyPluginDadesExternes();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5254,12 +5263,13 @@ public class PluginHelper {
 		return dadesExternesPlugin;
 	}
 	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
+		loadPluginProperties("VALIDATE_SIGNATURE");
 		if (validaSignaturaPlugin == null) {
 			String pluginClass = getPropertyPluginValidaSignatura();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					if (PropertiesHelper.getProperties().isLlegirSystem()) {
+					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
 						validaSignaturaPlugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(
 								String.class).newInstance(
 								"es.caib.ripea.");
@@ -5268,7 +5278,7 @@ public class PluginHelper {
 								String.class,
 								Properties.class).newInstance(
 								"es.caib.ripea.",
-								PropertiesHelper.getProperties().findAll());
+								configHelper.findAll());
 					}
 				} catch (Exception ex) {
 					throw new SistemaExternException(
@@ -5283,6 +5293,7 @@ public class PluginHelper {
 		return validaSignaturaPlugin;
 	}
 	private NotificacioPlugin getNotificacioPlugin() {
+		loadPluginProperties("NOTIB");
 		if (notificacioPlugin == null) {
 			String pluginClass = getPropertyPluginNotificacio();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5304,6 +5315,7 @@ public class PluginHelper {
 		return notificacioPlugin;
 	}
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
+		loadPluginProperties("FIRMA_SERVIDOR");
 		if (firmaServidorPlugin == null) {
 			String pluginClass = getPropertyPluginFirmaServidor();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5325,6 +5337,7 @@ public class PluginHelper {
 		return firmaServidorPlugin;
 	}
 	private ViaFirmaPlugin getViaFirmaPlugin() {
+		loadPluginProperties("FIRMA_VIAFIRMA");
 		boolean viaFirmaPluginConfiguracioProvada = false;
 		
 		if (viaFirmaPlugin == null && !viaFirmaPluginConfiguracioProvada) {
@@ -5351,6 +5364,7 @@ public class PluginHelper {
 	
 	
 	private ProcedimentPlugin getProcedimentPlugin() {
+		loadPluginProperties("GESCONADM");
 		if (procedimentPlugin == null) {
 			String pluginClass = getPropertyPluginProcediment();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -5371,99 +5385,113 @@ public class PluginHelper {
 		}
 		return procedimentPlugin;
 	}
-	
-	
+
+	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
+	private synchronized void loadPluginProperties(String codeProperties) {
+		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
+			propertiesLoaded.put(codeProperties, true);
+			Properties pluginProps = configHelper.getGroupProperties(codeProperties);
+			for (Map.Entry<Object, Object> entry : pluginProps.entrySet() ) {
+				String value = entry.getValue() == null ? "" : (String) entry.getValue();
+				System.setProperty((String) entry.getKey(), value);
+			}
+		}
+	}
+
+	/**
+	 * Esborra les properties del grup indicat per paràmetre de la memòria.
+	 *
+	 * @param codeProperties Codi del grup de propietats que vols esborrar de memòria.
+	 */
+	public void reloadProperties(String codeProperties) {
+		if (propertiesLoaded.containsKey(codeProperties))
+			propertiesLoaded.put(codeProperties, false);
+	}
+
+	public void resetPlugins() {
+		dadesUsuariPlugin = null;
+		unitatsOrganitzativesPlugin = null;
+		portafirmesPlugin = null;
+		digitalitzacioPlugin = null;
+		conversioPlugin = null;
+		dadesExternesPlugin = null;
+		arxiuPlugin = null;
+		validaSignaturaPlugin = null;
+		notificacioPlugin = null;
+		gestioDocumentalPlugin = null;
+		firmaServidorPlugin = null;
+		viaFirmaPlugin = null;
+		procedimentPlugin = null;
+	}
+
 
 	private String getPropertyPluginDadesUsuari() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dades.usuari.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.dades.usuari.class");
 	}
 	private String getPropertyPluginUnitatsOrganitzatives() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.unitats.organitzatives.class");
 	}
 	private String getPropertyPluginArxiu() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.arxiu.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.arxiu.class");
 	}
 	private String getPropertyPluginPortafirmes() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.portafirmes.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.portafirmes.class");
 	}
 	private String getPropertyPluginDigitalitzacio() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.digitalitzacio.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.digitalitzacio.class");
 	}
 	private String getPropertyPluginConversio() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.conversio.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.conversio.class");
 	}
-	/*private String getPropertyPluginCiutada() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.ciutada.class");
-	}*/
+
 	private String getPropertyPluginDadesExternes() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dadesext.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.dadesext.class");
 	}
 	private String getPropertyPluginProcediment() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.procediment.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.procediment.class");
 	}
 	private String getPropertyPluginValidaSignatura() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.validatesignature.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.validatesignature.class");
 	}
 	private String getPropertyPluginNotificacio() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.notificacio.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.notificacio.class");
 	}
 	private String getPropertyPluginGestioDocumental() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.gesdoc.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.gesdoc.class");
 	}
 	private String getPropertyPluginFirmaServidor() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.firmaservidor.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.firmaservidor.class");
 	}
 	private String getPropertyPluginViaFirma() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.viafirma.class");
+		return configHelper.getConfig("es.caib.ripea.plugin.viafirma.class");
 	}
 	private boolean getPropertyPluginRegistreSignarAnnexos() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.plugin.signatura.signarAnnexos");
+		return configHelper.getAsBoolean("es.caib.ripea.plugin.signatura.signarAnnexos");
 	}
 
 	private boolean getPropertyArxiuMetadadesAddicionalsActiu() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.arxiu.metadades.addicionals.actiu");
+		return configHelper.getAsBoolean("es.caib.ripea.arxiu.metadades.addicionals.actiu");
 	}
 	
 	private boolean getPropertyArxiuFirmaDetallsActiu() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.arxiu.firma.detalls.actiu");
+		return configHelper.getAsBoolean("es.caib.ripea.arxiu.firma.detalls.actiu");
 	}
 
 	private Integer getPropertyNotificacioRetardNumDies() {
-		String valor = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.notificacio.retard.num.dies");
-		return (valor != null) ? new Integer(valor) : null;
+		return configHelper.getAsInt("es.caib.ripea.notificacio.retard.num.dies");
 	}
 	private Integer getPropertyNotificacioCaducitatNumDies() {
-		String valor = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.notificacio.caducitat.num.dies");
-		return (valor != null) ? new Integer(valor) : 15;
+		return configHelper.getAsInt("es.caib.ripea.notificacio.caducitat.num.dies");
 	}
 	private String getPropertyNotificacioForsarEntitat() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.notificacio.forsar.entitat");
+		return configHelper.getConfig("es.caib.ripea.notificacio.forsar.entitat");
 	}
 	
 	private boolean getPropertyGuardarCertificacioExpedient() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
+		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
 	private boolean getPropertyViaFirmaDispositius() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled");
+		return configHelper.getAsBoolean("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled");
 	}
 	
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {

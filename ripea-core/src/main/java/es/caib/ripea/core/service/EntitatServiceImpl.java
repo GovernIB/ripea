@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,6 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PermisosEntitatHelper;
-import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -59,6 +53,8 @@ public class EntitatServiceImpl implements EntitatService {
 	private PermisosEntitatHelper permisosEntitatHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 	
 	@Transactional
 	@Override
@@ -115,7 +111,7 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public byte[] getLogo() throws NoSuchFileException, IOException{
 
-		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.ripea.capsalera.logo");
+		String filePath = configHelper.getConfig("es.caib.ripea.capsalera.logo");
 		Path path = Paths.get(filePath);
 		
 		return Files.readAllBytes(path);

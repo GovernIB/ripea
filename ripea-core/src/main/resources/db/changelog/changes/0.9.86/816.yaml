@@ -1,6 +1,6 @@
 databaseChangeLog:
 - changeSet:
-    id: 1624872722049
+    id: 1624872722049-1
     author: limit
     changes:
     - addColumn:

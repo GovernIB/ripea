@@ -152,7 +152,9 @@ public class ContingutHelper {
 	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	@Autowired
 	private InteressatRepository interessatRepository;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
 		return toContingutDto(
@@ -1408,31 +1410,17 @@ public class ContingutHelper {
 				0);
 		return items.size() == 0;
 	}
-	
-	/*private Long getCountByContingut(
-			ContingutEntity contingut,
-			List<Object[]> counts) {
-		for (Object[] count: counts) {
-			Long contingutId = (Long)count[0];
-			if (contingutId.equals(contingut.getId())) {
-				return (Long)count[1];
-			}
-		}
-		return new Long(0);
-	}*/
-	
+
 	public String getBaseDir() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
+		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
 	}
 	
 	public boolean isCarpetaLogica() {
-		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
-		return Boolean.valueOf(carpetesLogiques);
+		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
 	}
 	
 	public boolean isOrdenacioPermesa() {
-		String isOrdenacioPermesa = PropertiesHelper.getProperties().getProperty("es.caib.ripea.ordenacio.contingut.habilitada");
-		return Boolean.valueOf(isOrdenacioPermesa);
+		return configHelper.getAsBoolean("es.caib.ripea.ordenacio.contingut.habilitada");
 	}
 
 	private boolean isCertificacioAmbFirma(byte[] certificacioContingut) {
