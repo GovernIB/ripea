@@ -163,12 +163,11 @@ public interface AplicacioService {
 
 	/**
 	 * Retorna els valors dels paràmetres de configuració de l'aplicació
-	 * que tenen un determinat prefix.
+	 * agrupades dins un grup determinat
 	 * 
 	 * @return els valors com a un objecte Properties.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
-	public Properties propertyFindByPrefix(String prefix);
+	Properties propertyFindByGroup(String codiGrup);
 
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	String propertyFindByNom(String nom);

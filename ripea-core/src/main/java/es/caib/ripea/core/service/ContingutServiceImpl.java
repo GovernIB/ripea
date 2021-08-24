@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,19 +78,7 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DateHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -147,6 +136,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -1969,24 +1960,8 @@ public class ContingutServiceImpl implements ContingutService {
 		return conteDefinitius;
 	}
 
-
-
-	/*private void fitxerDocumentEsborratGuardarEnTmp(
-			DocumentEntity document) throws IOException {
-		File fContent = new File(contingutHelper.getBaseDir() + "/" + document.getId());
-		fContent.getParentFile().mkdirs();
-		FileOutputStream outContent = new FileOutputStream(fContent);
-		FitxerDto fitxer = documentHelper.getFitxerAssociat(
-				document,
-				null);
-		outContent.write(fitxer.getContingut());
-		outContent.close();
-	}*/
-
-
 	public boolean isCarpetaLogica() {
-		String carpetesLogiques = PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.logiques");
-		return Boolean.valueOf(carpetesLogiques);
+		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);

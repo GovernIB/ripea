@@ -76,7 +76,9 @@ public class DocumentNotificacioHelper {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private ContingutHelper contingutHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public static Map<String, String> notificacionsWithError = new HashMap<String, String>();
 	
 	public void crear(
@@ -358,15 +360,14 @@ public class DocumentNotificacioHelper {
 		}
 		return infoRegistre;
 	}
-	
+
+
+
+
 
 	
-	
-	
-	
 	private boolean getPropertyGuardarCertificacioExpedient() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
+		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
 	
 	private DocumentDto certificacioToDocumentDto(

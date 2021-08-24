@@ -3,19 +3,18 @@ package es.caib.ripea.core.helper;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TascaHelper {
-	
-	public static boolean shouldNotifyAboutDeadline(Date dataLimit) {
+	@Autowired
+	private ConfigHelper configHelper;
+
+	public boolean shouldNotifyAboutDeadline(Date dataLimit) {
 		boolean shouldNotifyAboutDeadline = false;
 		if (dataLimit != null) {
-			String preavisDataLimitEnDiesProp = PropertiesHelper.getProperties().getProperty("es.caib.ripea.tasca.preavisDataLimitEnDies");
-			Integer preavisDataLimitEnDies;
-			if (preavisDataLimitEnDiesProp != null) {
-				preavisDataLimitEnDies = new Integer(preavisDataLimitEnDiesProp).intValue();
-			} else {
-				preavisDataLimitEnDies = new Integer(2);
-			}
+			int preavisDataLimitEnDies = configHelper.getAsInt("es.caib.ripea.tasca.preavisDataLimitEnDies");
 			if ((new Date()).after(new DateTime(dataLimit).minusDays(preavisDataLimitEnDies).toDate())) {
 				shouldNotifyAboutDeadline = true;
 			}

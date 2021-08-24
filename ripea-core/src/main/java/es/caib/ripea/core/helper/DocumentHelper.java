@@ -69,6 +69,8 @@ public class DocumentHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
@@ -791,8 +793,7 @@ public class DocumentHelper {
 	}
 
 	public boolean isModificacioCustodiatsActiva() {
-		String isModificacioCustodiatsActiva = PropertiesHelper.getProperties().getProperty("es.caib.ripea.document.modificar.custodiats");
-		return Boolean.valueOf(isModificacioCustodiatsActiva);
+		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);

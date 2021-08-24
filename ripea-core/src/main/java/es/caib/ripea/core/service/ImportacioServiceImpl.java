@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +38,6 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.ExpedientHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -71,7 +66,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private EntitatRepository entitatRepository;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	@Transactional
@@ -154,7 +151,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 //				}
 //			}
 			// ############### CREAR CARPETA PARE ON INTRODUIR DOCUMENT #########
-//			boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+//			boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
 			if (crearNovaCarpeta) {
 				// create carpeta ind db and arxiu if doesnt already exists
 				Long carpetaId = expedientHelper.createCarpetaFromExpPeticio(
@@ -470,9 +467,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 	}
 	
 	private boolean isIncorporacioDuplicadaPermesa() {
-		boolean isPropagarRelacio = Boolean.parseBoolean(
-				PropertiesHelper.getProperties().getProperty("es.caib.ripea.incorporacio.anotacions.duplicada"));
-		return isPropagarRelacio;
+		return configHelper.getAsBoolean("es.caib.ripea.incorporacio.anotacions.duplicada");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ImportacioServiceImpl.class);
 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,17 +49,6 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.MetaNodeHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -110,6 +100,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -1018,7 +1010,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	}
 
 	private boolean isCarpetesDefectaActiva() {
-		return Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.carpetes.defecte"));
+		return configHelper.getAsBoolean("es.caib.ripea.carpetes.defecte");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);

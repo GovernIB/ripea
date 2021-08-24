@@ -145,7 +145,9 @@ public class ExpedientHelper {
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private MessageHelper messageHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	public ExpedientEntity create(
@@ -341,8 +343,7 @@ public class ExpedientHelper {
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
-		boolean isCarpetaActive = Boolean.parseBoolean(
-				PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+		boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaFromExpPeticio(
@@ -531,7 +532,7 @@ public class ExpedientHelper {
 
 		// ############################## CREATE CARPETA IN DB AND IN ARXIU
 		// ##########################################
-		boolean isCarpetaActive = Boolean.parseBoolean(PropertiesHelper.getProperties().getProperty("es.caib.ripea.creacio.carpetes.activa"));
+		boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaFromExpPeticio(

@@ -8,8 +8,10 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,14 +26,6 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.AplicacioHelper;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.ExcepcioLogHelper;
-import es.caib.ripea.core.helper.IntegracioHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -56,9 +50,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Resource
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Resource
-	private AplicacioHelper aplicacioHelper;
-	@Resource
 	private UsuariHelper usuariHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 
 	@Transactional
@@ -235,62 +229,51 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyBaseUrl() {
 		logger.debug("Consulta de la propietat base URL");
-		return aplicacioHelper.propertyBaseUrl();
+		return configHelper.getConfig("es.caib.ripea.base.url");
 	}
 
 	@Override
 	public String propertyPluginPassarelaFirmaIds() {
 		logger.debug("Consulta de la propietat amb les ids pels plugins de passarela de firma");
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.passarelafirma.ids");
+		return configHelper.getConfig("es.caib.ripea.plugin.passarelafirma.ids");
 	}
 
 	@Override
 	public String propertyPluginPassarelaFirmaIgnorarModalIds() {
 		logger.debug("Consulta de la propietat amb les ids pels plugins de passarela de firma");
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.passarelafirma.ignorar.modal.ids");
+		return configHelper.getConfig("es.caib.ripea.plugin.passarelafirma.ignorar.modal.ids");
 	}
 
 	@Override
 	public String propertyPluginEscaneigIds() {
 		logger.debug("Consulta de la propietat amb les ids pels plugins d'escaneig de documents");
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.escaneig.ids");
+		return configHelper.getConfig("es.caib.ripea.plugin.escaneig.ids");
 	}
 
 	@Override
-	public Properties propertyFindByPrefix(String prefix) {
-		logger.debug("Consulta del valor dels properties amb prefix (" +
-				"prefix=" + prefix + ")");
-		return PropertiesHelper.getProperties().findByPrefix(prefix);
+	public Properties propertyFindByGroup(String codiGrup) {
+		logger.debug("Consulta del valor de les properties d'un grup (" +
+				"codi grup=" + codiGrup + ")");
+		return configHelper.getGroupProperties(codiGrup);
 	}
-	
+
 	@Override
 	public String propertyFindByNom(String nom) {
 		logger.debug("Consulta del valor del propertat amb nom");
-		return PropertiesHelper.getProperties().getProperty(nom);
+		return configHelper.getConfig(nom);
 	}
 	
 	@Override
 	public Boolean propertyBooleanFindByKey(String key) {
 		logger.debug("Consulta del valor del propietat boolea amb key");
-		Boolean booleanValue = null;
-		String value = PropertiesHelper.getProperties().getProperty(key);
-		if (value != null) {
-			booleanValue = Boolean.parseBoolean(value);
-		}
-		return booleanValue;
+		return configHelper.getAsBoolean(key);
 	}
 	
 	@Override
+	@Deprecated
 	public boolean propertyBooleanFindByKey(String key, boolean defaultValueIfNull) {
 		logger.debug("Consulta del valor del propietat boolea amb key");
-		boolean booleanValue;
-		String value = PropertiesHelper.getProperties().getProperty(key);
-		if (value != null) {
-			booleanValue = Boolean.parseBoolean(value);
-		} else {
-			booleanValue = defaultValueIfNull;
-		}
-		return booleanValue;
+		return configHelper.getAsBoolean(key);
 	}
 	
 	private UsuariDto toUsuariDtoAmbRols(
@@ -311,9 +294,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	private String getIdiomaPerDefecte() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.usuari.idioma.defecte",
-				"CA");
+		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);

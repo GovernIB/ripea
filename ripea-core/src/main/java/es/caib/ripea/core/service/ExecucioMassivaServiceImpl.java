@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import es.caib.ripea.core.helper.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +46,6 @@ import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity.ExecucioMassivaE
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity.ExecucioMassivaTipus;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.AlertaHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.MessageHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaRepository;
@@ -90,7 +83,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	private DocumentService documentService;
 	@Autowired
 	private PluginHelper pluginHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	private static Map<Long, String> errorsMassiva = new HashMap<Long, String>();
 
 	@Transactional
@@ -318,10 +313,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		boolean active = true;
 		Long ultimaExecucioMassiva = null;
 		int timeBetweenExecutions = 500;
-		try {
-			timeBetweenExecutions = Integer.parseInt(
-					PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.arxiu.class"));
-		} catch (Exception ex) {}
+//		try {
+//			timeBetweenExecutions = configHelper.getAsInt("es.caib.ripea.plugin.arxiu.class");
+//		} catch (Exception ex) {}
 		while (active) {
 			Long cmasiu_id = null;
 			boolean alertat = false;
