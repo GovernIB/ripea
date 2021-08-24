@@ -217,7 +217,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
-			"and (d.estat = 1 or d.estat = 2) "  + 
+			"and ((d.estat = 1 or d.estat = 2) or ((d.estat = 0 or d.estat = 7) and d.gesDocAdjuntId!=null)) "  + 
 			"and d.esborrat = 0 " + 
 			"and d.documentTipus = 0 " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
@@ -231,7 +231,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
 			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
 			"				and docPortafirmes.estat = 'ENVIAT' " +
-			"				and docPortafirmes.error = 1))")
+			"				and docPortafirmes.error = 1) or d.gesDocAdjuntId!=null)")
 	public Page<DocumentEntity> findDocumentsPerCustodiarMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
