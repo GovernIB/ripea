@@ -274,7 +274,8 @@ public class ContingutHelper {
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			
 			dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
-			
+			dto.setOrganGestorText(expedient.getOrganGestor() != null ?
+					expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
@@ -595,25 +596,27 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
-		
-		if (!checkPerMassiuAdmin) {
-		// Comprova que l'usuari actual te agafat l'expedient
-		UsuariEntity agafatPer = expedient.getAgafatPer();
-		if (agafatPer == null) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"L'expedient al qual pertany el contingut no està agafat per cap usuari");
-		}
-		
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!auth.getName().equals(agafatPer.getCodi())) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
-					"usuariActualCodi=" + auth.getName() + ")");
-		}
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+		if (!checkPerMassiuAdmin && !esAdministradorEntitat) {
+			// Comprova que l'usuari actual te agafat l'expedient
+			UsuariEntity agafatPer = expedient.getAgafatPer();
+			if (agafatPer == null) {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
+			}
+
+			if (!auth.getName().equals(agafatPer.getCodi())) {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
+						"usuariActualCodi=" + auth.getName() + ")");
+			}
 		}
 
 		

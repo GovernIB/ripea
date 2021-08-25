@@ -41,7 +41,8 @@
 			es.caib.ripea.war.helper.RolHelper.isRolActualSuperusuari(request));
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
-			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request));
+			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request),
+			PageContext.SESSION_SCOPE);
 	pageContext.setAttribute(
   			"isRolActualAdministradorOrgan",
   			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
