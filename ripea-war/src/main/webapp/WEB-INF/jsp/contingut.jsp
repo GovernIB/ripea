@@ -1771,7 +1771,10 @@ function closeViewer() {
 							</c:choose>	
 								
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-							<dd>${contingut.ntiClasificacionSia}</dd>							
+							<dd>${contingut.ntiClasificacionSia}</dd>
+
+							<dt><spring:message code="contingut.info.nti.organ"/></dt>
+							<dd>${contingut.organGestorText}</dd>
 						</c:if>
 
 						<c:if test="${!isTasca && not empty relacionats}">

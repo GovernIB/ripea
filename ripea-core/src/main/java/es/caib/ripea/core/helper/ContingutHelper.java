@@ -182,9 +182,9 @@ public class ContingutHelper {
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		// ##################### EXPEDIENT ##################################
 		if (deproxied instanceof ExpedientEntity) {
-			
+
 			long t1 = System.currentTimeMillis();
-			
+
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
 			ExpedientDto dto = new ExpedientDto();
 			dto.setEstat(expedient.getEstat());
@@ -279,16 +279,18 @@ public class ContingutHelper {
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			
 			dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
+			dto.setOrganGestorText(expedient.getOrganGestor() != null ?
+					expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
 			dto.setOrganGestorNom(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getNom() : null);
-			
+
 			logger.debug("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
-			
+
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
-			
+
 			long t2 = System.currentTimeMillis();
-			
+
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
 			dto.setDescripcio(document.getDescripcio());
@@ -363,14 +365,14 @@ public class ContingutHelper {
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
-			
+
 			logger.debug("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
 			resposta = dto;
 		} 
-		
+
 		long t3 = System.currentTimeMillis();
 		// ##################### CONTINGUT ##################################
 		resposta.setId(contingut.getId());
@@ -509,7 +511,7 @@ public class ContingutHelper {
 				}
 			}
 		}
-		
+
 		logger.debug("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
@@ -612,25 +614,27 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
-		
-		if (!checkPerMassiuAdmin) {
-		// Comprova que l'usuari actual te agafat l'expedient
-		UsuariEntity agafatPer = expedient.getAgafatPer();
-		if (agafatPer == null) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"L'expedient al qual pertany el contingut no està agafat per cap usuari");
-		}
-		
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!auth.getName().equals(agafatPer.getCodi())) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
-					"usuariActualCodi=" + auth.getName() + ")");
-		}
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+		if (!checkPerMassiuAdmin && !esAdministradorEntitat) {
+			// Comprova que l'usuari actual te agafat l'expedient
+			UsuariEntity agafatPer = expedient.getAgafatPer();
+			if (agafatPer == null) {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
+			}
+
+			if (!auth.getName().equals(agafatPer.getCodi())) {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
+						"usuariActualCodi=" + auth.getName() + ")");
+			}
 		}
 
 		

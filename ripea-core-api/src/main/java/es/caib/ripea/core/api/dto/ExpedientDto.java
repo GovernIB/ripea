@@ -63,6 +63,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean hasAllDocumentsDefinitiu;
 	private Long organGestorId;
 	private String organGestorNom;
+	private String organGestorText;
 
 	public MetaExpedientDto getMetaExpedient() {
 		return (MetaExpedientDto)getMetaNode();

@@ -12,7 +12,9 @@
 <c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientPareAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:set var="expedientPareObert" value="${empty expedientPare or expedientPare.estat == 'OBERT'}"/>
 <c:set var="potModificarExpedientPare" value="${false}"/>
-<c:if test="${expedientPareAgafatPerUsuariActual and expedientPareObert and (not contingut.node or expedientPare.metaNode.usuariActualWrite) and expedientPare.usuariActualWrite}"><c:set var="potModificarExpedientPare" value="${true}"/></c:if>
+<c:if test="${expedientPareAgafatPerUsuariActual and expedientPareObert and (not contingut.node or expedientPare.metaNode.usuariActualWrite) and expedientPare.usuariActualWrite}">
+	<c:set var="potModificarExpedientPare" value="${true}"/>
+</c:if>
 <c:set var="mostrarSeparador" value="${false}"/>
 <c:set var="isTasca" value="${not empty tascaId}"/>
 <div <c:if test="${not empty id}">id="${id}" </c:if>class="dropdown<c:if test="${not modeLlistat}"> text-center</c:if><c:if test="${not empty className}"> ${className}</c:if>">
@@ -63,7 +65,7 @@
 			<li><a href="<c:url value="/expedient/${contingut.id}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 		</c:if>
 		
-		<c:if test="${isTasca || potModificarExpedientPare}">
+		<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL')}"/>
 			<c:choose>
@@ -112,7 +114,7 @@
 		<c:if test="${contingut.expedient && not expedientPareAgafatPerUsuariActual}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 		</c:if>
-		<c:if test="${isTasca || potModificarExpedientPare}">
+		<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
 			<c:if test="${contingut.expedient and !isTasca}">
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
@@ -313,7 +315,7 @@
 				</c:if>
 			</c:if>
 		</c:if>
-		<%---- Històric d'accions ----%>
+		<%---- Histï¿½ric d'accions ----%>
 		<c:if test="${!isTasca}">
 			<c:if test="${mostrarSeparador}">
 				<c:set var="mostrarSeparador" value="${false}"/>
