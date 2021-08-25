@@ -1,95 +1,316 @@
 databaseChangeLog:
-    - changeSet:
-        id: 1629371481-1
-        author: limit
-        changes:
-        -  createTable:
-            tableName: IPA_CONFIG_GROUP
-            columns:
-                - column:
-                     name: CODE
-                     type: varchar(128)
-                     constraints:
-                         primaryKey: true
-                         nullable: false
-                - column:
-                     name: PARENT_CODE
-                     type: varchar(128)
-                     constraints:
-                         nullable: true
-                - column:
-                     name: POSITION
-                     type: int
-                     defaultValueNumeric: 0
-                     constraints:
-                         nullable: false
-                - column:
-                     name: DESCRIPTION
-                     type: varchar(512)
-                     constraints:
-                         nullable: false
-        -  createTable:
-            tableName: IPA_CONFIG
-            columns:
-                -  column:
-                    name:  KEY
-                    type:  varchar(256)
-                    constraints:
-                      primaryKey:  true
-                      nullable:  false
-                -  column:
-                    name:  VALUE
-                    type:  varchar(2048)
-                -  column:
-                    name:  DESCRIPTION
-                    type:  varchar(2048)
-                -  column:
-                    name:  GROUP_CODE
-                    type:  varchar(128)
-                    constraints:
-                        nullable: false
-                        foreignKeyName: fk_abc_account
-                        references: IPA_CONFIG_GROUP(CODE)
-                -  column:
-                    name: POSITION
-                    type: int
-                    defaultValueNumeric: 0
-                    constraints:
-                      nullable: false
-                -  column:
-                    name: JBOSS_PROPERTY
-                    type: boolean
-                    defaultValueBoolean: false
-                    constraints:
-                        nullable: false
-                -  column:
-                    name: TYPE_CODE
-                    type: VARCHAR2(128)
-                    defaultValue: 'TEXT'
-                    constraints:
-                      nullable: false
-                - column:
-                    name: lastmodifiedby_codi
-                    type: VARCHAR2(64)
-                - column:
-                    name: lastmodifieddate
-                    type: TIMESTAMP
-        -  createTable:
-            tableName: IPA_CONFIG_TYPE
-            columns:
-                - column:
-                     name: CODE
-                     type: varchar(128)
-                     constraints:
-                         primaryKey: true
-                         nullable: false
-                - column:
-                     name: VALUE
-                     type: varchar(1024)
-        - sqlFile:
-            path: db/changelog/changes/0.9.86/794-inserts.sql
-        - sql:
-              dbms: oracle
-              sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_GROUP TO www_ripea;
-                    GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG TO www_ripea;
-                    GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_TYPE TO www_ripea;"
+- changeSet:
+    id: 1629371481-1
+    author: limit
+    changes:
+    - createTable:
+        tableName: IPA_CONFIG_GROUP
+        columns:
+            - column:
+                 name: CODE
+                 type: varchar(128)
+                 constraints:
+                     primaryKey: true
+                     nullable: false
+            - column:
+                 name: PARENT_CODE
+                 type: varchar(128)
+                 constraints:
+                     nullable: true
+            - column:
+                 name: POSITION
+                 type: int
+                 defaultValueNumeric: 0
+                 constraints:
+                     nullable: false
+            - column:
+                 name: DESCRIPTION
+                 type: varchar(512)
+                 constraints:
+                     nullable: false
+    - createTable:
+        tableName: IPA_CONFIG
+        columns:
+            - column:
+                name:  KEY
+                type:  varchar(256)
+                constraints:
+                    primaryKey:  true
+                    nullable:  false
+            - column:
+                name:  VALUE
+                type:  varchar(2048)
+            - column:
+                name:  DESCRIPTION
+                type:  varchar(2048)
+            - column:
+                name:  GROUP_CODE
+                type:  varchar(128)
+                constraints:
+                    nullable: false
+                    foreignKeyName: fk_abc_account
+                    references: IPA_CONFIG_GROUP(CODE)
+            - column:
+                name: POSITION
+                type: int
+                defaultValueNumeric: 0
+                constraints:
+                  nullable: false
+            - column:
+                name: JBOSS_PROPERTY
+                type: boolean
+                defaultValueBoolean: false
+                constraints:
+                    nullable: false
+            - column:
+                name: TYPE_CODE
+                type: VARCHAR2(128)
+                defaultValue: 'TEXT'
+                constraints:
+                  nullable: false
+            - column:
+                name: lastmodifiedby_codi
+                type: VARCHAR2(64)
+            - column:
+                name: lastmodifieddate
+                type: TIMESTAMP
+    - createTable:
+        tableName: IPA_CONFIG_TYPE
+        columns:
+            - column:
+                 name: CODE
+                 type: varchar(128)
+                 constraints:
+                     primaryKey: true
+                     nullable: false
+            - column:
+                 name: VALUE
+                 type: varchar(1024)
+- changeSet:
+    id: 1629371481-2
+    author: limit
+    changes:
+    - sql: 
+        sql: "
+INSERT INTO IPA_CONFIG_TYPE (CODE) VALUES ('BOOL');
+INSERT INTO IPA_CONFIG_TYPE (CODE) VALUES ('TEXT');
+INSERT INTO IPA_CONFIG_TYPE (CODE) VALUES ('INT');
+INSERT INTO IPA_CONFIG_TYPE (CODE) VALUES ('FLOAT');
+INSERT INTO IPA_CONFIG_TYPE (CODE) VALUES ('CRON');
+INSERT INTO IPA_CONFIG_TYPE (CODE) VALUES ('PASSWORD');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('CONVERSIO_CLASS', 'es.caib.ripea.plugin.caib.conversio.ConversioPluginXdocreport,es.caib.ripea.plugin.caib.conversio.ConversioPluginOpenOffice');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('DADESEXT_CLASS', 'es.caib.ripea.plugin.caib.dadesext.DadesExternesPluginCaib,es.caib.ripea.plugin.caib.dadesext.DadesExternesPluginDir3');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('DIGITALITZACIO_CLASS', 'es.caib.ripea.plugin.caib.digitalitzacio.DigitalitzacioPluginDigitalIB');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('FIRMASERVIDOR_CLASS', 'es.caib.ripea.plugin.caib.firmaservidor.FirmaServidorPluginPortafib,es.caib.ripea.plugin.caib.firmaservidor.FirmaServidorPluginMock');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('PORTAFIRMES_CLASS', 'es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginPortafib,es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginMock,es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginCwsJaxws');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('VIAFIRMA_CLASS', 'es.caib.ripea.plugin.caib.viafirma.ViaFirmaPluginImpl,es.caib.ripea.plugin.caib.viafirma.ViaFirmaPluginMock');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('GESCONADM_CLASS', 'es.caib.ripea.plugin.caib.procediment.ProcedimentPluginRolsac');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('ORGANISMES_CLASS', 'es.caib.ripea.plugin.caib.unitat.UnitatsOrganitzativesPluginDir3,es.caib.ripea.plugin.caib.unitat.UnitatsOrganitzativesPluginCaibMock,es.caib.ripea.plugin.caib.unitat.UnitatsOrganitzativesPluginMock');
+INSERT INTO IPA_CONFIG_TYPE (CODE, VALUE) VALUES ('USUARIS_CLASS', 'es.caib.ripea.plugin.caib.usuari.DadesUsuariPluginJdbc,es.caib.ripea.plugin.caib.usuari.DadesUsuariPluginLdap,es.caib.ripea.plugin.caib.usuari.DadesUsuariPluginMock');
+
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (0, 'GENERAL', 'Configuracions generals' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (1, 'EMAIL', 'Enviament de correus' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (2, 'SCHEDULLED', 'Configuració de les tasques periòdiques' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (3, 'PLUGINS', 'Plugins de l''aplicació' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (4, 'GES_DOC', 'Gestió documental (Sistema de fitxers)' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (5, 'FIRMA', 'Firma' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (5, 'LOGS', 'Logs del servidor' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (6, 'ASPECTE', 'Aspecte per defecte de l''aplicació' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (7, 'ESCANEIG', 'Configuració dels plugins d''escaneig' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (8, 'CONTINGUT', 'Configuració del contingut d''un expedient' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (9, 'ALTRES', 'Altres configuracions' );
+
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (1, 'FIRMA', 'PORTAFIRMES', 'Configuració del plugin de portafirmes' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (2, 'FIRMA', 'FIRMA_VIAFIRMA', 'Configuració del plugin de viafirma' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'FIRMA', 'FIRMA_PASSARELA', 'Configuració del plugin de passarel·la' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (4, 'FIRMA', 'FIRMA_SERVIDOR', 'Configuració del plugin de firma servidor' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (5, 'FIRMA', 'VALIDATE_SIGNATURE', 'Configuració del plugin validació de firmes' );
+
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (1, 'PLUGINS', 'ARXIU', 'Configuració de l''arxiu' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (2, 'PLUGINS', 'ORGANISMES', 'Configuració del plugin de DIR3' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'PLUGINS', 'NOTIB', 'Plugin de notificacions (NOTIB)' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (4, 'PLUGINS', 'CONVERSIO', 'Configuració del plugin de conversió de documents' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (5, 'PLUGINS', 'USUARIS', 'Configuració del plugin d''usuaris' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (6, 'PLUGINS', 'DADES_EXT', 'Configuració del plugin de dades exterbes' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (7, 'PLUGINS', 'GESCONADM', 'Plugin de gestió documental administratiu (ROLSAC)' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (8, 'PLUGINS', 'DIGITALITZACIO', 'Plugin de digitalització' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (9, 'PLUGINS', 'PINBAL', 'Plugin de PINBAL' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (10, 'PLUGINS', 'DISTRIBUCIO', 'Plugin de DISTRIBUCIO' );
+
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'ESCANEIG', 'ESCANEIG-1', 'Plugin d''escaneig IECISA' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'ESCANEIG', 'ESCANEIG-2', 'Plugin d''escaneig CAIB' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'ESCANEIG', 'ESCANEIG-3', 'Plugin d''escaneig DYNAMICWEBTWAIN' );
+
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'FIRMA_PASSARELA', 'FIRMA_PASSARELA-1', 'Plugin de firma que usa PortaFIB ' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'FIRMA_PASSARELA', 'FIRMA_PASSARELA-2', 'Plugin de firma amb targeta criptogràfica' );
+INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (3, 'FIRMA_PASSARELA', 'FIRMA_PASSARELA-3', 'Plugin de firma de MiniApplet en servidor' );
+
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.app.data.dir','','Path dels fitxers de l’aplicació','TEXT','GENERAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.base.url','','Especificar la URL base de l''aplicació','TEXT','GENERAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.usuari.idioma.defecte','CA','Idioma per defecte de l’aplicació','TEXT','GENERAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.capsalera.logo','','Especifica el path on està ubicat el logo de la capçalera','TEXT','ASPECTE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.capsalera.color.fons','','Color del fons per defecte de l’’aplicació','TEXT','ASPECTE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.capsalera.color.lletra','','Color de la lletra per defecte en la capçalera','TEXT','ASPECTE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio','30000','Interval de temps (ms) en que s’’executa la tasca periòdica de consultar i guardar anotacions per peticions pedents de creacio del expedients','INT','SCHEDULLED',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.segonpla.massives.periode.comprovacio','30000','Interval de temps (ms) en que s’’executa la tasca periòdica que comprova les execucions massives.','INT','SCHEDULLED',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.segonpla.email.enviament.agrupat.cron','0 0 * * * *','Expressió cron per indicar quan executar la tasca periòdica per enviar els correus electrònics pendents agrupats.','CRON','SCHEDULLED',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.dominis.cache.execucio','3600000','Interval de temps (ms) en que buidar la cache de dominis','INT','SCHEDULLED',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.tasca.preavisDataLimitEnDies','2','Nombre de dies limit en que s’ha d’enviar el preavís','INT','SCHEDULLED',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.email.jndi','','JNDI email','TEXT','EMAIL',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.email.remitent','ripea@limit.es','Remitent dels correus electrònics (correu electrònic)','TEXT','EMAIL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.dades.usuari.class','es.caib.ripea.plugin.caib.usuari.DadesUsuariPluginJdbc','Classe per a gestionar l''accés al plugin d''usuaris','USUARIS_CLASS','USUARIS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.dades.usuari.jdbc.query.codi','select usu_codi, usu_nom, usu_nif, ''josepg@limit.es'' from sc_wl_usuari where usu_codi=:codi','Consulta d''usuaris per codi','TEXT','USUARIS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.dades.usuari.jdbc.query.nif','select usu_codi, usu_nom, usu_nif, ''josepg@limit.es'' from sc_wl_usuari where usu_nif=:nif','Consulta d''usuaris per nif','TEXT','USUARIS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.dades.usuari.jdbc.query.rols','select ugr_codgru from sc_wl_usugru where ugr_codusu=:codi','Consulta d''usuaris per rols','TEXT','USUARIS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.dades.usuari.jdbc.query.grup','select usu_codi, usu_nom, usu_nif, ''josepg@limit.es'' from sc_wl_usuari u, sc_wl_usugru g where g.ugr_codgru=:grup and g.ugr_codusu=u.usu_codi','Consulta d''usuaris per grup','TEXT','USUARIS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre','select usu_codi, usu_nom, usu_nif, usu_codi||''@caib.es'' from sc_wl_usuari where lower(usu_nom) like lower(''%''||:filtre||''%'') or lower(usu_nif) like lower(''%''||:filtre||''%'') ','Consulta d''usuaris per filtre','TEXT','USUARIS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.plugin.dades.usuari.jdbc.datasource.jndi.name','','Datasource dels usuaris','TEXT','USUARIS',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.unitats.organitzatives.class','es.caib.ripea.plugin.caib.unitat.UnitatsOrganitzativesPluginDir3','Especificar la classe per a accedir a les unitats organitzatives','ORGANISMES_CLASS','ORGANISMES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.unitats.organitzatives.dir3.service.url','','Url per accedir als organismes','TEXT','ORGANISMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username','','Nom de l''usuari per a accedir a DIR3','TEXT','ORGANISMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password','','Password per a accedir a DIR3','PASSWORD','ORGANISMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.plugin.unitats.organitzatives.dir3.connect.timeout','300000','Timeout de connexió del plugin d’unitats organitzatives','INT','ORGANISMES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(8,'es.caib.ripea.plugin.unitats.organitzatives.dir3.request.timeout','300000','Timeout de petició del plugin d’unitats organitzatives','INT','ORGANISMES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.unitats.cerca.dir3.service.url','https://proves.caib.es/dir3caib/rest/busqueda/organismos','Url per a cercar organismes.','TEXT','ORGANISMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.plugin.unitats.organitzatives.dir3.service.log.actiu','true','Activar logs de les unitats organitzatives','BOOL','LOGS',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.gesdoc.class','es.caib.ripea.plugin.caib.gesdoc.GestioDocumentalPluginFilesystem','Nom de la classe per a gestionar l''emmagatzament de documents','TEXT','GES_DOC',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.gesdoc.filesystem.base.dir','','Directori del sistema de fitxers on emmagatzemar els documents','TEXT','GES_DOC',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.portafirmes.class','es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginPortafib','Classe del portafirmes','PORTAFIRMES_CLASS','PORTAFIRMES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.portafirmes.portafib.base.url','','Url de Portafirmes','TEXT','PORTAFIRMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.portafirmes.portafib.username','','Usuari de portafirmes','TEXT','PORTAFIRMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.portafirmes.portafib.password','','Password de portafirmes','PASSWORD','PORTAFIRMES',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio','false','Indica si filtrar els fluxos per usuari actual utilitzant el camp descripció','BOOL','PORTAFIRMES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.firmaservidor.class','es.caib.ripea.plugin.caib.firmaservidor.FirmaServidorPluginPortafib','Classe per a gestionar la firma servidor','TEXT','FIRMA_SERVIDOR',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.firmaservidor.portafib.username','dgdt-pre','Nom d’’usuari per a la firma de servidor emprant PortaFIB','TEXT','FIRMA_SERVIDOR',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.firmaservidor.portafib.location','Palma','Ubicació del firmant','TEXT','FIRMA_SERVIDOR',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.firmaservidor.portafib.signerEmail','suport@caib.es','Correu electrònic del firmant.','TEXT','FIRMA_SERVIDOR',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.arxiu.class','es.caib.plugins.arxiu.caib.ArxiuPluginCaib','Classe del plugin','TEXT','ARXIU',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.arxiu.caib.base.url','','Url de l’’arxiu','TEXT','ARXIU',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.arxiu.caib.usuari','','Usuari de l’’arxiu','TEXT','ARXIU',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.arxiu.caib.contrasenya','','Contrasenya de l’’arxiu','PASSWORD','ARXIU',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(8,'es.caib.ripea.plugin.arxiu.caib.aplicacio.codi','RIPEA','Codi de l’’aplicació','TEXT','ARXIU',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(9,'es.caib.ripea.plugin.arxiu.caib.csv.definicio','CSV_DEF','Csv definició','TEXT','ARXIU',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.url','https://dev.caib.es/concsv/rest/printable/uuid','Url on generar imprimible per UUID','TEXT','ARXIU',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.usuari','$concsv_ripea','Usuari per a generar imprimible','TEXT','ARXIU',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.contrasenya','concsv_ripea','Password per a generar imprimible','PASSWORD','ARXIU',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(10,'es.caib.ripea.plugin.arxiu.caib.timeout.connect','20000','Timeout connect','INT','ARXIU',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(11,'es.caib.ripea.plugin.arxiu.caib.timeout.read','20000','Timeout read','INT','ARXIU',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.conversio.class','es.caib.ripea.plugin.caib.conversio.ConversioPluginXdocreport','Classe del plugin','CONVERSIO_CLASS','CONVERSIO',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.conversio.ooffice.host','','Url del plugin','TEXT','CONVERSIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.conversio.ooffice.port','','Port del plugin','INT','CONVERSIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.dadesext.class','es.caib.ripea.plugin.caib.dadesext.DadesExternesPluginDir3','Classe del plugin','DADESEXT_CLASS','DADES_EXT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.dadesext.service.url','https://proves.caib.es/dir3caib/ws/Dir3CaibObtenerCatalogos','Url del plugin','TEXT','DADES_EXT',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.validatesignature.class','org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin','Classe del plugin','TEXT','VALIDATE_SIGNATURE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugins.validatesignature.afirmacxf.endpoint','','Endpoint de AfirmaCxf','TEXT','VALIDATE_SIGNATURE',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.username','','Usuari de AfirmaCxf','TEXT','VALIDATE_SIGNATURE',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.password','','Password de AfirmaCxf','PASSWORD','VALIDATE_SIGNATURE',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugins.validatesignature.afirmacxf.applicationID','CAIBDEV.RIPEA','ID de l’aplicació','TEXT','VALIDATE_SIGNATURE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.plugins.validatesignature.afirmacxf.ignoreservercertificates','true','Ignorar els certificats','BOOL','VALIDATE_SIGNATURE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.plugins.validatesignature.afirmacxf.TransformersTemplatesPath','','Path dels transformers','TEXT','VALIDATE_SIGNATURE',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.procediment.class','es.caib.ripea.plugin.caib.procediment.ProcedimentPluginRolsac','Classe del plugin','GESCONADM_CLASS','GESCONADM',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.procediment.rolsac.service.url','','Url del plugin','TEXT','GESCONADM',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.procediment.rolsac.service.username','','Usuari del plugin','TEXT','GESCONADM',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.procediment.rolsac.service.password','','Constrasenya del plugin','PASSWORD','GESCONADM',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.pinbal.base.url','https://proves.caib.es/pinbal','Url del plugin','TEXT','PINBAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.pinbal.user','','Usuari del plugin','TEXT','PINBAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.pinbal.password','','Constrasenya del plugin','PASSWORD','PINBAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.pinbal.basic.auth','false','Indica si l’autentificació és de tipus basic','BOOL','PINBAL',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.notificacio.class','es.caib.ripea.plugin.caib.notificacio.NotificacioPluginNotib','Classe del plugin','TEXT','NOTIB',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.notificacio.url','http://localhost:8080/notib','Url del plugin','TEXT','NOTIB',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.notificacio.username','USUARI_NOTIB','Usuari del plugin','TEXT','NOTIB',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.notificacio.password','CONTRASENYA_NOTIB','Constrasenya del plugin','PASSWORD','NOTIB',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.notificacio.retard.num.dies','5','Nombre de dies de retard per defecte de les notificacions que no tenen aquest valor definit.','INT','NOTIB',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.notificacio.caducitat.num.dies','15','Nombre de dies a caducar de les notificacions','INT','NOTIB',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.notificacio.enviament.postal.actiu','false','Activar la entrega postal','BOOL','NOTIB',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.notificacio.enviament.deh.activa','true','Activar la entrega DEH','BOOL','NOTIB',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.notificacio.forsar.entitat','A04013511','Forçar l’enviament de les notificacions per a una determinada entitat (indicar codi DIR3)','TEXT','NOTIB',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.digitalitzacio.class','es.caib.ripea.plugin.caib.digitalitzacio.DigitalitzacioPluginDigitalIB','Classe del plugin','DIGITALITZACIO_CLASS','DIGITALITZACIO',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.digitalitzacio.digitalib.base.url','http://localhost:8080/digitalib','Url del plugin','TEXT','DIGITALITZACIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.digitalitzacio.digitalib.username','digitalib','Nom d’’usuari de DigitalIB','TEXT','DIGITALITZACIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.digitalitzacio.digitalib.password','digitalib','Contrasenya de DigitalIB','PASSWORD','DIGITALITZACIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.digitalitzacio.digitalib.perfil','','Perfil de DigitalIB','TEXT','DIGITALITZACIO',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.distribucio.backofficeIntegracio.ws.url','http://localhost:8081/distribucio/ws/backofficeIntegracio','Url del plugin','TEXT','DISTRIBUCIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.distribucio.backofficeIntegracio.ws.username','admin','Usuari del plugin','TEXT','DISTRIBUCIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.distribucio.backofficeIntegracio.ws.password','admin','Constrasenya del plugin','PASSWORD','DISTRIBUCIO',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.class','es.caib.ripea.plugin.caib.viafirma.ViaFirmaPluginImpl','Classe del plugin','VIAFIRMA_CLASS','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.apiurl','https://services.viafirma.com/documents/api','Url del plugin','TEXT','FIRMA_VIAFIRMA',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.consumerkey','','CONSUMER_KEY','TEXT','FIRMA_VIAFIRMA',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.consumersecret','','CONSUMER_SECRET','TEXT','FIRMA_VIAFIRMA',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.authmode','','Mode d’autentificació','TEXT','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.authtype','','Tipus d’autentificació OAUTH','TEXT','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.callback.url','','Url del callback','TEXT','FIRMA_VIAFIRMA',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.callback.username','','Usuari del callback','TEXT','FIRMA_VIAFIRMA',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.callback.password','','Contrasenya del callback','PASSWORD','FIRMA_VIAFIRMA',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.proxy.host','','PROXY_HOST','TEXT','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.proxy.port','','PROXY_PORT','TEXT','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.dispositius.enabled','false','Habilitar dispositius via firma','BOOL','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.viafirma.caib.app.codi','','Codi de l’’aplicació (informar si la propietat anterior es false)','TEXT','FIRMA_VIAFIRMA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.carpetes.defecte','false','Carpetes per defecte','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.incorporar.justificant','false','Activar incorporació justificant','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.metaexpedients.revisio.activa','true','Activar revisió','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.incorporacio.anotacions.duplicada','false','Permetre incorporació duplicada','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(8,'es.caib.ripea.habilitar.documentsgenerals','false','Activar documents generals','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(9,'es.caib.ripea.habilitar.tipusdocument','false','Activar tipus de documents','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.arxiu.metadocumental.addicional.actiu','false','Activa la adició de metadocuments','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.propagar.relacio.expedients','false','Permet propagar la relació dels expedients a l''arxiu digital','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.conversio.definitiu','false','Activar la conversió definitiu','BOOL','ALTRES',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(0,'es.caib.ripea.plugin.escaneig.ids','','Llistat de identificadors de plugins disponibles','TEXT','ESCANEIG',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.escaneig.1.class','org.fundaciobit.plugins.scanweb.iecisa.IECISAScanWebPlugin','Classe del plugin d''escaneig','TEXT','ESCANEIG-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.escaneig.1.nom','Escaneig IECISA Simple','Nom del plugin d''escaneig','TEXT','ESCANEIG-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.escaneig.1.desc','Escaneig IECISA Simple','Descripció del plugin d''escaneig','TEXT','ESCANEIG-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.escaneig.1.plugins.scanweb.iecisa.showInModal','false','Propietat interna del plugin 1','BOOL','ESCANEIG-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.escaneig.1.plugins.scanweb.iecisa.debug','false','Propietat interna del plugin 2','BOOL','ESCANEIG-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.escaneig.2.class','org.fundaciobit.plugins.scanweb.caib.CAIBScanWebPlugin','Classe del plugin d''escaneig','TEXT','ESCANEIG-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.escaneig.2.nom','Escaneig CAIB','Nom del plugin d''escaneig','TEXT','ESCANEIG-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.escaneig.2.desc','Escaneig CAIB','Descripció del plugin d''escaneig','TEXT','ESCANEIG-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.escaneig.2.plugins.scanweb.caib.ws_urlbase','','Propietat interna del plugin 1','TEXT','ESCANEIG-2',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.escaneig.2.plugins.scanweb.caib.ws_username','','Propietat interna del plugin 2','TEXT','ESCANEIG-2',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.plugin.escaneig.2.plugins.scanweb.caib.ws_password','','Propietat interna del plugin 3','PASSWORD','ESCANEIG-2',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.plugin.escaneig.2.plugins.scanweb.caib.debug','false','Propietat interna del plugin 4','BOOL','ESCANEIG-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(8,'es.caib.ripea.plugin.escaneig.2.plugins.scanweb.caib.codi_integracio','','Propietat interna del plugin 5','TEXT','ESCANEIG-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.escaneig.3.class','es.limit.plugins.scanweb.dynamicwebtwain.DynamicWebTwainScanWebPlugin','Classe del plugin d''escaneig','TEXT','ESCANEIG-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.escaneig.3.nom','DynamicWebTwain','Nom del plugin d''escaneig','TEXT','ESCANEIG-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.escaneig.3.desc','DynamicWebTwain','Descripció del plugin d''escaneig','TEXT','ESCANEIG-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.escaneig.3.plugins.scanweb.dynamicwebtwain.debug','true','Propietat interna del plugin 1','BOOL','ESCANEIG-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.passarelafirma.ids','','Llistat de identificadors de plugins disponibles dins exemple','TEXT','FIRMA_PASSARELA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.passarelafirma.ignorar.modal.ids','','Llistat de identificadors de plugins a ignorar','TEXT','FIRMA_PASSARELA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.passarelafirma.versio.antiga','false','Activa la versió antiga de la passarel·la de firma','BOOL','FIRMA_PASSARELA',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.passarelafirma.1.class','org.fundaciobit.plugins.signatureweb.portafib.PortaFIBSignatureWebPlugin','Classe del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.passarelafirma.1.nom','Firma dins PortaFIB','Nom del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.passarelafirma.1.desc','Plugin de firma que usa PortaFIB ','Descripció del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-1',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.passarelafirma.1.plugins.signatureweb.portafib.api_passarela_url','','Url del plugin','TEXT','FIRMA_PASSARELA-1',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.passarelafirma.1.plugins.signatureweb.portafib.api_passarela_username','','Usuari del plugin','TEXT','FIRMA_PASSARELA-1',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.plugin.passarelafirma.1.plugins.signatureweb.portafib.api_passarela_password','','Constrasenya del plugin','PASSWORD','FIRMA_PASSARELA-1',1);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.passarelafirma.2.class','org.fundaciobit.plugins.signatureweb.miniappletinclient.MiniAppletInClientSignatureWebPlugin','Classe del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.passarelafirma.2.nom','Firma amb targeta criptogràfica','Nom del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.passarelafirma.2.desc','Plugin de firma emprant MiniApplet o JavaWebStart','Descripció del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-2',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.plugin.passarelafirma.3.class','org.fundaciobit.plugins.signatureweb.miniappletinserver.MiniAppletInServerSignatureWebPlugin','Classe del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.plugin.passarelafirma.3.nom','Plugin de firma de MiniApplet en servidor','Nom del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.plugin.passarelafirma.3.desc','Plugin de firma de MiniApplet en servidor','Descripció del plugin de la passarel·la de firma','TEXT','FIRMA_PASSARELA-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.plugin.passarelafirma.3.plugins.signatureweb.miniappletinserver.base_dir','','Propietat interna del plugin 1','TEXT','FIRMA_PASSARELA-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.plugin.passarelafirma.3.plugins.signatureweb.miniappletinserver.ignore_certificate_filter','true','Propietat interna del plugin 2','BOOL','FIRMA_PASSARELA-3',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(1,'es.caib.ripea.creacio.carpetes.activa','false','Activar creació de carpetes','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(2,'es.caib.ripea.carpetes.logiques','false','Activar les carpetes lògiques','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(3,'es.caib.ripea.ordenacio.contingut.habilitada','false','Habilitar la ordenació del contingut','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(4,'es.caib.ripea.index.logo','','Especifica el path del logo a mostrar a index','TEXT','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(5,'es.caib.ripea.index.expedients.relacionats','false','Crear index per expedients relacionats','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(6,'es.caib.ripea.index.expedient.camps.addicionals','false','Mostrar camps adicionals a l’’índex de l’expedient','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(7,'es.caib.ripea.creacio.importacio.activa','true','Activar per a mostrar la importació','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(8,'es.caib.ripea.creacio.documents.copiarMoure.activa','false','Activar per a permetre copiar i moure documents','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(9,'es.caib.ripea.creacio.documents.vincular.activa','false','Activar per a permetre vincular documents','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(10,'es.caib.ripea.descarregar.imprimible.nofirmats','false','Permet imprimibles no firmats','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(11,'es.caib.ripea.expedient.permetre.reobrir','true','Permetre reobrir expedients tancats','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(12,'es.caib.ripea.document.modificar.custodiats','false','Poder canviar el tipus de document a documents definitius.','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(13,'es.caib.ripea.document.nou.escanejar.actiu','false','Activar l’escaneig en document nou','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(14,'es.caib.ripea.creacio.documents.publicar.activa','true','nan','TEXT','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(15,'es.caib.ripea.documents.firma.biometrica.activa','false','Activar firma biomètrica','TEXT','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(16,'es.caib.ripea.documents.firma.biometrica','false','Activar firma biomètrica','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(17,'es.caib.ripea.documents.validacio.url','','URl validació documents imprimibles','TEXT','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(18,'plugin.passarelafirma.forsar.tancament.modal','true','Forçar el tancament del modal de la passarela de firma','BOOL','CONTINGUT',0);
+INSERT INTO IPA_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE, JBOSS_PROPERTY) values(19,'es.caib.ripea.creacio.documents.moure.mateix.expedient','false','Permet moure documents creats dins el mateix expedient','BOOL','CONTINGUT',0);
+"
+    - sql:
+        dbms: oracle
+        sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_GROUP TO www_ripea;
+              GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG TO www_ripea;
+              GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_TYPE TO www_ripea;"
