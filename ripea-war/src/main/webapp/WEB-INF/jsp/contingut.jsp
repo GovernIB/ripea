@@ -980,23 +980,6 @@ $(document).ready(function() {
 				elements.forEach(function(child) {
 					var childParent = $(child.parentElement);
 					var isCarpeta = childParent.hasClass('element-droppable');
-					/*var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
-					$.ajax({
-				        type: "GET",
-				        url: comprovacioUrl,
-				        success: function (isDocument) {
-				        	if (isDocument) {
-				        		$(input).addClass('selectd');
-								var index = docsIdx.indexOf(parseInt(input.id));
-								if (index < 0) {
-									docsIdx.push(parseInt(input.id));
-								}
-				        	}
-
-							enableDisableButton();
-							selectAll();
-				        }
-					});*/
 					if (!isCarpeta) {
 						$(child).addClass('selectd');
 						var index = docsIdx.indexOf(parseInt(child.id));
@@ -1037,9 +1020,7 @@ $(document).ready(function() {
 	    	$(this).popover('hide');
 	    }
 	});
-
-
-
+	
 	//======================= enviament list on clicking desplegable in notificacio table =============================
 	$('#taulaEnviaments').on('rowinfo.dataTable', function(e, td, rowData) {
 		var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + rowData.id;
@@ -1217,7 +1198,65 @@ $(document).ready(function() {
 			opacity: opacity
 		});
 	});
+	
+	//### canvi tipus documental massiu
+	var $botoTipusDocumental = $('#tipusdocumental-mult');
+	$botoTipusDocumental.on('click', function() {
+		$botoTipusDocumental.popover("show");
+	});
+		
+	$botoTipusDocumental.popover({
+		html: true,
+		placement: 'bottom',
+	    content: function () {
+	    	return showTipusDocumentals($(this));   
+	  	}
+	}).on('shown.bs.popover', function () {
+		var $selTipusDocument = $('.select-tipus-massiu');
+		var select2Options = {
+				theme: 'bootstrap', 
+				width: 'auto', 
+				minimumResultsForSearch: "0"};
+		$selTipusDocument.select2(select2Options);
+		$selTipusDocument.on('change', function(event) {
+			var tipusDocumentId = $(':selected', $(this)).attr('id');
+			if (tipusDocumentId) {
+				showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.massiu.processant"/>');				
+				var updateUrl = '<c:url value="/contingut/updateTipusDocumentMassiu/"/>' + tipusDocumentId;
+				$.ajax({
+					type: 'GET',
+			        url: updateUrl,
+			        success: function(json) {
+			        	if (json.error) {
+			        		$('div.modal').modal('hide');
+							$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
+			        	} else {
+							location.reload();
+						}
+			        },
+			        error: function(e) {
+			        	alert("Hi ha hagut un error actualitzant algún dels documents seleccionats amb el nou tipus de document");
+			        	location.reload();
+			        }
+			    });	
+			}
+		});
+	});
 });
+
+function showTipusDocumentals() {
+	var content = '<div> \
+						<select id="selectTipusMassiu" class="select-tipus-massiu"> \
+							<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option> \
+								<c:forEach items="${metaDocumentsLeft}" var="metaDocument"> \
+									<option id="${metaDocument.id}"> \
+										${metaDocument.nom} \
+									</option> \
+								</c:forEach> \
+						</select> \
+				   <div>';
+	return content;
+}
 
 function getEnviamentsDocument(document) {
 	var content;
@@ -1349,10 +1388,6 @@ function enableDisableButton() {
 			}
 		});
 	}
-
-
-
-
 	
 	if (isTotPdfFirmat && isTotPdf) {
 		$('.nomaximized').addClass('hidden'); //zip
@@ -1366,59 +1401,26 @@ function enableDisableButton() {
 		$('#definitiu-mult').addClass("disabled");
 	} else if (!isTotDocAdjuntGuardatEnArxiu) {
 		$('#definitiu-mult').addClass("disabled");
+		$('#tipusdocumental-mult').addClass("disabled");
 	} else {
 		$('#notificar-mult').addClass("disabled");
 		$('#definitiu-mult').removeClass("disabled");
+		$('#tipusdocumental-mult').removeClass("disabled");
 	}
 	
 	if (docsIdx.length > 0) {
 		$('#descarregar-mult').removeClass("disabled");
 		$('#moure-mult').removeClass("disabled");
+		$('#tipusdocumental-mult').removeClass("disabled");
 	} else {
 		$('#descarregar-mult').addClass("disabled");
 		$('#notificar-mult').addClass("disabled");
 		$('#moure-mult').addClass("disabled");
+		$('#tipusdocumental-mult').addClass("disabled");
 	}
 	$('#contenidor-contingut ').removeClass("disabled");
 	$('#table-documents').removeClass("disabled");
 	$('#loading').addClass('hidden');
-	/*
-	if (docsIdx != undefined) {
-		$.ajax({
-	        type: "GET",
-	        url: comprovacioUrl,
-	        dataType: "json",
-	        data: {docsIdx: docsIdx},
-	        success: function (resultat) {
-	        	if (resultat.isTotPdfFirmat && resultat.isTotPdf) {
-	        		$('.nomaximized').addClass('hidden'); //zip
-	        		$('.maximized').removeClass('hidden'); //concatenació
-	        		$('#notificar-mult').removeClass("disabled");
-	        		$('#definitiu-mult').addClass("disabled");
-	        	} else if (resultat.isTotPdfFirmat && !resultat.isTotPdf) {
-	        		$('.nomaximized').removeClass('hidden'); //zip
-	        		$('.maximized').addClass('hidden'); //concatenació
-	        		$('#notificar-mult').removeClass("disabled");
-	        		$('#definitiu-mult').addClass("disabled");
-	        	} else {
-	        		$('#notificar-mult').addClass("disabled");
-	        		$('#definitiu-mult').removeClass("disabled");
-	        	}
-	        	if (docsIdx.length > 0) {
-					$('#descarregar-mult').removeClass("disabled");
-					$('#moure-mult').removeClass("disabled");
-				} else {
-					$('#descarregar-mult').addClass("disabled");
-					$('#notificar-mult').addClass("disabled");
-					$('#moure-mult').addClass("disabled");
-				}
-	        	$('#contenidor-contingut ').removeClass("disabled");
-	        	$('#table-documents').removeClass("disabled");
-	        	$('#loading').addClass('hidden');
-			}
-	    });
-	}
-	*/
 }
 
 function selectAll() {
@@ -2078,6 +2080,10 @@ function closeViewer() {
 												
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
+										</div>
+										<div data-toggle="popover" title="<spring:message code="massiu.canvi.tipus.document"/>" class="btn btn-default" id="tipusdocumental-mult">
+											<span class="fa fa-edit"></span>
+											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 										</div>
 									</div>
 									<%---- Button descarregar zip mult 

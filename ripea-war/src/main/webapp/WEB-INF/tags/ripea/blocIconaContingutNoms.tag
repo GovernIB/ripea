@@ -11,3 +11,4 @@
 <c:set var="iconaArxiu" value="fa-archive" scope="request"/>
 <c:set var="iconaUnitat" value="fa-sitemap" scope="request"/>
 <c:set var="iconaAnotacioRegistre" value="fa-book" scope="request"/>
+<c:set var="iconaTipusDocument" value="fa-edit" scope="request"/>

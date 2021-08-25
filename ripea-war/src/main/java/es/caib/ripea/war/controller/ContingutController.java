@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.service.AlertaService;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -64,6 +65,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -102,6 +104,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	private AlertaService alertaService;
 	@Autowired
 	private BeanGeneratorHelper beanGeneratorHelper;
+	@Autowired
+	private DocumentService documentService;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
@@ -303,6 +307,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		return "contingutMoureForm";
 	}
+	
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.POST)
 	public String moure(
 			HttpServletRequest request,
@@ -342,6 +347,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				"redirect:../../" + contingutOrigenId,
 				"contingut.controller.element.mogut.ok");
 	}
+	
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure/{contingutDestiId}", method = RequestMethod.GET)
 	public String moureDragDrop(
 			HttpServletRequest request,
@@ -363,6 +369,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				"redirect:../../" + contingutOrigen.getPare().getId(),
 				"contingut.controller.element.mogut.ok");
 	}
+	
 	@RequestMapping(value = "/contingut/{contingutId}/ordenar", method = RequestMethod.POST, consumes="application/json")
 	@ResponseBody
 	public void ordenar(
@@ -392,6 +399,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		return "contingutCopiarForm";
 	}
+	
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/copiar", method = RequestMethod.POST)
 	public String copiar(
 			HttpServletRequest request,
@@ -435,6 +443,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		return "contingutVincularForm";
 	}
+	
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/vincular", method = RequestMethod.POST)
 	public String vincular(
 			HttpServletRequest request,
@@ -460,6 +469,33 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:../../" + contingutCreat.getId(),
 				"contingut.controller.element.vinculat.ok");
+	}
+	
+	@RequestMapping(value = "/contingut/updateTipusDocumentMassiu/{tipusDocumentId}", method = RequestMethod.GET)
+	@ResponseBody
+	public JsonResponse updateTipusDocumentMassiu(
+			HttpServletRequest request,
+			@PathVariable Long tipusDocumentId,
+			Model model) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			@SuppressWarnings("unchecked")
+			Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_SELECCIO);
+			for (Long contingutId: docsIdx) {
+				documentService.updateTipusDocumental(
+						entitatActual.getId(), 
+						contingutId, 
+						tipusDocumentId, 
+						false);
+			}
+			return new JsonResponse(new Boolean(true));
+			
+		} catch (Exception e) {
+			logger.error("Error actualitzant els documents amb el nou tipus de document", e);
+			return new JsonResponse(true, e.getMessage());
+		}
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutId}/errors", method = RequestMethod.GET)
