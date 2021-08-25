@@ -25,18 +25,18 @@ public class ConfigServiceBean implements ConfigService {
 	ConfigService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"IPA_SUPER"})
 	public ConfigDto updateProperty(ConfigDto property) throws Exception{
 		return delegate.updateProperty(property);
 	}
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"IPA_SUPER"})
 	public List<ConfigGroupDto> findAll(){
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"IPA_SUPER"})
 	public List<String> syncFromJBossProperties(){
 		return delegate.syncFromJBossProperties();
 	}
