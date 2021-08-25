@@ -322,6 +322,15 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
+		if (!isModificacioCustodiatsActiva() && (
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))) {
+			throw new ValidationException(
+					documentEntity.getId(),
+					DocumentEntity.class,
+					"No es pot actualitzar un document custodiat");
+		}
 		documentEntity.updateTipusDocument(
 				metaDocument,
 				metaDocument.getNtiOrigen(),

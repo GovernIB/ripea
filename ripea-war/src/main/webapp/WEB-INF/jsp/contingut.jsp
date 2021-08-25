@@ -443,6 +443,10 @@ body.loading .rmodal {
     cursor: move;
     vertical-align: middle !important;
 }
+.popover .close {
+	position: relative;
+	top: -3px;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -1208,6 +1212,7 @@ $(document).ready(function() {
 	$botoTipusDocumental.popover({
 		html: true,
 		placement: 'bottom',
+		title: '<spring:message code="massiu.canvi.tipus.document"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
 	    content: function () {
 	    	return showTipusDocumentals($(this));   
 	  	}
@@ -1240,6 +1245,11 @@ $(document).ready(function() {
 			        }
 			    });	
 			}
+		});
+		
+		var $popoverClose = $('.popover .close');
+		$popoverClose.on('click', function() {
+			$botoTipusDocumental.popover('hide');
 		});
 	});
 });
@@ -2081,7 +2091,11 @@ function closeViewer() {
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
+<<<<<<< ripea-dev
 										<div data-toggle="popover" title="<spring:message code="massiu.canvi.tipus.document"/>" class="btn btn-default" id="tipusdocumental-mult">
+=======
+										<div data-toggle="popover" class="btn btn-default" id="tipusdocumental-mult">
+>>>>>>> ce00f15 #841: Poder realitzar canvi massiu de tipus de documents en un expedient
 											<span class="fa fa-edit"></span>
 											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 										</div>
