@@ -1,0 +1,11 @@
+databaseChangeLog:
+- changeSet:
+    id: 1629723033616-1
+    author: limit
+    changes:
+    - addColumn:
+        tableName: ipa_metadocument
+        column:
+          name: per_defecte
+          type: boolean
+          valueBoolean: false

@@ -43,6 +43,12 @@
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="perDefecte" data-template="#cellPerDefecteTemplate">
+					<spring:message code="metadocument.list.columna.perdefecte"/>
+					<script id="cellPerDefecteTemplate" type="text/x-jsrender">
+						{{if perDefecte}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="10%">
 					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/metaDocument/{{:id}}/metaDada"/>" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
@@ -61,6 +67,11 @@
 									<li><a href="<c:url value="metaDocument/{{:id}}/disable"/>" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
 									{{/if}}
 									<li><a href="<c:url value="metaDocument/{{:id}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="metadocument.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{if !perDefecte}}
+										<li><a href="<c:url value="metaDocument/{{:id}}/default"/>" data-toggle="ajax"><span class="fa fa-check-square-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.defecte"/></a></li>
+									{{else}}
+										<li><a href="<c:url value="metaDocument/{{:id}}/default/remove"/>" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.defecte.remove"/></a></li>
+									{{/if}}
 								</ul>
 							</div>
 						</script>

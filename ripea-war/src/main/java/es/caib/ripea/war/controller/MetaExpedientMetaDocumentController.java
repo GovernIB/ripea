@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -259,6 +260,53 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				"metadocument.controller.desactivat.ok");
 	}
 	
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/default", method = RequestMethod.GET)
+	public String defecte(
+			HttpServletRequest request, 
+			@PathVariable Long metaExpedientId,
+			@PathVariable Long metaDocumentId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		try {
+			metaDocumentService.marcarPerDefecte(
+					entitatActual.getId(),
+					metaExpedientId,
+					metaDocumentId,
+					false);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../metaDocument",
+					"metadocument.controller.default.ok");
+		} catch (NotFoundException e) {
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					"redirect:../../metaDocument",
+					e.getMessage());
+		}
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/default/remove", method = RequestMethod.GET)
+	public String defecteRemove(
+			HttpServletRequest request, 
+			@PathVariable Long metaExpedientId,
+			@PathVariable Long metaDocumentId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		try {
+			metaDocumentService.marcarPerDefecte(
+					entitatActual.getId(),
+					metaExpedientId,
+					metaDocumentId,
+					true);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../metaDocument",
+					"metadocument.controller.default.remove.ok");
+		} catch (NotFoundException e) {
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					"redirect:../../metaDocument",
+					e.getMessage());
+		}
+	}
 
 	@RequestMapping(value = "/metaDocument/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody

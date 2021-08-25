@@ -351,7 +351,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 						}
 						DocumentPortafirmesDto documentPortafirmes = documentService.portafirmesInfo(
 								entitatCreada.getId(),
-								documentCreat.getId());
+								documentCreat.getId(), 
+								null);
 						assertNotNull(documentPortafirmes);
 						assertNotNull(documentPortafirmes.getPortafirmesId());
 						Exception callbackException = documentService.portafirmesCallback(

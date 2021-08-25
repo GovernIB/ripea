@@ -229,6 +229,20 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				tasques,
 				MetaExpedientTascaDto.class);
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaExpedientTascaDto> findAmbEntitat(
+			Long entitatId) {
+		logger.debug("Obtenint la llista de l'expedient tasques (" +
+				"entitatId=" + entitatId + ")");
+		
+		List<MetaExpedientTascaEntity> tasques = metaExpedientTascaRepository.findByActivaTrue();
+		
+		return conversioTipusHelper.convertirList(
+				tasques,
+				MetaExpedientTascaDto.class);
+	}
 
 	@Transactional(readOnly = true)
 	@Override

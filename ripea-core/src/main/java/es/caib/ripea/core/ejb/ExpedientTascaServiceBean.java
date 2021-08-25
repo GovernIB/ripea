@@ -286,4 +286,9 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				motiu);
 	}
 
+	@Override
+	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId) {
+		return delegate.findAmbEntitat(entitatId);
+	}
+
 }

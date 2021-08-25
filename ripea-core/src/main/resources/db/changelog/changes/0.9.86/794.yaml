@@ -1,0 +1,95 @@
+databaseChangeLog:
+    - changeSet:
+        id: 1629371481-1
+        author: limit
+        changes:
+        -  createTable:
+            tableName: IPA_CONFIG_GROUP
+            columns:
+                - column:
+                     name: CODE
+                     type: varchar(128)
+                     constraints:
+                         primaryKey: true
+                         nullable: false
+                - column:
+                     name: PARENT_CODE
+                     type: varchar(128)
+                     constraints:
+                         nullable: true
+                - column:
+                     name: POSITION
+                     type: int
+                     defaultValueNumeric: 0
+                     constraints:
+                         nullable: false
+                - column:
+                     name: DESCRIPTION
+                     type: varchar(512)
+                     constraints:
+                         nullable: false
+        -  createTable:
+            tableName: IPA_CONFIG
+            columns:
+                -  column:
+                    name:  KEY
+                    type:  varchar(256)
+                    constraints:
+                      primaryKey:  true
+                      nullable:  false
+                -  column:
+                    name:  VALUE
+                    type:  varchar(2048)
+                -  column:
+                    name:  DESCRIPTION
+                    type:  varchar(2048)
+                -  column:
+                    name:  GROUP_CODE
+                    type:  varchar(128)
+                    constraints:
+                        nullable: false
+                        foreignKeyName: fk_abc_account
+                        references: IPA_CONFIG_GROUP(CODE)
+                -  column:
+                    name: POSITION
+                    type: int
+                    defaultValueNumeric: 0
+                    constraints:
+                      nullable: false
+                -  column:
+                    name: JBOSS_PROPERTY
+                    type: boolean
+                    defaultValueBoolean: false
+                    constraints:
+                        nullable: false
+                -  column:
+                    name: TYPE_CODE
+                    type: VARCHAR2(128)
+                    defaultValue: 'TEXT'
+                    constraints:
+                      nullable: false
+                - column:
+                    name: lastmodifiedby_codi
+                    type: VARCHAR2(64)
+                - column:
+                    name: lastmodifieddate
+                    type: TIMESTAMP
+        -  createTable:
+            tableName: IPA_CONFIG_TYPE
+            columns:
+                - column:
+                     name: CODE
+                     type: varchar(128)
+                     constraints:
+                         primaryKey: true
+                         nullable: false
+                - column:
+                     name: VALUE
+                     type: varchar(1024)
+        - sqlFile:
+            path: db/changelog/changes/0.9.86/794-inserts.sql
+        - sql:
+              dbms: oracle
+              sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_GROUP TO www_ripea;
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG TO www_ripea;
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_TYPE TO www_ripea;"

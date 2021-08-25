@@ -290,6 +290,16 @@ body {
 								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 							</ul>
 						</div>
+						<div class="btn-group">
+							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>">
+										<spring:message code="decorator.menu.config.properties"/>
+									</a>
+								</li>
+							</ul>
+						</div>
 					</c:when>
 					<c:when test="${isRolActualAdministrador}">
 						<%---- Expedients ----%>
@@ -339,7 +349,30 @@ body {
 												<spring:message code="decorator.menu.revisioExpedients"/>
 										</a>
 									</li>	
-								</c:if>									
+								</c:if>	
+								<li>
+									<a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true">
+										<spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/>
+									</a>
+								</li>
+								<li>
+									<a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true">
+										<spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/>
+									</a>
+								</li>
+								<li>
+									<a href="<c:url value="/seguimentTasques"/>" data-maximized="true">
+										<spring:message code="decorator.menu.seguiment.assignacioTasques"/>
+									</a>
+								</li>		
+								<li>
+									<a href="<c:url value="/seguimentExpedientsPendents"/>" data-maximized="true">
+										<spring:message code="decorator.menu.seguiment.expedientsPendents"/>
+									</a>
+								</li>															
+								
+								
+																
 							</ul>
 						</div>
 					</c:when>

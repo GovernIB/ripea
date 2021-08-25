@@ -252,4 +252,10 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 		return delegate.findByMetaExpedientAndFirmaPortafirmesActiva(entitatId, metaExpedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void marcarPerDefecte(Long entitatId, Long metaExpedientId, Long metaDocumentId, boolean remove) throws NotFoundException {
+		delegate.marcarPerDefecte(entitatId, metaExpedientId, metaDocumentId, remove);
+	}
+
 }

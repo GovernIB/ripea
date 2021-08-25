@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
@@ -219,7 +220,7 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 	
 	
 	@RequestMapping(value = "/custodiar", method = RequestMethod.GET)
-	public String portafirmesReintentar(
+	public String custodiarReintentar(
 			HttpServletRequest request) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -245,15 +246,21 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 		for (Long id : seleccio) {
 			Exception exception = null;
 			try {
-				exception = documentService.portafirmesReintentar(
-						entitatActual.getId(),
-						id, 
-						rolActual);
+				DocumentDto doc = documentService.findById(entitatActual.getId(), id);
+				if (doc.getGesDocAdjuntId() != null) {
+					exception = documentService.guardarEnArxiuDocumentAdjunt(id);
+				} else {
+					exception = documentService.portafirmesReintentar(
+							entitatActual.getId(),
+							id, 
+							rolActual);
+				}
+
 			} catch (Exception ex) {
 				exception = ex;
 			}
 			if (exception != null ) {
-				logger.error("Error al custodiar document de portafirmes", exception);
+				logger.error("Error al custodiar document pendent", exception);
 				errors++;
 			} else {
 				correctes++;

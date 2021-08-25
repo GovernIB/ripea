@@ -125,4 +125,3 @@ fi
 
 echo "Configurant truststore"
 echo 'JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=/opt/webapps/truststore.jks -Djavax.net.ssl.trustStorePassword=tecnologies"' >> $RUN_CONF
-

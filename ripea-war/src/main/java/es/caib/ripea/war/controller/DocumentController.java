@@ -268,10 +268,12 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
 					entitatActual.getId(),
-					documentId);
+					documentId, 
+					null);
 			List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
 					entitatActual.getId(),
-					documentId);
+					documentId, 
+					null);
 			model.addAttribute(
 					"portafirmes",
 					portafirmes);

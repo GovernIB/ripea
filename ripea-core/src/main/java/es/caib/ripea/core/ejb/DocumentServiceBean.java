@@ -203,10 +203,12 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
-			Long documentId) {
+			Long documentId, 
+			Long enviamentId) {
 		return delegate.portafirmesInfo(
 				entitatId,
-				documentId);
+				documentId, 
+				enviamentId);
 	}
 
 	@Override
@@ -365,8 +367,8 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(Long entitatId, Long documentId) {
-		return delegate.recuperarBlocksFirmaEnviament(entitatId, documentId);
+	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(Long entitatId, Long documentId, Long enviamentId) {
+		return delegate.recuperarBlocksFirmaEnviament(entitatId, documentId, enviamentId);
 	}
 
 	@Override
@@ -410,5 +412,6 @@ public class DocumentServiceBean implements DocumentService {
 			boolean comprovarMetaExpedient) {
 		return delegate.updateTipusDocumental(entitatId, documentId, tipusDocumentId, comprovarMetaExpedient);
 	}
+
 
 }

@@ -454,6 +454,7 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param documentId
 	 *            Atribut id del document que es vol convertir.
+	 * @param enviamentId TODO
 	 * @return la informació de l'enviament a portafirmes.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -461,7 +462,8 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
-			Long documentId) throws NotFoundException;
+			Long documentId, 
+			Long enviamentId) throws NotFoundException;
 	
 	/**
 	 * Reintenta la custòdia d'un document firmat amb ViaFirma que ha donat
@@ -630,10 +632,11 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param documentId
 	 *            Atribut id del document del que es vol canviar l'estat.
+	 * @param enviamentId TODO
 	 */
 	List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
 			Long entitatId, 
-			Long documentId);
+			Long documentId, Long enviamentId);
 
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
@@ -670,5 +673,7 @@ public interface DocumentService {
 			Long documentId, 
 			Long tipusDocumentId,
 			boolean comprovarMetaExpedient);
+
+	
 
 }

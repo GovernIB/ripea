@@ -37,7 +37,8 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
-
+	private boolean perDefecte;
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

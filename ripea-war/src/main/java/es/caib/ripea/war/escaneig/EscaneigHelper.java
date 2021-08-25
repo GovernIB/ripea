@@ -302,37 +302,38 @@ public class EscaneigHelper {
 	private List<EscaneigPlugin> plugins;
 	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.escaneig.";
 	private List<EscaneigPlugin> getAllPluginsFromProperties() {
-		if (plugins == null) {
-			String idsStr = aplicacioService.propertyPluginEscaneigIds();
-			String[] ids = idsStr.split(",");
-			plugins = new ArrayList<EscaneigPlugin>();
-			for (String id: ids) {
-				String base = PROPERTIES_BASE + id + ".";
-				Properties pluginProperties = aplicacioService.propertyFindByPrefix(base);
-				String nom = pluginProperties.getProperty(base + "nom");
-				log.debug("Carregant plugin escaneig [" + base + "nom" + "]: " + nom);
-				String classe = pluginProperties.getProperty(base + "class");
-				String descripcioCurta = pluginProperties.getProperty(base + "desc");
-				Properties pluginPropertiesProcessat = new Properties();
-				for (Object property: pluginProperties.keySet()) {
-					String propertyStr = property.toString();
-					String value = pluginProperties.getProperty(propertyStr);
-					String nomFinal = propertyStr.substring(base.length());
-					pluginPropertiesProcessat.put(
-							PROPERTIES_BASE + nomFinal,
-							value);
-				}
-				log.debug("  descripcioCurta: " + descripcioCurta);
-				log.debug("  classe: " + classe);
-				log.debug("  properties: " + pluginPropertiesProcessat);
-				plugins.add(
-						new EscaneigPlugin(
-								id,
-								nom,
-								descripcioCurta,
-								classe,
-								pluginPropertiesProcessat));
+		if (plugins != null) {
+			return plugins;
+		}
+		String idsStr = aplicacioService.propertyPluginEscaneigIds();
+		String[] ids = idsStr.split(",");
+		plugins = new ArrayList<EscaneigPlugin>();
+		for (String id: ids) {
+			String base = PROPERTIES_BASE + id + ".";
+			Properties pluginProperties = aplicacioService.propertyFindByGroup("ESCANEIG-" + id);
+			String nom = pluginProperties.getProperty(base + "nom");
+			log.debug("Carregant plugin escaneig [" + base + "nom" + "]: " + nom);
+			String classe = pluginProperties.getProperty(base + "class");
+			String descripcioCurta = pluginProperties.getProperty(base + "desc");
+			Properties pluginPropertiesProcessat = new Properties();
+			for (Object property: pluginProperties.keySet()) {
+				String propertyStr = property.toString();
+				String value = pluginProperties.getProperty(propertyStr);
+				String nomFinal = propertyStr.substring(base.length());
+				pluginPropertiesProcessat.put(
+						PROPERTIES_BASE + nomFinal,
+						value);
 			}
+			log.debug("  descripcioCurta: " + descripcioCurta);
+			log.debug("  classe: " + classe);
+			log.debug("  properties: " + pluginPropertiesProcessat);
+			plugins.add(
+					new EscaneigPlugin(
+							id,
+							nom,
+							descripcioCurta,
+							classe,
+							pluginPropertiesProcessat));
 		}
 		return plugins;
 	}
