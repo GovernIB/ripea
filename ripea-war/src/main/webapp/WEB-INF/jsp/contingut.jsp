@@ -2091,11 +2091,7 @@ function closeViewer() {
 												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 											</a>
 										</div>
-<<<<<<< ripea-dev
-										<div data-toggle="popover" title="<spring:message code="massiu.canvi.tipus.document"/>" class="btn btn-default" id="tipusdocumental-mult">
-=======
 										<div data-toggle="popover" class="btn btn-default" id="tipusdocumental-mult">
->>>>>>> ce00f15 #841: Poder realitzar canvi massiu de tipus de documents en un expedient
 											<span class="fa fa-edit"></span>
 											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 										</div>
