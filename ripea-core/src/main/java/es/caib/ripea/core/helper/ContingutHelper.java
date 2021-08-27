@@ -281,7 +281,6 @@ public class ContingutHelper {
 			dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 			dto.setOrganGestorText(expedient.getOrganGestor() != null ?
 					expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
-			dto.setOrganGestorNom(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getNom() : null);
 
 			logger.debug("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
 
