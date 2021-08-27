@@ -121,7 +121,7 @@ $(document).ready(function() {
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="expedient.list.user.columna.tipus"/></th>
+				<th data-col-name="metaNode.nom" width="15%" data-orderable="false"><spring:message code="expedient.list.user.columna.tipus"/></th>
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>

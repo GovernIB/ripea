@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+@Slf4j
 @Component
 public class ConfigHelper {
 
@@ -45,8 +46,14 @@ public class ConfigHelper {
         if (configGroup == null) {
             return;
         }
-        for (ConfigEntity config : configGroup.getConfigs()) {
-            outProperties.put(config.getKey(), getConfig(config));
+		for (ConfigEntity config : configGroup.getConfigs()) {
+			String conf = getConfig(config);
+			if (conf != null) {
+				outProperties.put(config.getKey(), conf);
+			} else {
+				log.info("Propietat: " + config.getKey() + " es null");
+			}
+            
         }
 
         if (configGroup.getInnerConfigs() != null) {
@@ -96,7 +103,7 @@ public class ConfigHelper {
     @Slf4j
     public static class JBossPropertiesHelper extends Properties {
 
-        private static final String APPSERV_PROPS_PATH = "es.caib.notib.properties.path";
+        private static final String APPSERV_PROPS_PATH = "es.caib.ripea.properties.path";
 
         private static JBossPropertiesHelper instance = null;
 

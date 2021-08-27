@@ -1763,6 +1763,9 @@ function closeViewer() {
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
 								<dd>${contingut.metaNode.nom}</dd>
 							</c:if>
+							
+							<dt><spring:message code="contingut.info.nti.organ"/></dt>
+							<dd>${contingut.organGestorText}</dd>
 
 							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
 							<dd><fmt:formatDate value="${contingut.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
@@ -1780,10 +1783,6 @@ function closeViewer() {
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
 							<dd>${contingut.ntiClasificacionSia}</dd>
 
-							<c:if test="${contingut.metaNode.comu}">
-								<dt><spring:message code="contingut.info.nti.organ"/></dt>
-								<dd>${contingut.organGestorText}</dd>
-							</c:if>
 						</c:if>
 
 						<c:if test="${!isTasca && not empty relacionats}">
