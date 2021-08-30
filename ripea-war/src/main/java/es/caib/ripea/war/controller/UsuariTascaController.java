@@ -185,6 +185,7 @@ public class UsuariTascaController extends BaseUserController {
 		model.addAttribute("tascaDescripcio", expedientTascaDto.getMetaExpedientTasca().getDescripcio());
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
 		model.addAttribute("tasca", expedientTascaDto);
+		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
 		return "contingut";
 	}
 	

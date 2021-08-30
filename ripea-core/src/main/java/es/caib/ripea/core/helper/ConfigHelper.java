@@ -51,9 +51,8 @@ public class ConfigHelper {
 			if (conf != null) {
 				outProperties.put(config.getKey(), conf);
 			} else {
-				log.info("Propietat: " + config.getKey() + " es null");
+				log.debug("Propietat: " + config.getKey() + " es null");
 			}
-            
         }
 
         if (configGroup.getInnerConfigs() != null) {
@@ -67,7 +66,12 @@ public class ConfigHelper {
         Properties properties = new Properties();
         List<ConfigEntity> configEntities = configRepository.findAll();
         for (ConfigEntity configEntity: configEntities) {
-            properties.put(configEntity.getKey(), getConfig(configEntity));
+        	String conf = getConfig(configEntity);
+			if (conf != null) {
+				properties.put(configEntity.getKey(), conf);
+			} else {
+				log.debug("Configuration: " + configEntity.getKey() + " es null");
+			}
         }
         return properties;
     }
