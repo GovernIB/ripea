@@ -2,7 +2,9 @@ package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -447,6 +449,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
@@ -460,7 +464,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					dataInici,
 					dataFi == null,
 					dataFi,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					ExpedientDto.class,

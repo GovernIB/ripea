@@ -238,7 +238,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 				</th>
 				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
-				<th data-col-name="createdBy.codi" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 <%-- 				<th data-col-name="nomPropietariEscriptoriPare" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th> --%>
 			</tr>
 		</thead>

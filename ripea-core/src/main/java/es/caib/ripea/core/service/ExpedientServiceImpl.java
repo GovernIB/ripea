@@ -901,6 +901,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerTancamentMassiu(
 					entitat,
 					nomesAgafats,
@@ -914,7 +916,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					dataInici,
 					dataFi == null,
 					dataFi,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					ExpedientDto.class,

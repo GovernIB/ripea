@@ -1703,7 +1703,7 @@ function closeViewer() {
 			<ul class="list-group pull-right">
 	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
 	  				<spring:message code="contingut.info.agafat.per"/>:
-	  				${expedientPare.agafatPer.nom}&nbsp;
+	  				${expedientPare.agafatPer.codiAndNom}&nbsp;
 	  				<c:if test="${expedientAgafatPerUsuariActual}">
 	  					<a href="<c:url value="/expedient/${expedientPare.id}/alliberar"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
 	  				</c:if>

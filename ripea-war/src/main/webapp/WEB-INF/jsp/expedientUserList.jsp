@@ -516,7 +516,7 @@ function removeCookie(cname) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="agafatPer.nom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				<th data-col-name="agafatPer.codiAndNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
 <%-- 				<th data-col-name="interessatsResum" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.interessats"/></th>	 --%>
 				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">

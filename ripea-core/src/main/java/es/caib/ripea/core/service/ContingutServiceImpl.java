@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -1021,6 +1022,9 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		Date dataCreacioInici = DateHelper.toDateInicialDia(filtre.getDataCreacioInici());
 		Date dataCreacioFi = DateHelper.toDateFinalDia(filtre.getDataCreacioFi());
+		
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 		return paginacioHelper.toPaginaDto(
 				contingutRepository.findByFiltrePaginat(
 						entitat,
@@ -1037,7 +1041,7 @@ public class ContingutServiceImpl implements ContingutService {
 						dataCreacioFi,
 						filtre.isMostrarEsborrats(),
 						filtre.isMostrarNoEsborrats(),
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				ContingutDto.class,
 				new Converter<ContingutEntity, ContingutDto>() {
 					@Override
@@ -1544,6 +1548,9 @@ public class ContingutServiceImpl implements ContingutService {
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
 					entitat,
 					metaExpedientsPermesos, 
@@ -1559,7 +1566,7 @@ public class ContingutServiceImpl implements ContingutService {
 					dataInici,
 					dataFi == null,
 					dataFi,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					DocumentDto.class,

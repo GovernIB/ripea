@@ -108,7 +108,7 @@ $(document).ready(function() {
 					<c:forEach var="log" items="${logs}">
 						<tr>
 							<td><fmt:formatDate value="${log.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-							<td>${log.createdBy.nom}</td>
+							<td>${log.createdBy.codiAndNom}</td>
 							<td>
 								<c:choose>
 									<c:when test="${log.secundari}">
@@ -226,7 +226,7 @@ $(document).ready(function() {
 		  				<div class="panel-body">
 		    				<dl class="dl-horizontal">
 								<dt><spring:message code="contingut.log.camp.usuari.creacio"/></dt>
-								<dd>${contingut.createdBy.nom}</dd>
+								<dd>${contingut.createdBy.codiAndNom}</dd>
 								<dt><spring:message code="contingut.log.camp.data.creacio"/></dt>
 								<dd><fmt:formatDate value="${contingut.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 							</dl>
@@ -241,7 +241,7 @@ $(document).ready(function() {
 		  				<div class="panel-body">
 		    				<dl class="dl-horizontal">
 								<dt><spring:message code="contingut.log.camp.usuari.modificacio"/></dt>
-								<dd>${contingut.lastModifiedBy.nom}</dd>
+								<dd>${contingut.lastModifiedBy.codiAndNom}</dd>
 								<dt><spring:message code="contingut.log.camp.data.modificacio"/></dt>
 								<dd><fmt:formatDate value="${contingut.lastModifiedDate}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 							</dl>

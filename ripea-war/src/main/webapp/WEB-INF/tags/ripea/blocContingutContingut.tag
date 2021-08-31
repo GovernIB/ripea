@@ -259,7 +259,7 @@
 							</c:choose>
 						</td>
 						<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
-						<td>${fill.createdBy.nom}</td>
+						<td>${fill.createdBy.codiAndNom}</td>
 						<td>
 							<rip:blocContingutAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}"  nodeco="${nodeco}"/>
 						</td>

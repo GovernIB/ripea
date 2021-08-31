@@ -201,7 +201,7 @@ function enableDisableSelection($this, tipus) {
 					</script>
 				</th>				
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
-				<th data-col-name="createdBy.codi" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 			</tr>
 		</thead>
 	</table>
