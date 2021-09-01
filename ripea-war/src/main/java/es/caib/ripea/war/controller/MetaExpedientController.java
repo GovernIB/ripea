@@ -29,6 +29,8 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
@@ -122,10 +124,14 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
+		
+		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
+		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
+		
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
-				filtreCommand.asDto(),
+				filtreDto,
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");

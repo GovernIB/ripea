@@ -103,7 +103,20 @@
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>						
 				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
-
+				<c:if test="${isRolActualAdmin}">
+					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
+						<spring:message code="metaexpedient.list.columna.revisioEstat"/>
+						<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
+							{{if revisioEstat == 'PENDENT'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
+							{{else revisioEstat == 'REVISAT'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
+							{{else revisioEstat == 'REBUTJAT'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
+							{{/if}}
+						</script>
+					</th>
+				</c:if>
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>

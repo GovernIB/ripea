@@ -504,8 +504,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getOrganGestorId()) : null,
 							filtre.getAmbit() == null ,
 							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-							filtre.getRevisioEstat() == null,
-							filtre.getRevisioEstat(),
+							filtre.getRevisioEstats()[0] == null,
+							filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
 							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 					MetaExpedientDto.class);
 		} else {
@@ -525,8 +525,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getOrganGestorId()) : null,
 							filtre.getAmbit() == null ,
 							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-							filtre.getRevisioEstat() == null,
-							filtre.getRevisioEstat(),									
+							filtre.getRevisioEstats()[0] == null,
+							filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),					
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaExpedientDto.class);
 		}
