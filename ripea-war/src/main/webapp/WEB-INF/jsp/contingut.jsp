@@ -1930,6 +1930,12 @@ function closeViewer() {
 						<c:when test="${contingut.document}">
 							<table class="table table-bordered">
 								<tbody>
+									<c:if test="${!empty contingut.descripcio}">
+										<tr> 
+											<td><strong><spring:message code="contingut.document.camp.descripcio"/></strong></td>
+											<td>${contingut.descripcio}</td>
+										</tr>
+									</c:if>
 									<c:choose>
 										<c:when test="${contingut.documentTipus == 'DIGITAL'}">
 											<tr>
