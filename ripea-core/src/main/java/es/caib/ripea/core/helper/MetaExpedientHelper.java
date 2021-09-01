@@ -231,6 +231,7 @@ public class MetaExpedientHelper {
 				for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
 					permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
 					permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
+					permis.setOrganGestorCodi(metaExpedientOrgan.getOrganGestor().getCodi());
 					permisos.add(permis);
 				}
 			}

@@ -37,7 +37,7 @@
 				urlConsultaLlistat="${urlConsultaLlistat}"
 				textKey="organgestor.form.camp.pare"
 				suggestValue="id"
-				suggestText="nom"
+				suggestText="codiINom"
 				labelSize="2"/>
 				
 		<div id="modal-botons">

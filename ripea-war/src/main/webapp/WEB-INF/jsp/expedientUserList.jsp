@@ -365,7 +365,7 @@ function removeCookie(cname) {
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.form.camp.organgestor"
  					suggestValue="id"
- 					suggestText="nom"
+ 					suggestText="codiINom"
  					inline="true"/>	
 			</div>	
 			<div class="col-md-3">

@@ -73,7 +73,7 @@
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
- 					suggestText="nom" />
+ 					suggestText="codiINom" />
 			</div>		
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
@@ -102,7 +102,7 @@
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>						
-				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
 
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
