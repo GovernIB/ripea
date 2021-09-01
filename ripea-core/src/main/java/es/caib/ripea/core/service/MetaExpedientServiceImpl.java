@@ -4,8 +4,10 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
@@ -484,6 +486,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		}
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("organGestor.codiINom", new String[] {"organGestor.codi"});
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
@@ -502,7 +506,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
 							filtre.getRevisioEstat() == null,
 							filtre.getRevisioEstat(),
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
+							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 					MetaExpedientDto.class);
 		} else {
 			return paginacioHelper.toPaginaDto(

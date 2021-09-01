@@ -31,6 +31,7 @@ public class PermisDto implements Serializable {
 
 	private Long organGestorId;
 	private String organGestorNom;
+	private String organGestorCodi;
 
 	@Override
 	public String toString() {
@@ -41,6 +42,19 @@ public class PermisDto implements Serializable {
 		return organGestorId != null;
 	}
 
+	public String getOrganGestorCodiINom() {
+		String organGestorComplet = "";
+		if (organGestorNom != null) {
+			String nomOrganGestor = organGestorNom;
+			String codiOrganGestor = organGestorCodi;
+			if (codiOrganGestor != null && !codiOrganGestor.isEmpty())
+				organGestorComplet += codiOrganGestor + " - ";
+			if (nomOrganGestor != null && !nomOrganGestor.isEmpty())
+				organGestorComplet += nomOrganGestor;
+		}
+		return organGestorComplet;
+	}
+	
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

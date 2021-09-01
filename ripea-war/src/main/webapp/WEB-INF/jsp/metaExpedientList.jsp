@@ -80,7 +80,7 @@
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
- 					suggestText="nom" />
+ 					suggestText="codiINom" />
 			</div>
 			<div class="col-md-4">
 				<c:if test="${not isRolAdminOrgan}">
@@ -123,7 +123,7 @@
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
-				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.comu"/>
 					<script id="cellComuTemplate" type="text/x-jsrender">
