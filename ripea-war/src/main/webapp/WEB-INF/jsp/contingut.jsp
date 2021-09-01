@@ -1252,6 +1252,15 @@ $(document).ready(function() {
 			$botoTipusDocumental.popover('hide');
 		});
 	});
+	$(window).on('load', function() {
+		var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
+		$.get(
+				multipleUrl,
+				function(data) {
+					$(".seleccioCount").html(data);
+				}
+		);
+	});
 });
 
 function showTipusDocumentals() {
