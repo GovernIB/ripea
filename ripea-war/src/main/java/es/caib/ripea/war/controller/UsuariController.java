@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -65,4 +66,16 @@ public class UsuariController  extends BaseAdminController {
 					"usuari.controller.modificat.ok");
 	}
 
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public String logout(HttpServletRequest request, HttpServletResponse response) {
+		// Només per Jboss
+		// Es itera sobre totes les cookies
+		for(Cookie c : request.getCookies()) {
+			// Es sobre escriu el valor de cada cookie a NULL
+			Cookie ck = new Cookie(c.getName(), null);
+			ck.setPath(request.getContextPath());
+			response.addCookie(ck);
+		}
+		return "redirect:/";
+	}
 }

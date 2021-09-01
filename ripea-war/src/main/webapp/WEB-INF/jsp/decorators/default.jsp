@@ -225,11 +225,6 @@ body {
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
-									<spring:message code="decorator.menu.accions.massives.user"/>
-								</a>
-							</li>
-							<li>
 								<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
 									<spring:message code="decorator.menu.configuracio.user"/>
 								</a>
@@ -238,6 +233,11 @@ body {
 								<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
 								   rel="noopener noreferrer" target="_blank">
 									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
+								</a>
+							</li>
+							<li>
+								<a href="<c:url value="/usuari/logout"/>">
+									<i class="fa fa-power-off"></i> <spring:message code="decorator.menu.accions.desconectar"/>
 								</a>
 							</li>
 						</ul>
@@ -422,6 +422,11 @@ body {
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 							<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
 							<li><a href="<c:url value="/massiu/custodiar"/>"><spring:message code="massiu.custodiar"/></a></li>
+							<li>
+								<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
+									<spring:message code="decorator.menu.accions.massives.user"/>
+								</a>
+							</li>
 						</ul>
 					</div>
 				</c:if>
