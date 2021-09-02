@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.
@@ -189,22 +188,22 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	}
 
 	private String getDatasourceJndiName() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.datasource.jndi.name");
+		return System.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.datasource.jndi.name");
 	}
 	private String getJdbcQueryUsuariCodi() {
-		String query = PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query");
+		String query = System.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query");
 		if (query == null || query.isEmpty())
-			query = PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.codi");
+			query = System.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.codi");
 		return query;
 	}
 	private String getJdbcQueryUsuariGrup() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.grup");
+		return System.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.grup");
 	}
 	private String getJdbcQueryUsuariFiltre() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre");
+		return System.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre");
 	}
 	private String getJdbcFiltreRolsCodi() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.rols");
+		return System.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.rols");
 	}
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);
 
