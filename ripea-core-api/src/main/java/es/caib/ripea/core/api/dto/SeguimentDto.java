@@ -22,6 +22,7 @@ public class SeguimentDto implements Serializable {
 
 	private Long id;
 	private Long documentId;
+	private Long expedientId;
 	private String expedientNom;
 	private String documentNom;
 	private Date dataEnviament;
