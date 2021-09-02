@@ -67,14 +67,19 @@
 		data-toggle="datatable" 
 		data-url="<c:url value="seguimentTasques/datatable"/>" 
 		data-search-enabled="false"
-		data-default-order="4" 
+		data-default-order="5" 
 		data-default-dir="desc" 
 		class="table table-striped table-bordered" 
 		data-rowhref-toggle="modal"
 		style="width:100%">
 		<thead> 
 			<tr>
-				<th data-col-name="expedientNom"><spring:message code="seguiment.list.columna.expedientNom"/></th>
+				<th data-col-name="expedientId" data-visible="false"></th>
+				<th data-col-name="expedientNom" data-template="#cellExpedientLink"><spring:message code="seguiment.list.columna.expedientNom"/>
+					<script id="cellExpedientLink" type="text/x-jsrender">
+						<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNom}}</a>	
+					</script>
+				</th>						
 				<th data-col-name="tascaNom"><spring:message code="seguiment.list.columna.tasca"/></th>
 				<th data-col-name="tascaEstat" data-renderer="enum(TascaEstatEnumDto)"><spring:message code="seguiment.list.columna.estatEnviament"/></th>
 				<th data-col-name="responsableNom"><spring:message code="seguiment.list.columna.responsable"/></th>

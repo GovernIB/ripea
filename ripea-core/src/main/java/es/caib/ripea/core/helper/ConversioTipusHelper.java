@@ -380,6 +380,7 @@ public class ConversioTipusHelper {
 					public SeguimentDto convert(DocumentPortafirmesEntity source, Type<? extends SeguimentDto> destinationType) {
 						SeguimentDto target = new SeguimentDto();
 						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
 						target.setExpedientNom(source.getExpedient().getNom());
 						target.setDocumentId(source.getDocument().getId());
 						target.setDocumentNom(source.getDocument().getNom());
@@ -395,6 +396,7 @@ public class ConversioTipusHelper {
 					public SeguimentDto convert(DocumentNotificacioEntity source, Type<? extends SeguimentDto> destinationType) {
 						SeguimentDto target = new SeguimentDto();
 						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
 						target.setExpedientNom(source.getExpedient().getNom());
 						target.setDocumentId(source.getDocument().getId());
 						target.setDocumentNom(source.getDocument().getNom());
@@ -427,6 +429,7 @@ public class ConversioTipusHelper {
 					public SeguimentDto convert(ExpedientTascaEntity source, Type<? extends SeguimentDto> destinationType) {
 						SeguimentDto target = new SeguimentDto();
 						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
 						target.setExpedientNom(source.getExpedient().getNom());
 						target.setTascaNom(source.getMetaExpedientTasca().getNom());
 						target.setData(source.getDataInici());
