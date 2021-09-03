@@ -39,7 +39,7 @@ import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.

@@ -65,8 +65,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
-						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(1);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						//ExpedientDto expedientDtoFromDB = expedientService.findById(((EntitatEntity)elementsCreats.get(0)).getId(), expedientCreat.getId());
 						assertNotNull(expedientCreat);
 						assertNotNull(expedientCreat.getId());
@@ -99,8 +99,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(1);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						ExpedientDto modificat = expedientService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -138,7 +138,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						try {
 							ContingutDto esborrat = contingutService.deleteReversible(
 									entitatCreada.getId(),
@@ -179,7 +179,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						autenticarUsuari("admin");
 						ContingutDto esborrat = contingutService.deleteDefinitiu(
 								entitatCreada.getId(),
@@ -210,7 +210,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						autenticarUsuari("user");
 						assertTrue(
 								expedientCreat.isAgafat());
@@ -237,7 +237,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						autenticarUsuari("user");
 						expedientService.alliberarUser(
 								entitatCreada.getId(),
@@ -363,7 +363,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						String comentariText = "Comentari d'un usuari: amb accents i símbols $%&·\"'";
 						List<ExpedientComentariDto> comentaris0 = expedientService.findComentarisPerContingut(
 								entitatCreada.getId(),
@@ -396,8 +396,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						List<ExpedientEstatDto> estats0 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
 								expedientCreat.getId());
@@ -441,8 +441,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
-						ExpedientDto expedientCreat1 = (ExpedientDto)elementsCreats.get(4);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat1 = (ExpedientDto)elementsCreats.get(5);
 						List<ExpedientDto> relacionats10 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),
 								expedientCreat1.getId());
@@ -523,8 +523,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						assertNotNull(expedientCreat);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
@@ -582,8 +582,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						assertNotNull(expedientCreat);
 						CarpetaDto carpetaCreada = carpetaService.create(
 								entitatCreada.getId(), 

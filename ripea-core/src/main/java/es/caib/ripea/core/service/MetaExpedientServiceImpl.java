@@ -142,7 +142,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedientEntity);
 		}
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
 		} else {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
@@ -187,7 +187,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedientEntity);
 		}
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);

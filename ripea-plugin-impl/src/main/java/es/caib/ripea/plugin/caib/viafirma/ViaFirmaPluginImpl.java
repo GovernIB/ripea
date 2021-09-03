@@ -27,7 +27,7 @@ import com.viafirma.documents.sdk.java.model.Signature.CertificationLevelEnum;
 import com.viafirma.documents.sdk.java.model.Workflow;
 
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.viafirma.OAuthType;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;

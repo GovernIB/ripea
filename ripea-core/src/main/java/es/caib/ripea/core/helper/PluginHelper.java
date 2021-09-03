@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import es.caib.ripea.plugin.PropertiesHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -5393,7 +5394,7 @@ public class PluginHelper {
 			Properties pluginProps = configHelper.getGroupProperties(codeProperties);
 			for (Map.Entry<Object, Object> entry : pluginProps.entrySet() ) {
 				String value = entry.getValue() == null ? "" : (String) entry.getValue();
-				System.setProperty((String) entry.getKey(), value);
+				PropertiesHelper.getProperties().setProperty((String) entry.getKey(), value);
 			}
 		}
 	}

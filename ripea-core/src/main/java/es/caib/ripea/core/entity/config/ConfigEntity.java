@@ -38,7 +38,7 @@ public class ConfigEntity {
     @Column(name = "GROUP_CODE", length = 2048, nullable = true)
     private String groupCode;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)
     @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
     private ConfigTypeEntity type;

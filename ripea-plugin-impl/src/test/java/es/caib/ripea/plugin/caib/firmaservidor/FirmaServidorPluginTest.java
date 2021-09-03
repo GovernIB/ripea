@@ -10,7 +10,7 @@ import org.junit.Test;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /** Classe de test per provar el plugin de signatura en el servidor de RIPEA.
  * Les implementacions conegudes del plugin són l'API del Portafib i la
@@ -23,7 +23,6 @@ public class FirmaServidorPluginTest {
 	@Before
 	public void setUp() throws Exception {
 		// Carrega les propietats de test
-		PropertiesHelper.getProperties().setLlegirSystem(false);
 		PropertiesHelper.getProperties().load(ClassLoader.getSystemResourceAsStream("test.properties"));
 	}
 

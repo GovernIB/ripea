@@ -22,7 +22,7 @@ import es.caib.ripea.plugin.dadesext.NivellAdministracio;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.plugin.dadesext.TipusVia;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de dades externes que consulta la

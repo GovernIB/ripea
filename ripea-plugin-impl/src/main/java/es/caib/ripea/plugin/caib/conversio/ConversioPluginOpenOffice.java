@@ -30,7 +30,7 @@ import com.lowagie.text.pdf.PdfStamper;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de conversió de documents

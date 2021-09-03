@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.

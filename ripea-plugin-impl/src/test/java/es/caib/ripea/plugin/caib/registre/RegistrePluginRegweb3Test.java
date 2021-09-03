@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import es.caib.ripea.plugin.registre.RegistreAnotacioResposta;
 import es.caib.ripea.plugin.registre.RegistrePlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Classe de proves pel registre regweb3.
@@ -32,7 +32,6 @@ public class RegistrePluginRegweb3Test {
 
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setLlegirSystem(false);
 		PropertiesHelper.getProperties().setProperty(
 				"es.caib.ripea.plugin.registre.regweb3.base.url",
 				BASE_URL);

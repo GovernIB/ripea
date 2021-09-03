@@ -26,7 +26,6 @@ import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.core.helper.PropertiesHelper;
 
 /**
  * Tests per al servei d'entitats.
@@ -48,7 +47,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 
 	@Before
 	public void setUp() {
-		PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
+		setDefaultConfigs();
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");

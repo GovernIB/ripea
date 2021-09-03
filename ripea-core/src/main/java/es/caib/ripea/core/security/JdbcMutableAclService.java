@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import es.caib.ripea.core.helper.ConfigHelper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.security.acls.domain.AccessControlEntryImpl;
@@ -433,7 +434,7 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
 	}
 
 	private String getHibernateDialect() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.hibernate.dialect");
+		return ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.hibernate.dialect");
 	}
 
 }

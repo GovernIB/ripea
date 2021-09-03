@@ -18,7 +18,7 @@ import es.caib.ripea.plugin.dadesext.DadesExternesPlugin;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Client de test per al servei de dades externes DIR3.
@@ -37,7 +37,6 @@ public class DadesExternesPluginDir3Test {
 
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setLlegirSystem(false);
 		PropertiesHelper.getProperties().setProperty(
 				"es.caib.ripea.plugin.dadesext.dir3.service.url",
 				ENDPOINT_ADDRESS);

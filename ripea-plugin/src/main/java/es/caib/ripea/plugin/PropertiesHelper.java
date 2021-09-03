@@ -1,7 +1,4 @@
-/**
- * 
- */
-package es.caib.ripea.plugin.utils;
+package es.caib.ripea.plugin;
 
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -20,16 +17,22 @@ public class PropertiesHelper extends Properties {
 
 	private static PropertiesHelper instance = null;
 
-	private boolean llegirSystem = true;
-
-
+	
+	private PropertiesHelper(Properties defaults) {
+		super(defaults);
+	}
 
 	public static PropertiesHelper getProperties() {
+		return getProperties(null);
+	}
+	public static PropertiesHelper getProperties(String path) {
+		String propertiesPath = path;
+		if (propertiesPath == null) {
+			propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
+		}
 		if (instance == null) {
-			instance = new PropertiesHelper();
-			String propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
+			instance = new PropertiesHelper(System.getProperties());
 			if (propertiesPath != null) {
-				instance.llegirSystem = false;
 				logger.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
 				try {
 					if (propertiesPath.startsWith("classpath:")) {
@@ -53,14 +56,11 @@ public class PropertiesHelper extends Properties {
 	}
 
 	public String getProperty(String key) {
-		if (llegirSystem)
-			return System.getProperty(key);
-		else
-			return super.getProperty(key);
+		return super.getProperty(key);
 	}
 	public String getProperty(String key, String defaultValue) {
 		String val = getProperty(key);
-        return (val == null) ? defaultValue : val;
+		return (val == null) ? defaultValue : val;
 	}
 
 	public boolean getAsBoolean(String key) {
@@ -79,11 +79,23 @@ public class PropertiesHelper extends Properties {
 		return new Double(getProperty(key)).doubleValue();
 	}
 
-	public boolean isLlegirSystem() {
-		return llegirSystem;
+
+	public Properties findAll() {
+		return findByPrefix(null);
 	}
-	public void setLlegirSystem(boolean llegirSystem) {
-		this.llegirSystem = llegirSystem;
+	public Properties findByPrefix(String prefix) {
+		Properties properties = new Properties();
+		for (Object key: this.keySet()) {
+			if (key instanceof String) {
+				String keystr = (String)key;
+				if (prefix == null || keystr.startsWith(prefix)) {
+					properties.put(
+							keystr,
+							getProperty(keystr));
+				}
+			}
+		}
+		return properties;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
