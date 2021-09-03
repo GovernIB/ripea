@@ -20,7 +20,6 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import es.caib.ripea.core.helper.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
@@ -53,6 +52,8 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
@@ -75,8 +76,27 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.CsvHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DistribucioHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -551,7 +571,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, rolActual);
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, rolActual, ResultEnumDto.PAGE).getPagina();
 	}
 
 	@Transactional(readOnly = true)
@@ -566,7 +586,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, "tothom");
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, "tothom", ResultEnumDto.PAGE).getPagina();
 	}
 
 	@Transactional
@@ -669,12 +689,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Long> findIdsAmbFiltre(Long entitatId, ExpedientFiltreDto filtre) throws NotFoundException {
+	public List<Long> findIdsAmbFiltre(Long entitatId, ExpedientFiltreDto filtre, String rolActual) throws NotFoundException {
 		logger.debug(
 				"Consultant els ids d'expedient segons el filtre (" + "entitatId=" + entitatId + ", " + "filtre=" +
 						filtre + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		return findIdsAmbFiltrePaginat(entitatId, filtre, false, true);
+		return findAmbFiltrePaginat(entitatId, filtre, null, null, rolActual, ResultEnumDto.IDS).getIds();
 	}
 
 	@Transactional
@@ -1331,15 +1350,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ExtendedPermission.ADMINISTRATION);
 	}
 
-	private PaginaDto<ExpedientDto> findAmbFiltrePaginat(
+	private ResultDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			Long expedientId, 
-			String rolActual) {
+			String rolActual, 
+			ResultEnumDto resultEnum) {
+		
+		ResultDto<ExpedientDto> result = new ResultDto<ExpedientDto>();
 		
 		long t0 = System.currentTimeMillis();
-		
 		
 		long t1 = System.currentTimeMillis();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
@@ -1488,71 +1509,125 @@ public class ExpedientServiceImpl implements ExpedientService {
 			long t10 = System.currentTimeMillis();
 			// Cercam metaExpedients amb una meta-dada del domini del filtre
 			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
-			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
-					entitat,
-					metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty(),
-					metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty() ? null : metaExpedientIdPermesos,
-					organIdPermesos == null || organIdPermesos.isEmpty(),
-					organIdPermesos == null || organIdPermesos.isEmpty() ? null : organIdPermesos,
-					metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty(),
-					metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
-					metaExpedientFiltre == null,
-					metaExpedientFiltre,
-					metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),
-					metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty() ? null : metaExpedientIdDomini,
-					organGestorFiltre == null,
-					organGestorFiltre,
-					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
-					filtre.getNumero() == null ? "" : filtre.getNumero(),
-					filtre.getNom() == null || filtre.getNom().isEmpty(),
-					filtre.getNom() == null ? "" : filtre.getNom(),
-					filtre.getDataCreacioInici() == null,
-					filtre.getDataCreacioInici(),
-					filtre.getDataCreacioFi() == null,
-					DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
-					filtre.getDataTancatInici() == null,
-					filtre.getDataTancatInici(),
-					filtre.getDataTancatFi() == null,
-					filtre.getDataTancatFi(),
-					chosenEstatEnum == null,
-					chosenEstatEnum,
-					chosenEstat == null,
-					chosenEstat,
-					agafatPer == null,
-					agafatPer,
-					filtre.getSearch() == null,
-					filtre.getSearch() == null ? "" : filtre.getSearch(),
-					filtre.getTipusId() == null,
-					filtre.getTipusId(),
-					esNullExpedientsToBeExcluded,
-					expedientsToBeExluded,
-					filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
-					filtre.getInteressat(),
-					filtre.getMetaExpedientDominiValor() == null || filtre.getMetaExpedientDominiValor().isEmpty(),
-					filtre.getMetaExpedientDominiValor(),
-					esNullRolsCurrentUser,
-					rolsCurrentUser,
-					pageable);
+
 			
-			logger.debug("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
-			long t11 = System.currentTimeMillis();
-			PaginaDto<ExpedientDto> result = paginacioHelper.toPaginaDto(
-					paginaExpedients,
-					ExpedientDto.class,
-					new Converter<ExpedientEntity, ExpedientDto>() {
-						@Override
-						public ExpedientDto convert(ExpedientEntity source) {
-							return toExpedientDto(source, true);
-						}
-					});
-			for (ExpedientDto expedient: result) {
-				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(false, expedient.getId()) > 0;
-				expedient.setAlerta(enAlerta);
+			if (resultEnum == ResultEnumDto.PAGE) {
+				
+				// ================================  RETURNS PAGE (DATATABLE) ==========================================
+				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
+				Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
+						entitat,
+						metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty(),
+						metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty() ? null : metaExpedientIdPermesos,
+						organIdPermesos == null || organIdPermesos.isEmpty(),
+						organIdPermesos == null || organIdPermesos.isEmpty() ? null : organIdPermesos,
+						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty(),
+						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
+						metaExpedientFiltre == null,
+						metaExpedientFiltre,
+						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),
+						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty() ? null : metaExpedientIdDomini,
+						organGestorFiltre == null,
+						organGestorFiltre,
+						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+						filtre.getNumero() == null ? "" : filtre.getNumero(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() == null ? "" : filtre.getNom(),
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+						filtre.getDataTancatInici() == null,
+						filtre.getDataTancatInici(),
+						filtre.getDataTancatFi() == null,
+						filtre.getDataTancatFi(),
+						chosenEstatEnum == null,
+						chosenEstatEnum,
+						chosenEstat == null,
+						chosenEstat,
+						agafatPer == null,
+						agafatPer,
+						filtre.getSearch() == null,
+						filtre.getSearch() == null ? "" : filtre.getSearch(),
+						filtre.getTipusId() == null,
+						filtre.getTipusId(),
+						esNullExpedientsToBeExcluded,
+						expedientsToBeExluded,
+						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
+						filtre.getInteressat(),
+						filtre.getMetaExpedientDominiValor() == null || filtre.getMetaExpedientDominiValor().isEmpty(),
+						filtre.getMetaExpedientDominiValor(),
+						esNullRolsCurrentUser,
+						rolsCurrentUser,
+						pageable);
+				logger.debug("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
+				long t11 = System.currentTimeMillis();
+				PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
+						paginaExpedients,
+						ExpedientDto.class,
+						new Converter<ExpedientEntity, ExpedientDto>() {
+							@Override
+							public ExpedientDto convert(ExpedientEntity source) {
+								return toExpedientDto(source, true);
+							}
+						});
+				for (ExpedientDto expedient: paginaDto) {
+					boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(false, expedient.getId()) > 0;
+					expedient.setAlerta(enAlerta);
+				}
+				result.setPagina(paginaDto);
+				logger.debug("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");			
+				logger.debug("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+
+			} else {
+				
+				// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
+				List<Long> expedientsIds = expedientRepository.findIdsByEntitatAndFiltre(
+						entitat,
+						metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty(),
+						metaExpedientIdPermesos == null || metaExpedientIdPermesos.isEmpty() ? null : metaExpedientIdPermesos,
+						organIdPermesos == null || organIdPermesos.isEmpty(),
+						organIdPermesos == null || organIdPermesos.isEmpty() ? null : organIdPermesos,
+						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty(),
+						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
+						metaExpedientFiltre == null,
+						metaExpedientFiltre,
+						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),
+						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty() ? null : metaExpedientIdDomini,
+						organGestorFiltre == null,
+						organGestorFiltre,
+						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+						filtre.getNumero() == null ? "" : filtre.getNumero(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() == null ? "" : filtre.getNom(),
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+						filtre.getDataTancatInici() == null,
+						filtre.getDataTancatInici(),
+						filtre.getDataTancatFi() == null,
+						filtre.getDataTancatFi(),
+						chosenEstatEnum == null,
+						chosenEstatEnum,
+						chosenEstat == null,
+						chosenEstat,
+						agafatPer == null,
+						agafatPer,
+						filtre.getSearch() == null,
+						filtre.getSearch() == null ? "" : filtre.getSearch(),
+						filtre.getTipusId() == null,
+						filtre.getTipusId(),
+						true,
+						null,
+						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
+						filtre.getInteressat(),
+						filtre.getMetaExpedientDominiValor() == null || filtre.getMetaExpedientDominiValor().isEmpty(),
+						filtre.getMetaExpedientDominiValor(),
+						esNullRolsCurrentUser,
+						rolsCurrentUser);
+				result.setIds(expedientsIds);
 			}
-			logger.debug("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");
-			
-			logger.debug("findAmbFiltrePaginat (" + (result != null ? result.getTamany() + "/" + result.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 			
 			
 			return result;
@@ -1561,63 +1636,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}*/
 	}
 
-	private List<Long> findIdsAmbFiltrePaginat(
-			Long entitatId,
-			ExpedientFiltreDto filtre,
-			boolean accesAdmin,
-			boolean comprovarAccesMetaExpedients) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, (!accesAdmin), accesAdmin, false, false, false);
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false, false);
-		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
-		if (comprovarAccesMetaExpedients) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			permisosHelper.filterGrantedAll(
-					metaExpedientsPermesos,
-					new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-						@Override
-						public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-							return metaExpedient.getId();
-						}
-					},
-					MetaNodeEntity.class,
-					new Permission[] { ExtendedPermission.READ },
-					auth);
-		}
-		if (!metaExpedientsPermesos.isEmpty()) {
-			return expedientRepository.findIdByEntitatAndFiltre(
-					entitat,
-					metaExpedientsPermesos,
-					metaExpedient == null,
-					metaExpedient,
-					filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
-					filtre.getNumero(),
-					filtre.getNom() == null || filtre.getNom().isEmpty(),
-					filtre.getNom(),
-					filtre.getDataCreacioInici() == null,
-					filtre.getDataCreacioInici(),
-					filtre.getDataCreacioFi() == null,
-					filtre.getDataCreacioFi(),
-					filtre.getDataTancatInici() == null,
-					filtre.getDataTancatInici(),
-					filtre.getDataTancatFi() == null,
-					filtre.getDataTancatFi(),
-					filtre.getEstat() == null,
-					filtre.getEstat(),
-					filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
-					filtre.getInteressat());
-		} else {
-			return new ArrayList<Long>();
-		}
-	}
+
 
 	private ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
 		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(

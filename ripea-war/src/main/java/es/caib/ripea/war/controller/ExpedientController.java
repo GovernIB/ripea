@@ -248,11 +248,16 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				SESSION_ATTRIBUTE_SELECCIO);
 	}
 
+	
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody
 	public int select(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -274,7 +279,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			seleccio.addAll(
 					expedientService.findIdsAmbFiltre(
 							entitatActual.getId(),
-							ExpedientFiltreCommand.asDto(filtreCommand)));
+							ExpedientFiltreCommand.asDto(filtreCommand), rolActual));
 		}
 		return seleccio.size();
 	}

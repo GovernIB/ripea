@@ -174,6 +174,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param filtre
 	 *            Filtre per a la consulta.
+	 * @param rolActual 
 	 * @return La llista amb els ids dels expedients.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -181,7 +182,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
-			ExpedientFiltreDto filtre) throws NotFoundException;
+			ExpedientFiltreDto filtre, 
+			String rolActual) throws NotFoundException;
 
 	/**
 	 * Posa un expedient a l'escriptori de l'usuari actual.

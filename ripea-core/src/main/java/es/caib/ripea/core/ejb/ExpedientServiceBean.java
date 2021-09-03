@@ -112,8 +112,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
-			ExpedientFiltreDto filtre) throws NotFoundException {
-		return delegate.findIdsAmbFiltre(entitatId, filtre);
+			ExpedientFiltreDto filtre, String rolActual) throws NotFoundException {
+		return delegate.findIdsAmbFiltre(entitatId, filtre, rolActual);
 	}
 
 	@Override

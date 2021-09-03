@@ -164,33 +164,67 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			Pageable pageable);
 
-	@Query(	"select" +
-			"    e.id " +
-			"from" +
+	
+	
+	
+	
+	@Query(	"select " +
+			"    distinct e.id " +
+			"from " +
 			"    ExpedientEntity e " +
+			"    left join e.organGestorPares eogp " +
+			"    left join eogp.metaExpedientOrganGestor eogpmeog " +
+			"    left join eogp.metaExpedientOrganGestor.organGestor eogpmeogog " +
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
+			"and (" +
+			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullOrganIdPermesos = false and eogpmeogog.id in (:organIdPermesos)) " +
+			// Falta contemplar el cas en el que la combinació meta-expedient + organ de l'expedient està a :metaExpedientOrganIdPermesos
+			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos))) " +
+			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
+			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
+			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
 			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstat = true or e.estat = :estat) " + 
+			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
+			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
+			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
+			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +
+			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
+			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " +
 			"and (:esNullInteressat = true " +
 			"		or  e.id in (" +
 			"			select interessat.expedient.id " +
 			"			from InteressatEntity interessat " +	
 			"			where interessat.esRepresentant = false " +
-			"				and lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%'))) ")
-	List<Long> findIdByEntitatAndFiltre(
+			"				and (lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
+			"and (:esNullMetaExpedientDominiValor = true " +
+			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
+			"and (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser)))) "
+			)
+	List<Long> findIdsByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
+			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
+			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
+			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos, 
+			@Param("organIdPermesos") List<Long> organIdPermesos,
+			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
+			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
-			@Param("metaNode") MetaNodeEntity metaNode,			
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("esNullMetaExpedientIdDomini") boolean esNullMetaExpedientIdDomini,
+			@Param("metaExpedientIdDomini") List<Long> metaExpedientIdDomini,
+			@Param("esNullOrganGestor") boolean esNullOrganGestor,
+			@Param("organGestor") OrganGestorEntity organGestor,
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullNom") boolean esNullNom,
@@ -203,10 +237,25 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("tancatInici") Date tancatInici,
 			@Param("esNullTancatFi") boolean esNullTancatFi,
 			@Param("tancatFi") Date tancatFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEnumDto estat,
+			@Param("estat") ExpedientEstatEntity estat,
+			@Param("esNullAgafatPer") boolean esNullAgafatPer,
+			@Param("agafatPer") UsuariEntity agafatPer,
+			@Param("esNullSearch") boolean esNullSearch,
+			@Param("search") String search,
+			@Param("esNullTipusId") boolean esNullTipusId,
+			@Param("tipusId") Long tipusId,
+			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded, 
+			@Param("expedientsToBeExluded") List<ExpedientEntity> expedientsToBeExluded,
 			@Param("esNullInteressat") boolean esNullInteressat,
-			@Param("interessat") String interessat);
+			@Param("interessat") String interessat,
+			@Param("esNullMetaExpedientDominiValor") boolean esNullMetaExpedientDominiValor,
+			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
+			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
+			@Param("rolsCurrentUser") List<String> rolsCurrentUser);
+	
 
 	List<ExpedientEntity> findByEntitatAndIdInOrderByIdAsc(
 			EntitatEntity entitat,
