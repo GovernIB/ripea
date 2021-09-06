@@ -136,7 +136,7 @@ $(document).ready(function() {
 		alert("Button Clicked");
 	});
 	
-	// Mostrar els tipus d'expedients al filtre
+	// Mostrar els procediments al filtre
 	findActiusPerLectura();
 	
 	var metaExpedientId = "";

@@ -832,7 +832,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
 				entitat, 
 				metaExpedientId);
-//		Recupera els metadocuments del mateix tipus d'expedient
+//		Recupera els metadocuments del mateix procediment
 		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
 		
 		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {

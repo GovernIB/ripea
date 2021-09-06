@@ -437,7 +437,7 @@ public class ContingutServiceImpl implements ContingutService {
 						"No es poden moure documents firmats");
 			}
 		}
-		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
@@ -538,7 +538,7 @@ public class ContingutServiceImpl implements ContingutService {
 						"No es poden copiar documents firmats");
 			}
 		}
-		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
@@ -638,7 +638,7 @@ public class ContingutServiceImpl implements ContingutService {
 		//				"No es poden enllaçar documents firmats");
 		//	}
 		//}
-		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,

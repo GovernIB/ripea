@@ -84,7 +84,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@RequestParam(value = "organGestorsIds", required = false) 
 			List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) 
 			List<Long> metaExpedientsIds,
 			
@@ -109,8 +109,8 @@ public class ApiHistoricController extends BaseAdminController {
 
 	@RequestMapping(value = "/entitat/{entitatId}/actuals", method = RequestMethod.GET, produces = "application/json")
 	@ApiOperation(
-			value = "Consulta l'històric d'ús de l'aplicació per cada tipus d'expedient per una entitat concreta",
-			notes = "Retorna una llista dels històrics del dia d'avui per cada tipus d'expedient ",
+			value = "Consulta l'històric d'ús de l'aplicació per cada procediment per una entitat concreta",
+			notes = "Retorna una llista dels històrics del dia d'avui per cada procediment ",
 			position = 0,
 			response = List.class,
 			tags = "HistoricsEntitat")
@@ -123,7 +123,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -170,7 +170,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@RequestParam(value = "organGestorsIds", required = true) 
 			List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) 
 			List<Long> metaExpedientsIds,
 			
@@ -227,7 +227,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = true)
 			@RequestParam(value = "organGestorsIds", required = true) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -280,7 +280,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -333,7 +333,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -394,7 +394,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -451,7 +451,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 

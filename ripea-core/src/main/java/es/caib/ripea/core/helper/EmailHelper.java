@@ -179,15 +179,15 @@ public class EmailHelper {
 		
 		
 		String from = getRemitent();
-		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de tipus d'expedient";
+		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
 			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
 		}
 		String text = 
-				"Informació del tipus d'expedient:\n" +
+				"Informació del procediment:\n" +
 						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
-						"\tTipus d'expedient nom: " + metaExpedientEntity.getNom() + "\n" +
+						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
 						comentari ;
 		

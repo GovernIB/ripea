@@ -249,7 +249,7 @@ public class ExpedientHelper {
 				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE);
 			}
 		}
-		// crear carpetes per defecte del tipus d'expedient
+		// crear carpetes per defecte del procediment
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
 		// Crea les relacions expedients i organs pare
 		organGestorHelper.crearExpedientOrganPares(
@@ -1549,7 +1549,7 @@ public class ExpedientHelper {
 		return carpetaId;
 	}
 	
-	//crea les carpetes per defecte definides al tipus d'expedient
+	//crea les carpetes per defecte definides al procediment
 	private void crearCarpetesMetaExpedient(
 			Long entitatId, 
 			MetaExpedientEntity metaExpedient, 

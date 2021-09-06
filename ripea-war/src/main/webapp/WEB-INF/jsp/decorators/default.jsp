@@ -383,7 +383,7 @@ body {
 						<div class="btn-group">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
-								 <%---- Tipus d'expedients ----%>
+								 <%---- Procediments ----%>
 								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
 							</ul>
 						</div>

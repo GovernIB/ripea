@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy=CodiMetaExpedientTascaNoRepetitValidator.class)
 public @interface CodiMetaExpedientTascaNoRepetit {
 
-	String message() default "El tipus d'expedient ja conté una tasca amb aquest codi";
+	String message() default "El procediment ja conté una tasca amb aquest codi";
 
 	Class<?>[] groups() default {};
 

@@ -343,7 +343,7 @@ public interface MetaDocumentService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param metaExpedientId
-	 *            Id del tipus d'expedient.
+	 *            Id del procediment.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
 	@PreAuthorize("hasRole('tothom')")
@@ -378,24 +378,24 @@ public interface MetaDocumentService {
 			MetaDocumentTipusGenericEnumDto tipusGeneric);
 
 	/**
-	 * Consulta els meta-documents actius i amb l'opció de Portafirmes activa donat un tipus d'expedient 
+	 * Consulta els meta-documents actius i amb l'opció de Portafirmes activa donat un procediment 
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param metaExpedientId
-	 *            Id del tipus d'expedient.
+	 *            Id del procediment.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId);
 	
 	/**
-	 * Marca un tipus de document com per defecte per un tipus d'expedient.
+	 * Marca un tipus de document com per defecte per un procediment.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param metaExpedientId
-	 *            Atribut id del tipus d'expedient pare.
+	 *            Atribut id del procediment pare.
 	 * @param metaDocumentId
 	 *            Atribut id del tipus de document a marcar per defecte.
 	 * @param remove

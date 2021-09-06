@@ -7,5 +7,5 @@ UPDATE IPA_EXPEDIENT EXP SET (EXP.ORGAN_GESTOR_ID) = (SELECT OGE.ID FROM IPA_CON
 UPDATE IPA_METADADA SET MULTIPLICITAT = 1 WHERE TIPUS = 6;
 
 -- #732
--- Esborra les carpetes que hi ha creades per defecte a nivell de tipus d'expedient
+-- Esborra les carpetes que hi ha creades per defecte a nivell de procediment
 DELETE FROM IPA_METAEXPEDIENT_CARPETA;

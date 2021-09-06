@@ -151,7 +151,7 @@ public interface ExpedientService {
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 	
 	/**
-	 * Consulta els expedients de l'usuari per tipus d'expedient
+	 * Consulta els expedients de l'usuari per procediment
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat.
