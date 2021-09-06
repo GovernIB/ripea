@@ -308,8 +308,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	}
 
 	@Override
-	@Scheduled(fixedDelayString = "${config:es.caib.ripea.segonpla.massives.periode.comprovacio}")
 	public void comprovarExecucionsMassives() {
+		logger.info("Execució tasca periòdica: Execucions massives");
 		boolean active = true;
 		Long ultimaExecucioMassiva = null;
 		int timeBetweenExecutions = 500;

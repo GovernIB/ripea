@@ -43,8 +43,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-import es.caib.ripea.core.helper.PropertiesHelper;
-
 
 /**
  * Provides a base JDBC implementation of {@link MutableAclService}.

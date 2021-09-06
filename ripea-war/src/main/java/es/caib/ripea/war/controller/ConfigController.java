@@ -45,28 +45,33 @@ public class ConfigController extends BaseUserController{
         return "config";
     }
 
+    @ResponseBody
     @RequestMapping(value="/update", method = RequestMethod.POST)
-    public String updateConfig(
+    public SimpleResponse updateConfig(
             HttpServletRequest request,
             Model model,
-			@Valid ConfigCommand configCommand,
-			BindingResult bindingResult) {
+            @Valid ConfigCommand configCommand,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return get(request, model);
+            return SimpleResponse.builder()
+                    .status(0)
+                    .message(getMessage(request, "config.controller.edit.error"))
+                    .build();
         }
 
-        String msg;
+        String msg = "config.controller.edit.ok";
+        int status = 1;
         try {
             configService.updateProperty(configCommand.asDto());
-            msg = "config.controller.edit.ok";
         } catch (Exception e) {
             e.printStackTrace();
             msg = "config.controller.edit.error";
+            status = 0;
         }
-        return getModalControllerReturnValueSuccess(
-                request,
-                "redirect:.",
-                msg);
+        return SimpleResponse.builder()
+                .status(status)
+                .message(getMessage(request, msg))
+                .build();
     }
 
     @ResponseBody
@@ -104,5 +109,11 @@ public class ConfigController extends BaseUserController{
     public static class SyncResponse {
         private boolean status;
         private List<String> editedProperties;
+    }
+
+    @Builder @Getter
+    public static class SimpleResponse {
+        private int status;
+        private String message;
     }
 }

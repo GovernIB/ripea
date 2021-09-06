@@ -71,10 +71,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
 	 */
 	@Override
-	@Scheduled(fixedDelayString = "${config:es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio}")
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
-		logger.debug(
-				"Execució de tasca programada: consultar i guardar anotacions per peticions pedents de creacio del expedients");
+		logger.info(
+				"Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
 		// find peticions with no registre associated and with no errors from previous invocation of this method
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(
@@ -158,8 +157,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	@Override
-	@Scheduled(fixedDelayString = "${config:es.caib.ripea.dominis.cache.execucio}")
 	public void buidarCacheDominis() {
+		logger.info("Execució tasca periòdica: Buidar cachés dominis");
 		try {
 			//Consulta
 			cacheHelper.evictFindDominisByConsutla();
@@ -184,9 +183,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	@Override
 	@Transactional
-	@Scheduled(cron = "${config:es.caib.ripea.segonpla.email.enviament.agrupat.cron}")
 	public void enviarEmailsPendentsAgrupats() {
-		
+		logger.info("Execució tasca periòdica: Enviar correus pendents agrupats");
 
 		List<EmailPendentEnviarEntity> emailPendentsList = emailPendentEnviarRepository.findByOrderByDestinatariAscEventTipusEnumAsc();
 		

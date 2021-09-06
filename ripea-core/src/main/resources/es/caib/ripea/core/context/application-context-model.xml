@@ -29,9 +29,9 @@
 	<context:component-scan base-package="es.caib.ripea.core.service" />
 	<context:component-scan base-package="es.caib.ripea.core.helper" />
 	<context:component-scan base-package="es.caib.ripea.core.firma" />
-	<context:component-scan base-package="es.caib.ripea.core.historic" />
 	<context:component-scan base-package="es.caib.ripea.core.task" />
 	<context:component-scan base-package="es.caib.ripea.core.aspect" />
+	<context:component-scan base-package="es.caib.ripea.core.config" />
 	<jpa:repositories base-package="es.caib.ripea.core.repository" />
 
 	<jpa:auditing auditor-aware-ref="auditorAwareBean" />

@@ -320,3 +320,17 @@ Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY
         sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_GROUP TO www_ripea;
               GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG TO www_ripea;
               GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_CONFIG_TYPE TO www_ripea;"
+- changeSet:
+      id: 1629371481-3
+      author: limit
+      changes:
+          - sql:
+                sql: "
+UPDATE IPA_CONFIG
+SET jboss_property = 0
+WHERE key in ('es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio',
+              'es.caib.ripea.segonpla.massives.periode.comprovacio',
+              'es.caib.ripea.dominis.cache.execucio',
+              'es.caib.ripea.segonpla.email.enviament.agrupat.cron');
+
+                "

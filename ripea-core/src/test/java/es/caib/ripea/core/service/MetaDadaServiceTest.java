@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.helper.PropertiesHelper;
 
 /**
  * Tests per al servei d'entitats.
