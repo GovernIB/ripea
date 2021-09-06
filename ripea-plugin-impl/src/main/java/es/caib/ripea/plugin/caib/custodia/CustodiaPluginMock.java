@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.custodia.CustodiaPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació de proves del plugin de custòdia.

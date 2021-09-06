@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import es.caib.ripea.plugin.custodia.CustodiaPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Classe de proves per la custòdia documental.
@@ -22,7 +22,6 @@ public class CustodiaPluginCaibTest {
 
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setLlegirSystem(false);
 		PropertiesHelper.getProperties().setProperty(
 				"es.caib.ripea.plugin.custodia.caib.service.url",
 				"https://proves.caib.es/signatura/services/CustodiaDocumentos");

@@ -69,9 +69,11 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     
     @PreRemove
     private void preRemove() {
-    	for (OrganGestorEntity fill : this.getFills()) {
-    	    fill.setPare(null);
-    	}
+        if (this.getFills() != null) {
+            for (OrganGestorEntity fill : this.getFills()) {
+                fill.setPare(null);
+            }
+        }
     }
     
     public List<OrganGestorEntity> getAllChildren(){

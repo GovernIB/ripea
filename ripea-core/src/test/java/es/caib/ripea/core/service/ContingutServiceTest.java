@@ -42,9 +42,11 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 	private MetaDadaDto metaDadaBoolea;
 	
 	private MetaDadaDto metaDadaTextMultiple;
+
 	@Before
 	public void setUp() {
 		super.setUp();
+		setDefaultConfigs();
 		metaDadaText = new MetaDadaDto();
 		metaDadaText.setCodi("metaDadaText");
 		metaDadaText.setNom("metaDadaText");
@@ -103,8 +105,8 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(1);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaExpedientDto metaExpedient = (MetaExpedientDto)elementsCreats.get(2);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 
 						autenticarUsuari("admin");
 						

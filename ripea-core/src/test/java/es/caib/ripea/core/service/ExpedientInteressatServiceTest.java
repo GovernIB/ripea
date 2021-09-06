@@ -163,7 +163,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -189,7 +189,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -218,7 +218,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -246,7 +246,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -274,7 +274,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -302,7 +302,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
@@ -336,7 +336,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -364,7 +364,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -392,7 +392,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -423,7 +423,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -452,7 +452,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 					@Override
 					public void executar(List<Object> elementsCreats) {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),

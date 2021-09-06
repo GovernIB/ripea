@@ -5,10 +5,14 @@ package es.caib.ripea.core.service;
 
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.service.*;
+import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.repository.config.ConfigRepository;
+import es.caib.ripea.plugin.PropertiesHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -21,17 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.PropertiesHelper;
 import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
@@ -62,10 +56,13 @@ public class BaseServiceTest {
 
 	@Autowired
 	private  UsuariRepository usuariRepository;
-
+	@Autowired
+	protected ConfigRepository configRepository;
+	@Autowired
+	protected OrganGestorService organGestorService;
 	@BeforeClass
 	public static void beforeClass() {
-		PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
+		ConfigHelper.JBossPropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
 	}
 
 	@AfterClass
@@ -104,6 +101,7 @@ public class BaseServiceTest {
 		logger.info("-------------------------------------------------------------------");
 		List<Object> elementsCreats = new ArrayList<Object>();
 		Long entitatId = null;
+		Long organGestorId = null;
 		try {
 			for (Object element: elements) {
 				Long id = null;
@@ -121,14 +119,25 @@ public class BaseServiceTest {
 						}
 					}
 					id = entitatCreada.getId();
-				} else {
+				} else if (element instanceof OrganGestorDto) {
+					autenticarUsuari("admin");
+					OrganGestorDto organCreat = organGestorService.create(
+							entitatId,
+							(OrganGestorDto)element);
+					elementsCreats.add(organCreat);
+					id = organCreat.getId();
+					organGestorId = id;
+
+				}else {
 					autenticarUsuari("admin");
 					// TODO
 					if (entitatId != null) {
 						if (element instanceof MetaExpedientDto) {
+							MetaExpedientDto metaExpedientData = (MetaExpedientDto) element;
+							metaExpedientData.setOrganGestor(organGestorService.findById(entitatId, organGestorId));
 							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
 									entitatId,
-									(MetaExpedientDto) element, null);
+									metaExpedientData, null);
 							elementsCreats.add(metaExpedientCreat);
 							if (((MetaExpedientDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
@@ -141,7 +150,7 @@ public class BaseServiceTest {
 						} else if (element instanceof MetaDocumentDto) {
 							MetaDocumentDto metaDocumentCreat = metaDocumentService.create(
 									entitatId,
-									((MetaExpedientDto) elementsCreats.get(1)).getId(),
+									((MetaExpedientDto) elementsCreats.get(2)).getId(),
 									(MetaDocumentDto)element,
 									PLANTILLA_NOM,
 									PLANTILLA_CONTTYPE,
@@ -158,7 +167,7 @@ public class BaseServiceTest {
 						} else if (element instanceof MetaDadaDto) {
 							MetaDadaDto metaDadaCreada = metaDadaService.create(
 									entitatId,
-									((MetaExpedientDto)elementsCreats.get(1)).getId(),
+									((MetaExpedientDto) elementsCreats.get(2)).getId(),
 									(MetaDadaDto) element, "tothom");
 							elementsCreats.add(metaDadaCreada);
 							id = metaDadaCreada.getId();
@@ -180,7 +189,7 @@ public class BaseServiceTest {
 		} finally {
 			Long metaExpedientId = null;
 			if (elementsCreats.size() > 1) {
-				metaExpedientId = ((MetaExpedientDto)elementsCreats.get(1)).getId();
+				metaExpedientId = ((MetaExpedientDto)elementsCreats.get(2)).getId();
 			}
 			// TODO
 			Collections.reverse(elementsCreats);
@@ -206,6 +215,11 @@ public class BaseServiceTest {
 					metaExpedientService.delete(
 							entitatId,
 							((MetaExpedientDto)element).getId());
+				} else if (element instanceof OrganGestorDto) {
+					autenticarUsuari("admin");
+					organGestorService.delete(
+							entitatId,
+							((OrganGestorDto)element).getId());
 				}
 				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
@@ -224,6 +238,22 @@ public class BaseServiceTest {
 	abstract class TestAmbElementsCreats {
 		public abstract void executar(
 				List<Object> elementsCreats) throws Exception;
+	}
+
+
+	@Transactional
+	protected void addConfig(String key, String value) {
+		ConfigEntity configEntity = new ConfigEntity(key, value);
+		configRepository.save(configEntity);
+	}
+	protected void setDefaultConfigs() {
+		Properties props = PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties").findAll();
+		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
+			addConfig(entry.getKey().toString(), entry.getValue().toString());
+		}
+	}
+	protected void removeAllConfigs() {
+		configRepository.deleteAll();
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);

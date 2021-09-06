@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,13 +19,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.helper.PropertiesHelper;
 
 /**
  * Tests per al servei d'entitats.
@@ -40,13 +36,14 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 	private MetaExpedientService metaExpedientService;
 
 	private EntitatDto entitat;
+	protected OrganGestorDto organGestorDto;
 	private MetaExpedientDto metaExpedientCreate;
 	private MetaExpedientDto metaExpedientUpdate;
 	private PermisDto permisUserRead;
 
 	@Before
 	public void setUp() {
-		PropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
+		setDefaultConfigs();
 		entitat = new EntitatDto();
 		entitat.setCodi("LIMIT");
 		entitat.setNom("Limit Tecnologies");
@@ -99,6 +96,10 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		permisUserRead.setRead(true);
 		permisUserRead.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
 		permisUserRead.setPrincipalNom("user");
+
+		organGestorDto = new OrganGestorDto();
+		organGestorDto.setCodi("A000000000");
+		organGestorDto.setNom("Òrgan 0");
 	}
 
 	@Test
@@ -107,7 +108,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(List<Object> elementsCreats) {
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
 						assertNotNull(metaExpedientCreat);
 						assertNotNull(metaExpedientCreat.getId());
 						comprovarMetaExpedientCoincideix(
@@ -118,6 +119,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				},
 				"Creació d'un meta-expedient",
 				entitat,
+				organGestorDto,
 				metaExpedientCreate);
 	}
 
@@ -129,7 +131,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
 						MetaExpedientDto trobat = metaExpedientService.findById(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId());
@@ -142,6 +144,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				},
 				"Consulta d'un meta-expedient",
 				entitat,
+				organGestorDto,
 				metaExpedientCreate);
     }
 
@@ -153,7 +156,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
 						metaExpedientUpdate.setId(metaExpedientCreat.getId());
 						MetaExpedientDto modificat = metaExpedientService.update(
 								entitatCreada.getId(),
@@ -171,6 +174,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				},
 				"Modificació d'un meta-expedient",
 				entitat,
+				organGestorDto,
 				metaExpedientCreate);
 	}
 
@@ -182,7 +186,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
 						MetaExpedientDto esborrat = metaExpedientService.delete(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId());
@@ -201,6 +205,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				},
 				"Eliminació d'un meta-expedient",
 				entitat,
+				organGestorDto,
 				metaExpedientCreate);
 	}
 
@@ -212,7 +217,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 					public void executar(List<Object> elementsCreats) {
 						autenticarUsuari("admin");
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(1);
+						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
 						MetaExpedientDto desactivat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
@@ -231,6 +236,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				},
 				"Activació/desactivació d'un meta-expedient",
 				entitat,
+				organGestorDto,
 				metaExpedientCreate);
 	}
 

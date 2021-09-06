@@ -25,7 +25,7 @@ import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerP
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de firma en servidor emprant PortaFIB.

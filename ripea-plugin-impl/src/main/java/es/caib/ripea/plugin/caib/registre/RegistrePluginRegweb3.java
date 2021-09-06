@@ -40,7 +40,7 @@ import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.registre.RegistreAnotacioResposta;
 import es.caib.ripea.plugin.registre.RegistrePlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació per a l'aplicació REGWEB3 del plugin de registre.

@@ -18,7 +18,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Classe de proves pel portafirmes Portafib.
@@ -40,7 +40,6 @@ public class PortafirmesPluginPortafibTest {
 
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setLlegirSystem(false);
 		PropertiesHelper.getProperties().setProperty(
 				"es.caib.ripea.plugin.portafirmes.portafib.base.url",
 				BASE_URL);

@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import es.caib.ripea.plugin.PropertiesHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.core.helper.PropertiesHelper;
 
 /**
  * Tests per als mètodes del BaseServiceTest.

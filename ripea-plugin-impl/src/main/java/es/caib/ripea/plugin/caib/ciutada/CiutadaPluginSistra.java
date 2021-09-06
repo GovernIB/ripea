@@ -50,7 +50,7 @@ import es.caib.ripea.plugin.ciutada.CiutadaNotificacioEstat.ZonaperJustificantEs
 import es.caib.ripea.plugin.ciutada.CiutadaNotificacioResultat;
 import es.caib.ripea.plugin.ciutada.CiutadaPersona;
 import es.caib.ripea.plugin.ciutada.CiutadaPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.zonaper.ws.v2.model.configuracionavisosexpediente.ConfiguracionAvisosExpediente;
 import es.caib.zonaper.ws.v2.model.documentoexpediente.DocumentoExpediente;
 import es.caib.zonaper.ws.v2.model.documentoexpediente.DocumentosExpediente;

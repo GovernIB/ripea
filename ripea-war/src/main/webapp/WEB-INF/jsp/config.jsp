@@ -53,6 +53,42 @@
             });
         });
 
+        <c:url var="urlEdit" value="/config/update"/>
+        $(".form-update-config").submit(function(e) {
+
+            //prevent Default functionality
+            e.preventDefault();
+
+            let self = this;
+            let formData = new FormData(this);
+            $('#syncModal-body').html(
+                '<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
+                '	<span class="fa fa-circle-o-notch fa-spin fa-3x"></span> <br>' +
+                '   Sincronitzant la propietat: ' + formData.get('key') +
+                '</div>');
+            $("#syncModal").modal("show");
+
+            //do your own request an handle the results
+            $.ajax({
+                url: '${urlEdit}',
+                type: 'post',
+                processData: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                data: formData,
+                success: function(data) {
+                    $("#syncModal").modal("hide");
+                    if (data.status === 1) {
+                        alert("La propietat " + formData.get('key') + " s'ha editat satisfactoriament");
+                    } else {
+                        alert("Hi ha hagut un error editant la propietat");
+                        document.location.reload();
+                    }
+                }
+            });
+
+        });
+
         $('.a-config-group:first').tab('show');
     });
 </script>

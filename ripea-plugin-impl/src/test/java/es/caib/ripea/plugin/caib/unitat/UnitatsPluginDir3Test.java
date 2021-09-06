@@ -11,7 +11,7 @@ import org.junit.Test;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Client de test per al servei bustia de RIPEA.
@@ -31,7 +31,6 @@ public class UnitatsPluginDir3Test {
 
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setLlegirSystem(false);
 		PropertiesHelper.getProperties().setProperty(
 				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.url",
 				ENDPOINT_ADDRESS);

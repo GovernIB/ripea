@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils;
 
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de gestió documental que

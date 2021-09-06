@@ -1,15 +1,10 @@
-/**
- * 
- */
-package es.caib.ripea.core.helper;
+package es.caib.ripea.plugin;
 
 import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import es.caib.ripea.core.api.exception.PropietatNotFoundException;
 
 /**
  * Utilitat per accedir a les entrades del fitxer de properties.
@@ -22,8 +17,10 @@ public class PropertiesHelper extends Properties {
 
 	private static PropertiesHelper instance = null;
 
-	private boolean llegirSystem = true;
-
+	
+	private PropertiesHelper(Properties defaults) {
+		super(defaults);
+	}
 
 	public static PropertiesHelper getProperties() {
 		return getProperties(null);
@@ -34,9 +31,8 @@ public class PropertiesHelper extends Properties {
 			propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
 		}
 		if (instance == null) {
-			instance = new PropertiesHelper();
+			instance = new PropertiesHelper(System.getProperties());
 			if (propertiesPath != null) {
-				instance.llegirSystem = false;
 				logger.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
 				try {
 					if (propertiesPath.startsWith("classpath:")) {
@@ -59,98 +55,47 @@ public class PropertiesHelper extends Properties {
 		return instance;
 	}
 
-	public boolean isLlegirSystem() {
-		return llegirSystem;
-	}
-
 	public String getProperty(String key) {
-		if (llegirSystem)
-			return System.getProperty(key);
-		else
-			return super.getProperty(key);
+		return super.getProperty(key);
 	}
 	public String getProperty(String key, String defaultValue) {
 		String val = getProperty(key);
-        return (val == null) ? defaultValue : val;
-	}
-	public String getPropertyAmbComprovacio(String key) {
-		String valor = getProperty(key);
-		if (valor == null || valor.isEmpty()) {
-			throw new PropietatNotFoundException(key);
-		}
-		return valor;
+		return (val == null) ? defaultValue : val;
 	}
 
 	public boolean getAsBoolean(String key) {
-		String value = getProperty(key);
-		if (value != null) {
-			return new Boolean(getProperty(key)).booleanValue();
-		} else {
-			return false;
-		}
+		return new Boolean(getProperty(key)).booleanValue();
 	}
 	public int getAsInt(String key) {
-		String value = getProperty(key);
-		if (value != null) {
-			return new Integer(value).intValue();
-		} else {
-			throw new PropietatNotFoundException(key);
-		}
+		return new Integer(getProperty(key)).intValue();
 	}
 	public long getAsLong(String key) {
-		String value = getProperty(key);
-		if (value != null) {
-			return new Long(value).longValue();
-		} else {
-			throw new PropietatNotFoundException(key);
-		}
+		return new Long(getProperty(key)).longValue();
 	}
 	public float getAsFloat(String key) {
-		String value = getProperty(key);
-		if (value != null) {
-			return new Float(value).floatValue();
-		} else {
-			throw new PropietatNotFoundException(key);
-		}
+		return new Float(getProperty(key)).floatValue();
 	}
 	public double getAsDouble(String key) {
-		String value = getProperty(key);
-		if (value != null) {
-			return new Double(value).doubleValue();
-		} else {
-			throw new PropietatNotFoundException(key);
-		}
+		return new Double(getProperty(key)).doubleValue();
 	}
 
+
+	public Properties findAll() {
+		return findByPrefix(null);
+	}
 	public Properties findByPrefix(String prefix) {
 		Properties properties = new Properties();
-		if (llegirSystem) {
-			for (Object key: System.getProperties().keySet()) {
-				if (key instanceof String) {
-					String keystr = (String)key;
-					if (prefix == null || keystr.startsWith(prefix)) {
-						properties.put(
-								keystr,
-								System.getProperty(keystr));
-					}
-				}
-			}
-		} else {
-			for (Object key: this.keySet()) {
-				if (key instanceof String) {
-					String keystr = (String)key;
-					if (prefix == null || keystr.startsWith(prefix)) {
-						properties.put(
-								keystr,
-								getProperty(keystr));
-					}
+		for (Object key: this.keySet()) {
+			if (key instanceof String) {
+				String keystr = (String)key;
+				if (prefix == null || keystr.startsWith(prefix)) {
+					properties.put(
+							keystr,
+							getProperty(keystr));
 				}
 			}
 		}
 		return properties;
-	}
-	public Properties findAll() {
-		return findByPrefix(null);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);

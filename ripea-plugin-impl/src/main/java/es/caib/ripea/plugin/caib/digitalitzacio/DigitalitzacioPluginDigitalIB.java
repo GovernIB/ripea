@@ -27,7 +27,7 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de portafirmes emprant el portafirmes

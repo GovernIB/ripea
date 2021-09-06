@@ -20,7 +20,7 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de procediments emprant ROLSAC.

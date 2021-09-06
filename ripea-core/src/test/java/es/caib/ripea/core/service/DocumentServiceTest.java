@@ -65,8 +65,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 					public void executar(
 							List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
 						dto.setData(new Date());
@@ -108,8 +108,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 					public void executar(
 							List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
 						dto.setData(new Date());
@@ -152,8 +152,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 					public void executar(
 							List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
 						dto.setData(new Date());
@@ -200,8 +200,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 					public void executar(
 							List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
 						dto.setData(new Date());
@@ -242,8 +242,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 					public void executar(
 							List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
 						dto.setData(new Date());
@@ -294,8 +294,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 					public void executar(
 							List<Object> elementsCreats) throws IOException {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(2);
-						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(4);
+						MetaDocumentDto metaDocumentCreat = (MetaDocumentDto)elementsCreats.get(3);
+						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						DocumentDto dto = new DocumentDto();
 						dto.setNom("Test");
 						dto.setData(new Date());

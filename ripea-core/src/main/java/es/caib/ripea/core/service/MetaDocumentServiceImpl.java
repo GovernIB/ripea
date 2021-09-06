@@ -129,7 +129,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					plantillaContentType,
 					plantillaContingut);
 		}
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(

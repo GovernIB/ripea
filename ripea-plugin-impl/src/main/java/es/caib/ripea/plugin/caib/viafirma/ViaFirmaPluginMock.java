@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.utils.PropertiesHelper;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.plugin.viafirma.ViaFirmaError;
