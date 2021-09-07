@@ -64,6 +64,9 @@
 	pageContext.setAttribute(
 			"countAnotacionsPendents",
 			es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+	pageContext.setAttribute(
+			"teAccesEstadistiques",
+			es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -389,7 +392,11 @@ body {
 						</div>
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
-					
+						<c:if test="${teAccesEstadistiques}">
+							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary">
+								<spring:message code="decorator.menu.accions.estadistiques"/>
+							</a>
+						</c:if>
 						<%---- Expedients ----%>
 						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary">
 								<spring:message code="decorator.menu.expedients"/>

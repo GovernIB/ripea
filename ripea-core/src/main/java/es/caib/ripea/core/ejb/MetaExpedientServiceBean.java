@@ -368,4 +368,13 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.isRevisioActiva();
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
+			Long entitatId,
+			String filtreNomOrCodiSia, 
+			String rolActual) {
+		return delegate.findActiusAmbEntitatPerConsultaEstadistiques(entitatId, filtreNomOrCodiSia, rolActual);
+	}
+
 }

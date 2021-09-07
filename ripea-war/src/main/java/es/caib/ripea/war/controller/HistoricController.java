@@ -1,5 +1,6 @@
 package es.caib.ripea.war.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.core.api.exception.PermissionDeniedStatisticsException;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -49,7 +51,7 @@ public class HistoricController extends BaseAdminController {
 	private ExportacioActionHistoric exportacioActionHistoric;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(HttpServletRequest request, Model model) {
+	public String get(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		model.addAttribute(historicFiltreCommand);
@@ -58,7 +60,8 @@ public class HistoricController extends BaseAdminController {
 		model.addAttribute("showDadesUsuari", historicFiltreCommand.showingDadesUsuari());
 		model.addAttribute("showDadesInteressat", historicFiltreCommand.showingDadesInteressat());
 		model.addAttribute("showingDadesActuals", historicFiltreCommand.getTipusAgrupament() == null);
-
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		String[] usuaris = (String[])RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS);
 		if (usuaris == null) {
 			usuaris = new String[0];
@@ -74,6 +77,11 @@ public class HistoricController extends BaseAdminController {
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessats);
 		}
 		model.addAttribute("interessatsSeleccionats", interessats);
+		try {
+			historicService.comprovarAccesEstadistiques(entitat.getId(), rolActual);
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+		}
 		return "historic";
 	}
 
@@ -97,93 +105,140 @@ public class HistoricController extends BaseAdminController {
 
 	@RequestMapping(value = "/expedient/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse expedientsDatatable(HttpServletRequest request) {
+	public DatatablesResponse expedientsDatatable(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-		PaginaDto<HistoricExpedientDto> pagina = historicService.getPageDadesEntitat(
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		PaginaDto<HistoricExpedientDto> pagina = null;
+		try {
+			pagina = historicService.getPageDadesEntitat(
 				entitat.getId(),
 				historicFiltreCommand.asDto(),
+				rolActual,
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+		}
 		return DatatablesHelper.getDatatableResponse(request, pagina);
 	}
 
 	@RequestMapping(value = "/chart/entitat", method = RequestMethod.GET)
 	@ResponseBody
-	public List<HistoricExpedientDto> expedientsEntitatChartData(HttpServletRequest request) {
+	public List<HistoricExpedientDto> expedientsEntitatChartData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-		List<HistoricExpedientDto> response = historicService.getDadesEntitat(
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		List<HistoricExpedientDto> result = null;
+		try {
+			result = historicService.getDadesEntitat(
 				entitat.getId(),
+				rolActual,
 				historicFiltreCommand.asDto());
-		return response;
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "/entitat/actual", method = RequestMethod.GET)
 	@ResponseBody
-	public List<HistoricExpedientDto> getHistoricExpedientActual(HttpServletRequest request) {
+	public List<HistoricExpedientDto> getHistoricExpedientActual(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-		List<HistoricExpedientDto> response = historicService.getDadesActualsEntitat(
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		List<HistoricExpedientDto> result = null;
+		
+		try {
+			result = historicService.getDadesActualsEntitat(
 				entitat.getId(),
+				rolActual,
 				historicFiltreCommand.asDto());
-		return response;
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+		}
+		return result;
 	}
 	
 	@RequestMapping(value = "/organgestors", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
-			HttpServletRequest request,
-			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) {
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) throws IOException {
 		getEntitatActualComprovantPermisAdminEntitat(request);
-
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-
-		Map<OrganGestorDto, List<HistoricExpedientDto>> dades = historicService.getHistoricsByOrganGestor(
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		Map<OrganGestorDto, List<HistoricExpedientDto>> dades = null;
+		
+		try {
+			dades = historicService.getHistoricsByOrganGestor(
+				entitat.getId(),
+				rolActual,
 				historicFiltreCommand.asDto());
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+		}
 		if (dades == null) {
 			return new HashMap<>();
 		}
 
 		// Substituim els objectes organGestorsDto pel nom de l'organ
-		Map<String, List<HistoricExpedientDto>> response = new HashMap<>();
+		Map<String, List<HistoricExpedientDto>> results = new HashMap<>();
 		for (OrganGestorDto organ : dades.keySet()) {
-			response.put(organ.getNom(), dades.get(organ));
+			results.put(organ.getNom(), dades.get(organ));
 		}
 
-		return response;
+		return results;
 	}
 	
 	@RequestMapping(value = "/organgestors/actual", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, HistoricExpedientDto> getDadesActualsOrgansGestors(
-			HttpServletRequest request) {
+			HttpServletRequest request, 
+			HttpServletResponse response) throws IOException {
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-
-		Map<OrganGestorDto, HistoricExpedientDto> dades = historicService.getDadesActualsOrgansGestors(
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		Map<OrganGestorDto, HistoricExpedientDto> dades = null;
+		
+		try {
+			dades = historicService.getDadesActualsOrgansGestors(
+				entitat.getId(),
+				rolActual,
 				historicFiltreCommand.asDto());
-		Map<String, HistoricExpedientDto> response = new HashMap<>();
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+		}
+		Map<String, HistoricExpedientDto> results = new HashMap<>();
 		if (dades == null) {
-			return response;
+			return results;
 		}
 		for (OrganGestorDto organ : dades.keySet()) {
-			response.put(organ.getNom(), dades.get(organ));
+			results.put(organ.getNom(), dades.get(organ));
 		}
-		return response;
+		return results;
 	}
 
 	@RequestMapping(value = "/usuaris/dades/", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, List<HistoricUsuariDto>> usuarisData(
-			HttpServletRequest request,
-			@RequestParam("usuaris[]") String[] usuarisCodi) {
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam("usuaris[]") String[] usuarisCodi) throws IOException {
 		// registram els usuaris consultats a la sessió
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS, usuarisCodi);
-
 		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
-			results.put(codiUsuari, historicService.getDadesUsuari(codiUsuari, historicFiltreCommand.asDto()));
+			try {
+				results.put(codiUsuari, historicService.getDadesUsuari(codiUsuari, entitat.getId(), rolActual, historicFiltreCommand.asDto()));
+			} catch (PermissionDeniedStatisticsException e) {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+			}
 		}
 
 		return results;
@@ -192,36 +247,49 @@ public class HistoricController extends BaseAdminController {
 	@RequestMapping(value = "/usuaris/actual", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, List<HistoricUsuariDto>> usuarisDataActual(
-			HttpServletRequest request,
-			@RequestParam("usuaris[]") String[] usuarisCodi) {
-
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam("usuaris[]") String[] usuarisCodi) throws IOException {
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS, usuarisCodi);
-
 		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-		Map<String, List<HistoricUsuariDto>> response = new HashMap<String, List<HistoricUsuariDto>>();
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
-			response.put(codiUsuari, historicService.getDadesActualsUsuari(codiUsuari, historicFiltreCommand.asDto()));
+			try {
+				results.put(codiUsuari, historicService.getDadesActualsUsuari(codiUsuari, entitat.getId(), rolActual, historicFiltreCommand.asDto()));
+			} catch (PermissionDeniedStatisticsException e) {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+			}
 		}
-		return response;
+		return results;
 	}
 
 	@RequestMapping(value = "/interessats/dades/", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, List<HistoricInteressatDto>> interessatsData(
-			HttpServletRequest request,
-			@RequestParam("interessats[]") String[] interessatsDocNum) {
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam("interessats[]") String[] interessatsDocNum) throws IOException {
 		// registram els usuaris consultats a la sessió
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessatsDocNum);
-
 		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
 		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
-			List<HistoricInteressatDto> historics = historicService.getDadesInteressat(
-					docNum,
-					historicFiltreCommand.asDto());
-			results.put(docNum, historics);
+			try {
+				List<HistoricInteressatDto> historics = historicService.getDadesInteressat(
+						docNum,
+						entitat.getId(),
+						rolActual,
+						historicFiltreCommand.asDto());
+				results.put(docNum, historics);
+			} catch (PermissionDeniedStatisticsException e) {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+			}
 		}
 
 		return results;
@@ -230,18 +298,23 @@ public class HistoricController extends BaseAdminController {
 	@RequestMapping(value = "/interessats/actual", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, List<HistoricInteressatDto>> interessatsDataActual(
-			HttpServletRequest request,
-			@RequestParam("interessats[]") String[] interessatsDocNum) {
-
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam("interessats[]") String[] interessatsDocNum) throws IOException {
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessatsDocNum);
-
 		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
-		Map<String, List<HistoricInteressatDto>> response = new HashMap<String, List<HistoricInteressatDto>>();
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
-			response.put(docNum, historicService.getDadesActualsInteressat(docNum, historicFiltreCommand.asDto()));
+			try {
+				results.put(docNum, historicService.getDadesActualsInteressat(docNum, entitat.getId(), rolActual, historicFiltreCommand.asDto()));
+			} catch (PermissionDeniedStatisticsException e) {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+			}
 		}
-		return response;
+		return results;
 	}
 
 	@RequestMapping(value = "/exportar", method = RequestMethod.POST)
@@ -253,30 +326,34 @@ public class HistoricController extends BaseAdminController {
 		if (historicFiltreCommand.getTipusAgrupament() == null) {
 			historicFiltreCommand.setTipusAgrupament(HistoricTipusEnumDto.DIARI);
 		}
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		FitxerDto fitxer = null;
-		if (historicFiltreCommand.showingDadesEntitat()) {
-			fitxer = exportacioActionHistoric.exportarHistoricEntitat(entitatActual, historicFiltreCommand.asDto(), format);
-			
-		} else if (historicFiltreCommand.showingDadesOrganGestor()) {
-			fitxer = exportacioActionHistoric.exportarHistoricOrgansGestors(historicFiltreCommand.asDto(), format);
-			
-		} else if (historicFiltreCommand.showingDadesUsuari()) {
-			String[] usuaris = (String[])RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS);
-			usuaris = usuaris == null ? new String[0] : usuaris;
-			fitxer = exportacioActionHistoric.exportarHistoricUsuaris(usuaris, historicFiltreCommand.asDto(), format);
-			
-		} else if (historicFiltreCommand.showingDadesInteressat()) {
-			String[] interessats = (String[])RequestSessionHelper.obtenirObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_INTERESSATS);
-			interessats = interessats == null ? new String[0] : interessats;
-			fitxer = exportacioActionHistoric.exportarHistoricInteressats(interessats, historicFiltreCommand.asDto(), format);
-			
-		} else {
-			throw new Exception("No s'han seleccionat el tipus de dades a generar");
+		try {
+			if (historicFiltreCommand.showingDadesEntitat()) {
+				fitxer = exportacioActionHistoric.exportarHistoricEntitat(entitatActual, rolActual, historicFiltreCommand.asDto(), format);
+				
+			} else if (historicFiltreCommand.showingDadesOrganGestor()) {
+				fitxer = exportacioActionHistoric.exportarHistoricOrgansGestors(entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
+				
+			} else if (historicFiltreCommand.showingDadesUsuari()) {
+				String[] usuaris = (String[])RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS);
+				usuaris = usuaris == null ? new String[0] : usuaris;
+				fitxer = exportacioActionHistoric.exportarHistoricUsuaris(usuaris, entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
+				
+			} else if (historicFiltreCommand.showingDadesInteressat()) {
+				String[] interessats = (String[])RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_INTERESSATS);
+				interessats = interessats == null ? new String[0] : interessats;
+				fitxer = exportacioActionHistoric.exportarHistoricInteressats(interessats, entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
+				
+			} else {
+				throw new Exception("No s'han seleccionat el tipus de dades a generar");
+			}
+		} catch (PermissionDeniedStatisticsException e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
 		}
-
 		writeFileToResponse(fitxer.getNom(), fitxer.getContingut(), response);
 		return null;
 	}

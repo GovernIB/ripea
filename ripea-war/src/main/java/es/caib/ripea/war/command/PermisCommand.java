@@ -36,6 +36,7 @@ public class PermisCommand {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
+	private boolean statistics;
 	private boolean selectAll;
 
 	private Long organGestorId;
@@ -104,6 +105,10 @@ public class PermisCommand {
 
 	public void setAdministration(boolean administration) {
 		this.administration = administration;
+	}
+
+	public void setStatistics(boolean statistics) {
+		this.statistics = statistics;
 	}
 
 	public void setSelectAll(boolean selectAll) {

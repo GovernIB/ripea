@@ -476,6 +476,12 @@ public interface MetaExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean isRevisioActiva();
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
+			Long entitatId, 
+			String filtreNomOrCodiSia,
+			String rolActual);
 	
 	
 }

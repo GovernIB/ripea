@@ -28,7 +28,7 @@ public class PermisDto implements Serializable {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
-
+	private boolean statistics;
 	private Long organGestorId;
 	private String organGestorNom;
 	private String organGestorCodi;

@@ -78,6 +78,7 @@
 			<rip:inputCheckbox name="read" textKey="metaexpedient.permis.form.camp.consulta"/>
 			<rip:inputCheckbox name="write" textKey="metaexpedient.permis.form.camp.modificacio"/>
 			<rip:inputCheckbox name="delete" textKey="metaexpedient.permis.form.camp.eliminacio"/>
+			<rip:inputCheckbox name="statistics" textKey="metaexpedient.permis.form.camp.statistics"/>
 		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

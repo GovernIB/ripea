@@ -35,6 +35,8 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/metaExpedient")
 public class MetaExpedientPermisController extends BaseAdminController {
 
+	private static final String REQUEST_PARAMETER_STATISTICS_EXPEDIENTS = "ExpedientHelper.teAccesEstadistiques";
+	
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 
@@ -144,7 +146,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				metaExpedientId,
 				PermisCommand.asDto(command), 
 				rolActual);
-		
+		request.setAttribute(REQUEST_PARAMETER_STATISTICS_EXPEDIENTS, null);
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}

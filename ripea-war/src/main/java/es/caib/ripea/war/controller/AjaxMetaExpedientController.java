@@ -70,6 +70,30 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 		return metaExpedientsPermisLectura;
 	}
 	
+	@RequestMapping(value = "/metaexpedients/estadistiques/{text}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> getMetaExpedientsAmbPermis(
+			HttpServletRequest request,
+			@PathVariable String text,
+			Model model) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		List<MetaExpedientDto> metaExpedientsPermisLectura;
+		if ("tothom".equals(rolActual)) {
+			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerConsultaEstadistiques(
+					entitat.getId(), 
+					text, 
+					rolActual);
+		} else {
+			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+					entitat.getId(), 
+					text, 
+					rolActual);
+		}
+		return metaExpedientsPermisLectura;
+	}
+	
 	
 	@RequestMapping(value = "/metaexpedient/item/{id}", method = RequestMethod.GET)
 	@ResponseBody

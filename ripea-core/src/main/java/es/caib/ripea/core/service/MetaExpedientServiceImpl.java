@@ -966,6 +966,27 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return metaExpedientHelper.isRevisioActiva();
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
+			Long entitatId,
+			String filtreNomOrCodiSia, 
+			String rolActual) {
+		logger.debug("Consulta de meta-expedients de l'entitat amb el permis STATISTICS (" + "entitatId=" + entitatId + ")");
+
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findAmbEntitatPermis(
+						entitatId,
+						ExtendedPermission.STATISTICS,
+						true,
+						filtreNomOrCodiSia, 
+						"IPA_ADMIN".equals(rolActual),
+						"IPA_ORGAN_ADMIN".equals(rolActual),
+						null), // TODO especificar organId quan és admin organ
+				MetaExpedientDto.class);
+
+	}
+	
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
 		List<Long> metaExpedientIds = new ArrayList<Long>();
 		for (MetaExpedientDto metaExpedient : metaExpedients) {

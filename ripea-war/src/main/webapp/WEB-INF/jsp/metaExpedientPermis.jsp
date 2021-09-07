@@ -50,6 +50,12 @@
 						{{if delete}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="statistics" data-template="#cellPermisStatisticsTemplate">
+					<spring:message code="metaexpedient.permis.columna.statistics"/>
+					<script id="cellPermisStatisticsTemplate" type="text/x-jsrender">
+						{{if statistics}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<c:if test="${!esRevisor}">
 					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">
