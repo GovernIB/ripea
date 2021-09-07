@@ -176,6 +176,55 @@
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AnotacionsPendentsInterceptor"/>
 		</mvc:interceptor>	
+		
+		<!-- Rutes només accessibles amb el rol d'administrador d'organ o d'entitat -->
+		<mvc:interceptor>
+			<mvc:mapping path="/metaExpedient**"/>
+			<mvc:mapping path="/metaExpedient/**"/>
+			<mvc:exclude-mapping path="/metaExpedient/findPerLectura/**"/>
+			<mvc:exclude-mapping path="/metaExpedient/metaDadaPermisLectura/domini"/>	
+			<bean class="es.caib.ripea.war.interceptor.AccesAdminInterceptor"/>
+		</mvc:interceptor>
+
+		<!-- Rutes només accessibles amb el rol d'administrador d'entitat -->
+		<mvc:interceptor>
+			<mvc:mapping path="/domini**"/>
+			<mvc:mapping path="/domini/**"/>
+			<mvc:mapping path="/grup**"/>
+			<mvc:mapping path="/grup/**"/>
+			<mvc:mapping path="/organgestor**"/>
+			<mvc:mapping path="/organgestor/**"/>
+			<mvc:mapping path="/permis**"/>
+			<mvc:mapping path="/permis/**"/>
+			<mvc:mapping path="/contingutAdmin**"/>
+			<mvc:mapping path="/contingutAdmin/**"/>
+			<mvc:mapping path="/historic**"/>
+			<mvc:mapping path="/historic/**"/>
+			<mvc:mapping path="/metaExpedientRevisio**"/>
+			<mvc:mapping path="/metaExpedientRevisio/**"/>
+			<mvc:mapping path="/seguimentPortafirmes**"/>
+			<mvc:mapping path="/seguimentPortafirmes/**"/>
+			<mvc:mapping path="/seguimentNotificacions**"/>
+			<mvc:mapping path="/seguimentNotificacions/**"/>
+			<mvc:mapping path="/seguimentTasques**"/>
+			<mvc:mapping path="/seguimentTasques/**"/>
+			<mvc:mapping path="/seguimentExpedientsPendents**"/>
+			<mvc:mapping path="/seguimentExpedientsPendents/**"/>
+			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatInterceptor"/>
+		</mvc:interceptor>
+		
+		<!-- Rutes només accessibles amb el rol de superusuari -->
+		<mvc:interceptor>
+			<mvc:mapping path="/entitat**"/>
+			<mvc:mapping path="/entitat/**"/>
+			<mvc:mapping path="/integracio**"/>
+			<mvc:mapping path="/integracio/**"/>
+			<mvc:mapping path="/excepcio**"/>
+			<mvc:mapping path="/excepcio/**"/>
+			<mvc:mapping path="/config**"/>
+			<mvc:mapping path="/config/**"/>
+			<bean class="es.caib.ripea.war.interceptor.AccesSuperInterceptor"/>
+		</mvc:interceptor>		
 	</mvc:interceptors>
 
 	<bean id="defaultViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
