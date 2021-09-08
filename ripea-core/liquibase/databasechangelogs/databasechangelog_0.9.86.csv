@@ -292,4 +292,7 @@
 "1629371481-2","limit","db/changelog/changes/0.9.86/794.yaml","2021-09-06T13:10:05.869","291","EXECUTED","8:710d7892921166176db6582ddddaad04","sql; sql","","","4.4.3","()","","0926605399"
 "1629371481-3","limit","db/changelog/changes/0.9.86/794.yaml","2021-09-06T13:10:05.898","292","EXECUTED","8:a3b002305b482c9c85a5fd9d3ee9b744","sql","","","4.4.3","()","","0926605399"
 "1624872722049-1","limit","db/changelog/changes/0.9.86/816.yaml","2021-09-06T13:10:05.923","293","EXECUTED","8:0ea3176817ef7b8e6d67d45790ea61bc","addColumn tableName=ipa_contingut","","","4.4.3","()","","0926605399"
-"1629723033616-1","limit","db/changelog/changes/0.9.86/840.yaml","2021-09-06T13:10:05.947","294","EXECUTED","8:8a8ec866c95e6ae147d52f43d04dd584","addColumn tableName=ipa_metadocument",,"","4.4.3","()","","0926605399"
+"1629723033616-1","limit","db/changelog/changes/0.9.86/840.yaml","2021-09-06T13:10:05.947","294","EXECUTED","8:8a8ec866c95e6ae147d52f43d04dd584","addColumn tableName=ipa_metadocument","","","4.4.3","()","","0926605399"
+"init-6","","db/changelog/initial_schema_table.yaml","2021-09-08T08:42:45.939","295","EXECUTED","8:e68c4093daafc96f7ad94ae14c270804","createTable tableName=ipa_cont_mov","","","4.4.3","()","","1083365472"
+"init-index-87","","db/changelog/initial_schema_index.yaml","2021-09-08T08:42:45.968","296","EXECUTED","8:d41d8cd98f00b204e9800998ecf8427e","empty","","","4.4.3","()","","1083365472"
+"1629371481-4","limit","db/changelog/changes/0.9.86/794.yaml","2021-09-08T08:42:45.989","297","EXECUTED","8:3b5ce41ff0e9578da27ae639a6a0e8bf","sql",,"","4.4.3","()","","1083365472"
