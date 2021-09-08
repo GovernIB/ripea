@@ -1362,6 +1362,8 @@ function getEnviamentsDocument(document) {
 		             		if (val.error) {
 		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 		             		}
+		             		content += "<p class='estat_" + val.id +  "' style='display:inline'></p>";
+		             		returnEnviamentsStatusDiv(val.id);
 		             	}
 		             	content += "</td>";
 		             	content += "</tr>";
@@ -1725,8 +1727,34 @@ function closeViewer() {
 	});
 }
 
+function returnEnviamentsStatusDiv(notificacioId) {
+    var content = "";
+    var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + notificacioId;
 
+    $.getJSON({
+        url: getUrl,
+        success: (notificacio) => {
+			var enviaments = notificacio.documentEnviamentInteressats;
+            for (i = 0; i < enviaments.length; i++) {
+                content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+            }
+            if (content !== undefined && content != '') {
+                content = "("+content.replace(/,\s*$/, "")+")";
+            }
+            $('.estat_' + notificacioId).html("");
+            $('.estat_' + notificacioId).append(content);
+        },
+        error: function(data){
+        	console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId);
+        }
+    })
+}
 
+var myHelpers = {
+recuperarEstatEnviament: returnEnviamentsStatusDiv,
+};
+
+$.views.helpers(myHelpers);
 
 </script>
 
@@ -2483,6 +2511,10 @@ function closeViewer() {
 														{{else}}
 															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
 													{{/if}}
+												{{/if}}
+												{{if notificacioEstat == 'PROCESSADA'}}
+												{{:~recuperarEstatEnviament(id)}}
+												<p class="estat_{{:id}}"  style="display:inline"></p>
 												{{/if}}
 											{{else publicacio}}
 												{{if estat == 'PENDENT'}}
