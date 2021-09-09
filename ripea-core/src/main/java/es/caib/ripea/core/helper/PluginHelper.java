@@ -4058,30 +4058,6 @@ public class PluginHelper {
 		return viaFirmaDispositiusDto;
 	}
 
-	private boolean gestioDocumentalPluginConfiguracioProvada = false;
-	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
-		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
-			gestioDocumentalPluginConfiguracioProvada = true;
-			String pluginClass = getPropertyPluginGestioDocumental();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_GESDOC,
-							"Error al crear la instància del plugin de gestió documental",
-							ex);
-				}
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_USUARIS,
-						"La classe del plugin de gestió documental no està configurada");
-			}
-		}
-		return gestioDocumentalPlugin;
-	}
-
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(
 			UnitatOrganitzativa unitatOrganitzativa,
 			List<UnitatOrganitzativa> unitatsOrganitzatives,
@@ -5385,6 +5361,29 @@ public class PluginHelper {
 			}
 		}
 		return procedimentPlugin;
+	}
+
+	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
+		loadPluginProperties("GES_DOC");
+		if (gestioDocumentalPlugin == null) {
+			String pluginClass = getPropertyPluginGestioDocumental();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_GESDOC,
+							"Error al crear la instància del plugin de gestió documental",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_USUARIS,
+						"La classe del plugin de gestió documental no està configurada");
+			}
+		}
+		return gestioDocumentalPlugin;
 	}
 
 	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
