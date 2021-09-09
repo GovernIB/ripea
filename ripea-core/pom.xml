@@ -9,7 +9,7 @@
 	<artifactId>ripea-core</artifactId>
 	<packaging>ejb</packaging>
 	<properties>
-		<liquibase.version>4.3.3</liquibase.version>
+		<liquibase.version>4.4.3</liquibase.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -381,6 +381,7 @@
 			<plugin>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>${liquibase.version}</version>
 				<configuration>
 					<propertyFile>liquibase/liquibase.properties</propertyFile>
 				</configuration>

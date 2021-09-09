@@ -334,3 +334,22 @@ WHERE key in ('es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio',
               'es.caib.ripea.segonpla.email.enviament.agrupat.cron');
 
                 "
+-   changeSet:
+        id: 1629371481-4
+        author: limit
+        changes:
+            -   sql:
+                    sql: "
+UPDATE IPA_CONFIG
+SET value = '600000'
+WHERE key in 'es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio';
+UPDATE IPA_CONFIG
+SET value = '30000'
+WHERE key in 'es.caib.ripea.segonpla.massives.periode.comprovacio';
+UPDATE IPA_CONFIG
+SET value = '3600000'
+WHERE key in 'es.caib.ripea.dominis.cache.execucio';
+UPDATE IPA_CONFIG
+SET value = '0 0 * * * *'
+WHERE key in 'es.caib.ripea.segonpla.email.enviament.agrupat.cron';
+            "
