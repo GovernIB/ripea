@@ -539,56 +539,13 @@ $(document).ready(function() {
 	$("#tascaBtn").appendTo(".panel-heading h2");
 	<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 
-	
 	$("#mostraDetallSignants").click(function(){
-		$('#detallSignants').html("");
-		$('#detallSignants').append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
-		$.get("../contingut/" + ${contingut.id} + "/document/" + ${contingut.id} + "/mostraDetallSignants", function(data){
-			if (data.estatOk) {
-				$('#detallSignants').html("");
-				if(data.objecte != null && data.objecte.length > 0){
-					data.objecte.forEach(function(firma){
-						if(firma != null){
-							var firmaDataStr = "";
-							if(firma.responsableNom == null){
-								firma.responsableNom = "";
-							}
-							if(firma.responsableNif == null){
-								firma.responsableNif = "";
-							}
-							if(firma.data != null){
-								firmaDataStr = new Date(firma.data);
-							}
-							if(firma.emissorCertificat == null){
-								firma.emissorCertificat = "";
-							}
-							$("#detallSignants").append(
-								  "<tr><th><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
-								+ "</strong></th><th>"
-								+ firma.responsableNom
-								+ "</th></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
-								+ "</strong></td><td>"
-								+ firma.responsableNif
-								+ "</td></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
-								+ "</strong></td><td>"
-								+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
-								+ "</td></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
-								+ "</strong></td><td>"
-								+ firma.emissorCertificat
-								+ "</td></tr>");
-						}
-					})
-				}
-			}else{
-				$('#detallSignants').html("");
-			}
-			webutilRefreshMissatges();
-		});
+
+		let contingutId = ${contingut.id}; 
+
+		getDetallsSignants($('#detallSignants'), contingutId);
 	});
+
 	$('#contenidor-contingut li').mouseover(function() {
 		$('a.btn', this).removeClass('hidden');
 	});
@@ -905,6 +862,8 @@ $(document).ready(function() {
 		var checkItAll = document.getElementById('checkItAll');
 		$('.checkItAll').addClass('disabled');
 	</c:if>
+
+	<c:if test="${!contingut.document}"> 
 	$('#habilitar-mult').on('click', function() {
 		var contenidorContingut = document.getElementById('contenidor-contingut');
 		var inputs = contenidorContingut.querySelectorAll('li>div');
@@ -1007,7 +966,8 @@ $(document).ready(function() {
 			}
 		});
 	}
-
+	</c:if>
+	
 	$("span[class*='popover-']").popover({
 		html: true,
 	    content: function () {
@@ -1377,6 +1337,7 @@ function getEnviamentsDocument(document) {
 	}
 }
 
+<c:if test="${!contingut.document}"> 
 function enableDisableButton() {
 	var isTotPdfFirmat = true;
 	var isTotPdf = true;
@@ -1390,52 +1351,53 @@ function enableDisableButton() {
 	//icones
 	var gridDocuments = document.getElementById('contenidor-contingut');
 	$(gridDocuments).addClass("disabled");
-	
-	if (docsIdx != undefined && tableDocuments != undefined) {
-		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-		inputs.forEach(function(input) {
-			var documentId = parseInt(input.id);
-			if (docsIdx.includes(documentId)) {
-				var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
-				var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
-				var isDocAdjuntPendentGuardarArxiu = $(input.closest('tr')).hasClass('docAdjuntPendentGuardarArxiu');
-				if (isDocAdjuntPendentGuardarArxiu) {
-					isTotDocAdjuntGuardatEnArxiu = false;
-				}
-				
-				if (!isFirmatCurrentDocument) {
-					isTotPdfFirmat = false;
-					return false;
-				}
-				if (!isPdfCurrentDocument) {
-					isTotPdf = false;
-				}
-			}
-		});
 
-	} else if (docsIdx != undefined && gridDocuments != undefined) {
-		var list = gridDocuments.querySelectorAll('li');
-		list.forEach(function(child) {
-			var childId = $(child).attr('data-contenidor-id');
-			var documentId = parseInt(childId);
-			if (docsIdx.includes(documentId)) {
-				var isFirmatCurrentDocument = $(child).hasClass('firmat');
-				var isPdfCurrentDocument = $(child).hasClass('isPdf');
-				var isDocAdjuntPendentGuardarArxiu = $(child).hasClass('docAdjuntPendentGuardarArxiu');
-				if (isDocAdjuntPendentGuardarArxiu) {
-					isTotDocAdjuntGuardatEnArxiu = false;
+		if (docsIdx != undefined && tableDocuments != undefined) {
+			var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+			inputs.forEach(function(input) {
+				var documentId = parseInt(input.id);
+				if (docsIdx.includes(documentId)) {
+					var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
+					var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
+					var isDocAdjuntPendentGuardarArxiu = $(input.closest('tr')).hasClass('docAdjuntPendentGuardarArxiu');
+					if (isDocAdjuntPendentGuardarArxiu) {
+						isTotDocAdjuntGuardatEnArxiu = false;
+					}
+					
+					if (!isFirmatCurrentDocument) {
+						isTotPdfFirmat = false;
+						return false;
+					}
+					if (!isPdfCurrentDocument) {
+						isTotPdf = false;
+					}
 				}
-				
-				if (!isFirmatCurrentDocument) {
-					isTotPdfFirmat = false;
-					return false;
+			});
+
+		} else if (docsIdx != undefined && gridDocuments != undefined) {
+			var list = gridDocuments.querySelectorAll('li');
+			list.forEach(function(child) {
+				var childId = $(child).attr('data-contenidor-id');
+				var documentId = parseInt(childId);
+				if (docsIdx.includes(documentId)) {
+					var isFirmatCurrentDocument = $(child).hasClass('firmat');
+					var isPdfCurrentDocument = $(child).hasClass('isPdf');
+					var isDocAdjuntPendentGuardarArxiu = $(child).hasClass('docAdjuntPendentGuardarArxiu');
+					if (isDocAdjuntPendentGuardarArxiu) {
+						isTotDocAdjuntGuardatEnArxiu = false;
+					}
+					
+					if (!isFirmatCurrentDocument) {
+						isTotPdfFirmat = false;
+						return false;
+					}
+					if (!isPdfCurrentDocument) {
+						isTotPdf = false;
+					}
 				}
-				if (!isPdfCurrentDocument) {
-					isTotPdf = false;
-				}
-			}
-		});
-	}
+			});
+		}		
+
 	
 	if (isTotPdfFirmat && isTotPdf) {
 		$('.nomaximized').addClass('hidden'); //zip
@@ -1456,16 +1418,16 @@ function enableDisableButton() {
 		$('#tipusdocumental-mult').removeClass("disabled");
 	}
 	
-	if (docsIdx.length > 0) {
-		$('#descarregar-mult').removeClass("disabled");
-		$('#moure-mult').removeClass("disabled");
-		$('#tipusdocumental-mult').removeClass("disabled");
-	} else {
-		$('#descarregar-mult').addClass("disabled");
-		$('#notificar-mult').addClass("disabled");
-		$('#moure-mult').addClass("disabled");
-		$('#tipusdocumental-mult').addClass("disabled");
-	}
+		if (docsIdx.length > 0) {
+			$('#descarregar-mult').removeClass("disabled");
+			$('#moure-mult').removeClass("disabled");
+			$('#tipusdocumental-mult').removeClass("disabled");
+		} else {
+			$('#descarregar-mult').addClass("disabled");
+			$('#notificar-mult').addClass("disabled");
+			$('#moure-mult').addClass("disabled");
+			$('#tipusdocumental-mult').addClass("disabled");
+		}
 	$('#contenidor-contingut ').removeClass("disabled");
 	$('#table-documents').removeClass("disabled");
 	$('#loading').addClass('hidden');
@@ -1492,6 +1454,8 @@ function deselectAll() {
 			}
 	);
 }
+</c:if>
+
 
 function recuperarResultatDomini(
 		metaExpedientId,
@@ -1651,7 +1615,7 @@ function showLoadingModal(message) {
 
 
 // ------------------ VISOR ------------------------------
-function showViewer(event, documentId, contingutNom) {
+function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 	if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 5 || event.target.cellIndex === 6)) return;
     var resumViewer = $('#resum-viewer');
 	// Mostrar/amagar visor
@@ -1666,15 +1630,28 @@ function showViewer(event, documentId, contingutNom) {
 	
     // Mostrar contingut capçalera visor
     resumViewer.find('*').not('#container').remove();
+    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%;">\
+									<table style="width: 453px;">\
+										<tbody id="detallSignantsPreview">\
+										</tbody>\
+									</table>\
+								 </div>';
     var viewerContent = '<div class="panel-heading"><spring:message code="contingut.previsualitzacio"/> \
     					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
     					 </div>\
     					 <div class="viewer-content viewer-padding">\
     						<dl class="dl-horizontal">\
-	        					<dt style="text-align: left;"><spring:message code="contingut.info.nom"/>: </dt><dd>' + contingutNom + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="contingut.info.nom"/> </dt><dd>' + contingutNom + '</dd>\
         					</dl>\
     					 </div>';
+    					 
+    if (contingutCustodiat) {
+    	viewerContent += signantsViewerContent;
+    }
     resumViewer.prepend(viewerContent);
+    if (contingutCustodiat) {
+    	getDetallsSignants($("#detallSignantsPreview"), documentId);
+    }
     
 
     // Recuperar i mostrar document al visor
@@ -1727,6 +1704,57 @@ function closeViewer() {
 	});
 }
 
+function getDetallsSignants(idTbody, contingutId) {
+	
+	idTbody.html("");
+	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
+	$.get("../contingut/document/" + contingutId + "/mostraDetallSignants", function(data){
+		if (data.estatOk) {
+			idTbody.html("");
+			if(data.objecte != null && data.objecte.length > 0){
+				data.objecte.forEach(function(firma){
+					if(firma != null){
+						var firmaDataStr = "";
+						if(firma.responsableNom == null){
+							firma.responsableNom = "";
+						}
+						if(firma.responsableNif == null){
+							firma.responsableNif = "";
+						}
+						if(firma.data != null){
+							firmaDataStr = new Date(firma.data);
+						}
+						if(firma.emissorCertificat == null){
+							firma.emissorCertificat = "";
+						}
+						idTbody.append(
+							  "<tr><th><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
+							+ "</strong></th><th>"
+							+ firma.responsableNom
+							+ "</th></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
+							+ "</strong></td><td>"
+							+ firma.responsableNif
+							+ "</td></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
+							+ "</strong></td><td>"
+							+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
+							+ "</td></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
+							+ "</strong></td><td>"
+							+ firma.emissorCertificat
+							+ "</td></tr>");
+					}
+				})
+			}
+		}else{
+			idTbody.html("");
+		}
+		webutilRefreshMissatges();
+	});
+}
+	
 function returnEnviamentsStatusDiv(notificacioId) {
     var content = "";
     var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + notificacioId;

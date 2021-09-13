@@ -413,11 +413,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return idTransaccio;
 	}
 	
-	@RequestMapping(value = "/{contingutId}/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
+	@RequestMapping(value = "/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
 	@ResponseBody
 	public AjaxFormResponse mostraDetallSignants(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
 			@PathVariable Long documentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
