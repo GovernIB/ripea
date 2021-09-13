@@ -464,7 +464,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 			model.addAttribute(
 					"titolConsulta",
 					getMessage(request, "accio.massiva.consulta.titol.gobal"));
-		} else if (RolHelper.isRolActualUsuari(request)) {
+		} else if (RolHelper.isRolActualUsuari(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
 			usuariActual = aplicacioService.getUsuariActual();
 			model.addAttribute(
 					"titolConsulta",
