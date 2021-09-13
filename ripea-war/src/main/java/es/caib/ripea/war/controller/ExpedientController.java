@@ -599,7 +599,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				metaExpedientId,
 				filter, 
-				null);
+				null,
+				RolHelper.isRolActualAdministrador(request));
 
 	}
 
@@ -616,7 +617,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				metaExpedientId,
 				filter, 
-				expedientId);
+				expedientId,
+				RolHelper.isRolActualAdministrador(request));
 
 	}
 

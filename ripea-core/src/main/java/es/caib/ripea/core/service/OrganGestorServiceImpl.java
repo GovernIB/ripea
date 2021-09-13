@@ -351,13 +351,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			Long entitatId,
 			Long metaExpedientId,
 			String filter, 
-			Long expedientId) {
+			Long expedientId,
+			boolean isAdmin) {
 		List<OrganGestorEntity> organsPermesos = findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 				entitatId,
 				metaExpedientId,
 				expedientId == null ? ExtendedPermission.CREATE : ExtendedPermission.WRITE,
 				filter, 
-				expedientId);
+				expedientId,
+				isAdmin);
 		return conversioTipusHelper.convertirList(
 				organsPermesos,
 				OrganGestorDto.class);	
@@ -455,89 +457,95 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			Long metaExpedientId,
 			Permission permis,
 			String filtre, 
-			Long expedientId) {
+			Long expedientId,
+			boolean isAdmin) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		List<OrganGestorEntity> organsGestors = null;
-		if (metaExpedient.getOrganGestor() != null) {
-			// S'han de retornar els fills de l'òrgan gestor del metaExpedient si l'usuari actual
-			// te permisos per l'òrgan gestor.
-			organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
-					entitat,
-					filtre == null,
-					filtre,
-					Arrays.asList(metaExpedient.getOrganGestor().getId()));
+		
+		if (isAdmin) {
+			organsGestors = organGestorRepository.findByEntitat(entitat);
 		} else {
-			// Cercam las parelles metaExpedient-organ amb permisos assignats 
-			List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
-			permisosHelper.filterGrantedAll(
-					metaExpedientOrgansGestors,
-					MetaExpedientOrganGestorEntity.class,
-					new Permission[] { permis });
-
-			if (!metaExpedientOrgansGestors.isEmpty()) {
-				List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestors(metaExpedientOrgansGestors);
-				organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
-				
-				organsGestors = organGestorRepository.findByEntitatAndFiltreAndIds(
+		
+			if (metaExpedient.getOrganGestor() != null) {
+				// S'han de retornar els fills de l'òrgan gestor del metaExpedient si l'usuari actual
+				// te permisos per l'òrgan gestor.
+				organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
 						entitat,
-						filtre == null || filtre.isEmpty(),
-						filtre, 
-						organIds);
-				
-			}
-			
-			// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
-			if (organsGestors == null || organsGestors.isEmpty()) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				boolean metaNodeHasPermis = permisosHelper.isGrantedAll(
-						metaExpedientId,
-						MetaNodeEntity.class,
-						new Permission[] {permis},
-						auth);
-				if (metaNodeHasPermis) {
-					OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
-								entitat,
-								entitat.getUnitatArrel());
-					organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
+						filtre == null,
+						filtre,
+						Arrays.asList(metaExpedient.getOrganGestor().getId()));
+			} else {
+				// Cercam las parelles metaExpedient-organ amb permisos assignats 
+				List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
+				permisosHelper.filterGrantedAll(
+						metaExpedientOrgansGestors,
+						MetaExpedientOrganGestorEntity.class,
+						new Permission[] { permis });
+	
+				if (!metaExpedientOrgansGestors.isEmpty()) {
+					List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestors(metaExpedientOrgansGestors);
+					organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
+					
+					organsGestors = organGestorRepository.findByEntitatAndFiltreAndIds(
 							entitat,
-							filtre == null,
-							filtre,
-							Arrays.asList(organGestorEntitat.getId()));
-					organsGestors.add(0, organGestorEntitat);
+							filtre == null || filtre.isEmpty(),
+							filtre, 
+							organIds);
+					
+				}
+				
+				// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
+				if (organsGestors == null || organsGestors.isEmpty()) {
+					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+					boolean metaNodeHasPermis = permisosHelper.isGrantedAll(
+							metaExpedientId,
+							MetaNodeEntity.class,
+							new Permission[] {permis},
+							auth);
+					if (metaNodeHasPermis) {
+						OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
+									entitat,
+									entitat.getUnitatArrel());
+						organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
+								entitat,
+								filtre == null,
+								filtre,
+								Arrays.asList(organGestorEntitat.getId()));
+						organsGestors.add(0, organGestorEntitat);
+					}
 				}
 			}
-		}
-		
-		// if we modify expedient we have to insure that we can still see its organ in dropdown even if permissions were removed 
-		if (expedientId != null) {
-			ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
-					entitatId,
-					expedientId,
-					false,
-					false,
-					false,
-					false,
-					false,
-					false);
 			
-			OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
-			
-			if (organsGestors == null) {
-				organsGestors = new ArrayList<>();
-			}
-			boolean alreadyInTheList = false;
-			for (OrganGestorEntity organGestor : organsGestors) {
-				if (organGestor.getId().equals(organGestorEntity.getId())) {
-					alreadyInTheList = true;
+			// if we modify expedient we have to insure that we can still see its organ in dropdown even if permissions were removed 
+			if (expedientId != null) {
+				ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
+						entitatId,
+						expedientId,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false);
+				
+				OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
+				
+				if (organsGestors == null) {
+					organsGestors = new ArrayList<>();
+				}
+				boolean alreadyInTheList = false;
+				for (OrganGestorEntity organGestor : organsGestors) {
+					if (organGestor.getId().equals(organGestorEntity.getId())) {
+						alreadyInTheList = true;
+					}
+				}
+				if (!alreadyInTheList) {
+					organsGestors.add(0, organGestorEntity);
 				}
 			}
-			if (!alreadyInTheList) {
-				organsGestors.add(0, organGestorEntity);
-			}
+		
 		}
-		
-		
 		return organsGestors;
 	}
 
