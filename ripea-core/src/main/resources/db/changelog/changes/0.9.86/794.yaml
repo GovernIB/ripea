@@ -353,3 +353,14 @@ UPDATE IPA_CONFIG
 SET value = '0 0 * * * *'
 WHERE key in 'es.caib.ripea.segonpla.email.enviament.agrupat.cron';
             "
+
+-   changeSet:
+        id: 1629371481-5
+        author: limit
+        changes:
+            -   sql:
+                    sql: "
+Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values
+('es.caib.ripea.notificacio.guardar.certificacio.expedient','false','Guardar certificació expedient','NOTIB','12','0','BOOL',null,null);
+            "
+
