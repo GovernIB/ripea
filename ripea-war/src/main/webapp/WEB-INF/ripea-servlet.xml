@@ -198,8 +198,11 @@
 			<mvc:mapping path="/permis/**"/>
 			<mvc:mapping path="/contingutAdmin**"/>
 			<mvc:mapping path="/contingutAdmin/**"/>
+			<!--  Els usuaris poden accedir a l'historic si tenen permís d'estadística sobre el procediment -->
+			<!-- 
 			<mvc:mapping path="/historic**"/>
 			<mvc:mapping path="/historic/**"/>
+			-->
 			<mvc:mapping path="/metaExpedientRevisio**"/>
 			<mvc:mapping path="/metaExpedientRevisio/**"/>
 			<mvc:mapping path="/seguimentPortafirmes**"/>
