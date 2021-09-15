@@ -215,6 +215,7 @@ public class DocumentCommand extends ContenidorCommand {
 		DocumentCommand command = ConversioTipusHelper.convertir(
 				dto,
 				DocumentCommand.class);
+		command.setDataTime(new LocalDateTime(dto.getDataCaptura()));
 		if (dto.getPare() != null)
 			command.setPareId(dto.getPare().getId());
 		if (dto.getMetaNode() != null)
