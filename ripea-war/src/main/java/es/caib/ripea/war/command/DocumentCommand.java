@@ -4,12 +4,16 @@
 package es.caib.ripea.war.command;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -50,7 +54,8 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Long metaNodeId;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
-	private Date data;
+	@DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+	private LocalDateTime dataTime;
 	private MultipartFile arxiu;
 	private FitxerTemporalDto arxiuTemporal;
 	private DocumentFisicOrigenEnum origen;
@@ -96,11 +101,11 @@ public class DocumentCommand extends ContenidorCommand {
 	public void setMetaNodeId(Long metaNodeId) {
 		this.metaNodeId = metaNodeId;
 	}
-	public Date getData() {
-		return data;
+	public LocalDateTime getDataTime() {
+		return dataTime;
 	}
-	public void setData(Date data) {
-		this.data = data;
+	public void setDataTime(LocalDateTime dataTime) {
+		this.dataTime = dataTime;
 	}
 	public MultipartFile getArxiu() {
 		return arxiu;
@@ -216,11 +221,12 @@ public class DocumentCommand extends ContenidorCommand {
 			command.setMetaNodeId(dto.getMetaNode().getId());
 		return command;
 	}
-	public static DocumentDto asDto(DocumentCommand command) throws IOException{
+	public static DocumentDto asDto(DocumentCommand command) throws IOException, ParseException{
 		DocumentDto dto = ConversioTipusHelper.convertir(
 				command,
 				DocumentDto.class);
-			
+		dto.setData(convertToDate(command.getDataTime()));
+//		importacioDto.setDataPresentacioFormatted(convertToDateViaSqlTimestamp(command.getDataPresentacio()));	
 		if (command.getArxiuTemporal() != null) {
 			dto.setFitxerNom(command.getArxiuTemporal().getNom());
 			dto.setFitxerContentType(command.getArxiuTemporal().getContentType());
@@ -285,5 +291,9 @@ public class DocumentCommand extends ContenidorCommand {
 	public enum DocumentFisicOrigenEnum {
 		DISC,
 		ESCANER
+	}
+	
+	private static Date convertToDate(LocalDateTime dateToConvert) throws ParseException {
+		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dateToConvert.toString("dd/MM/yyyy HH:mm:ss"));
 	}
 }

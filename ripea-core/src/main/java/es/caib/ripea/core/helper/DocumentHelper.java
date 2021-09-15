@@ -106,8 +106,8 @@ public class DocumentHelper {
 				document.getDocumentTipus(),
 				document.getNom(),
 				document.getDescripcio(),
-				document.getData(),
 				new Date(),
+				document.getData(), //data captura
 				expedient.getNtiOrgano(),
 				metaDocument.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),

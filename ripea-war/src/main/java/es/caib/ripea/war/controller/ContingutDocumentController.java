@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,8 +158,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					document);
 		} else {
 			command = new DocumentCommand();
-			Date ara = new Date();
-			command.setData(ara);
+			LocalDateTime ara = new LocalDateTime();
+			command.setDataTime(ara);
 
 			omplirModelFormulari(
 					request,
@@ -181,7 +183,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long pareId,
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
 		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
 				request,
@@ -249,7 +251,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long contingutId,
 			@Validated({UpdateDigital.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
@@ -558,7 +560,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public String concatenar(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 		boolean totsFinals = true;
@@ -1035,7 +1037,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			DocumentCommand command,
 			DocumentGenericCommand commandGeneric,
 			boolean notificar,
-			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
