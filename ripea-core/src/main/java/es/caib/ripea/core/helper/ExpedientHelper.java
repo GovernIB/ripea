@@ -793,13 +793,15 @@ public class ExpedientHelper {
 	
 	public FitxerDto exportarExpedient(
 			EntitatEntity entitatActual, 
-			ExpedientEntity expedient, 
+			List<ExpedientEntity> expedients,
 			boolean exportar) throws IOException {
 		FitxerDto resultat = new FitxerDto();
 		if (exportar) {
+//			crear estructura documents + exportació ENI + índex
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			BigDecimal sum = new BigDecimal(1);
+			ExpedientEntity expedient = expedients.get(0);
 			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
 					expedient,
 					0,
@@ -856,7 +858,7 @@ public class ExpedientHelper {
 				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 			}
 			
-			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient, exportar);
+			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedients, exportar);
 			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
 			zos.close();
 			
@@ -864,7 +866,7 @@ public class ExpedientHelper {
 			resultat.setContentType("application/zip");
 			resultat.setContingut(baos.toByteArray());
 		} else {
-			resultat = contingutHelper.generarIndex(entitatActual, expedient, exportar);
+			resultat = contingutHelper.generarIndex(entitatActual, expedients, exportar);
 		}
 		return resultat;
 	}

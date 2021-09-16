@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -348,7 +349,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
-				expedientId,
+				new HashSet<>(Arrays.asList(expedientId)),
 				false);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
@@ -367,7 +368,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
-				expedientId,
+				new HashSet<>(Arrays.asList(expedientId)),
 				true);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
@@ -378,10 +379,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				response);
 	}
 	
-	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)
+	@RequestMapping(value = "/generarIndex/{format}", method = RequestMethod.GET)
 	public String generarIndexMultiple(
 			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+			HttpServletResponse response,
+			@PathVariable String format) throws IOException {
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -397,7 +399,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			FitxerDto fitxer = expedientService.exportIndexExpedients(
 					entitatActual.getId(),
-					seleccio);
+					seleccio,
+					format);
 				
 			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 			writeFileToResponse(

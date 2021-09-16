@@ -6,6 +6,7 @@ package es.caib.ripea.core.ejb;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -290,15 +291,16 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportIndexExpedients(Long entitatId, Collection<Long> expedientIds) throws IOException {
+	public FitxerDto exportIndexExpedients(Long entitatId, Set<Long> expedientIds, String format) throws IOException {
 		return delegate.exportIndexExpedients(
 				entitatId, 
-				expedientIds);
+				expedientIds,
+				format);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId, boolean exportar) throws IOException {
+	public FitxerDto exportIndexExpedient(Long entitatId, Set<Long> expedientId, boolean exportar) throws IOException {
 		return delegate.exportIndexExpedient(
 				entitatId,
 				expedientId,

@@ -1294,16 +1294,19 @@ public class ContingutHelper {
 	
 	public FitxerDto generarIndex(
 			EntitatEntity entitatActual, 
-			ExpedientEntity expedient,
+			List<ExpedientEntity> expedients,
 			boolean exportar) throws IOException {
 		
 		byte[] indexGenerated = indexHelper.generarIndexPerExpedient(
-					expedient,
-					entitatActual,
-					exportar);
+				expedients,
+				entitatActual,
+				exportar);
 		
 		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".pdf");
+		if (expedients.size() > 1)
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".pdf");
+		else
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedients.get(0).getNom() + ".pdf");
 		fitxer.setContentType("application/pdf");
 		if (indexGenerated != null)
 			fitxer.setContingut(indexGenerated);

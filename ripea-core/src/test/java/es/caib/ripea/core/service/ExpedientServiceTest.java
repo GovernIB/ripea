@@ -10,7 +10,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -651,7 +653,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						
 						FitxerDto index = expedientService.exportIndexExpedient(
 								entitatCreada.getId(), 
-								expedientCreat.getId(),
+								new HashSet<>(Arrays.asList(expedientCreat.getId())),
 								false);
 						
 						assertNotNull(index);

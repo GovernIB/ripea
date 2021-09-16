@@ -8,13 +8,16 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import javax.swing.table.DefaultTableModel;
@@ -1290,27 +1293,32 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
-			Long expedientId,
+			Set<Long> expedientIds,
 			boolean exportar) throws IOException {
-		logger.debug(
-				"Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientId +
-						")");
+		if (expedientIds.size() == 1)
+			logger.debug("Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientIds.iterator().next() + ")");
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				expedientId,
-				false,
-				true,
-				false,
-				false,
-				false, false);
+		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
+//		comprovar accés expedients
+		for (Long expedientId : expedientIds) {
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+					entitatId,
+					expedientId,
+					false,
+					true,
+					false,
+					false,
+					false, 
+					false);
+			expedients.add(expedient);
+		}
 		
 		FitxerDto resultat = new FitxerDto();
 		
 		try {
 			resultat = expedientHelper.exportarExpedient(
 					entitatActual, 
-					expedient, 
+					expedients, 
 					exportar);	
 		} catch (Exception ex) {
 			throw new RuntimeException("Hi ha hagut un problema generant l'índex de l'expedient", ex);
@@ -1320,24 +1328,39 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Override
 	@Transactional
-	public FitxerDto exportIndexExpedients(Long entitatId, Collection<Long> expedientIds) throws IOException {
-		logger.debug(
-				"Exportant índex dels expedients seleccionats (" + "entitatId=" + entitatId + ", " + "expedientIds=" +
-						expedientIds + ")");
+	public FitxerDto exportIndexExpedients(
+			Long entitatId, 
+			Set<Long> expedientIds,
+			String format) throws IOException {
+		logger.debug("Exportant índex dels expedients seleccionats (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ZipOutputStream zos = new ZipOutputStream(baos);
-
-		for (Long expedientId : expedientIds) {
-			FitxerDto resultat = exportIndexExpedient(entitatId, expedientId, false);
-			contingutHelper.crearNovaEntrada(resultat.getNom(), resultat, zos);
+		FitxerDto resposta = new FitxerDto();
+		
+		if ("PDF".equals(format)) {
+			FitxerDto resultat = exportIndexExpedient(
+					entitatId, 
+					expedientIds, 
+					false);
+			resposta.setNom(resultat.getNom());
+			resposta.setContentType("application/pdf");
+			resposta.setContingut(resultat.getContingut());
+		} else if ("ZIP".equals(format)) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ZipOutputStream zos = new ZipOutputStream(baos);
+			for (Long expedientId : expedientIds) {
+				Set<Long> expedientIdSet = new HashSet<>(Arrays.asList(expedientId));
+				FitxerDto resultat = exportIndexExpedient(entitatId, expedientIdSet, false);
+				contingutHelper.crearNovaEntrada(
+						resultat.getNom(), 
+						resultat, 
+						zos);
+			}
+			zos.close();
+			resposta.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
+			resposta.setContentType("application/zip");
+			resposta.setContingut(baos.toByteArray());
 		}
-		zos.close();
-		FitxerDto resultat = new FitxerDto();
-		resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
-		resultat.setContentType("application/zip");
-		resultat.setContingut(baos.toByteArray());
-		return resultat;
+		return resposta;
 	}
 	
 	@Override

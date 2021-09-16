@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -400,6 +401,8 @@ public interface ExpedientService {
 	 * 
 	 * @param entitatId 
 	 *            Atribut id de l'entitat.
+	 * @param format 
+	 * 			  Format exportació (PDF/ZIP)
 	 * @param expedientId
 	 *            Atribut id de l'expedient que es vol consultar.
 	 * @return Un document amb l'índex.
@@ -408,22 +411,23 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportIndexExpedients(
 			Long entitatId, 
-			Collection<Long> expedientIds) throws IOException;
+			Set<Long> expedientIds,
+			String format) throws IOException;
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.
 	 * 
 	 * @param entitatId 
 	 *            Atribut id de l'entitat.
-	 * @param expedientId
-	 *            Atribut id de l'expedient que es vol consultar.
+	 * @param expedientIds
+	 *            Els expedients dels que vol generar l'índex
 	 * @return Un document amb l'índex.
 	 * @throws IOException 
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
-			Long expedientId,
+			Set<Long> expedientIds,
 			boolean exportar) throws IOException;
 
 	@PreAuthorize("hasRole('tothom')")

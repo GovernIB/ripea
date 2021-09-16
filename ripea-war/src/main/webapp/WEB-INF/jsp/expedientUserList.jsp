@@ -436,7 +436,8 @@ function removeCookie(cname) {
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
-						<li><a class="fileDownload" href="expedient/generarIndex"><spring:message code="expedient.list.user.recuperar.index"/></a></li>
+						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
+						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
 					</ul>
 				</div>
 			</div>
