@@ -1914,26 +1914,6 @@ databaseChangeLog:
             name: meta_node_id
             type: BIGINT
         - column:
-            name: global_document
-            type: BOOLEAN
-        - column:
-            name: global_expedient
-            type: BOOLEAN
-        - column:
-            name: global_multiplicitat
-            type: VARCHAR2(255)
-        - column:
-            name: global_readonly
-            type: BOOLEAN
-        - column:
-            name: global_carpeta
-            type: BOOLEAN
-        - column:
-            constraints:
-              nullable: false
-            name: entitat_id
-            type: BIGINT
-        - column:
             name: valor
             type: VARCHAR2(255)
         - column:
