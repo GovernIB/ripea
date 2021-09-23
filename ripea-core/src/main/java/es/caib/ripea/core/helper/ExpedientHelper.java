@@ -717,6 +717,15 @@ public class ExpedientHelper {
 				null,
 				false,
 				false);
+		
+		// Actualitza les relacions expedients i organs pare
+		organGestorHelper.removeOldExpedientOrganPares(
+				expedient,
+				organGestorEntity);
+		organGestorHelper.crearExpedientOrganPares(
+				expedient,
+				organGestorEntity);
+		
 		return expedient;
 	}
 	
