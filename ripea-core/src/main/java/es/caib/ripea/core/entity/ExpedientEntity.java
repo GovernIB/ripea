@@ -357,6 +357,12 @@ public class ExpedientEntity extends NodeEntity {
 	public void removeRelacionat(ExpedientEntity relacionat) {
 		relacionatsAmb.remove(relacionat);
 	}
+	public List<ExpedientOrganPareEntity> getOrganGestorPares() {
+		return organGestorPares;
+	}
+	public void removeOrganGestorPares() {
+		this.organGestorPares.clear();
+	}
 
 	public static Builder getBuilder(
 			String nom,

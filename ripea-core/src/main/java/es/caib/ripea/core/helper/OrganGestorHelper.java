@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -106,16 +108,30 @@ public class OrganGestorHelper {
 					expedient.getMetaExpedient(),
 					organGestorActual);
 			if (metaExpedientOrganGestor == null) {
+				logger.debug("meteaxp-organ created,  metaexp: " + expedient.getMetaExpedient().getId() + ", organ: " + organGestorActual.getId() + " " + organGestorActual.getNom());
 				metaExpedientOrganGestor = metaExpedientOrganGestorRepository.save(
 						MetaExpedientOrganGestorEntity.getBuilder(
 								expedient.getMetaExpedient(),
 								organGestorActual).build());
 			}
-			ExpedientOrganPareEntity ExpedientOrganPare = ExpedientOrganPareEntity.getBuilder(
+			ExpedientOrganPareEntity expedientOrganPare = ExpedientOrganPareEntity.getBuilder(
 					expedient,
 					metaExpedientOrganGestor).build();
-			expedientOrganPareRepository.save(ExpedientOrganPare);
+			
+			logger.debug("expedient-organ-pare created, expedient: " + expedient.getId() +  ", organ: " + organGestorActual.getId() + " " + organGestorActual.getNom());
+			expedientOrganPareRepository.save(expedientOrganPare);
 		}
+	}
+	
+	public void removeOldExpedientOrganPares(
+			ExpedientEntity expedient,
+			OrganGestorEntity organGestor) {
+		
+		for (ExpedientOrganPareEntity expOrgPare : expedient.getOrganGestorPares()) {
+			expedientOrganPareRepository.delete(expOrgPare);
+		}
+		expedient.removeOrganGestorPares();
+
 	}
 
 	public void afegirOrganGestorFillsIds(
@@ -151,5 +167,7 @@ public class OrganGestorHelper {
 		}
 		return pares;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 }
