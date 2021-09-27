@@ -154,7 +154,8 @@ public class ExpedientHelper {
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
-	public ExpedientEntity create(
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Long create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
@@ -255,7 +256,7 @@ public class ExpedientHelper {
 		organGestorHelper.crearExpedientOrganPares(
 				expedient,
 				organGestor);
-		return expedient;
+		return expedient.getId();
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -331,12 +332,15 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional
-	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, ExpedientPeticioEntity expedientPeticioEntity) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
+		
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
 		expedientEntity = expedientRepository.findOne(expedientId);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
@@ -453,6 +457,7 @@ public class ExpedientHelper {
 			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 				carpetaEntity.updateArxiu(documentUuid);
 			}
+			
 			if (!documentExistsInArxiu) {
 				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
 						docEntity,
@@ -479,6 +484,11 @@ public class ExpedientHelper {
 			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 				expedientEntity.updateArxiu(documentUuid);
 			}
+			boolean throwExcepcion = false; //throwExcepcion = true;
+			if (throwExcepcion) {
+				throw new RuntimeException("Mock Excepcion crearDocFromAnnex");
+			}
+			
 			if (!documentExistsInArxiu) {
 				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
 						docEntity,
@@ -515,14 +525,15 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DocumentEntity crearDocFromUuid(
 			Long expedientId, 
 			String arxiuUuid, 
-			ExpedientPeticioEntity expedientPeticioEntity) {
+			Long expedientPeticioId) {
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientEntity = expedientRepository.findOne(expedientId);
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 				null, 

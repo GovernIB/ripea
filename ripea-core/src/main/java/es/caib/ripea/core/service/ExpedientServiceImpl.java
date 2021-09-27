@@ -36,6 +36,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
@@ -204,13 +205,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"sequencia=" + sequencia + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
-		// if expedient comes from distribucio
-		ExpedientPeticioEntity expedientPeticioEntity = null;
-		if (expedientPeticioId != null) {
-			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		}
+
 		// create expedient in db 
-		ExpedientEntity expedient = expedientHelper.create(
+		Long expedientId = expedientHelper.create(
 				entitatId,
 				metaExpedientId,
 				metaExpedientDominiId,
@@ -222,6 +219,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientPeticioId,
 				associarInteressats,
 				grupId);
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		ExpedientDto expedientDto = toExpedientDto(expedient, true);
 		//create expedient in arxiu
 		contingutHelper.arxiuPropagarModificacio(
@@ -231,7 +229,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null);
 		boolean processatOk = true;
+		
 		// if expedient comes from distribucio
+		ExpedientPeticioEntity expedientPeticioEntity = null;
+		if (expedientPeticioId != null) {
+			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		}
 		if (expedientPeticioId != null) {
 			expedientHelper.inicialitzarExpedientsWithImportacio();
 			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
@@ -239,7 +242,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientHelper.crearDocFromAnnex(
 							expedient.getId(),
 							registeAnnexEntity.getId(),
-							expedientPeticioEntity);
+							expedientPeticioEntity.getId());
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
@@ -256,7 +259,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientHelper.crearDocFromUuid(
 							expedient.getId(),
 							arxiuUuid, 
-							expedientPeticioEntity);
+							expedientPeticioEntity.getId());
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
@@ -295,7 +298,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.crearDocFromAnnex(
 						expedientId,
 						registeAnnexEntity.getId(),
-						expedientPeticioEntity);	
+						expedientPeticioEntity.getId());	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
@@ -308,7 +311,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.crearDocFromUuid(
 						expedientId,
 						arxiuUuid, 
-						expedientPeticioEntity);
+						expedientPeticioEntity.getId());
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
@@ -323,6 +326,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return processatOk;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void canviEstatToProcessatPendent(ExpedientPeticioEntity expedientPeticioEntity) {
 		expedientPeticioHelper.canviEstatExpedientPeticio(
 				expedientPeticioEntity.getId(),
@@ -357,7 +361,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		try {
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity);
+			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId());
 
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {

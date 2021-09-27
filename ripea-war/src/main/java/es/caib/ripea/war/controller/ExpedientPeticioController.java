@@ -359,6 +359,7 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
+		
 		if (command.getMetaExpedientId() == null) {
 			bindingResult.rejectValue("metaExpedientId", "NotNull");
 		}
@@ -377,11 +378,14 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			omplirModel(expedientPeticioId, request, model, command);
 			return "expedientPeticioAccept";
 		}
+		
 		boolean processatOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
-		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
-			try {
+		
+		try {
+
+			if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 				ExpedientDto expedientDto = expedientService.create(
 						entitat.getId(),
 						command.getMetaExpedientId(),
@@ -395,68 +399,56 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 						command.isAssociarInteressats(),
 						null);
 				processatOk = expedientDto.isProcessatOk();
-			} catch (Exception ex) {
-				logger.error("Error al crear expedient per anotacio", ex);
-				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
-					addWarningDocumentExists(request);
-					return getModalControllerReturnValueError(
-							request,
-							"redirect:expedientPeticio",
-							"expedientPeticio.controller.acceptat.ko");
-				} else {
-					Throwable throwable = ExceptionHelper.getRootCauseOrItself(ex);
-					if (throwable instanceof PermissionDeniedException) {
-						PermissionDeniedException perExc = (PermissionDeniedException) throwable;
-						if (perExc.getPermissionName().equals("WRITE")) {
-							return getModalControllerReturnValueError(
-									request,
-									"redirect:expedientPeticio",
-									"expedientPeticio.controller.acceptar.no.permis",
-									new Object[] { perExc.getUserName() });
-						
-						} 
-					} else {
-						return getModalControllerReturnValueErrorMessageText(
-								request,
-								"redirect:expedientPeticio",
-								ex.getMessage());
-					}
-				}
+				
+			} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
+					processatOk = expedientService.incorporar(
+							entitat.getId(),
+							command.getExpedientId(),
+							expedientPeticioDto.getId(),
+							command.isAssociarInteressats());
 			}
-		} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
-			try {
-				processatOk = expedientService.incorporar(
-						entitat.getId(),
-						command.getExpedientId(),
-						expedientPeticioDto.getId(),
-						command.isAssociarInteressats());
-			} catch (Exception ex) {
-				logger.error("Error al incorporar anotacio al expedient", ex);
-				if (ex.getCause() instanceof DocumentAlreadyImportedException) {
-					addWarningDocumentExists(request);
-					return getModalControllerReturnValueError(
-							request,
-							"redirect:expedientPeticio",
-							"expedientPeticio.controller.acceptat.ko");
-				} else {
 					
-					Throwable throwable = ExceptionHelper.getRootCauseOrItself(ex);
-					if (throwable instanceof PermissionDeniedException) {
-						PermissionDeniedException perExc = (PermissionDeniedException) throwable;
-						if (perExc.getPermissionName().equals("WRITE")) {
-							return getModalControllerReturnValueError(
-									request,
-									"redirect:expedientPeticio",
-									"expedientPeticio.controller.acceptar.no.permis",
-									new Object[] { perExc.getUserName() });
-						
-						} 
+		} catch (Exception ex) {
+			if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+				logger.error("Error al crear expedient per anotacio", ex);
+			} else {
+				logger.error("Error al incorporar anotacio al expedient", ex);
+			}
+
+			if (ex.getCause() instanceof DocumentAlreadyImportedException) {
+				addWarningDocumentExists(request);
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:expedientPeticio",
+						"expedientPeticio.controller.acceptat.ko");
+			} else {
+				Throwable throwable = ExceptionHelper.getRootCauseOrItself(ex);
+				if (throwable instanceof PermissionDeniedException) {
+					PermissionDeniedException perExc = (PermissionDeniedException) throwable;
+					if (perExc.getPermissionName().equals("CREATE")) {
+						return getModalControllerReturnValueError(
+								request,
+								"redirect:expedientPeticio",
+								"expedientPeticio.controller.acceptar.no.permis.creacio",
+								new Object[] { perExc.getUserName() });
+					
+					} else if (perExc.getPermissionName().equals("WRITE")){
+						return getModalControllerReturnValueError(
+								request,
+								"redirect:expedientPeticio",
+								"expedientPeticio.controller.acceptar.no.permis.modificacio",
+								new Object[] { perExc.getUserName() });
 					} else {
 						return getModalControllerReturnValueErrorMessageText(
 								request,
 								"redirect:expedientPeticio",
 								ex.getMessage());
 					}
+				} else {
+					return getModalControllerReturnValueErrorMessageText(
+							request,
+							"redirect:expedientPeticio",
+							ex.getMessage());
 				}
 			}
 		}
@@ -468,12 +460,12 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 							request, 
 							"expedientPeticio.controller.acceptat.warning"));
 		}
-		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:expedientPeticio",
 				"expedientPeticio.controller.acceptat.ok");
 	}
+	
 	
 	private void addWarningDocumentExists(HttpServletRequest request) {
 		List<DocumentDto> documentsAlreadyImported = expedientService.consultaExpedientsAmbImportacio();
