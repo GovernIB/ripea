@@ -183,6 +183,8 @@
 			<mvc:mapping path="/metaExpedient/**"/>
 			<mvc:exclude-mapping path="/metaExpedient/findPerLectura/**"/>
 			<mvc:exclude-mapping path="/metaExpedient/metaDadaPermisLectura/domini"/>	
+			<mvc:exclude-mapping path="/metaExpedientRevisio**"/>
+			<mvc:exclude-mapping path="/metaExpedientRevisio/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesAdminInterceptor"/>
 		</mvc:interceptor>
 
@@ -203,8 +205,6 @@
 			<mvc:mapping path="/historic**"/>
 			<mvc:mapping path="/historic/**"/>
 			-->
-			<mvc:mapping path="/metaExpedientRevisio**"/>
-			<mvc:mapping path="/metaExpedientRevisio/**"/>
 			<mvc:mapping path="/seguimentPortafirmes**"/>
 			<mvc:mapping path="/seguimentPortafirmes/**"/>
 			<mvc:mapping path="/seguimentNotificacions**"/>
@@ -213,7 +213,16 @@
 			<mvc:mapping path="/seguimentTasques/**"/>
 			<mvc:mapping path="/seguimentExpedientsPendents**"/>
 			<mvc:mapping path="/seguimentExpedientsPendents/**"/>
+			<mvc:exclude-mapping path="/metaExpedientRevisio**"/>
+			<mvc:exclude-mapping path="/metaExpedientRevisio/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatInterceptor"/>
+		</mvc:interceptor>
+		
+		<!-- Rutes només accessibles amb el rol d'administrador d'entitat -->
+		<mvc:interceptor>
+			<mvc:mapping path="/metaExpedientRevisio**"/>
+			<mvc:mapping path="/metaExpedientRevisio/**"/>
+			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatORevisorInterceptor"/>
 		</mvc:interceptor>
 		
 		<!-- Rutes només accessibles amb el rol de superusuari -->
