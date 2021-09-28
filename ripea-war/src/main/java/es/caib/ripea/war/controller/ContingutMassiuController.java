@@ -205,7 +205,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 				filtreCommand);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		
 		String rolActual = (String)request.getSession().getAttribute(
@@ -270,7 +270,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					docId,
 					true,
-					false);
+					false, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
 				documentService.documentActualitzarEstat(
 						entitatActual.getId(), 

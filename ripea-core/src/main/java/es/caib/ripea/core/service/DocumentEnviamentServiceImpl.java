@@ -161,7 +161,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		
 		return documentNotificacioHelper.findAmbId(entitatId, expedient, notificacioId);
 	}
@@ -388,7 +388,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByCreatedDateDesc(expedient);
 		for (DocumentNotificacioEntity notificacio: notificacions) {
@@ -425,7 +425,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		int count = 0;
 		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);

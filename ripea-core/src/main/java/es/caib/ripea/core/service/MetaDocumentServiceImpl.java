@@ -405,7 +405,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 		}
 		return resposta;
 	}
@@ -435,7 +435,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 		}
 		return resposta;
 	}	
@@ -477,7 +477,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 										MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 		}
 		return resposta;
 	}
@@ -662,7 +662,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				contingut,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 				entitat,
 				expedientSuperior);
@@ -696,7 +696,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				document,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		// Han de ser els mateixos que per a la creació però afegit el meta-document
 		// del document que es vol modificar
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(

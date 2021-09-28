@@ -420,7 +420,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesFluxTipus(),
 					null,
-					null);
+					null, null);
 				
 			emc.updateFinalitzat(new Date());
 			execucioMassivaContingutRepository.save(emc);

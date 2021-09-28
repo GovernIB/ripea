@@ -464,7 +464,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		List<OrganGestorEntity> organsGestors = null;
 		
 		if (isAdmin) {
-			organsGestors = organGestorRepository.findByEntitat(entitat);
+			organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
 		} else {
 		
 			if (metaExpedient.getOrganGestor() != null) {
@@ -504,15 +504,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 							new Permission[] {permis},
 							auth);
 					if (metaNodeHasPermis) {
-						OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
-									entitat,
-									entitat.getUnitatArrel());
-						organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
-								entitat,
-								filtre == null,
-								filtre,
-								Arrays.asList(organGestorEntitat.getId()));
-						organsGestors.add(0, organGestorEntitat);
+						organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
 					}
 				}
 			}
@@ -527,7 +519,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						false,
 						false,
 						false,
-						false);
+						false, null);
 				
 				OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
 				

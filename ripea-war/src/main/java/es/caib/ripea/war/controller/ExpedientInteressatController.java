@@ -32,6 +32,7 @@ import es.caib.ripea.war.command.InteressatCommand.Administracio;
 import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.ValidationHelper;
 
 /**
@@ -156,12 +157,14 @@ public class ExpedientInteressatController extends BaseUserController {
 			expedientInteressatService.create(
 					entitatActual.getId(),
 					expedientId,
-					interessatDto);	
+					interessatDto, 
+					RolHelper.getRolActual(request));	
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
 					expedientId,
-					interessatDto);
+					interessatDto, 
+					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.modificat.ok";
 		}
 		return getModalControllerReturnValueSuccess(
@@ -180,7 +183,8 @@ public class ExpedientInteressatController extends BaseUserController {
 		expedientInteressatService.delete(
 				entitatActual.getId(),
 				expedientId,
-				interessatId);
+				interessatId, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + expedientId,
@@ -309,13 +313,15 @@ public class ExpedientInteressatController extends BaseUserController {
 					expedientId,
 					interessatId,
 					representantDto,
-					true);	
+					true, 
+					RolHelper.getRolActual(request));	
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
-					representantDto);
+					representantDto, 
+					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.representant.modificat.ok";
 		}
 		return getModalControllerReturnValueSuccess(
@@ -336,7 +342,8 @@ public class ExpedientInteressatController extends BaseUserController {
 				entitatActual.getId(),
 				expedientId,
 				interessatId,
-				representantId);
+				representantId, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../../../contenidor/" + expedientId,

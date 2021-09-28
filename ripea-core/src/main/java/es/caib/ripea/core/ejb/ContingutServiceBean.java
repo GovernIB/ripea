@@ -75,8 +75,8 @@ public class ContingutServiceBean implements ContingutService {
 	@RolesAllowed("tothom")
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			Long contingutId) throws IOException {
-		return delegate.deleteReversible(entitatId, contingutId);
+			Long contingutId, String rolActual) throws IOException {
+		return delegate.deleteReversible(entitatId, contingutId, rolActual);
 	}
 
 	@Override
@@ -120,12 +120,12 @@ public class ContingutServiceBean implements ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions) {
+			boolean ambVersions, String rolActual) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
-				ambVersions);
+				ambVersions, null);
 	}
 
 	@Override
@@ -319,13 +319,13 @@ public class ContingutServiceBean implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermis) {
+			boolean ambPermis, String rolActual) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
-				ambPermis);
+				ambPermis, null);
 	}
 
 	@Override

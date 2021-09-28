@@ -156,7 +156,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		contingutHelper.comprovarNomValid(
 				contingut.getPare(),
 				nom,
@@ -178,7 +178,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 	}
 
 	@Transactional
@@ -197,7 +197,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false, true);
+				false, true, null);
 		// Esborra les dades no especificades
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {
@@ -223,7 +223,8 @@ public class ContingutServiceImpl implements ContingutService {
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			Long contingutId) throws IOException {
+			Long contingutId, 
+			String rolActual) throws IOException {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
@@ -234,7 +235,9 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				true, false);
+				true, 
+				false, 
+				rolActual);
 		if (contingut instanceof ExpedientEntity) {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
@@ -270,7 +273,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -360,7 +363,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -411,7 +414,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true, 
-				false);
+				false, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -419,7 +422,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false);
+				false, null);
 		// Comprova el tipus del contingut que es vol moure
 		if ((contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -442,12 +445,12 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutOrigen,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -485,7 +488,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -512,7 +515,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -520,7 +523,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false);
+				false, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -543,12 +546,12 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutOrigen,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -588,7 +591,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -613,14 +616,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -643,12 +646,12 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutOrigen,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -694,7 +697,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		return dto;
 	}
 
@@ -704,13 +707,15 @@ public class ContingutServiceImpl implements ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions) {
+			boolean ambVersions, 
+			String rolActual) {
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
-				true);
+				true, 
+				rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -720,7 +725,8 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermisos) {
+			boolean ambPermisos, 
+			String rolActual) {
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
@@ -761,7 +767,8 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				true,
-				ambVersions);
+				ambVersions, 
+				rolActual);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -794,7 +801,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true);
+				true, null);
 	}
 
 	@Transactional(readOnly = true)
@@ -1054,7 +1061,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false);
+								false, null);
 					}
 				});
 	}
@@ -1115,7 +1122,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false);
+								false, null);
 					}
 				});
 	}
@@ -1536,7 +1543,7 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1581,7 +1588,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false);
+									false, null);
 							return dto;
 						}
 					});
@@ -1622,7 +1629,7 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1676,7 +1683,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false);
+				false, null);
 		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();

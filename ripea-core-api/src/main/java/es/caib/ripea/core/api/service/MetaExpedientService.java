@@ -166,13 +166,14 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param rolActual TODO
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
-			Long entitatId) throws NotFoundException;
+			Long entitatId, String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-expedients actius per una entitat amb el permis WRITE

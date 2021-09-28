@@ -185,7 +185,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false,
 					false,
 					false,
-					false);
+					false, null);
 		}
 		
 		

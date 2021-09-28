@@ -115,7 +115,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
@@ -168,7 +168,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				true,
 				true,
-				ambVersions);
+				ambVersions, null);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -326,7 +326,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
 		
@@ -681,7 +681,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				true,
 				true,
-				false);
+				false, null);
 	}
 
 	/*private String getIdiomaPerDefecte() {

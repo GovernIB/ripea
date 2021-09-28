@@ -48,7 +48,8 @@ public class ExpedientInteressatHelper {
 			Long interessatId, //interessatId to which representant will be related to
 			InteressatDto interessat,
 			boolean propagarArxiu, 
-			PermissionEnumDto permission){
+			PermissionEnumDto permission, 
+			String rolActual){
 		
 		if (interessatId != null) {
 			logger.debug("Creant nou representant ("
@@ -70,7 +71,8 @@ public class ExpedientInteressatHelper {
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),
 				permission.equals(PermissionEnumDto.DELETE), 
-				false);
+				false, 
+				rolActual);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
@@ -187,7 +189,8 @@ public class ExpedientInteressatHelper {
 			Long interessatId,
 			InteressatDto interessatDto,
 			boolean propagarArxiu,
-			InteressatDto representantDto){
+			InteressatDto representantDto, 
+			String rolActual){
 		
 		logger.debug("Actualitzant interessat ("
 				+ "entitatId=" + entitatId + ", "
@@ -201,7 +204,9 @@ public class ExpedientInteressatHelper {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		InteressatEntity interessatEntity = entityComprovarHelper.comprovarInteressat(
 				expedient, 
 				interessatId); 
@@ -215,7 +220,8 @@ public class ExpedientInteressatHelper {
 		expedientInteressatService.update(
 				entitatId,
 				expedientId,
-				interessatDto);
+				interessatDto, 
+				rolActual);
 		
 		//### Actualitza la informació del representant
 		if (representantDto != null && interessatEntity.getRepresentant() != null) {
@@ -223,7 +229,8 @@ public class ExpedientInteressatHelper {
 					entitatId,
 					expedientId,
 					interessatId,
-					representantDto);
+					representantDto, 
+					rolActual);
 		}
 		
 		//### Crear nou representant de l'interessat
@@ -233,7 +240,8 @@ public class ExpedientInteressatHelper {
 					expedientId,
 					interessatId,
 					representantDto,
-					true);
+					true, 
+					rolActual);
 		}
 		
 		//### Esborra un representant si no s'ha informat en la petició
@@ -242,7 +250,8 @@ public class ExpedientInteressatHelper {
 					entitatId, 
 					expedientId, 
 					interessatId, 
-					interessatEntity.getRepresentant().getId());
+					interessatEntity.getRepresentant().getId(), 
+					rolActual);
 		}
 		
 		if (propagarArxiu) {

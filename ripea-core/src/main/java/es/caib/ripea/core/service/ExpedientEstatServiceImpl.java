@@ -167,7 +167,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				false);
+				false, null);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
@@ -272,7 +272,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				checkPerMassiuAdmin);
+				checkPerMassiuAdmin, null);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, expedientId, ExpedientEstatEnumDto.OBERT);
 		ExpedientEstatEntity estat;
 		if (expedientEstatId!=null){
@@ -359,13 +359,13 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				false);
+				false, null);
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
 			throw new ValidationException(
@@ -479,7 +479,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 									false,
 									true,
 									true,
-									false);
+									false, null);
 							return dto;
 						}
 					});
@@ -572,7 +572,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				ambPathIPermisos,
 				false,
-				false);
+				false, null);
 		
 		return expedientDto;
 	}

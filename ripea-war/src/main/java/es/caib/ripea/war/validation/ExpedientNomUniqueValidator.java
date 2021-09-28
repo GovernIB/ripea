@@ -5,6 +5,7 @@ package es.caib.ripea.war.validation;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.war.helper.RolHelper;
 
 
 /**
@@ -33,6 +35,9 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 	
 	@Autowired
 	private ExpedientService expedientService;
+
+    @Autowired
+    private HttpServletRequest request;
 
 	@Override
 	public void initialize(final ExpedientNomUnique constraintAnnotation) {
@@ -59,7 +64,8 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 					metaExpedientId,
 					pareId,
 					nom,
-					0);
+					0, 
+					RolHelper.getRolActual(request));
 			}
 			if (expedient != null) {
 				if (id == null) // creant

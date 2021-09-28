@@ -64,6 +64,7 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 
@@ -195,7 +196,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					command.getPortafirmesSequenciaTipus(),
 					command.getPortafirmesFluxTipus(),
 					command.getAnnexos(),
-					transaccioId); //nou flux
+					transaccioId, 
+					RolHelper.getRolActual(request)); //nou flux
 			
 			return this.getModalControllerReturnValueSuccess(
 					request,
@@ -405,7 +407,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			documentService.processarFirmaClient(
 					identificador,
 					command.getFirma().getOriginalFilename(),
-					command.getFirma().getBytes());
+					command.getFirma().getBytes(), 
+					RolHelper.getRolActual(request));
 			MissatgesHelper.success(
 					request,
 					getMessage(
@@ -468,7 +471,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					documentService.processarFirmaClient(
 							identificador,
 							firmaStatus.getSignedData().getName(),
-							IOUtils.toByteArray(fis));
+							IOUtils.toByteArray(fis), 
+							RolHelper.getRolActual(request));
 					MissatgesHelper.success(
 							request,
 							getMessage(
@@ -694,7 +698,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				documentId,
 				true,
-				false);
+				false, null);
 		documentService.documentActualitzarEstat(
 				entitatActual.getId(), 
 				documentId, 

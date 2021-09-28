@@ -165,7 +165,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 	}
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
@@ -175,7 +175,8 @@ public class ContingutHelper {
 			boolean ambDades,
 			boolean ambPath,
 			boolean pathNomesFinsExpedientArrel,
-			boolean ambVersions) {
+			boolean ambVersions, 
+			String rolActual) {
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
@@ -242,7 +243,8 @@ public class ContingutHelper {
 						true,
 						false,
 						false, 
-						false);
+						false, 
+						rolActual);
 				dto.setUsuariActualWrite(true);
 			} catch (PermissionDeniedException ex) {
 			}
@@ -256,7 +258,8 @@ public class ContingutHelper {
 						false,
 						false,
 						true, 
-						false);
+						false, 
+						rolActual);
 				dto.setUsuariActualDelete(true);
 			} catch (PermissionDeniedException ex) {
 			}
@@ -395,7 +398,8 @@ public class ContingutHelper {
 							false,
 							false,
 							false,
-							false));
+							false, 
+							rolActual));
 		}
 		resposta.setEntitat(
 				conversioTipusHelper.convertir(
@@ -412,7 +416,7 @@ public class ContingutHelper {
 		}
 		if (ambPermisos && metaNode != null) {
 			// Omple els permisos
-			metaNodeHelper.omplirPermisosPerMetaNode(metaNode);
+			metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual);
 		}
 		if (resposta != null) {
 			// Omple la informació d'auditoria
@@ -478,7 +482,7 @@ public class ContingutHelper {
 							false,
 							false,
 							false,
-							false));
+							false, rolActual));
 				}
 				for (ContingutEntity fill: fills) {
 					if (fill.getEsborrat() == 0) {
@@ -490,7 +494,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false);
+								false, rolActual);
 						// Configura el pare de cada fill
 						fillDto.setPath(fillPath);
 						contenidorDtos.add(fillDto);
@@ -563,7 +567,8 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin) {
+			boolean checkPerMassiuAdmin, 
+			String rolActual) {
 		ContingutEntity contingut = comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -571,7 +576,8 @@ public class ContingutHelper {
 				comprovarPermisWrite,
 				comprovarPermisCreate,
 				comprovarPermisDelete, 
-				checkPerMassiuAdmin);
+				checkPerMassiuAdmin, 
+				rolActual);
 		if (!(contingut instanceof NodeEntity)) {
 			throw new ValidationException(
 					contingut.getId(),
@@ -589,7 +595,8 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin) {
+			boolean checkPerMassiuAdmin, 
+			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -606,7 +613,8 @@ public class ContingutHelper {
 				true,
 				false,
 				true, 
-				checkPerMassiuAdmin);
+				checkPerMassiuAdmin, 
+				rolActual);
 		if (expedient == null) {
 			throw new ValidationException(
 					contingutId,
@@ -652,7 +660,8 @@ public class ContingutHelper {
 					comprovarPermisWrite,
 					comprovarPermisCreate,
 					comprovarPermisDelete, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, 
+					rolActual);
 		}
 		return contingut;
 	}
@@ -696,14 +705,14 @@ public class ContingutHelper {
 				true,
 				false,
 				false, 
-				false);
+				false, null);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			comprovarPermisosExpedient(
 					(ExpedientEntity)contingut,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					false,
-					false, false);
+					false, false, null);
 		}
 		return contingut;
 	}
@@ -759,7 +768,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -840,7 +849,8 @@ public class ContingutHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin) {
+			boolean checkPerMassiuAdmin, 
+			String rolActual) {
 		if (expedient.getMetaNode() != null) {
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					expedient.getMetaNode(),
@@ -849,7 +859,8 @@ public class ContingutHelper {
 					comprovarPermisWrite,
 					comprovarPermisCreate,
 					comprovarPermisDelete, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, 
+					rolActual);
 		} else {
 			throw new ValidationException(
 					expedient.getId(),
@@ -863,7 +874,8 @@ public class ContingutHelper {
 			boolean incloureActual,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite, 
-			boolean checkPerMassiuAdmin) {
+			boolean checkPerMassiuAdmin, 
+			String rolActual) {
 		ExpedientEntity expedient = null;
 		if (incloureActual && contingut instanceof ExpedientEntity) {
 			expedient = (ExpedientEntity)contingut;
@@ -890,7 +902,8 @@ public class ContingutHelper {
 						false,
 						false,
 						false, 
-						false);
+						false, 
+						rolActual);
 			}
 			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
 				
@@ -903,7 +916,8 @@ public class ContingutHelper {
 							true,
 							false,
 							false, 
-							false);
+							false, 
+							rolActual);
 					
 				}
 			}
@@ -1285,7 +1299,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false));
+								false, null));
 				}
 			}
 		}

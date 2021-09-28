@@ -166,7 +166,8 @@ public class ExpedientHelper {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId) {
+			Long grupId, 
+			String rolActual) {
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
@@ -181,12 +182,13 @@ public class ExpedientHelper {
 				false,
 				true,
 				false, 
-				false);
+				false, 
+				rolActual);
 		
 		OrganGestorEntity organGestor = getOrganGestorForExpedient(
 				metaExpedient,
 				organGestorId,
-				ExtendedPermission.CREATE);
+				ExtendedPermission.CREATE, rolActual);
 
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
@@ -200,7 +202,8 @@ public class ExpedientHelper {
 					false,
 					true,
 					false, 
-					false);
+					false, 
+					rolActual);
 		}
 		contingutHelper.comprovarNomValid(contingutPare, nom, null, ExpedientEntity.class);
 //		comprovarSiExpedientAmbMateixNom(
@@ -247,7 +250,7 @@ public class ExpedientHelper {
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
 			if (associarInteressats) {
-				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE);
+				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
 			}
 		}
 		// crear carpetes per defecte del procediment
@@ -260,7 +263,7 @@ public class ExpedientHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission) {
+	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
@@ -280,7 +283,8 @@ public class ExpedientHelper {
 						null,
 						toInteressatDto(registreInteressatEntity, null),
 						true, 
-						permission);
+						permission, 
+						rolActual);
 				if (registreInteressatEntity.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
@@ -288,7 +292,8 @@ public class ExpedientHelper {
 							createdInteressat.getId(),
 							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
 							true, 
-							permission);
+							permission, 
+							rolActual);
 				}
 			} else {
 				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();
@@ -299,7 +304,7 @@ public class ExpedientHelper {
 						existingInteressat.getId(), 
 						toInteressatDto(registreInteressatEntity, existingInteressat.getId()), 
 						true,
-						representant != null ? toInteressatDto(representant, idRepresentant) : null);
+						representant != null ? toInteressatDto(representant, idRepresentant) : null, rolActual);
 			}
 		}
 	}
@@ -716,10 +721,10 @@ public class ExpedientHelper {
 	}
 	
 	
-	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId) {
+	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId, String rolActual) {
 		Long id = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
 		
-		OrganGestorEntity organGestorEntity = getOrganGestorForExpedient(expedient.getMetaExpedient(), organGestorId, ExtendedPermission.WRITE);
+		OrganGestorEntity organGestorEntity = getOrganGestorForExpedient(expedient.getMetaExpedient(), organGestorId, ExtendedPermission.WRITE, rolActual);
 		expedient.updateOrganGestor(organGestorEntity);
 		contingutLogHelper.log(
 				expedient,
@@ -783,12 +788,12 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false);
+				false, null);
 	}
 
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
 
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false, null);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedient.getId() + ")");
 			throw new ValidationException(expedient.getId(), ExpedientEntity.class, "No es pot agafar un expedient no arrel");
@@ -958,7 +963,7 @@ public class ExpedientHelper {
 		return num;
 	}
 	
-	private OrganGestorEntity getOrganGestorForExpedient(MetaExpedientEntity metaExpedient, Long organGestorId, Permission permis) {
+	private OrganGestorEntity getOrganGestorForExpedient(MetaExpedientEntity metaExpedient, Long organGestorId, Permission permis, String rolActual) {
 		
 		OrganGestorEntity organGestor;
 		if (metaExpedient.getOrganGestor() != null) {
@@ -971,7 +976,7 @@ public class ExpedientHelper {
 						"La creació/modificació d'un expedient de tipus (metaExpedientId=" + metaExpedient.getId() + ") requereix especificar un òrgan gestor");
 			}
 			organGestor = organGestorRepository.getOne(organGestorId);
-			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, permis)) {
+			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, permis, rolActual)) {
 				throw new ValidationException(
 						metaExpedient.getId(),
 						MetaExpedientEntity.class,

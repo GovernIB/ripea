@@ -69,8 +69,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	public InteressatDto create(
 			Long entitatId,
 			Long expedientId,
-			InteressatDto interessat) {
-		return create(entitatId, expedientId, null, interessat, true);
+			InteressatDto interessat, 
+			String rolActual) {
+		return create(entitatId, expedientId, null, interessat, true, rolActual);
 	}
 
 	@Override
@@ -79,14 +80,16 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long expedientId,
 			Long interessatId,
 			InteressatDto interessat,
-			boolean propagarArxiu) {
+			boolean propagarArxiu, 
+			String rolActual) {
 		return expedientInteressatHelper.create(
 				entitatId,
 				expedientId,
 				interessatId,
 				interessat,
 				propagarArxiu, 
-				PermissionEnumDto.WRITE);
+				PermissionEnumDto.WRITE, 
+				rolActual);
 	}
 
 	@Transactional
@@ -94,8 +97,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	public InteressatDto update(
 			Long entitatId,
 			Long expedientId,
-			InteressatDto interessat) {
-		return update(entitatId, expedientId, null, interessat);
+			InteressatDto interessat, 
+			String rolActual) {
+		return update(entitatId, expedientId, null, interessat, rolActual);
 	}
 
 	@Transactional
@@ -104,7 +108,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long entitatId,
 			Long expedientId,
 			Long interessatId,
-			InteressatDto interessat) {
+			InteressatDto interessat, 
+			String rolActual) {
 		if (interessatId != null) {
 			logger.debug("Modificant un representant ("
 					+ "entitatId=" + entitatId + ", "
@@ -124,7 +129,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
@@ -239,7 +246,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	public void delete(
 			Long entitatId,
 			Long expedientId,
-			Long interessatId) {
+			Long interessatId, 
+			String rolActual) {
 		logger.debug("Esborrant interessat de l'expedient  ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
@@ -251,7 +259,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			interessatRepository.delete(interessat);
@@ -284,7 +294,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long entitatId,
 			Long expedientId,
 			Long interessatId,
-			Long representantId) {
+			Long representantId, 
+			String rolActual) {
 		logger.debug("Esborrant interessat de l'expedient  ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
@@ -297,7 +308,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			if (interessat.getRepresentant() != null && 
@@ -403,7 +416,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
 		if (nomesAmbNotificacioActiva) {
@@ -438,7 +451,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		return interessatRepository.countByExpedient(
 				expedient);
 	}
@@ -468,7 +481,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				document,
 				false,
 				false,
-				true, false);
+				true, false, null);
 		if (expedient == null) {
 			throw new ValidationException(
 					documentId,

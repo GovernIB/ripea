@@ -167,7 +167,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaFisicaDto);	
+								interessatPersonaFisicaDto, null);	
 						assertNotNull(interessatCreat);
 						assertNotNull(interessatCreat.getId());
 						comprovarInteressatPersonaFisicaCoincideix(
@@ -193,14 +193,14 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaFisicaDto);	
+								interessatPersonaFisicaDto, null);	
 						interessatPersonaFisicaDto.setId(interessatCreat.getId());
 						interessatPersonaFisicaDto.setLlinatge1("Llinatge1 test modificar");
 						interessatPersonaFisicaDto.setDocumentNum("07933975X");
 						InteressatDto interessatModificat = expedientInteressatService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaFisicaDto);
+								interessatPersonaFisicaDto, null);
 						assertNotNull(interessatModificat);
 						assertNotNull(interessatModificat.getId());
 						comprovarInteressatPersonaFisicaCoincideix(
@@ -222,11 +222,11 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaFisicaDto);	
+								interessatPersonaFisicaDto, null);	
 						expedientInteressatService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatCreat.getId());
+								interessatCreat.getId(), null);
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
@@ -250,13 +250,13 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaFisicaDto);	
+								interessatPersonaFisicaDto, null);	
 						InteressatDto representantCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId(),
 								representantPersonaFisicaDto,
-								true);
+								true, null);
 						assertNotNull(representantCreat);
 						assertNotNull(representantCreat.getId());
 						comprovarInteressatPersonaFisicaCoincideix(
@@ -278,13 +278,13 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaFisicaDto);	
+								interessatPersonaFisicaDto, null);	
 						InteressatDto representantCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								interessatCreat.getId(),
 								representantPersonaFisicaDto,
-								true);
+								true, null);
 						assertNotNull(representantCreat);
 						assertNotNull(representantCreat.getId());
 						comprovarInteressatPersonaFisicaCoincideix(
@@ -307,7 +307,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaJuridicaDto);	
+								interessatPersonaJuridicaDto, null);	
 
 						assertNotNull(interessatCreat);
 						assertNotNull(interessatCreat.getId());
@@ -340,13 +340,13 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaJuridicaDto);	
+								interessatPersonaJuridicaDto, null);	
 						interessatPersonaJuridicaDto.setId(interessatCreat.getId());
 						interessatPersonaJuridicaDto.setDocumentNum("07933975X");
 						InteressatDto interessatModificat = expedientInteressatService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaJuridicaDto);
+								interessatPersonaJuridicaDto, null);
 						assertNotNull(interessatModificat);
 						assertNotNull(interessatModificat.getId());
 						comprovarInteressatPersonaJuridicaCoincideix(
@@ -368,11 +368,11 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatPersonaJuridicaDto);	
+								interessatPersonaJuridicaDto, null);	
 						expedientInteressatService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatCreat.getId());
+								interessatCreat.getId(), null);
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
@@ -396,7 +396,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatAdministracioDto);	
+								interessatAdministracioDto, null);	
 						assertNotNull(interessatCreat);
 						assertNotNull(interessatCreat.getId());
 						comprovarInteressatAdministracioCoincideix(
@@ -427,13 +427,13 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatAdministracioDto);	
+								interessatAdministracioDto, null);	
 						interessatAdministracioDto.setId(interessatCreat.getId());
 						interessatAdministracioDto.setDocumentNum("07933975X");
 						InteressatDto interessatModificat = expedientInteressatService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatAdministracioDto);
+								interessatAdministracioDto, null);
 						assertNotNull(interessatModificat);
 						assertNotNull(interessatModificat.getId());
 						comprovarInteressatAdministracioCoincideix(
@@ -456,11 +456,11 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						InteressatDto interessatCreat = expedientInteressatService.create(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatAdministracioDto);	
+								interessatAdministracioDto, null);	
 						expedientInteressatService.delete(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								interessatCreat.getId());
+								interessatCreat.getId(), null);
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(

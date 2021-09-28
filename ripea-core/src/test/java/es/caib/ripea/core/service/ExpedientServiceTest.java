@@ -144,7 +144,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						try {
 							ContingutDto esborrat = contingutService.deleteReversible(
 									entitatCreada.getId(),
-									expedientCreat.getId());
+									expedientCreat.getId(), null);
 							assertTrue(esborrat instanceof ExpedientDto);
 							comprovarExpedientCoincideix(
 									expedientCreate,
@@ -375,7 +375,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						expedientService.publicarComentariPerExpedient(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								comentariText);
+								comentariText, null);
 						List<ExpedientComentariDto> comentaris1 = expedientService.findComentarisPerContingut(
 								entitatCreada.getId(),
 								expedientCreat.getId());
@@ -461,7 +461,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								"Expedient de test2 (" + System.currentTimeMillis() + ")",
 								null,
 								false, 
-								null);
+								null, null);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),
@@ -472,7 +472,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						expedientService.relacioCreate(
 								entitatCreada.getId(),
 								expedientCreat1.getId(),
-								expedientCreat2.getId());
+								expedientCreat2.getId(), null);
 						List<ExpedientDto> relacionats11 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),
 								expedientCreat1.getId());
@@ -502,7 +502,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						expedientService.relacioDelete(
 								entitatCreada.getId(),
 								expedientCreat2.getId(),
-								expedientCreat1.getId());
+								expedientCreat1.getId(), null);
 						List<ExpedientDto> relacionats13 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),
 								expedientCreat1.getId());
@@ -543,7 +543,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true);
+								true, null);
 						assertNotNull(documentCreat);
 						try {
 							expedientService.tancar(
@@ -561,7 +561,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						documentService.processarFirmaClient(
 								identificador,
 								"firma.pdf",
-								dto.getFitxerContingut());
+								dto.getFitxerContingut(), null);
 						expedientService.tancar(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
@@ -620,7 +620,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										entitatCreada.getId(),
 										expedientCreat.getId(),
 										dto,
-										true);
+										true, null);
 								assertNotNull(documentCreat);
 							}
 							//Pare = carpeta
@@ -629,7 +629,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										entitatCreada.getId(),
 										carpetaCreada.getId(),
 										dto,
-										true);
+										true, null);
 								assertNotNull(documentCreat);
 							}
 							//Pare = sub carpeta
@@ -638,7 +638,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										entitatCreada.getId(),
 										subCarpetaCreada.getId(),
 										dto,
-										true);
+										true, null);
 								assertNotNull(documentCreat);
 							}
 							if (i == 6 || i == 7) {
@@ -646,7 +646,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										entitatCreada.getId(),
 										subCarpetaCreada2.getId(),
 										dto,
-										true);
+										true, null);
 								assertNotNull(documentCreat);
 							}
 						}

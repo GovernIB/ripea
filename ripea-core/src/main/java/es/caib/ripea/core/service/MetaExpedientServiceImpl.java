@@ -272,7 +272,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -299,7 +299,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -316,7 +316,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -352,7 +352,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(Long entitatId) {
+	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(Long entitatId, String rolActual) {
 		logger.debug(
 				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
 						")");
@@ -363,8 +363,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						ExtendedPermission.CREATE,
 						true,
 						null, 
-						false,
-						false,
+						rolActual != null && rolActual.equals("IPA_ADMIN"),
+						rolActual != null && rolActual.equals("IPA_ORGAN_ADMIN"),
 						null),
 				MetaExpedientDto.class);
 
@@ -666,7 +666,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					permission == PermissionEnumDto.WRITE,
 					permission == PermissionEnumDto.CREATE,
 					permission == PermissionEnumDto.DELETE,
-					false);
+					false, null);
 		} catch (PermissionDeniedException ex) {
 			permitted = false;
 		}

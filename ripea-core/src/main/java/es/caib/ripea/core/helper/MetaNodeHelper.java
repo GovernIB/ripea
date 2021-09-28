@@ -173,7 +173,7 @@ public class MetaNodeHelper {
 	}
 
 	public void omplirPermisosPerMetaNode(
-			MetaNodeDto metaNode) {
+			MetaNodeDto metaNode, String rolActual) {
 		
 		try {
 			metaNode.setUsuariActualRead(false);
@@ -184,7 +184,8 @@ public class MetaNodeHelper {
 					false,
 					false,
 					false,
-					false);
+					false, 
+					rolActual);
 			metaNode.setUsuariActualRead(true);
 		} catch (PermissionDeniedException ex) {
 		}
@@ -198,7 +199,8 @@ public class MetaNodeHelper {
 					true,
 					false,
 					false,
-					false);
+					false, 
+					rolActual);
 			metaNode.setUsuariActualWrite(true);
 		} catch (PermissionDeniedException ex) {
 		}
@@ -212,7 +214,8 @@ public class MetaNodeHelper {
 					false,
 					true,
 					false,
-					false);
+					false, 
+					rolActual);
 			metaNode.setUsuariActualCreate(true);
 		} catch (PermissionDeniedException ex) {
 		}
@@ -226,7 +229,8 @@ public class MetaNodeHelper {
 					false,
 					false,
 					true,
-					false);
+					false, 
+					rolActual);
 			metaNode.setUsuariActualDelete(true);
 		} catch (PermissionDeniedException ex) {
 		}

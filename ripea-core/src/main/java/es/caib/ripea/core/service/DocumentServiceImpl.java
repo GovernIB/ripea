@@ -160,7 +160,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long entitatId,
 			Long pareId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, 
+			String rolActual) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
@@ -172,7 +173,8 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false, 
-				false);
+				false, 
+				rolActual);
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
@@ -205,7 +207,8 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto documentDto,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, 
+			String rolActual) {
 		logger.debug("Actualitzant el document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentDto.getId() + ", " +
@@ -216,7 +219,9 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		ContingutEntity pare = null;
 		if (documentDto.getPareId() != null) {
 			contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -226,7 +231,8 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					false);	
+					false, 
+					rolActual);	
 		} 
 		
 		if (! checkCarpetaUniqueContraint(documentDto.getNom(), pare, entitatId)) {
@@ -256,7 +262,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ContingutEntity pare = null;
 		if (documentEntity.getPareId() != null) {
 			contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -266,7 +272,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					false);	
+					false, null);	
 		} 
 		
 		if (! checkCarpetaUniqueContraint(documentEntity.getNom(), pare, entitatId)) {
@@ -310,7 +316,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -418,7 +424,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -456,7 +462,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndTipus(
 				entitat, 
 				expedient,
@@ -585,7 +591,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		ExpedientEntity expedient = pare.getExpedientPare();
 		MetaDocumentEntity metaDocument = null;
 		if (metaDocumentId != null) {
@@ -695,7 +701,8 @@ public class DocumentServiceImpl implements DocumentService {
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
-			String transaccioId) {
+			String transaccioId, 
+			String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
@@ -707,7 +714,9 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		
 		
 		try {
@@ -747,7 +756,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 
 		firmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
@@ -803,7 +812,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		return firmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
@@ -832,7 +841,7 @@ public class DocumentServiceImpl implements DocumentService {
 					true,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 			Exception exception = firmaPortafirmesHelper.portafirmesReintentar(
 					entitatId,
 					document);
@@ -949,7 +958,7 @@ public class DocumentServiceImpl implements DocumentService {
 									false,
 									true,
 									true,
-									false);
+									false, null);
 							return dto;
 						}
 					});
@@ -991,7 +1000,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1044,7 +1053,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
@@ -1083,7 +1092,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					true,
 					false,
-					false, false);
+					false, false, null);
 			if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 				throw new ValidationException(
 						document.getId(),
@@ -1175,7 +1184,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -1374,7 +1383,8 @@ public class DocumentServiceImpl implements DocumentService {
 	public void processarFirmaClient(
 			String identificador,
 			String arxiuNom,
-			byte[] arxiuContingut) {
+			byte[] arxiuContingut, 
+			String rolActual) {
 		logger.debug("Custodiar identificador firma applet ("
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;
@@ -1395,7 +1405,9 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					true,
 					false,
-					false, false);
+					false, 
+					false, 
+					rolActual);
 			
 			firmaAppletHelper.processarFirmaClient(
 					identificador,
@@ -1493,7 +1505,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				true,
-				false);
+				false, null);
 	}
 	
 	

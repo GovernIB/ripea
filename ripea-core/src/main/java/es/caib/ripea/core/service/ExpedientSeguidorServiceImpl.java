@@ -55,7 +55,7 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
 		if (expedient.getSeguidors().contains(usuariActual)) 
@@ -80,7 +80,7 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
 		if (!expedient.getSeguidors().contains(usuariActual))
@@ -103,7 +103,7 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		return conversioTipusHelper.convertirList(
 				expedient.getSeguidors(), 

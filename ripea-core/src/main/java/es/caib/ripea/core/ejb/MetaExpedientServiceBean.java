@@ -100,8 +100,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@Override
 	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
-			Long entitatId) {
-		return delegate.findActiusAmbEntitatPerCreacio(entitatId);
+			Long entitatId, String rolActual) {
+		return delegate.findActiusAmbEntitatPerCreacio(entitatId, null);
 	}
 	
 	@Override

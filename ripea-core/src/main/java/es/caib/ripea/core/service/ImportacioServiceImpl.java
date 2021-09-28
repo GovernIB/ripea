@@ -106,7 +106,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		// ############### RECUPERAR DOCUMENTS DEL NUMERO D REGISTRE INTRDUIT #########
 		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(
 				dades.getNumeroRegistre(),
@@ -300,7 +300,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				true,
 				true,
-				false);
+				false, null);
 	}
 
 	private static NtiOrigenEnumDto getOrigen(Document document) {

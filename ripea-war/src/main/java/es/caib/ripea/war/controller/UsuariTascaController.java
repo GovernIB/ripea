@@ -443,7 +443,7 @@ public class UsuariTascaController extends BaseUserController {
 				documentId,
 				true,
 				false,
-				false);
+				false, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = expedientTascaService.descarregar(
 					entitatActual.getId(),
@@ -644,7 +644,7 @@ public class UsuariTascaController extends BaseUserController {
 		model.addAttribute("contingut", contingut);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 		model.addAttribute(
 				"metaDocuments",
 				metaDocumentService.findActiusPerCreacio(

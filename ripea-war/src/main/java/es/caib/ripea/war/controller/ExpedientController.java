@@ -149,7 +149,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				"rolActual",
 				rolActual);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
-				entitatActual.getId());
+				entitatActual.getId(), null);
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
 				metaExpedientsPermisCreacio);
@@ -236,15 +236,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				expedientService.findAmbFiltreUser(
 						entitatActual.getId(),
 						ExpedientFiltreCommand.asDto(filtreCommand),
 						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						rolActual),
+						RolHelper.getRolActual(request)),
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
 	}
@@ -443,9 +442,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		List<MetaExpedientDto> metaExpedients = null;
 		if (expedientId != null) {
-			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom");
+			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request));
 		} else {
-			metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
+			metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), RolHelper.getRolActual(request));
 		}
 		
 		model.addAttribute(
@@ -470,7 +469,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 			return "contingutExpedientForm";
 		}
 		try {
@@ -485,7 +484,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getNom(),
 					null,
 					false,
-					command.getGrupId());
+					command.getGrupId(), 
+					RolHelper.getRolActual(request));
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -495,7 +495,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 			return "contingutExpedientForm";
 		} catch (Exception ex) {
 			logger.error("Error al crear expedient", ex);
@@ -541,12 +541,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getNom(),
 					command.getAny(),
 					command.getMetaNodeDominiId(), 
-					command.getOrganGestorId());
+					command.getOrganGestorId(), 
+					RolHelper.getRolActual(request));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
 					"expedient.controller.modificat.ok");
 		} catch (ValidationException ex) {
+			logger.error("Error al modificar expedient", ex);
 			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
@@ -674,7 +676,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				
 			}
 			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
-				if (expedientService.isOrganGestorPermes(expedientId)) {
+				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
 					expedientService.agafarAdmin(entitatActual.getId(), 
 										null, 
 										expedientId, 
@@ -723,7 +725,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false));
+						false, null));
 		boolean hasWritePermisions = expedientService.hasWritePermission(expedientId);
 		model.addAttribute(
 				"hasWritePermisions",
@@ -745,7 +747,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (text != null && !text.isEmpty()) {
-			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text);
+			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text, RolHelper.getRolActual(request));
 		}
 			
 		return expedientService.findComentarisPerContingut(
@@ -998,7 +1000,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false));
+						false, null));
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
@@ -1084,13 +1086,15 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			expedientService.relacioCreate(
 					entitatActual.getId(),
 					expedientId,
-					relacionatId);
+					relacionatId, 
+					RolHelper.getRolActual(request));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:/../../contingut/" + expedientId,
 					"expedient.controller.relacionat.ok");
 			
 		} catch (Exception e) {
+			logger.error("Error al relacionar expedient", e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../esborrat",
@@ -1127,7 +1131,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (expedientService.relacioDelete(
 				entitatActual.getId(),
 				expedientId,
-				relacionatId)) {
+				relacionatId, 
+				RolHelper.getRolActual(request))) {
 			MissatgesHelper.success(
 					request, 
 					getMessage(
@@ -1264,7 +1269,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				expedientId,
 				true,
-				false);
+				false, null);
 		model.addAttribute("expedient", expedient);
 		if (expedient.isHasEsborranys()) {
 			List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(

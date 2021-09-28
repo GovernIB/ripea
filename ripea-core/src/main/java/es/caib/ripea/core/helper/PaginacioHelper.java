@@ -105,6 +105,31 @@ public class PaginacioHelper {
 		}
 		return dto;
 	}
+	
+	
+	public <S, T> PaginaDto<T> toPaginaDto(Page<S> page, Class<T> targetType, String param, ConverterParam<S, T> converter) {
+		PaginaDto<T> dto = new PaginaDto<T>();
+		dto.setNumero(page.getNumber());
+		dto.setTamany(page.getSize());
+		dto.setTotal(page.getTotalPages());
+		dto.setElementsTotal(page.getTotalElements());
+		dto.setAnteriors(page.hasPrevious());
+		dto.setPrimera(page.isFirst());
+		dto.setPosteriors(page.hasNext());
+		dto.setDarrera(page.isLast());
+		if (page.hasContent()) {
+			if (converter == null) {
+				dto.setContingut(conversioTipusHelper.convertirList(page.getContent(), targetType));
+			} else {
+				List<T> contingut = new ArrayList<T>();
+				for (S element : page.getContent()) {
+					contingut.add(converter.convert(element, param));
+				}
+				dto.setContingut(contingut);
+			}
+		}
+		return dto;
+	}
 
 	public <T> PaginaDto<T> toPaginaDto(List<?> llista, Class<T> targetType) {
 		PaginaDto<T> dto = new PaginaDto<T>();
@@ -138,6 +163,12 @@ public class PaginacioHelper {
 	public interface Converter<S, T> {
 
 		T convert(S source);
+
+	}
+	
+	public interface ConverterParam<S, T> {
+
+		T convert(S source, String param);
 
 	}
 

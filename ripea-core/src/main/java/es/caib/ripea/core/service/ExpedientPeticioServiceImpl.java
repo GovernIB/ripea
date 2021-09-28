@@ -237,7 +237,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByExpedient(
 				expedient, 
 				paginacioHelper.toSpringDataPageable(paginacioParams));

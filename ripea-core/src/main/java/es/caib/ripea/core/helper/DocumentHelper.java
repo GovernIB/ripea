@@ -446,7 +446,7 @@ public class DocumentHelper {
 				false,
 				true,
 				true,
-				false);
+				false, null);
 	}
 		
 
@@ -684,7 +684,8 @@ public class DocumentHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin) {
+			boolean checkPerMassiuAdmin, 
+			String rolActual) {
 		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientModificable(
 				entitatId,
 				id,
@@ -692,7 +693,8 @@ public class DocumentHelper {
 				comprovarPermisWrite,
 				comprovarPermisCreate,
 				comprovarPermisDelete, 
-				checkPerMassiuAdmin);
+				checkPerMassiuAdmin, 
+				rolActual);
 		if (!ContingutTipusEnumDto.DOCUMENT.equals(node.getTipus())) {
 			throw new ValidationException(
 					id,
@@ -795,7 +797,7 @@ public class DocumentHelper {
 							false, 
 							true, 
 							false, 
-							false));
+							false, null));
 			
 		}
 		return documentsDto;

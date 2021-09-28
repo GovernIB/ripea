@@ -78,6 +78,7 @@ public interface ContingutService {
 	 *            Atribut id de l'entitat a la qual pertany el contingut.
 	 * @param contingutId
 	 *            Atribut id del contingut que es vol esborrar.
+	 * @param rolActual TODO
 	 * @param nomesMarcarEsborrat
 	 *            Posar a true si es vol esborrar el contingut definitivament
 	 *            o false si només es vol marcar com a esborrat.
@@ -91,7 +92,7 @@ public interface ContingutService {
 	@PreAuthorize("hasRole('tothom')")
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			Long contingutId) throws IOException, NotFoundException;
+			Long contingutId, String rolActual) throws IOException, NotFoundException;
 
 	/**
 	 * Esborra un contingut sense possibilitat de recuperar-lo.
@@ -214,6 +215,7 @@ public interface ContingutService {
 	 *            Indica si la resposta ha d'incloure els fills del contingut.
 	 * @param ambVersions
 	 *            Indica si la resposta ha d'incloure les versions del contingut.
+	 * @param rolActual TODO
 	 * @return El contingut amb l'id especificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -223,7 +225,7 @@ public interface ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions) throws NotFoundException;
+			boolean ambVersions, String rolActual) throws NotFoundException;
 
 	/**
 	 * Obté la informació del contingut especificat.
@@ -514,7 +516,7 @@ public interface ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermis);
+			boolean ambPermis, String rolActual);
 	
 	/**
 	 * Assigna el nou ordre als fills d'un contenidor.

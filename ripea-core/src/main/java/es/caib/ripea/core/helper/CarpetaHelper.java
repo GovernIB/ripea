@@ -77,12 +77,12 @@ public class CarpetaHelper {
 					false,
 					false,
 					false,
-					false, false);
+					false, false, null);
 			ExpedientEntity expedient = contingutHelper.getExpedientSuperior(
 					pare,
 					true,
 					false,
-					false, false);
+					false, false, null);
 			contingutHelper.comprovarNomValid(
 					pare,
 					nom,
@@ -130,7 +130,7 @@ public class CarpetaHelper {
 				false,
 				false,
 				false,
-				false);
+				false, null);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);

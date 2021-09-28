@@ -86,6 +86,7 @@ import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de documents.
@@ -215,7 +216,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
@@ -277,7 +278,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
@@ -469,7 +470,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				documentId,
 				true,
-				false);
+				false, null);
 		if (contingut instanceof DocumentDto) {
 			
 			try {
@@ -531,7 +532,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				pareId,
 				true,
-				false);
+				false, null);
 		
 		byte[] reportContent = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -576,7 +577,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		
 		List<DocumentDto> documents = new ArrayList<DocumentDto>();
 		@SuppressWarnings("unchecked")
@@ -590,7 +591,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false);
+					false, null);
 
 			document = (DocumentDto) contingutDoc;
 			//No es possible concatenar els documents que no són pdf
@@ -664,7 +665,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false);
+					false, null);
 		}
 	}
 	
@@ -697,7 +698,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false);
+					false, null);
 		} catch (Exception exception) {
 			return getModalControllerReturnValueErrorMessageText(
 					request, 
@@ -717,7 +718,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -729,7 +730,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false);
+					false, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 				existsEsborrat = true;
 				documentService.documentActualitzarEstat(
@@ -866,7 +867,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						entitatActual.getId(),
 						docId,
 						true,
-						false);
+						false, null);
 				if (contingut instanceof DocumentDto) {
 					DocumentDto document = (DocumentDto) contingut;
 					if ((!document.isFirmat() || document.isCustodiat())
@@ -899,7 +900,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		if (!contingut.isCarpeta())
 			isDocument = true;
 		else
@@ -921,7 +922,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					documentId,
 					true,
-					false);
+					false, null);
 				FitxerDto fitxer = documentService.descarregarImprimible(
 						entitatActual.getId(),
 						documentId,
@@ -1037,7 +1038,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			DocumentCommand command,
 			DocumentGenericCommand commandGeneric,
 			boolean notificar,
-			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+			boolean comprovarMetaExpedient, 
+			String rolActual) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -1050,7 +1052,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					pareId,
 					documentDto,
-					comprovarMetaExpedient);
+					comprovarMetaExpedient, 
+					rolActual);
 			//Valor per defecte d'algunes metadades
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
 					entitatActual.getId(), 
@@ -1104,7 +1107,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			documentService.update(
 					entitatActual.getId(),
 					commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric),
-					comprovarMetaExpedient);
+					comprovarMetaExpedient, 
+					rolActual);
 			
 			return getModalControllerReturnValueSuccess(
 					request,
