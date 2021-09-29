@@ -122,35 +122,12 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"    ContingutEntity c " +
 			"where " +
 			"c.arxiuUuid = null " +
-			"and (c.tipus = 0 and c.arxiuReintents < :arxiuMaxReintentsExpedients or c.tipus = 2 and c.arxiuReintents < :arxiuMaxReintentsDocuments and c.expedient.arxiuUuid != null) " +
+			"and ((c.tipus = 0 and c.arxiuReintents < :arxiuMaxReintentsExpedients) or (c.tipus = 2 and c.arxiuReintents < :arxiuMaxReintentsDocuments and c.expedient.arxiuUuid != null)) " +
 			"and c.esborrat = 0 " +
 			"order by c.arxiuIntentData asc")
 	public List<ContingutEntity> findContingutsPendentsArxiu(
 			@Param("arxiuMaxReintentsExpedients") int arxiuMaxReintentsExpedients,
 			@Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	@Query(	"select " +
-			"    c " +
-			"from " +
-			"    ContingutEntity c " +
-			"where " +
-			"c.arxiuUuid = null " +
-			"and (c.tipus = 0) " +
-			"and c.esborrat = 0 " +
-			"order by c.arxiuIntentData asc")
-	public List<ContingutEntity> findContingutsPendentsArxiu2();
-
 	
 
 }

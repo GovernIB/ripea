@@ -319,7 +319,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void guardarExpedientsDocumentsArxiu() {
 		
-		logger.debug("Execució tasca periòdica: Guardar expedients i documents en arxiu");
+		logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
 		
 		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
 		int arxiuMaxReintentsDocuments =  getArxiuMaxReintentsDocuments();
@@ -346,7 +346,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void guardarInteressatsArxiu() {
 		
-		logger.debug("Execució tasca periòdica: Guardar interessats en arxiu");
+		logger.info("Execució tasca periòdica: Guardar interessats en arxiu");
 		
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
 		

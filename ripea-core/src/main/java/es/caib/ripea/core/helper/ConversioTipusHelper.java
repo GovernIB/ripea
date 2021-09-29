@@ -235,6 +235,7 @@ public class ConversioTipusHelper {
 						target.setEntregaDehObligat(source.getEntregaDehObligat());
 						target.setIncapacitat(source.getIncapacitat());
 						target.setRepresentant(source.getRepresentant() != null ? convertir(source.getRepresentant(),InteressatDto.class) : null);
+						target.setArxiuPropagat(source.isArxiuPropagat());
 						target.setRepresentantArxiuPropagat(source.getRepresentant() != null ? source.getRepresentant().isArxiuPropagat() : true);
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
 						return target;

@@ -320,13 +320,22 @@ public class ExpedientInteressatController extends BaseUserController {
 		
 		String msgKey = "interessat.controller.representant.afegit.ok";
 		if (interessatCommand.getId() == null) {
-			expedientInteressatService.create(
+			InteressatDto representant = expedientInteressatService.create(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
 					representantDto,
 					true, 
 					RolHelper.getRolActual(request));	
+			
+			if (!representant.isArxiuPropagat()) {
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:../../../contingut/" + expedientId,
+						"interessat.controller.creat.error.arxiu.representant",
+						null);
+			}
+			
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
