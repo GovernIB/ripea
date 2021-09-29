@@ -357,4 +357,17 @@ public class ExpedientServiceBean implements ExpedientService {
 	public boolean isOrganGestorPermes (Long expedientId, String rolActual) {
 		return delegate.isOrganGestorPermes(expedientId, rolActual);
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public Exception guardarExpedientArxiu(Long expId) {
+		return delegate.guardarExpedientArxiu(expId);
+	}
+	@Override
+	@RolesAllowed("IPA_SUPER")
+	public List<ExpedientDto> findByText(
+			Long entitatId,
+			String text){
+		return delegate.findByText(entitatId, text);
+	}
 }

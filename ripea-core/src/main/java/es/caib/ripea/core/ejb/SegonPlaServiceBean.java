@@ -49,4 +49,16 @@ public class SegonPlaServiceBean implements SegonPlaService {
 		delegate.testEmailsAgrupats();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void guardarExpedientsDocumentsArxiu() {
+		delegate.guardarExpedientsDocumentsArxiu();		
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void guardarInteressatsArxiu() {
+		delegate.guardarInteressatsArxiu();
+	}
+
 }

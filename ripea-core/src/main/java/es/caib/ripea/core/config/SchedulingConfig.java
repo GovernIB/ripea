@@ -143,6 +143,61 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
+        
+        
+        // 5. Guardar en arxiu continguts pendents
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        segonPlaService.guardarExpedientsDocumentsArxiu();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_CONTINGUTS_PENDENTS), TimeUnit.MILLISECONDS);
+                        // Només la primera vegada que s'executa
+                        long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+                        if (primeraVez[3]) {
+                        	enviamentRefrescarEstatPendentsInitialDelayLong = DEFAULT_INITIAL_DELAY_MS;
+                        	primeraVez[3] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+        
+        // 6. Guardar en arxiu interessats
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        segonPlaService.guardarInteressatsArxiu();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_INTERESSATS), TimeUnit.MILLISECONDS);
+                        // Només la primera vegada que s'executa
+                        long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+                        if (primeraVez[4]) {
+                        	enviamentRefrescarEstatPendentsInitialDelayLong = DEFAULT_INITIAL_DELAY_MS;
+                        	primeraVez[4] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }                
+        );
 
     }
 }

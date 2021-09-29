@@ -292,6 +292,8 @@ body {
 								<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 								<%---- Excepcions ----%>
 								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
+								<%---- Elements pendents arxiu ----%>
+								<li><a href="<c:url value="/seguimentArxiuPendents"/>"><spring:message code="decorator.menu.pendents.arxiu"/></a></li>
 							</ul>
 						</div>
 						<div class="btn-group">

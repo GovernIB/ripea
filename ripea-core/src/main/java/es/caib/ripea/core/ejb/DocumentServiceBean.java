@@ -406,8 +406,8 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public Exception guardarEnArxiuDocumentAdjunt(Long docId) {
-		return delegate.guardarEnArxiuDocumentAdjunt(docId);
+	public Exception guardarDocumentArxiu(Long docId) {
+		return delegate.guardarDocumentArxiu(docId);
 	}
 
 	@Override

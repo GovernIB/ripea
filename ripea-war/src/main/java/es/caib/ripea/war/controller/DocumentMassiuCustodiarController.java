@@ -248,7 +248,7 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 			try {
 				DocumentDto doc = documentService.findById(entitatActual.getId(), id);
 				if (doc.getGesDocAdjuntId() != null) {
-					exception = documentService.guardarEnArxiuDocumentAdjunt(id);
+					exception = documentService.guardarDocumentArxiu(id);
 				} else {
 					exception = documentService.portafirmesReintentar(
 							entitatActual.getId(),

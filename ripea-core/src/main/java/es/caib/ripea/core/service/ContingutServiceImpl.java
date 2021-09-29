@@ -1032,6 +1032,8 @@ public class ContingutServiceImpl implements ContingutService {
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+		
+		
 		return paginacioHelper.toPaginaDto(
 				contingutRepository.findByFiltrePaginat(
 						entitat,

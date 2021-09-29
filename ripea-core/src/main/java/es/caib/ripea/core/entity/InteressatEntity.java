@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -119,7 +122,13 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@Column(name = "incapacitat")
 	protected Boolean incapacitat;
 	
-	
+	@Column(name = "arxiu_propagat")
+	protected boolean arxiuPropagat;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "arxiu_intent_data")
+	protected Date arxiuIntentData;
+	@Column(name = "arxiu_reintents")
+	protected int arxiuReintents;
 
 	@OneToMany(
 			mappedBy = "interessat",
@@ -178,6 +187,12 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		return incapacitat != null ? incapacitat : false;
 	}
 	public abstract String getIdentificador();
+
+	public void updateArxiuIntent(boolean arxiuPropagat) {
+		this.arxiuPropagat = arxiuPropagat;
+		this.arxiuReintents++;
+		this.arxiuIntentData = new Date();
+	}
 
 
 

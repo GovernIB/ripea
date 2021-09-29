@@ -152,4 +152,10 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 		return delegate.findByDocumentNum(documentNum);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public Exception guardarInteressatsArxiu(Long expId) {
+		return guardarInteressatsArxiu(expId);
+	}
+
 }

@@ -5,10 +5,15 @@ package es.caib.ripea.core.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
@@ -176,5 +181,45 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "order by "
 			+ "    inter.id asc")
 	List<InteressatEntity> findByText(String text);
+	
+	
+	@Query(	"select " +
+			"    i " +
+			"from " +
+			"    InteressatEntity i " +
+			"where " +
+			"i.arxiuPropagat = false " +
+			"and i.arxiuReintents < :arxiuMaxReintents " +
+			"order by i.arxiuIntentData asc")
+	public List<InteressatEntity> findInteressatsPendentsArxiu(
+			@Param("arxiuMaxReintents") int arxiuMaxReintents);
+	
+
+	
+	
+	@Query(	"select " +
+			"    i " +
+			"from " +
+			"    InteressatEntity i " +
+			"where " +
+			"    i.expedient.entitat = :entitat " +
+			"and i.arxiuPropagat = false " +
+			"and i.expedient.esborrat = 0 " +
+			"and (:esNullNom = true " +
+			"			or (lower(i.documentNum||' '||i.nom||' '||i.llinatge1||' '||i.llinatge2) like lower('%'||:nom||'%')" +
+			"				or lower(i.raoSocial) like lower('%'||:nom||'%')" +
+			"				or lower(i.organNom) like lower('%'||:nom||'%'))) " + 
+			"and (:esNullExpedient = true or i.expedient = :expedient) " +
+			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) ")
+	public Page<InteressatEntity> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,			
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			Pageable pageable);
+	
 	
 }

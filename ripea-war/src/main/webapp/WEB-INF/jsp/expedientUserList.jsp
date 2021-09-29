@@ -452,7 +452,7 @@ function removeCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="18" 
+		data-default-order="19" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -476,9 +476,19 @@ function removeCookie(cname) {
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>				
-				<th data-col-name="nom" width="30%">
+				<th data-col-name="arxiuUuid" data-visible="false"></th>			
+				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>	
+				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
+					<script id="cellNomTemplate" type="text/x-jsrender">
+						{{:nom}} 
+						{{if arxiuUuid != null}}
+							<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+						{{else}}
+							<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+						{{/if}}
+
+					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAvisosTemplate" width="5%">
 					<spring:message code="expedient.list.user.columna.avisos"/>

@@ -815,6 +815,32 @@ public class ExpedientHelper {
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
 	}
 	
+	@Transactional
+	public Exception guardarExpedientArxiu(
+			Long expId) {
+		
+		Exception exception = null;
+		
+		ExpedientEntity expedient = expedientRepository.findOne(expId);
+		
+		try {
+			contingutHelper.arxiuPropagarModificacio(
+					expedient,
+					null,
+					false,
+					false,
+					null);
+		} catch (Exception ex) {
+			logger.error("Error al custodiar expedient en arxiu  (" +
+					"id=" + expedient.getId() + ")",
+					ex);
+			exception = ex;
+		}
+		expedient.updateArxiuIntent();
+		
+		return exception;
+	}
+	
 	
 	public FitxerDto exportarExpedient(
 			EntitatEntity entitatActual, 

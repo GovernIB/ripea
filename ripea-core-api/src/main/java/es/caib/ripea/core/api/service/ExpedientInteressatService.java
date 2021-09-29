@@ -251,4 +251,7 @@ public interface ExpedientInteressatService {
 	@PreAuthorize("hasRole('tothom')")
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException;
 
+	@PreAuthorize("hasRole('tothom')")
+	public Exception guardarInteressatsArxiu(Long expId);
+
 }

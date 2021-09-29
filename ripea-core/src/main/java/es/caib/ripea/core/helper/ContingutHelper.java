@@ -792,10 +792,8 @@ public class ContingutHelper {
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) && document.getGesDocAdjuntId() == null) {
 					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
 				}
-				if (document.getGesDocAdjuntId() == null) {
-					// Elimina contingut a l'arxiu
-					arxiuPropagarEliminacio(contingut);
-				}
+				// Elimina contingut a l'arxiu
+				arxiuPropagarEliminacio(contingut);
 			} else {
 				// Elimina contingut a l'arxiu
 				arxiuPropagarEliminacio(contingut);

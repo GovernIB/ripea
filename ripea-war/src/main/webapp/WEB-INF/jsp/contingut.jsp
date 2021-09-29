@@ -34,6 +34,14 @@
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
+		<c:choose>
+			<c:when test="${contingut.arxiuUuid != null}">
+				<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+			</c:when>
+			<c:otherwise>
+				<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+			</c:otherwise>
+		</c:choose>		
 	</title>
 	
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
@@ -447,6 +455,11 @@ body.loading .rmodal {
 	position: relative;
 	top: -3px;
 }
+
+.disabledMsg:hover {
+    cursor: not-allowed;
+}
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -520,6 +533,9 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 
 let pageSizeDominis = 20;
 $(document).ready(function() {
+
+	$('.disabledMsg').tooltip();
+	
 	removeLoading();
 	$("a.fileDownload").on("click", function() {
 		$("body").addClass("loading");
@@ -596,6 +612,7 @@ $(document).ready(function() {
 	$('#taulaInteressats').on('draw.dt', function (e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		$('#interessats-count').html(api.page.info().recordsTotal);
+		$('.disabledMsg').tooltip();
 	});
 	$('#taulaEnviaments').on('draw.dt', function (e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
@@ -2417,7 +2434,7 @@ $.views.helpers(myHelpers);
 								id="taulaInteressats" 
 								data-toggle="datatable" 
 								data-url="<c:url value="/contingut/${contingut.id}/interessat/datatable"/>" 
-								data-paging-enabled="false" 
+								data-paging-enabled="false"
 								data-botons-template="#taulaInteressatsNouBoton" 
 								class="table table-striped table-bordered" 
 								style="width:100%">
@@ -2425,6 +2442,10 @@ $.views.helpers(myHelpers);
 									<tr>
 										<th data-col-name="id" data-visible="false">#</th>
 										<th data-col-name="representantId" data-visible="false">#</th>
+										<th data-col-name="representant" data-visible="false">#</th>
+										<th data-col-name="arxiuPropagat" data-visible="false"></th>
+										<th data-col-name="representantArxiuPropagat" data-visible="false"></th>			
+										<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 										<th data-col-name="tipus" data-template="#cellTipusInteressatTemplate" data-orderable="false" width="15%">
 											<spring:message code="contingut.interessat.columna.tipus"/>
 											<script id="cellTipusInteressatTemplate" type="text/x-jsrender">
@@ -2432,14 +2453,42 @@ $.views.helpers(myHelpers);
 										</script>
 										</th>
 										<th data-col-name="documentNum" data-orderable="false" width="15%"><spring:message code="contingut.interessat.columna.document"/></th>
-										<th data-col-name="identificador" data-orderable="false" width="35%"><spring:message code="contingut.interessat.columna.identificador"/></th>
-										<th data-col-name="representantIdentificador" data-orderable="false" width="25%"><spring:message code="contingut.interessat.columna.representant"/>
+										<th data-col-name="identificador" data-orderable="false" width="35%" data-template="#cellIdentificadorTemplate"><spring:message code="contingut.interessat.columna.identificador"/>
+											<script id="cellIdentificadorTemplate" type="text/x-jsrender">
+												{{:identificador}} 
+												{{if arxiuPropagat}}
+													<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+												{{else}}
+													<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+												{{/if}}												
+											</script>
+										</th>
+										<th data-col-name="representantIdentificador" data-orderable="false" width="25%" data-template="#cellRepresentantTemplate">
+											<spring:message code="contingut.interessat.columna.representant"/>
+											<script id="cellRepresentantTemplate" type="text/x-jsrender">
+												{{:representantIdentificador}} 
+												{{if representantId != null}}
+													{{if representantArxiuPropagat}}
+														<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+													{{else}}
+														<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+													{{/if}}	
+												{{/if}}												
+											</script>										
+										</th>
 										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 										<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
 											<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
 											<div class="dropdown">
 												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 												<ul class="dropdown-menu">
+													{{if (!arxiuPropagat || !representantArxiuPropagat)}}
+														{{if !expedientArxiuPropagat}}
+															<li class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+														{{else}}
+															<li><a href="<c:url value="/expedient/${contingut.id}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+														{{/if}}
+													{{/if}}	
 													<li><a href="<c:url value="/expedient/${contingut.id}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true" class="btnModificarInteressat"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 													<li><a href="<c:url value="/expedient/${contingut.id}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="true" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 													{{if tipus != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>'}}
@@ -2453,7 +2502,7 @@ $.views.helpers(myHelpers);
 													{{/if}}
 												</ul>
 											</div>
-										</script>
+											</script>
 										</th>
 										</c:if>
 									</tr>

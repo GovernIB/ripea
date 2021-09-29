@@ -36,10 +36,10 @@ public abstract class InteressatDto implements Serializable {
 	protected String representantIdentificador;
 	protected String identificador;
 	private boolean esRepresentant;
-	
-	
 	private InteressatDto representant;
-	
+	protected boolean arxiuPropagat;
+	protected boolean representantArxiuPropagat;
+	protected boolean expedientArxiuPropagat;
 	protected Boolean entregaDeh;
 	private Boolean entregaDehObligat;
 	
@@ -207,31 +207,41 @@ public abstract class InteressatDto implements Serializable {
 		this.entregaDeh = entregaDeh;
 	}
 
-
-
 	public Boolean getEntregaDehObligat() {
 		return entregaDehObligat;
 	}
 	public void setEntregaDehObligat(Boolean entregaDehObligat) {
 		this.entregaDehObligat = entregaDehObligat;
 	}
-
-
-
 	public InteressatDto getRepresentant() {
 		return representant;
 	}
 	public void setRepresentant(InteressatDto representant) {
 		this.representant = representant;
 	}
-
-
-
 	public boolean isEsRepresentant() {
 		return esRepresentant;
 	}
 	public void setEsRepresentant(boolean esRepresentant) {
 		this.esRepresentant = esRepresentant;
+	}
+	public boolean isArxiuPropagat() {
+		return arxiuPropagat;
+	}
+	public void setArxiuPropagat(boolean arxiuPropagat) {
+		this.arxiuPropagat = arxiuPropagat;
+	}
+	public boolean isRepresentantArxiuPropagat() {
+		return representantArxiuPropagat;
+	}
+	public void setRepresentantArxiuPropagat(boolean representantArxiuPropagat) {
+		this.representantArxiuPropagat = representantArxiuPropagat;
+	}
+	public boolean isExpedientArxiuPropagat() {
+		return expedientArxiuPropagat;
+	}
+	public void setExpedientArxiuPropagat(boolean expedientArxiuPropagat) {
+		this.expedientArxiuPropagat = expedientArxiuPropagat;
 	}
 
 

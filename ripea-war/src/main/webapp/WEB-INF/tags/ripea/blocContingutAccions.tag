@@ -21,8 +21,16 @@
 
 	<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle<c:if test="${not modeLlistat}"> btn-xs</c:if>"><span class="fa fa-cog"></span><c:if test="${modeLlistat}">&nbsp;<spring:message code="comu.boto.accions"/></c:if>&nbsp;<span class="caret caret-white"></span></button>
 	<ul class="dropdown-menu">
-		<c:if test="${contingut.document && contingut.gesDocAdjuntId!=null}">
-			<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarEnArxiuDocumentAdjunt"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+		<c:if test="${contingut.arxiuUuid==null}">
+			<c:choose>
+				<c:when test="${contingut.document}">
+					<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
+					<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				</c:when>
+				<c:when test="${contingut.expedient}">
+					<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				</c:when>
+			</c:choose>
 		</c:if>
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
 			<c:choose>

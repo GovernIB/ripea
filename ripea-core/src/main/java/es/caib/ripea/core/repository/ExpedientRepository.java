@@ -19,6 +19,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -453,5 +454,40 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
+	
+	
+	
+	
+	@Query(	"select " +
+			"    e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.arxiuUuid = null " +
+			"and e.esborrat = 0 " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
+	public Page<ExpedientEntity> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			Pageable pageable);
+	
+	
+	@Query(	"select " +
+			"    e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and (lower(e.nom) like lower('%'||:text||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:text||'%')) ")
+	public List<ExpedientEntity> findByText(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("text") String text);
+	
+	
 
 }

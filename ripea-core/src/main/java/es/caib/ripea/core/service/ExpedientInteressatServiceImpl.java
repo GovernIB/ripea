@@ -36,6 +36,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
@@ -350,6 +351,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					"No s'ha trobat l'interessat a l'expedient (expedientId=" + expedientId + ")");
 		}
 	}
+	
+	@Override
+	public Exception guardarInteressatsArxiu(
+			Long expId) {
+		return expedientInteressatHelper.guardarInteressatsArxiu(expId);
+	}
+	
 
 	@Transactional(readOnly = true)
 	@Override

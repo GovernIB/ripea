@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -556,6 +557,46 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "contingutExpedientForm";
 		}		
 	}
+	
+	
+	@RequestMapping(value = "/{expedientId}/guardarExpedientArxiu", method = RequestMethod.GET)
+	public String guardarExpedientArxiu(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam(value = "origin") String origin,
+			Model model)  {
+
+		Exception exception = expedientService.guardarExpedientArxiu(expedientId);
+		
+		String redirect = null;
+		if (origin.equals("expDetail")) {
+			redirect = "redirect:../../contingut/" + expedientId;
+		} else if (origin.equals("seguiment")) {
+			redirect = "redirect:../../seguimentArxiuPendents";
+		}
+		
+		if (exception == null) {
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					redirect,
+					"expedient.controller.guardar.arxiu.ok");
+		} else {
+			logger.error("Error guardant document en arxiu", exception);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
+			String msg = null;
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				msg = getMessage(request,"error.arxiu.connectTimedOut");
+			} else {
+				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+			}
+			return getAjaxControllerReturnValueError(
+					request,
+					redirect,
+					"expedient.controller.guardar.arxiu.error",
+					new Object[] {msg});
+		}
+	}
+	
 	
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/grup", method = RequestMethod.GET)
 	@ResponseBody

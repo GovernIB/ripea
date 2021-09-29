@@ -656,7 +656,7 @@ public interface DocumentService {
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
-	public Exception guardarEnArxiuDocumentAdjunt(Long docId);
+	public Exception guardarDocumentArxiu(Long docId);
 
 	/**
 	 * Actualitza un document amb un tipus de document nou

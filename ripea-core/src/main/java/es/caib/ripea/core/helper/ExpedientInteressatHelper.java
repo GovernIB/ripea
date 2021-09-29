@@ -21,6 +21,7 @@ import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 
 @Component
@@ -40,6 +41,8 @@ public class ExpedientInteressatHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
+	@Autowired
+	private ExpedientRepository expedientRepository;
 	
 	@Transactional
 	public InteressatDto create(
@@ -161,8 +164,17 @@ public class ExpedientInteressatHelper {
 		}
 		expedient.addInteressat(interessatEntity);
 		
-		if (propagarArxiu) {
-			pluginHelper.arxiuExpedientActualitzar(expedient);
+		if (propagarArxiu && expedient.getArxiuUuid() != null) {
+			
+			try {
+				pluginHelper.arxiuExpedientActualitzar(expedient);
+				interessatEntity.updateArxiuIntent(true);
+			} catch (Exception e) {
+				logger.error("Error al custodiar interessat en arxiu (" +
+						"id=" + expedient.getId() + ")",
+						e);
+				interessatEntity.updateArxiuIntent(false);
+			}
 		}
 		
 		// Registra al log la creació de l'interessat
@@ -273,6 +285,30 @@ public class ExpedientInteressatHelper {
 		return conversioTipusHelper.convertir(
 							interessatRepository.save(interessatEntity),
 							InteressatDto.class);
+	}
+	
+	@Transactional
+	public Exception guardarInteressatsArxiu(
+			Long expId) {
+		
+		Exception exception = null;
+		ExpedientEntity expedient = expedientRepository.findOne(expId);
+			
+			try {
+				pluginHelper.arxiuExpedientActualitzar(expedient);
+				for (InteressatEntity interessat : expedient.getInteressats()) {
+					interessat.updateArxiuIntent(true);
+				}
+			} catch (Exception e) {
+				logger.error("Error al custodiar interessats en arxiu (" +
+						"expedient id=" + expedient.getId() + ")",
+						e);
+				exception = e;
+				for (InteressatEntity interessat : expedient.getInteressats()) {
+					interessat.updateArxiuIntent(false);
+				}
+			}
+		return exception;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);

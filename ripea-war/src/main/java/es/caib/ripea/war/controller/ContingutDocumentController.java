@@ -316,30 +316,44 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	}
 
 	
-	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarEnArxiuDocumentAdjunt", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarDocumentArxiu", method = RequestMethod.GET)
 	public String guardarEnArxiuDocumentAdjunt(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
+			@RequestParam(value = "origin") String origin,
 			Model model)  {
 
-		Exception exception = documentService.guardarEnArxiuDocumentAdjunt(documentId);
+		Exception exception = documentService.guardarDocumentArxiu(documentId);
+		
+		String redirect = null;
+		if (origin.equals("docDetail")) {
+			redirect = "redirect:../../";
+		} else if (origin.equals("seguiment")) {
+			redirect = "redirect:../../../../seguimentArxiuPendents/#documents";
+		}
 		
 		if (exception == null) {
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:../../",
+					redirect,
 					"document.controller.guardar.arxiu.ok");
 		} else {
 			logger.error("Error guardant document en arxiu", exception);
-			return getModalControllerReturnValueError(
+			
+			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
+			String msg = null;
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				msg = getMessage(request,"error.arxiu.connectTimedOut");
+			} else {
+				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+			}
+			return getAjaxControllerReturnValueError(
 					request,
-					"redirect:../../",
+					redirect,
 					"document.controller.guardar.arxiu.error",
-					new Object[] {exception.getMessage()});
+					new Object[] {msg});
 		}
-
-
 	}
 
 
@@ -1048,6 +1062,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		Long pareId = commandGeneric == null ? command.getPareId() : commandGeneric.getPareId();
 		if (commandGeneric == null ? command.getId() == null : commandGeneric.getId() == null) {
 			DocumentDto documentDto = commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric);
+			
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,
@@ -1083,7 +1098,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					valors);
 			
 			if (!notificar) {
-				if (document.getGesDocAdjuntId()==null) {
+				if (document.getArxiuUuid() != null) {
 					return getModalControllerReturnValueSuccess(
 							request,
 							"redirect:../../contingut/" + pareId,
@@ -1095,8 +1110,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							"document.controller.creat.error.arxiu",
 							null);
 				}
-
-				
 				
 				
 			} else {

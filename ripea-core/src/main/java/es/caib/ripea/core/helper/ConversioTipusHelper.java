@@ -37,6 +37,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
@@ -50,6 +51,7 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
@@ -77,6 +79,9 @@ public class ConversioTipusHelper {
 
 	@Autowired
 	private ContingutHelper contingutHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	
 	@Autowired
 	private TascaHelper tascaHelper;
 	public ConversioTipusHelper() {
@@ -226,6 +231,8 @@ public class ConversioTipusHelper {
 						target.setEntregaDehObligat(source.getEntregaDehObligat());
 						target.setIncapacitat(source.getIncapacitat());
 						target.setRepresentant(source.getRepresentant() != null ? convertir(source.getRepresentant(),InteressatDto.class) : null);
+						target.setRepresentantArxiuPropagat(source.getRepresentant() != null ? source.getRepresentant().isArxiuPropagat() : true);
+						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
 						return target;
 					}
 				});
@@ -439,7 +446,58 @@ public class ConversioTipusHelper {
 					}
 				});	
 		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(ExpedientEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+						target.setId(source.getId());
+						target.setElementNom(source.getNom());
+						target.setExpedientNumeroNom(source.getNom() + " (" + expedientHelper.calcularNumero(source) + ")");
+						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setDataDarrerIntent(source.getArxiuIntentData());
+						return target;
+					}
+				});	
 		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(DocumentEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
+						target.setElementNom(source.getNom());
+						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + expedientHelper.calcularNumero(source.getExpedient()) + ")");
+						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setDataDarrerIntent(source.getArxiuIntentData());
+						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<InteressatEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(InteressatEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
+						if (source instanceof  InteressatAdministracioEntity) {
+							target.setElementNom(((InteressatAdministracioEntity)source).getOrganNom());
+						} else if (source instanceof  InteressatPersonaFisicaEntity) {
+							InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity)source;
+							target.setElementNom(fis.getNom() + " " + fis.getLlinatge1() + " " + fis.getLlinatge2());
+						} else if (source instanceof  InteressatPersonaJuridicaEntity) {
+							target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
+						} 
+						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + expedientHelper.calcularNumero(source.getExpedient()) + ")");
+						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setDataDarrerIntent(source.getArxiuIntentData());
+						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+						return target;
+					}
+				});			
 	}
 	
 

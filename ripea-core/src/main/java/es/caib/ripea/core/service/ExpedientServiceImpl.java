@@ -225,6 +225,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				rolActual);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		ExpedientDto expedientDto = toExpedientDto(expedient, true, null);
+		try {
 		//create expedient in arxiu
 		contingutHelper.arxiuPropagarModificacio(
 				expedient,
@@ -232,6 +233,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
+		} catch (Exception ex) {
+			logger.error("Error al custodiar expedient en arxiu  (" +
+					"id=" + expedient.getId() + ")",
+					ex);
+		}
+		expedient.updateArxiuIntent();
+		
+		
+		// if expedient comes from distribucio
 		boolean processatOk = true;
 		
 		// if expedient comes from distribucio
@@ -891,6 +901,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 	}
 
+	
+	@Transactional
+	@Override
+	public Exception guardarExpedientArxiu(
+			Long expId) {
+		
+		return expedientHelper.guardarExpedientArxiu(expId);
+	}
+	
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
@@ -1163,6 +1183,29 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return trobat;
 	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientDto> findByText(Long entitatId, String text) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				false);
+		List<ExpedientEntity> expedients = expedientRepository.findByText(entitat, text);
+		List<ExpedientDto> expedientsDto = new ArrayList<ExpedientDto>();
+		for (ExpedientEntity expedientEntity : expedients) {
+			ExpedientDto expedientDto = new ExpedientDto();
+			expedientDto.setId(expedientEntity.getId());
+			expedientDto.setNom(expedientEntity.getNom());
+			expedientDto.setNumero(expedientHelper.calcularNumero(expedientEntity));
+			expedientsDto.add(expedientDto);
+		}
+		return expedientsDto;
+	}
+
 
 	@Transactional(readOnly = true)
 	@Override

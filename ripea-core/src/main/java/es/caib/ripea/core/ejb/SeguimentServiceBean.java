@@ -11,6 +11,8 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 import es.caib.ripea.core.api.service.SeguimentService;
@@ -23,7 +25,7 @@ import es.caib.ripea.core.api.service.SeguimentService;
  */
 @Stateless
 @Interceptors(SpringBeanAutowiringInterceptor.class)
-public class SeguimentServiceBean implements SeguimentService {
+public  class SeguimentServiceBean implements SeguimentService {
 
 	@Autowired
 	SeguimentService delegate;
@@ -69,6 +71,42 @@ public class SeguimentServiceBean implements SeguimentService {
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findExpedientsPendents(
+				entitatId,
+				filtre,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_SUPER")
+	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsExpedients(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findArxiuPendentsExpedients(
+				entitatId,
+				filtre,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_SUPER")
+	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsDocuments(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findArxiuPendentsDocuments(
+				entitatId,
+				filtre,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_SUPER")
+	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsInteressats(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findArxiuPendentsInteressats(
 				entitatId,
 				filtre,
 				paginacioParams);
