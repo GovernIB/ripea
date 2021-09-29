@@ -359,6 +359,21 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 		}
 	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/marcarPendentRevisio", method = RequestMethod.GET)
+	public String marcarPendent(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
+		
+		metaExpedientService.marcarPendentRevisio(
+				entitatActual.getId(),
+				metaExpedientId);
+		
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../metaExpedient",
+				"metaexpedient.controller.marcar.pendent.ok");
+	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
 	@ResponseBody

@@ -207,7 +207,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstatRepository.save(expedientEstat),
@@ -245,7 +245,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstat,
@@ -335,7 +335,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		expedientEstatRepository.delete(entity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, entity.getMetaExpedient().getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, entity.getMetaExpedient().getId());
 		}
 		return conversioTipusHelper.convertir(
 				entity,
