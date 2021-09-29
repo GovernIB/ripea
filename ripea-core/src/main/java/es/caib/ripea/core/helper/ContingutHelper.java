@@ -742,7 +742,8 @@ public class ContingutHelper {
 					+ "usuari=" + auth.getName() + ")");
 		}
 		
-		if (!expedientTascaEntity.getResponsable().getCodi().equals(auth.getName())) {
+		UsuariEntity responsableActual = expedientTascaEntity.getResponsableActual();
+		if (responsableActual != null && !responsableActual.getCodi().equals(auth.getName())) {
 			throw new SecurityException("Sense permisos per accedir la tasca ("
 					+ "tascaId=" + expedientTascaEntity.getId() + ", "
 					+ "usuari=" + auth.getName() + ")");

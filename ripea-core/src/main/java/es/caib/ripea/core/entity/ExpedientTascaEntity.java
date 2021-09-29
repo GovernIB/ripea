@@ -3,7 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -45,9 +49,20 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	private MetaExpedientTascaEntity metaExpedientTasca;
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "responsable_codi")
+	@JoinColumn(name = "responsable_actual_codi")
 	@ForeignKey(name = "ipa_usuari_exptasc_fk")
-	private UsuariEntity responsable;
+	private UsuariEntity responsableActual;
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "ipa_expedient_tasca_resp",
+			joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
+			inverseJoinColumns = {@JoinColumn(name = "responsable_codi")})
+	@ForeignKey(
+			name = "ipa_expedient_tasca_fk",
+			inverseName = "ipa_expedient_tascaresp_fk")
+	private List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
+	
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_inici", nullable = false)
@@ -75,13 +90,13 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
-			UsuariEntity responsable,
+			List<UsuariEntity> responsables,
 			Date dataLimit,
 			String comentari) {
 		return new Builder(
 				expedient,
 				metaExpedientTasca,
-				responsable,
+				responsables,
 				dataLimit,
 				comentari);
 	}
@@ -91,13 +106,13 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		Builder(
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
-				UsuariEntity responsable,
+				List<UsuariEntity> responsables,
 				Date dataLimit,
 				String comentari) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
-			built.responsable = responsable;
+			built.responsables = responsables;
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
@@ -108,6 +123,10 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		}
 	}
 
+	public void updateResponsableActual(UsuariEntity responsableActual) {
+		this.responsableActual = responsableActual;
+	}
+	
 	public void updateEstat(TascaEstatEnumDto estat) {
 		this.estat = estat;
 		if (estat == TascaEstatEnumDto.FINALITZADA) {
@@ -131,9 +150,21 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		return metaExpedientTasca;
 	}
 
-	public UsuariEntity getResponsable() {
-		return responsable;
+	public List<UsuariEntity> getResponsables() {
+		return responsables;
 	}
+	
+	public UsuariEntity getResponsableActual() {
+		return responsableActual;
+	}
+
+	public void addResponsable(UsuariEntity responsable) {
+		responsables.add(responsable);
+	}
+	
+	public void removeResponsable(UsuariEntity responsable) {
+		responsables.remove(responsable);
+	} 
 
 	public Date getDataInici() {
 		return dataInici;
@@ -155,5 +186,12 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public String getComentari() {
 		return comentari;
 	}
+	
+//	@PreUpdate
+//	public void clearResponsables() {
+//		if (estat.equals(TascaEstatEnumDto.FINALITZADA) || estat.equals(TascaEstatEnumDto.CANCELLADA) || estat.equals(TascaEstatEnumDto.REBUTJADA)) {
+//			responsables.clear();
+//		}
+//	}
 
 }

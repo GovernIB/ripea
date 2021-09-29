@@ -525,7 +525,7 @@ public class EmailHelper {
 						estatAnterior == null,
 						expedientTascaEntity.getExpedient(),
 						expedientTascaEntity.getCreatedBy().getCodi(),
-						expedientTascaEntity.getResponsable() != null ? expedientTascaEntity.getResponsable().getCodi() : null),
+						expedientTascaEntity.getResponsables()),
 				false);
 
 	}	
@@ -542,7 +542,7 @@ public class EmailHelper {
 			boolean isTascaNova,
 			ExpedientEntity expedient,
 			String createdByCodi,
-			String responsableCodi) {
+			List<UsuariEntity> responsablesTasca) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
 		UsuariEntity agafatPer = expedient.getAgafatPer();
 		
@@ -552,11 +552,13 @@ public class EmailHelper {
 			if ((!isTasca || (isTasca && isTascaNova)) && createdBy.getEmail() != null && !createdBy.getEmail().isEmpty())
 				responsables.add(createdBy);
 	
-			//Persona responsable tasca
-			if (responsableCodi != null) {
-				DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(responsableCodi);
-				if (responsable.getEmail() != null && !responsable.getEmail().isEmpty())
-					responsables.add(responsable);
+			//Persones responsables tasca
+			if (responsablesTasca != null && !responsablesTasca.isEmpty()) {
+				for (UsuariEntity resp: responsablesTasca) {
+					DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(resp.getCodi());
+					if (responsable.getEmail() != null && !responsable.getEmail().isEmpty())
+						responsables.add(responsable);
+				}
 			}
 			
 			//Persona que té agafat l'expedient

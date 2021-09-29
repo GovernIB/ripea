@@ -63,10 +63,12 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientTascaDto createTasca(Long entitatId,
+	public ExpedientTascaDto createTasca(
+			Long entitatId,
 			Long expedientId,
 			ExpedientTascaDto expedientTasca) {
-		return delegate.createTasca(entitatId,
+		return delegate.createTasca(
+				entitatId,
 				expedientId,
 				expedientTasca);
 	}

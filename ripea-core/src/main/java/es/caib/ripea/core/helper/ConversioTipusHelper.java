@@ -4,10 +4,12 @@
 package es.caib.ripea.core.helper;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.joda.time.DateTime;
@@ -61,6 +63,7 @@ import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -159,7 +162,8 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient()));
 						target.setMetaExpedientTasca(convertir(source.getMetaExpedientTasca(), MetaExpedientTascaDto.class));
-						target.setResponsable(convertir(source.getResponsable(), UsuariDto.class));
+						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));
+						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
 						target.setEstat(source.getEstat());
@@ -440,7 +444,11 @@ public class ConversioTipusHelper {
 						target.setExpedientNom(source.getExpedient().getNom());
 						target.setTascaNom(source.getMetaExpedientTasca().getNom());
 						target.setData(source.getDataInici());
-						target.setResponsableNom(source.getResponsable().getNom());
+						List<String> responsablesNom = new ArrayList<String>();
+						for (UsuariEntity responsable: source.getResponsables()) {
+							responsablesNom.add(responsable.getNom());
+						}
+						target.setResponsableNom(StringUtils.join(responsablesNom, ","));
 						target.setTascaEstat(source.getEstat());
 						return target;
 					}

@@ -32,8 +32,8 @@ $(document).ready(function(){
 
 				$('#metaExpedientTascaDescripcio').val(data.descripcio);
 				
-				$('#responsableCodi').data('currentValue', data.responsable);
-				$('#responsableCodi').webutilInputSuggest();
+				$('#responsablesCodi').data('currentValue', data.responsable);
+				$('#responsablesCodi').webutilInputSuggest();
 
 				$('#dataLimit').val(data.dataLimitString);
 			})
@@ -63,13 +63,14 @@ $(document).ready(function(){
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
-			name="responsableCodi" 
+			name="responsablesCodi" 
 			urlConsultaInicial="${urlConsultaInicial}" 
 			urlConsultaLlistat="${urlConsultaLlistat}" 
 			textKey="expedient.tasca.form.camp.responsable"
 			suggestValue="codi"
 			suggestText="nom"
-			required="true"/>				
+			required="true"
+			multiple="true"/>				
 		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
 		<rip:inputTextarea name="comentari" textKey="expedient.tasca.form.camp.comentari" required="false"/>
 		<rip:inputTextarea 

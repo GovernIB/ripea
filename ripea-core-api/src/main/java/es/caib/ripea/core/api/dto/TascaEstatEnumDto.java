@@ -5,5 +5,6 @@ public enum TascaEstatEnumDto {
 	INICIADA,
 	FINALITZADA,
 	CANCELLADA,
-	REBUTJADA
+	REBUTJADA,
+	AGAFADA
 }

@@ -2704,7 +2704,7 @@ $.views.helpers(myHelpers);
 								data-toggle="datatable"
 								data-url="<c:url value="/expedientTasca/${contingut.id}/datatable"/>"
 								data-paging-enabled="false"
-								data-agrupar="5"
+								data-agrupar="6"
 								class="table table-bordered table-striped"
 								style="width:100%"
 								data-botons-template="#taulaTasquesNouBoton">
@@ -2715,7 +2715,8 @@ $.views.helpers(myHelpers);
 										<th data-col-name="comentari" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>	
 										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
-										<th data-col-name="responsable.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable"/></th>								
+										<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>	
+										<th data-col-name="responsableActual.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>								
 										<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
 											<spring:message code="expedient.tasca.list.columna.estat"/>
 											<script id="cellTascaEstatTemplate" type="text/x-jsrender">
