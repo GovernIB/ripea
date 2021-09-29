@@ -377,4 +377,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.findActiusAmbEntitatPerConsultaEstadistiques(entitatId, filtreNomOrCodiSia, rolActual);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
+		return delegate.marcarPendentRevisio(entitatId, id);
+	}
 }

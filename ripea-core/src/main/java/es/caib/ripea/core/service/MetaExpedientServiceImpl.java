@@ -145,7 +145,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
 		} else {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
 		}
@@ -190,7 +190,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
@@ -209,9 +209,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getRevisioComentari());
 
 		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 
+				&& metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
 
 			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
+
+		}
+		
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
+
+			emailHelper.canviEstatRevisioMetaExpedientAOrganAdmin(metaExpedientEntity, entitatId);
 
 		}
 
@@ -232,7 +239,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedient.updateActiu(actiu);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}
@@ -742,7 +749,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				estatFinalitzarTasca).build();
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
 	}
@@ -777,7 +784,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				estatFinalitzarTasca);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -796,7 +803,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entity.updateActiva(activa);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -811,7 +818,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedientTascaRepository.delete(entity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -929,7 +936,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 	}
 
@@ -957,7 +964,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 	}
 
@@ -1038,6 +1045,20 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return configHelper.getAsBoolean("es.caib.ripea.carpetes.defecte");
 	}
 
+	@Transactional
+	@Override
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
+		logger.debug(
+				"Marcant com a pendent de revisióun meta-expedient existent (" + "entitatId=" + entitatId + ", " +
+						"id=" + id + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+
+		metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+		
+		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);
 
 }

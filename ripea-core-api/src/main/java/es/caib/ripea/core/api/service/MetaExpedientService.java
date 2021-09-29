@@ -484,5 +484,19 @@ public interface MetaExpedientService {
 			String filtreNomOrCodiSia,
 			String rolActual);
 	
+	/**
+	 * Marcar com a pendent de revisió el meta-expedient que tengui el mateix
+	 * id que l'especificat per paràmetre.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedient
+	 *            Informació del meta-expedient a marcar com a pendent.
+	 * @return El meta-expedient modificat.
+	 * @throws NotFoundException TODO
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id);
 	
 }

@@ -218,7 +218,71 @@ public class EmailHelper {
 		}
 	}
 	
+	public void canviEstatRevisioMetaExpedientAOrganAdmin(
+			MetaExpedientEntity metaExpedientEntity, 
+			Long entitatId) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de revisio a l'organ admin");
+		
+		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
+		
+		List<String> emailsNoAgrupats = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		
+		DadesUsuari dadesUsuariOrganAdmin = pluginHelper.dadesUsuariFindAmbCodi(organAdminCreador.getCodi());
 	
+		UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuariOrganAdmin.getCodi());
+
+		if (usuari != null) {
+			if (usuari.isRebreEmailsAgrupats()) {
+				emailsAgrupats.add(dadesUsuariOrganAdmin.getEmail());
+			} else {
+				emailsNoAgrupats.add(dadesUsuariOrganAdmin.getEmail());
+			}
+		}
+	
+		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
+		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
+		
+		
+		String from = getRemitent();
+		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
+		String comentari = "";
+		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
+			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
+		}
+		String text = 
+				"Informació del procediment:\n" +
+						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
+						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
+						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+						comentari ;
+		
+		if (!emailsNoAgrupats.isEmpty()) {
+
+			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(from);
+			missatge.setBcc(to);
+			missatge.setSubject(subject);
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
+		
+		if (!emailsAgrupats.isEmpty()) {
+			
+			for (String email : emailsAgrupats) {
+				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
+						from,
+						email,
+						subject,
+						text,
+						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
+						.build();
+				emailPendentEnviarRepository.save(enitity);
+			}
+		}
+	}
 
 	public void canviEstatDocumentPortafirmes(
 			DocumentPortafirmesEntity documentPortafirmes) {
