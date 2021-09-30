@@ -218,7 +218,7 @@
 			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatInterceptor"/>
 		</mvc:interceptor>
 		
-		<!-- Rutes només accessibles amb el rol d'administrador d'entitat -->
+		<!-- Rutes només accessibles amb el rol d'administrador d'entitat o revisor -->
 		<mvc:interceptor>
 			<mvc:mapping path="/metaExpedientRevisio**"/>
 			<mvc:mapping path="/metaExpedientRevisio/**"/>
