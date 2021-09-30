@@ -727,79 +727,82 @@ public class DocumentHelper {
 	}
 	
 	
-	@Transactional
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public Exception guardarDocumentArxiu(
 			Long docId) {
 		
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);
-		try {
-			FitxerDto fitxer = new FitxerDto();
-			fitxer.setNom(documentEntity.getFitxerNom());
-			fitxer.setContentType(documentEntity.getFitxerContentType());
+		if (documentEntity.getExpedientPare().getArxiuUuid() != null) {
+			try {
+				FitxerDto fitxer = new FitxerDto();
+				fitxer.setNom(documentEntity.getFitxerNom());
+				fitxer.setContentType(documentEntity.getFitxerContentType());
 
-			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					documentEntity.getGesDocAdjuntId(),
-					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-					streamAnnex);
-			fitxer.setContingut(streamAnnex.toByteArray());
-			
-			List<ArxiuFirmaDto> firmes = null;
-			if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
-				byte[] firmaSeparada = null;
-				if (documentEntity.getGesDocAdjuntFirmaId() != null) {
-					ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
-					pluginHelper.gestioDocumentalGet(
-							documentEntity.getGesDocAdjuntFirmaId(),
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-							streamAnnex1);
-					firmaSeparada = streamAnnex1.toByteArray();
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						documentEntity.getGesDocAdjuntId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+						streamAnnex);
+				fitxer.setContingut(streamAnnex.toByteArray());
+				
+				List<ArxiuFirmaDto> firmes = null;
+				if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+					byte[] firmaSeparada = null;
+					if (documentEntity.getGesDocAdjuntFirmaId() != null) {
+						ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
+						pluginHelper.gestioDocumentalGet(
+								documentEntity.getGesDocAdjuntFirmaId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+								streamAnnex1);
+						firmaSeparada = streamAnnex1.toByteArray();
+					}
+					firmes = validaFirmaDocument(
+							documentEntity,
+							fitxer,
+							firmaSeparada);
 				}
-				firmes = validaFirmaDocument(
-						documentEntity,
-						fitxer,
-						firmaSeparada);
-			}
+			
+				if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
+					documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
 		
-			if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
-				documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
-	
-	
-				contingutHelper.arxiuPropagarModificacio(
-						documentEntity,
-						fitxer,
-						documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
-						documentEntity.getGesDocAdjuntFirmaId() != null,
-						firmes);
-			
-				if (documentEntity.getGesDocAdjuntId() != null ) {
-					pluginHelper.gestioDocumentalDelete(
-							documentEntity.getGesDocAdjuntId(),
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-					documentEntity.setGesDocAdjuntId(null);
-				}
-				if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
-					pluginHelper.gestioDocumentalDelete(
-							documentEntity.getGesDocAdjuntFirmaId(),
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-					documentEntity.setGesDocAdjuntFirmaId(null);
-				}
-		} catch (Exception ex) {
-			logger.error("Error al custodiar en arxiu document adjunt  (" +
-					"id=" + documentEntity.getId() + ")",
-					ex);
+		
+					contingutHelper.arxiuPropagarModificacio(
+							documentEntity,
+							fitxer,
+							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
+							documentEntity.getGesDocAdjuntFirmaId() != null,
+							firmes);
+				
+					if (documentEntity.getGesDocAdjuntId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+						documentEntity.setGesDocAdjuntId(null);
+					}
+					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntFirmaId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+						documentEntity.setGesDocAdjuntFirmaId(null);
+					}
+			} catch (Exception ex) {
+				logger.error("Error al custodiar en arxiu document adjunt  (" +
+						"id=" + documentEntity.getId() + ")",
+						ex);
 
-			Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
-			if (e != null) {
-				exception = (Exception) e;
-			} else {
-				exception = (Exception) ExceptionUtils.getRootCause(ex);
-				if (exception == null)
-					exception = ex;
+				Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+				if (e != null) {
+					exception = (Exception) e;
+				} else {
+					exception = (Exception) ExceptionUtils.getRootCause(ex);
+					if (exception == null)
+						exception = ex;
+				}
 			}
 		}
+
 		documentEntity.updateArxiuIntent();
 		return exception;
 	}

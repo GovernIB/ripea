@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
@@ -287,13 +288,14 @@ public class ExpedientInteressatHelper {
 							InteressatDto.class);
 	}
 	
-	@Transactional
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public Exception guardarInteressatsArxiu(
 			Long expId) {
 		
 		Exception exception = null;
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
 			
+		if (expedient.getArxiuUuid() != null) {
 			try {
 				pluginHelper.arxiuExpedientActualitzar(expedient);
 				for (InteressatEntity interessat : expedient.getInteressats()) {
@@ -308,6 +310,11 @@ public class ExpedientInteressatHelper {
 					interessat.updateArxiuIntent(false);
 				}
 			}
+		} else {
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(false);
+			}
+		}
 		return exception;
 	}
 	

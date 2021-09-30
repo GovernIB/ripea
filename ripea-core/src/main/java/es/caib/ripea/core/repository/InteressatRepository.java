@@ -190,7 +190,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"where " +
 			"i.arxiuPropagat = false " +
 			"and i.arxiuReintents < :arxiuMaxReintents " +
-			"and i.expedient.arxiuUuid != null " +
 			"order by i.arxiuIntentData asc")
 	public List<InteressatEntity> findInteressatsPendentsArxiu(
 			@Param("arxiuMaxReintents") int arxiuMaxReintents);

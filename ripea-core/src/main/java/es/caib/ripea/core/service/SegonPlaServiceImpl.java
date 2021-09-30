@@ -322,8 +322,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
 		
 		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
-		int arxiuMaxReintentsDocuments =  getArxiuMaxReintentsDocuments();
-		
+		int arxiuMaxReintentsDocuments = getArxiuMaxReintentsDocuments();
 		
 		List<ContingutEntity> pendents = contingutRepository.findContingutsPendentsArxiu(
 				arxiuMaxReintentsExpedients,
@@ -334,9 +333,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			if (contingut instanceof ExpedientEntity) {
 				expedientHelper.guardarExpedientArxiu(contingut.getId());
 			} else if (contingut instanceof DocumentEntity) {
-				if (contingut.getExpedient().getArxiuUuid() != null) {
-					documentHelper.guardarDocumentArxiu(contingut.getId());
-				}
+				documentHelper.guardarDocumentArxiu(contingut.getId());
 			}
 		}
 	}

@@ -815,7 +815,7 @@ public class ExpedientHelper {
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
 	}
 	
-	@Transactional
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public Exception guardarExpedientArxiu(
 			Long expId) {
 		
