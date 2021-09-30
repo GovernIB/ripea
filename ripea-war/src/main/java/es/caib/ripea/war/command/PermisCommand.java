@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.PermisMetaExpedient;
 import lombok.Getter;
 
 /**
@@ -23,6 +24,7 @@ import lombok.Getter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@PermisMetaExpedient
 public class PermisCommand {
 
 	private Long id;

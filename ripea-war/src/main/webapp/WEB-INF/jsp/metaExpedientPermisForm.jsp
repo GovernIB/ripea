@@ -70,7 +70,8 @@
 				textKey="metaexpedient.permis.form.camp.organgestor"
 				disabled="${not empty permisCommand.id}" 
 				suggestValue="id"
-				suggestText="codiINom"/>
+				suggestText="codiINom"
+				required="true"/>
 		</c:if>
 		<rip:inputCheckbox name="selectAll" textKey="metaexpedient.permis.form.camp.all"/>
 		<div class="permisosInput">
