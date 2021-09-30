@@ -193,12 +193,12 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
-					SESSION_ATTRIBUTE_FILTRE_DOCUMENTS);
+					SESSION_ATTRIBUTE_FILTRE_INTERESSATS);
 		} else {
 			if (!bindingResult.hasErrors()) {
 				RequestSessionHelper.actualitzarObjecteSessio(
 						request,
-						SESSION_ATTRIBUTE_FILTRE_DOCUMENTS,
+						SESSION_ATTRIBUTE_FILTRE_INTERESSATS,
 						filtreCommand);
 			}
 		}

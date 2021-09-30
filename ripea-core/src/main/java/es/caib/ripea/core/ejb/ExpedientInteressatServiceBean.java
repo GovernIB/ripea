@@ -155,7 +155,7 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 	@Override
 	@RolesAllowed("tothom")
 	public Exception guardarInteressatsArxiu(Long expId) {
-		return guardarInteressatsArxiu(expId);
+		return delegate.guardarInteressatsArxiu(expId);
 	}
 
 }

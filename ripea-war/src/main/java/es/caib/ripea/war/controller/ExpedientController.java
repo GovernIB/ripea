@@ -487,11 +487,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					false,
 					command.getGrupId(), 
 					RolHelper.getRolActual(request));
+			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../expedient",
-					"expedient.controller.creat.ok");
+			
+			if (expedientDto.getArxiuUuid() != null) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"",
+						"expedient.controller.creat.ok");
+			} else {
+				return getModalControllerReturnValueWarning(
+						request,
+						"",
+						"expedient.controller.creat.error.arxiu",
+						null);
+			}
+
+			
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(

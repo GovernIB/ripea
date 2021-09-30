@@ -128,7 +128,7 @@ $(document).ready(function() {
 			<form:form id="seguimentFiltreDocumentsForm" action="${ formAction }" method="post" cssClass="well" commandName="commandDocuments">
 				<div class="row">
 					<div class="col-md-4">
-						<rip:inputText name="elementNom2" inline="true" placeholderKey="seguiment.list.filtre.camp.expedientNom"/>
+						<rip:inputText name="elementNom2" inline="true" placeholderKey="seguiment.list.filtre.camp.documentNom"/>
 					</div>	
 					<div class="col-md-4">	
 						<c:url value="/expedientajax/expedient" var="urlConsultaInicial"/>
@@ -193,7 +193,7 @@ $(document).ready(function() {
 			<form:form id="seguimentFiltreInteressatsForm" action="${ formAction }" method="post" cssClass="well" commandName="commandInteressats">
 				<div class="row">
 					<div class="col-md-4">
-						<rip:inputText name="elementNom3" inline="true" placeholderKey="seguiment.list.filtre.camp.expedientNom"/>
+						<rip:inputText name="elementNom3" inline="true" placeholderKey="seguiment.list.filtre.camp.interessatNom"/>
 					</div>		
 					<div class="col-md-4">	
 						<c:url value="/expedientajax/expedient" var="urlConsultaInicial"/>
