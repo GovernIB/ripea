@@ -52,14 +52,6 @@
 									<c:if test="${fill.node and not fill.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
 									<c:if test="${fill.document && (fill.estat == 'CUSTODIAT' || (fill.estat == 'FIRMAT' && fill.errorEnviamentPortafirmes && fill.gesDocFirmatId != null) || fill.estat == 'ADJUNT_FIRMAT')}"><span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 									<c:if test="${fill.document && fill.estat == 'FIRMAT' && fill.gesDocFirmatId != null}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span></c:if>
-									<c:choose>
-										<c:when test="${fill.arxiuUuid != null}">
-											<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-										</c:when>
-										<c:otherwise>
-											<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-										</c:otherwise>
-									</c:choose>									
 									<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
 									<c:if test="${fill.document && fill.estat == 'DEFINITIU'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
 									<c:if test="${fill.document && fill.ambNotificacions}">
@@ -95,6 +87,14 @@
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
 									</c:if>
 									${fill.nom}
+									<c:choose>
+										<c:when test="${fill.arxiuUuid != null}">
+											<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+										</c:when>
+										<c:otherwise>
+											<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+										</c:otherwise>
+									</c:choose>									
 								</p>
 								<rip:blocContingutAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}" nodeco="${nodeco}"/>
 							</div>
@@ -206,14 +206,6 @@
 							<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
 							<c:if test="${fill.document && (fill.estat == 'CUSTODIAT' || (fill.estat == 'FIRMAT' && fill.errorEnviamentPortafirmes && fill.gesDocFirmatId != null) || fill.estat == 'ADJUNT_FIRMAT')}"><span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
 							<c:if test="${fill.document && fill.estat == 'FIRMAT' && fill.gesDocFirmatId != null}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span></c:if>
-							<c:choose>
-								<c:when test="${fill.arxiuUuid != null}">
-									<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-								</c:when>
-								<c:otherwise>
-									<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-								</c:otherwise>
-							</c:choose>
 							<c:if test="${fill.document && fill.estat == 'DEFINITIU'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
 							<c:if test="${fill.document && fill.ambNotificacions}">
 								<c:choose>
@@ -245,6 +237,14 @@
 								<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 							</c:if>
 							&nbsp;${fill.nom}
+							<c:choose>
+								<c:when test="${fill.arxiuUuid != null}">
+									<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+								</c:when>
+								<c:otherwise>
+									<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+								</c:otherwise>
+							</c:choose>
 						</td>
 						<td>
 						<c:if test="${fill.document}">

@@ -259,6 +259,22 @@ public class ExpedientHelper {
 		organGestorHelper.crearExpedientOrganPares(
 				expedient,
 				organGestor);
+		
+		try {
+		//create expedient in arxiu
+		contingutHelper.arxiuPropagarModificacio(
+				expedient,
+				null,
+				false,
+				false,
+				null);
+		} catch (Exception ex) {
+			logger.error("Error al custodiar expedient en arxiu  (" +
+					"id=" + expedient.getId() + ")",
+					ex);
+		}
+		expedient.updateArxiuIntent();
+		
 		return expedient.getId();
 	}
 

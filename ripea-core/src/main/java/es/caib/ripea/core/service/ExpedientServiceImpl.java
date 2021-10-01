@@ -225,21 +225,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				rolActual);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		ExpedientDto expedientDto = toExpedientDto(expedient, true, null);
-		try {
-		//create expedient in arxiu
-		contingutHelper.arxiuPropagarModificacio(
-				expedient,
-				null,
-				false,
-				false,
-				null);
-		} catch (Exception ex) {
-			logger.error("Error al custodiar expedient en arxiu  (" +
-					"id=" + expedient.getId() + ")",
-					ex);
-		}
-		expedient.updateArxiuIntent();
-		
 		
 		// if expedient comes from distribucio
 		boolean processatOk = true;
