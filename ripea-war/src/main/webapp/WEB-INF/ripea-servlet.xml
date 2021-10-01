@@ -235,6 +235,7 @@
 			<mvc:mapping path="/excepcio/**"/>
 			<mvc:mapping path="/config**"/>
 			<mvc:mapping path="/config/**"/>
+			<mvc:exclude-mapping path="/entitat/getEntitatLogo"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesSuperInterceptor"/>
 		</mvc:interceptor>		
 	</mvc:interceptors>
