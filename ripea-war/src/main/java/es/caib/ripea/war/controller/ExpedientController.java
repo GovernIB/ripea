@@ -470,7 +470,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 			return "contingutExpedientForm";
 		}
 		try {
