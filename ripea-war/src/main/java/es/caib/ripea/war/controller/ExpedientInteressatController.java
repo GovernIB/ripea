@@ -391,7 +391,7 @@ public class ExpedientInteressatController extends BaseUserController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					redirect,
-					"expedient.controller.guardar.arxiu.ok");
+					"interessat.controller.guardar.arxiu.ok");
 		} else {
 			logger.error("Error guardant document en arxiu", exception);
 			
