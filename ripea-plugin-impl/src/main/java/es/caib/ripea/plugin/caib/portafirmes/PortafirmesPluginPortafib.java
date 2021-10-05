@@ -34,7 +34,6 @@ import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleRevis
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignature;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureBlock;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureRequestInfo;
-import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureRequestWithFlowTemplateCode;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignatureRequestWithSignBlockList;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSignedFile;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleSigner;
@@ -112,8 +111,8 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 			String idTransaccio) throws SistemaExternException {
 		try {
 			long peticioDeFirmaId = 0;
-//			FirmaAsyncSimpleSignatureRequestWithSignBlockList signatureRequest = new FirmaAsyncSimpleSignatureRequestWithSignBlockList();
-			FirmaAsyncSimpleSignatureRequestWithFlowTemplateCode signatureRequest = new FirmaAsyncSimpleSignatureRequestWithFlowTemplateCode();
+			FirmaAsyncSimpleSignatureRequestWithSignBlockList signatureRequest = new FirmaAsyncSimpleSignatureRequestWithSignBlockList();
+
 			signatureRequest.setTitle(document.getTitol());
 			signatureRequest.setDescription(document.getDescripcio());
 			signatureRequest.setReason(motiu);
@@ -159,13 +158,11 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 //				### convertir en blocs de portafirme a partir d'un llistat de destinataris
 				signatureBlocks = simpleBlockToPortafirmesBlock(flux);
 			}
-			signatureRequest.setFlowTemplateCode("23987518");
-//			signatureRequest.setSignatureBlocks(signatureBlocks);
+			signatureRequest.setSignatureBlocks(signatureBlocks);
 			if (isEnviarUrlExpedientPermitida())
 				signatureRequest.setExpedientUrl(getUrlExpedient() + document.getExpedientUuid());
 			
-			peticioDeFirmaId = getFirmaAsyncSimpleApi().createAndStartSignatureRequestWithFlowTemplateCode(signatureRequest);
-					//createAndStartSignatureRequestWithSignBlockList(signatureRequest);
+			peticioDeFirmaId = getFirmaAsyncSimpleApi().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
 			return new Long(peticioDeFirmaId).toString();
 		} catch (Exception ex) {
 			throw new SistemaExternException(
