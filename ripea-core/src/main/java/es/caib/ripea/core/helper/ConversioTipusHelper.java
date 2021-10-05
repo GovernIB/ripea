@@ -449,7 +449,9 @@ public class ConversioTipusHelper {
 						for (UsuariEntity responsable: source.getResponsables()) {
 							responsablesNom.add(responsable.getNom());
 						}
-						target.setResponsableNom(StringUtils.join(responsablesNom, ","));
+						target.setResponsablesNom(StringUtils.join(responsablesNom, ","));
+						if (source.getResponsableActual() != null)
+							target.setResponsableActualNom(source.getResponsableActual().getNom());
 						target.setTascaEstat(source.getEstat());
 						return target;
 					}

@@ -82,7 +82,8 @@
 				</th>						
 				<th data-col-name="tascaNom"><spring:message code="seguiment.list.columna.tasca"/></th>
 				<th data-col-name="tascaEstat" data-renderer="enum(TascaEstatEnumDto)"><spring:message code="seguiment.list.columna.estatEnviament"/></th>
-				<th data-col-name="responsableNom"><spring:message code="seguiment.list.columna.responsable"/></th>
+				<th data-col-name="responsablesNom" data-ordenable="false"><spring:message code="seguiment.list.columna.responsable"/></th>
+				<th data-col-name="responsableActualNom"><spring:message code="seguiment.list.columna.responsable.actual"/></th>
 				<th data-col-name="data" data-type="datetime" data-converter="datetime" nowrap><spring:message code="seguiment.list.columna.dataInici"/></th>
 				<th data-col-name="id" data-visible="false">
 				</th>

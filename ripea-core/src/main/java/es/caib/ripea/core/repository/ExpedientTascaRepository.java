@@ -67,9 +67,9 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 	
 
 	
-	@Query(	"from " +
+	@Query(	"select et from " +
 			"    ExpedientTascaEntity et " +
-			"inner join et.responsables responsable " +
+			"left join et.responsables responsable " +
 			"where " +
 			"    (et.expedient.entitat = :entitat) " +
 			"and (:esNullExpedientNom = true or lower(et.expedient.nom) like lower('%'||:expedientNom||'%')) " +
