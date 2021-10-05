@@ -90,7 +90,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				interessat,
 				propagarArxiu, 
 				PermissionEnumDto.WRITE, 
-				rolActual);
+				rolActual, 
+				true);
 	}
 
 	@Transactional

@@ -597,7 +597,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, "tothom", ResultEnumDto.PAGE).getPagina();
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, "tothom", ResultEnumDto.PAGE).getPagina();
 	}
 
 	@Transactional

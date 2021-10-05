@@ -459,7 +459,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			String filtre, 
 			Long expedientId,
 			boolean isAdmin) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, !isAdmin, false, false, false, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		List<OrganGestorEntity> organsGestors = null;
 		

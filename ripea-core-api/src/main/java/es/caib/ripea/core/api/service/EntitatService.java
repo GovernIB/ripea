@@ -209,7 +209,7 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	byte[] getLogo() throws NoSuchFileException, IOException;
 
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_SUPER')")
 	void evictEntitatsAccessiblesUsuari();
 
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")

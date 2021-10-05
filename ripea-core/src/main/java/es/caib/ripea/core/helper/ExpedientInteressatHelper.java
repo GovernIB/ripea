@@ -53,7 +53,8 @@ public class ExpedientInteressatHelper {
 			InteressatDto interessat,
 			boolean propagarArxiu, 
 			PermissionEnumDto permission, 
-			String rolActual){
+			String rolActual, 
+			boolean comprovarAgafat){
 		
 		if (interessatId != null) {
 			logger.debug("Creant nou representant ("
@@ -70,7 +71,7 @@ public class ExpedientInteressatHelper {
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
-				true,
+				comprovarAgafat,
 				permission.equals(PermissionEnumDto.READ),
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),

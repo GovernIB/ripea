@@ -300,7 +300,8 @@ public class ExpedientHelper {
 						toInteressatDto(registreInteressatEntity, null),
 						true, 
 						permission, 
-						rolActual);
+						rolActual, 
+						false);
 				if (registreInteressatEntity.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
@@ -309,7 +310,8 @@ public class ExpedientHelper {
 							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
 							true, 
 							permission, 
-							rolActual);
+							rolActual, 
+							false);
 				}
 			} else {
 				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();

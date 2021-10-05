@@ -107,10 +107,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				paginacioParams +
 				")");
 
-		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
-				true,
+		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
 				false,
-				false, 
+				false,
+				true, 
 				false, 
 				false);
 

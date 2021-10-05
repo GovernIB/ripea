@@ -65,7 +65,6 @@
 			<mvc:exclude-mapping path="/img/**"/>
 			<mvc:exclude-mapping path="/extensions/**"/>
 			<mvc:exclude-mapping path="/webjars/**"/>
-			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
@@ -80,7 +79,6 @@
 			<mvc:exclude-mapping path="/img/**"/>
 			<mvc:exclude-mapping path="/extensions/**"/>
 			<mvc:exclude-mapping path="/webjars/**"/>
-			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>

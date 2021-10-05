@@ -34,14 +34,7 @@
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
-		<c:choose>
-			<c:when test="${contingut.arxiuUuid != null}">
-				<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-			</c:when>
-			<c:otherwise>
-				<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-			</c:otherwise>
-		</c:choose>		
+
 	</title>
 	
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
@@ -561,6 +554,18 @@ $(document).ready(function() {
 
 		getDetallsSignants($('#detallSignants'), contingutId);
 	});
+
+	<c:choose>
+		<c:when test="${contingut.arxiuUuid != null}">
+			var arxiu = '<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>';
+		</c:when>
+		<c:otherwise>
+			var arxiu = '<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>';
+		</c:otherwise>
+	</c:choose>	
+
+	$(".container-main .panel-heading h2").append(arxiu);
+	
 
 	$('#contenidor-contingut li').mouseover(function() {
 		$('a.btn', this).removeClass('hidden');
