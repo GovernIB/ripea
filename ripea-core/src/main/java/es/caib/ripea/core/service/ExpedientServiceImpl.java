@@ -606,7 +606,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Consultant els expedients(" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(

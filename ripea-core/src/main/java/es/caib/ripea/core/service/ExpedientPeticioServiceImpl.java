@@ -205,9 +205,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				+ "metaExpedientId=" + metaExpedientId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false, false, false);
+				false,
+				true, 
+				false, 
+				false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
