@@ -180,6 +180,14 @@
 			<mvc:mapping path="/metaExpedient**"/>
 			<mvc:mapping path="/metaExpedient/**"/>
 			<mvc:exclude-mapping path="/metaExpedient/findPerLectura/**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/meta**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/meta**/**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/tasca**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/tasca**/**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/grup**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/grup**/**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/permis**"/>
+			<mvc:exclude-mapping path="/metaExpedient/**/permis**/**"/>
 			<mvc:exclude-mapping path="/metaExpedient/metaDadaPermisLectura/domini"/>	
 			<mvc:exclude-mapping path="/metaExpedientRevisio**"/>
 			<mvc:exclude-mapping path="/metaExpedientRevisio/**"/>
