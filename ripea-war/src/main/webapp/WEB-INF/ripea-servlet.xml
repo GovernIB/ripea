@@ -198,11 +198,9 @@
 			<mvc:mapping path="/permis/**"/>
 			<mvc:mapping path="/contingutAdmin**"/>
 			<mvc:mapping path="/contingutAdmin/**"/>
-			<!--  Els usuaris poden accedir a l'historic si tenen permís d'estadística sobre el procediment -->
-			<!-- 
+			<!-- TODO: Els usuaris poden accedir a l'historic si tenen permís d'estadística sobre el procediment --> 
 			<mvc:mapping path="/historic**"/>
 			<mvc:mapping path="/historic/**"/>
-			-->
 			<mvc:mapping path="/seguimentPortafirmes**"/>
 			<mvc:mapping path="/seguimentPortafirmes/**"/>
 			<mvc:mapping path="/seguimentNotificacions**"/>

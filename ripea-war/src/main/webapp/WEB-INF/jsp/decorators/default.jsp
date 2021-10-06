@@ -394,11 +394,11 @@ body {
 						</div>
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
-						<c:if test="${teAccesEstadistiques}">
-							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary">
-								<spring:message code="decorator.menu.accions.estadistiques"/>
-							</a>
-						</c:if>
+<%-- 						<c:if test="${teAccesEstadistiques}"> --%>
+<%-- 							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary"> --%>
+<%-- 								<spring:message code="decorator.menu.accions.estadistiques"/> --%>
+<!-- 							</a> -->
+<%-- 						</c:if> --%>
 						<%---- Expedients ----%>
 						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary">
 								<spring:message code="decorator.menu.expedients"/>
