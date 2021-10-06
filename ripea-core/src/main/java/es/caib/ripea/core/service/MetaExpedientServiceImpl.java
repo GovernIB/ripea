@@ -294,7 +294,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 
 
-		return metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT;
+		return metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT 
+				|| metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY;
 	}
 
 	@Transactional(readOnly = true)
