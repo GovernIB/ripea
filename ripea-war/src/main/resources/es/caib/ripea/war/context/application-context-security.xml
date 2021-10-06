@@ -23,7 +23,7 @@
 		<sec:intercept-url pattern="/entitat*" access="hasRole('IPA_SUPER')"/>
 		<sec:intercept-url pattern="/permis*" access="hasRole('IPA_ADMIN')"/>
 		<sec:intercept-url pattern="/tipusDocumental*" access="hasRole('IPA_ADMIN')"/>
-		<sec:intercept-url pattern="/metaExpedient*" access="hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')"/>
+		<sec:intercept-url pattern="/metaExpedient*" access="hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')"/>
 		<sec:intercept-url pattern="/config*" access="hasRole('IPA_SUPER')"/>
 
 		<sec:intercept-url pattern="/*" access="hasRole('tothom')"/>
