@@ -436,6 +436,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
 			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			resposta.setMetaExpedientId(metaDocument.getMetaExpedient().getId());
 		}
 		return resposta;
 	}	

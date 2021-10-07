@@ -38,6 +38,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
 	private boolean perDefecte;
+	private Long metaExpedientId;
 	
 	@Override
 	public String toString() {
