@@ -3090,7 +3090,7 @@ databaseChangeLog:
               primaryKey: true
               primaryKeyName: ipa_acl_sid_pk
             name: id
-            type: BIGINT
+            type: ${acl_pk_type}
         - column:
             constraints:
               nullable: false
@@ -3114,7 +3114,7 @@ databaseChangeLog:
               primaryKey: true
               primaryKeyName: ipa_acl_class_pk
             name: id
-            type: BIGINT
+            type: ${acl_pk_type}
         - column:
             constraints:
               nullable: false
@@ -3133,7 +3133,7 @@ databaseChangeLog:
               primaryKey: true
               primaryKeyName: ipa_acl_object_identity_pk
             name: id
-            type: BIGINT
+            type: ${acl_pk_type}
         - column:
             constraints:
               nullable: false
@@ -3170,7 +3170,7 @@ databaseChangeLog:
               primaryKey: true
               primaryKeyName: ipa_acl_entry_pk
             name: id
-            type: BIGINT
+            type: ${acl_pk_type}
         - column:
             constraints:
               nullable: false
