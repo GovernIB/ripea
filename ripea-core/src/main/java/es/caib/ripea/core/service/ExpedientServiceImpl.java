@@ -224,7 +224,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				grupId, 
 				rolActual);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		ExpedientDto expedientDto = toExpedientDto(expedient, true, null);
+		ExpedientDto expedientDto = toExpedientDto(expedient, true, null, false);
 		
 		// if expedient comes from distribucio
 		boolean processatOk = true;
@@ -409,7 +409,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, null);
 
 		expedientHelper.updateNomExpedient(expedient, nom);
-		ExpedientDto dto = toExpedientDto(expedient, true, null);
+		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
 	}
@@ -435,7 +435,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
-		ExpedientDto dto = toExpedientDto(expedient, true, null);
+		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
 		return dto;
 	}
@@ -452,7 +452,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false, false, null);
-		return toExpedientDto(expedient, true, null);
+		return toExpedientDto(expedient, true, null, false);
 	}
 
 	@Transactional(readOnly = true)
@@ -492,7 +492,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				contingutPare,
 				nom,
 				esborrat);
-		return expedient == null ? null : toExpedientDto(expedient, true, null);
+		return expedient == null ? null : toExpedientDto(expedient, true, null, false);
 	}
 
 	@Transactional
@@ -967,7 +967,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 									false,
 									true,
 									true,
-									false, null);
+									false, null, false);
 							return dto;
 						}
 					});
@@ -1217,7 +1217,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		});
 		List<ExpedientDto> relacionatsDto = new ArrayList<ExpedientDto>();
 		for (ExpedientEntity e : relacionats)
-			relacionatsDto.add(toExpedientDto(e, false, null));
+			relacionatsDto.add(toExpedientDto(e, false, null, false));
 		return relacionatsDto;
 	}
 
@@ -1640,7 +1640,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						new ConverterParam<ExpedientEntity, ExpedientDto>() {
 							@Override
 							public ExpedientDto convert(ExpedientEntity source, String param) {
-								return toExpedientDto(source, true, param);
+								return toExpedientDto(source, false, param, true);
 							}
 						});
 				for (ExpedientDto expedient: paginaDto) {
@@ -1712,7 +1712,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 
 
-	private ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual) {
+	private ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {
 		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
@@ -1722,7 +1722,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ambPathIPermisos,
 				false,
 				false, 
-				rolActual);
+				rolActual, 
+				onlyForList);
 		return expedientDto;
 	}
 	

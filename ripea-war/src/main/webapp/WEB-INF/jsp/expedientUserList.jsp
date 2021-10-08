@@ -452,7 +452,7 @@ function removeCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="19" 
+		data-default-order="16" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -464,8 +464,6 @@ function removeCookie(cname) {
 			<tr>
 				<th data-col-name="usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="seguidor" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="expedientEstat" data-visible="false"></th>
@@ -475,7 +473,6 @@ function removeCookie(cname) {
 				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
-				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>			
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>	
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
@@ -531,7 +528,7 @@ function removeCookie(cname) {
 <%-- 				<th data-col-name="interessatsResum" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.interessats"/></th>	 --%>
 				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
-							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default {{if !(metaNode.usuariActualWrite || usuariActualWrite)}} disabled {{/if}}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default {{if !usuariActualWrite}} disabled {{/if}}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 				
 					</script>
 				</th>	
@@ -550,7 +547,7 @@ function removeCookie(cname) {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualWrite || usuariActualWrite || '${rolActual}' == 'IPA_ADMIN' || '${rolActual}' == 'IPA_ORGAN_ADMIN'}}
+								{{if usuariActualWrite || '${rolActual}' == 'IPA_ADMIN' || '${rolActual}' == 'IPA_ORGAN_ADMIN'}}
 									{{if !agafat}}
 										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
@@ -561,12 +558,12 @@ function removeCookie(cname) {
 										{{/if}}
 									{{/if}}
 								{{/if}}	
-								{{if metaNode.usuariActualWrite && seguidor}}
+								{{if usuariActualWrite && seguidor}}
 									<li><a href="expedient/{{:id}}/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
-								{{else metaNode.usuariActualWrite && !seguidor}}					
+								{{else usuariActualWrite && !seguidor}}					
 									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
 								{{/if}}
-								{{if metaNode.usuariActualDelete && estat != 'TANCAT'}}
+								{{if usuariActualDelete && estat != 'TANCAT'}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 							</ul>

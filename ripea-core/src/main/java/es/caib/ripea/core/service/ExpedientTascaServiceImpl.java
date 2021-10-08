@@ -172,7 +172,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				true,
 				true,
-				ambVersions, null);
+				ambVersions, null, false);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -702,7 +702,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				true,
 				true,
-				false, null);
+				false, null, false);
 	}
 
 	/*private String getIdiomaPerDefecte() {

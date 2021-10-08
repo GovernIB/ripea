@@ -178,7 +178,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null);
+				false, null, false);
 	}
 
 	@Transactional
@@ -273,7 +273,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null);
+				false, null, false);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -363,7 +363,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null);
+				false, null, false);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -488,7 +488,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null);
+				false, null, false);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -591,7 +591,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null);
+				false, null, false);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -697,7 +697,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null);
+				false, null, false);
 		return dto;
 	}
 
@@ -768,7 +768,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual);
+				rolActual, false);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -801,7 +801,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null);
+				true, null, false);
 	}
 
 	@Transactional(readOnly = true)
@@ -1063,7 +1063,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null);
+								false, null, false);
 					}
 				});
 	}
@@ -1124,7 +1124,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null);
+								false, null, false);
 					}
 				});
 	}
@@ -1590,7 +1590,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null);
+									false, null, false);
 							return dto;
 						}
 					});

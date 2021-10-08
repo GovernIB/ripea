@@ -449,7 +449,7 @@ public class DocumentHelper {
 				false,
 				true,
 				true,
-				false, null);
+				false, null, false);
 	}
 		
 
@@ -882,7 +882,7 @@ public class DocumentHelper {
 							false, 
 							true, 
 							false, 
-							false, null));
+							false, null, false));
 			
 		}
 		return documentsDto;
