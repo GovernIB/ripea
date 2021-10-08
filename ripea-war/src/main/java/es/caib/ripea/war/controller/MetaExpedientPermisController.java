@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.PermisCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -39,6 +41,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 	
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(value = "/{metaExpedientId}/permis", method = RequestMethod.GET)
 	public String permis(
@@ -59,6 +63,11 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
+		
+		if (RolHelper.isRolActualAdministradorOrgan(request) && !Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ"))) {
+			throw new SecurityException("Per poder gestionar permisos la propietat \"es.caib.ripea.procediment.gestio.permis.administrador.organ\" ha de ser activada pel superusuari ", null);
+			
+		}
 		return "metaExpedientPermis";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/permis/datatable", method = RequestMethod.GET)
