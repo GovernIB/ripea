@@ -4,4 +4,4 @@ databaseChangeLog:
     author: limit
     changes:   
     - sql:
-        sql: "Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.procediment.gestio.permis.administrador.organ','true','Propietat per habilitar / deshabilitar la gestió de permisos dels administradors d''òrgan','ALTRES','10','0','BOOL',null,null);"    
+        sql: "Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.procediment.gestio.permis.administrador.organ','true','Habilitar / deshabilitar la gestió de permisos dels administradors d''òrgan','ALTRES','10','0','BOOL',null,null);"    
