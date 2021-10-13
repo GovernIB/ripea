@@ -137,7 +137,12 @@ $(document).ready(function() {
 	});
 	
 	// Mostrar els procediments al filtre
-	findActiusPerLectura();
+	var organGestorId = $("#organGestorId").val();
+	if (organGestorId) {
+		findActiusPerLectura(organGestorId);
+	} else {
+		findActiusPerLectura();
+	}
 	
 	var metaExpedientId = "";
 	var counter = 0;
@@ -255,32 +260,70 @@ $(document).ready(function() {
 function findActiusPerLectura(organId) {
 	var findUrl;
 	if (organId != undefined) {
-		findUrl = '<c:url value="/metaExpedient/findPerLectura/"/>' + organId;
+		findUrl = '<c:url value="/metaExpedient/findPerLectura?organId="/>' + organId;
 	} else {
 		findUrl = '<c:url value="/metaExpedient/findPerLectura/"/>';
 	}
-	var selDomini = $("#metaExpedientId");
-	console.log(selDomini.val());
+	var selProcediments = $("#metaExpedientId");
+	var previousValue = selProcediments.val();
 	$.ajax({
         type: "GET",
         url: findUrl,
         success: function (data) {
-        	selDomini.empty();
-    		selDomini.append("<option value=\"\"></option>");
+        	selProcediments.empty();
+    		selProcediments.append("<option value=\"\"></option>");
     		if (data) {
-    			data.forEach(function(tipus) {
-    				if(tipus.id == '${expedientFiltreCommand.metaExpedientId}') {
-    					selDomini.append("<option value='" + tipus.id + "' selected>" + tipus.nom + " (" + tipus.classificacioSia + ")</option>");
-    				} else {
-    					selDomini.append("<option value='" + tipus.id + "'>" + tipus.nom + " (" + tipus.classificacioSia + ")</option>");
-    				}
-    			});
+
+    		    var procedimentsComuns = [];
+    		    var procedimentsOrgan = [];
+    		    $.each(data, function(i, val) {
+    		        if(val.comu) {
+    		            procedimentsComuns.push(val);
+    		        } else {
+    		            procedimentsOrgan.push(val);
+    		        }
+    		    });
+
+                console.info(procedimentsComuns);
+                console.info(procedimentsOrgan);
+
+
+                if (procedimentsComuns.length > 0) {
+                    selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.comuns'/>'>");
+                    $.each(procedimentsComuns, function(index, val) {
+        				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
+        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        				} else {
+        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        				}
+                    });
+                    selProcediments.append("</optgroup>");
+                }
+                if (procedimentsOrgan.length > 0) {
+                	 selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.organs'/>'>");
+                    $.each(procedimentsOrgan, function(index, val) {
+        				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
+        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        				} else {
+        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        				}
+                    });
+                    selProcediments.append("</optgroup>");
+                }
+    			
     		}
         }
 	});
 	var select2Options = {theme: 'bootstrap', width: '100%', minimumInputLength: 0, allowClear: true}
-	selDomini.select2(select2Options);
+	selProcediments.select2(select2Options);
 }
+
+
+
+
+
+
+
 
 function checkLoadingFinished() {
 	var cookieName = "contentLoaded";
@@ -340,9 +383,7 @@ function removeCookie(cname) {
  					/>				
 			</div>
 			--%>
-			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientId" inline="true" emptyOption="true" optionMinimumResultsForSearch="6" placeholderKey="expedient.list.user.placeholder.procediment"/>
-			</div>
+
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>
 			</div>
@@ -351,12 +392,13 @@ function removeCookie(cname) {
 			</div>
 			<div class="col-md-3">
 				<rip:inputSelect name="expedientEstatId" optionItems="${expedientEstatsOptions}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.list.user.placeholder.estat" inline="true"/>
-			</div>
-
+			</div>	
+			<div class="col-md-3">
+				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
+			</div>	
 		</div>
 		<div class="row">
 			<div class="col-md-3">
-			
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
@@ -367,16 +409,18 @@ function removeCookie(cname) {
  					suggestValue="id"
  					suggestText="codiINom"
  					inline="true"/>	
-			</div>	
+			</div>				
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientId" inline="true" emptyOption="true" optionMinimumResultsForSearch="6" placeholderKey="expedient.list.user.placeholder.procediment"/>
+			</div>		
+	
 			<div class="col-md-3">
 				<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
 			</div>
 			<div class="col-md-3">
 				<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
 			</div>	
-			<div class="col-md-3">
-				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
-			</div>			
+		
 		</div>
 		
 		<div class="row">

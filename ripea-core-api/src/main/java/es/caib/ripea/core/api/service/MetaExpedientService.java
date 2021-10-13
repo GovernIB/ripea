@@ -198,13 +198,15 @@ public interface MetaExpedientService {
 	 *            Id de l'entitat.
 	 * @param filtreNomOrCodiSia TODO
 	 * @param rolActual TODO
+	 * @param comu TODO
+	 * @param organId TODO
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
-			Long entitatId, String filtreNomOrCodiSia, String rolActual) throws NotFoundException;
+	public List<MetaExpedientDto> findActius(
+			Long entitatId, String filtreNomOrCodiSia, String rolActual, boolean comu, Long organId) throws NotFoundException;
 
 	/**
 	 * Retorna el pròxim número de seqüència per a un meta-expedient.
@@ -432,7 +434,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
-			Long organGestorId, String filtre);
+			Long organGestorId, 
+			String filtre);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(Long entitatId, Long metaExpedientId);

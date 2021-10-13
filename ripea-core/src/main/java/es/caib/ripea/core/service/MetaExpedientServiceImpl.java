@@ -366,14 +366,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						")");
 
 		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbEntitatPermis(
+				metaExpedientHelper.findAmbPermis(
 						entitatId,
 						ExtendedPermission.CREATE,
 						true,
 						null, 
 						rolActual != null && rolActual.equals("IPA_ADMIN"),
 						rolActual != null && rolActual.equals("IPA_ORGAN_ADMIN"),
-						null),
+						null, 
+						false),
 				MetaExpedientDto.class);
 
 	}
@@ -383,35 +384,39 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(Long entitatId, String rolActual) {
 		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis WRITE (" + "entitatId=" + entitatId + ")");
 		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbEntitatPermis(
+				metaExpedientHelper.findAmbPermis(
 						entitatId,
 						ExtendedPermission.WRITE,
 						true,
 						null, 
 						"IPA_ADMIN".equals(rolActual),
 						"IPA_ORGAN_ADMIN".equals(rolActual),
-						null),
+						null, 
+						false),
 				MetaExpedientDto.class);
 
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerLectura(
+	public List<MetaExpedientDto> findActius(
 			Long entitatId,
 			String filtreNomOrCodiSia, 
-			String rolActual) {
+			String rolActual, 
+			boolean comu, 
+			Long organId) {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
 
 		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbEntitatPermis(
+				metaExpedientHelper.findAmbPermis(
 						entitatId,
 						ExtendedPermission.READ,
 						true,
 						filtreNomOrCodiSia, 
 						"IPA_ADMIN".equals(rolActual),
 						"IPA_ORGAN_ADMIN".equals(rolActual),
-						null), // TODO especificar organId quan és admin organ
+						organId, 
+						comu), // TODO especificar organId quan és admin organ
 				MetaExpedientDto.class);
 
 	}
@@ -983,14 +988,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.debug("Consulta de meta-expedients de l'entitat amb el permis STATISTICS (" + "entitatId=" + entitatId + ")");
 
 		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbEntitatPermis(
+				metaExpedientHelper.findAmbPermis(
 						entitatId,
 						ExtendedPermission.STATISTICS,
 						true,
 						filtreNomOrCodiSia, 
 						"IPA_ADMIN".equals(rolActual),
 						"IPA_ORGAN_ADMIN".equals(rolActual),
-						null), // TODO especificar organId quan és admin organ
+						null, 
+						false), // TODO especificar organId quan és admin organ
 				MetaExpedientDto.class);
 
 	}

@@ -240,14 +240,15 @@ public class HistoricHelper {
 	
 	private List<Long> getMetaExpedientsPermisStatistics(Long entitatId) {
 		List<Long> metaExpedientsPermisStatisticsIds = new ArrayList<Long>();
-		List<MetaExpedientEntity> metaExpedientsPermisStatistics = metaExpedientHelper.findAmbEntitatPermis(
+		List<MetaExpedientEntity> metaExpedientsPermisStatistics = metaExpedientHelper.findAmbPermis(
 				entitatId,
 				ExtendedPermission.STATISTICS,
 				true,
 				null, 
 				false,
 				false,
-				null);
+				null, 
+				false);
 		for (MetaExpedientEntity metaExpedientEntity : metaExpedientsPermisStatistics) {
 			metaExpedientsPermisStatisticsIds.add(metaExpedientEntity.getId());
 		}

@@ -139,10 +139,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					filtreCommand.getOrganGestorId(), 
 					null);
 		} else {
-			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+			metaExpedientsPermisLectura = metaExpedientService.findActius(
 					entitatActual.getId(), 
 					null, 
-					rolActual);
+					rolActual, 
+					false, 
+					null);
 		}
 		logger.debug("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
 		long t2 = System.currentTimeMillis();
@@ -150,7 +152,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				"rolActual",
 				rolActual);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
-				entitatActual.getId(), null);
+				entitatActual.getId(), 
+				rolActual);
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
 				metaExpedientsPermisCreacio);
@@ -639,10 +642,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		return metaExpedientService.findActiusAmbEntitatPerLectura(
+		return metaExpedientService.findActius(
 				entitatActual.getId(), 
 				null, 
-				rolActual);
+				rolActual, 
+				false, 
+				null);
 	}
 	
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/organsGestorsPermesos", method = RequestMethod.GET)
@@ -1061,19 +1066,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerLectura(
+				metaExpedientService.findActius(
 						entitatActual.getId(), 
 						null, 
-						rolActual));
+						rolActual, 
+						false, 
+						null));
 		model.addAttribute(
 				"expedientEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						ExpedientEstatEnumDto.class,
 						"expedient.estat.enum."));
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
 				entitatActual.getId(), 
 				null, 
-				rolActual);
+				rolActual, 
+				false, 
+				null);
 		model.addAttribute(
 				"metaExpedientsPermisLectura",
 				metaExpedientsPermisLectura);

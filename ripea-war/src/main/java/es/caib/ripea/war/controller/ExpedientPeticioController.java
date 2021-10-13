@@ -92,10 +92,12 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
 				entitatActual.getId(), 
 				null, 
-				rolActual);
+				rolActual, 
+				false, 
+				null);
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientsPermisLectura);

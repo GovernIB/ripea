@@ -198,14 +198,15 @@ public class MetaExpedientHelper {
 	}
 
 	public List<MetaExpedientEntity> findPermesosAccioMassiva(Long entitatId, String rolActual) {
-		return findAmbEntitatPermis(
+		return findAmbPermis(
 				entitatId,
 				ExtendedPermission.WRITE,
 				true,
 				null,
 				"IPA_ADMIN".equals(rolActual),
 				"IPA_ORGAN_ADMIN".equals(rolActual),
-				null);
+				null, 
+				false);
 	}
 	
 	
@@ -242,14 +243,15 @@ public class MetaExpedientHelper {
 	}
 	
 
-	public List<MetaExpedientEntity> findAmbEntitatPermis(
+	public List<MetaExpedientEntity> findAmbPermis(
 			Long entitatId,
 			Permission permis,
 			boolean nomesActius,
 			String filtreNomOrCodiSia, 
 			boolean isAdminEntitat,
 			boolean isAdminOrgan,
-			Long adminOrganOrganId) {
+			Long organId, 
+			boolean comu) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -285,7 +287,9 @@ public class MetaExpedientHelper {
 				organIds == null || organIds.isEmpty() ? null : organIds,
 				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty(),
 				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds, 
-				isRevisioActiva());
+				isRevisioActiva(),
+				comu && organId != null,
+				organId != null ? organGestorRepository.findOne(organId) : null);
 		
 		
 /*		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
@@ -480,24 +484,26 @@ public class MetaExpedientHelper {
 	public List<Long> getIdsCreateWritePermesos(Long entitatId) {
 		
 		List<Long> createPermIds = getIds(
-				findAmbEntitatPermis(
+				findAmbPermis(
 					entitatId,
 					ExtendedPermission.CREATE,
 					true,
 					null,
 					false,
 					false,
-					null));
+					null, 
+					false));
 
 		List<Long> writePermIds = getIds(
-				findAmbEntitatPermis(
+				findAmbPermis(
 					entitatId,
 					ExtendedPermission.WRITE,
 					true,
 					null,
 					false,
 					false,
-					null));
+					null, 
+					false));
 
 		List<Long> createWritePermIds = new ArrayList<>(); 
 		createWritePermIds.addAll(createPermIds);

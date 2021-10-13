@@ -62,10 +62,12 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
-		metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+		metaExpedientsPermisLectura = metaExpedientService.findActius(
 				entitat.getId(), 
 				text, 
-				rolActual);
+				rolActual, 
+				false, 
+				null);
 		
 		return metaExpedientsPermisLectura;
 	}
@@ -86,10 +88,12 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 					text, 
 					rolActual);
 		} else {
-			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
+			metaExpedientsPermisLectura = metaExpedientService.findActius(
 					entitat.getId(), 
 					text, 
-					rolActual);
+					rolActual, 
+					false, 
+					null);
 		}
 		return metaExpedientsPermisLectura;
 	}

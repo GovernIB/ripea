@@ -57,7 +57,7 @@ public class ExpedientHelper {
 			teAcces = new Boolean(false);
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			if (entitatActual != null) {
-				List<MetaExpedientDto> expedientsAccessibles =  metaExpedientService.findActiusAmbEntitatPerLectura(entitatActual.getId(), null, rolActual);
+				List<MetaExpedientDto> expedientsAccessibles =  metaExpedientService.findActius(entitatActual.getId(), null, rolActual, false, null);
 				teAcces = new Boolean(expedientsAccessibles != null && !expedientsAccessibles.isEmpty());
 			}
 			request.getSession().setAttribute(

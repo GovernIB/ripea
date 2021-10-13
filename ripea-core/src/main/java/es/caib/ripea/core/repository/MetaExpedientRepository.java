@@ -169,6 +169,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    me.entitat = :entitat " +
 			"and (:esNullActiu = true or me.actiu = :actiu and (:revisioActiva = false or me.revisioEstat = 'REVISAT')) " +
 			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
+			"and (:organGestorIComu = false or (me.organGestor = :organ or me.organGestor is null)) " +
 			"and (:esAdminEntitat = true " +
 			"     or (:esAdminOrgan = true and :esAdminOrgan = false) " + // TODO esborrar
 			"     or (:esNullIdPermesos = false and me.id in (:idPermesos)) " +
@@ -188,7 +189,12 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("organIdPermesos") List<Long> organIdPermesos,
 			@Param("esNullMetaExpedientOrganIdPermesos") boolean hiHaMetaExpedientOrganIdPermesos,
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos, 
-			@Param("revisioActiva") boolean revisioActiva);
+			@Param("revisioActiva") boolean revisioActiva,
+			@Param("organGestorIComu") boolean organGestorIComu,
+			@Param("organ") OrganGestorEntity organ);
+	
+	
+	
 
 	@Query( "from " +
 			"    MetaExpedientEntity me " +

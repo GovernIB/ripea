@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,7 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.command.MetaExpedientFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -383,38 +385,38 @@ public class MetaExpedientController extends BaseAdminController {
 		return metaExpedientService.findByEntitat(entitatActual.getId());
 	}
 	
+
+	
 	@RequestMapping(value = "/findPerLectura", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> findPerLectura(
 			HttpServletRequest request,
+			@RequestParam(value = "organId", required = false) Long organId,
 			Model model) {
-		
 		long t0 = System.currentTimeMillis();
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbEntitatPerLectura(
-				entitatActual.getId(), 
-				null, 
-				rolActual);
-		
-		logger.debug("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
-		return metaExpedientsPermisLectura;
-	}
-	
-	@RequestMapping(value = "/findPerLectura/{organId}", method = RequestMethod.GET)
-	@ResponseBody
-	public List<MetaExpedientDto> findPerLectura(
-			HttpServletRequest request,
-			@PathVariable Long organId,
-			Model model) {
-		long t0 = System.currentTimeMillis();
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
-				entitatActual.getId(),
-				organId, 
-				null);
-		logger.debug("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
+		List<MetaExpedientDto> metaExpedientsPermisLectura = new ArrayList<MetaExpedientDto>();
+		if (organId != null) {
+			metaExpedientsPermisLectura = metaExpedientService.findActius(
+					entitatActual.getId(), 
+					null, 
+					rolActual, 
+					true, 
+					organId);
+			
+			logger.debug("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
+		} else {
+			metaExpedientsPermisLectura = metaExpedientService.findActius(
+					entitatActual.getId(), 
+					null, 
+					rolActual, 
+					false, 
+					null);
+			logger.debug("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
+		}
+
 		return metaExpedientsPermisLectura;
 	}
 
