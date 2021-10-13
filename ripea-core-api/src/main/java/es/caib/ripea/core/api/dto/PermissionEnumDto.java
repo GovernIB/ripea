@@ -11,5 +11,6 @@ public enum PermissionEnumDto implements Serializable {
 	WRITE,
 	CREATE,
 	DELETE,
-	ADMINISTRATION
+	ADMINISTRATION,
+	STATISTICS
 }

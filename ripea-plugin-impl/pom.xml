@@ -36,6 +36,10 @@
 					<artifactId>stax-api</artifactId>
 					<groupId>stax</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>poi-ooxml</artifactId>
+					<groupId>org.apache.poi</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

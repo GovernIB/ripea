@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -155,7 +156,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		contingutHelper.comprovarNomValid(
 				contingut.getPare(),
 				nom,
@@ -177,7 +178,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null, false);
 	}
 
 	@Transactional
@@ -196,7 +197,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false, true);
+				false, true, null);
 		// Esborra les dades no especificades
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {
@@ -222,7 +223,8 @@ public class ContingutServiceImpl implements ContingutService {
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			Long contingutId) throws IOException {
+			Long contingutId, 
+			String rolActual) throws IOException {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
@@ -233,7 +235,9 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				true, false);
+				true, 
+				false, 
+				rolActual);
 		if (contingut instanceof ExpedientEntity) {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
@@ -269,7 +273,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null, false);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -359,7 +363,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null, false);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -410,7 +414,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true, 
-				false);
+				false, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -418,7 +422,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false);
+				false, null);
 		// Comprova el tipus del contingut que es vol moure
 		if ((contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -436,17 +440,17 @@ public class ContingutServiceImpl implements ContingutService {
 						"No es poden moure documents firmats");
 			}
 		}
-		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -484,7 +488,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null, false);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -511,7 +515,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -519,7 +523,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false);
+				false, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -537,17 +541,17 @@ public class ContingutServiceImpl implements ContingutService {
 						"No es poden copiar documents firmats");
 			}
 		}
-		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -587,7 +591,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null, false);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -612,14 +616,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -637,17 +641,17 @@ public class ContingutServiceImpl implements ContingutService {
 		//				"No es poden enllaçar documents firmats");
 		//	}
 		//}
-		// Es comprova que el tipus d'expedient orígen i destí son el mateix
+		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
 				contingutOrigen,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -693,7 +697,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false);
+				false, null, false);
 		return dto;
 	}
 
@@ -703,13 +707,15 @@ public class ContingutServiceImpl implements ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions) {
+			boolean ambVersions, 
+			String rolActual) {
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
-				true);
+				true, 
+				rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -719,7 +725,8 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermisos) {
+			boolean ambPermisos, 
+			String rolActual) {
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
@@ -760,7 +767,8 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				true,
-				ambVersions);
+				ambVersions, 
+				rolActual, false);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -793,7 +801,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true);
+				true, null, false);
 	}
 
 	@Transactional(readOnly = true)
@@ -1021,6 +1029,11 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		Date dataCreacioInici = DateHelper.toDateInicialDia(filtre.getDataCreacioInici());
 		Date dataCreacioFi = DateHelper.toDateFinalDia(filtre.getDataCreacioFi());
+		
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+		
+		
 		return paginacioHelper.toPaginaDto(
 				contingutRepository.findByFiltrePaginat(
 						entitat,
@@ -1037,7 +1050,7 @@ public class ContingutServiceImpl implements ContingutService {
 						dataCreacioFi,
 						filtre.isMostrarEsborrats(),
 						filtre.isMostrarNoEsborrats(),
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				ContingutDto.class,
 				new Converter<ContingutEntity, ContingutDto>() {
 					@Override
@@ -1050,7 +1063,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false);
+								false, null, false);
 					}
 				});
 	}
@@ -1111,7 +1124,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false);
+								false, null, false);
 					}
 				});
 	}
@@ -1532,7 +1545,7 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1544,6 +1557,9 @@ public class ContingutServiceImpl implements ContingutService {
 		if (!metaExpedientsPermesos.isEmpty()) {
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
 					entitat,
 					metaExpedientsPermesos, 
@@ -1559,7 +1575,7 @@ public class ContingutServiceImpl implements ContingutService {
 					dataInici,
 					dataFi == null,
 					dataFi,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					DocumentDto.class,
@@ -1574,7 +1590,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false);
+									false, null, false);
 							return dto;
 						}
 					});
@@ -1615,7 +1631,7 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1669,7 +1685,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false);
+				false, null);
 		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();

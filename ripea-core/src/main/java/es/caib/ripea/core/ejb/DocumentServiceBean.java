@@ -57,12 +57,13 @@ public class DocumentServiceBean implements DocumentService {
 			Long entitatId,
 			Long contenidorId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, String rolActual) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
 				document,
-				comprovarMetaExpedient);
+				comprovarMetaExpedient, 
+				rolActual);
 	}
 
 	@Override
@@ -70,11 +71,13 @@ public class DocumentServiceBean implements DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, 
+			String rolActual) {
 		return delegate.update(
 				entitatId,
 				document,
-				comprovarMetaExpedient);
+				comprovarMetaExpedient, 
+				rolActual);
 	}
 
 	@Override
@@ -155,7 +158,8 @@ public class DocumentServiceBean implements DocumentService {
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
-			String transaccioId) {
+			String transaccioId, 
+			String rolActual) {
 		delegate.portafirmesEnviar(
 				entitatId,
 				id,
@@ -166,7 +170,8 @@ public class DocumentServiceBean implements DocumentService {
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
 				annexosIds,
-				transaccioId);
+				transaccioId, 
+				rolActual);
 	}
 
 	@Override
@@ -301,11 +306,13 @@ public class DocumentServiceBean implements DocumentService {
 	public void processarFirmaClient(
 			String identificador,
 			String arxiuNom,
-			byte[] arxiuContingut) {
+			byte[] arxiuContingut, 
+			String rolActual) {
 		delegate.processarFirmaClient(
 				identificador,
 				arxiuNom,
-				arxiuContingut);
+				arxiuContingut, 
+				rolActual);
 	}
 
 	@Override	
@@ -399,8 +406,8 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public Exception guardarEnArxiuDocumentAdjunt(Long docId) {
-		return delegate.guardarEnArxiuDocumentAdjunt(docId);
+	public Exception guardarDocumentArxiu(Long docId) {
+		return delegate.guardarDocumentArxiu(docId);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignature;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -305,8 +307,8 @@ public class UsuariTascaController extends BaseUserController {
 					document);
 		} else {
 			command = new DocumentCommand();
-			Date ara = new Date();
-			command.setData(ara);
+			LocalDateTime ara = new LocalDateTime();
+			command.setDataTime(ara);
 
 			omplirModelFormulari(
 					request,
@@ -441,7 +443,7 @@ public class UsuariTascaController extends BaseUserController {
 				documentId,
 				true,
 				false,
-				false);
+				false, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = expedientTascaService.descarregar(
 					entitatActual.getId(),
@@ -471,7 +473,7 @@ public class UsuariTascaController extends BaseUserController {
 			DocumentCommand command,
 			Long tascaId,
 			BindingResult bindingResult,
-			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 //		List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -642,7 +644,7 @@ public class UsuariTascaController extends BaseUserController {
 		model.addAttribute("contingut", contingut);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 		model.addAttribute(
 				"metaDocuments",
 				metaDocumentService.findActiusPerCreacio(

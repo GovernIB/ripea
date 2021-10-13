@@ -4,8 +4,10 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
@@ -143,7 +145,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
 		} else {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
 		}
@@ -188,7 +190,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
@@ -207,9 +209,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getRevisioComentari());
 
 		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 
+				&& metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
 
 			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
+
+		}
+		
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
+
+			emailHelper.canviEstatRevisioMetaExpedientAOrganAdmin(metaExpedientEntity, entitatId);
 
 		}
 
@@ -230,7 +239,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedient.updateActiu(actiu);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}
@@ -270,7 +279,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -285,7 +294,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 
 
-		return metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT;
+		return metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT 
+				|| metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY;
 	}
 
 	@Transactional(readOnly = true)
@@ -297,7 +307,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -314,7 +324,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -350,7 +360,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(Long entitatId) {
+	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(Long entitatId, String rolActual) {
 		logger.debug(
 				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
 						")");
@@ -361,8 +371,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						ExtendedPermission.CREATE,
 						true,
 						null, 
-						false,
-						false,
+						rolActual != null && rolActual.equals("IPA_ADMIN"),
+						rolActual != null && rolActual.equals("IPA_ORGAN_ADMIN"),
 						null),
 				MetaExpedientDto.class);
 
@@ -484,6 +494,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		}
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("organGestor.codiINom", new String[] {"organGestor.codi"});
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
@@ -500,9 +512,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getOrganGestorId()) : null,
 							filtre.getAmbit() == null ,
 							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-							filtre.getRevisioEstat() == null,
-							filtre.getRevisioEstat(),
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
+							filtre.getRevisioEstats()[0] == null,
+							filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
+							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 					MetaExpedientDto.class);
 		} else {
 			return paginacioHelper.toPaginaDto(
@@ -521,8 +533,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							filtre.getOrganGestorId()) : null,
 							filtre.getAmbit() == null ,
 							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-							filtre.getRevisioEstat() == null,
-							filtre.getRevisioEstat(),									
+							filtre.getRevisioEstats()[0] == null,
+							filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),					
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaExpedientDto.class);
 		}
@@ -662,7 +674,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					permission == PermissionEnumDto.WRITE,
 					permission == PermissionEnumDto.CREATE,
 					permission == PermissionEnumDto.DELETE,
-					false);
+					false, null);
 		} catch (PermissionDeniedException ex) {
 			permitted = false;
 		}
@@ -738,7 +750,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				estatFinalitzarTasca).build();
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
 	}
@@ -773,7 +785,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				estatFinalitzarTasca);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -792,7 +804,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entity.updateActiva(activa);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -807,7 +819,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedientTascaRepository.delete(entity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -925,7 +937,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 	}
 
@@ -953,13 +965,34 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 	}
 
 	@Override
 	public boolean isRevisioActiva() {
 		return metaExpedientHelper.isRevisioActiva();
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
+			Long entitatId,
+			String filtreNomOrCodiSia, 
+			String rolActual) {
+		logger.debug("Consulta de meta-expedients de l'entitat amb el permis STATISTICS (" + "entitatId=" + entitatId + ")");
+
+		return conversioTipusHelper.convertirList(
+				metaExpedientHelper.findAmbEntitatPermis(
+						entitatId,
+						ExtendedPermission.STATISTICS,
+						true,
+						filtreNomOrCodiSia, 
+						"IPA_ADMIN".equals(rolActual),
+						"IPA_ORGAN_ADMIN".equals(rolActual),
+						null), // TODO especificar organId quan és admin organ
+				MetaExpedientDto.class);
+
 	}
 	
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
@@ -1013,6 +1046,20 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return configHelper.getAsBoolean("es.caib.ripea.carpetes.defecte");
 	}
 
+	@Transactional
+	@Override
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
+		logger.debug(
+				"Marcant com a pendent de revisióun meta-expedient existent (" + "entitatId=" + entitatId + ", " +
+						"id=" + id + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+
+		metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+		
+		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);
 
 }

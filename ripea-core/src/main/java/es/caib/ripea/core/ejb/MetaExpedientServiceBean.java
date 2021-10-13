@@ -91,7 +91,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_SUPER"})
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
@@ -100,8 +100,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@Override
 	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
-			Long entitatId) {
-		return delegate.findActiusAmbEntitatPerCreacio(entitatId);
+			Long entitatId, String rolActual) {
+		return delegate.findActiusAmbEntitatPerCreacio(entitatId, rolActual);
 	}
 	
 	@Override
@@ -368,4 +368,18 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.isRevisioActiva();
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
+			Long entitatId,
+			String filtreNomOrCodiSia, 
+			String rolActual) {
+		return delegate.findActiusAmbEntitatPerConsultaEstadistiques(entitatId, filtreNomOrCodiSia, rolActual);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
+		return delegate.marcarPendentRevisio(entitatId, id);
+	}
 }

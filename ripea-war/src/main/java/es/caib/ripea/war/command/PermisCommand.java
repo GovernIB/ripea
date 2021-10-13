@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.validation.PermisMetaExpedient;
 import lombok.Getter;
 
 /**
@@ -23,6 +24,7 @@ import lombok.Getter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@PermisMetaExpedient
 public class PermisCommand {
 
 	private Long id;
@@ -36,6 +38,7 @@ public class PermisCommand {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
+	private boolean statistics;
 	private boolean selectAll;
 
 	private Long organGestorId;
@@ -104,6 +107,10 @@ public class PermisCommand {
 
 	public void setAdministration(boolean administration) {
 		this.administration = administration;
+	}
+
+	public void setStatistics(boolean statistics) {
+		this.statistics = statistics;
 	}
 
 	public void setSelectAll(boolean selectAll) {

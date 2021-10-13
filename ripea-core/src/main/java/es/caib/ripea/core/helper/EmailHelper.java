@@ -179,15 +179,15 @@ public class EmailHelper {
 		
 		
 		String from = getRemitent();
-		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de tipus d'expedient";
+		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
 			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
 		}
 		String text = 
-				"Informació del tipus d'expedient:\n" +
+				"Informació del procediment:\n" +
 						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
-						"\tTipus d'expedient nom: " + metaExpedientEntity.getNom() + "\n" +
+						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
 						comentari ;
 		
@@ -218,7 +218,71 @@ public class EmailHelper {
 		}
 	}
 	
+	public void canviEstatRevisioMetaExpedientAOrganAdmin(
+			MetaExpedientEntity metaExpedientEntity, 
+			Long entitatId) {
+		logger.debug("Enviant correu electrònic per a canvi d'estat de revisio a l'organ admin");
+		
+		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
+		
+		List<String> emailsNoAgrupats = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		
+		DadesUsuari dadesUsuariOrganAdmin = pluginHelper.dadesUsuariFindAmbCodi(organAdminCreador.getCodi());
 	
+		UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuariOrganAdmin.getCodi());
+
+		if (usuari != null) {
+			if (usuari.isRebreEmailsAgrupats()) {
+				emailsAgrupats.add(dadesUsuariOrganAdmin.getEmail());
+			} else {
+				emailsNoAgrupats.add(dadesUsuariOrganAdmin.getEmail());
+			}
+		}
+	
+		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
+		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
+		
+		
+		String from = getRemitent();
+		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
+		String comentari = "";
+		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
+			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
+		}
+		String text = 
+				"Informació del procediment:\n" +
+						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
+						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
+						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+						comentari ;
+		
+		if (!emailsNoAgrupats.isEmpty()) {
+
+			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(from);
+			missatge.setBcc(to);
+			missatge.setSubject(subject);
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
+		
+		if (!emailsAgrupats.isEmpty()) {
+			
+			for (String email : emailsAgrupats) {
+				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
+						from,
+						email,
+						subject,
+						text,
+						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
+						.build();
+				emailPendentEnviarRepository.save(enitity);
+			}
+		}
+	}
 
 	public void canviEstatDocumentPortafirmes(
 			DocumentPortafirmesEntity documentPortafirmes) {
@@ -525,7 +589,7 @@ public class EmailHelper {
 						estatAnterior == null,
 						expedientTascaEntity.getExpedient(),
 						expedientTascaEntity.getCreatedBy().getCodi(),
-						expedientTascaEntity.getResponsable() != null ? expedientTascaEntity.getResponsable().getCodi() : null),
+						expedientTascaEntity.getResponsables()),
 				false);
 
 	}	
@@ -542,7 +606,7 @@ public class EmailHelper {
 			boolean isTascaNova,
 			ExpedientEntity expedient,
 			String createdByCodi,
-			String responsableCodi) {
+			List<UsuariEntity> responsablesTasca) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
 		UsuariEntity agafatPer = expedient.getAgafatPer();
 		
@@ -552,11 +616,13 @@ public class EmailHelper {
 			if ((!isTasca || (isTasca && isTascaNova)) && createdBy.getEmail() != null && !createdBy.getEmail().isEmpty())
 				responsables.add(createdBy);
 	
-			//Persona responsable tasca
-			if (responsableCodi != null) {
-				DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(responsableCodi);
-				if (responsable.getEmail() != null && !responsable.getEmail().isEmpty())
-					responsables.add(responsable);
+			//Persones responsables tasca
+			if (responsablesTasca != null && !responsablesTasca.isEmpty()) {
+				for (UsuariEntity resp: responsablesTasca) {
+					DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(resp.getCodi());
+					if (responsable.getEmail() != null && !responsable.getEmail().isEmpty())
+						responsables.add(responsable);
+				}
 			}
 			
 			//Persona que té agafat l'expedient

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -53,7 +54,10 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
-
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN"));
+		
 		return "metaExpedientRevisioList";
 	}
 
@@ -89,10 +93,18 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		filtreCommand.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
+		
+		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
+		if (rolActual.equals("IPA_ADMIN")) {
+			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT, MetaExpedientRevisioEstatEnumDto.REVISAT });
+		} else {
+			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT });
+		}
+		
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
-				filtreCommand.asDto(),
+						filtreDto,
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");

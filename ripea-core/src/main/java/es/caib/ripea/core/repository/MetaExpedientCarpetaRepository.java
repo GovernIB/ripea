@@ -12,7 +12,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades que representa les carpetes d'un tipus d'expedient
+ * de dades que representa les carpetes d'un procediment
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

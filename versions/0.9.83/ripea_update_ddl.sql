@@ -1,4 +1,4 @@
--- #694 Nou perfil Revisor de tipus d'expedient
+-- #694 Nou perfil Revisor de procediment
 ALTER TABLE IPA_METAEXPEDIENT
 ADD (
     REVISIO_ESTAT VARCHAR2(8 CHAR),
@@ -12,7 +12,7 @@ ALTER TABLE IPA_DOCUMENT_ENVIAMENT ADD VF_VALIDATE_CODE VARCHAR2(100 CHAR);
 -- #756 Al firmar en ViaFirma hauria d'enviar un correu de confirmació si així ho marquen en el formulari
 ALTER TABLE IPA_DOCUMENT_ENVIAMENT ADD VF_REBRE_CORREU NUMBER(1);
 
--- #767 Filtrar anotacions pendents per tipus d'expedient
+-- #767 Filtrar anotacions pendents per procediment
 ALTER TABLE ipa_expedient_peticio DROP COLUMN meta_expedient_nom;
 
 ALTER TABLE ipa_expedient_peticio ADD metaexpedient_id NUMBER(19);

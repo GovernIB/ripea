@@ -156,7 +156,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_SUPER')")
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
@@ -166,13 +166,14 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param rolActual TODO
 	 * @return La llista de meta-expedients actius per l'entitat especificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
-			Long entitatId) throws NotFoundException;
+			Long entitatId, String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-expedients actius per una entitat amb el permis WRITE
@@ -476,6 +477,26 @@ public interface MetaExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean isRevisioActiva();
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
+			Long entitatId, 
+			String filtreNomOrCodiSia,
+			String rolActual);
 	
+	/**
+	 * Marcar com a pendent de revisió el meta-expedient que tengui el mateix
+	 * id que l'especificat per paràmetre.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedient
+	 *            Informació del meta-expedient a marcar com a pendent.
+	 * @return El meta-expedient modificat.
+	 * @throws NotFoundException TODO
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id);
 	
 }

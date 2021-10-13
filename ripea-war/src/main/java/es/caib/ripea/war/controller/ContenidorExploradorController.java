@@ -49,7 +49,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false);
+				false, null);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		return contenidor;
 	}	
@@ -67,7 +67,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false);
+				false, null);
 //		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		return contenidor;
 	}
@@ -85,7 +85,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false);
+				false, null);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		
 		Long metaExpedientId;
@@ -98,7 +98,7 @@ public class ContenidorExploradorController extends BaseUserController {
 			metaExpedientId = exp.getMetaNode().getId();
 		}
 		
-		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId);
+		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId, null);
 		
 		
 		List<ContingutDto> expedientsReplaced = new ArrayList<>();
@@ -126,7 +126,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false);
+				false, null);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), contenidorArrelId);
 		List<ContingutDto> expedientsReplaced = new ArrayList<>();

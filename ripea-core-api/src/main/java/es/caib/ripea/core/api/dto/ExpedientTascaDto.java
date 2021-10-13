@@ -1,7 +1,9 @@
 package es.caib.ripea.core.api.dto;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -12,11 +14,12 @@ public class ExpedientTascaDto {
 	private Long id;
 	private ExpedientDto expedient;
 	private MetaExpedientTascaDto metaExpedientTasca;
-	private UsuariDto responsable;
+	private UsuariDto responsableActual; 
+	private List<UsuariDto> responsables;
 	private Date dataInici;
 	private Date dataFi;
 	private TascaEstatEnumDto estat;
-	private String responsableCodi;
+	private List<String> responsablesCodi;
 	private Long metaExpedientTascaId;
 	private String motiuRebuig;
 	private UsuariDto createdBy;
@@ -31,6 +34,17 @@ public class ExpedientTascaDto {
 		} else {
 			return "";
 		}
+	}
+	
+	public boolean isAgafada() {
+		return responsableActual != null;
+	}
+	public String getResponsablesStr() {
+		List<String> responsablesStr = new ArrayList<String>();
+		for (UsuariDto usuariDto : responsables) {
+			responsablesStr.add(usuariDto.getCodi());
+		}
+		return StringUtils.join(responsablesStr, ",");
 	}
 	
 	public String getMetaExpedientTascaDescAbrv() {
@@ -54,11 +68,11 @@ public class ExpedientTascaDto {
 	public void setExpedient(ExpedientDto expedient) {
 		this.expedient = expedient;
 	}
-	public UsuariDto getResponsable() {
-		return responsable;
+	public List<UsuariDto> getResponsables() {
+		return responsables;
 	}
-	public void setResponsable(UsuariDto responsable) {
-		this.responsable = responsable;
+	public void setResponsables(List<UsuariDto> responsables) {
+		this.responsables = responsables;
 	}
 	public Date getDataInici() {
 		return dataInici;
@@ -78,11 +92,11 @@ public class ExpedientTascaDto {
 	public void setEstat(TascaEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public String getResponsableCodi() {
-		return responsableCodi;
+	public List<String> getResponsablesCodi() {
+		return responsablesCodi;
 	}
-	public void setResponsableCodi(String responsableCodi) {
-		this.responsableCodi = responsableCodi;
+	public void setResponsablesCodi(List<String> responsablesCodi) {
+		this.responsablesCodi = responsablesCodi;
 	}
 	public MetaExpedientTascaDto getMetaExpedientTasca() {
 		return metaExpedientTasca;
@@ -119,6 +133,14 @@ public class ExpedientTascaDto {
 	}
 	public void setComentari(String comentari) {
 		this.comentari = comentari;
+	}
+
+	public UsuariDto getResponsableActual() {
+		return responsableActual;
+	}
+
+	public void setResponsableActual(UsuariDto responsableActual) {
+		this.responsableActual = responsableActual;
 	}
 	
 }

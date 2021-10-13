@@ -29,6 +29,8 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
@@ -77,6 +79,7 @@ public class MetaExpedientController extends BaseAdminController {
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
+		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
 		
 		if (RolHelper.isRolActualAdministrador(request)) {
 			boolean revisioActiva = metaExpedientService.isRevisioActiva();
@@ -122,10 +125,14 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
+		
+		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
+		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
+		
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
-				filtreCommand.asDto(),
+				filtreDto,
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
@@ -352,6 +359,21 @@ public class MetaExpedientController extends BaseAdminController {
 				throw ex;
 			}
 		}
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/marcarPendentRevisio", method = RequestMethod.GET)
+	public String marcarPendent(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
+		
+		metaExpedientService.marcarPendentRevisio(
+				entitatActual.getId(),
+				metaExpedientId);
+		
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../metaExpedient",
+				"metaexpedient.controller.marcar.pendent.ok");
 	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)

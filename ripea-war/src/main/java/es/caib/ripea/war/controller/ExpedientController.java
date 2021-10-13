@@ -4,8 +4,10 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -148,7 +150,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				"rolActual",
 				rolActual);
 		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
-				entitatActual.getId());
+				entitatActual.getId(), null);
 		model.addAttribute(
 				"metaExpedientsPermisCreacio",
 				metaExpedientsPermisCreacio);
@@ -235,24 +237,28 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				expedientService.findAmbFiltreUser(
 						entitatActual.getId(),
 						ExpedientFiltreCommand.asDto(filtreCommand),
 						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						rolActual),
+						RolHelper.getRolActual(request)),
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
 	}
 
+	
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody
 	public int select(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -274,7 +280,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			seleccio.addAll(
 					expedientService.findIdsAmbFiltre(
 							entitatActual.getId(),
-							ExpedientFiltreCommand.asDto(filtreCommand)));
+							ExpedientFiltreCommand.asDto(filtreCommand), rolActual));
 		}
 		return seleccio.size();
 	}
@@ -343,7 +349,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
-				expedientId,
+				new HashSet<>(Arrays.asList(expedientId)),
 				false);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
@@ -362,7 +368,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
-				expedientId,
+				new HashSet<>(Arrays.asList(expedientId)),
 				true);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
@@ -373,10 +379,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				response);
 	}
 	
-	@RequestMapping(value = "/generarIndex", method = RequestMethod.GET)
+	@RequestMapping(value = "/generarIndex/{format}", method = RequestMethod.GET)
 	public String generarIndexMultiple(
 			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+			HttpServletResponse response,
+			@PathVariable String format) throws IOException {
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -392,7 +399,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			FitxerDto fitxer = expedientService.exportIndexExpedients(
 					entitatActual.getId(),
-					seleccio);
+					seleccio,
+					format);
 				
 			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 			writeFileToResponse(
@@ -435,9 +443,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		List<MetaExpedientDto> metaExpedients = null;
 		if (expedientId != null) {
-			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom");
+			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request));
 		} else {
-			metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId());
+			metaExpedients = metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), RolHelper.getRolActual(request));
 		}
 		
 		model.addAttribute(
@@ -462,7 +470,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 			return "contingutExpedientForm";
 		}
 		try {
@@ -477,17 +485,30 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getNom(),
 					null,
 					false,
-					command.getGrupId());
+					command.getGrupId(), 
+					RolHelper.getRolActual(request));
+			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../expedient",
-					"expedient.controller.creat.ok");
+			
+			if (expedientDto.getArxiuUuid() != null) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"",
+						"expedient.controller.creat.ok");
+			} else {
+				return getModalControllerReturnValueWarning(
+						request,
+						"",
+						"expedient.controller.creat.error.arxiu",
+						null);
+			}
+
+			
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
-					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 			return "contingutExpedientForm";
 		} catch (Exception ex) {
 			logger.error("Error al crear expedient", ex);
@@ -533,12 +554,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getNom(),
 					command.getAny(),
 					command.getMetaNodeDominiId(), 
-					command.getOrganGestorId());
+					command.getOrganGestorId(), 
+					RolHelper.getRolActual(request));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
 					"expedient.controller.modificat.ok");
 		} catch (ValidationException ex) {
+			logger.error("Error al modificar expedient", ex);
 			MissatgesHelper.error(request, ex.getMessage());
 			model.addAttribute(
 					"metaExpedients",
@@ -546,6 +569,46 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "contingutExpedientForm";
 		}		
 	}
+	
+	
+	@RequestMapping(value = "/{expedientId}/guardarExpedientArxiu", method = RequestMethod.GET)
+	public String guardarExpedientArxiu(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam(value = "origin") String origin,
+			Model model)  {
+
+		Exception exception = expedientService.guardarExpedientArxiu(expedientId);
+		
+		String redirect = null;
+		if (origin.equals("expDetail")) {
+			redirect = "redirect:../../contingut/" + expedientId;
+		} else if (origin.equals("seguiment")) {
+			redirect = "redirect:../../seguimentArxiuPendents";
+		}
+		
+		if (exception == null) {
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					redirect,
+					"expedient.controller.guardar.arxiu.ok");
+		} else {
+			logger.error("Error guardant document en arxiu", exception);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
+			String msg = null;
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				msg = getMessage(request,"error.arxiu.connectTimedOut");
+			} else {
+				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+			}
+			return getAjaxControllerReturnValueError(
+					request,
+					redirect,
+					"expedient.controller.guardar.arxiu.error",
+					new Object[] {msg});
+		}
+	}
+	
 	
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/grup", method = RequestMethod.GET)
 	@ResponseBody
@@ -594,7 +657,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				metaExpedientId,
 				filter, 
-				null);
+				null,
+				RolHelper.isRolActualAdministrador(request));
 
 	}
 
@@ -611,7 +675,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				metaExpedientId,
 				filter, 
-				expedientId);
+				expedientId,
+				RolHelper.isRolActualAdministrador(request));
 
 	}
 
@@ -664,7 +729,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				
 			}
 			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
-				if (expedientService.isOrganGestorPermes(expedientId)) {
+				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
 					expedientService.agafarAdmin(entitatActual.getId(), 
 										null, 
 										expedientId, 
@@ -713,7 +778,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false));
+						false, null));
 		boolean hasWritePermisions = expedientService.hasWritePermission(expedientId);
 		model.addAttribute(
 				"hasWritePermisions",
@@ -735,7 +800,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (text != null && !text.isEmpty()) {
-			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text);
+			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text, RolHelper.getRolActual(request));
 		}
 			
 		return expedientService.findComentarisPerContingut(
@@ -988,7 +1053,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false));
+						false, null));
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
@@ -1074,13 +1139,15 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			expedientService.relacioCreate(
 					entitatActual.getId(),
 					expedientId,
-					relacionatId);
+					relacionatId, 
+					RolHelper.getRolActual(request));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:/../../contingut/" + expedientId,
 					"expedient.controller.relacionat.ok");
 			
 		} catch (Exception e) {
+			logger.error("Error al relacionar expedient", e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../esborrat",
@@ -1117,7 +1184,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (expedientService.relacioDelete(
 				entitatActual.getId(),
 				expedientId,
-				relacionatId)) {
+				relacionatId, 
+				RolHelper.getRolActual(request))) {
 			MissatgesHelper.success(
 					request, 
 					getMessage(
@@ -1254,7 +1322,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				expedientId,
 				true,
-				false);
+				false, null);
 		model.addAttribute("expedient", expedient);
 		if (expedient.isHasEsborranys()) {
 			List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(

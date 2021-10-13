@@ -30,7 +30,8 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"    tasca " +
 			"from " +
 			"    ExpedientTascaEntity tasca " +
-			"where tasca.responsable = :responsable " +
+			"inner join tasca.responsables responsable " +
+			"where responsable = :responsable " +
 			"      and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
 	List<ExpedientTascaEntity> findByResponsableAndEstat(
 			@Param("responsable") UsuariEntity responsable,
@@ -38,16 +39,17 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 	
 	@Query(	"select " +
             "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
-            "	     tasca.responsable, " +
+            "	     responsable, " +
 			"	     e.metaExpedient, " +
             "        count(tasca) " +
             "    ) " +
 			"from " +
 			"    ExpedientTascaEntity tasca JOIN tasca.expedient e " +
+			"inner join tasca.responsables responsable " +
 			"where " +
 			"    tasca.estat IN :estats " +
 			"group by" +
-			"    tasca.responsable, e.metaExpedient")
+			"    responsable, e.metaExpedient")
     List<ContingutLogCountAggregation<UsuariEntity>> countByResponsableAndEstat(
 			@Param("estats") TascaEstatEnumDto[] estats);
 	
@@ -55,8 +57,9 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"    count(tasca) " +
 			"from " +
 			"    ExpedientTascaEntity tasca " +
+			"join tasca.responsables responsable " +
 			"where " +
-			"        tasca.responsable = :responsable " +
+			"       responsable = :responsable " +
 			"    and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
 	long countTasquesPendents(
 			@Param("responsable") UsuariEntity responsable);
@@ -64,15 +67,16 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 	
 
 	
-	@Query(	"from " +
+	@Query(	"select et from " +
 			"    ExpedientTascaEntity et " +
+			"left join et.responsables responsable " +
 			"where " +
 			"    (et.expedient.entitat = :entitat) " +
 			"and (:esNullExpedientNom = true or lower(et.expedient.nom) like lower('%'||:expedientNom||'%')) " +
 			"and (:esNullMetaTasca = true or et.metaExpedientTasca = :metaTasca) " +
 			"and (:esNullDataInici = true or et.createdDate >= :dataInici) " +
 			"and (:esNullDataFinal = true or et.createdDate <= :dataFinal) " +
-			"and (:esNullResponsable = true or et.responsable = :responsable)" +
+			"and (:esNullResponsable = true or responsable = :responsable)" +
 			"and (:esNullEstat = true or et.estat = :estat) ")
 	public Page<ExpedientTascaEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,

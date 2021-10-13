@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Classe del model de dades que representa una carpeta per defecte d'un tipus d'expedient
+ * Classe del model de dades que representa una carpeta per defecte d'un procediment
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

@@ -10,6 +10,9 @@ import java.util.Map;
 
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import es.caib.ripea.core.aggregation.ContingutLogCountAggregation;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.exception.PermissionDeniedStatisticsException;
 import es.caib.ripea.core.entity.HistoricEntity;
 import es.caib.ripea.core.entity.HistoricExpedientEntity;
 import es.caib.ripea.core.entity.HistoricInteressatEntity;
@@ -28,6 +32,7 @@ import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 @Component
 public class HistoricHelper {
@@ -42,7 +47,8 @@ public class HistoricHelper {
 	private ContingutLogRepository contingutLogRepository;
 	@Autowired
 	private ExpedientTascaRepository expedientTascaRepository;
-
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 	
 	@Transactional
 	public void generateOldMontlyHistorics (int nMonths) {
@@ -205,6 +211,47 @@ public class HistoricHelper {
 		}
 
 		return mapHistorics.getValues();
+	}
+	
+	public List<Long> comprovarAccesEstadistiques(
+			Long entitatId,
+			String rolActual) {
+		List<Long> metaExpedientsEstadistica = null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		boolean isUsuariActualApiGranted = rolActual == null && auth != null && auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_API_HIST"));
+		boolean isUsuariActualApiNotGranted = rolActual == null && auth != null && !auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_API_HIST"));
+		
+//		Intent consulta estadístiques API sense permís 'IPA_API_HIST'
+		if (isUsuariActualApiNotGranted)
+			throw new PermissionDeniedStatisticsException("L'usuari " + auth.getName() + " no disposa dels permisos necessaris per consultar les estadístiques");
+		
+//		Consulta estadístiques amb permís 'IPA_API_HIST' (no comprovar permisos sobre meta-expedients)
+		if (isUsuariActualApiGranted)
+			return metaExpedientsEstadistica;
+		
+//		Consulta estadístiques amb permís 'tothom' (comprovar permisos sobre meta-expedients)
+		if ("tothom".equals(rolActual)) {
+			metaExpedientsEstadistica = getMetaExpedientsPermisStatistics(entitatId);
+			if (metaExpedientsEstadistica.isEmpty())
+				throw new PermissionDeniedStatisticsException("L'usuari " + auth.getName() + " no disposa de cap permís estadística sobre cap tipus d'expedient");
+		}
+		return metaExpedientsEstadistica;
+	}
+	
+	private List<Long> getMetaExpedientsPermisStatistics(Long entitatId) {
+		List<Long> metaExpedientsPermisStatisticsIds = new ArrayList<Long>();
+		List<MetaExpedientEntity> metaExpedientsPermisStatistics = metaExpedientHelper.findAmbEntitatPermis(
+				entitatId,
+				ExtendedPermission.STATISTICS,
+				true,
+				null, 
+				false,
+				false,
+				null);
+		for (MetaExpedientEntity metaExpedientEntity : metaExpedientsPermisStatistics) {
+			metaExpedientsPermisStatisticsIds.add(metaExpedientEntity.getId());
+		}
+		return metaExpedientsPermisStatisticsIds;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

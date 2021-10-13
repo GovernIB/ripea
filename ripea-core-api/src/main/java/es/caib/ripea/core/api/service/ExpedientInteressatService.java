@@ -27,19 +27,21 @@ public interface ExpedientInteressatService {
 	 * @param expedientId Atribut id de l'expedient al qual s'associarà
 	 *                    l'interessat.
 	 * @param interessat  Dades de l'interessat que es vol crear.
+	 * @param rolActual TODO
 	 * @return L'interessat creat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat) throws NotFoundException;
+	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) throws NotFoundException;
 
 	/**
 	 * Crea un nou interessat i l'associa a un expedient.
-	 * 
-	 * @param entitatId    Atribut id de l'entitat a la qual pertany l'expedient.
 	 * @param expedientId  Atribut id de l'expedient al qual s'associarà
 	 *                     l'interessat.
 	 * @param representant Dades del representant que es vol crear.
+	 * @param rolActual TODO
+	 * @param entitatId    Atribut id de l'entitat a la qual pertany l'expedient.
+	 * 
 	 * @return L'interessat creat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -49,7 +51,7 @@ public interface ExpedientInteressatService {
 			Long expedientId,
 			Long interessatId,
 			InteressatDto representant,
-			boolean propagarArxiu) throws NotFoundException;
+			boolean propagarArxiu, String rolActual) throws NotFoundException;
 
 	/**
 	 * Modifica un representant associat a un interessat.
@@ -57,14 +59,14 @@ public interface ExpedientInteressatService {
 	 * @param entitatId    Atribut id de l'entitat a la qual pertany l'interessat.
 	 * @param expedientId  Atribut id de l'expedient al qual s'associarà
 	 *                     l'interessat.
+	 * @param rolActual TODO
 	 * @param interessatId Atribut id de linteressat al qual s'associarà
 	 *                     l'interessat.
-	 * 
 	 * @return L'interessat modificat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat) throws NotFoundException;
+	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) throws NotFoundException;
 
 	/**
 	 * Modifica un representant associat a un interessat.
@@ -76,11 +78,12 @@ public interface ExpedientInteressatService {
 	 * @param interessatId Atribut id de linteressat al qual s'associarà el
 	 *                     representant.
 	 * @param representant Dades del representant que es vol modificar.
+	 * @param rolActual TODO
 	 * @return L'interessat modificat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant);
+	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant, String rolActual);
 
 	/**
 	 * elimina un interessat existent en un expedient.
@@ -89,10 +92,11 @@ public interface ExpedientInteressatService {
 	 * @param expedientId  Atribut id de l'expedient al qual s'associarà
 	 *                     l'interessat.
 	 * @param interessatId Atribut id de l'interessat que es vol afegir.
+	 * @param rolActual TODO
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void delete(Long entitatId, Long expedientId, Long interessatId);
+	public void delete(Long entitatId, Long expedientId, Long interessatId, String rolActual);
 
 	/**
 	 * elimina un interessat existent en un expedient.
@@ -104,10 +108,11 @@ public interface ExpedientInteressatService {
 	 * @param interessatId   Atribut id de l'interessat al qual pertany el
 	 *                       representant.
 	 * @param representantId Atribut id del representant que es vol esborrar.
+	 * @param rolActual TODO
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId);
+	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual);
 
 	/**
 	 * Consulta l'interessat donat el seu id.
@@ -245,5 +250,8 @@ public interface ExpedientInteressatService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	public Exception guardarInteressatsArxiu(Long expId);
 
 }

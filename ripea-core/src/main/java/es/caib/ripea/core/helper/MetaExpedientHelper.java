@@ -231,6 +231,7 @@ public class MetaExpedientHelper {
 				for (PermisDto permis: permisosOrganGestor.get(metaExpedientOrgan.getId())) {
 					permis.setOrganGestorId(metaExpedientOrgan.getOrganGestor().getId());
 					permis.setOrganGestorNom(metaExpedientOrgan.getOrganGestor().getNom());
+					permis.setOrganGestorCodi(metaExpedientOrgan.getOrganGestor().getCodi());
 					permisos.add(permis);
 				}
 			}
@@ -358,6 +359,24 @@ public class MetaExpedientHelper {
 						null);
 				
 				emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
+			}
+		}
+	}
+	
+	public void canviarRevisioADisseny(Long entitatId, Long metaExpedientId) {
+
+		boolean revisioActiva = configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
+		
+		if (revisioActiva) {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
+
+			if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
+				metaExpedientEntity.updateRevisioEstat(
+						MetaExpedientRevisioEstatEnumDto.DISSENY,
+						null);
+				// No s'envia email mentre el meta-expedient està en DISSENY;
+				// s'enviarà quan el IPA_ORGAN_ADMIN canviï el seu estat a PENDENT
 			}
 		}
 	}

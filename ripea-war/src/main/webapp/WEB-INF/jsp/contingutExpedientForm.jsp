@@ -113,7 +113,7 @@ function refrescarOrgan() {
 	if (organ) {
 		$('#organFixed').show();
 		$('#organSelect').hide();
-		$('#organFixedNom').text(organ.nom);
+		$('#organFixedNom').text(organ.codi + ' - ' + organ.nom);
 		$('#organFixedNom').after($('<input>').attr({
 		    type: 'hidden',
 		    name: 'organGestorId',
@@ -130,7 +130,7 @@ function refrescarOrgan() {
 				if (organs && organs.length > 0) {
 					$.each(organs, function(i, organ) {
 						const selected = (organ.id == organGestorId) ? ' selected' : '';
-						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.nom + '</option>');
+						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.codi + ' - ' + organ.nom + '</option>');
 					});
 				}
 				selOrgans.select2({

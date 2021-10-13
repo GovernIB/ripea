@@ -32,8 +32,8 @@ public class ExportacioActionHistoric {
 	private ExportacioCsvHistoric exportacioCsvHistoric;
 
 	
-	public FitxerDto exportarHistoricEntitat(EntitatDto entitat, HistoricFiltreDto filtre, String format) throws Exception {
-		List<HistoricExpedientDto> dades = historicService.getDadesEntitat(entitat.getId(), filtre);
+	public FitxerDto exportarHistoricEntitat(EntitatDto entitat, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
+		List<HistoricExpedientDto> dades = historicService.getDadesEntitat(entitat.getId(), rolActual, filtre);
 //		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
 		
 		byte[] fileContent = null;
@@ -66,19 +66,19 @@ public class ExportacioActionHistoric {
 		return fitxer;
 	}
 
-	public FitxerDto exportarHistoricOrgansGestors(HistoricFiltreDto filtre, String format) throws Exception {
+	public FitxerDto exportarHistoricOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
 		
 
 		byte[] fileContent = null;
 		FitxerDto fitxer = null;
 		if (format.equals("json")) {
-			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(filtre);
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(entitatId, rolActual, filtre);
 
 			fileContent = (new ExportacioJSONHistoric()).convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.json", "application/json", fileContent);
 
 		} else if (format.equals("xlsx")) {
-			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(filtre);
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(entitatId, rolActual, filtre);
 			List<OrganGestorDto> organsGestors = new ArrayList<>();
 			for (Long organId : filtre.getOrganGestorsIds()) {
 				OrganGestorDto organGestor = organGestorService.findItem(organId);
@@ -95,12 +95,12 @@ public class ExportacioActionHistoric {
 			fitxer = new FitxerDto("historicOrgansGestors.xls", "application/vnd.ms-excel", fileContent);
 
 		} else if (format.equals("odf")) {
-			Map<OrganGestorDto, List<HistoricExpedientDto>> dades = historicService.getHistoricsByOrganGestor(filtre);
+			Map<OrganGestorDto, List<HistoricExpedientDto>> dades = historicService.getHistoricsByOrganGestor(entitatId, rolActual, filtre);
 			fileContent = (new ExportacioDocHistoric()).convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.ods", "application/vnd.oasis.opendocument.text", fileContent);
 
 		} else if (format.equals("xml")) {
-			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(filtre);
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(entitatId, rolActual, filtre);
 			fileContent = exportacioXMLHistoric.convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
 			fitxer = new FitxerDto("historicOrgansGestors.xml", "application/xml", fileContent);
 
@@ -113,11 +113,13 @@ public class ExportacioActionHistoric {
 
 	public FitxerDto exportarHistoricUsuaris(
 			String[] usuarisCodi,
+			Long entitatId,
+			String rolActual,
 			HistoricFiltreDto filtre,
 			String format) throws Exception {
 		Map<String, List<HistoricUsuariDto>> dades = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
-			dades.put(codiUsuari, historicService.getDadesUsuari(codiUsuari, filtre));
+			dades.put(codiUsuari, historicService.getDadesUsuari(codiUsuari, entitatId, rolActual, filtre));
 		}
 
 		byte[] fileContent = null;
@@ -147,11 +149,13 @@ public class ExportacioActionHistoric {
 
 	public FitxerDto exportarHistoricInteressats(
 			String[] interessatsDocNum,
+			Long entitatId,
+			String rolActual,
 			HistoricFiltreDto filtre,
 			String format) throws Exception {
 		Map<String, List<HistoricInteressatDto>> dades = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
-			dades.put(docNum, historicService.getDadesInteressat(docNum, filtre));
+			dades.put(docNum, historicService.getDadesInteressat(docNum, entitatId, rolActual, filtre));
 		}
 
 		byte[] fileContent = null;

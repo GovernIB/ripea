@@ -47,7 +47,7 @@ public class NomCarpetaNoRepetitValidator implements ConstraintValidator<NomCarp
 					pareId, 
 					true, 
 					false,
-					false);
+					false, null);
 			
 			for (ContingutDto contingut: contingutPare.getFills()) {
 				if (contingut.isCarpeta() && !contingut.isEsborrat()) {

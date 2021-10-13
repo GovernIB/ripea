@@ -43,6 +43,15 @@
 	        }
 	    });
 	});
+	
+	var myHelpers = {
+	        hlpIsAdministradorOrgan: isRolAdminOrgan};
+	
+	$.views.helpers(myHelpers);
+	
+    function isRolAdminOrgan() {
+        return ${isRolAdminOrgan};
+    }
 	</script>
 </head>
 <body>
@@ -80,7 +89,7 @@
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
- 					suggestText="nom" />
+ 					suggestText="codiINom" />
 			</div>
 			<div class="col-md-4">
 				<c:if test="${not isRolAdminOrgan}">
@@ -123,7 +132,7 @@
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
-				<th data-col-name="organGestor.nom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.comu"/>
 					<script id="cellComuTemplate" type="text/x-jsrender">
@@ -140,7 +149,9 @@
 					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
 						<spring:message code="metaexpedient.list.columna.revisioEstat"/>
 						<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
-							{{if revisioEstat == 'PENDENT'}}
+							{{if revisioEstat == 'DISSENY'}}
+								<spring:message code="meta.expedient.revisio.estat.enum.DISSENY"/>
+							{{else revisioEstat == 'PENDENT'}}
 								<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
 							{{else revisioEstat == 'REVISAT'}}
 								<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
@@ -163,11 +174,14 @@
 				<th data-col-name="expedientTasquesCount" data-visible="false"></th>
 				<th data-col-name="grupsCount" data-visible="false"></th>
 				
-				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
-					<script id="cellPermisosTemplate" type="text/x-jsrender">
+				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
+					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
+						<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
-				</th>
+					</th>
+				</c:if>
+
 				
 				<th data-col-name="id" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
 					<script id="cellElementsTemplate" type="text/x-jsrender">
@@ -195,6 +209,9 @@
 								<li><a href="metaExpedient/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
 								{{/if}}
 								<li><a href="metaExpedient/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{^{if ~hlpIsAdministradorOrgan() && revisioEstat == 'DISSENY'}}
+									<li><a href="metaExpedient/{{:id}}/marcarPendentRevisio" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.accio.boto.pendent"/></a></li>
+								{{/if}}
 							</ul>
 						</div>
 					</script>

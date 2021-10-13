@@ -2,6 +2,7 @@ package es.caib.ripea.core.helper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -56,44 +57,50 @@ public class OrganGestorHelper {
 	public boolean isOrganGestorPermes(
 			MetaExpedientEntity metaExpedient,
 			OrganGestorEntity organGestor,
-			Permission permis) {
-		boolean permes = false;
+			Permission permis, 
+			String rolActual) {
 		
-		boolean granted = permisosHelper.isGrantedAll(
-				metaExpedient.getId(),
-				MetaNodeEntity.class,
-				new Permission[] {permis},
-				SecurityContextHolder.getContext().getAuthentication());
-		if (granted) {
-			permes = true;
+		if (RolHelper.isAdmin(rolActual)) {
+			return true;
 		} else {
-			List<OrganGestorEntity> organGestorAmbPares = findPares(
-					metaExpedient,
-					organGestor,
-					true);
-			for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
-				if (permisosHelper.isGrantedAny(
-						organGestorActual.getId(),
-						OrganGestorEntity.class,
-						new Permission[] { permis },
-						SecurityContextHolder.getContext().getAuthentication())) {
-					permes = true;
-					break;
-				}
-				MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientAndOrganGestor(
+			boolean permes = false;
+			
+			boolean granted = permisosHelper.isGrantedAll(
+					metaExpedient.getId(),
+					MetaNodeEntity.class,
+					new Permission[] {permis},
+					SecurityContextHolder.getContext().getAuthentication());
+			if (granted) {
+				permes = true;
+			} else {
+				List<OrganGestorEntity> organGestorAmbPares = findPares(
 						metaExpedient,
-						organGestorActual);
-				if (metaExpedientOrganGestor != null && permisosHelper.isGrantedAny(
-							metaExpedientOrganGestor.getId(),
-							MetaExpedientOrganGestorEntity.class,
+						organGestor,
+						true);
+				for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
+					if (permisosHelper.isGrantedAny(
+							organGestorActual.getId(),
+							OrganGestorEntity.class,
 							new Permission[] { permis },
 							SecurityContextHolder.getContext().getAuthentication())) {
-					permes = true;
-					break;
+						permes = true;
+						break;
+					}
+					MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientAndOrganGestor(
+							metaExpedient,
+							organGestorActual);
+					if (metaExpedientOrganGestor != null && permisosHelper.isGrantedAny(
+								metaExpedientOrganGestor.getId(),
+								MetaExpedientOrganGestorEntity.class,
+								new Permission[] { permis },
+								SecurityContextHolder.getContext().getAuthentication())) {
+						permes = true;
+						break;
+					}
 				}
 			}
+			return permes;
 		}
-		return permes;
 	}
 
 	public void crearExpedientOrganPares(
@@ -151,6 +158,23 @@ public class OrganGestorHelper {
 				entitat,
 				pares));
 	}
+	
+	
+	public List<OrganGestorEntity> findArrelFills(
+			EntitatEntity entitat,
+			String filtre) {
+		OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
+				entitat,
+				entitat.getUnitatArrel());
+		List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
+				entitat,
+				filtre == null,
+				filtre,
+				Arrays.asList(organGestorEntitat.getId()));
+		organsGestors.add(0, organGestorEntitat);
+		return organsGestors;
+	}
+	
 
 	private List<OrganGestorEntity> findPares(
 			MetaExpedientEntity metaExpedient,

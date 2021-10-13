@@ -22,10 +22,17 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
+	<%--
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
-	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
+	--%>
+	<script src="<c:url value="/webjars/moment/2.15.1/min/moment.min.js"/>"></script>
+	<script src="<c:url value="/webjars/moment/2.15.1/min/locales.min.js"/>"></script>
+	<script src="<c:url value="/webjars/moment/2.15.1/locale/${requestLocale}.js"/>"></script>
+	<link href="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/css/bootstrap-datetimepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build//js/bootstrap-datetimepicker.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<rip:modalHead/>
 <style type="text/css">
 
@@ -374,7 +381,8 @@ function removeLoading() {
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
 		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters" maxlength="250"/>
 		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" maxlength="510"/>
-		<rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
+		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
+		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">

@@ -160,7 +160,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long entitatId,
 			Long pareId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, 
+			String rolActual) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
@@ -172,7 +173,8 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false, 
-				false);
+				false, 
+				rolActual);
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
@@ -205,7 +207,8 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto documentDto,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, 
+			String rolActual) {
 		logger.debug("Actualitzant el document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentDto.getId() + ", " +
@@ -216,7 +219,9 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		ContingutEntity pare = null;
 		if (documentDto.getPareId() != null) {
 			contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -226,7 +231,8 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					false);	
+					false, 
+					rolActual);	
 		} 
 		
 		if (! checkCarpetaUniqueContraint(documentDto.getNom(), pare, entitatId)) {
@@ -256,7 +262,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		ContingutEntity pare = null;
 		if (documentEntity.getPareId() != null) {
 			contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -266,7 +272,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					false);	
+					false, null);	
 		} 
 		
 		if (! checkCarpetaUniqueContraint(documentEntity.getNom(), pare, entitatId)) {
@@ -310,7 +316,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -324,79 +330,10 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional
 	@Override
-	public Exception guardarEnArxiuDocumentAdjunt(
+	public Exception guardarDocumentArxiu(
 			Long docId) {
 		
-		Exception exception = null;
-		
-		DocumentEntity documentEntity = documentRepository.findOne(docId);
-		
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(documentEntity.getFitxerNom());
-		fitxer.setContentType(documentEntity.getFitxerContentType());
-		
-		ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-		pluginHelper.gestioDocumentalGet(
-				documentEntity.getGesDocAdjuntId(),
-				PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-				streamAnnex);
-		fitxer.setContingut(streamAnnex.toByteArray());
-		
-		List<ArxiuFirmaDto> firmes = null;
-		if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
-			byte[] firmaSeparada = null;
-			if (documentEntity.getGesDocAdjuntFirmaId() != null) {
-				ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
-				pluginHelper.gestioDocumentalGet(
-						documentEntity.getGesDocAdjuntFirmaId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-						streamAnnex1);
-				firmaSeparada = streamAnnex1.toByteArray();
-			}
-			firmes = documentHelper.validaFirmaDocument(
-					documentEntity,
-					fitxer,
-					firmaSeparada);
-		}
-		
-		if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
-			documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
-
-		try {
-			contingutHelper.arxiuPropagarModificacio(
-					documentEntity,
-					fitxer,
-					documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
-					documentEntity.getGesDocAdjuntFirmaId() != null,
-					firmes);
-		
-			if (documentEntity.getGesDocAdjuntId() != null ) {
-				pluginHelper.gestioDocumentalDelete(
-						documentEntity.getGesDocAdjuntId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-				documentEntity.setGesDocAdjuntId(null);
-			}
-			if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
-				pluginHelper.gestioDocumentalDelete(
-						documentEntity.getGesDocAdjuntFirmaId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-				documentEntity.setGesDocAdjuntFirmaId(null);
-			}
-		} catch (Exception ex) {
-			logger.error("Error al custodiar en arxiu document adjunt  (" +
-					"id=" + documentEntity.getId() + ")",
-					ex);
-
-			Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
-			if (e != null) {
-				exception = (Exception) e;
-			} else {
-				exception = (Exception) ExceptionUtils.getRootCause(ex);
-				if (exception == null)
-					exception = ex;
-			}
-		}
-		return exception;
+		return documentHelper.guardarDocumentArxiu(docId);
 	}
 
 
@@ -418,7 +355,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -456,7 +393,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndTipus(
 				entitat, 
 				expedient,
@@ -585,7 +522,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		ExpedientEntity expedient = pare.getExpedientPare();
 		MetaDocumentEntity metaDocument = null;
 		if (metaDocumentId != null) {
@@ -695,7 +632,8 @@ public class DocumentServiceImpl implements DocumentService {
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
-			String transaccioId) {
+			String transaccioId, 
+			String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
@@ -707,7 +645,9 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		
 		
 		try {
@@ -747,7 +687,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 
 		firmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
@@ -803,7 +743,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		return firmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
@@ -832,7 +772,7 @@ public class DocumentServiceImpl implements DocumentService {
 					true,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 			Exception exception = firmaPortafirmesHelper.portafirmesReintentar(
 					entitatId,
 					document);
@@ -880,6 +820,12 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		return docPortafir;
 	}
+	
+	
+	
+
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -949,7 +895,7 @@ public class DocumentServiceImpl implements DocumentService {
 									false,
 									true,
 									true,
-									false);
+									false, null, false);
 							return dto;
 						}
 					});
@@ -991,7 +937,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin, null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1044,7 +990,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
@@ -1083,7 +1029,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					true,
 					false,
-					false, false);
+					false, false, null);
 			if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 				throw new ValidationException(
 						document.getId(),
@@ -1175,7 +1121,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -1374,7 +1320,8 @@ public class DocumentServiceImpl implements DocumentService {
 	public void processarFirmaClient(
 			String identificador,
 			String arxiuNom,
-			byte[] arxiuContingut) {
+			byte[] arxiuContingut, 
+			String rolActual) {
 		logger.debug("Custodiar identificador firma applet ("
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;
@@ -1395,7 +1342,9 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					true,
 					false,
-					false, false);
+					false, 
+					false, 
+					rolActual);
 			
 			firmaAppletHelper.processarFirmaClient(
 					identificador,
@@ -1493,7 +1442,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				true,
-				false);
+				false, null, false);
 	}
 	
 	

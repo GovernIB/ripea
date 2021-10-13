@@ -130,7 +130,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					plantillaContingut);
 		}
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				metaDocumentRepository.save(entity),
@@ -245,7 +245,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		
 		return conversioTipusHelper.convertir(
@@ -337,7 +337,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				id);
 		metaDocument.updateActiu(actiu);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				metaDocument,
@@ -372,7 +372,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				id);
 		metaDocumentRepository.delete(metaDocument);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				metaDocument,
@@ -405,7 +405,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 		}
 		return resposta;
 	}
@@ -435,7 +435,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			resposta.setMetaExpedientId(metaDocument.getMetaExpedient().getId());
 		}
 		return resposta;
 	}	
@@ -477,7 +478,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 										MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 		}
 		return resposta;
 	}
@@ -662,7 +663,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				contingut,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 				entitat,
 				expedientSuperior);
@@ -696,7 +697,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				document,
 				true,
 				false,
-				false, false);
+				false, false, null);
 		// Han de ser els mateixos que per a la creació però afegit el meta-document
 		// del document que es vol modificar
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
@@ -832,7 +833,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
 				entitat, 
 				metaExpedientId);
-//		Recupera els metadocuments del mateix tipus d'expedient
+//		Recupera els metadocuments del mateix procediment
 		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
 		
 		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {

@@ -4,6 +4,7 @@
 package es.caib.ripea.core.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +52,7 @@ import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.TascaHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
@@ -99,6 +101,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private DocumentFirmaAppletHelper documentFirmaAppletHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private TascaHelper tascaHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -115,7 +119,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				false,
 				false,
-				false, false);
+				false, false, null);
 		
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
@@ -168,7 +172,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				true,
 				true,
-				ambVersions);
+				ambVersions, null, false);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -268,7 +272,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				"tascaEstatEnumDto=" + tascaEstatEnumDto +
 				")");
 
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName());
+		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
 		TascaEstatEnumDto estatAnterior = expedientTascaEntity.getEstat();
 		
 		if (tascaEstatEnumDto == TascaEstatEnumDto.REBUTJADA) {
@@ -277,13 +283,20 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			expedientTascaEntity.updateEstat(tascaEstatEnumDto);
 		}
 		
+		if(tascaEstatEnumDto == TascaEstatEnumDto.INICIADA) {
+			expedientTascaEntity.updateResponsableActual(responsableActual);
+		}
+		
 		if (tascaEstatEnumDto == TascaEstatEnumDto.FINALITZADA && expedientTascaEntity.getMetaExpedientTasca().getEstatFinalitzarTasca() != null) {
 			ExpedientEntity expedientEntity = expedientTascaEntity.getExpedient();
 			expedientEntity.updateExpedientEstat(expedientTascaEntity.getMetaExpedientTasca().getEstatFinalitzarTasca());
 		}
 		
 		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior);
-		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
+		
+		for (UsuariEntity responsable: expedientTascaEntity.getResponsables()) {
+			cacheHelper.evictCountTasquesPendents(responsable.getCodi());	
+		}
 
 		log(expedientTascaEntity, LogTipusEnumDto.CANVI_ESTAT);
 		
@@ -326,16 +339,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				false,
-				false, false);
+				false, false, null);
 
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
-		
-		UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(expedientTasca.getResponsableCodi());
+		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
+		for (String responsableCodi: expedientTasca.getResponsablesCodi()) {
+			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi);
+			responsables.add(responsable);
+		}
 
 		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(
 				expedient, 
 				metaExpedientTascaEntity, 
-				responsable, 
+				responsables, 
 				expedientTasca.getDataLimit(),
 				expedientTasca.getComentari()).build();
 		
@@ -343,7 +359,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			expedient.updateExpedientEstat(metaExpedientTascaEntity.getEstatCrearTasca());
 		}
 		
-		cacheHelper.evictCountTasquesPendents(expedientTascaEntity.getResponsable().getCodi());
+		for (String responsableCodi: expedientTasca.getResponsablesCodi()) {
+			cacheHelper.evictCountTasquesPendents(responsableCodi);	
+		}
 		
 		expedientTascaRepository.save(expedientTascaEntity);
 		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
@@ -357,7 +375,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional
 	public void enviarEmailCrearTasca(Long expedientTascaId) {
 		
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
+		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
 
 		emailHelper.enviarEmailCanviarEstatTasca(
 				expedientTascaEntity,
@@ -400,7 +418,10 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(tascaId);
 		if (expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			expedientTascaEntity.updateEstat(TascaEstatEnumDto.INICIADA);
+			UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName());
+			expedientTascaEntity.updateResponsableActual(responsableActual);
 		}
 
 		return documentHelper.crearDocument(
@@ -681,7 +702,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				true,
 				true,
-				false);
+				false, null, false);
 	}
 
 	/*private String getIdiomaPerDefecte() {

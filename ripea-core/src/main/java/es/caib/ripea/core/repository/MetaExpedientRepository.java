@@ -48,7 +48,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
-			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
+			"and (:esNullRevisioEstat = true or me.revisioEstat IN (:revisioEstats)) ")
 	List<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullCodi") boolean esNullCodi,
@@ -64,9 +64,9 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullAmbit") boolean esNullAmbit,
 			@Param("comuns") boolean comuns,
 			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
-			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
+			@Param("revisioEstats") MetaExpedientRevisioEstatEnumDto[] revisioEstats,
 			Sort sort);
-
+	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +
@@ -77,7 +77,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
-			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
+			"and (:esNullRevisioEstat = true or me.revisioEstat IN (:revisioEstats)) ")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullCodi") boolean esNullCodi,
@@ -93,7 +93,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("esNullAmbit") boolean esNullAmbit,
 			@Param("comuns") boolean comuns,
 			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
-			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
+			@Param("revisioEstats") MetaExpedientRevisioEstatEnumDto[] revisioEstats,
 			Pageable pageable);
 
 	@Query( "from " +

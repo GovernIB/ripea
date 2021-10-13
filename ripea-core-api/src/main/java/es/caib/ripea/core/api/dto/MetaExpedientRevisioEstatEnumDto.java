@@ -12,5 +12,6 @@ package es.caib.ripea.core.api.dto;
 public enum MetaExpedientRevisioEstatEnumDto {
 	PENDENT,
 	REVISAT,
-	REBUTJAT
+	REBUTJAT,
+	DISSENY
 }

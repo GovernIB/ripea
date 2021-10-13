@@ -13,5 +13,6 @@ public class MetaExpedientFiltreDto {
 
 	private MetaExpedientAmbitEnumDto ambit;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
+	private MetaExpedientRevisioEstatEnumDto[] revisioEstats;
 
 }

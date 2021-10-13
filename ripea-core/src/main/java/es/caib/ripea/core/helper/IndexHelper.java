@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -95,70 +96,76 @@ public class IndexHelper {
 	private ConfigHelper configHelper;
 
 	public byte[] generarIndexPerExpedient(
-			ExpedientEntity expedient, 
+			List<ExpedientEntity> expedients, 
 			EntitatEntity entitatActual,
 			boolean exportar) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			Document index = inicialitzaDocument(out);
 			
-			crearTitol(
-					index, 
-					expedient,
-					false);
-			
-			crearTaulaDocuments(
-					index, 
-					expedient, 
-					entitatActual,
-					false);
-			
-//			## Crear un índex per cada expedient relacionat
-			if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
-//				## [TAULA QUE CONTÉ EL TÍTOL 'EXPEDIENTS RELACIONATS']
-				PdfPTable titolRelacioTable = new PdfPTable(1);
-				titolRelacioTable.setWidthPercentage(100);
-
-//				## [TITOL EXPEDIENTS RELACIONATS]
-				PdfPCell relacioTitolCell = new PdfPCell();
-				relacioTitolCell.setBorder(Rectangle.BOTTOM);
-				relacioTitolCell.setBorderColor(new BaseColor(160, 160, 160));
-				Paragraph relacioTitol = new Paragraph(messageHelper.getMessage("expedient.service.exportacio.index.relacions"), frutiger10Italic);
-				relacioTitol.add(Chunk.NEWLINE);
-				relacioTitolCell.addElement(relacioTitol);
-				titolRelacioTable.addCell(relacioTitolCell);
-				index.add(titolRelacioTable);
+			for (Iterator<ExpedientEntity> it = expedients.iterator(); it.hasNext();) {
+				ExpedientEntity expedient = it.next();
+				crearTitol(
+						index, 
+						expedient,
+						false);
 				
-				if (!expedient.getRelacionatsAmb().isEmpty()) {
-//					## [TÍTOL I TAULA PER CADA RELACIÓ]
-					for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsAmb()) {
-						crearTitol(
-								index, 
-								expedient_relacionat,
-								true);
-						crearTaulaDocuments(
-								index, 
-								expedient_relacionat, 
-								entitatActual,
-								true);
+				crearTaulaDocuments(
+						index, 
+						expedient, 
+						entitatActual,
+						false);
+				
+	//			## Crear un índex per cada expedient relacionat
+				if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
+	//				## [TAULA QUE CONTÉ EL TÍTOL 'EXPEDIENTS RELACIONATS']
+					PdfPTable titolRelacioTable = new PdfPTable(1);
+					titolRelacioTable.setWidthPercentage(100);
+	
+	//				## [TITOL EXPEDIENTS RELACIONATS]
+					PdfPCell relacioTitolCell = new PdfPCell();
+					relacioTitolCell.setBorder(Rectangle.BOTTOM);
+					relacioTitolCell.setBorderColor(new BaseColor(160, 160, 160));
+					Paragraph relacioTitol = new Paragraph(messageHelper.getMessage("expedient.service.exportacio.index.relacions"), frutiger10Italic);
+					relacioTitol.add(Chunk.NEWLINE);
+					relacioTitolCell.addElement(relacioTitol);
+					titolRelacioTable.addCell(relacioTitolCell);
+					index.add(titolRelacioTable);
+					
+					if (!expedient.getRelacionatsAmb().isEmpty()) {
+	//					## [TÍTOL I TAULA PER CADA RELACIÓ]
+						for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsAmb()) {
+							crearTitol(
+									index, 
+									expedient_relacionat,
+									true);
+							crearTaulaDocuments(
+									index, 
+									expedient_relacionat, 
+									entitatActual,
+									true);
+						}
 					}
-				}
-				if (!expedient.getRelacionatsPer().isEmpty()) {
-//					## [TÍTOL I TAULA PER CADA RELACIÓ]
-					for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsPer()) {
-						crearTitol(
-								index, 
-								expedient_relacionat,
-								true);
-						crearTaulaDocuments(
-								index, 
-								expedient_relacionat, 
-								entitatActual,
-								true);
+					if (!expedient.getRelacionatsPer().isEmpty()) {
+	//					## [TÍTOL I TAULA PER CADA RELACIÓ]
+						for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsPer()) {
+							crearTitol(
+									index, 
+									expedient_relacionat,
+									true);
+							crearTaulaDocuments(
+									index, 
+									expedient_relacionat, 
+									entitatActual,
+									true);
+						}
 					}
+					
+
+					if (it.hasNext())
+						index.add(Chunk.NEXTPAGE);
 				}
 			}
-			
 			index.close();
 		} catch (Exception ex) {
 			throw new RuntimeException(

@@ -55,6 +55,10 @@
 			<dd>${contingut.ntiClasificacionSia}</dd>
 		</c:if>
 		<c:if test="${contingut.document}">
+			<c:if test="${!empty contingut.descripcio}">
+				<dt><spring:message code="contingut.admin.info.camp.descripcio"/></dt>
+				<dd>${contingut.descripcio}</dd>
+			</c:if>
 			<dt><spring:message code="contingut.admin.info.camp.data"/></dt>
 			<dd><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></dd>
 			<dt><spring:message code="contingut.admin.info.camp.estat"/></dt>

@@ -42,7 +42,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/organgestor")
-public class OrganGestorController extends BaseUserController {
+public class OrganGestorController extends BaseUserOAdminController {
 	
 	private static final String SESSION_ATTRIBUTE_FILTRE = "OrganGestorController.session.filtre";
 	

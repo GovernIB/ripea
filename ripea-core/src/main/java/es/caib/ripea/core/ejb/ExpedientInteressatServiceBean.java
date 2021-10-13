@@ -34,8 +34,8 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat) {
-		return delegate.create(entitatId, expedientId, interessat);
+	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) {
+		return delegate.create(entitatId, expedientId, interessat, rolActual);
 	}
 
 	@Override
@@ -45,32 +45,32 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 			Long expedientId,
 			Long interessatId,
 			InteressatDto representant,
-			boolean propagarArxiu) {
-		return delegate.create(entitatId, expedientId, interessatId, representant, propagarArxiu);
+			boolean propagarArxiu, String rolActual) {
+		return delegate.create(entitatId, expedientId, interessatId, representant, propagarArxiu, null);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat) {
-		return delegate.update(entitatId, expedientId, interessat);
+	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) {
+		return delegate.update(entitatId, expedientId, interessat, rolActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant) {
-		return delegate.update(entitatId, expedientId, interessatId, representant);
+	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant, String rolActual) {
+		return delegate.update(entitatId, expedientId, interessatId, representant, rolActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public void delete(Long entitatId, Long expedientId, Long interessatId) {
-		delegate.delete(entitatId, expedientId, interessatId);
+	public void delete(Long entitatId, Long expedientId, Long interessatId, String rolActual) {
+		delegate.delete(entitatId, expedientId, interessatId, null);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId) {
-		delegate.delete(entitatId, expedientId, interessatId, representantId);
+	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual) {
+		delegate.delete(entitatId, expedientId, interessatId, representantId, rolActual);
 	}
 
 	@Override
@@ -150,6 +150,12 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 	@RolesAllowed("tothom")
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException {
 		return delegate.findByDocumentNum(documentNum);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Exception guardarInteressatsArxiu(Long expId) {
+		return delegate.guardarInteressatsArxiu(expId);
 	}
 
 }

@@ -10,4 +10,8 @@ public interface SegonPlaService {
 
 	void testEmailsAgrupats();
 
+	void guardarExpedientsDocumentsArxiu();
+
+	void guardarInteressatsArxiu();
+
 }

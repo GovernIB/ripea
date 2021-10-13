@@ -106,8 +106,8 @@ public class DocumentHelper {
 				document.getDocumentTipus(),
 				document.getNom(),
 				document.getDescripcio(),
-				document.getData(),
 				new Date(),
+				document.getData(), //data captura
 				expedient.getNtiOrgano(),
 				metaDocument.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
@@ -161,34 +161,37 @@ public class DocumentHelper {
 			entity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
 		
 		try {
-			contingutHelper.arxiuPropagarModificacio(
-					entity,
-					fitxer,
-					document.isAmbFirma(),
-					document.isFirmaSeparada(),
-					firmes != null ? firmes : firmesValidacio);
-		
-			if (gestioDocumentalAdjuntId != null ) {
-				pluginHelper.gestioDocumentalDelete(
-						gestioDocumentalAdjuntId,
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-				entity.setGesDocAdjuntId(null);
+			if (entity.getExpedient().getArxiuUuid() != null) {
+				contingutHelper.arxiuPropagarModificacio(
+						entity,
+						fitxer,
+						document.isAmbFirma(),
+						document.isFirmaSeparada(),
+						firmes != null ? firmes : firmesValidacio);
+				
+				if (gestioDocumentalAdjuntId != null ) {
+					pluginHelper.gestioDocumentalDelete(
+							gestioDocumentalAdjuntId,
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					entity.setGesDocAdjuntId(null);
+				}
+				if (gestioDocumentalAdjuntFirmaId != null ) {
+					pluginHelper.gestioDocumentalDelete(
+							gestioDocumentalAdjuntFirmaId,
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					entity.setGesDocAdjuntFirmaId(null);
+				}	
 			}
-			if (gestioDocumentalAdjuntFirmaId != null ) {
-				pluginHelper.gestioDocumentalDelete(
-						gestioDocumentalAdjuntFirmaId,
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-				entity.setGesDocAdjuntFirmaId(null);
-			}
+
 			
 		} catch (Exception ex) {
-			logger.error("Error al custodiar en arxiu document adjunt  (" +
+			logger.error("Error al custodiar document en arxiu  (" +
 					"id=" + entity.getId() + ")",
 					ex);
-			Throwable rootCause = ExceptionUtils.getRootCause(ex);
-			if (rootCause == null) rootCause = ex;
 
 		}
+		entity.updateArxiuIntent();
+		
 		if (returnDetail)		
 			dto = toDocumentDto(entity);
 		else
@@ -238,9 +241,9 @@ public class DocumentHelper {
 				metaDocument,
 				document.getNom(),
 				document.getDescripcio(),
-				document.getData(),
-				document.getUbicacio(),
 				documentEntity.getDataCaptura(),
+				document.getUbicacio(),
+				document.getData(),
 				documentEntity.getNtiOrgano(),
 				metaDocument.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
@@ -446,7 +449,7 @@ public class DocumentHelper {
 				false,
 				true,
 				true,
-				false);
+				false, null, false);
 	}
 		
 
@@ -684,7 +687,8 @@ public class DocumentHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin) {
+			boolean checkPerMassiuAdmin, 
+			String rolActual) {
 		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientModificable(
 				entitatId,
 				id,
@@ -692,7 +696,8 @@ public class DocumentHelper {
 				comprovarPermisWrite,
 				comprovarPermisCreate,
 				comprovarPermisDelete, 
-				checkPerMassiuAdmin);
+				checkPerMassiuAdmin, 
+				rolActual);
 		if (!ContingutTipusEnumDto.DOCUMENT.equals(node.getTipus())) {
 			throw new ValidationException(
 					id,
@@ -720,6 +725,88 @@ public class DocumentHelper {
 		}
 		return (DocumentEntity)node;
 	}
+	
+	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public Exception guardarDocumentArxiu(
+			Long docId) {
+		
+		Exception exception = null;
+
+		DocumentEntity documentEntity = documentRepository.findOne(docId);
+		if (documentEntity.getExpedientPare().getArxiuUuid() != null) {
+			try {
+				FitxerDto fitxer = new FitxerDto();
+				fitxer.setNom(documentEntity.getFitxerNom());
+				fitxer.setContentType(documentEntity.getFitxerContentType());
+
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						documentEntity.getGesDocAdjuntId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+						streamAnnex);
+				fitxer.setContingut(streamAnnex.toByteArray());
+				
+				List<ArxiuFirmaDto> firmes = null;
+				if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+					byte[] firmaSeparada = null;
+					if (documentEntity.getGesDocAdjuntFirmaId() != null) {
+						ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
+						pluginHelper.gestioDocumentalGet(
+								documentEntity.getGesDocAdjuntFirmaId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+								streamAnnex1);
+						firmaSeparada = streamAnnex1.toByteArray();
+					}
+					firmes = validaFirmaDocument(
+							documentEntity,
+							fitxer,
+							firmaSeparada);
+				}
+			
+				if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
+					documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
+		
+		
+					contingutHelper.arxiuPropagarModificacio(
+							documentEntity,
+							fitxer,
+							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
+							documentEntity.getGesDocAdjuntFirmaId() != null,
+							firmes);
+				
+					if (documentEntity.getGesDocAdjuntId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+						documentEntity.setGesDocAdjuntId(null);
+					}
+					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntFirmaId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+						documentEntity.setGesDocAdjuntFirmaId(null);
+					}
+			} catch (Exception ex) {
+				logger.error("Error al custodiar en arxiu document adjunt  (" +
+						"id=" + documentEntity.getId() + ")",
+						ex);
+
+				Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
+				if (e != null) {
+					exception = (Exception) e;
+				} else {
+					exception = (Exception) ExceptionUtils.getRootCause(ex);
+					if (exception == null)
+						exception = ex;
+				}
+			}
+		}
+
+		documentEntity.updateArxiuIntent();
+		return exception;
+	}
+	
 
 	public List<ArxiuFirmaDto> validaFirmaDocument(
 			DocumentEntity document,
@@ -795,7 +882,7 @@ public class DocumentHelper {
 							false, 
 							true, 
 							false, 
-							false));
+							false, null, false));
 			
 		}
 		return documentsDto;

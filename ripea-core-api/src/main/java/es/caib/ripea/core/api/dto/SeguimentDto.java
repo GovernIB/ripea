@@ -33,7 +33,8 @@ public class SeguimentDto implements Serializable {
 
 	private String tascaNom;
 	private Date data;
-	private String responsableNom;
+	private String responsablesNom;
+	private String responsableActualNom; //usuari qui ha iniciat la tasca
 	private TascaEstatEnumDto tascaEstat;
 	
 

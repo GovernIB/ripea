@@ -2,7 +2,9 @@ package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,7 +167,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				false);
+				false, null);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
@@ -205,7 +207,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstatRepository.save(expedientEstat),
@@ -243,7 +245,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstat,
@@ -270,7 +272,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				checkPerMassiuAdmin);
+				checkPerMassiuAdmin, null);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, expedientId, ExpedientEstatEnumDto.OBERT);
 		ExpedientEstatEntity estat;
 		if (expedientEstatId!=null){
@@ -333,7 +335,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		expedientEstatRepository.delete(entity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, entity.getMetaExpedient().getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, entity.getMetaExpedient().getId());
 		}
 		return conversioTipusHelper.convertir(
 				entity,
@@ -357,13 +359,13 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				false);
+				false, null);
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
 				false,
 				false,
 				false,
-				false);
+				false, null);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
 			throw new ValidationException(
@@ -447,6 +449,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		
 			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
@@ -460,7 +464,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					dataInici,
 					dataFi == null,
 					dataFi,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					ExpedientDto.class,
@@ -475,7 +479,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 									false,
 									true,
 									true,
-									false);
+									false, null, false);
 							return dto;
 						}
 					});
@@ -568,7 +572,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				ambPathIPermisos,
 				false,
-				false);
+				false, null, false);
 		
 		return expedientDto;
 	}

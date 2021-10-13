@@ -30,6 +30,9 @@ public class ExpedientsInterceptor extends HandlerInterceptorAdapter {
 		ExpedientHelper.accesUsuariExpedients(
 				request, 
 				metaExpedientService);
+		ExpedientHelper.accesUsuariEstadistiques(
+				request, 
+				metaExpedientService);
 		return true;
 	}
 

@@ -184,7 +184,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 								expedientCreate.getNom(),
 								null,
 								false,
-								null);
+								null, null);
 						try {
 							elementsCreats.add(creat);
 							testAmbExpedientCreat.executar(elementsCreats);

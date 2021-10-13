@@ -24,7 +24,7 @@
 				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="metaexpedient.permis.columna.tipus"/></th>
 				<th data-col-name="principalCodiNom"><spring:message code="metaexpedient.permis.columna.principal"/></th>
 				<c:if test="${empty metaExpedient.organGestor}"> 
-					<th data-col-name="organGestorNom"><spring:message code="metaexpedient.permis.columna.organ.gestor"/></th>
+					<th data-col-name="organGestorCodiINom"><spring:message code="metaexpedient.permis.columna.organ.gestor"/></th>
 				</c:if>
 				<th data-col-name="create" data-template="#cellPermisCreateTemplate">
 					<spring:message code="metaexpedient.permis.columna.creacio"/>
@@ -48,6 +48,12 @@
 					<spring:message code="metaexpedient.permis.columna.eliminacio"/>
 					<script id="cellPermisDeleteTemplate" type="text/x-jsrender">
 						{{if delete}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="statistics" data-template="#cellPermisStatisticsTemplate">
+					<spring:message code="metaexpedient.permis.columna.statistics"/>
+					<script id="cellPermisStatisticsTemplate" type="text/x-jsrender">
+						{{if statistics}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
 				<c:if test="${!esRevisor}">

@@ -107,10 +107,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				paginacioParams +
 				")");
 
-		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,
-				true,
+		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
 				false,
-				false, 
+				false,
+				true, 
 				false, 
 				false);
 
@@ -204,9 +205,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				+ "metaExpedientId=" + metaExpedientId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false, false, false);
+				false,
+				true, 
+				false, 
+				false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
@@ -237,7 +240,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				false,
 				false, 
-				false);
+				false, null);
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByExpedient(
 				expedient, 
 				paginacioHelper.toSpringDataPageable(paginacioParams));

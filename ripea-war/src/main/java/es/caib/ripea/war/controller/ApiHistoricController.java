@@ -84,7 +84,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@RequestParam(value = "organGestorsIds", required = false) 
 			List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) 
 			List<Long> metaExpedientsIds,
 			
@@ -101,7 +101,7 @@ public class ApiHistoricController extends BaseAdminController {
 		HistoricFiltreCommand filtre = new HistoricFiltreCommand();
 		filtre.updateConditional(dataInici, dataFi, organGestorsIds, metaExpedientsIds, incorporarExpedientsComuns, tipusAgrupament);
 
-		List<HistoricExpedientDto> data = historicService.getDadesEntitat(entitatId, filtre.asDto());
+		List<HistoricExpedientDto> data = historicService.getDadesEntitat(entitatId, null, filtre.asDto());
 		
 		List<RegistreExpedient> response = ConversioTipusHelper.convertirList(data, RegistreExpedient.class);
 		return new HistoricApiResponse(filtre.asDto(), response);
@@ -109,8 +109,8 @@ public class ApiHistoricController extends BaseAdminController {
 
 	@RequestMapping(value = "/entitat/{entitatId}/actuals", method = RequestMethod.GET, produces = "application/json")
 	@ApiOperation(
-			value = "Consulta l'històric d'ús de l'aplicació per cada tipus d'expedient per una entitat concreta",
-			notes = "Retorna una llista dels històrics del dia d'avui per cada tipus d'expedient ",
+			value = "Consulta l'històric d'ús de l'aplicació per cada procediment per una entitat concreta",
+			notes = "Retorna una llista dels històrics del dia d'avui per cada procediment ",
 			position = 0,
 			response = List.class,
 			tags = "HistoricsEntitat")
@@ -123,7 +123,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -136,6 +136,7 @@ public class ApiHistoricController extends BaseAdminController {
 		filtre.updateConditional(null, null, organGestorsIds, metaExpedientsIds, incorporarExpedientsComuns, null);
 		List<HistoricExpedientDto> response = historicService.getDadesActualsEntitat(
 				entitatId,
+				null,
 				filtre.asDto());
 		return response;
 	}
@@ -170,7 +171,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@RequestParam(value = "organGestorsIds", required = true) 
 			List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) 
 			List<Long> metaExpedientsIds,
 			
@@ -196,6 +197,8 @@ public class ApiHistoricController extends BaseAdminController {
 
 		// Perform query
 		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(
+				null,
+				null, 
 				filtre.asDto());
 		List<RegistresOrganGestor> registres = DAOHistoric.mapRegistreOrganGestor(dades, tipusAgrupament).registres;
 		
@@ -227,7 +230,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = true)
 			@RequestParam(value = "organGestorsIds", required = true) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -246,6 +249,8 @@ public class ApiHistoricController extends BaseAdminController {
 		
 		// Perform query
 		Map<OrganGestorDto, HistoricExpedientDto> dades = historicService.getDadesActualsOrgansGestors(
+				null,
+				null,
 				filtre.asDto());
 
 		return DAOHistoric.mapRegistresActualsOrganGestors(dades);
@@ -280,7 +285,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -312,7 +317,7 @@ public class ApiHistoricController extends BaseAdminController {
 		// Perform query
 		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
-			results.put(codiUsuari, historicService.getDadesUsuari(codiUsuari, filtre.asDto()));
+			results.put(codiUsuari, historicService.getDadesUsuari(null, null, codiUsuari, filtre.asDto()));
 		}
 
 		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresUsuaris(results, tipusAgrupament).registres);
@@ -333,7 +338,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -362,7 +367,7 @@ public class ApiHistoricController extends BaseAdminController {
 		// Perform query
 		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
-			results.put(codiUsuari, historicService.getDadesActualsUsuari(codiUsuari, filtre.asDto()));
+			results.put(codiUsuari, historicService.getDadesActualsUsuari(null, null, codiUsuari, filtre.asDto()));
 		}
 
 		return results;
@@ -394,7 +399,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -428,6 +433,8 @@ public class ApiHistoricController extends BaseAdminController {
 		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
 			List<HistoricInteressatDto> historics = historicService.getDadesInteressat(
+					null,
+					null,
 					docNum,
 					filtre.asDto());
 			results.put(docNum, historics);
@@ -451,7 +458,7 @@ public class ApiHistoricController extends BaseAdminController {
 			@ApiParam(name = "organGestorsIds", value = "Òrgans gestors dels quals consultar dades", required = false)
 			@RequestParam(value = "organGestorsIds", required = false) List<Long> organGestorsIds,
 			
-			@ApiParam(name = "metaExpedientsIds", value = "Tipus d'expedients dels quals consultar dades", required = false)
+			@ApiParam(name = "metaExpedientsIds", value = "Procediments dels quals consultar dades", required = false)
 			@RequestParam(value = "metaExpedientsIds", required = false) List<Long> metaExpedientsIds,
 			
 			@ApiParam(name = "incorporarExpedientsComuns", 
@@ -467,7 +474,7 @@ public class ApiHistoricController extends BaseAdminController {
 		
 		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
-			results.put(docNum, historicService.getDadesActualsInteressat(docNum, filtre.asDto()));
+			results.put(docNum, historicService.getDadesActualsInteressat(null, null, docNum, filtre.asDto()));
 		}
 		return results;
 	}

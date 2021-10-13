@@ -16,6 +16,12 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script type="text/javascript">
 	</script>
+	
+	<style type="text/css">
+		li[class*="disabled"]{
+			pointer-events: none;
+		}
+	</style>
 </head>
 <body>
 	<script id="rowhrefTemplate" type="text/x-jsrender">usuariTasca/{{:id}}/tramitar</script>
@@ -40,6 +46,8 @@
 				<th data-col-name="comentari" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+				<th data-col-name="agafada" data-visible="false"></th>
+				<th data-col-name="responsableActual.codi" width="20%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
 				<th data-col-name="dataLimitString" width="20%" data-template="#cellTascaDeadlineTemplate" >
 					<spring:message code="expedient.tasca.list.columna.dataLimit"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
@@ -77,13 +85,13 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/usuariTasca/{{:id}}/tramitar"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
+								<li {{if agafada && responsableActual.codi != '${pageContext.request.userPrincipal.name}'}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/tramitar"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
 								{{if estat == 'PENDENT'}}					
-									<li><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
-									<li><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>	 
+									<li {{if agafada && responsableActual.codi != '${pageContext.request.userPrincipal.name}'}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
+									<li {{if agafada && responsableActual.codi != '${pageContext.request.userPrincipal.name}'}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>	 
 								{{else}}						
-									<li><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>	
-								{{/if}}								
+									<li {{if agafada && responsableActual.codi != '${pageContext.request.userPrincipal.name}'}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>	
+								{{/if}}						
 							</ul>
 						</div>
 					</script>

@@ -13,5 +13,11 @@ public class PropertiesConstants {
 
     // 4. Enviar emails pendents agrupats
     public static final String ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON = "es.caib.ripea.segonpla.email.enviament.agrupat.cron";
+    
+    // 5. Guardar en arxiu continguts pendents
+    public static final String GUARDAR_ARXIU_CONTINGUTS_PENDENTS = "es.caib.ripea.segonpla.guardar.arxiu.continguts.pendents";
+    
+    // 6. Guardar en arxiu interessats
+    public static final String GUARDAR_ARXIU_INTERESSATS = "es.caib.ripea.segonpla.guardar.arxiu.interessats";
 
 }

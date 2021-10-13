@@ -20,7 +20,8 @@ public class ExtendedPermission extends BasePermission {
 	public static final Permission CREATE = new ExtendedPermission(1 << 2, 'C'); // 4
 	public static final Permission DELETE = new ExtendedPermission(1 << 3, 'D'); // 8
 	public static final Permission ADMINISTRATION = new ExtendedPermission(1 << 4, 'A'); // 16
-
+	public static final Permission STATISTICS = new ExtendedPermission(1 << 5, 'S'); // 32
+	
 	protected ExtendedPermission(int mask) {
 		super(mask);
 	}

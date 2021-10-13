@@ -64,6 +64,9 @@
 	pageContext.setAttribute(
 			"countAnotacionsPendents",
 			es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+	pageContext.setAttribute(
+			"teAccesEstadistiques",
+			es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -225,11 +228,6 @@ body {
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
-									<spring:message code="decorator.menu.accions.massives.user"/>
-								</a>
-							</li>
-							<li>
 								<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
 									<spring:message code="decorator.menu.configuracio.user"/>
 								</a>
@@ -238,6 +236,11 @@ body {
 								<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
 								   rel="noopener noreferrer" target="_blank">
 									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
+								</a>
+							</li>
+							<li>
+								<a href="<c:url value="/usuari/logout"/>">
+									<i class="fa fa-power-off"></i> <spring:message code="decorator.menu.accions.desconectar"/>
 								</a>
 							</li>
 						</ul>
@@ -289,6 +292,8 @@ body {
 								<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 								<%---- Excepcions ----%>
 								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
+								<%---- Elements pendents arxiu ----%>
+								<li><a href="<c:url value="/seguimentArxiuPendents"/>"><spring:message code="decorator.menu.pendents.arxiu"/></a></li>
 							</ul>
 						</div>
 						<div class="btn-group">
@@ -333,11 +338,11 @@ body {
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
-								<li>
+								<%--<li>
 									<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
 										<spring:message code="decorator.menu.accions.massives.admin"/>
 									</a>
-								</li>
+								</li>--%>
 								<li>
 									<a href="<c:url value="/historic"/>" data-maximized="true">
 										<spring:message code="decorator.menu.accions.estadistiques"/>
@@ -383,13 +388,17 @@ body {
 						<div class="btn-group">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
-								 <%---- Tipus d'expedients ----%>
+								 <%---- Procediments ----%>
 								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
 							</ul>
 						</div>
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
-					
+<%-- 						<c:if test="${teAccesEstadistiques}"> --%>
+<%-- 							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary"> --%>
+<%-- 								<spring:message code="decorator.menu.accions.estadistiques"/> --%>
+<!-- 							</a> -->
+<%-- 						</c:if> --%>
 						<%---- Expedients ----%>
 						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary">
 								<spring:message code="decorator.menu.expedients"/>
@@ -422,6 +431,11 @@ body {
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 							<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
 							<li><a href="<c:url value="/massiu/custodiar"/>"><spring:message code="massiu.custodiar"/></a></li>
+							<li>
+								<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
+									<spring:message code="decorator.menu.accions.massives.user"/>
+								</a>
+							</li>
 						</ul>
 					</div>
 				</c:if>

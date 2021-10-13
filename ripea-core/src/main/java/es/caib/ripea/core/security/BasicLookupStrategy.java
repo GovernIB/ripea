@@ -36,7 +36,6 @@ import org.springframework.security.acls.domain.AccessControlEntryImpl;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
 import org.springframework.security.acls.domain.AclImpl;
 import org.springframework.security.acls.domain.AuditLogger;
-import org.springframework.security.acls.domain.DefaultPermissionFactory;
 import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -109,7 +108,7 @@ public final class BasicLookupStrategy implements LookupStrategy {
     //~ Instance fields ================================================================================================
 
     private final AclAuthorizationStrategy aclAuthorizationStrategy;
-    private PermissionFactory permissionFactory = new DefaultPermissionFactory();
+    private PermissionFactory permissionFactory = new ExtendedPermissionFactory();
     private final AclCache aclCache;
     private final PermissionGrantingStrategy grantingStrategy;
     private final JdbcTemplate jdbcTemplate;
@@ -431,7 +430,7 @@ public final class BasicLookupStrategy implements LookupStrategy {
 
     /**
      * Sets the {@code PermissionFactory} instance which will be used to convert loaded permission
-     * data values to {@code Permission}s. A {@code DefaultPermissionFactory} will be used by default.
+     * data values to {@code Permission}s. A {@code ExtendedPermissionFactory} will be used by default.
      *
      * @param permissionFactory
      */

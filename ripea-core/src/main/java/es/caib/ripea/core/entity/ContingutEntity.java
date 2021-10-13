@@ -85,6 +85,11 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "arxiu_data_act")
 	protected Date arxiuDataActualitzacio;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "arxiu_intent_data")
+	protected Date arxiuIntentData;
+	@Column(name = "arxiu_reintents")
+	protected int arxiuReintents;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "ipa_entitat_contingut_fk")
@@ -170,6 +175,12 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		this.arxiuUuid = null;
 		this.arxiuDataActualitzacio = null;
 	}
+	
+	public void updateArxiuIntent() {
+		this.arxiuIntentData = new Date();
+		this.arxiuReintents++;
+	}
+	
 
 	@Override
 	public int hashCode() {

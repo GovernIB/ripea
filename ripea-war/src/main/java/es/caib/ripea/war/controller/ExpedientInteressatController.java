@@ -3,11 +3,14 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +34,9 @@ import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.InteressatCommand.Administracio;
 import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.ValidationHelper;
 
 /**
@@ -100,7 +105,7 @@ public class ExpedientInteressatController extends BaseUserController {
 	}
 	
 	@RequestMapping(value="/{expedientId}/interessat", method = RequestMethod.POST)
-	public String postCiutada(
+	public String post(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@ModelAttribute InteressatCommand interessatCommand,
@@ -153,15 +158,25 @@ public class ExpedientInteressatController extends BaseUserController {
 		
 		String msgKey = "interessat.controller.afegit.ok";
 		if (interessatCommand.getId() == null) {
-			expedientInteressatService.create(
+			InteressatDto interessat = expedientInteressatService.create(
 					entitatActual.getId(),
 					expedientId,
-					interessatDto);	
+					interessatDto, 
+					RolHelper.getRolActual(request));	
+			if (!interessat.isArxiuPropagat()) {
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:../../../contingut/" + expedientId,
+						"interessat.controller.creat.error.arxiu",
+						null);
+			}
+			
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
 					expedientId,
-					interessatDto);
+					interessatDto, 
+					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.modificat.ok";
 		}
 		return getModalControllerReturnValueSuccess(
@@ -180,7 +195,8 @@ public class ExpedientInteressatController extends BaseUserController {
 		expedientInteressatService.delete(
 				entitatActual.getId(),
 				expedientId,
-				interessatId);
+				interessatId, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + expedientId,
@@ -304,18 +320,29 @@ public class ExpedientInteressatController extends BaseUserController {
 		
 		String msgKey = "interessat.controller.representant.afegit.ok";
 		if (interessatCommand.getId() == null) {
-			expedientInteressatService.create(
+			InteressatDto representant = expedientInteressatService.create(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
 					representantDto,
-					true);	
+					true, 
+					RolHelper.getRolActual(request));	
+			
+			if (!representant.isArxiuPropagat()) {
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:../../../contingut/" + expedientId,
+						"interessat.controller.creat.error.arxiu.representant",
+						null);
+			}
+			
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
-					representantDto);
+					representantDto, 
+					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.representant.modificat.ok";
 		}
 		return getModalControllerReturnValueSuccess(
@@ -336,13 +363,54 @@ public class ExpedientInteressatController extends BaseUserController {
 				entitatActual.getId(),
 				expedientId,
 				interessatId,
-				representantId);
+				representantId, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../../../contenidor/" + expedientId,
 				"interessat.controller.representant.eliminat.ok");
 		
 	}
+	
+	
+	@RequestMapping(value = "/{expedientId}/guardarInteressatsArxiu", method = RequestMethod.GET)
+	public String guardarExpedientArxiu(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam(value = "origin") String origin,
+			Model model)  {
+
+		Exception exception = expedientInteressatService.guardarInteressatsArxiu(expedientId);
+		String redirect = null;
+		if (origin.equals("docDetail")) {
+			redirect = "redirect:../../contingut/" + expedientId + "#interessats";
+		} else if (origin.equals("seguiment")) {
+			redirect = "redirect:../../seguimentArxiuPendents#interessats";
+		}
+		if (exception == null) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					redirect,
+					"interessat.controller.guardar.arxiu.ok");
+		} else {
+			logger.error("Error guardant document en arxiu", exception);
+			
+			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
+			String msg = null;
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				msg = getMessage(request,"error.arxiu.connectTimedOut");
+			} else {
+				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+			}
+			return getAjaxControllerReturnValueError(
+					request,
+					redirect,
+					"interessat.controller.guardar.arxiu.error",
+					new Object[] {msg});
+			
+		}
+	}
+	
 	
 	@RequestMapping(value = "/organ/{codi}", method = RequestMethod.GET)
 	@ResponseBody
@@ -426,5 +494,6 @@ public class ExpedientInteressatController extends BaseUserController {
 			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.nivell.administracio.error"));
 		}
 	}
+	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatController.class);
 
 }

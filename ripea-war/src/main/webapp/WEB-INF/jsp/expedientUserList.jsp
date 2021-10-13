@@ -136,7 +136,7 @@ $(document).ready(function() {
 		alert("Button Clicked");
 	});
 	
-	// Mostrar els tipus d'expedients al filtre
+	// Mostrar els procediments al filtre
 	findActiusPerLectura();
 	
 	var metaExpedientId = "";
@@ -341,7 +341,7 @@ function removeCookie(cname) {
 			</div>
 			--%>
 			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientId" inline="true" emptyOption="true" optionMinimumResultsForSearch="6" placeholderKey="expedient.list.user.placeholder.tipusExpedient"/>
+				<rip:inputSelect name="metaExpedientId" inline="true" emptyOption="true" optionMinimumResultsForSearch="6" placeholderKey="expedient.list.user.placeholder.procediment"/>
 			</div>
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>
@@ -365,7 +365,7 @@ function removeCookie(cname) {
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.form.camp.organgestor"
  					suggestValue="id"
- 					suggestText="nom"
+ 					suggestText="codiINom"
  					inline="true"/>	
 			</div>	
 			<div class="col-md-3">
@@ -436,11 +436,12 @@ function removeCookie(cname) {
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
-						<li><a class="fileDownload" href="expedient/generarIndex"><spring:message code="expedient.list.user.recuperar.index"/></a></li>
+						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
+						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
 					</ul>
 				</div>
 			</div>
-			<c:if test="${not empty metaExpedientsPermisCreacio}">
+			<c:if test="${not empty metaExpedientsPermisCreacio || rolActual == 'IPA_ADMIN'}">
 				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" data-maximized="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 			</c:if>
 		</div>
@@ -451,7 +452,7 @@ function removeCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="18" 
+		data-default-order="16" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -463,8 +464,6 @@ function removeCookie(cname) {
 			<tr>
 				<th data-col-name="usuariActualWrite" data-visible="false"></th>
 				<th data-col-name="seguidor" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="expedientEstat" data-visible="false"></th>
@@ -474,10 +473,19 @@ function removeCookie(cname) {
 				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
-				<th data-col-name="conteDocumentsFirmats" data-visible="false"></th>
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>				
-				<th data-col-name="nom" width="30%">
+				<th data-col-name="arxiuUuid" data-visible="false"></th>			
+				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>	
+				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
+					<script id="cellNomTemplate" type="text/x-jsrender">
+						{{:nom}} 
+						{{if arxiuUuid != null}}
+							<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+						{{else}}
+							<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+						{{/if}}
+
+					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAvisosTemplate" width="5%">
 					<spring:message code="expedient.list.user.columna.avisos"/>
@@ -490,7 +498,7 @@ function removeCookie(cname) {
 						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}			
 					</script>
 				</th>
-				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.tipus"/></th>								
+				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>								
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
@@ -516,11 +524,11 @@ function removeCookie(cname) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="agafatPer.nom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				<th data-col-name="agafatPer.codiAndNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
 <%-- 				<th data-col-name="interessatsResum" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.interessats"/></th>	 --%>
 				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
-							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default {{if !(metaNode.usuariActualWrite || usuariActualWrite)}} disabled {{/if}}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default {{if !usuariActualWrite}} disabled {{/if}}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 				
 					</script>
 				</th>	
@@ -539,7 +547,7 @@ function removeCookie(cname) {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if metaNode.usuariActualWrite || usuariActualWrite || '${rolActual}' == 'IPA_ADMIN' || '${rolActual}' == 'IPA_ORGAN_ADMIN'}}
+								{{if usuariActualWrite || '${rolActual}' == 'IPA_ADMIN' || '${rolActual}' == 'IPA_ORGAN_ADMIN'}}
 									{{if !agafat}}
 										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
@@ -550,12 +558,12 @@ function removeCookie(cname) {
 										{{/if}}
 									{{/if}}
 								{{/if}}	
-								{{if metaNode.usuariActualWrite && seguidor}}
+								{{if usuariActualWrite && seguidor}}
 									<li><a href="expedient/{{:id}}/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
-								{{else metaNode.usuariActualWrite && !seguidor}}					
+								{{else usuariActualWrite && !seguidor}}					
 									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
 								{{/if}}
-								{{if metaNode.usuariActualDelete && estat != 'TANCAT'}}
+								{{if usuariActualDelete && estat != 'TANCAT'}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 							</ul>

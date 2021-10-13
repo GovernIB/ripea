@@ -50,6 +50,7 @@ public interface DocumentService {
 	 *            Atribut id del contenidor a on es vol crear el document.
 	 * @param document
 	 *            Informació del document que es vol crear.
+	 * @param rolActual TODO
 	 * @return El document creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -61,7 +62,7 @@ public interface DocumentService {
 			Long entitatId,
 			Long pareId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException;
+			boolean comprovarMetaExpedient, String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
@@ -70,6 +71,7 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param document
 	 *            Informació del document que es vol crear.
+	 * @param rolActual TODO
 	 * @return El document modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -80,7 +82,7 @@ public interface DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException;
+			boolean comprovarMetaExpedient, String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Consulta un document donat el seu id.
@@ -283,6 +285,7 @@ public interface DocumentService {
 	 *            L'assumpte de l'enviament.
 	 * @param prioritat
 	 *            La prioritat de l'enviament.
+	 * @param rolActual TODO
 	 * @param dataCaducitat
 	 *            La data màxima per a firmar el document.
 	 * @throws NotFoundException
@@ -303,7 +306,7 @@ public interface DocumentService {
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
-			String transaccioId) throws NotFoundException, IllegalStateException, SistemaExternException;
+			String transaccioId, String rolActual) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Recupera els dispositius disponibles per un usuari
@@ -576,6 +579,7 @@ public interface DocumentService {
 	 *            Nom de l'arxiu firmat.
 	 * @param arxiuContingut
 	 *            Contingut de l'arxiu firmat.
+	 * @param rolActual TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws SistemaExternException
@@ -585,7 +589,7 @@ public interface DocumentService {
 	public void processarFirmaClient(
 			String identificador,
 			String arxiuNom,
-			byte[] arxiuContingut) throws NotFoundException, SistemaExternException;
+			byte[] arxiuContingut, String rolActual) throws NotFoundException, SistemaExternException;
 
 	FitxerDto descarregarImprimible(Long entitatId, Long id, String versio);
 	
@@ -652,7 +656,7 @@ public interface DocumentService {
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
-	public Exception guardarEnArxiuDocumentAdjunt(Long docId);
+	public Exception guardarDocumentArxiu(Long docId);
 
 	/**
 	 * Actualitza un document amb un tipus de document nou

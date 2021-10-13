@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
@@ -21,6 +22,7 @@ import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 
 @Component
@@ -40,6 +42,8 @@ public class ExpedientInteressatHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
+	@Autowired
+	private ExpedientRepository expedientRepository;
 	
 	@Transactional
 	public InteressatDto create(
@@ -48,7 +52,9 @@ public class ExpedientInteressatHelper {
 			Long interessatId, //interessatId to which representant will be related to
 			InteressatDto interessat,
 			boolean propagarArxiu, 
-			PermissionEnumDto permission){
+			PermissionEnumDto permission, 
+			String rolActual, 
+			boolean comprovarAgafat){
 		
 		if (interessatId != null) {
 			logger.debug("Creant nou representant ("
@@ -65,12 +71,13 @@ public class ExpedientInteressatHelper {
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				expedientId,
-				true,
+				comprovarAgafat,
 				permission.equals(PermissionEnumDto.READ),
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),
 				permission.equals(PermissionEnumDto.DELETE), 
-				false);
+				false, 
+				rolActual);
 		InteressatEntity pare = null;
 		if (interessatId != null) {
 			pare = interessatRepository.findOne(interessatId);
@@ -159,8 +166,17 @@ public class ExpedientInteressatHelper {
 		}
 		expedient.addInteressat(interessatEntity);
 		
-		if (propagarArxiu) {
-			pluginHelper.arxiuExpedientActualitzar(expedient);
+		if (propagarArxiu && expedient.getArxiuUuid() != null) {
+			
+			try {
+				pluginHelper.arxiuExpedientActualitzar(expedient);
+				interessatEntity.updateArxiuIntent(true);
+			} catch (Exception e) {
+				logger.error("Error al custodiar interessat en arxiu (" +
+						"id=" + expedient.getId() + ")",
+						e);
+				interessatEntity.updateArxiuIntent(false);
+			}
 		}
 		
 		// Registra al log la creació de l'interessat
@@ -187,7 +203,8 @@ public class ExpedientInteressatHelper {
 			Long interessatId,
 			InteressatDto interessatDto,
 			boolean propagarArxiu,
-			InteressatDto representantDto){
+			InteressatDto representantDto, 
+			String rolActual){
 		
 		logger.debug("Actualitzant interessat ("
 				+ "entitatId=" + entitatId + ", "
@@ -201,7 +218,9 @@ public class ExpedientInteressatHelper {
 				false,
 				true,
 				false,
-				false, false);
+				false, 
+				false, 
+				rolActual);
 		InteressatEntity interessatEntity = entityComprovarHelper.comprovarInteressat(
 				expedient, 
 				interessatId); 
@@ -215,7 +234,8 @@ public class ExpedientInteressatHelper {
 		expedientInteressatService.update(
 				entitatId,
 				expedientId,
-				interessatDto);
+				interessatDto, 
+				rolActual);
 		
 		//### Actualitza la informació del representant
 		if (representantDto != null && interessatEntity.getRepresentant() != null) {
@@ -223,7 +243,8 @@ public class ExpedientInteressatHelper {
 					entitatId,
 					expedientId,
 					interessatId,
-					representantDto);
+					representantDto, 
+					rolActual);
 		}
 		
 		//### Crear nou representant de l'interessat
@@ -233,7 +254,8 @@ public class ExpedientInteressatHelper {
 					expedientId,
 					interessatId,
 					representantDto,
-					true);
+					true, 
+					rolActual);
 		}
 		
 		//### Esborra un representant si no s'ha informat en la petició
@@ -242,7 +264,8 @@ public class ExpedientInteressatHelper {
 					entitatId, 
 					expedientId, 
 					interessatId, 
-					interessatEntity.getRepresentant().getId());
+					interessatEntity.getRepresentant().getId(), 
+					rolActual);
 		}
 		
 		if (propagarArxiu) {
@@ -264,6 +287,36 @@ public class ExpedientInteressatHelper {
 		return conversioTipusHelper.convertir(
 							interessatRepository.save(interessatEntity),
 							InteressatDto.class);
+	}
+	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public Exception guardarInteressatsArxiu(
+			Long expId) {
+		
+		Exception exception = null;
+		ExpedientEntity expedient = expedientRepository.findOne(expId);
+			
+		if (expedient.getArxiuUuid() != null) {
+			try {
+				pluginHelper.arxiuExpedientActualitzar(expedient);
+				for (InteressatEntity interessat : expedient.getInteressats()) {
+					interessat.updateArxiuIntent(true);
+				}
+			} catch (Exception e) {
+				logger.error("Error al custodiar interessats en arxiu (" +
+						"expedient id=" + expedient.getId() + ")",
+						e);
+				exception = e;
+				for (InteressatEntity interessat : expedient.getInteressats()) {
+					interessat.updateArxiuIntent(false);
+				}
+			}
+		} else {
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(false);
+			}
+		}
+		return exception;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);

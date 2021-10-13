@@ -154,7 +154,8 @@ public class ExpedientHelper {
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
-	public ExpedientEntity create(
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Long create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
@@ -165,7 +166,8 @@ public class ExpedientHelper {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId) {
+			Long grupId, 
+			String rolActual) {
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
@@ -180,12 +182,13 @@ public class ExpedientHelper {
 				false,
 				true,
 				false, 
-				false);
+				false, 
+				rolActual);
 		
 		OrganGestorEntity organGestor = getOrganGestorForExpedient(
 				metaExpedient,
 				organGestorId,
-				ExtendedPermission.CREATE);
+				ExtendedPermission.CREATE, rolActual);
 
 //		if (metaExpedientDominiId != null) {
 //			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
@@ -199,7 +202,8 @@ public class ExpedientHelper {
 					false,
 					true,
 					false, 
-					false);
+					false, 
+					rolActual);
 		}
 		contingutHelper.comprovarNomValid(contingutPare, nom, null, ExpedientEntity.class);
 //		comprovarSiExpedientAmbMateixNom(
@@ -246,20 +250,36 @@ public class ExpedientHelper {
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
 			if (associarInteressats) {
-				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE);
+				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
 			}
 		}
-		// crear carpetes per defecte del tipus d'expedient
+		// crear carpetes per defecte del procediment
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
 		// Crea les relacions expedients i organs pare
 		organGestorHelper.crearExpedientOrganPares(
 				expedient,
 				organGestor);
-		return expedient;
+		
+		try {
+		//create expedient in arxiu
+		contingutHelper.arxiuPropagarModificacio(
+				expedient,
+				null,
+				false,
+				false,
+				null);
+		} catch (Exception ex) {
+			logger.error("Error al custodiar expedient en arxiu  (" +
+					"id=" + expedient.getId() + ")",
+					ex);
+		}
+		expedient.updateArxiuIntent();
+		
+		return expedient.getId();
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission) {
+	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
@@ -279,7 +299,9 @@ public class ExpedientHelper {
 						null,
 						toInteressatDto(registreInteressatEntity, null),
 						true, 
-						permission);
+						permission, 
+						rolActual, 
+						false);
 				if (registreInteressatEntity.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
@@ -287,7 +309,9 @@ public class ExpedientHelper {
 							createdInteressat.getId(),
 							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
 							true, 
-							permission);
+							permission, 
+							rolActual, 
+							false);
 				}
 			} else {
 				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();
@@ -298,7 +322,7 @@ public class ExpedientHelper {
 						existingInteressat.getId(), 
 						toInteressatDto(registreInteressatEntity, existingInteressat.getId()), 
 						true,
-						representant != null ? toInteressatDto(representant, idRepresentant) : null);
+						representant != null ? toInteressatDto(representant, idRepresentant) : null, rolActual);
 			}
 		}
 	}
@@ -331,12 +355,15 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional
-	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, ExpedientPeticioEntity expedientPeticioEntity) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
+		
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
 		expedientEntity = expedientRepository.findOne(expedientId);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
@@ -453,6 +480,7 @@ public class ExpedientHelper {
 			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 				carpetaEntity.updateArxiu(documentUuid);
 			}
+			
 			if (!documentExistsInArxiu) {
 				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
 						docEntity,
@@ -479,6 +507,11 @@ public class ExpedientHelper {
 			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 				expedientEntity.updateArxiu(documentUuid);
 			}
+			boolean throwExcepcion = false; //throwExcepcion = true;
+			if (throwExcepcion) {
+				throw new RuntimeException("Mock Excepcion crearDocFromAnnex");
+			}
+			
 			if (!documentExistsInArxiu) {
 				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
 						docEntity,
@@ -515,14 +548,15 @@ public class ExpedientHelper {
 	 * @param expedientPeticioId
 	 * @return
 	 */
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DocumentEntity crearDocFromUuid(
 			Long expedientId, 
 			String arxiuUuid, 
-			ExpedientPeticioEntity expedientPeticioEntity) {
+			Long expedientPeticioId) {
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientEntity = expedientRepository.findOne(expedientId);
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 				null, 
@@ -705,10 +739,10 @@ public class ExpedientHelper {
 	}
 	
 	
-	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId) {
+	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId, String rolActual) {
 		Long id = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
 		
-		OrganGestorEntity organGestorEntity = getOrganGestorForExpedient(expedient.getMetaExpedient(), organGestorId, ExtendedPermission.WRITE);
+		OrganGestorEntity organGestorEntity = getOrganGestorForExpedient(expedient.getMetaExpedient(), organGestorId, ExtendedPermission.WRITE, rolActual);
 		expedient.updateOrganGestor(organGestorEntity);
 		contingutLogHelper.log(
 				expedient,
@@ -772,12 +806,12 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false);
+				false, null, false);
 	}
 
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
 
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false, null);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedient.getId() + ")");
 			throw new ValidationException(expedient.getId(), ExpedientEntity.class, "No es pot agafar un expedient no arrel");
@@ -799,16 +833,44 @@ public class ExpedientHelper {
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
 	}
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public Exception guardarExpedientArxiu(
+			Long expId) {
+		
+		Exception exception = null;
+		
+		ExpedientEntity expedient = expedientRepository.findOne(expId);
+		
+		try {
+			contingutHelper.arxiuPropagarModificacio(
+					expedient,
+					null,
+					false,
+					false,
+					null);
+		} catch (Exception ex) {
+			logger.error("Error al custodiar expedient en arxiu  (" +
+					"id=" + expedient.getId() + ")",
+					ex);
+			exception = ex;
+		}
+		expedient.updateArxiuIntent();
+		
+		return exception;
+	}
+	
 	
 	public FitxerDto exportarExpedient(
 			EntitatEntity entitatActual, 
-			ExpedientEntity expedient, 
+			List<ExpedientEntity> expedients,
 			boolean exportar) throws IOException {
 		FitxerDto resultat = new FitxerDto();
 		if (exportar) {
+//			crear estructura documents + exportació ENI + índex
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			BigDecimal sum = new BigDecimal(1);
+			ExpedientEntity expedient = expedients.get(0);
 			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
 					expedient,
 					0,
@@ -865,7 +927,7 @@ public class ExpedientHelper {
 				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 			}
 			
-			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedient, exportar);
+			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedients, exportar);
 			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
 			zos.close();
 			
@@ -873,7 +935,7 @@ public class ExpedientHelper {
 			resultat.setContentType("application/zip");
 			resultat.setContingut(baos.toByteArray());
 		} else {
-			resultat = contingutHelper.generarIndex(entitatActual, expedient, exportar);
+			resultat = contingutHelper.generarIndex(entitatActual, expedients, exportar);
 		}
 		return resultat;
 	}
@@ -945,7 +1007,7 @@ public class ExpedientHelper {
 		return num;
 	}
 	
-	private OrganGestorEntity getOrganGestorForExpedient(MetaExpedientEntity metaExpedient, Long organGestorId, Permission permis) {
+	private OrganGestorEntity getOrganGestorForExpedient(MetaExpedientEntity metaExpedient, Long organGestorId, Permission permis, String rolActual) {
 		
 		OrganGestorEntity organGestor;
 		if (metaExpedient.getOrganGestor() != null) {
@@ -958,7 +1020,7 @@ public class ExpedientHelper {
 						"La creació/modificació d'un expedient de tipus (metaExpedientId=" + metaExpedient.getId() + ") requereix especificar un òrgan gestor");
 			}
 			organGestor = organGestorRepository.getOne(organGestorId);
-			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, permis)) {
+			if (!organGestorHelper.isOrganGestorPermes(metaExpedient, organGestor, permis, rolActual)) {
 				throw new ValidationException(
 						metaExpedient.getId(),
 						MetaExpedientEntity.class,
@@ -1558,7 +1620,7 @@ public class ExpedientHelper {
 		return carpetaId;
 	}
 	
-	//crea les carpetes per defecte definides al tipus d'expedient
+	//crea les carpetes per defecte definides al procediment
 	private void crearCarpetesMetaExpedient(
 			Long entitatId, 
 			MetaExpedientEntity metaExpedient, 

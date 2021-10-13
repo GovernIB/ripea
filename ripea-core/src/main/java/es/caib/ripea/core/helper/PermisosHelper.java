@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
@@ -483,16 +482,18 @@ public class PermisosHelper {
 					}
 				}
 				if (permis != null) {
-					if (BasePermission.READ.equals(ace.getPermission()))
+					if (ExtendedPermission.READ.equals(ace.getPermission()))
 						permis.setRead(true);
-					if (BasePermission.WRITE.equals(ace.getPermission()))
+					if (ExtendedPermission.WRITE.equals(ace.getPermission()))
 						permis.setWrite(true);
-					if (BasePermission.CREATE.equals(ace.getPermission()))
+					if (ExtendedPermission.CREATE.equals(ace.getPermission()))
 						permis.setCreate(true);
-					if (BasePermission.DELETE.equals(ace.getPermission()))
+					if (ExtendedPermission.DELETE.equals(ace.getPermission()))
 						permis.setDelete(true);
-					if (BasePermission.ADMINISTRATION.equals(ace.getPermission()))
+					if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission()))
 						permis.setAdministration(true);
+					if (ExtendedPermission.STATISTICS.equals(ace.getPermission()))
+						permis.setStatistics(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -634,6 +635,8 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.DELETE);
 		if (permis.isAdministration())
 			permissions.add(ExtendedPermission.ADMINISTRATION);
+		if (permis.isStatistics())
+			permissions.add(ExtendedPermission.STATISTICS);
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
 

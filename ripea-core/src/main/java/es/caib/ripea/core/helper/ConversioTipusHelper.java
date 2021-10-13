@@ -4,10 +4,12 @@
 package es.caib.ripea.core.helper;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.joda.time.DateTime;
@@ -37,6 +39,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
@@ -50,6 +53,7 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
@@ -59,6 +63,7 @@ import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -77,6 +82,9 @@ public class ConversioTipusHelper {
 
 	@Autowired
 	private ContingutHelper contingutHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	
 	@Autowired
 	private TascaHelper tascaHelper;
 	public ConversioTipusHelper() {
@@ -154,7 +162,8 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient()));
 						target.setMetaExpedientTasca(convertir(source.getMetaExpedientTasca(), MetaExpedientTascaDto.class));
-						target.setResponsable(convertir(source.getResponsable(), UsuariDto.class));
+						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));
+						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
 						target.setEstat(source.getEstat());
@@ -226,6 +235,9 @@ public class ConversioTipusHelper {
 						target.setEntregaDehObligat(source.getEntregaDehObligat());
 						target.setIncapacitat(source.getIncapacitat());
 						target.setRepresentant(source.getRepresentant() != null ? convertir(source.getRepresentant(),InteressatDto.class) : null);
+						target.setArxiuPropagat(source.isArxiuPropagat());
+						target.setRepresentantArxiuPropagat(source.getRepresentant() != null ? source.getRepresentant().isArxiuPropagat() : true);
+						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
 						return target;
 					}
 				});
@@ -433,13 +445,70 @@ public class ConversioTipusHelper {
 						target.setExpedientNom(source.getExpedient().getNom());
 						target.setTascaNom(source.getMetaExpedientTasca().getNom());
 						target.setData(source.getDataInici());
-						target.setResponsableNom(source.getResponsable().getNom());
+						List<String> responsablesNom = new ArrayList<String>();
+						for (UsuariEntity responsable: source.getResponsables()) {
+							responsablesNom.add(responsable.getNom());
+						}
+						target.setResponsablesNom(StringUtils.join(responsablesNom, ","));
+						if (source.getResponsableActual() != null)
+							target.setResponsableActualNom(source.getResponsableActual().getNom());
 						target.setTascaEstat(source.getEstat());
 						return target;
 					}
 				});	
 		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(ExpedientEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+						target.setId(source.getId());
+						target.setElementNom(source.getNom());
+						target.setExpedientNumeroNom(source.getNom() + " (" + expedientHelper.calcularNumero(source) + ")");
+						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setDataDarrerIntent(source.getArxiuIntentData());
+						return target;
+					}
+				});	
 		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(DocumentEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
+						target.setElementNom(source.getNom());
+						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + expedientHelper.calcularNumero(source.getExpedient()) + ")");
+						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setDataDarrerIntent(source.getArxiuIntentData());
+						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+						return target;
+					}
+				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<InteressatEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(InteressatEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+						target.setId(source.getId());
+						target.setExpedientId(source.getExpedient().getId());
+						if (source instanceof  InteressatAdministracioEntity) {
+							target.setElementNom(((InteressatAdministracioEntity)source).getOrganNom());
+						} else if (source instanceof  InteressatPersonaFisicaEntity) {
+							InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity)source;
+							target.setElementNom(fis.getNom() + " " + fis.getLlinatge1() + " " + fis.getLlinatge2());
+						} else if (source instanceof  InteressatPersonaJuridicaEntity) {
+							target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
+						} 
+						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + expedientHelper.calcularNumero(source.getExpedient()) + ")");
+						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setDataDarrerIntent(source.getArxiuIntentData());
+						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+						return target;
+					}
+				});			
 	}
 	
 

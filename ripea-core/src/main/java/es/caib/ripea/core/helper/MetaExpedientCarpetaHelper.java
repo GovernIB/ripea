@@ -11,7 +11,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.repository.MetaExpedientCarpetaRepository;
 
 /**
- * Utilitats comunes per gestionar les carpetes d'un tipus d'expedient
+ * Utilitats comunes per gestionar les carpetes d'un procediment
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

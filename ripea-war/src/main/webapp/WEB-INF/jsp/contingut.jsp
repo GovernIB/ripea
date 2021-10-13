@@ -34,6 +34,7 @@
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
+
 	</title>
 	
 	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut}" nomesIconaNom="true"/></c:set>
@@ -447,6 +448,11 @@ body.loading .rmodal {
 	position: relative;
 	top: -3px;
 }
+
+.disabledMsg:hover {
+    cursor: not-allowed;
+}
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -520,6 +526,9 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 
 let pageSizeDominis = 20;
 $(document).ready(function() {
+
+	$('.disabledMsg').tooltip();
+	
 	removeLoading();
 	$("a.fileDownload").on("click", function() {
 		$("body").addClass("loading");
@@ -539,56 +548,25 @@ $(document).ready(function() {
 	$("#tascaBtn").appendTo(".panel-heading h2");
 	<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 
-	
 	$("#mostraDetallSignants").click(function(){
-		$('#detallSignants').html("");
-		$('#detallSignants').append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
-		$.get("../contingut/" + ${contingut.id} + "/document/" + ${contingut.id} + "/mostraDetallSignants", function(data){
-			if (data.estatOk) {
-				$('#detallSignants').html("");
-				if(data.objecte != null && data.objecte.length > 0){
-					data.objecte.forEach(function(firma){
-						if(firma != null){
-							var firmaDataStr = "";
-							if(firma.responsableNom == null){
-								firma.responsableNom = "";
-							}
-							if(firma.responsableNif == null){
-								firma.responsableNif = "";
-							}
-							if(firma.data != null){
-								firmaDataStr = new Date(firma.data);
-							}
-							if(firma.emissorCertificat == null){
-								firma.emissorCertificat = "";
-							}
-							$("#detallSignants").append(
-								  "<tr><th><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
-								+ "</strong></th><th>"
-								+ firma.responsableNom
-								+ "</th></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
-								+ "</strong></td><td>"
-								+ firma.responsableNif
-								+ "</td></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
-								+ "</strong></td><td>"
-								+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
-								+ "</td></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
-								+ "</strong></td><td>"
-								+ firma.emissorCertificat
-								+ "</td></tr>");
-						}
-					})
-				}
-			}else{
-				$('#detallSignants').html("");
-			}
-			webutilRefreshMissatges();
-		});
+
+		let contingutId = ${contingut.id}; 
+
+		getDetallsSignants($('#detallSignants'), contingutId);
 	});
+
+	<c:choose>
+		<c:when test="${contingut.arxiuUuid != null}">
+			var arxiu = '<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>';
+		</c:when>
+		<c:otherwise>
+			var arxiu = '<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>';
+		</c:otherwise>
+	</c:choose>	
+
+	$(".container-main .panel-heading h2").append(arxiu);
+	
+
 	$('#contenidor-contingut li').mouseover(function() {
 		$('a.btn', this).removeClass('hidden');
 	});
@@ -639,6 +617,7 @@ $(document).ready(function() {
 	$('#taulaInteressats').on('draw.dt', function (e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		$('#interessats-count').html(api.page.info().recordsTotal);
+		$('.disabledMsg').tooltip();
 	});
 	$('#taulaEnviaments').on('draw.dt', function (e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
@@ -905,6 +884,8 @@ $(document).ready(function() {
 		var checkItAll = document.getElementById('checkItAll');
 		$('.checkItAll').addClass('disabled');
 	</c:if>
+
+	<c:if test="${!contingut.document}"> 
 	$('#habilitar-mult').on('click', function() {
 		var contenidorContingut = document.getElementById('contenidor-contingut');
 		var inputs = contenidorContingut.querySelectorAll('li>div');
@@ -1007,7 +988,8 @@ $(document).ready(function() {
 			}
 		});
 	}
-
+	</c:if>
+	
 	$("span[class*='popover-']").popover({
 		html: true,
 	    content: function () {
@@ -1252,6 +1234,42 @@ $(document).ready(function() {
 			$botoTipusDocumental.popover('hide');
 		});
 	});
+	$(window).on('load', function() {
+		var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
+		$.get(
+				multipleUrl,
+				function(data) {
+					$(".seleccioCount").html(data);
+				}
+		);
+	});
+	
+	let $taula = $('#taulaInteressats');
+	$taula.on('init.dt', function () {
+            $('#addInteressatBtn').on('click', function() {
+            	if (!(/#interessats/.test(window.location.href))) {
+            		window.history.replaceState('','', window.location.href  + '#interessats');
+            	}
+            });
+            
+            $('.btnModificarInteressat').each(function() {
+	            $(this).on('click', function() {
+	            	if (!(/#interessats/.test(window.location.href))) {
+		            	window.history.replaceState('','', window.location.href  + '#interessats');
+	            	}
+	            });
+			});
+    });
+	if (/#interessats/.test(window.location.href)) {
+		$('.nav-tabs a[href$="#interessats"]').trigger('click');	
+	}	
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		  var target = $(e.target).attr("href")
+		  if (target != "#interessats" && /#interessats/.test(window.location.href)) {
+			  window.history.replaceState('','', window.location.href.substr(0, window.location.href.indexOf("#interessats")));
+		  }
+	});
+	
 });
 
 function showTipusDocumentals() {
@@ -1326,6 +1344,8 @@ function getEnviamentsDocument(document) {
 		             		if (val.error) {
 		             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 		             		}
+		             		content += "<p class='estat_" + val.id +  "' style='display:inline'></p>";
+		             		returnEnviamentsStatusDiv(val.id);
 		             	}
 		             	content += "</td>";
 		             	content += "</tr>";
@@ -1339,6 +1359,7 @@ function getEnviamentsDocument(document) {
 	}
 }
 
+<c:if test="${!contingut.document}"> 
 function enableDisableButton() {
 	var isTotPdfFirmat = true;
 	var isTotPdf = true;
@@ -1352,52 +1373,53 @@ function enableDisableButton() {
 	//icones
 	var gridDocuments = document.getElementById('contenidor-contingut');
 	$(gridDocuments).addClass("disabled");
-	
-	if (docsIdx != undefined && tableDocuments != undefined) {
-		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-		inputs.forEach(function(input) {
-			var documentId = parseInt(input.id);
-			if (docsIdx.includes(documentId)) {
-				var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
-				var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
-				var isDocAdjuntPendentGuardarArxiu = $(input.closest('tr')).hasClass('docAdjuntPendentGuardarArxiu');
-				if (isDocAdjuntPendentGuardarArxiu) {
-					isTotDocAdjuntGuardatEnArxiu = false;
-				}
-				
-				if (!isFirmatCurrentDocument) {
-					isTotPdfFirmat = false;
-					return false;
-				}
-				if (!isPdfCurrentDocument) {
-					isTotPdf = false;
-				}
-			}
-		});
 
-	} else if (docsIdx != undefined && gridDocuments != undefined) {
-		var list = gridDocuments.querySelectorAll('li');
-		list.forEach(function(child) {
-			var childId = $(child).attr('data-contenidor-id');
-			var documentId = parseInt(childId);
-			if (docsIdx.includes(documentId)) {
-				var isFirmatCurrentDocument = $(child).hasClass('firmat');
-				var isPdfCurrentDocument = $(child).hasClass('isPdf');
-				var isDocAdjuntPendentGuardarArxiu = $(child).hasClass('docAdjuntPendentGuardarArxiu');
-				if (isDocAdjuntPendentGuardarArxiu) {
-					isTotDocAdjuntGuardatEnArxiu = false;
+		if (docsIdx != undefined && tableDocuments != undefined) {
+			var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+			inputs.forEach(function(input) {
+				var documentId = parseInt(input.id);
+				if (docsIdx.includes(documentId)) {
+					var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
+					var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
+					var isDocAdjuntPendentGuardarArxiu = $(input.closest('tr')).hasClass('docAdjuntPendentGuardarArxiu');
+					if (isDocAdjuntPendentGuardarArxiu) {
+						isTotDocAdjuntGuardatEnArxiu = false;
+					}
+					
+					if (!isFirmatCurrentDocument) {
+						isTotPdfFirmat = false;
+						return false;
+					}
+					if (!isPdfCurrentDocument) {
+						isTotPdf = false;
+					}
 				}
-				
-				if (!isFirmatCurrentDocument) {
-					isTotPdfFirmat = false;
-					return false;
+			});
+
+		} else if (docsIdx != undefined && gridDocuments != undefined) {
+			var list = gridDocuments.querySelectorAll('li');
+			list.forEach(function(child) {
+				var childId = $(child).attr('data-contenidor-id');
+				var documentId = parseInt(childId);
+				if (docsIdx.includes(documentId)) {
+					var isFirmatCurrentDocument = $(child).hasClass('firmat');
+					var isPdfCurrentDocument = $(child).hasClass('isPdf');
+					var isDocAdjuntPendentGuardarArxiu = $(child).hasClass('docAdjuntPendentGuardarArxiu');
+					if (isDocAdjuntPendentGuardarArxiu) {
+						isTotDocAdjuntGuardatEnArxiu = false;
+					}
+					
+					if (!isFirmatCurrentDocument) {
+						isTotPdfFirmat = false;
+						return false;
+					}
+					if (!isPdfCurrentDocument) {
+						isTotPdf = false;
+					}
 				}
-				if (!isPdfCurrentDocument) {
-					isTotPdf = false;
-				}
-			}
-		});
-	}
+			});
+		}		
+
 	
 	if (isTotPdfFirmat && isTotPdf) {
 		$('.nomaximized').addClass('hidden'); //zip
@@ -1418,16 +1440,16 @@ function enableDisableButton() {
 		$('#tipusdocumental-mult').removeClass("disabled");
 	}
 	
-	if (docsIdx.length > 0) {
-		$('#descarregar-mult').removeClass("disabled");
-		$('#moure-mult').removeClass("disabled");
-		$('#tipusdocumental-mult').removeClass("disabled");
-	} else {
-		$('#descarregar-mult').addClass("disabled");
-		$('#notificar-mult').addClass("disabled");
-		$('#moure-mult').addClass("disabled");
-		$('#tipusdocumental-mult').addClass("disabled");
-	}
+		if (docsIdx.length > 0) {
+			$('#descarregar-mult').removeClass("disabled");
+			$('#moure-mult').removeClass("disabled");
+			$('#tipusdocumental-mult').removeClass("disabled");
+		} else {
+			$('#descarregar-mult').addClass("disabled");
+			$('#notificar-mult').addClass("disabled");
+			$('#moure-mult').addClass("disabled");
+			$('#tipusdocumental-mult').addClass("disabled");
+		}
 	$('#contenidor-contingut ').removeClass("disabled");
 	$('#table-documents').removeClass("disabled");
 	$('#loading').addClass('hidden');
@@ -1454,6 +1476,8 @@ function deselectAll() {
 			}
 	);
 }
+</c:if>
+
 
 function recuperarResultatDomini(
 		metaExpedientId,
@@ -1613,7 +1637,7 @@ function showLoadingModal(message) {
 
 
 // ------------------ VISOR ------------------------------
-function showViewer(event, documentId, contingutNom) {
+function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 	if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 5 || event.target.cellIndex === 6)) return;
     var resumViewer = $('#resum-viewer');
 	// Mostrar/amagar visor
@@ -1628,15 +1652,28 @@ function showViewer(event, documentId, contingutNom) {
 	
     // Mostrar contingut capçalera visor
     resumViewer.find('*').not('#container').remove();
+    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%;">\
+									<table style="width: 453px;">\
+										<tbody id="detallSignantsPreview">\
+										</tbody>\
+									</table>\
+								 </div>';
     var viewerContent = '<div class="panel-heading"><spring:message code="contingut.previsualitzacio"/> \
     					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
     					 </div>\
     					 <div class="viewer-content viewer-padding">\
     						<dl class="dl-horizontal">\
-	        					<dt style="text-align: left;"><spring:message code="contingut.info.nom"/>: </dt><dd>' + contingutNom + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="contingut.info.nom"/> </dt><dd>' + contingutNom + '</dd>\
         					</dl>\
     					 </div>';
+    					 
+    if (contingutCustodiat) {
+    	viewerContent += signantsViewerContent;
+    }
     resumViewer.prepend(viewerContent);
+    if (contingutCustodiat) {
+    	getDetallsSignants($("#detallSignantsPreview"), documentId);
+    }
     
 
     // Recuperar i mostrar document al visor
@@ -1689,8 +1726,85 @@ function closeViewer() {
 	});
 }
 
+function getDetallsSignants(idTbody, contingutId) {
+	
+	idTbody.html("");
+	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
+	$.get("../contingut/document/" + contingutId + "/mostraDetallSignants", function(data){
+		if (data.estatOk) {
+			idTbody.html("");
+			if(data.objecte != null && data.objecte.length > 0){
+				data.objecte.forEach(function(firma){
+					if(firma != null){
+						var firmaDataStr = "";
+						if(firma.responsableNom == null){
+							firma.responsableNom = "";
+						}
+						if(firma.responsableNif == null){
+							firma.responsableNif = "";
+						}
+						if(firma.data != null){
+							firmaDataStr = new Date(firma.data);
+						}
+						if(firma.emissorCertificat == null){
+							firma.emissorCertificat = "";
+						}
+						idTbody.append(
+							  "<tr><th><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
+							+ "</strong></th><th>"
+							+ firma.responsableNom
+							+ "</th></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
+							+ "</strong></td><td>"
+							+ firma.responsableNif
+							+ "</td></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
+							+ "</strong></td><td>"
+							+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
+							+ "</td></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
+							+ "</strong></td><td>"
+							+ firma.emissorCertificat
+							+ "</td></tr>");
+					}
+				})
+			}
+		}else{
+			idTbody.html("");
+		}
+		webutilRefreshMissatges();
+	});
+}
+	
+function returnEnviamentsStatusDiv(notificacioId) {
+    var content = "";
+    var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + notificacioId;
 
+    $.getJSON({
+        url: getUrl,
+        success: (notificacio) => {
+			var enviaments = notificacio.documentEnviamentInteressats;
+            for (i = 0; i < enviaments.length; i++) {
+                content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+            }
+            if (content !== undefined && content != '') {
+                content = "("+content.replace(/,\s*$/, "")+")";
+            }
+            $('.estat_' + notificacioId).html("");
+            $('.estat_' + notificacioId).append(content);
+        },
+        error: function(data){
+        	console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId);
+        }
+    })
+}
 
+var myHelpers = {
+recuperarEstatEnviament: returnEnviamentsStatusDiv,
+};
+
+$.views.helpers(myHelpers);
 
 </script>
 
@@ -1703,7 +1817,7 @@ function closeViewer() {
 			<ul class="list-group pull-right">
 	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
 	  				<spring:message code="contingut.info.agafat.per"/>:
-	  				${expedientPare.agafatPer.nom}&nbsp;
+	  				${expedientPare.agafatPer.codiAndNom}&nbsp;
 	  				<c:if test="${expedientAgafatPerUsuariActual}">
 	  					<a href="<c:url value="/expedient/${expedientPare.id}/alliberar"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
 	  				</c:if>
@@ -1921,6 +2035,12 @@ function closeViewer() {
 						<c:when test="${contingut.document}">
 							<table class="table table-bordered">
 								<tbody>
+									<c:if test="${!empty contingut.descripcio}">
+										<tr> 
+											<td><strong><spring:message code="contingut.document.camp.descripcio"/></strong></td>
+											<td>${contingut.descripcio}</td>
+										</tr>
+									</c:if>
 									<c:choose>
 										<c:when test="${contingut.documentTipus == 'DIGITAL'}">
 											<tr>
@@ -2319,7 +2439,7 @@ function closeViewer() {
 								id="taulaInteressats" 
 								data-toggle="datatable" 
 								data-url="<c:url value="/contingut/${contingut.id}/interessat/datatable"/>" 
-								data-paging-enabled="false" 
+								data-paging-enabled="false"
 								data-botons-template="#taulaInteressatsNouBoton" 
 								class="table table-striped table-bordered" 
 								style="width:100%">
@@ -2327,6 +2447,10 @@ function closeViewer() {
 									<tr>
 										<th data-col-name="id" data-visible="false">#</th>
 										<th data-col-name="representantId" data-visible="false">#</th>
+										<th data-col-name="representant" data-visible="false">#</th>
+										<th data-col-name="arxiuPropagat" data-visible="false"></th>
+										<th data-col-name="representantArxiuPropagat" data-visible="false"></th>			
+										<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 										<th data-col-name="tipus" data-template="#cellTipusInteressatTemplate" data-orderable="false" width="15%">
 											<spring:message code="contingut.interessat.columna.tipus"/>
 											<script id="cellTipusInteressatTemplate" type="text/x-jsrender">
@@ -2334,15 +2458,43 @@ function closeViewer() {
 										</script>
 										</th>
 										<th data-col-name="documentNum" data-orderable="false" width="15%"><spring:message code="contingut.interessat.columna.document"/></th>
-										<th data-col-name="identificador" data-orderable="false" width="35%"><spring:message code="contingut.interessat.columna.identificador"/></th>
-										<th data-col-name="representantIdentificador" data-orderable="false" width="25%"><spring:message code="contingut.interessat.columna.representant"/>
+										<th data-col-name="identificador" data-orderable="false" width="35%" data-template="#cellIdentificadorTemplate"><spring:message code="contingut.interessat.columna.identificador"/>
+											<script id="cellIdentificadorTemplate" type="text/x-jsrender">
+												{{:identificador}} 
+												{{if arxiuPropagat}}
+													<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+												{{else}}
+													<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+												{{/if}}												
+											</script>
+										</th>
+										<th data-col-name="representantIdentificador" data-orderable="false" width="25%" data-template="#cellRepresentantTemplate">
+											<spring:message code="contingut.interessat.columna.representant"/>
+											<script id="cellRepresentantTemplate" type="text/x-jsrender">
+												{{:representantIdentificador}} 
+												{{if representantId != null}}
+													{{if representantArxiuPropagat}}
+														<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
+													{{else}}
+														<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+													{{/if}}	
+												{{/if}}												
+											</script>										
+										</th>
 										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
 										<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
 											<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
 											<div class="dropdown">
 												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 												<ul class="dropdown-menu">
-													<li><a href="<c:url value="/expedient/${contingut.id}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+													{{if (!arxiuPropagat || !representantArxiuPropagat)}}
+														{{if !expedientArxiuPropagat}}
+															<li class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+														{{else}}
+															<li><a href="<c:url value="/expedient/${contingut.id}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+														{{/if}}
+													{{/if}}	
+													<li><a href="<c:url value="/expedient/${contingut.id}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true" class="btnModificarInteressat"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 													<li><a href="<c:url value="/expedient/${contingut.id}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="true" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 													{{if tipus != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>'}}
 														<li class="divider" role="separator"></li>
@@ -2355,7 +2507,7 @@ function closeViewer() {
 													{{/if}}
 												</ul>
 											</div>
-										</script>
+											</script>
 										</th>
 										</c:if>
 									</tr>
@@ -2363,7 +2515,7 @@ function closeViewer() {
 							</table>
 							<script id="taulaInteressatsNouBoton" type="text/x-jsrender">
 							<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
-								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.id}/interessat/new"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
+								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.id}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 							</c:if>
 						</script>
 						</div>
@@ -2441,6 +2593,10 @@ function closeViewer() {
 														{{else}}
 															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
 													{{/if}}
+												{{/if}}
+												{{if notificacioEstat == 'PROCESSADA'}}
+												{{:~recuperarEstatEnviament(id)}}
+												<p class="estat_{{:id}}"  style="display:inline"></p>
 												{{/if}}
 											{{else publicacio}}
 												{{if estat == 'PENDENT'}}
@@ -2553,7 +2709,7 @@ function closeViewer() {
 								data-toggle="datatable"
 								data-url="<c:url value="/expedientTasca/${contingut.id}/datatable"/>"
 								data-paging-enabled="false"
-								data-agrupar="5"
+								data-agrupar="6"
 								class="table table-bordered table-striped"
 								style="width:100%"
 								data-botons-template="#taulaTasquesNouBoton">
@@ -2564,7 +2720,8 @@ function closeViewer() {
 										<th data-col-name="comentari" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>	
 										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
-										<th data-col-name="responsable.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable"/></th>								
+										<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>	
+										<th data-col-name="responsableActual.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>								
 										<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
 											<spring:message code="expedient.tasca.list.columna.estat"/>
 											<script id="cellTascaEstatTemplate" type="text/x-jsrender">

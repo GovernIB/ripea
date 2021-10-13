@@ -6,6 +6,7 @@ package es.caib.ripea.core.ejb;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -52,7 +53,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId) {
+			Long grupId, 
+			String rolActual) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -64,19 +66,20 @@ public class ExpedientServiceBean implements ExpedientService {
 				nom,
 				expedientPeticioId,
 				associarInteressats,
-				grupId);
+				grupId, 
+				rolActual);
 	}
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,
 			Long metaExpedientId,
 			Long pareId,
 			String nom,
-			int esborrat) {
+			int esborrat, String rolActual) {
 		return delegate.findByMetaExpedientAndPareAndNomAndEsborrat(entitatId,
 																	metaExpedientId,
 																	pareId,
 																	nom,
-																	esborrat);
+																	esborrat, rolActual);
 	}
 	@Override
 	@RolesAllowed("tothom")
@@ -112,8 +115,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
-			ExpedientFiltreDto filtre) throws NotFoundException {
-		return delegate.findIdsAmbFiltre(entitatId, filtre);
+			ExpedientFiltreDto filtre, String rolActual) throws NotFoundException {
+		return delegate.findIdsAmbFiltre(entitatId, filtre, rolActual);
 	}
 
 	@Override
@@ -173,11 +176,12 @@ public class ExpedientServiceBean implements ExpedientService {
 	public void relacioCreate(
 			Long entitatId,
 			Long id,
-			Long relacionatId) {
+			Long relacionatId, String rolActual) {
 		delegate.relacioCreate(
 				entitatId,
 				id,
-				relacionatId);
+				relacionatId, 
+				rolActual);
 	}
 
 	@Override
@@ -185,11 +189,13 @@ public class ExpedientServiceBean implements ExpedientService {
 	public boolean relacioDelete(
 			Long entitatId, 
 			Long expedientId, 
-			Long relacionatId) {
+			Long relacionatId, 
+			String rolActual) {
 		return delegate.relacioDelete(
 				entitatId,
 				expedientId,
-				relacionatId);
+				relacionatId, 
+				rolActual);
 	}
 
 	@Override
@@ -235,18 +241,20 @@ public class ExpedientServiceBean implements ExpedientService {
 	@Override
 	public List<ExpedientDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId) {
+			Long metaExpedientId, String rolActual) {
 		return delegate.findByEntitatAndMetaExpedient(
 				entitatId,
-				metaExpedientId);
+				metaExpedientId, 
+				rolActual);
 	}
 
 	@Override
-	public boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text) {
+	public boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
 		return delegate.publicarComentariPerExpedient(
 				entitatId,
 				expedientId,
-				text);
+				text, 
+				rolActual);
 	}
 
 	@Override
@@ -262,8 +270,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId) {
-		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId);
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual) {
+		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual);
 	}
 
 
@@ -280,25 +288,28 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public boolean incorporar(Long entitatId,
+	public boolean incorporar(
+			Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
-			boolean associarInteressats) {
-		return delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats);
+			boolean associarInteressats, 
+			String rolActual) {
+		return delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats, rolActual);
 		
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportIndexExpedients(Long entitatId, Collection<Long> expedientIds) throws IOException {
+	public FitxerDto exportIndexExpedients(Long entitatId, Set<Long> expedientIds, String format) throws IOException {
 		return delegate.exportIndexExpedients(
 				entitatId, 
-				expedientIds);
+				expedientIds,
+				format);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportIndexExpedient(Long entitatId, Long expedientId, boolean exportar) throws IOException {
+	public FitxerDto exportIndexExpedient(Long entitatId, Set<Long> expedientId, boolean exportar) throws IOException {
 		return delegate.exportIndexExpedient(
 				entitatId,
 				expedientId,
@@ -343,7 +354,20 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 	@Override
 	@RolesAllowed("IPA_ORGAN_ADMIN")
-	public boolean isOrganGestorPermes (Long expedientId) {
-		return delegate.isOrganGestorPermes(expedientId);
+	public boolean isOrganGestorPermes (Long expedientId, String rolActual) {
+		return delegate.isOrganGestorPermes(expedientId, rolActual);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public Exception guardarExpedientArxiu(Long expId) {
+		return delegate.guardarExpedientArxiu(expId);
+	}
+	@Override
+	@RolesAllowed("IPA_SUPER")
+	public List<ExpedientDto> findByText(
+			Long entitatId,
+			String text){
+		return delegate.findByText(entitatId, text);
 	}
 }

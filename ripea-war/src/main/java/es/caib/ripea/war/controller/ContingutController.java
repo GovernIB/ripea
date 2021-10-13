@@ -120,7 +120,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					true,
-					true);
+					true, 
+					RolHelper.getRolActual(request));
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,
@@ -203,7 +204,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					true,
-					false);
+					false, null);
 			
 			boolean isExpedient = contingut.getPare() == null;
 			if (isExpedient) {
@@ -215,7 +216,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			
 			contingutService.deleteReversible(
 					entitatActual.getId(),
-					contingutId);
+					contingutId, 
+					RolHelper.getRolActual(request));
 
 			return getAjaxControllerReturnValueSuccess(
 					request,
@@ -295,7 +297,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(), 
 				contingutOrigenId, 
 				false, 
-				false);
+				false, null);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			command.setOrigenIds(
@@ -359,7 +361,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false);
+				false, null);
 		contingutService.move(
 				entitatActual.getId(),
 				contingutOrigenId,
@@ -510,7 +512,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false));
+						false, null));
 		model.addAttribute(
 				"errors",
 				contingutService.findErrorsValidacio(
@@ -531,7 +533,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false));
+						false, null));
 		model.addAttribute(
 				"alertes",
 				contingutService.findAlertes(
@@ -580,7 +582,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		if (contingut instanceof ExpedientDto) {
 			interessats = interessatService.findByExpedient(
 					entitatActual.getId(),
@@ -604,7 +606,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false));
+						false, null));
 		model.addAttribute(
 				"logs",
 				contingutService.findLogsPerContingutUser(
@@ -654,7 +656,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					false,
-					false);
+					false, null);
 			model.addAttribute("contingut", contingut);
 			if (contingut.isReplicatDinsArxiu()) {
 				model.addAttribute(
@@ -747,7 +749,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("contingut", contingut);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 		model.addAttribute(
 				"metaDocuments",
 				metaDocumentService.findActiusPerCreacio(
@@ -837,11 +839,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false);
+				false, null);
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			List<ContingutDto> documentsOrigen = new ArrayList<ContingutDto>();
 			for (Long docIdx : docsIdx) {
-				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false);
+				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, null);
 				documentsOrigen.add(contingut);
 			}
 			model.addAttribute(

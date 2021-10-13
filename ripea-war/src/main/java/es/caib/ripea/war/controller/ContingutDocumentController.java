@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +86,7 @@ import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de documents.
@@ -156,8 +159,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					document);
 		} else {
 			command = new DocumentCommand();
-			Date ara = new Date();
-			command.setData(ara);
+			LocalDateTime ara = new LocalDateTime();
+			command.setDataTime(ara);
 
 			omplirModelFormulari(
 					request,
@@ -181,7 +184,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long pareId,
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
 		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
 				request,
@@ -213,7 +216,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
@@ -249,7 +252,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long contingutId,
 			@Validated({UpdateDigital.class}) DocumentCommand command,
 			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
@@ -275,7 +278,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
@@ -313,30 +316,44 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	}
 
 	
-	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarEnArxiuDocumentAdjunt", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarDocumentArxiu", method = RequestMethod.GET)
 	public String guardarEnArxiuDocumentAdjunt(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
+			@RequestParam(value = "origin") String origin,
 			Model model)  {
 
-		Exception exception = documentService.guardarEnArxiuDocumentAdjunt(documentId);
+		Exception exception = documentService.guardarDocumentArxiu(documentId);
+		
+		String redirect = null;
+		if (origin.equals("docDetail")) {
+			redirect = "redirect:../../";
+		} else if (origin.equals("seguiment")) {
+			redirect = "redirect:../../../../seguimentArxiuPendents/#documents";
+		}
 		
 		if (exception == null) {
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:../../",
+					redirect,
 					"document.controller.guardar.arxiu.ok");
 		} else {
 			logger.error("Error guardant document en arxiu", exception);
-			return getModalControllerReturnValueError(
+			
+			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
+			String msg = null;
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				msg = getMessage(request,"error.arxiu.connectTimedOut");
+			} else {
+				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+			}
+			return getAjaxControllerReturnValueError(
 					request,
-					"redirect:../../",
+					redirect,
 					"document.controller.guardar.arxiu.error",
-					new Object[] {exception.getMessage()});
+					new Object[] {msg});
 		}
-
-
 	}
 
 
@@ -413,11 +430,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return idTransaccio;
 	}
 	
-	@RequestMapping(value = "/{contingutId}/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
+	@RequestMapping(value = "/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
 	@ResponseBody
 	public AjaxFormResponse mostraDetallSignants(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
 			@PathVariable Long documentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -468,7 +484,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				documentId,
 				true,
-				false);
+				false, null);
 		if (contingut instanceof DocumentDto) {
 			
 			try {
@@ -530,7 +546,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				pareId,
 				true,
-				false);
+				false, null);
 		
 		byte[] reportContent = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -559,7 +575,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public String concatenar(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 		boolean totsFinals = true;
@@ -575,7 +591,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		
 		List<DocumentDto> documents = new ArrayList<DocumentDto>();
 		@SuppressWarnings("unchecked")
@@ -589,7 +605,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false);
+					false, null);
 
 			document = (DocumentDto) contingutDoc;
 			//No es possible concatenar els documents que no són pdf
@@ -663,7 +679,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false);
+					false, null);
 		}
 	}
 	
@@ -696,7 +712,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false);
+					false, null);
 		} catch (Exception exception) {
 			return getModalControllerReturnValueErrorMessageText(
 					request, 
@@ -716,7 +732,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -728,7 +744,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false);
+					false, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 				existsEsborrat = true;
 				documentService.documentActualitzarEstat(
@@ -865,7 +881,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						entitatActual.getId(),
 						docId,
 						true,
-						false);
+						false, null);
 				if (contingut instanceof DocumentDto) {
 					DocumentDto document = (DocumentDto) contingut;
 					if ((!document.isFirmat() || document.isCustodiat())
@@ -898,7 +914,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false);
+				false, null);
 		if (!contingut.isCarpeta())
 			isDocument = true;
 		else
@@ -920,7 +936,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					documentId,
 					true,
-					false);
+					false, null);
 				FitxerDto fitxer = documentService.descarregarImprimible(
 						entitatActual.getId(),
 						documentId,
@@ -1036,7 +1052,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			DocumentCommand command,
 			DocumentGenericCommand commandGeneric,
 			boolean notificar,
-			boolean comprovarMetaExpedient) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			boolean comprovarMetaExpedient, 
+			String rolActual) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -1045,11 +1062,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		Long pareId = commandGeneric == null ? command.getPareId() : commandGeneric.getPareId();
 		if (commandGeneric == null ? command.getId() == null : commandGeneric.getId() == null) {
 			DocumentDto documentDto = commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric);
+			
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,
 					documentDto,
-					comprovarMetaExpedient);
+					comprovarMetaExpedient, 
+					rolActual);
 			//Valor per defecte d'algunes metadades
 			List<MetaDadaDto> metadades = metaDadaService.findByNode(
 					entitatActual.getId(), 
@@ -1079,7 +1098,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					valors);
 			
 			if (!notificar) {
-				if (document.getGesDocAdjuntId()==null) {
+				if (document.getArxiuUuid() != null) {
 					return getModalControllerReturnValueSuccess(
 							request,
 							"redirect:../../contingut/" + pareId,
@@ -1091,8 +1110,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							"document.controller.creat.error.arxiu",
 							null);
 				}
-
-				
 				
 				
 			} else {
@@ -1103,7 +1120,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			documentService.update(
 					entitatActual.getId(),
 					commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric),
-					comprovarMetaExpedient);
+					comprovarMetaExpedient, 
+					rolActual);
 			
 			return getModalControllerReturnValueSuccess(
 					request,

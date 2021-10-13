@@ -16,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
@@ -115,7 +116,17 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			Pageable pageable);
 
 
-
-	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    ContingutEntity c " +
+			"where " +
+			"c.arxiuUuid = null " +
+			"and ((c.tipus = 0 and c.arxiuReintents < :arxiuMaxReintentsExpedients) or (c.tipus = 2 and c.arxiuReintents < :arxiuMaxReintentsDocuments)) " +
+			"and c.esborrat = 0 " +
+			"order by c.arxiuIntentData asc")
+	public List<ContingutEntity> findContingutsPendentsArxiu(
+			@Param("arxiuMaxReintentsExpedients") int arxiuMaxReintentsExpedients,
+			@Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
 
 }

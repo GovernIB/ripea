@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +28,27 @@ import es.caib.distribucio.ws.backofficeintegracio.Estat;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.TestHelper;
+import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -60,10 +70,20 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private JavaMailSender mailSender;
 	@Autowired
 	private TestHelper testHelper;
-	
 	@Autowired
 	private EmailPendentEnviarRepository emailPendentEnviarRepository;
-	
+	@Autowired
+	private ContingutRepository contingutRepository;
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	@Autowired
+	private DocumentHelper documentHelper;
+	@Autowired
+	private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired
+	private InteressatRepository interessatRepository;
+	@Autowired
+	private ConfigHelper configHelper;
 	
 	private static final String PREFIX_RIPEA = "[RIPEA]";
 
@@ -267,7 +287,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
 				header = "Canvi d'estat de documents enviat a ViaFirma";
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
-				header = "Canvi d'estat de revisio de tipus d'expedients";
+				header = "Canvi d'estat de revisio de procediments";
 			}
 			
 			text += header + "\n";
@@ -294,8 +314,59 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	
 	
+	
+	@Override
+	@Transactional
+	public void guardarExpedientsDocumentsArxiu() {
+		
+		logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
+		
+		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
+		int arxiuMaxReintentsDocuments = getArxiuMaxReintentsDocuments();
+		
+		List<ContingutEntity> pendents = contingutRepository.findContingutsPendentsArxiu(
+				arxiuMaxReintentsExpedients,
+				arxiuMaxReintentsDocuments);
+		
+		for (ContingutEntity contingut : pendents) {
+			
+			if (contingut instanceof ExpedientEntity) {
+				expedientHelper.guardarExpedientArxiu(contingut.getId());
+			} else if (contingut instanceof DocumentEntity) {
+				documentHelper.guardarDocumentArxiu(contingut.getId());
+			}
+		}
+	}
+	
+	
+	@Override
+	@Transactional
+	public void guardarInteressatsArxiu() {
+		
+		logger.info("Execució tasca periòdica: Guardar interessats en arxiu");
+		
+		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
+		
+		for (InteressatEntity interessat : pendents) {
+			expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+		}
+	}
+	
+	private int getArxiuMaxReintentsExpedients() {
+		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
+		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;
+	}
+	
+	private int getArxiuMaxReintentsDocuments() {
+		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
+		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
+	}
+	private int getArxiuMaxReintentsInteressats() {
+		String arxiuMaxReintentsInteressats = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats");
+		return arxiuMaxReintentsInteressats != null && !arxiuMaxReintentsInteressats.isEmpty() ? Integer.valueOf(arxiuMaxReintentsInteressats) : 0;
+	}
+	
 
-	private static final Logger logger = LoggerFactory.getLogger(
-			SegonPlaServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(SegonPlaServiceImpl.class);
 
 }

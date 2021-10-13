@@ -21,8 +21,16 @@
 
 	<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle<c:if test="${not modeLlistat}"> btn-xs</c:if>"><span class="fa fa-cog"></span><c:if test="${modeLlistat}">&nbsp;<spring:message code="comu.boto.accions"/></c:if>&nbsp;<span class="caret caret-white"></span></button>
 	<ul class="dropdown-menu">
-		<c:if test="${contingut.document && contingut.gesDocAdjuntId!=null}">
-			<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarEnArxiuDocumentAdjunt"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+		<c:if test="${contingut.arxiuUuid==null}">
+			<c:choose>
+				<c:when test="${contingut.document}">
+					<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
+					<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				</c:when>
+				<c:when test="${contingut.expedient}">
+					<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				</c:when>
+			</c:choose>
 		</c:if>
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
 			<c:choose>
@@ -35,7 +43,7 @@
 									<li class="hidden"><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 								</c:when>
 								<c:otherwise>
-									<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}, ${tascaId}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+									<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}, ${tascaId}', ${contingut.custodiat}"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 								</c:otherwise>
 							</c:choose>
 						</c:when>
@@ -45,7 +53,7 @@
 									<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 								</c:when>
 								<c:otherwise>
-									<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+									<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 								</c:otherwise>
 							</c:choose>							
 							
@@ -188,7 +196,7 @@
 					</c:otherwise>
 				</c:choose>
 				<%---- Visualitzar ----%>
-				<li class="${contingut.gesDocAdjuntId!=null || (contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}')"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+				<li class="${contingut.gesDocAdjuntId!=null || (contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
@@ -335,7 +343,7 @@
 			<c:if test="${contingut.expedient}">
 				<c:choose>
 					<c:when test="${contingut.hasFills}">
-						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index"/>...</a></li>
+						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>
 						<c:choose>
 							<c:when test="${contingut.conteDocumentsFirmats}">
 								<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>

@@ -69,7 +69,6 @@ public class HistoricServiceImpl implements HistoricService {
 	@Autowired
 	private HistoricHelper historicHelper;
 
-
 	@Override
 	public void generateOldHistorics() {
 		historicHelper.generateOldDailyHistorics(30*8);
@@ -80,11 +79,20 @@ public class HistoricServiceImpl implements HistoricService {
 	public PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
 			Long entitatId,
 			HistoricFiltreDto filtre,
+			String rolActual,
 			PaginacioParamsDto paginacioParams) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
+			
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("mes", new String[] { "data" });
 		Page<HistoricExpedientAggregation> pagina = historicExpedientRepository.findByEntitatAndDateRangeGroupedByDate(
@@ -93,8 +101,8 @@ public class HistoricServiceImpl implements HistoricService {
 				!fiteringByOrganGestors,
 				!fiteringByOrganGestors ? null : filtre.getOrganGestorsIds(),
 				filtre.getIncorporarExpedientsComuns(),
-				!fiteringByMetaExpedients,
-				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
+				!filteringByMetaExpedients,
+				!filteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici() != null ? filtre.getDataInici() : new GregorianCalendar(2000, Calendar.JANUARY, 01).getTime(),
 				filtre.getDataFi() != null ? filtre.getDataFi() : (new LocalDate()).toDateTimeAtCurrentTime().toDate(),
 				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
@@ -106,30 +114,38 @@ public class HistoricServiceImpl implements HistoricService {
 	}
 
 	@Override
-	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, HistoricFiltreDto filtre) {
+	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
+		
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		List<HistoricExpedientAggregation> historicEntitat = historicExpedientRepository.findByEntitatAndDateRangeGroupedByDate(
 				entitat,
 				filtre.getTipusAgrupament(),
 				!fiteringByOrganGestors,
 				!fiteringByOrganGestors ? null : filtre.getOrganGestorsIds(),
 				filtre.getIncorporarExpedientsComuns(),
-				!fiteringByMetaExpedients,
-				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
+				!filteringByMetaExpedients,
+				!filteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici() != null ? filtre.getDataInici() : new GregorianCalendar(2000, Calendar.JANUARY, 01).getTime(),
 				filtre.getDataFi() != null ? filtre.getDataFi() : (new LocalDate()).toDateTimeAtCurrentTime().toDate());
 		
 		//historicEntitat = fillEmptyData(filtre, historicEntitat, HistoricExpedientAggregation.class);
 		return conversioTipusHelper.convertirList(historicEntitat, HistoricExpedientDto.class);
 	}
-
+  
 	@Override
-	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(HistoricFiltreDto filtre) {
-		Map<OrganGestorDto, List<HistoricExpedientDto>> data = getHistoricsByOrganGestor(filtre);
+	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
+		Map<OrganGestorDto, List<HistoricExpedientDto>> data = getHistoricsByOrganGestor(entitatId, rolActual, filtre);
 		
 		if (data.keySet().isEmpty()) {
 			return null;
@@ -153,13 +169,23 @@ public class HistoricServiceImpl implements HistoricService {
 	}
 
 	@Override
-	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(HistoricFiltreDto filtre) {
+	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
+			Long entitatId,
+			String rolActual, 
+			HistoricFiltreDto filtre) {
 		List<Long> organGestorIds = filtre.getOrganGestorsIds();
 		if (organGestorIds == null) {
 			return new HashMap<>();
 		}
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
-				filtre.getMetaExpedientsIds().size() > 0;
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null && filtre.getMetaExpedientsIds().size() > 0;
+		
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		Map<OrganGestorDto, List<HistoricExpedientDto>> results = new HashMap<>();
 		List<OrganGestorDto> organGestors = new ArrayList<>();
 		for (Long organId : organGestorIds) {
@@ -167,8 +193,8 @@ public class HistoricServiceImpl implements HistoricService {
 			List<HistoricExpedientAggregation> historics = historicExpedientRepository.findByOrganGestorAndDateRangeGroupedByDate(
 					organGestor,
 					filtre.getTipusAgrupament(),
-					!fiteringByMetaExpedients,
-					!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
+					!filteringByMetaExpedients,
+					!filteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
 			OrganGestorDto organDto = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
@@ -183,8 +209,8 @@ public class HistoricServiceImpl implements HistoricService {
 			organDto.setNom("Expedients comuns");
 			List<HistoricExpedientAggregation> historics = historicExpedientRepository.findByExpedientsComunsAndDateRangeGroupedByDate(
 					filtre.getTipusAgrupament(),
-					!fiteringByMetaExpedients,
-					!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
+					!filteringByMetaExpedients,
+					!filteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
 			organGestors.add(organDto);
@@ -196,19 +222,27 @@ public class HistoricServiceImpl implements HistoricService {
 	}
 	
 	@Override
-	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, HistoricFiltreDto filtre) {
+	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		UsuariEntity usuari = usuariRepository.findByCodi(usuariCodi);
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
+
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		List<HistoricUsuariAggregation> historics = historicUsuariRepository.findByDateRangeGroupedByDate(
 				usuari,
 				filtre.getTipusAgrupament(),
 				!fiteringByOrganGestors,
 				!fiteringByOrganGestors ? null : filtre.getOrganGestorsIds(),
 				filtre.getIncorporarExpedientsComuns(),
-				!fiteringByMetaExpedients,
-				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
+				!filteringByMetaExpedients,
+				!filteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici(),
 				filtre.getDataFi());
 		historics = fillEmptyData(filtre, historics, HistoricUsuariAggregation.class);
@@ -219,18 +253,26 @@ public class HistoricServiceImpl implements HistoricService {
 	}
 
 	@Override
-	public List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, HistoricFiltreDto filtre) {
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+	public List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
+
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		List<HistoricAggregation> historics = historicInteressatRepository.findByDateRangeGroupedByDate(
 				interessatDocNum,
 				filtre.getTipusAgrupament(),
 				!fiteringByOrganGestors,
 				!fiteringByOrganGestors ? null : filtre.getOrganGestorsIds(),
 				filtre.getIncorporarExpedientsComuns(),
-				!fiteringByMetaExpedients,
-				!fiteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
+				!filteringByMetaExpedients,
+				!filteringByMetaExpedients ? null : filtre.getMetaExpedientsIds(),
 				filtre.getDataInici(),
 				filtre.getDataFi());
 		historics = fillEmptyData(filtre, historics, HistoricAggregation.class);
@@ -239,12 +281,22 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Transactional
 	@Override
-	public List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, HistoricFiltreDto filtre) {
+	public List<HistoricExpedientDto> getDadesActualsEntitat(
+			Long entitatId, 
+			String rolActual,
+			HistoricFiltreDto filtre) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
 
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		Collection<HistoricExpedientEntity> historics = historicHelper.calcularHistoricExpedient(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
@@ -253,7 +305,7 @@ public class HistoricServiceImpl implements HistoricService {
 		List<HistoricExpedientEntity> resultat = new ArrayList<HistoricExpedientEntity>();
 		for (HistoricExpedientEntity historic : historics) {
 			MetaExpedientEntity metaExpedient = historic.getMetaExpedient();
-			boolean selectedByMetaExp = !fiteringByMetaExpedients ||
+			boolean selectedByMetaExp = !filteringByMetaExpedients ||
 					filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 			boolean selectedByOrgan = !fiteringByOrganGestors || (historic.getOrganGestor() != null &&
 					filtre.getOrganGestorsIds().contains(historic.getOrganGestor().getId()));
@@ -269,13 +321,20 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Transactional
 	@Override
-	public Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(HistoricFiltreDto filtre) {
+	public Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		List<Long> organGestors = filtre.getOrganGestorsIds();
 		if (organGestors == null || organGestors.isEmpty()) {
 			return null;
 		}
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
-				filtre.getMetaExpedientsIds().size() > 0;
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null && filtre.getMetaExpedientsIds().size() > 0;
+
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		Collection<HistoricExpedientEntity> historics = historicHelper.calcularHistoricExpedient(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
@@ -288,7 +347,7 @@ public class HistoricServiceImpl implements HistoricService {
 					(new LocalDate()).toDateTimeAtCurrentTime().toDate());
 			for (HistoricExpedientEntity historic : historics) {
 				MetaExpedientEntity metaExpedient = historic.getMetaExpedient();
-				boolean selectedByMetaExp = !fiteringByMetaExpedients ||
+				boolean selectedByMetaExp = !filteringByMetaExpedients ||
 						filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 
 				if (selectedByMetaExp && metaExpedient.getOrganGestor() != null &&
@@ -321,7 +380,7 @@ public class HistoricServiceImpl implements HistoricService {
 					(new LocalDate()).toDateTimeAtCurrentTime().toDate());
 			for (HistoricExpedientEntity historic : historics) {
 				MetaExpedientEntity metaExpedient = historic.getMetaExpedient();
-				boolean selectedByMetaExp = !fiteringByMetaExpedients ||
+				boolean selectedByMetaExp = !filteringByMetaExpedients ||
 						filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 
 				if (selectedByMetaExp && metaExpedient.getOrganGestor() == null) {
@@ -349,11 +408,18 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Transactional
 	@Override
-	public List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, HistoricFiltreDto filtre) {
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+	public List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
 
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		Collection<HistoricUsuariEntity> historics = historicHelper.calcularHistoricUsuari(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
@@ -362,7 +428,7 @@ public class HistoricServiceImpl implements HistoricService {
 		List<HistoricUsuariEntity> resultat = new ArrayList<HistoricUsuariEntity>();
 		for (HistoricUsuariEntity historic : historics) {
 			MetaExpedientEntity metaExpedient = historic.getMetaExpedient();
-			boolean selectedByMetaExp = !fiteringByMetaExpedients ||
+			boolean selectedByMetaExp = !filteringByMetaExpedients ||
 					filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 			boolean selectedByOrgan = !fiteringByOrganGestors || (historic.getOrganGestor() != null &&
 					filtre.getOrganGestorsIds().contains(historic.getOrganGestor().getId()));
@@ -375,11 +441,18 @@ public class HistoricServiceImpl implements HistoricService {
 
 	@Transactional
 	@Override
-	public List<HistoricInteressatDto> getDadesActualsInteressat(String docNum, HistoricFiltreDto filtre) {
-		boolean fiteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
+	public List<HistoricInteressatDto> getDadesActualsInteressat(String docNum, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
+		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
 		boolean fiteringByOrganGestors = filtre.getOrganGestorsIds() != null && filtre.getOrganGestorsIds().size() > 0;
 
+//		### Comprovar permisos consulta estadístiques
+		List<Long> metaExpedientsStatisticsAcces = comprovarAccesEstadistiques(entitatId, rolActual);
+		if (metaExpedientsStatisticsAcces != null) {
+			filtre.setMetaExpedientsIds(metaExpedientsStatisticsAcces);
+			filteringByMetaExpedients = true;
+		}
+		
 		Collection<HistoricInteressatEntity> historics = historicHelper.calcularHistoricInteressat(
 				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
 				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
@@ -388,7 +461,7 @@ public class HistoricServiceImpl implements HistoricService {
 		List<HistoricInteressatEntity> resultat = new ArrayList<HistoricInteressatEntity>();
 		for (HistoricInteressatEntity historic : historics) {
 			MetaExpedientEntity metaExpedient = historic.getMetaExpedient();
-			boolean selectedByMetaExp = !fiteringByMetaExpedients ||
+			boolean selectedByMetaExp = !filteringByMetaExpedients ||
 					filtre.getMetaExpedientsIds().contains(metaExpedient.getId());
 			boolean selectedByOrgan = !fiteringByOrganGestors || (historic.getOrganGestor() != null &&
 					filtre.getOrganGestorsIds().contains(historic.getOrganGestor().getId()));
@@ -397,6 +470,15 @@ public class HistoricServiceImpl implements HistoricService {
 			}
 		}
 		return conversioTipusHelper.convertirList(resultat, HistoricInteressatDto.class);
+	}
+
+	@Override
+	public List<Long> comprovarAccesEstadistiques(
+			Long entitatId,
+			String rolActual) {
+		return historicHelper.comprovarAccesEstadistiques(
+				entitatId, 
+				rolActual);
 	}
 
 	/**

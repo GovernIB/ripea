@@ -27,12 +27,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per al manteniment de les meta-dades dels meta-expedients.
@@ -117,10 +118,14 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			return "metaDadaForm";
 		}
+		
+		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
+		
 		if (command.getId() != null) {
 			metaDadaService.update(entitatActual.getId(), metaDocumentId, MetaDadaCommand.asDto(command), rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(
@@ -130,7 +135,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		} else {
 			metaDadaService.create(entitatActual.getId(), metaDocumentId, MetaDadaCommand.asDto(command), rolActual);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
 			return getModalControllerReturnValueSuccess(request, "redirect:metaDada", "metadada.controller.creat.ok");
@@ -143,7 +148,10 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -161,7 +169,10 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(
@@ -176,7 +187,10 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		metaDadaService.delete(entitatActual.getId(), metaDocumentId, metaDadaId, rolActual);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
 		return getAjaxControllerReturnValueSuccess(

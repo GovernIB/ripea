@@ -52,12 +52,11 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
 		ExpedientPeticioFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findByEntitat(
+		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByEntitat(
 				entitatActual.getId());
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientsPermisLectura);
-		
+				metaExpedients);
     	
         return "seguimentExpedientsPendentsList";
     }

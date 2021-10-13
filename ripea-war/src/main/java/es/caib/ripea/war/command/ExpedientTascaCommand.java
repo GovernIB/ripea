@@ -1,12 +1,14 @@
 package es.caib.ripea.war.command;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 
@@ -15,7 +17,7 @@ public class ExpedientTascaCommand {
 	@NotNull
 	private Long metaExpedientTascaId;
 	@NotEmpty
-	private String responsableCodi;
+	private List<String> responsablesCodi;
 	private String metaExpedientTascaDescripcio;
 	private Date dataInici;
 	private Date dataFi;
@@ -40,11 +42,11 @@ public class ExpedientTascaCommand {
 	public void setMetaExpedientTascaId(Long metaExpedientTascaId) {
 		this.metaExpedientTascaId = metaExpedientTascaId;
 	}
-	public String getResponsableCodi() {
-		return responsableCodi;
+	public List<String> getResponsablesCodi() {
+		return responsablesCodi;
 	}
-	public void setResponsableCodi(String responsableCodi) {
-		this.responsableCodi = responsableCodi != null ? responsableCodi.trim() : null;
+	public void setResponsablesCodi(List<String> responsablesCodi) {
+		this.responsablesCodi = responsablesCodi;
 	}
 	public Date getDataInici() {
 		return dataInici;
@@ -71,7 +73,10 @@ public class ExpedientTascaCommand {
 				ExpedientTascaCommand.class);
 		command.setMetaExpedientTascaId(dto.getMetaExpedientTasca().getId());
 		command.setMetaExpedientTascaDescripcio(dto.getMetaExpedientTasca().getDescripcio());
-		command.setResponsableCodi(dto.getResponsable().getCodi());
+		for (UsuariDto responsable : dto.getResponsables()) {
+			command.getResponsablesCodi().add(responsable.getCodi());
+			
+		}
 		return command;
 	}
 	public static ExpedientTascaDto asDto(ExpedientTascaCommand command) {
