@@ -233,7 +233,7 @@ $(document).ready(function() {
 					<tr>
 						<th data-col-name="expedientId" data-visible="false"></th>
 						<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
-						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.document"/></th>
+						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.interessat"/></th>
 						<th data-col-name="expedientNumeroNom"><spring:message code="seguiment.list.columna.expedient"/></th>
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>

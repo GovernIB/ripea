@@ -79,6 +79,7 @@ public class MetaExpedientController extends BaseAdminController {
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
+		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
 		
 		if (RolHelper.isRolActualAdministrador(request)) {
 			boolean revisioActiva = metaExpedientService.isRevisioActiva();

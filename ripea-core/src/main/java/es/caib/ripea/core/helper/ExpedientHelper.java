@@ -806,7 +806,7 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null);
+				false, null, false);
 	}
 
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
