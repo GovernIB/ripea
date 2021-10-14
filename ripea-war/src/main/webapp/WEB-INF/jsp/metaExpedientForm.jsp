@@ -249,7 +249,7 @@
 					</div>
 				</div>
 				
-				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
+				<rip:inputTextarea name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
 				
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
