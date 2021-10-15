@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
@@ -46,14 +46,27 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.MetaNodeHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
@@ -104,6 +117,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private EmailHelper emailHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private MetaExpedientComentariRepository metaExpedientComentariRepository;
 
 	@Transactional
 	@Override
@@ -281,6 +296,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
 			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
+			resposta.setNumComentaris(metaExpedient.getComentaris().size());
 		}
 		return resposta;
 	}
@@ -473,6 +489,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			metaExpedient.setExpedientTasquesCount(
 					metaExpedientTascaRepository.countByMetaExpedient(metaExpedientEntity));
 			metaExpedient.setGrupsCount(metaExpedientEntity.getGrups().size());
+			metaExpedient.setNumComentaris(metaExpedientEntity.getComentaris().size());
 		}
 		return resposta;
 	}
@@ -861,6 +878,68 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 				MetaExpedientTascaDto.class);
 	}
+	
+	
+	
+	
+	@Transactional
+	@Override
+	public boolean publicarComentariPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			String text, 
+			String rolActual) {
+		logger.debug("Obtenint els comentaris pel contingut ("
+				+ "entitatId=" + entitatId + ", "
+				+ "nodeId=" + metaExpedientId + ")");
+		EntitatEntity entitat = null;
+		if (rolActual.equals("IPA_REVISIO")) {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, true);
+		}
+		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
+		//truncam a 1024 caracters
+		if (text.length() > 1024)
+			text = text.substring(0, 1024);
+		MetaExpedientComentariEntity comentari = MetaExpedientComentariEntity.getBuilder(
+				metaExpedient, 
+				text).build();
+		metaExpedientComentariRepository.save(comentari);
+		return true;
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaExpedientComentariDto> findComentarisPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId, 
+			String rolActual) {
+		logger.debug("Obtenint els comentaris pel metaExpedient ("
+				+ "entitatId=" + entitatId + ", "
+				+ "nodeId=" + metaExpedientId + ")");
+		EntitatEntity entitat = null;
+		
+		if (rolActual.equals("IPA_REVISIO")) {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, true);
+		}
+		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		
+		List<MetaExpedientComentariEntity> expcoms = 
+				metaExpedientComentariRepository.findByMetaExpedientOrderByCreatedDateAsc(metaExpedient);
+
+		return conversioTipusHelper.convertirList(
+				expcoms, 
+				MetaExpedientComentariDto.class);
+	}	
+	
+	
 	
 	
 	

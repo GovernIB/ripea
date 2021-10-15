@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -500,6 +501,21 @@ public interface MetaExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id);
+	public MetaExpedientDto marcarPendentRevisio(
+			Long entitatId, 
+			Long id);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	public boolean publicarComentariPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			String text,
+			String rolActual);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	public List<MetaExpedientComentariDto> findComentarisPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			String rolActual);
 	
 }

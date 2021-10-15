@@ -38,6 +38,7 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	private String revisioComentari;
+	private long numComentaris;
 	
 	public boolean isComu() {
 		if (organGestor == null) {

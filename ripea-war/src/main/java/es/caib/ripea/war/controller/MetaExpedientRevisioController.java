@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -19,11 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaExpedientFiltreCommand;
 import es.caib.ripea.war.command.MetaExpedientRevisioCommand;
@@ -46,6 +51,8 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 
 	@Autowired
 	private MetaExpedientService metaExpedientRevisioService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	
 	@RequestMapping(method = RequestMethod.GET)
@@ -157,7 +164,50 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 	}
 
 
+	@RequestMapping(value = "/{metaExpedientId}/comentaris", method = RequestMethod.GET)
+	public String comentaris(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"metaExpedient",
+				metaExpedientService.findById(
+						entitatActual.getId(),
+						metaExpedientId));
+		
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		model.addAttribute(
+				"usuariActual",
+				usuariActual);
+		
+		model.addAttribute(
+				"isRevisor",
+				true);
+		
+		return "metaExpedientComentaris";
+	}	
+	
+	
+	
+	@RequestMapping(value = "/{metaExpedientId}/comentaris/publicar", method = RequestMethod.POST)
+	@ResponseBody
+	public List<MetaExpedientComentariDto> publicarComentari(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@RequestParam String text,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (text != null && !text.isEmpty()) {
+			metaExpedientService.publicarComentariPerMetaExpedient(entitatActual.getId(), metaExpedientId, text, RolHelper.getRolActual(request));
+		}
 
+		return metaExpedientService.findComentarisPerMetaExpedient(
+				entitatActual.getId(), 
+				metaExpedientId,
+				RolHelper.getRolActual(request));
+	}
 
 
 

@@ -119,6 +119,12 @@
 						</script>
 					</th>
 				</c:if>
+				
+				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellNumComentaris" width="1%">
+					<script id="cellNumComentaris" type="text/x-jsrender">
+							<a href="metaExpedientRevisio/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+					</script>
+				</th>					
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>

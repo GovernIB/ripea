@@ -105,6 +105,11 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@Column(name = "revisio_comentari", length = 1024)
 	private String revisioComentari;
 	
+	@OneToMany(
+			mappedBy = "metaExpedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<MetaExpedientComentariEntity> comentaris = new ArrayList<MetaExpedientComentariEntity>();
 
 	public void addGrup(GrupEntity grup) {
 		grups.add(grup);
@@ -232,9 +237,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			return false;
 		return true;
 	}
-    
-    
-    
+	
 
     private static final long serialVersionUID = -2299453443943600172L;
 

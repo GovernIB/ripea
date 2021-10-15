@@ -15,6 +15,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -381,5 +382,31 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
 		return delegate.marcarPendentRevisio(entitatId, id);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public boolean publicarComentariPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			String text,
+			String rolActual) {
+		return delegate.publicarComentariPerMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				text,
+				rolActual);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public List<MetaExpedientComentariDto> findComentarisPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			String rolActual) {
+		return delegate.findComentarisPerMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				rolActual);
 	}
 }

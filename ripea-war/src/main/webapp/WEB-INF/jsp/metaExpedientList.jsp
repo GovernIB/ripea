@@ -162,6 +162,12 @@
 					</th>
 				</c:if>
 				
+				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellNumComentaris" width="1%">
+					<script id="cellNumComentaris" type="text/x-jsrender">
+							<a href="metaExpedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+					</script>
+				</th>	
+				
 				<!--  <th data-col-name="gestioAmbGrupsActiva" data-template="#cellGestioAmbGrupsActivaTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.gestioAmbGrupsActiva"/>
 					<script id="cellGestioAmbGrupsActivaTemplate" type="text/x-jsrender">

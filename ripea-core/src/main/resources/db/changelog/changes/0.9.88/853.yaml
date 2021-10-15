@@ -1,0 +1,58 @@
+databaseChangeLog:
+- changeSet:
+    id: 1634278381293-1
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: id
+            type: number(19)
+        - column:
+            constraints:
+              nullable: false
+            name: meta_expedient_id
+            type: number(19)
+        - column:
+            name: text
+            type: varchar(1024)
+        - column:
+            name: createdby_codi
+            type: varchar(64)
+        - column:
+            name: createddate
+            type: timestamp
+        - column:
+            name: lastmodifiedby_codi
+            type: varchar(64)
+        - column:
+            name: lastmodifieddate
+            type: timestamp
+        tableName: ipa_metaexp_comment
+    - addPrimaryKey:
+        columnNames: id
+        constraintName: ipa_metaexp_comment_pk
+        tableName: ipa_metaexp_comment
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ipa_metaexp_comment
+        constraintName: ipa_metaexp_metaexpcomment_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_metaexpedient
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_metaexp_comment
+        constraintName: ipa_usucre_metaexpcomment_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_metaexp_comment
+        constraintName: ipa_usumod_metaexpcomment_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+    - sql:
+        dbms: oracle
+        sql: grant select, update, insert, delete on ipa_metaexp_comment to www_ripea;
