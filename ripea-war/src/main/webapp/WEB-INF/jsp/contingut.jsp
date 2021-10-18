@@ -2029,18 +2029,18 @@ $.views.helpers(myHelpers);
 						<c:when test="${contingut.document}">
 							<table class="table table-bordered">
 								<tbody>
-									<c:if test="${!empty contingut.descripcio}">
-										<tr> 
-											<td><strong><spring:message code="contingut.document.camp.descripcio"/></strong></td>
-											<td>${contingut.descripcio}</td>
-										</tr>
-									</c:if>
 									<c:choose>
 										<c:when test="${contingut.documentTipus == 'DIGITAL'}">
 											<tr>
 												<td><strong><spring:message code="contingut.document.camp.arxiu"/></strong></td>
 												<td>${contingut.fitxerNom}</td>
 											</tr>
+											<c:if test="${!empty contingut.descripcio}">
+												<tr> 
+													<td><strong><spring:message code="contingut.document.camp.descripcio"/></strong></td>
+													<td>${contingut.descripcio}</td>
+												</tr>
+											</c:if>											
 											<tr>
 												<td><strong><spring:message code="contingut.document.camp.content.type"/></strong></td>
 												<td>${contingut.fitxerContentType}</td>
