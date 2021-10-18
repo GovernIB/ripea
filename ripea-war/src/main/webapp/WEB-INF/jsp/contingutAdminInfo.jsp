@@ -34,6 +34,10 @@
 			<rip:blocIconaContingut contingut="${contingut}"/>
 			${contingut.nom}
 		</dd>
+		<c:if test="${contingut.document && !empty contingut.descripcio}">
+			<dt><spring:message code="contingut.admin.info.camp.descripcio"/></dt>
+			<dd>${contingut.descripcio}</dd>
+		</c:if>
 		<c:if test="${contingut.expedient or contingut.document and not empty contingut.metaNode}">
 			<dt><spring:message code="contingut.admin.info.camp.metanode"/></dt>
 			<dd>${contingut.metaNode.nom}</dd>
@@ -55,10 +59,6 @@
 			<dd>${contingut.ntiClasificacionSia}</dd>
 		</c:if>
 		<c:if test="${contingut.document}">
-			<c:if test="${!empty contingut.descripcio}">
-				<dt><spring:message code="contingut.admin.info.camp.descripcio"/></dt>
-				<dd>${contingut.descripcio}</dd>
-			</c:if>
 			<dt><spring:message code="contingut.admin.info.camp.data"/></dt>
 			<dd><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></dd>
 			<dt><spring:message code="contingut.admin.info.camp.estat"/></dt>
