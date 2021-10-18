@@ -36,7 +36,7 @@ public class InteressatEmailValidator implements ConstraintValidator<InteressatE
 			InteressatCommand interessat = (InteressatCommand)value;
 			boolean valid = true;
 			
-			if ((interessat.getEntregaDeh() != null && interessat.getEntregaDeh() || interessat.getNotificacioAutoritzat() != null && interessat.getNotificacioAutoritzat()) && (interessat.getEmail() == null || interessat.getEmail().isEmpty())) {
+			if ((interessat.getEntregaDeh() != null && interessat.getEntregaDeh()) && (interessat.getEmail() == null || interessat.getEmail().isEmpty())) {
 				context
 					.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("interessat.form.valid.email", null, new RequestContext(request).getLocale()))
