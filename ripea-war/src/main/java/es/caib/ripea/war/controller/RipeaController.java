@@ -127,6 +127,9 @@ public class RipeaController {
 		public Throwable getThrowable() {
 			return throwable;
 		}
+		public String getThrowableClassName() {
+			return throwable.getClass().getName();
+		}
 		public String getExceptionMessage() {
 			return exceptionMessage;
 		}

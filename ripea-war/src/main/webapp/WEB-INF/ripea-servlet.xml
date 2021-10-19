@@ -69,6 +69,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.SessioInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -83,6 +84,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.LlistaEntitatsInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -97,6 +99,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.LlistaRolsInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -157,6 +160,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.ExpedientsInterceptor"/>
 		</mvc:interceptor>	
 		<mvc:interceptor>
