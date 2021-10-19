@@ -13,6 +13,7 @@
 	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
 		<pattern>/firmapassarela*</pattern>
 		<pattern>/scanweb*</pattern>
+		<pattern>/error</pattern>
 	</decorator>
 	<decorator name="default" page="default.jsp">
 		<pattern>/*</pattern>
