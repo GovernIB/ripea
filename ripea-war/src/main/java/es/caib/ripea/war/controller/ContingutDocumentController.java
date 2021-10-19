@@ -75,8 +75,6 @@ import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentGenericCommand;
-import es.caib.ripea.war.helper.AjaxHelper;
-import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.ArxiuTemporalHelper;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DocumentHelper;
@@ -432,16 +430,21 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	
 	@RequestMapping(value = "/document/{documentId}/mostraDetallSignants", method = RequestMethod.GET)
 	@ResponseBody
-	public AjaxFormResponse mostraDetallSignants(
+	public JsonResponse mostraDetallSignants(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<ArxiuFirmaDetallDto> detallSignants = documentService.getDetallSignants(
-				entitatActual.getId(),
-				documentId,
-				null);
-		return AjaxHelper.generarAjaxFormOk(detallSignants);
+		List<ArxiuFirmaDetallDto> detallSignants;
+		try {
+			detallSignants = documentService.getDetallSignants(
+					entitatActual.getId(),
+					documentId,
+					null);
+			return new JsonResponse(detallSignants);
+		} catch (Exception e) {
+			return new JsonResponse(true, ExceptionHelper.getRootCauseOrItself(e).getMessage());
+		}
 	}
 	
 	
