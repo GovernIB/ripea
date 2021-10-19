@@ -555,16 +555,10 @@ $(document).ready(function() {
 		getDetallsSignants($('#detallSignants'), contingutId);
 	});
 
-	<c:choose>
-		<c:when test="${contingut.arxiuUuid != null}">
-			var arxiu = '<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>';
-		</c:when>
-		<c:otherwise>
-			var arxiu = '<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>';
-		</c:otherwise>
-	</c:choose>	
-
-	$(".container-main .panel-heading h2").append(arxiu);
+	<c:if test="${contingut.arxiuUuid == null}">
+		var arxiu = '<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>';
+		$(".container-main .panel-heading h2").append(arxiu);
+	</c:if>
 	
 
 	$('#contenidor-contingut li').mouseover(function() {
@@ -2461,9 +2455,7 @@ $.views.helpers(myHelpers);
 										<th data-col-name="identificador" data-orderable="false" width="35%" data-template="#cellIdentificadorTemplate"><spring:message code="contingut.interessat.columna.identificador"/>
 											<script id="cellIdentificadorTemplate" type="text/x-jsrender">
 												{{:identificador}} 
-												{{if arxiuPropagat}}
-													<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-												{{else}}
+												{{if !arxiuPropagat}}
 													<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
 												{{/if}}												
 											</script>
@@ -2473,9 +2465,7 @@ $.views.helpers(myHelpers);
 											<script id="cellRepresentantTemplate" type="text/x-jsrender">
 												{{:representantIdentificador}} 
 												{{if representantId != null}}
-													{{if representantArxiuPropagat}}
-														<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-													{{else}}
+													{{if !representantArxiuPropagat}}
 														<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
 													{{/if}}	
 												{{/if}}												
