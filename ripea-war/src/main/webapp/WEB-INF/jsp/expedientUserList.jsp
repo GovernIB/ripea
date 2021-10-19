@@ -523,12 +523,6 @@ function removeCookie(cname) {
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
 						{{:nom}} 
-						{{if arxiuUuid != null}}
-							<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-						{{else}}
-							<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-						{{/if}}
-
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAvisosTemplate" width="5%">
@@ -540,6 +534,9 @@ function removeCookie(cname) {
 						{{if ambEnviamentsPendents }}<span class="fa fa-pencil-square text-primary" title="<spring:message code="contingut.pendents.expedient.enviaments"/>"></span>{{/if}}
 						{{if ambNotificacionsPendents }}<span class="fa fa-envelope-square text-primary" title="<spring:message code="contingut.pendents.expedient.notificacions"/>"></span>{{/if}}
 						{{if alerta}}<span class="fa fa-exclamation-circle text-danger" title="<spring:message code="contingut.errors.expedient.alertes"/>"></span>{{/if}}			
+						{{if arxiuUuid == null}}
+							<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+						{{/if}}
 					</script>
 				</th>
 				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>								

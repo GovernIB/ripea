@@ -87,14 +87,9 @@
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
 									</c:if>
 									${fill.nom}
-									<c:choose>
-										<c:when test="${fill.arxiuUuid != null}">
-											<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-										</c:when>
-										<c:otherwise>
-											<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-										</c:otherwise>
-									</c:choose>									
+									<c:if test="${fill.arxiuUuid == null}">
+										<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+									</c:if>
 								</p>
 								<rip:blocContingutAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}" nodeco="${nodeco}"/>
 							</div>
@@ -237,14 +232,9 @@
 								<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 							</c:if>
 							&nbsp;${fill.nom}
-							<c:choose>
-								<c:when test="${fill.arxiuUuid != null}">
-									<span class="fa fa-check text-success" title="<spring:message code="contingut.icona.estat.guardatArxiu"/>"></span>
-								</c:when>
-								<c:otherwise>
-									<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-								</c:otherwise>
-							</c:choose>
+							<c:if test="${fill.arxiuUuid == null}">
+								<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+							</c:if>
 						</td>
 						<td>
 						<c:if test="${fill.document}">
