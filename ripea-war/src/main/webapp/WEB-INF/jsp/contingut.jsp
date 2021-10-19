@@ -453,6 +453,39 @@ body.loading .rmodal {
     cursor: not-allowed;
 }
 
+#detallSignantsPreview .alert {
+	padding: 10px 15px !important;
+}
+#detallSignantsPreview button.close-alertes {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    padding: 0;
+}
+#detallSignantsPreview .close-alertes {
+    color: #000000;
+    float: right;
+    font-weight: bold;
+    opacity: 0.2;
+    text-shadow: 0 1px 0 #FFFFFF;
+}
+#detallSignants .alert {
+	padding: 10px 15px !important;
+}
+#detallSignants button.close-alertes {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    padding: 0;
+}
+#detallSignants .close-alertes {
+    color: #000000;
+    float: right;
+    font-weight: bold;
+    opacity: 0.2;
+    text-shadow: 0 1px 0 #FFFFFF;
+}
+
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -552,7 +585,7 @@ $(document).ready(function() {
 
 		let contingutId = ${contingut.id}; 
 
-		getDetallsSignants($('#detallSignants'), contingutId);
+		getDetallsSignants($('#detallSignants'), contingutId, false);
 	});
 
 	<c:if test="${contingut.arxiuUuid == null}">
@@ -1620,7 +1653,7 @@ function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 	
     // Mostrar contingut capçalera visor
     resumViewer.find('*').not('#container').remove();
-    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%;">\
+    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px;">\
 									<table style="width: 453px;">\
 										<tbody id="detallSignantsPreview">\
 										</tbody>\
@@ -1640,7 +1673,7 @@ function showViewer(event, documentId, contingutNom, contingutCustodiat) {
     }
     resumViewer.prepend(viewerContent);
     if (contingutCustodiat) {
-    	getDetallsSignants($("#detallSignantsPreview"), documentId);
+    	getDetallsSignants($("#detallSignantsPreview"), documentId, true);
     }
     
 
@@ -1694,15 +1727,17 @@ function closeViewer() {
 	});
 }
 
-function getDetallsSignants(idTbody, contingutId) {
+function getDetallsSignants(idTbody, contingutId, header) {
 	
 	idTbody.html("");
 	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
-	$.get("../contingut/document/" + contingutId + "/mostraDetallSignants", function(data){
-		if (data.estatOk) {
+	$.get("../contingut/document/" + contingutId + "/mostraDetallSignants", function(json){
+		if (json.error) {
+			idTbody.html('<tr><td colspan="2" style="width:100%"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="contingut.document.info.firma.error"/>: ' + json.errorMsg + '</div></td></tr>');
+		} else {
 			idTbody.html("");
-			if(data.objecte != null && data.objecte.length > 0){
-				data.objecte.forEach(function(firma){
+			if(json.data != null && json.data.length > 0){
+				json.data.forEach(function(firma){
 					if(firma != null){
 						var firmaDataStr = "";
 						if(firma.responsableNom == null){
@@ -1717,6 +1752,11 @@ function getDetallsSignants(idTbody, contingutId) {
 						if(firma.emissorCertificat == null){
 							firma.emissorCertificat = "";
 						}
+						if (header){
+							idTbody.append('<tr><th style="padding-bottom: 2px;"><strong>'
+									+ '<u><spring:message code="contingut.document.info.firma"/></u>'
+									+ "</strong></th><tr>");
+						} 
 						idTbody.append(
 							  "<tr><th><strong>"
 							+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
@@ -1738,8 +1778,6 @@ function getDetallsSignants(idTbody, contingutId) {
 					}
 				})
 			}
-		}else{
-			idTbody.html("");
 		}
 		webutilRefreshMissatges();
 	});
