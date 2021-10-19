@@ -204,6 +204,17 @@
 					$('#metaExpedientCommand').show();
 				}
 			});	
+					
+
+			$('#revisioEstat').on('change', function() {
+				var estat = $(this).val();
+				if (estat=='REBUTJAT') {
+	            	$("label[for='revisioComentari']").append( " *" );
+				} else {
+					$("label[for='revisioComentari']").text( $("label[for='revisioComentari']").text().replace(' *', '') );
+				}
+			});
+					
 		});
 	
 	</script>	
@@ -225,7 +236,7 @@
 				<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 			</c:if>
 			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
-				<li role="presentation"><a href="#revisioEstat" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
+				<li role="presentation"><a href="#revisioEstatTab" aria-controls="revisioEstatTab" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
 			</c:if>
 		</ul>
 		<form:hidden path="id"/>
@@ -284,9 +295,12 @@
 					</div>
 				</div>
 			</c:if>
-			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
-				<div role="revisioEstat" class="tab-pane" id="revisioEstat">
-					
+			<div role="revisioEstatTab" class="tab-pane" id="revisioEstatTab">
+				<c:if test="${isRolActualAdministrador}">
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio"/>
+					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}"/>
+				</c:if>
+				<c:if test="${isRolAdminOrgan}">
 					<dl class="dl-horizontal">
 						<dt><spring:message code="metaexpedient.revisio.form.camp.estatRevisio"/></dt>
 						<dd>${metaExpedientCommand.revisioEstat}</dd>
@@ -296,9 +310,9 @@
 								<dd><pre style="height:300px"><c:out value="${metaExpedientCommand.revisioComentari}" escapeXml="true"/></pre></dd>
 							</div>
 						</c:if>
-					</dl>
-				</div>
-			</c:if>
+					</dl>				
+				</c:if>
+			</div>
 		</div>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

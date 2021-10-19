@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +50,16 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.MetaNodeHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -100,8 +109,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired
 	private UsuariHelper usuariHelper;
-	@Autowired
-	private EmailHelper emailHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 
@@ -191,6 +198,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+		} else if ("IPA_ADMIN".equals(rolActual)){
+			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
@@ -199,30 +208,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto canviarEstatRevisioASellecionat(Long entitatId, MetaExpedientDto metaExpedient) {
 		logger.debug("Canviant estat revicio meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getId());
 
-		MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedientEntity.getRevisioEstat();
-		
-		metaExpedientEntity.updateRevisioEstat(
-				metaExpedient.getRevisioEstat(),
-				metaExpedient.getRevisioComentari());
-
-		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 
-				&& metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
-
-			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
-
-		}
-		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
-
-			emailHelper.canviEstatRevisioMetaExpedientAOrganAdmin(metaExpedientEntity, entitatId);
-
-		}
-
-		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
+		return metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 	}
 	
 

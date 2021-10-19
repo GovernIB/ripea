@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -72,6 +73,8 @@ public class MetaExpedientHelper {
     private EmailHelper emailHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
     
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
@@ -518,6 +521,44 @@ public class MetaExpedientHelper {
 		}
 		return ids;
 	}
+	
+	
+
+	public MetaExpedientDto canviarEstatRevisioASellecionat(Long entitatId, MetaExpedientDto metaExpedient) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getId());
+
+		MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedientEntity.getRevisioEstat();
+		
+		metaExpedientEntity.updateRevisioEstat(
+				metaExpedient.getRevisioEstat(),
+				metaExpedient.getRevisioComentari());
+
+		
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 
+				&& metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
+
+			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
+
+		}
+		
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
+
+			emailHelper.canviEstatRevisioMetaExpedientAOrganAdmin(metaExpedientEntity, entitatId);
+
+		}
+
+		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());

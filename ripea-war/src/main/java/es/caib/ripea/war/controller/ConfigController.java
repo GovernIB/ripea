@@ -1,12 +1,10 @@
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.config.ConfigDto;
-import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
-import es.caib.ripea.core.api.service.ConfigService;
-import es.caib.ripea.war.command.ConfigCommand;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.List;
+import es.caib.ripea.core.api.dto.config.ConfigDto;
+import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.war.command.ConfigCommand;
+import es.caib.ripea.war.helper.MetaExpedientHelper;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador per a la gestió de la configuració de l'aplicació.
@@ -63,6 +66,11 @@ public class ConfigController extends BaseUserController{
         int status = 1;
         try {
             configService.updateProperty(configCommand.asDto());
+            
+			if (configCommand.getKey().equals("es.caib.ripea.metaexpedients.revisio.activa")) {
+				MetaExpedientHelper.resetRevisioActiva(request);
+			}
+            
         } catch (Exception e) {
             e.printStackTrace();
             msg = "config.controller.edit.error";
