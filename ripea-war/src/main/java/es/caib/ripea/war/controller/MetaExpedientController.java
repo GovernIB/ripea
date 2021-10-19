@@ -239,6 +239,9 @@ public class MetaExpedientController extends BaseAdminController {
 		if (!command.isComu() && command.getOrganGestorId() == null) {
 			bindingResult.rejectValue("organGestorId", "NotNull");
 		}
+		if (command.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REBUTJAT && (command.getRevisioComentari() == null || command.getRevisioComentari().isEmpty())) {
+			bindingResult.rejectValue("revisioComentari", "NotNull");
+		}
 		if (bindingResult.hasErrors()) {
 			fillFormModel(request, dto, model);
 			return "metaExpedientForm";

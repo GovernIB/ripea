@@ -71,6 +71,7 @@ public class MetaExpedientCommand {
     private String estructuraCarpetesJson;
     
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
+	@Size(max = 1024)
 	private String revisioComentari;
 	
 	private boolean comu = true;

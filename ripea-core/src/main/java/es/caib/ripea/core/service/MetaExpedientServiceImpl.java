@@ -114,8 +114,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
 	private MetaExpedientComentariRepository metaExpedientComentariRepository;
@@ -206,6 +204,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+		} else if ("IPA_ADMIN".equals(rolActual)){
+			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
@@ -214,30 +214,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto canviarEstatRevisioASellecionat(Long entitatId, MetaExpedientDto metaExpedient) {
 		logger.debug("Canviant estat revicio meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getId());
 
-		MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedientEntity.getRevisioEstat();
-		
-		metaExpedientEntity.updateRevisioEstat(
-				metaExpedient.getRevisioEstat(),
-				metaExpedient.getRevisioComentari());
-
-		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 
-				&& metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
-
-			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
-
-		}
-		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
-
-			emailHelper.canviEstatRevisioMetaExpedientAOrganAdmin(metaExpedientEntity, entitatId);
-
-		}
-
-		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
+		return metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 	}
 	
 
