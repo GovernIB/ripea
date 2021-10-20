@@ -235,7 +235,7 @@
 			<c:if test="${isCarpetaDefecte}">
 				<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 			</c:if>
-			<c:if test="${metaExpedientCommand.revisioEstat!=null}">
+			<c:if test="${metaExpedientCommand.revisioEstat!=null && isRevisioActiva}">
 				<li role="presentation"><a href="#revisioEstatTab" aria-controls="revisioEstatTab" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
 			</c:if>
 		</ul>
