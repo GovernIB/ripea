@@ -486,6 +486,7 @@ public class MetaExpedientController extends BaseAdminController {
 		boolean hasOrganGestor = dto != null ? dto.getOrganGestor() != null : false;
 		model.addAttribute("hasOrganGestor", hasOrganGestor);
 		model.addAttribute("isCarpetaDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte")));
+		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
 	}
 	
 	

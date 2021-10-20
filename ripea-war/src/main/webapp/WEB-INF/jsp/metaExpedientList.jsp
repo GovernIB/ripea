@@ -100,10 +100,12 @@
 			</div>	
 		</div>
 		
-		<div class="row">		
-			<div class="col-md-4">
-				<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
-			</div>	
+		<div class="row">	
+			<c:if test="${isRevisioActiva}">	
+				<div class="col-md-4">
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
+				</div>
+			</c:if>
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
