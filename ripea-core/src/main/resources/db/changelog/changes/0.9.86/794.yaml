@@ -342,16 +342,16 @@ WHERE key in ('es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio',
                     sql: "
 UPDATE IPA_CONFIG
 SET value = '600000'
-WHERE key in 'es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio';
+WHERE key in ('es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio');
 UPDATE IPA_CONFIG
 SET value = '30000'
-WHERE key in 'es.caib.ripea.segonpla.massives.periode.comprovacio';
+WHERE key in ('es.caib.ripea.segonpla.massives.periode.comprovacio');
 UPDATE IPA_CONFIG
 SET value = '3600000'
-WHERE key in 'es.caib.ripea.dominis.cache.execucio';
+WHERE key in ('es.caib.ripea.dominis.cache.execucio');
 UPDATE IPA_CONFIG
 SET value = '0 0 * * * *'
-WHERE key in 'es.caib.ripea.segonpla.email.enviament.agrupat.cron';
+WHERE key in ('es.caib.ripea.segonpla.email.enviament.agrupat.cron');
             "
 
 -   changeSet:

@@ -53,11 +53,15 @@ FROM IPA_EXPEDIENT_TASCA;
     runOnChange: true
     changes:
         - sql:
-              sql: "
-ALTER TABLE IPA_EXPEDIENT_TASCA MODIFY RESPONSABLE_CODI NULL;
-ALTER TABLE IPA_EXPEDIENT_TASCA RENAME COLUMN RESPONSABLE_CODI TO RESPONSABLE_ACTUAL_CODI;
+              dbms: oracle
+              sql: "ALTER TABLE IPA_EXPEDIENT_TASCA MODIFY RESPONSABLE_CODI NULL;
+                    ALTER TABLE IPA_EXPEDIENT_TASCA RENAME COLUMN RESPONSABLE_CODI TO RESPONSABLE_ACTUAL_CODI;"
+        - sql:
+              dbms: postgresql
+              sql: "ALTER TABLE IPA_EXPEDIENT_TASCA ALTER COLUMN RESPONSABLE_CODI DROP NOT NULL;
+                    ALTER TABLE IPA_EXPEDIENT_TASCA RENAME COLUMN RESPONSABLE_CODI TO RESPONSABLE_ACTUAL_CODI;"                    
+                    
 
-                "
 
 #Tasques sense responsable actual (no iniciades)
 - changeSet:

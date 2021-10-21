@@ -1,39 +1,12 @@
 databaseChangeLog:
 - changeSet:
-    id: init-index-1
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: metadada_id
-        - column:
-            name: node_id
-        - column:
-            name: ordre
-        indexName: ipa_dada_mult_uk
-        tableName: ipa_dada
-        unique: true
-- changeSet:
     id: init-index-2
     author: limit (generated)
     changes:
     - addUniqueConstraint:
         columnNames: metadada_id, node_id, ordre
         constraintName: ipa_dada_mult_uk
-        forIndexName: ipa_dada_mult_uk
         tableName: ipa_dada
-- changeSet:
-    id: init-index-3
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: codi
-        indexName: ipa_entitat_codi_uk
-        tableName: ipa_entitat
-        unique: true
 - changeSet:
     id: init-index-4
     author: limit (generated)
@@ -41,21 +14,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: codi
         constraintName: ipa_entitat_codi_uk
-        forIndexName: ipa_entitat_codi_uk
         tableName: ipa_entitat
-- changeSet:
-    id: init-index-5
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: lastmodifiedby_codi
-        - column:
-            name: filter_name
-        indexName: ipa_expedient_filtre_uk
-        tableName: ipa_expedient_filtre
-        unique: true
 - changeSet:
     id: init-index-6
     author: limit (generated)
@@ -63,23 +22,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: lastmodifiedby_codi, filter_name
         constraintName: ipa_expedient_filtre_uk
-        forIndexName: ipa_expedient_filtre_uk
         tableName: ipa_expedient_filtre
-- changeSet:
-    id: init-index-7
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: metaexpedient_id
-        - column:
-            name: anio
-        - column:
-            name: sequencia
-        indexName: ipa_expedient_seq_uk
-        tableName: ipa_expedient
-        unique: true
 - changeSet:
     id: init-index-8
     author: limit (generated)
@@ -87,21 +30,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: metaexpedient_id, anio, sequencia
         constraintName: ipa_expedient_seq_uk
-        forIndexName: ipa_expedient_seq_uk
         tableName: ipa_expedient
-- changeSet:
-    id: init-index-9
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: meta_node_id
-        - column:
-            name: codi
-        indexName: ipa_metadada_metanode_codi_uk
-        tableName: ipa_metadada
-        unique: true
 - changeSet:
     id: init-index-10
     author: limit (generated)
@@ -109,21 +38,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: meta_node_id, codi
         constraintName: ipa_metadada_metanode_codi_uk
-        forIndexName: ipa_metadada_metanode_codi_uk
         tableName: ipa_metadada
-- changeSet:
-    id: init-index-11
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: meta_expedient_id
-        - column:
-            name: codi
-        indexName: ipa_metadoc_metaexp_codi_uk
-        tableName: ipa_metadocument
-        unique: true
 - changeSet:
     id: init-index-12
     author: limit (generated)
@@ -131,21 +46,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: meta_expedient_id, codi
         constraintName: ipa_metadoc_metaexp_codi_uk
-        forIndexName: ipa_metadoc_metaexp_codi_uk
         tableName: ipa_metadocument
-- changeSet:
-    id: init-index-13
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: entitat_id
-        - column:
-            name: codi
-        indexName: ipa_metaexp_entitat_codi_uk
-        tableName: ipa_metaexpedient
-        unique: true
 - changeSet:
     id: init-index-14
     author: limit (generated)
@@ -153,21 +54,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: entitat_id, codi
         constraintName: ipa_metaexp_entitat_codi_uk
-        forIndexName: ipa_metaexp_entitat_codi_uk
         tableName: ipa_metaexpedient
-- changeSet:
-    id: init-index-15
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: anio
-        - column:
-            name: meta_expedient_id
-        indexName: ipa_metaexp_seq_mult_uk
-        tableName: ipa_metaexp_seq
-        unique: true
 - changeSet:
     id: init-index-16
     author: limit (generated)
@@ -175,21 +62,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: anio, meta_expedient_id
         constraintName: ipa_metaexp_seq_mult_uk
-        forIndexName: ipa_metaexp_seq_mult_uk
         tableName: ipa_metaexp_seq
-- changeSet:
-    id: init-index-17
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: codi
-        - column:
-            name: meta_expedient_id
-        indexName: ipa_metaexp_tasca_MULT_uk
-        tableName: ipa_metaexp_tasca
-        unique: true
 - changeSet:
     id: init-index-18
     author: limit (generated)
@@ -197,21 +70,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: codi, meta_expedient_id
         constraintName: ipa_metaexp_tasca_mult_uk
-        forIndexName: ipa_metaexp_tasca_mult_uk
         tableName: ipa_metaexp_tasca
-- changeSet:
-    id: init-index-19
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: metanode_id
-        - column:
-            name: metadada_id
-        indexName: ipa_mnode_mdada_mnod_mdad_uk
-        tableName: ipa_metanode_metadada
-        unique: true
 - changeSet:
     id: init-index-20
     author: limit (generated)
@@ -219,21 +78,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: metanode_id, metadada_id
         constraintName: ipa_mnode_mdada_mnod_mdad_uk
-        forIndexName: ipa_mnode_mdada_mnod_mdad_uk
         tableName: ipa_metanode_metadada
-- changeSet:
-    id: init-index-21
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: codi
-        - column:
-            name: entitat_id
-        indexName: ipa_organ_gestor_uk
-        tableName: ipa_organ_gestor
-        unique: true
 - changeSet:
     id: init-index-22
     author: limit (generated)
@@ -241,21 +86,7 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: codi, entitat_id
         constraintName: ipa_organ_gestor_uk
-        forIndexName: ipa_organ_gestor_uk
         tableName: ipa_organ_gestor
-- changeSet:
-    id: init-index-23
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: metaexpedient_id
-        - column:
-            name: metadocument_id
-        indexName: ipa_metaexp_metadov_uk
-        tableName: ipa_metaexpedient_metadocument
-        unique: true
 - changeSet:
     id: init-index-24
     author: limit (generated)
@@ -263,7 +94,6 @@ databaseChangeLog:
     - addUniqueConstraint:
         columnNames: metaexpedient_id, metadocument_id
         constraintName: ipa_metaexp_metadov_uk
-        forIndexName: ipa_metaexp_metadov_uk
         tableName: ipa_metaexpedient_metadocument
 - changeSet:
     id: init-index-25
