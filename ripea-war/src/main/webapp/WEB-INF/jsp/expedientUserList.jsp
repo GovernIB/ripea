@@ -68,7 +68,7 @@ body.loading .rmodal {
 </style>
 <script>
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
-var columnaAgafatPer = 21;
+var columnaAgafatPer = 19;
 $(document).ready(function() {
 
 
