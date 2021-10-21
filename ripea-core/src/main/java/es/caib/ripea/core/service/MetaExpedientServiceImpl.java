@@ -495,7 +495,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-			ordenacioMap.put("organGestor.codiINom", new String[] {"organGestor.codi"});
+			ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,

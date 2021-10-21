@@ -67,8 +67,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("revisioEstats") MetaExpedientRevisioEstatEnumDto[] revisioEstats,
 			Sort sort);
 	
-	@Query(	"from " +
-			"    MetaExpedientEntity me " +
+	@Query(	"select me from " +
+			"    MetaExpedientEntity me left join me.organGestor org " +
 			"where " +
 			"    me.entitat = :entitat " +
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
