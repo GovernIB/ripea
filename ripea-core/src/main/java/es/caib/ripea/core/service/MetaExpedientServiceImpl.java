@@ -162,7 +162,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional
 	@Override
-	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual) {
+	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, boolean isCanviEstatDissenyAPendentByOrganAdmin) {
 		logger.debug(
 				"Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" +
 						metaExpedient + ")");
@@ -197,7 +197,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+			if (isCanviEstatDissenyAPendentByOrganAdmin)
+				marcarPendentRevisio(entitatId,  metaExpedientEntity.getId());
+			else
+				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
 		} else if ("IPA_ADMIN".equals(rolActual)){
 			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 		}

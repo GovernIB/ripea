@@ -249,8 +249,17 @@ public class MetaExpedientController extends BaseAdminController {
 
 		if (command.getId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), command.getId());
-			
-			metaExpedientService.update(entitatActual.getId(), dto, rolActual);
+
+			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+				MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, command.getId());
+				MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedient.getRevisioEstat();
+				boolean isCanviEstatDissenyAPendentByOrganAdmin = !dto.getRevisioEstat().equals(estatAnterior) 
+						&& estatAnterior.equals(MetaExpedientRevisioEstatEnumDto.DISSENY) 
+						&& dto.getRevisioEstat().equals(MetaExpedientRevisioEstatEnumDto.PENDENT);
+				metaExpedientService.update(entitatActual.getId(), dto, rolActual, isCanviEstatDissenyAPendentByOrganAdmin);
+			} else {
+				metaExpedientService.update(entitatActual.getId(), dto, rolActual, false);
+			}
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));

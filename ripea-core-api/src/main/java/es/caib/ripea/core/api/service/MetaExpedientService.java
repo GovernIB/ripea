@@ -54,6 +54,9 @@ public interface MetaExpedientService {
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a modificar.
 	 * @param rolActual TODO
+	 * @param isCanviEstatDissenyAPendentOrganAdmin
+	 * 			  Indica si la modificació del meta-expedient és un canvi d'estat 
+	 * 			  de disseny a pendent per part de l'admin d'òrgan.
 	 * @return El meta-expedient modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -61,8 +64,9 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient, String rolActual) throws NotFoundException;
-
+			MetaExpedientDto metaExpedient, String rolActual, 
+			boolean isCanviEstatDissenyAPendentOrganAdmin) throws NotFoundException;
+	
 	/**
 	 * Marca el meta-expedient especificat com a actiu/inactiu .
 	 * 

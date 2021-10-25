@@ -301,16 +301,8 @@
 					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}"/>
 				</c:if>
 				<c:if test="${isRolAdminOrgan}">
-					<dl class="dl-horizontal">
-						<dt><spring:message code="metaexpedient.revisio.form.camp.estatRevisio"/></dt>
-						<dd>${metaExpedientCommand.revisioEstat}</dd>
-						<c:if test="${not empty metaExpedientCommand.revisioComentari}">
-							<div style="margin-top: 15px;">
-								<dt><spring:message code="metaexpedient.revisio.form.camp.comentari"/></dt>
-								<dd><pre style="height:300px"><c:out value="${metaExpedientCommand.revisioComentari}" escapeXml="true"/></pre></dd>
-							</div>
-						</c:if>
-					</dl>				
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatPerAdminOrganEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio"/>
+					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="false"/>
 				</c:if>
 			</div>
 		</div>
