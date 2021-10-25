@@ -160,7 +160,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						metaExpedientUpdate.setId(metaExpedientCreat.getId());
 						MetaExpedientDto modificat = metaExpedientService.update(
 								entitatCreada.getId(),
-								metaExpedientUpdate, null);
+								metaExpedientUpdate, null, false);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(

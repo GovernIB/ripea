@@ -52,8 +52,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient, String rolActual) {
-		return delegate.update(entitatId, metaExpedient, rolActual);
+			MetaExpedientDto metaExpedient, String rolActual,
+			boolean isCanviEstatDissenyAPendentByOrganAdmin) {
+		return delegate.update(entitatId, metaExpedient, rolActual, isCanviEstatDissenyAPendentByOrganAdmin);
 	}
 
 	@Override
