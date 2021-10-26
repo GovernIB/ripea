@@ -32,6 +32,7 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 	private String campNom;
 	private String campEntitatId;
 	private String campPareId;
+	private String campOrganGestorId;
 	
 	@Autowired
 	private ExpedientService expedientService;
@@ -46,6 +47,7 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 		this.campNom = constraintAnnotation.campNom();
 		this.campEntitatId = constraintAnnotation.campEntitatId();
 		this.campPareId = constraintAnnotation.campPareId();
+		this.campOrganGestorId = constraintAnnotation.campOrganGestorId();
 	}
 
 	@Override
@@ -56,6 +58,7 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 			final String nom = BeanUtils.getProperty(value, campNom);
 			final Long entitatId = getLongProperty(value, campEntitatId); 
 			final Long pareId = getLongProperty(value, campPareId); 
+			final Long organGestorId = getLongProperty(value, campOrganGestorId); 
 			ExpedientDto expedient = null;
 			
 			if (metaExpedientId != null) {
@@ -65,7 +68,8 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 					pareId,
 					nom,
 					0, 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					organGestorId);
 			}
 			if (expedient != null) {
 				if (id == null) // creant

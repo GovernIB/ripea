@@ -54,7 +54,6 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
@@ -272,7 +271,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			resposta.setNumComentaris(metaExpedient.getComentaris().size());
 		}
@@ -301,7 +300,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -318,7 +317,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -674,7 +673,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					permission == PermissionEnumDto.WRITE,
 					permission == PermissionEnumDto.CREATE,
 					permission == PermissionEnumDto.DELETE,
-					false, null);
+					false, null, null);
 		} catch (PermissionDeniedException ex) {
 			permitted = false;
 		}

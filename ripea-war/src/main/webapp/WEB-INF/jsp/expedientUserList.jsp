@@ -496,7 +496,7 @@ function removeCookie(cname) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="16" 
+		data-default-order="17" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -507,6 +507,7 @@ function removeCookie(cname) {
 		<thead>
 			<tr>
 				<th data-col-name="usuariActualWrite" data-visible="false"></th>
+				<th data-col-name="usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="seguidor" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>

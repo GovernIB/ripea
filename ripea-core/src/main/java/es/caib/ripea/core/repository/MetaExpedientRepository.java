@@ -174,7 +174,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"     or (:esAdminOrgan = true and :esAdminOrgan = false) " + // TODO esborrar
 			"     or (:esNullIdPermesos = false and me.id in (:idPermesos)) " +
 			"     or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos)) " +
-			"     or (me.organGestor is null and :esNullMetaExpedientOrganIdPermesos = false and meog.id in (:metaExpedientOrganIdPermesos)) )")
+			"     or (me.organGestor is null and :esNullMetaExpedientOrganIdPermesos = false and meog.id in (:metaExpedientOrganIdPermesos)) " +
+			"	  or (:allComuns = true and me.organGestor is null))")
 	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullActiu") boolean esNullActiu,
@@ -191,7 +192,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos, 
 			@Param("revisioActiva") boolean revisioActiva,
 			@Param("organGestorIComu") boolean organGestorIComu,
-			@Param("organ") OrganGestorEntity organ);
+			@Param("organ") OrganGestorEntity organ,
+			@Param("allComuns") boolean allComuns);
 	
 	
 	
@@ -227,6 +229,17 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findByOrganGestorOrderByNomAsc(OrganGestorEntity organGestorEntity);
 
 	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
+	
+	@Query( "select " +
+			"   me.id " +
+			"from " +
+			"    MetaExpedientEntity me " +
+			"where " +
+			"    me.entitat = :entitat " +
+			"and me.organGestor is null " +
+			"and me.actiu = true")
+	List<Long> findProcedimentsComunsActiveIds(
+			@Param("entitat") EntitatEntity entitat);
 
 	@Query(	"from" +
 			"    MetaExpedientEntity me " +

@@ -38,4 +38,6 @@ public @interface ExpedientNomUnique {
 	String campNom();
 
 	String campEntitatId();
+	
+	String campOrganGestorId();
 }

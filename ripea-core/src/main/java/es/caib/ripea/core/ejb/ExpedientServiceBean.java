@@ -74,12 +74,17 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long metaExpedientId,
 			Long pareId,
 			String nom,
-			int esborrat, String rolActual) {
-		return delegate.findByMetaExpedientAndPareAndNomAndEsborrat(entitatId,
-																	metaExpedientId,
-																	pareId,
-																	nom,
-																	esborrat, rolActual);
+			int esborrat, 
+			String rolActual, 
+			Long organId) {
+		return delegate.findByMetaExpedientAndPareAndNomAndEsborrat(
+				entitatId,
+				metaExpedientId,
+				pareId,
+				nom,
+				esborrat,
+				rolActual,
+				organId);
 	}
 	@Override
 	@RolesAllowed("tothom")

@@ -197,6 +197,22 @@ public class OrganGestorHelper {
 		return pares;
 	}
 	
+	public List<Long> findParesIds(
+			Long organGestorId,
+			boolean incloureOrganGestor) {
+		OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);
+		List<Long> pares = new ArrayList<Long>();
+		if (incloureOrganGestor) {
+			pares.add(organGestor.getId());
+		}
+		OrganGestorEntity organGestorActual = organGestor;
+		while (organGestorActual.getPare() != null) {
+			organGestorActual = organGestorActual.getPare();
+			pares.add(organGestorActual.getId());
+		}
+		return pares;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 }

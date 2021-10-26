@@ -276,6 +276,17 @@ public class MetaExpedientHelper {
 				MetaExpedientOrganGestorEntity.class,
 				permis));
 		organGestorHelper.afegirOrganGestorFillsIds(entitat, metaExpedientOrganIds);
+		
+		// Cercam els òrgans amb permisos per procediemnts comuns
+		List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
+				OrganGestorEntity.class,
+				ExtendedPermission.COMU,
+				permis);
+		boolean accessAllComu = false;
+		if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
+			accessAllComu = true;
+		}
+
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(
 				entitat,
 				!nomesActius,
@@ -292,7 +303,8 @@ public class MetaExpedientHelper {
 				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds, 
 				isRevisioActiva(),
 				comu && organId != null,
-				organId != null ? organGestorRepository.findOne(organId) : null);
+				organId != null ? organGestorRepository.findOne(organId) : null,
+				accessAllComu);
 		
 		
 /*		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);

@@ -19,7 +19,6 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -90,8 +89,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
 			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
 			"     or (:esNullOrganIdPermesos = false and eogpmeogog.id in (:organIdPermesos)) " +
-			// Falta contemplar el cas en el que la combinació meta-expedient + organ de l'expedient està a :metaExpedientOrganIdPermesos
-			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos))) " +
+			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos)) " +
+			"     or (:esNullOrganProcedimentsComunsIdsPermesos = false and eogpmeogog.id in (:organProcedimentsComunsIdsPermesos) and e.metaExpedient.id in (:procedimentsComunsIds))) " +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
@@ -127,6 +126,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("organIdPermesos") List<Long> organIdPermesos,
 			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
+			@Param("esNullOrganProcedimentsComunsIdsPermesos") boolean esNullOrganProcedimentsComunsIdsPermesos, 
+			@Param("organProcedimentsComunsIdsPermesos") List<Long> organProcedimentsComunsIdsPermesos,
+			@Param("procedimentsComunsIds") List<Long> procedimentsComunsIds,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("esNullMetaExpedientIdDomini") boolean esNullMetaExpedientIdDomini,

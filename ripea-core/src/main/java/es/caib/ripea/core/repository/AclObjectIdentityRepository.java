@@ -34,5 +34,20 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			@Param("classname") String classname, 
 			@Param("sids") List<AclSidEntity> sids, 
 			@Param("mask") Integer mask);
+	
+	
+	@Query(	"select " +
+			"    distinct oi.objectId " +
+			"from " +
+			"    AclObjectIdentityEntity oi " +
+			"where " +
+			"    oi.classname.classname = :classname " +
+			"and (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.sid in (:sids) and entry.mask = :mask1 and entry.granting = true) = 1 " +
+			"and (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.sid in (:sids) and entry.mask = :mask2 and entry.granting = true) = 1 ")
+	public List<Serializable> findObjectsWithPermissions(
+			@Param("classname") String classname, 
+			@Param("sids") List<AclSidEntity> sids, 
+			@Param("mask1") Integer mask1,
+			@Param("mask2") Integer mask2);
 
 }

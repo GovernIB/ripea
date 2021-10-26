@@ -100,12 +100,16 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    og.id " +
 			"from " +
 			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
 			"where " +
 			"    og.entitat = :entitat " +
-			"and (og.pare.id in (:pareIds) " +
-			"     or og.pare.pare.id in (:pareIds) " +
-			"     or og.pare.pare.pare.id in (:pareIds) " +
-			"     or og.pare.pare.pare.pare.id in (:pareIds))")
+			"and (pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds))")
 	public List<Long> findFillsIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pareIds") List<Long> pareIds);
@@ -137,6 +141,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    org.id = :organId")
 	List<OrganGestorEntity> findOrganGestorsPath(
 			@Param("organId") Long organId);
+	
 	
 	@Query(	"select " +
 			"    meog " + 

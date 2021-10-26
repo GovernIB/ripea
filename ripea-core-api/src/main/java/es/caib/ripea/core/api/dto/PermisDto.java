@@ -27,11 +27,13 @@ public class PermisDto implements Serializable {
 	private boolean write;
 	private boolean create;
 	private boolean delete;
+	private boolean procedimentsComuns;
 	private boolean administration;
 	private boolean statistics;
 	private Long organGestorId;
 	private String organGestorNom;
 	private String organGestorCodi;
+	
 
 	@Override
 	public String toString() {

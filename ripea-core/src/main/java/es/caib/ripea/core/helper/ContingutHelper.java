@@ -216,7 +216,8 @@ public class ContingutHelper {
 						false,
 						false, 
 						false, 
-						rolActual);
+						rolActual, 
+						null);
 				dto.setUsuariActualWrite(true);
 			} catch (PermissionDeniedException ex) {
 			}
@@ -231,7 +232,8 @@ public class ContingutHelper {
 						false,
 						true, 
 						false, 
-						rolActual);
+						rolActual, 
+						null);
 				dto.setUsuariActualDelete(true);
 			} catch (PermissionDeniedException ex) {
 			}
@@ -447,7 +449,7 @@ public class ContingutHelper {
 			
 			if (ambPermisos && metaNode != null) {
 				// Omple els permisos
-				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual);
+				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
 			}
 			
 			// Omple la informació d'auditoria
@@ -887,7 +889,8 @@ public class ContingutHelper {
 					comprovarPermisCreate,
 					comprovarPermisDelete, 
 					checkPerMassiuAdmin, 
-					rolActual);
+					rolActual, 
+					null);
 		} else {
 			throw new ValidationException(
 					expedient.getId(),
@@ -930,7 +933,8 @@ public class ContingutHelper {
 						false,
 						false, 
 						false, 
-						rolActual);
+						rolActual, 
+						null);
 			}
 			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
 				

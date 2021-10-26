@@ -70,12 +70,18 @@
 						{{if delete}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="procedimentsComuns" data-template="#cellProcedimentsComunsTemplate" width="5%">
+					<spring:message code="organgestor.permis.columna.procedimentsComuns"/>
+					<script id="cellProcedimentsComunsTemplate" type="text/x-jsrender">
+ 						{{if procedimentsComuns}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="administration" data-template="#cellPermisAdministrationTemplate" width="5%">
 					<spring:message code="organgestor.permis.columna.administracio"/>
 					<script id="cellPermisAdministrationTemplate" type="text/x-jsrender">
  						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
+				</th>				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
  						<div class="dropdown"> 

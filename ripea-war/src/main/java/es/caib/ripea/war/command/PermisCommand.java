@@ -40,6 +40,7 @@ public class PermisCommand {
 	private boolean administration;
 	private boolean statistics;
 	private boolean selectAll;
+	private boolean procedimentsComuns;
 
 	private Long organGestorId;
 
@@ -63,7 +64,8 @@ public class PermisCommand {
 		if (permisCommand.isCreate() &&
 			permisCommand.isDelete() &&
 			permisCommand.isRead() &&
-			permisCommand.isWrite())
+			permisCommand.isWrite() && 
+			permisCommand.isProcedimentsComuns())
 			permisCommand.setSelectAll(true);
 		return permisCommand;
 	}
@@ -125,4 +127,9 @@ public class PermisCommand {
 		this.principalCodiNom = principalCodiNom;
 	}
 
+	public void setProcedimentsComuns(boolean procedimentsComuns) {
+		this.procedimentsComuns = procedimentsComuns;
+	}
+
+	
 }

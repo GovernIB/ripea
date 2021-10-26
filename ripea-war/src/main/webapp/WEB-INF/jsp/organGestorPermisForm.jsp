@@ -79,6 +79,7 @@
 			<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
 			<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
 			<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
+			<rip:inputCheckbox name="procedimentsComuns" textKey="organgestor.permis.form.camp.procedimentsComuns"/>
 		</div>
 		<rip:inputCheckbox name="administration" textKey="organgestor.permis.form.camp.administracio"/>
 		<div id="modal-botons">
