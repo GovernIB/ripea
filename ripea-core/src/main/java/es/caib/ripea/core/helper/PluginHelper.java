@@ -4273,15 +4273,18 @@ public class PluginHelper {
 				
 				document.setContingut(contingut);
 			}
+			
+			Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
+			
 			if (getPropertyArxiuMetadadesAddicionalsActiu()) {
-				Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
 				metadadesAddicionals.put("tipusDocumentNom", tipusDocumentNom);
 				metadadesAddicionals.put("isImportacio", documentImportat);
 				if (firmes != null && ! firmes.isEmpty()) {
 					metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
 				}
-				metadades.setMetadadesAddicionals(metadadesAddicionals);
 			}
+			metadadesAddicionals.put("eni:descripcion", descripcio);
+			metadades.setMetadadesAddicionals(metadadesAddicionals);
 		}
 		return document;
 	}
