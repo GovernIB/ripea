@@ -171,6 +171,8 @@ public class OrganGestorHelper {
 				filtre == null,
 				filtre,
 				Arrays.asList(organGestorEntitat.getId()));
+		
+		organsGestors.remove(organGestorEntitat);
 		organsGestors.add(0, organGestorEntitat);
 		return organsGestors;
 	}

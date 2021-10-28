@@ -73,16 +73,22 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			Pageable paginacio);
 
-	@Query("from " +
+	@Query(	"select " +
+			"    og " + 
+			"from " +
 			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
 			"where " +
 			"    og.entitat = :entitat " +
 			"and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) " +
 			"and (og.id in (:pareIds) " +
-			"     or og.pare.id in (:pareIds) " +
-			"     or og.pare.pare.id in (:pareIds) " +
-			"     or og.pare.pare.pare.id in (:pareIds) " +
-			"     or og.pare.pare.pare.pare.id in (:pareIds)) " +
+			"     or pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds)) " +
 			"order by og.nom asc")
 	public List<OrganGestorEntity> findByEntitatAndFiltreAndPareIdIn(
 			@Param("entitat") EntitatEntity entitat,
