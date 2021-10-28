@@ -33,12 +33,14 @@
 				<c:if test="${!esRevisor}">
 					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">
+							<c:if test="${!bloquejarCamps}">
 							{{if !relacionat}}
 								<a href="grup/{{:id}}/relacionar" class="btn btn-success"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="comu.boto.relacionar"/></a>
 								
 							{{else}}
 								<a href="grup/{{:id}}/desvincular" class="btn btn-success"><span class="fa fa-unlink"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desvincular"/></a>
 							{{/if}}
+							</c:if>
 						</script>
 					</th>
 				</c:if>

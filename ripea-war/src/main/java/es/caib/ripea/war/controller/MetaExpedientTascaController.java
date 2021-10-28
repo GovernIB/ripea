@@ -24,12 +24,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaExpedientTascaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -58,9 +61,9 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		model.addAttribute(
 				"esRevisor",
 				rolActual.equals("IPA_REVISIO"));
-		
+		MetaExpedientDto metaExpedient = null;
 		if (!rolActual.equals("IPA_REVISIO")) {
-			comprovarAccesMetaExpedient(request, metaExpedientId);
+			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
 		
 		model.addAttribute(
@@ -69,6 +72,12 @@ public class MetaExpedientTascaController extends BaseAdminController {
 						entitatActual.getId(),
 						metaExpedientId));
 		//TODO rename to metaExpedientTascaList
+		if (metaExpedient != null // es tracta d'una modificació
+				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
+				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+			model.addAttribute("bloquejarCamps", true);
+		}
 		return "metaExpedientTasca";
 	}
 
@@ -117,7 +126,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			@PathVariable Long id,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedientService.findById(
@@ -148,6 +157,12 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
+		if (metaExpedient != null // es tracta d'una modificació
+				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
+				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+			model.addAttribute("bloquejarCamps", true);
+		}
 		return "metaExpedientTascaForm";
 	}
 	

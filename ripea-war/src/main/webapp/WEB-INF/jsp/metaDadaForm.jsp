@@ -184,10 +184,10 @@ $(document).ready(function() {
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaNodeId"/>
-		<rip:inputText name="codi" textKey="metadada.form.camp.codi" required="true"/>
-		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true"/>
-		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto"/>
-		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
+		<rip:inputText name="codi" textKey="metadada.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
+		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
+		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto" disabled="${bloquejarCamps}"/>
+		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto" disabled="${bloquejarCamps}"/>
 		
 		
 		<c:set var="displaySencer"></c:set>
@@ -199,7 +199,7 @@ $(document).ready(function() {
 				<spring:message code="metadada.form.camp.valor"/>
 			</label>
 			<div class="col-xs-8">	
-				<form:input path="valorSencer" id="valorSencer" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
+				<form:input path="valorSencer" id="valorSencer" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}" disabled="${bloquejarCamps}"></form:input>
 			</div>		
 		</div>
 
@@ -212,7 +212,7 @@ $(document).ready(function() {
 				<spring:message code="metadada.form.camp.valor"/>
 			</label>
 			<div class="col-xs-8">	
-				<form:input path="valorFlotant" id="valorFlotant" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+				<form:input path="valorFlotant" id="valorFlotant" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}" disabled="${bloquejarCamps}"></form:input>
 			</div>
 		</div>
 
@@ -225,7 +225,7 @@ $(document).ready(function() {
 				<spring:message code="metadada.form.camp.valor"/>
 			</label>
 			<div class="col-xs-8">	
-				<form:input path="valorImport" id="valorImport" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+				<form:input path="valorImport" id="valorImport" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}" disabled="${bloquejarCamps}"></form:input>
 			</div>
 		</div>
 		
@@ -238,7 +238,7 @@ $(document).ready(function() {
 				<spring:message code="metadada.form.camp.valor"/>
 			</label>
 			<div class="col-xs-8">	
-				<form:input path="valorData" id="valorData" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}" ></form:input>
+				<form:input path="valorData" id="valorData" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"  disabled="${bloquejarCamps}"></form:input>
 			</div>
 		</div>
 
@@ -251,7 +251,7 @@ $(document).ready(function() {
 				<spring:message code="metadada.form.camp.valor"/>
 			</label>
 			<div class="col-xs-8">	
-				<form:checkbox path="valorBoolea" id="valorBoolea" name="valorBoolea" ></form:checkbox>
+				<form:checkbox path="valorBoolea" id="valorBoolea" name="valorBoolea" disabled="${bloquejarCamps}"></form:checkbox>
 			</div>
 		</div>
 
@@ -264,14 +264,14 @@ $(document).ready(function() {
 				<spring:message code="metadada.form.camp.valor"/>
 			</label>
 			<div class="col-xs-8">	
-				<form:input path="valorString" id="valorString" cssClass="form-control${multipleClass}"></form:input>
+				<form:input path="valorString" id="valorString" cssClass="form-control${multipleClass}" disabled="${bloquejarCamps}"></form:input>
 			</div>
 		</div>
 	
-		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini"/>
-		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio"/>
+		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini" disabled="${bloquejarCamps}"/>
+		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

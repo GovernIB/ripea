@@ -63,11 +63,13 @@
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
 									<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<c:if test="${!bloquejarCamps}">
 									{{if !ambOrganGestor}}
 									<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									{{else}}
 									<li><a href="../../metaExpedient/${metaExpedient.id}/permis/{{:id}}/delete?organGestorId={{:organGestorId}}" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									{{/if}}
+									</c:if>
 								</ul>
 							</div>
 						</script>
@@ -77,7 +79,9 @@
 		</thead>
 	</table>
 	<script id="tableButtonsTemplate" type="text/x-jsrender">
+		<c:if test="${!bloquejarCamps}">
 		<p style="text-align:right"><a class="btn btn-default" href="../../metaExpedient/${metaExpedient.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.permis.boto.nou.permis"/></a></p>
+		</c:if>
 	</script>
 	<a href="<c:url value="${!esRevisor ? '/metaExpedient?mantenirPaginacio=true' : '/metaExpedientRevisio?mantenirPaginacio=true'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>
