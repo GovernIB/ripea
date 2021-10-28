@@ -40,6 +40,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre
@@ -86,6 +87,7 @@ public class ContingutDadaController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
+			MissatgesHelper.error(request, getMessage(request, "contingut.controller.dades.modificades.error"));
 			return AjaxHelper.generarAjaxFormErrors(
 					null,
 					bindingResult);
@@ -110,6 +112,7 @@ public class ContingutDadaController extends BaseUserController {
 					entitatActual.getId(),
 					contingutId,
 					valors);
+			MissatgesHelper.success(request, getMessage(request, "contingut.controller.dades.modificades.ok"));
 			return AjaxHelper.generarAjaxFormOk();
 		}
 	}

@@ -559,6 +559,21 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 
 let pageSizeDominis = 20;
 $(document).ready(function() {
+	
+	if (/#contingut/.test(window.location.href)) {
+		$('.nav-tabs a[href$="#contingut"]').trigger('click');	
+	} else if (/#dades/.test(window.location.href)){
+		$('.nav-tabs a[href$="#dades"]').trigger('click');
+	} else if (/#interessats/.test(window.location.href)){
+		$('.nav-tabs a[href$="#interessats"]').trigger('click');
+	} else if (/#tasques/.test(window.location.href)){
+		$('.nav-tabs a[href$="#tasques"]').trigger('click');
+	}
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		  var target = $(e.target).attr("href")
+		  window.history.replaceState('','', window.location.href.substr(0, window.location.href.indexOf("#")) + target);  
+	});
+
 
 	$('.disabledMsg').tooltip();
 	
