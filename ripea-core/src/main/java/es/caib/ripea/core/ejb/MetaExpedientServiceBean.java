@@ -383,4 +383,11 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
 		return delegate.marcarPendentRevisio(entitatId, id);
 	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
+		return delegate.marcarProcesDisseny(entitatId, id);
+	}
+	
 }

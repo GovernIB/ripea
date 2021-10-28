@@ -44,7 +44,7 @@ $(document).ready(function() {
 </script>	
 </head>
 <body>
-	<c:if test="${!esRevisor}">
+	<c:if test="${!esRevisor && !bloquejarCamps}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
 		</div>
@@ -71,12 +71,14 @@ $(document).ready(function() {
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
 									<li><a href="metaDada/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<c:if test="${!bloquejarCamps}">
 									{{if !activa}}
 									<li><a href="metaDada/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 									{{else}}
 									<li><a href="metaDada/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
 									{{/if}}
 									<li><a href="metaDada/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metadada.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									</c:if>
 								</ul>
 							</div>
 						</script>

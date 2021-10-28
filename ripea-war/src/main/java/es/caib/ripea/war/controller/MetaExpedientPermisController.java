@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -52,8 +54,9 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		MetaExpedientDto metaExpedient = null;
 		if (!rolActual.equals("IPA_REVISIO")) {
-			comprovarAccesMetaExpedient(request, metaExpedientId);
+			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
 		model.addAttribute(
 				"esRevisor",
@@ -68,6 +71,13 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			throw new SecurityException("Per poder gestionar permisos la propietat \"es.caib.ripea.procediment.gestio.permis.administrador.organ\" ha de ser activada pel superusuari ", null);
 			
 		}
+		if (metaExpedient != null // es tracta d'una modificació
+				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
+				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+			model.addAttribute("bloquejarCamps", true);
+		}
+
 		return "metaExpedientPermis";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/permis/datatable", method = RequestMethod.GET)

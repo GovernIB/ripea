@@ -246,24 +246,24 @@
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
-				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
+				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 				
 				<c:set var="campErrors"><form:errors path="classificacioSia"/></c:set>
 				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 					<label class="control-label col-xs-4" for="classificacioSia"><spring:message code="metaexpedient.form.camp.classificacio.sia"/> *</label>
 					<div class="col-xs-6">
-						<form:input path="classificacioSia" cssClass="form-control" id="classificacioSia" disabled="false"  readonly="false" />	
+						<form:input path="classificacioSia" cssClass="form-control" id="classificacioSia" disabled="false" readonly="${bloquejarCamps}"/>	
 						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="classificacioSia"/></p></c:if>
 					</div>
 					<div class="col-xs-2">
-						<button id="importMetaExpedient" type="button" class="btn btn-info"><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
+						<button id="importMetaExpedient" type="button" class="btn btn-info" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
 					</div>
 				</div>
 				
-				<rip:inputText name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
-				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio"/>
+				<rip:inputTextarea name="nom" textKey="metaexpedient.form.camp.nom" required="true" disabled="${bloquejarCamps}"/>
+				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 				
-				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
+				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true" readonly="${bloquejarCamps}"/>
 				<c:if test="${not isRolAdminOrgan}">		
 					<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu"/>				
 				</c:if>
@@ -276,13 +276,14 @@
  					textKey="metaexpedient.form.camp.organgestor"
  					suggestValue="id"
  					suggestText="codiINom"
- 					required="true"/>
-				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari"/>
-				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre"/>
-				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva"/>
+ 					required="true"
+ 					disabled="${bloquejarCamps}"/>
+				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari" readonly="${bloquejarCamps}"/>
+				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre" disabled="${bloquejarCamps}"/>
+				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
-				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa"/>
+				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa" disabled="${bloquejarCamps}"/>
 			</div>
 			<c:if test="${isCarpetaDefecte}">
 				<div role="carpetes" class="tab-pane" id="carpetes">
@@ -290,8 +291,8 @@
 					<rip:arbreMultiple id="arbreCarpetes" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
 					<form:hidden path="estructuraCarpetesJson"/>
 					<div id="botons_container" class="well">
-						<input id="add_folder" onclick="addFolder();" type="button" class="btn btn-default" value="<spring:message code="metaexpedient.form.camp.estructura.subcarpeta"/>">
-						<input id="add_parent_folder" onclick="addParentFolder();" type="button" class="btn btn-info" value="<spring:message code="metaexpedient.form.camp.estructura.carpeta"/>">
+						<input id="add_folder" onclick="addFolder();" type="button" class="btn btn-default" value="<spring:message code="metaexpedient.form.camp.estructura.subcarpeta"/>" readonly="${bloquejarCamps}">
+						<input id="add_parent_folder" onclick="addParentFolder();" type="button" class="btn btn-info" value="<spring:message code="metaexpedient.form.camp.estructura.carpeta"/>" readonly="${bloquejarCamps}">
 					</div>
 				</div>
 			</c:if>
@@ -301,13 +302,13 @@
 					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}"/>
 				</c:if>
 				<c:if test="${isRolAdminOrgan}">
-					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatPerAdminOrganEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio"/>
-					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="false"/>
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatPerAdminOrganEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${bloquejarCamps}"/>
+					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="false" disabled="${bloquejarCamps}"/>
 				</c:if>
 			</div>
 		</div>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

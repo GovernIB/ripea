@@ -25,6 +25,8 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
@@ -42,6 +44,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de meta-documents asociats a un
@@ -76,8 +79,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				"esRevisor",
 				rolActual.equals("IPA_REVISIO"));
 		
+		MetaExpedientDto metaExpedient = null;
 		if (!rolActual.equals("IPA_REVISIO")) {
-			comprovarAccesMetaExpedient(request, metaExpedientId);
+			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
 		
 		model.addAttribute(
@@ -85,6 +89,13 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
+
+		if (metaExpedient != null // es tracta d'una modificació
+				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
+				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+			model.addAttribute("bloquejarCamps", true);
+		}
 
 		return "metaExpedientMetaDocument";
 	}
@@ -121,7 +132,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaDocumentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
+		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
 			metaDocument = metaDocumentService.findById(entitatActual.getId(), metaExpedientId, metaDocumentId);
@@ -140,6 +151,13 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);
 		emplenarModelForm(request, model);
+		
+		if (metaExpedient != null // es tracta d'una modificació
+				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
+				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+			model.addAttribute("bloquejarCamps", true);
+		}
 		return "metaExpedientMetaDocumentForm";
 	}
 

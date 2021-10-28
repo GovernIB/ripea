@@ -38,7 +38,9 @@ $(document).ready(function() {
 
 
 	<script id="botonsTemplate" type="text/x-jsrender">
+		<c:if test="${!bloquejarCamps}">
 		<p style="text-align:right"><a class="btn btn-default" href="${metaExpedient.id}/new" data-toggle="modal" data-datatable-id="regles" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="expedient.estat.list.boto.nou"/></a></p>
+		</c:if>
 	</script>
 	<table id="estats" data-toggle="datatable" data-url="<c:url value="/expedientEstat/${metaExpedient.id}/datatable"/>" ${!esRevisor ? 'data-drag-enabled="true"' : ''}  data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered" style="width:100%" ${!esRevisor ? 'data-botons-template="#botonsTemplate"' : ''}>
 
@@ -65,7 +67,9 @@ $(document).ready(function() {
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
 									<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<c:if test="${!bloquejarCamps}">
 									<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									</c:if>
 								</ul>
 							</div>
 						</script>

@@ -52,6 +52,7 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
@@ -1040,12 +1041,26 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
 		logger.debug(
-				"Marcant com a pendent de revisióun meta-expedient existent (" + "entitatId=" + entitatId + ", " +
+				"Marcant com a pendent de revisió un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
 
 		metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
+		
+		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
+	}
+	
+	@Transactional
+	@Override
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
+		logger.debug(
+				"Marcant com en procés de disseny un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
+						"id=" + id + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+
+		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
 		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}
