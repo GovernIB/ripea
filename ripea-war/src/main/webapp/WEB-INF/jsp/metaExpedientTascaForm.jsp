@@ -28,8 +28,8 @@
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaExpedientId"/>
 		
-		<rip:inputText name="codi" textKey="metaexpedient.tasca.form.camp.codi" required="true"/>
-		<rip:inputText name="nom" textKey="metaexpedient.tasca.form.camp.nom" required="true"/>
+		<rip:inputText name="codi" textKey="metaexpedient.tasca.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
+		<rip:inputText name="nom" textKey="metaexpedient.tasca.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
@@ -39,14 +39,15 @@
 			textKey="metaexpedient.tasca.form.camp.responsable"
 			suggestValue="codi"
 			suggestText="nom"
-			placeholderKey="metaexpedient.tasca.form.camp.responsable"/>	
-		<rip:inputDate name="dataLimit" textKey="metaexpedient.tasca.form.camp.dataLimit"/>
-		<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true"/>
+			placeholderKey="metaexpedient.tasca.form.camp.responsable"
+			disabled="${bloquejarCamps}"/>	
+		<rip:inputDate name="dataLimit" textKey="metaexpedient.tasca.form.camp.dataLimit" readonly="${bloquejarCamps}"/>
+		<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true" disabled="${bloquejarCamps}"/>
 		
-		<rip:inputSelect name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom"/>
-		<rip:inputSelect name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom"/>
+		<rip:inputSelect name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}"/>
+		<rip:inputSelect name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}"/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/tasca"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

@@ -17,7 +17,7 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<c:if test="${!esRevisor}">
+	<c:if test="${!esRevisor && !bloquejarCamps}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="tasca/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.tasca.boto.afegir"/></a>
 		</div>
@@ -42,12 +42,14 @@
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
 									<li><a href="tasca/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<c:if test="${!bloquejarCamps}">
 									{{if !activa}}
 									<li><a href="tasca/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 									{{else}}
 									<li><a href="tasca/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
 									{{/if}}
 									<li><a href="tasca/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.tasca.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									</c:if>
 								</ul>
 							</div>
 						</script>

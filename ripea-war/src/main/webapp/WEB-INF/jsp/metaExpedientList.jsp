@@ -211,14 +211,19 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								{{if !actiu}}
-								<li><a href="metaExpedient/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
-								{{else}}
-								<li><a href="metaExpedient/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{^{if !~hlpIsAdministradorOrgan() || (~hlpIsAdministradorOrgan() && revisioEstat != 'REVISAT')}}
+									{{if !actiu}}
+									<li><a href="metaExpedient/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+									{{else}}
+									<li><a href="metaExpedient/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+									{{/if}}
+									<li><a href="metaExpedient/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
-								<li><a href="metaExpedient/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{^{if ~hlpIsAdministradorOrgan() && revisioEstat == 'DISSENY'}}
 									<li><a href="metaExpedient/{{:id}}/marcarPendentRevisio" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.accio.boto.pendent"/></a></li>
+								{{/if}}
+								{^{if ~hlpIsAdministradorOrgan() && revisioEstat == 'REVISAT'}}
+									<li><a href="metaExpedient/{{:id}}/marcarProcesDisseny" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.accio.boto.disseny"/></a></li>
 								{{/if}}
 							</ul>
 						</div>

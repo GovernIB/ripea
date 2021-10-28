@@ -173,6 +173,14 @@ public class MetaExpedientController extends BaseAdminController {
 				carpetes = new ArrayList<ArbreDto<MetaExpedientCarpetaDto>>();
 			model.addAttribute("carpetes", carpetes);
 		}
+		
+		if (metaExpedient != null // es tracta d'una modificació
+				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
+				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+			model.addAttribute("bloquejarCamps", true);
+		}
+		
 		fillFormModel(
 				request,
 				metaExpedient,
@@ -376,7 +384,7 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/marcarPendentRevisio", method = RequestMethod.GET)
-	public String marcarPendent(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+	public String marcarPendentRevisio(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		
@@ -388,6 +396,21 @@ public class MetaExpedientController extends BaseAdminController {
 				request,
 				"redirect:../../metaExpedient",
 				"metaexpedient.controller.marcar.pendent.ok");
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/marcarProcesDisseny", method = RequestMethod.GET)
+	public String marcarProcesDisseny(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		comprovarAccesMetaExpedient(request, metaExpedientId);
+		
+		metaExpedientService.marcarProcesDisseny(
+				entitatActual.getId(),
+				metaExpedientId);
+		
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../metaExpedient",
+				"metaexpedient.controller.marcar.disseny.ok");
 	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)

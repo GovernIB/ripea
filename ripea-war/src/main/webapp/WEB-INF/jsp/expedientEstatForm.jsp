@@ -26,10 +26,10 @@
 			<form:hidden path="id"/>
 			<form:hidden path="metaExpedientId"/>
 			<form:hidden path="comu"/>
-			<rip:inputText name="codi" textKey="expedient.estat.form.camp.codi" required="true"/>
-			<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true"/>
-			<rip:inputText name="color" textKey="expedient.estat.form.camp.color" />
-			<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial"/>
+			<rip:inputText name="codi" textKey="expedient.estat.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
+			<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
+			<rip:inputText name="color" textKey="expedient.estat.form.camp.color" readonly="${bloquejarCamps}"/>
+			<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial" disabled="${bloquejarCamps}"/>
 			
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 			<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
@@ -40,10 +40,11 @@
 				textKey="expedient.estat.form.camp.responsable"
 				suggestValue="codi"
 				suggestText="nom"
-				required="${!expedientEstatCommand.comu}" />
+				required="${!expedientEstatCommand.comu}" 
+				disabled="${bloquejarCamps}"/>
 				
 			<div id="modal-botons">
-				<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+				<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 				<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 			</div>
 		</form:form>

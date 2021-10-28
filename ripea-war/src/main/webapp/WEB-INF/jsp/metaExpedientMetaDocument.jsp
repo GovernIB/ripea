@@ -17,7 +17,7 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<c:if test="${!esRevisor}">
+	<c:if test="${!esRevisor && !bloquejarCamps}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="metaDocument/new" data-toggle="modal" data-datatable-id="metadocuments"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.list.boto.nou"/></a>
 		</div>
@@ -61,6 +61,7 @@
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="metaDocument/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<c:if test="${!bloquejarCamps}">
 									{{if !actiu}}
 									<li><a href="<c:url value="metaDocument/{{:id}}/enable"/>" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 									{{else}}
@@ -72,6 +73,7 @@
 									{{else}}
 										<li><a href="<c:url value="metaDocument/{{:id}}/default/remove"/>" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.defecte.remove"/></a></li>
 									{{/if}}
+									</c:if>
 								</ul>
 							</div>
 						</script>
