@@ -210,16 +210,6 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: ipa_entitat
 - changeSet:
-    id: init-constraint-22
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: entitat_id
-        baseTableName: ipa_metadada
-        constraintName: ipa_metadada_entitat_fk
-        referencedColumnNames: id
-        referencedTableName: ipa_entitat
-- changeSet:
     id: init-constraint-23
     author: limit (generated)
     changes:
@@ -555,8 +545,8 @@ databaseChangeLog:
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: metaexpedient_id
-        baseTableName: ipa_metaexpedient_GRUP
-        constraintName: ipa_METAEXP_METAEXPGRUP_fk
+        baseTableName: ipa_metaexpedient_grup
+        constraintName: ipa_metaexp_metaexpgrup_fk
         referencedColumnNames: id
         referencedTableName: ipa_metaexpedient
 - changeSet:
@@ -604,7 +594,7 @@ databaseChangeLog:
     author: limit (generated)
     changes:
     - addForeignKeyConstraint:
-        baseColumnNames: ESTAT_FINALITZAR_TASCA_id
+        baseColumnNames: estat_finalitzar_tasca_id
         baseTableName: ipa_metaexp_tasca
         constraintName: ipa_mexp_tasca_exp_est_fi_fk
         referencedColumnNames: id
@@ -744,7 +734,7 @@ databaseChangeLog:
     author: limit (generated)
     changes:
     - addForeignKeyConstraint:
-        baseColumnNames: PARE_id
+        baseColumnNames: pare_id
         baseTableName: ipa_metaexpedient
         constraintName: ipa_metaexpedient_pare_fk
         referencedColumnNames: id
@@ -835,7 +825,7 @@ databaseChangeLog:
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: portafirmes_block_id
-        baseTableName: ipa_portafirmes_block_INFO
+        baseTableName: ipa_portafirmes_block_info
         constraintName: ipa_port_blo_info_pot_blo_fk
         referencedColumnNames: id
         referencedTableName: ipa_portafirmes_block

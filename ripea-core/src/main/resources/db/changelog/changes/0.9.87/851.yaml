@@ -9,7 +9,7 @@ databaseChangeLog:
         columns:
             - column:
                 name:  TASCA_ID
-                type:  number(19)
+                type:  BIGINT
                 constraints:
                     nullable: false
                     foreignKeyName: ipa_expedient_tasca_fk
@@ -70,7 +70,8 @@ FROM IPA_EXPEDIENT_TASCA;
     runOnChange: true
     changes:
           - sql:
-                sql: "
-UPDATE IPA_EXPEDIENT_TASCA TASCA SET TASCA.RESPONSABLE_ACTUAL_CODI = NULL WHERE TASCA.ESTAT = 'PENDENT';
-
-                "
+                sql: "UPDATE IPA_EXPEDIENT_TASCA SET RESPONSABLE_ACTUAL_CODI = NULL WHERE ESTAT = 'PENDENT';"
+                dbms: oracle
+          - sql:
+                sql: "UPDATE IPA_EXPEDIENT_TASCA SET RESPONSABLE_ACTUAL_CODI = NULL WHERE ESTAT = 'PENDENT';"
+                dbms: postgresql                

@@ -10,7 +10,7 @@ databaseChangeLog:
         tableName: ipa_expedient_peticio
         column:
           name: metaexpedient_id
-          type: number(19)
+          type: bigint
     - addForeignKeyConstraint:
         baseColumnNames: metaexpedient_id
         baseTableName: ipa_expedient_peticio

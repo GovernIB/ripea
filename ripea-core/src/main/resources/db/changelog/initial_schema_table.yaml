@@ -1299,7 +1299,7 @@ databaseChangeLog:
         - column:
             constraints:
               nullable: false
-            name: data_Alta
+            name: data_alta
             type: TIMESTAMP
         - column:
             constraints:
