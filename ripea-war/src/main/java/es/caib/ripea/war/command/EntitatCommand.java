@@ -111,7 +111,7 @@ public class EntitatCommand {
 		EntitatDto entitat = ConversioTipusHelper.convertir(
 				command,
 				EntitatDto.class);
-		entitat.setLogoImgBytes(command.getLogoImg().getBytes());
+		entitat.setLogoImgBytes(command.getLogoImg() != null ? command.getLogoImg().getBytes() : null);
 		return entitat;
 	}
 
