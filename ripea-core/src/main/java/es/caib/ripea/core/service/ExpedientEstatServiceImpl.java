@@ -525,7 +525,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					metaExpedient == null,
 					metaExpedient,
 					filtre.getNom() == null,
-					filtre.getNom(),
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					dataInici == null,
 					dataInici,
 					dataFi == null,

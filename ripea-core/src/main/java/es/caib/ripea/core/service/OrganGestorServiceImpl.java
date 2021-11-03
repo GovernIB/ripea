@@ -261,9 +261,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		Page<OrganGestorEntity> organs = organGestorRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-				filtre.getCodi(),
+				filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 				filtre.getNom() == null || filtre.getNom().isEmpty(),
-				filtre.getNom(),
+				filtre.getNom() != null ? filtre.getNom().trim() : "",
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 		for (OrganGestorDto organ : paginaOrgans.getContingut()) {
@@ -473,7 +473,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
 						entitat,
 						filtre == null,
-						filtre,
+						filtre != null ? filtre.trim() : "",
 						Arrays.asList(metaExpedient.getOrganGestor().getId()));
 			} else {
 				// Cercam las parelles metaExpedient-organ amb permisos assignats 
@@ -490,7 +490,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					organsGestors = organGestorRepository.findByEntitatAndFiltreAndIds(
 							entitat,
 							filtre == null || filtre.isEmpty(),
-							filtre, 
+							filtre != null ? filtre.trim() : "", 
 							organIds);
 					
 				}

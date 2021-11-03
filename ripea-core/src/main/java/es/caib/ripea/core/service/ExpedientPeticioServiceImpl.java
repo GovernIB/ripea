@@ -136,16 +136,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				metaExpedient,
 				filtre.getProcediment() == null ||
 						filtre.getProcediment().isEmpty(),
-				filtre.getProcediment(),
+				filtre.getProcediment() != null ? filtre.getProcediment().trim() : "",
 				filtre.getNumero() == null ||
 						filtre.getNumero().isEmpty(),
-				filtre.getNumero(),
+				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
 				filtre.getExtracte() == null ||
 						filtre.getExtracte().isEmpty(),
-				filtre.getExtracte(),
+				filtre.getExtracte() != null ? filtre.getExtracte().trim() : "",
 				filtre.getDestinacio() == null ||
 						filtre.getDestinacio().isEmpty(),
-				filtre.getDestinacio(),
+				filtre.getDestinacio() != null ? filtre.getDestinacio().trim() : "",
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,

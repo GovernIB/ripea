@@ -169,7 +169,7 @@ public class OrganGestorHelper {
 		List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
 				entitat,
 				filtre == null,
-				filtre,
+				filtre != null ? filtre.trim() : "",
 				Arrays.asList(organGestorEntitat.getId()));
 //		for (OrganGestorEntity organGestorEntity : organsGestors) {
 //			logger.info("organ: "+ organGestorEntity.getId() +"  "+ organGestorEntity.getCodi() + " - " + organGestorEntity.getNom());

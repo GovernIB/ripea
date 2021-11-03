@@ -2700,7 +2700,7 @@ databaseChangeLog:
             name: origen_registre_num
             type: VARCHAR2(80)
         - column:
-            name: ref_Externa
+            name: ref_externa
             type: VARCHAR2(16)
         - column:
             name: solicita

@@ -87,9 +87,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<DocumentPortafirmesEntity> docsEnvs = documentPortafirmesRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
-				filtre.getExpedientNom(),
+				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
 				filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
-				filtre.getDocumentNom(),
+				filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
 				filtre.getDataEnviamentInici() == null, 
 				filtre.getDataEnviamentInici(), 
 				filtre.getDataEnviamentFinal() == null, 
@@ -122,9 +122,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
-				filtre.getExpedientNom(),
+				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
 				filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
-				filtre.getDocumentNom(),
+				filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
 				filtre.getDataEnviamentInici() == null, 
 				filtre.getDataEnviamentInici(), 
 				filtre.getDataEnviamentFinal() == null, 
@@ -161,7 +161,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<ExpedientTascaEntity> docsEnvs = expedientTascaRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
-				filtre.getExpedientNom(),
+				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
 				metaExpedientTascaEntity == null, 
 				metaExpedientTascaEntity, 
 				filtre.getDataInici() == null, 
@@ -215,7 +215,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 				filtre.getNumero(),
 				filtre.getExtracte() == null ||
 				filtre.getExtracte().isEmpty(),
-				filtre.getExtracte(),
+				filtre.getExtracte() != null ? filtre.getExtracte().trim() : "",
 				true,
 				null,
 				filtre.getDataInicial() == null,
@@ -266,7 +266,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<ExpedientEntity> exps = expedientRepository.findArxiuPendents(
 				entitat,
 				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom(),
+				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 				metaExpedient == null,
 				metaExpedient,
 				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
@@ -321,7 +321,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<DocumentEntity> docs = documentRepository.findArxiuPendents(
 				entitat,
 				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom(),
+				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 				expedient == null,
 				expedient,
 				metaExpedient == null,
@@ -378,7 +378,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<InteressatEntity> ints = interessatRepository.findArxiuPendents(
 				entitat,
 				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom(),
+				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 				expedient == null,
 				expedient,
 				metaExpedient == null,
