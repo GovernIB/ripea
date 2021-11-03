@@ -357,7 +357,7 @@ databaseChangeLog:
             type: VARCHAR2(256)
         - column:
             name: fitxer_contingut
-            type: BLOB
+            type: ${blob}
         - column:
             name: versio_darrera
             type: VARCHAR2(32)
@@ -924,7 +924,7 @@ databaseChangeLog:
             type: BOOLEAN
         - column:
             name: logo_img
-            type: BLOB
+            type: ${blob}
         - column:
             name: capsalera_color_fons
             type: VARCHAR2(32)
@@ -1989,7 +1989,7 @@ databaseChangeLog:
             type: VARCHAR2(256)
         - column:
             name: plantilla_contingut
-            type: BLOB
+            type: ${blob}
         - column:
             name: meta_expedient_id
             type: BIGINT
@@ -2764,10 +2764,10 @@ databaseChangeLog:
             type: BIGINT
         - column:
             name: contingut
-            type: BLOB
+            type: ${blob}
         - column:
             name: firma_contingut
-            type: BLOB
+            type: ${blob}
         - column:
             name: firma_perfil
             type: VARCHAR2(20)
