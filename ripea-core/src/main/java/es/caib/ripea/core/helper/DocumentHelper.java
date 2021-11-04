@@ -223,11 +223,12 @@ public class DocumentHelper {
 		if (!isModificacioCustodiatsActiva() && (
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))) {
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
-					"No es pot actualitzar un document custodiat");
+					"No es poden actualitzar les metadades d'un document definitiu");
 		}
 		contingutHelper.comprovarNomValid(
 				documentEntity.getPare(),
@@ -253,11 +254,16 @@ public class DocumentHelper {
 				document.getNtiCsv(),
 				document.getNtiCsvRegulacion());
 		FitxerDto fitxer = null;
-		if (document.getFitxerContingut() != null && document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+		if (document.getFitxerContingut() != null && (
+				document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ||
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
-					"No es pot actualitzar el contingut d'un document importat");
+					"No es pot actualitzar el contingut d'un document importat o definitiu");
 		}
 		if (document.getFitxerContingut() != null) {
 			fitxer = new FitxerDto();
