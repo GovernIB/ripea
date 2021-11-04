@@ -9,3 +9,4 @@ target/
 # intellij files
 .idea
 *.iml
+/republish.sh
