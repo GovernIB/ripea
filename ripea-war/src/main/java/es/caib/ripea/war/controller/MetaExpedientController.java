@@ -179,6 +179,8 @@ public class MetaExpedientController extends BaseAdminController {
 			model.addAttribute("bloquejarCamps", true);
 		}
 		
+		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
+		
 		fillFormModel(
 				request,
 				metaExpedient,
