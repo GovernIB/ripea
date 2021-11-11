@@ -60,11 +60,11 @@ public class SessioHelper {
 			request
 					.getSession()
 					.setAttribute("SessionHelper.isTipusDocumentsEnabled", aplicacioService
-							.propertyFindByNom("es.caib.ripea.habilitar.tipusdocument") != null);
+							.propertyBooleanFindByKey("es.caib.ripea.habilitar.tipusdocument", false));
 			request
 					.getSession()
 					.setAttribute("SessionHelper.isDocumentsGeneralsEnabled", aplicacioService
-							.propertyFindByNom("es.caib.ripea.habilitar.documentsgenerals") != null);
+							.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			localeResolver
 					.setLocale(request, response, StringUtils

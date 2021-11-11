@@ -279,7 +279,10 @@
  					required="true"
  					disabled="${bloquejarCamps}"/>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari" readonly="${bloquejarCamps}"/>
-				<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre" disabled="${bloquejarCamps}"/>
+				
+				<c:if test="${isDocumentsGeneralsEnabled}">
+					<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre" disabled="${bloquejarCamps}"/>
+				</c:if>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="notificacions">
