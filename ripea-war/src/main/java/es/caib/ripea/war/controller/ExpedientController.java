@@ -1301,9 +1301,19 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request,
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
+			
+			Date now = new Date();
+			Calendar c = Calendar.getInstance(); 
+			c.setTime(now); 
+			c.add(Calendar.MONTH, -3);
+	        c.set(Calendar.HOUR, 0);
+	        c.set(Calendar.MINUTE, 0);
+	        c.set(Calendar.SECOND, 0);
+			filtreCommand.setDataCreacioInici(c.getTime());
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
+
 		return filtreCommand;
 	}
 
