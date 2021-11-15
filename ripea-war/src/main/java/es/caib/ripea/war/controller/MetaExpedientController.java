@@ -34,6 +34,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -366,17 +367,24 @@ public class MetaExpedientController extends BaseAdminController {
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.esborrat.ok");
 		} catch (Exception ex) {
+			logger.error("Error al esborrar metaexpedient", ex);
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
 					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"metaexpedient.controller.esborrar.error.fk");
+						"metaexpedient.controller.esborrar.error.fk",
+						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsEsborratsException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
 						"metaexpedient.controller.esborrar.error.fk.esborrats");
+			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsException.class)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metaexpedient.controller.esborrar.error.fk.expedients");
 			} else {
 				throw ex;
 			}

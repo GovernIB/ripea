@@ -27,11 +27,17 @@ public class HistoricUsuariEntity extends HistoricEntity {
 	@Column(name = "n_tasques_tramitades")
 	private Long numTasquesTramitades;
 	
+	
+	
 	public HistoricUsuariEntity(Date data, HistoricTipusEnumDto tipus) {
 		super(data, tipus);
 		this.numTasquesTramitades = 0L;
 	}
 	
+	public HistoricUsuariEntity() {
+		super();
+	}
+
 	/**
 	 * 
 	 */
