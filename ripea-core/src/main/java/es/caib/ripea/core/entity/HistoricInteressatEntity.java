@@ -25,6 +25,11 @@ public class HistoricInteressatEntity extends HistoricEntity {
 		// TODO Auto-generated constructor stub
 	}
 	
+	public HistoricInteressatEntity() {
+		super();
+	}
+
+
 	/**
 	 * 
 	 */
