@@ -68,6 +68,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
     protected Set<ExpedientEstatEntity> estats;
     
+    
+    @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
+    protected Set<HistoricEntity> historics;
+    
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "entitat_id")

@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -54,7 +55,6 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
@@ -254,8 +254,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				allEsborats = false;
 			}
 		}
-		if (allEsborats == true && expedients.size() > 0)
-			throw new ExisteixenExpedientsEsborratsException();
+		if (expedients.size() > 0) {
+			if (allEsborats) {
+				throw new ExisteixenExpedientsEsborratsException();
+			} else {
+				throw new ExisteixenExpedientsException();
+			}
+			
+		}
+			
 		//esborrar les carpetes per defecte
 		metaExpedientCarpetaHelper.removeAllCarpetes(metaExpedient);
 		metaExpedientRepository.delete(metaExpedient);
