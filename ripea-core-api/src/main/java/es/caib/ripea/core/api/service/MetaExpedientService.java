@@ -538,5 +538,5 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long metaExpedientId,
 			String rolActual);
-	
+
 }

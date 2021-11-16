@@ -68,7 +68,11 @@ $(document).ready(function() {
 								<ul class="dropdown-menu">
 									<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 									<c:if test="${!bloquejarCamps}">
+<<<<<<< HEAD
 										<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+=======
+									<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+>>>>>>> refs/heads/link_manual
 									</c:if>
 								</ul>
 							</div>

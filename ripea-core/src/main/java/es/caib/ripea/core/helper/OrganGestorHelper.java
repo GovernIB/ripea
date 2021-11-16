@@ -171,9 +171,12 @@ public class OrganGestorHelper {
 				filtre == null,
 				filtre != null ? filtre.trim() : "",
 				Arrays.asList(organGestorEntitat.getId()));
+<<<<<<< HEAD
 //		for (OrganGestorEntity organGestorEntity : organsGestors) {
 //			logger.info("organ: "+ organGestorEntity.getId() +"  "+ organGestorEntity.getCodi() + " - " + organGestorEntity.getNom());
 //		}
+=======
+>>>>>>> refs/heads/link_manual
 		
 		organsGestors.remove(organGestorEntitat);
 		organsGestors.add(0, organGestorEntitat);
