@@ -142,7 +142,7 @@ body {
 					<c:if test="${hiHaEntitats}">
 						<li class="dropdown">
 							<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
-	         				<span class="fa fa-institution"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
+						<span class="fa fa-institution"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
 							<c:if test="${hiHaMesEntitats}"></a></c:if>
 							<c:if test="${hiHaMesEntitats}">
 								<ul class="dropdown-menu">
@@ -190,20 +190,20 @@ body {
 						<li class="dropdown">
 							<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
 							<c:if test="${null != organGestorActual}">
-	         				<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-	         				</c:if>
-	         				<c:if test="${null == organGestorActual}">
-	         				<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-	         				</c:if>
+								<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+							</c:if>
+							<c:if test="${null == organGestorActual}">
+								<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+							</c:if>
 							<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
 							<c:if test="${hiHaMesOrgansGestors}">
 								<ul class="dropdown-menu">
-			         				<c:if test="${null != organGestorActual}">
-			         					<c:url var="urlCanviOrganGestor" value="/index">
-											<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
-										</c:url>
-<%-- 				         					<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
-			         				</c:if>
+								<c:if test="${null != organGestorActual}">
+									<c:url var="urlCanviOrganGestor" value="/index">
+										<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
+									</c:url>
+<%-- 									<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
+								</c:if>
 									<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
 										<c:if test="${og.id != organGestorActual.id}">
 											<c:url var="urlCanviOrganGestor" value="/index">
@@ -233,8 +233,7 @@ body {
 								</a>
 							</li>
 							<li>
-								<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/RIPEA_Manual_Usuari.pdf"
-								   rel="noopener noreferrer" target="_blank">
+								<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf" rel="noopener noreferrer" target="_blank">
 									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
 								</a>
 							</li>
