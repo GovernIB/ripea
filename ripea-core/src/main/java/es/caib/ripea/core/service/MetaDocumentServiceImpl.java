@@ -405,7 +405,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 		}
 		return resposta;
 	}
@@ -435,7 +435,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			resposta.setMetaExpedientId(metaDocument.getMetaExpedient().getId());
 		}
 		return resposta;
@@ -478,7 +478,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 										MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 		}
 		return resposta;
 	}

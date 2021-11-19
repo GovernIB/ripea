@@ -123,6 +123,7 @@ public interface ExpedientService {
 	 * @param esborrat
 	 *            Atribut id de l'expedient que es vol trobar.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return L'expedient.
 	 */
 	@PreAuthorize("hasRole('tothom')")
@@ -131,7 +132,9 @@ public interface ExpedientService {
 			Long metaExpedientId,
 			Long pareId,
 			String nom,
-			int esborrat, String rolActual);
+			int esborrat, 
+			String rolActual, 
+			Long organId);
 
 	/**
 	 * Consulta els expedients segons el filtre.

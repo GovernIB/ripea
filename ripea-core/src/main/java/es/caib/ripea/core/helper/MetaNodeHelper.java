@@ -173,13 +173,13 @@ public class MetaNodeHelper {
 	}
 
 	public void omplirPermisosPerMetaNode(
-			MetaNodeDto metaNode, String rolActual) {
+			MetaNodeDto metaNode, String rolActual, Long nodeId) {
 		
 		try {
 			metaNode.setUsuariActualRead(false);
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					metaNode.getId(),
-					null,
+					nodeId,
 					true,
 					false,
 					false,
@@ -194,7 +194,7 @@ public class MetaNodeHelper {
 			metaNode.setUsuariActualWrite(false);
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					metaNode.getId(),
-					null,
+					nodeId,
 					false,
 					true,
 					false,
@@ -209,7 +209,7 @@ public class MetaNodeHelper {
 			metaNode.setUsuariActualCreate(false);
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					metaNode.getId(),
-					null,
+					nodeId,
 					false,
 					false,
 					true,
@@ -224,7 +224,7 @@ public class MetaNodeHelper {
 			metaNode.setUsuariActualDelete(false);
 			entityComprovarHelper.comprovarPermisosMetaNode(
 					metaNode.getId(),
-					null,
+					nodeId,
 					false,
 					false,
 					false,

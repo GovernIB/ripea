@@ -179,6 +179,42 @@ public class PermisosHelper {
 			return new ArrayList<Serializable>();
 		}
 	}
+	
+	/**
+	 * Obté els identificadors de tots els objectes de la classe especificada sobre
+	 * els quals l'usuari actual té tots dos permisos
+	 * 
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permission1 per comporvar
+	 * @param permission2 per comporvar
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public List<Serializable> getObjectsIdsWithTwoPermissions(Class<?> clazz, Permission permission1, Permission permission2) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
+		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
+		if (userSid != null) {
+			sids.add(userSid);
+		}
+		List<String> rolesNames = new ArrayList<String>();
+		for (GrantedAuthority authority : auth.getAuthorities()) {
+			rolesNames.add(authority.getAuthority());
+		}
+		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+			if (aclSid != null) {
+				sids.add(aclSid);
+			}
+		}
+		if (!sids.isEmpty()) {
+			return aclObjectIdentityRepository.findObjectsWithPermissions(
+					clazz.getName(),
+					sids,
+					permission1.getMask(),
+					permission2.getMask());
+		} else {
+			return new ArrayList<Serializable>();
+		}
+	}
 
 	/**
 	 * Filtre un llistat d'identificadors d'objectes amb els que tenen uns
@@ -494,6 +530,8 @@ public class PermisosHelper {
 						permis.setAdministration(true);
 					if (ExtendedPermission.STATISTICS.equals(ace.getPermission()))
 						permis.setStatistics(true);
+					if (ExtendedPermission.COMU.equals(ace.getPermission()))
+						permis.setProcedimentsComuns(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -637,6 +675,8 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.ADMINISTRATION);
 		if (permis.isStatistics())
 			permissions.add(ExtendedPermission.STATISTICS);
+		if (permis.isProcedimentsComuns())
+			permissions.add(ExtendedPermission.COMU);
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
 

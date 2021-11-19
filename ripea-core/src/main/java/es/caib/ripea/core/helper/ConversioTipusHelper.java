@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -134,9 +135,11 @@ public class ConversioTipusHelper {
 						target.setWrite(source.isWrite());
 						target.setCreate(source.isCreate());
 						target.setDelete(source.isDelete());
+						target.setProcedimentsComuns(source.isProcedimentsComuns());
 						target.setAdministration(source.isAdministration());
 						target.setOrganGestorId(source.getOrganGestorId());
 						target.setOrganGestorNom(source.getOrganGestorNom());
+
 						return target;
 					}
 				});
@@ -509,6 +512,14 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});			
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<Serializable, Long>() {
+					@Override
+					public Long convert(Serializable source, Type<? extends Long> destinationType) {
+						Long target = (Long)source;
+						return target;
+					}
+				});	
 	}
 	
 

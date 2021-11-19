@@ -183,7 +183,8 @@ public class ExpedientHelper {
 				true,
 				false, 
 				false, 
-				rolActual);
+				rolActual, 
+				organGestorId);
 		
 		OrganGestorEntity organGestor = getOrganGestorForExpedient(
 				metaExpedient,

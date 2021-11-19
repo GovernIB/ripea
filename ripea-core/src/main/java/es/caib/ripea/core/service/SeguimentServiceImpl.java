@@ -199,7 +199,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false,
 					false,
 					false,
-					false, null);
+					false, null, null);
 		}
 		
 		
@@ -255,7 +255,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false,
 					false, 
 					false, 
-					null);
+					null, null);
 		}
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
@@ -296,7 +296,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false,
 					false, 
 					false,
-					null);
+					null, null);
 		}
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
@@ -353,7 +353,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false,
 					false, 
 					false,
-					null);
+					null, null);
 		}
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {

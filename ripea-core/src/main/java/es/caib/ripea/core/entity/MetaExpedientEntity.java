@@ -225,6 +225,14 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         }
     }
     
+	public boolean isComu() {
+		if (organGestor == null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+    
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

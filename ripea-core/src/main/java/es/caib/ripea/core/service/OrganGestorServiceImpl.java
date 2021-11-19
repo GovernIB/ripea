@@ -3,6 +3,7 @@ package es.caib.ripea.core.service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -476,15 +477,29 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						filtre != null ? filtre.trim() : "",
 						Arrays.asList(metaExpedient.getOrganGestor().getId()));
 			} else {
+				
 				// Cercam las parelles metaExpedient-organ amb permisos assignats 
 				List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
 				permisosHelper.filterGrantedAll(
 						metaExpedientOrgansGestors,
 						MetaExpedientOrganGestorEntity.class,
 						new Permission[] { permis });
-	
+				List<Long> organIds = new ArrayList<>();
 				if (!metaExpedientOrgansGestors.isEmpty()) {
-					List<Long> organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestors(metaExpedientOrgansGestors);
+					organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestors(metaExpedientOrgansGestors);
+				}
+				// Cercam els òrgans amb permisos per procediments comuns
+				if (metaExpedient.getOrganGestor() == null) {
+					List<Long> organProcedimentsComunsIds = conversioTipusHelper.convertirList(
+							permisosHelper.getObjectsIdsWithTwoPermissions(
+							OrganGestorEntity.class,
+							ExtendedPermission.COMU,
+							permis), 
+							Long.class);
+	
+					organIds.addAll(organProcedimentsComunsIds);
+					organIds = new ArrayList<>(new HashSet<>(organIds));
+				}
 					organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
 					
 					organsGestors = organGestorRepository.findByEntitatAndFiltreAndIds(
@@ -493,7 +508,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 							filtre != null ? filtre.trim() : "", 
 							organIds);
 					
-				}
 				
 				// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
 				if (organsGestors == null || organsGestors.isEmpty()) {

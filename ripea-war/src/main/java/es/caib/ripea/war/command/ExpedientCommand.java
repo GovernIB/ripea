@@ -28,7 +28,8 @@ import es.caib.ripea.war.validation.ExpedientODocumentNom;
 		campMetaExpedientId = "metaNodeId",
 		campNom = "nom",
 		campEntitatId = "entitatId",
-		campPareId = "pareId")
+		campPareId = "pareId",
+		campOrganGestorId = "organGestorId")
 @ExpedientODocumentNom(groups = {Create.class, Update.class})
 public class ExpedientCommand extends ContenidorCommand {
 

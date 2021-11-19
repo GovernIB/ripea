@@ -462,7 +462,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long pareId,
 			String nom,
 			int esborrat, 
-			String rolActual) {
+			String rolActual, 
+			Long organId) {
 		logger.debug(
 				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + ")");
@@ -475,7 +476,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false, 
 				false, 
-				rolActual);
+				rolActual, 
+				organId);
 
 		ContingutEntity contingutPare = null;
 		if (pareId != null) {
@@ -617,7 +619,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false, 
 					false, 
-					rolActual);
+					rolActual, 
+					null);
 		}
 		List<ContingutEntity> expedientsEnt = contingutRepository.findByEntitatAndMetaExpedient(entitat, metaExpedient);
 		List<ExpedientDto> expedientsDto = new ArrayList<>();
@@ -671,7 +674,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					true,
 					false,
 					false, 
-					checkPerMassiuAdmin, null);
+					checkPerMassiuAdmin, 
+					null, 
+					null);
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -743,7 +748,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedient.getId(),
 				ExtendedPermission.WRITE,
 				"WRITE",
-				usuariCodi, null);
+				usuariCodi, 
+				null, 
+				null);
 		
 		expedientHelper.agafar(expedient, usuariCodi);
 	}
@@ -927,7 +934,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false,
 					false, 
-					checkPerMassiuAdmin, null);
+					checkPerMassiuAdmin, null, null);
 		}
 		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
@@ -997,7 +1004,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					true,
 					false,
 					false,
-					false, false, null);
+					false, false, null, null);
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 
@@ -1238,7 +1245,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					true,
 					false,
 					false,
-					false, false, null);
+					false, false, null, null);
 		}
 		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndIdInOrderByIdAsc(
 				entitat,
@@ -1447,7 +1454,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false,
 					false, 
-					rolActual);
+					rolActual, null);
 		}
 		logger.debug("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
@@ -1563,23 +1570,33 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			logger.debug("metaExpedientIdPermesos (" + (metaExpedientIdPermesos != null ? metaExpedientIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
 			
-			long t8 = System.currentTimeMillis();
 			// Cercam els òrgans amb permisos assignats directament
+			long t8 = System.currentTimeMillis();
 			List<Long> organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					OrganGestorEntity.class,
 					ExtendedPermission.READ));
-			
 			logger.debug("organIdPermesos (" + (organIdPermesos != null ? organIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
 			
-			long t9 = System.currentTimeMillis();
 			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+			long t9 = System.currentTimeMillis();
 			List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
 					ExtendedPermission.READ));
-
-			// Cercam metaExpedients amb una meta-dada del domini del filtre
-			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
 			logger.debug("metaExpedientOrganIdPermesos (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
+			
+			// Cercam els òrgans amb permisos per procediemnts comuns
+			long t91 = System.currentTimeMillis();
+			List<Long> organProcedimentsComunsIdsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
+					MetaExpedientOrganGestorEntity.class,
+					ExtendedPermission.COMU,
+					ExtendedPermission.READ));
+			List<Long> procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+			logger.debug("organProcedimentsComunsIdsPermesos (" + (organProcedimentsComunsIdsPermesos != null ? organProcedimentsComunsIdsPermesos.size() : "0") + " " + (procedimentsComunsIds != null ? procedimentsComunsIds.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
+			
+			// Cercam metaExpedients amb una meta-dada del domini del filtre
+			long t92 = System.currentTimeMillis();
+			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
+			logger.debug("metaExpedientIdDomini (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t92) + " ms");
 			
 			if (resultEnum == ResultEnumDto.PAGE) {
 				
@@ -1594,6 +1611,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 						organIdPermesos == null || organIdPermesos.isEmpty() ? null : organIdPermesos,
 						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty(),
 						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
+						organProcedimentsComunsIdsPermesos == null || organProcedimentsComunsIdsPermesos.isEmpty(),
+						organProcedimentsComunsIdsPermesos == null || organProcedimentsComunsIdsPermesos.isEmpty() ? null : organProcedimentsComunsIdsPermesos,	
+						procedimentsComunsIds,
 						metaExpedientFiltre == null,
 						metaExpedientFiltre,
 						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),

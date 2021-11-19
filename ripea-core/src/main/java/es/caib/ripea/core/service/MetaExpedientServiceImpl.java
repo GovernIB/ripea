@@ -282,7 +282,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			resposta.setNumComentaris(metaExpedient.getComentaris().size());
 		}
@@ -311,7 +311,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -328,7 +328,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null);
+			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 		}
 		return resposta;
@@ -684,7 +684,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					permission == PermissionEnumDto.WRITE,
 					permission == PermissionEnumDto.CREATE,
 					permission == PermissionEnumDto.DELETE,
-					false, null);
+					false, null, null);
 		} catch (PermissionDeniedException ex) {
 			permitted = false;
 		}
