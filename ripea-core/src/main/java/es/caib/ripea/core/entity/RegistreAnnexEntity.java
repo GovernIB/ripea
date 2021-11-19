@@ -45,11 +45,11 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @SuppressWarnings("serial")
 public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 
-	@Lob
+//	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "contingut")
 	private byte[] contingut;
-	@Lob
+//	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "firma_contingut")
 	private byte[] firmaContingut;

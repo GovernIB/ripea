@@ -65,7 +65,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private String plantillaNom;
 	@Column(name = "plantilla_content_type", length = 256)
 	private String plantillaContentType;
-	@Lob
+	//@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "plantilla_contingut")
 	private byte[] plantillaContingut;

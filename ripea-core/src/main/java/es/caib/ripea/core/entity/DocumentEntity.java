@@ -67,7 +67,7 @@ public class DocumentEntity extends NodeEntity {
 	private String fitxerNom;
 	@Column(name = "fitxer_content_type", length = 256)
 	private String fitxerContentType;
-	@Lob
+	//@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "fitxer_contingut")
 	private byte[] fitxerContingut;
