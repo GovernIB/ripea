@@ -263,7 +263,7 @@ public class MetaExpedientController extends BaseAdminController {
 		if (command.getId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), command.getId());
 
-			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && metaExpedientService.isRevisioActiva()) {
 				MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, command.getId());
 				MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedient.getRevisioEstat();
 				boolean isCanviEstatDissenyAPendentByOrganAdmin = !dto.getRevisioEstat().equals(estatAnterior) 

@@ -384,9 +384,9 @@ public class MetaExpedientHelper {
 	
 	public void canviarRevisioADisseny(Long entitatId, Long metaExpedientId) {
 
-		boolean revisioActiva = configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
+//		boolean revisioActiva = configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
 		
-		if (revisioActiva) {
+//		if (revisioActiva) {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
 
@@ -396,7 +396,7 @@ public class MetaExpedientHelper {
 						null);
 				// No s'envia email mentre el meta-expedient està en DISSENY;
 				// s'enviarà quan el IPA_ORGAN_ADMIN canviï el seu estat a PENDENT
-			}
+//			}
 		}
 	}
 	
