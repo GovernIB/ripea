@@ -512,14 +512,7 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});			
-		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<Serializable, Long>() {
-					@Override
-					public Long convert(Serializable source, Type<? extends Long> destinationType) {
-						Long target = (Long)source;
-						return target;
-					}
-				});	
+
 	}
 	
 

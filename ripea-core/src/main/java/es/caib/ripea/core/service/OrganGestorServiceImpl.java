@@ -490,12 +490,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				}
 				// Cercam els òrgans amb permisos per procediments comuns
 				if (metaExpedient.getOrganGestor() == null) {
-					List<Long> organProcedimentsComunsIds = conversioTipusHelper.convertirList(
+					List<Long> organProcedimentsComunsIds = toListLong(
 							permisosHelper.getObjectsIdsWithTwoPermissions(
 							OrganGestorEntity.class,
 							ExtendedPermission.COMU,
-							permis), 
-							Long.class);
+							permis));
 	
 					organIds.addAll(organProcedimentsComunsIds);
 					organIds = new ArrayList<>(new HashSet<>(organIds));

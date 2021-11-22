@@ -10,6 +10,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -43,6 +45,7 @@ import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
@@ -241,12 +244,29 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					request,
 					"redirect:../../metaDocument",
 					"metadocument.controller.esborrat.ok");
-		} catch (DataIntegrityViolationException ex) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../esborrat",
-					"metadocument.controller.esborrar.error.fk");
+		} catch (Exception ex) {
+			
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenDocumentsException.class)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metadocument.controller.esborrar.error.fk.documents");
+			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) || ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class)) {
+
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metadocument.controller.esborrar.error.fk",
+						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage()});
+			} else {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						ExceptionHelper.getRootCauseOrItself(ex).getMessage());
+			}
+
 		}
+		
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/enable", method = RequestMethod.GET)

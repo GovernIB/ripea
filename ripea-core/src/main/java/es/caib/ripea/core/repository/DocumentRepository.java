@@ -108,6 +108,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			MetaNodeEntity metaNode,
 			int esborrat);
 	
+	List<DocumentEntity> findByMetaNode(
+			MetaNodeEntity metaNode);
+	
 	@Query(	"select " +
 			"    c " +
 			"from " +

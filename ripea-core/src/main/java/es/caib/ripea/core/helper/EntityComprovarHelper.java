@@ -997,6 +997,19 @@ public class EntityComprovarHelper {
 						if (isGrantedProcedimentsComuns && metaExpedientEntity.isComu()) {
 							grantedOrganProcedimentsComuns = true;
 						}
+					} else {
+						// Cercam els òrgans amb permisos per procediemnts comuns
+						List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
+								OrganGestorEntity.class,
+								ExtendedPermission.COMU,
+								permission);
+						boolean accessAllComu = false;
+						if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
+							accessAllComu = true;
+						}
+						if (accessAllComu && metaExpedientEntity.isComu()) {
+							grantedOrganProcedimentsComuns = true;
+						}
 					}
 				}
 	

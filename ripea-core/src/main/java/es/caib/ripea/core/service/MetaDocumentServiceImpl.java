@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -370,6 +371,12 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				entitat,
 				metaExpedient,
 				id);
+		
+		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocument);
+		if (docs != null && !docs.isEmpty()) {
+			throw new ExisteixenDocumentsException();
+		}
+		
 		metaDocumentRepository.delete(metaDocument);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
@@ -436,7 +443,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
 			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
-			resposta.setMetaExpedientId(metaDocument.getMetaExpedient().getId());
+			resposta.setMetaExpedientId(metaDocument.getMetaExpedient() != null ? metaDocument.getMetaExpedient().getId() : null);
 		}
 		return resposta;
 	}	
