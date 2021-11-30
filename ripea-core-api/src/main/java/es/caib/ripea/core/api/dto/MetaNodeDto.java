@@ -42,6 +42,10 @@ public class MetaNodeDto implements Serializable {
 	public String getIdentificador() {
 		return nom + " (" + codi + ")";
 	}
+	
+    public String getCodiINom() {
+    	return codi + " - " + nom;
+    }
 
 	@Override
 	public String toString() {
