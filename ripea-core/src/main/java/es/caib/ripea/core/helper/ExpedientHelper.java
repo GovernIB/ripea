@@ -872,10 +872,23 @@ public class ExpedientHelper {
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			BigDecimal sum = new BigDecimal(1);
 			ExpedientEntity expedient = expedients.get(0);
-			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
+//			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
+//					expedient,
+//					0,
+//					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+			List<ContingutEntity> continguts = new ArrayList<ContingutEntity>();
+			List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
 					expedient,
 					0,
 					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+			
+			List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
+					expedient,
+					0,
+					new Sort("createdDate"));
+			
+			continguts.addAll(fillsOrder1);
+			continguts.addAll(fillsOrder2);
 			BigDecimal num = new BigDecimal(0);
 			for (ContingutEntity contingut : continguts) {
 				if (num.scale() > 0)
@@ -950,10 +963,23 @@ public class ExpedientHelper {
 			ZipOutputStream zos) throws Exception {
 		ContingutEntity carpetaActual = contingut;
 		
-		List<ContingutEntity> contingutsCarpetaActual = contingutRepository.findByPareAndEsborrat(
-				carpetaActual, 
-				0, 
+//		List<ContingutEntity> contingutsCarpetaActual = contingutRepository.findByPareAndEsborrat(
+//				carpetaActual, 
+//				0, 
+//				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		List<ContingutEntity> contingutsCarpetaActual = new ArrayList<ContingutEntity>();
+		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
+				carpetaActual,
+				0,
 				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		
+		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
+				carpetaActual,
+				0,
+				new Sort("createdDate"));
+		
+		contingutsCarpetaActual.addAll(fillsOrder1);
+		contingutsCarpetaActual.addAll(fillsOrder2);
 		
 		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
 			if (contingutCarpetaActual instanceof CarpetaEntity) {

@@ -70,5 +70,7 @@ public enum LogTipusEnumDto {
 	// Log una vegada s'ha validat la firma
 	DOC_FIRMAT, // 42
 
-	CANVI_ESTAT
+	CANVI_ESTAT,
+	
+	CANVI_RESPONSABLES
 }

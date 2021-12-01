@@ -362,7 +362,7 @@ function removeLoading() {
 			<spring:message code="contingut.document.form.info.plantilla.si"/>
 			<a href="#" class="btn btn-xs btn-default pull-right"><spring:message code="comu.boto.descarregar"/></a>
 		</div>
-		<c:set var="isPermesModificarCustodiatsVar" value="${documentEstat != 'CUSTODIAT' && documentEstat != 'FIRMAT' && documentEstat != 'FIRMA_PARCIAL'}"/>
+		<c:set var="isPermesModificarCustodiatsVar" value="${documentEstat != 'CUSTODIAT' && documentEstat != 'FIRMAT' && documentEstat != 'FIRMA_PARCIAL' && documentEstat != 'DEFINITIU'}"/>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>

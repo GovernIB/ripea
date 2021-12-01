@@ -29,6 +29,7 @@ import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.war.command.ExpedientTascaCommand;
+import es.caib.ripea.war.command.TascaReassignarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
@@ -209,7 +210,41 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			Model model) {
 		return expedientTascaService.findMetaExpedientTascaById(metaExpedientTascaId);
 	}
+
+	@RequestMapping(value = "/{expedientTascaId}/reassignar", method = RequestMethod.GET)
+	public String reassignar(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+
+		TascaReassignarCommand command = new TascaReassignarCommand();
+		model.addAttribute(command);
+		
+		return "expedientTascaReassignar";
+	}
 	
+	@RequestMapping(value = "/{expedientTascaId}/reassignar", method = RequestMethod.POST)
+	public String reassignarPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@Valid TascaReassignarCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			return "expedientTascaReassignar";
+		}
+	
+		expedientTascaService.updateResponsables(expedientTascaId, command.getUsuariCodi());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"expedient.tasca.controller.reassignat.ok");
+	}
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

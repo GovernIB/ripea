@@ -146,11 +146,6 @@ public class ExpedientEstatController extends BaseAdminController {
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		
-		
-		if (!command.isComu() && (command.getResponsableCodi() == null || command.getResponsableCodi().isEmpty())) {
-			bindingResult.rejectValue("responsableCodi", "NotNull");
-		}
-		
 		if (bindingResult.hasErrors()) {
 
 			return "expedientEstatForm";

@@ -47,9 +47,30 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			EntitatEntity entitat,
 			int esborrat);
 	
-	List<ContingutEntity> findByPareAndEsborrat(
-			ContingutEntity pare,
-			int esborrat,
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    ContingutEntity c " +
+			"where " +
+			"c.pare = :pare " +
+			"and c.esborrat = :esborrat " +
+			"and c.ordre != 0")
+	List<ContingutEntity> findByPareAndEsborratAndOrdenat(
+			@Param("pare") ContingutEntity pare,
+			@Param("esborrat") int esborrat,
+			Sort sort);
+	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    ContingutEntity c " +
+			"where " +
+			"c.pare = :pare " +
+			"and c.esborrat = :esborrat " +
+			"and c.ordre = 0")
+	List<ContingutEntity> findByPareAndEsborratSenseOrdre(
+			@Param("pare") ContingutEntity pare,
+			@Param("esborrat") int esborrat,
 			Sort sort);
 
 	List<ContingutEntity> findByPareAndNomOrderByEsborratAsc(

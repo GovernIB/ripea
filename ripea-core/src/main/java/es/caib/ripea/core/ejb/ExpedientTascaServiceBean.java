@@ -287,7 +287,13 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				tascaEstatEnumDto,
 				motiu);
 	}
-
+	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
+			String usuariCodi) {
+		return delegate.updateResponsables(
+				expedientTascaId,
+				usuariCodi);
+	}
+		
 	@Override
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId) {
 		return delegate.findAmbEntitat(entitatId);
