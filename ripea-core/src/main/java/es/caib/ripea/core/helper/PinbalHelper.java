@@ -170,8 +170,6 @@ public class PinbalHelper {
 		solicitud.setNombreSolicitante(entitat.getNom());
 		solicitud.setIdentificadorSolicitante(entitat.getCif());
 		solicitud.setCodigoProcedimiento(metaExpedient.getClassificacioSia());
-		solicitud.setIdentificadorSolicitante("S0711001H");
-		solicitud.setCodigoProcedimiento("CODSVDR_GBA_20121107");
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		solicitud.setFinalidad(finalitat);
 		switch (consentiment) {
