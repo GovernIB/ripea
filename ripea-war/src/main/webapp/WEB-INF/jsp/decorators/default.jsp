@@ -233,6 +233,11 @@ body {
 								</a>
 							</li>
 							<li>
+								<c:if test="${isRolActualSuperusuari or isRolActualAdministrador or isRolActualAdministradorOrgan}">
+									<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf" rel="noopener noreferrer" target="_blank">
+										<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualAdministradors"/>
+									</a>
+								</c:if>
 								<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf" rel="noopener noreferrer" target="_blank">
 									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
 								</a>
