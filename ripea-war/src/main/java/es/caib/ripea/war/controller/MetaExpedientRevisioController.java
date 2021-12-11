@@ -113,7 +113,9 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 				organActual == null ? null : organActual.getId(),
 						filtreDto,
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
-				DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual);
+				DatatablesHelper.getPaginacioDtoFromRequest(request),
+				rolActual,
+				true);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
 		return dtr;
 	}

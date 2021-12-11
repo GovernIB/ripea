@@ -137,6 +137,7 @@ public class ConversioTipusHelper {
 						target.setDelete(source.isDelete());
 						target.setProcedimentsComuns(source.isProcedimentsComuns());
 						target.setAdministration(source.isAdministration());
+						target.setAdministrationComuns(source.isAdministrationComuns());
 						target.setOrganGestorId(source.getOrganGestorId());
 						target.setOrganGestorNom(source.getOrganGestorNom());
 

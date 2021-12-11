@@ -41,6 +41,7 @@ public class PermisCommand {
 	private boolean statistics;
 	private boolean selectAll;
 	private boolean procedimentsComuns;
+	private boolean administrationComuns;
 
 	private Long organGestorId;
 
@@ -131,5 +132,7 @@ public class PermisCommand {
 		this.procedimentsComuns = procedimentsComuns;
 	}
 
-	
+	public void setAdministrationComuns(boolean administrationComuns) {
+		this.administrationComuns = administrationComuns;
+	}
 }

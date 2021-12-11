@@ -461,10 +461,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			MetaExpedientFiltreDto filtre,
 			boolean isRolActualAdministradorOrgan,
 			PaginacioParamsDto paginacioParams, 
-			String rolActual) {
+			String rolActual,
+			boolean hasPermisAdmComu) {
 		PaginaDto<MetaExpedientDto> resposta = null;
 		if (isRolActualAdministradorOrgan) {
-			resposta = findByOrganGestor(entitatId, organGestorId, filtre, paginacioParams);
+			resposta = findByOrganGestor(entitatId, organGestorId, hasPermisAdmComu, filtre, paginacioParams);
 		} else {
 			resposta = findByEntitat(entitatId, filtre, paginacioParams, rolActual);
 		}
@@ -554,14 +555,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private PaginaDto<MetaExpedientDto> findByOrganGestor(
 			Long entitatId,
 			Long organGestorId,
+			boolean hasPermisAdmComu,
 			MetaExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		List<Long> candidateMetaExpIds = metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(
-				entitatId, organGestorId);
+				entitatId,
+				organGestorId,
+				hasPermisAdmComu);
 		if (candidateMetaExpIds.size() == 0) {
 			return new PaginaDto<MetaExpedientDto>();
-
 		} else if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByOrganGestor(

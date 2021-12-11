@@ -248,6 +248,7 @@ public interface OrganGestorService {
 	public void delete(
 			Long entitatId,
 			Long id);
-	
 
+	@PreAuthorize("hasRole('tothom')")
+    boolean hasPermisAdminComu(Long organId);
 }

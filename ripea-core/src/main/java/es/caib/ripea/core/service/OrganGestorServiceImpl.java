@@ -452,6 +452,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
 		cacheHelper.evictEntitatsAccessiblesAllUsuaris();
 	}
+	@Transactional
+	@Override
+	public boolean hasPermisAdminComu(Long organId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		boolean hasPermisAdminComu = permisosHelper.isGrantedAll(
+				organId,
+				OrganGestorEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU },
+				auth);
+		return hasPermisAdminComu;
+	}
 
 	private List<OrganGestorEntity> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,

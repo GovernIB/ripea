@@ -429,7 +429,9 @@ public interface MetaExpedientService {
 			Long organGestorId,
 			MetaExpedientFiltreDto filtre,
 			boolean isRolActualAdministradorOrgan,
-			PaginacioParamsDto paginacioParams, String rolActual);
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			boolean hasPermisAdmComu);
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<GrupDto> findGrupsAmbMetaExpedient(

@@ -38,7 +38,17 @@
 			});
 			$("#selectAll").prop('checked', totsSeleccionats);
 		});
-		
+		$("#administration").change(() => {
+			if (!$("#administration").prop('checked')) {
+				$("#administrationComuns").prop("checked", false);
+			}
+		});
+
+		$("#administrationComuns").change(() => {
+			if ($("#administrationComuns").prop("checked")) {
+				$("#administration").prop("checked", true);
+			}
+		});
 	});
 </script>
 <style>
@@ -82,6 +92,9 @@
 			<rip:inputCheckbox name="procedimentsComuns" textKey="organgestor.permis.form.camp.procedimentsComuns"/>
 		</div>
 		<rip:inputCheckbox name="administration" textKey="organgestor.permis.form.camp.administracio"/>
+		<div style="margin-left: 45px;">
+			<rip:inputCheckbox name="administrationComuns" textKey="organgestor.permis.form.camp.administracio.comuns"/>
+		</div>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="organgestor/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

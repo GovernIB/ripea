@@ -189,4 +189,10 @@ public class OrganGestorServiceBean implements OrganGestorService {
 				 id);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean hasPermisAdminComu(Long organId) {
+		return delegate.hasPermisAdminComu(organId);
+	}
+
 }

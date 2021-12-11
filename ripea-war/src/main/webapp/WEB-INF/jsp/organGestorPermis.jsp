@@ -81,7 +81,13 @@
 					<script id="cellPermisAdministrationTemplate" type="text/x-jsrender">
  						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>				
+				</th>
+				<th data-col-name="administrationComuns" data-template="#cellPermisAdministrationComunsTemplate" width="5%">
+					<spring:message code="organgestor.permis.columna.administracio.comuns"/>
+					<script id="cellPermisAdministrationComunsTemplate" type="text/x-jsrender">
+ 						{{if administrationComuns}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
  						<div class="dropdown"> 

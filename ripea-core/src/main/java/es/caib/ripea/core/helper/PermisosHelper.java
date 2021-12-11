@@ -532,6 +532,8 @@ public class PermisosHelper {
 						permis.setStatistics(true);
 					if (ExtendedPermission.COMU.equals(ace.getPermission()))
 						permis.setProcedimentsComuns(true);
+					if (ExtendedPermission.ADM_COMU.equals(ace.getPermission()))
+						permis.setAdministrationComuns(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -677,6 +679,8 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.STATISTICS);
 		if (permis.isProcedimentsComuns())
 			permissions.add(ExtendedPermission.COMU);
+		if (permis.isAdministrationComuns())
+			permissions.add(ExtendedPermission.ADM_COMU);
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
 

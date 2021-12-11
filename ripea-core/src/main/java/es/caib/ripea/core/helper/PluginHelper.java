@@ -3903,6 +3903,12 @@ public class PluginHelper {
 					fitxer.getContingut(),
 					tipusFirma,
 					idioma);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_FIRMASERV,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
 			return firmaContingut;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
