@@ -318,8 +318,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 			p = new es.caib.notib.ws.notificacio.Persona();
 			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
 				p.setDir3Codi(persona.getNif());
-				p.setNif(persona.getNif());// valid NIF A04032363
-
+				
 			} else {
 				p.setNif(persona.getNif());
 			}
