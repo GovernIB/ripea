@@ -477,8 +477,24 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			Pageable pageable);
-	
-	
+
+	@Query(	"select " +
+			"    e.id " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.arxiuUuid = null " +
+			"and e.esborrat = 0 " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
+	public List<Long> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+
 	@Query(	"select " +
 			"    e " +
 			"from " +
@@ -489,7 +505,5 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	public List<ExpedientEntity> findByText(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("text") String text);
-	
-	
 
 }

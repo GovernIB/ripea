@@ -17,6 +17,8 @@ import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 import es.caib.ripea.core.api.service.SeguimentService;
 
+import java.util.List;
+
 /**
  * Implementació de SeguimentService com a EJB que empra una clase delegada
  * per accedir a la funcionalitat del servei.
@@ -89,6 +91,11 @@ public  class SeguimentServiceBean implements SeguimentService {
 	}
 
 	@Override
+	public List<Long> findArxiuPendentsExpedients(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
+		return delegate.findArxiuPendentsExpedients(entitatId, filtre);
+	}
+
+	@Override
 	@RolesAllowed("IPA_SUPER")
 	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsDocuments(
 			Long entitatId,
@@ -98,6 +105,11 @@ public  class SeguimentServiceBean implements SeguimentService {
 				entitatId,
 				filtre,
 				paginacioParams);
+	}
+
+	@Override
+	public List<Long> findArxiuPendentsDocuments(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
+		return delegate.findArxiuPendentsDocuments(entitatId, filtre);
 	}
 
 	@Override
@@ -112,7 +124,10 @@ public  class SeguimentServiceBean implements SeguimentService {
 				paginacioParams);
 	}
 
-
+	@Override
+	public List<Long> findArxiuPendentsInteressats(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
+		return delegate.findArxiuPendentsInteressats(entitatId, filtre);
+	}
 
 
 }

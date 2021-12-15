@@ -254,4 +254,6 @@ public interface ExpedientInteressatService {
 	@PreAuthorize("hasRole('tothom')")
 	public Exception guardarInteressatsArxiu(Long expId);
 
+	@PreAuthorize("hasRole('tothom')")
+    public Long findExpedientIdByInteressat(Long interessatId);
 }

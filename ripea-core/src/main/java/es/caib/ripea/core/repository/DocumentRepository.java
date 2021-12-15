@@ -337,7 +337,25 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			Pageable pageable);
 
-	
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.entitat = :entitat " +
+			"and d.arxiuUuid = null " +
+			"and d.esborrat = 0 " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) ")
+	public List<Long> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
 	
 

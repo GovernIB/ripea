@@ -158,4 +158,10 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 		return delegate.guardarInteressatsArxiu(expId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public Long findExpedientIdByInteressat(Long interessatId) {
+		return delegate.findExpedientIdByInteressat(interessatId);
+	}
+
 }
