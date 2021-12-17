@@ -2,6 +2,7 @@ package es.caib.ripea.core.firma;
 
 import java.util.Arrays;
 
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +25,10 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	private ContingutLogHelper contingutLogHelper;
 	
 	public ArxiuFirmaDto firmar(DocumentEntity document, FitxerDto fitxer, String motiu) {
-		byte[] firma = pluginHelper.firmaServidorFirmar(document, fitxer, TipusFirma.CADES, motiu, "ca");
+		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, TipusFirma.CADES, motiu, "ca");
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 		arxiuFirma.setFitxerNom("firma.cades");
-		arxiuFirma.setContingut(firma);
+		arxiuFirma.setContingut(firma.getContingut());
 		arxiuFirma.setTipusMime("application/octet-stream");
 		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
 		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);

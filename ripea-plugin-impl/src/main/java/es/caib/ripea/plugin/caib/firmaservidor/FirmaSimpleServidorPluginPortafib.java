@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import es.caib.ripea.plugin.firmaservidor.SignaturaConsulta;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
+import es.caib.ripea.plugin.firmaservidor.TipusMime;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleCommonInfo;
@@ -35,43 +38,36 @@ import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.firmaservidor.portafib.";
 
 	@Override
-	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
-		return signar(null, nom, motiu, tipusFirma.name(), contingut, null);
+	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
+
+		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).tipusFirma(tipusFirma).mime(TipusMime.PDF).contingut(contingut).build());
 	}
 
-	public byte[] signar(
-			String id,
-			String nom,
-			String motiu,
-			String tipusFirma,
-			byte[] contingut, 
-			String tipusDocumental) {
+	public SignaturaResposta signar(SignaturaConsulta consulta) {
 
-		ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(
-				getPropertyEndpoint(),
-				getPropertyUsername(),
-				getPropertyPassword());
-		
-		
-		FirmaSimpleFile fileToSign = new FirmaSimpleFile(nom, "application/pdf", contingut);
-
-		FirmaSimpleSignatureResult result;
 		try {
-			
+			ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(getPropertyEndpoint(), getPropertyUsername(), getPropertyPassword());
+			FirmaSimpleFile fileToSign = new FirmaSimpleFile(consulta.getNom(), consulta.getMime().getTipus(), consulta.getContingut());
+
 			// getAvailableProfiles(api);
 			String perfil = getPropertyPerfil();
-			result = internalSignDocument(
-					api,
-					perfil,
-					fileToSign,
-					motiu,
-					tipusDocumental);
-			
-			return result.getSignedFile().getData();
+			FirmaSimpleSignatureResult result = internalSignDocument(api, perfil, fileToSign, consulta.getMotiu(), consulta.getTipusDocumental());
+			SignaturaResposta resposta = new SignaturaResposta();
+			resposta.setContingut(result.getSignedFile().getData());
+			if (result.getSignedFile() != null) {
+				resposta.setNom(result.getSignedFile().getNom());
+				resposta.setMime(result.getSignedFile().getMime());
+			}
+			if (result.getSignedFileInfo() != null) {
+				resposta.setTipusFirma(result.getSignedFileInfo().getSignType());
+				resposta.setTipusFirmaEni(result.getSignedFileInfo().getEniTipoFirma());
+				resposta.setPerfilFirmaEni(result.getSignedFileInfo().getEniPerfilFirma());
+			}
+			return resposta;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}  
+	}
 
 	protected FirmaSimpleSignatureResult internalSignDocument(
 			ApiFirmaEnServidorSimple api,

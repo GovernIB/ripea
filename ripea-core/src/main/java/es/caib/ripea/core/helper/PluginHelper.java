@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.codec.binary.Base64;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -3885,7 +3886,7 @@ public class PluginHelper {
 		}
 	}
 
-	public byte[] firmaServidorFirmar(
+	public SignaturaResposta firmaServidorFirmar(
 			DocumentEntity document,
 			FitxerDto fitxer,
 			TipusFirma tipusFirma,
@@ -3897,7 +3898,7 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			byte[] firmaContingut = getFirmaServidorPlugin().firmar(
+			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(
 					document.getNom(),
 					motiu,
 					fitxer.getContingut(),
@@ -3909,7 +3910,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			return firmaContingut;
+			return resposta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
 			integracioHelper.addAccioError(
