@@ -159,9 +159,9 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 				signatureBlocks = simpleBlockToPortafirmesBlock(flux);
 			}
 			signatureRequest.setSignatureBlocks(signatureBlocks);
-			if (isEnviarUrlExpedientPermitida())
+			if (isEnviarUrlExpedientPermitida()) {
 				signatureRequest.setExpedientUrl(getUrlExpedient() + document.getExpedientUuid());
-			
+			}
 			peticioDeFirmaId = getFirmaAsyncSimpleApi().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
 			return new Long(peticioDeFirmaId).toString();
 		} catch (Exception ex) {
@@ -169,7 +169,8 @@ public class PortafirmesPluginPortafib implements PortafirmesPlugin {
 					"No s'ha pogut pujar el document al portafirmes (" +
 					"titol=" + document.getTitol() + ", " +
 					"descripcio=" + document.getDescripcio() + ", " +
-					"arxiuNom=" + document.getArxiuNom() + ")",
+					"arxiuNom=" + document.getArxiuNom() + ")" +
+					" error= " + ex.getMessage(),
 					ex);
 		}
 	}

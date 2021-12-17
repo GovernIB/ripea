@@ -665,7 +665,8 @@ public class DocumentServiceImpl implements DocumentService {
 					transaccioId);
 		} catch (Exception e) {
 			Throwable wsValidationException = ExceptionHelper.findThrowableInstance(e, WsValidationException.class, 6);
-			if (wsValidationException != null && (wsValidationException.getMessage().contains("Destinatari ID") || wsValidationException.getMessage().contains("ha trobat cap usuari"))) {
+			if (wsValidationException != null && (wsValidationException.getMessage().contains("Destinatari ID") || wsValidationException.getMessage().contains("ha trobat cap usuari"))
+				|| e instanceof SistemaExternException && e.getCause().getMessage().contains("error= No existeix cap usuari") ) {
 				throw new ResponsableNoValidPortafirmesException();
 			} else {
 				throw e;

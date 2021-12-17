@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
@@ -73,6 +74,7 @@ import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/document")
 public class DocumentController extends BaseUserOAdminOOrganController {
@@ -205,24 +207,12 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					"document.controller.portafirmes.upload.ok");	
 			
 		} catch (Exception ex) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)) {
-				MissatgesHelper.error(
-						request, 
-						getMessage(
-								request, 
-								"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes"));
-				setFluxPredefinit(
-						metaDocument, 
-						model, 
-						command);
-				emplenarModelPortafirmes(
-						request,
-						documentId,
-						model);
-				return "portafirmesForm";
-			} else {
-				throw ex;
-			}
+			String missatge = ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)
+					? getMessage(request,"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes") : ex.getCause().getMessage();
+			MissatgesHelper.error(request, missatge);
+			setFluxPredefinit(metaDocument, model, command);
+			emplenarModelPortafirmes(request, documentId, model);
+			return "portafirmesForm";
 		}
 	}
 
