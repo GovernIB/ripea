@@ -35,7 +35,10 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Pageable pageable);
-	
+
+
+	int deleteByCodi(String codi);
+
 	List<MetaExpedientTascaEntity> findByMetaExpedientAndActivaTrue(
 			MetaExpedientEntity metaExpedient);
 	
