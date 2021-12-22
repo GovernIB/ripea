@@ -1563,7 +1563,7 @@ public class PluginHelper {
 			List<ArxiuFirmaDto> firmes) {
 		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
 		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
-		String accioDescripcio = "Guardar document firmat amb CAdES com a document definitiu";
+		String accioDescripcio = "Guardar document firmat com a document definitiu";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
@@ -4961,9 +4961,33 @@ public class PluginHelper {
 		return accioParams;
 	}
 
+	public ArxiuFirmaTipusEnumDto toArxiuFirmaTipus(String tipusFirmaEni) {
 
+		switch (tipusFirmaEni) {
+			case "TF01":
+				return ArxiuFirmaTipusEnumDto.CSV;
+			case "TF02":
+				return ArxiuFirmaTipusEnumDto.XADES_DET;
+			case "TF03":
+				return ArxiuFirmaTipusEnumDto.XADES_ENV;
+			case "TF04":
+				return ArxiuFirmaTipusEnumDto.CADES_DET;
+			case "TF05":
+				return ArxiuFirmaTipusEnumDto.CADES_ATT;
+			case "TF06":
+				return ArxiuFirmaTipusEnumDto.PADES;
+			case "TF07":
+				return ArxiuFirmaTipusEnumDto.SMIME;
+			case "TF08":
+				return ArxiuFirmaTipusEnumDto.ODT;
+			case "TF09":
+				return ArxiuFirmaTipusEnumDto.OOXML;
+			default:
+				return null;
+		}
+	}
 
-	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {
+	public ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {
 		ArxiuFirmaPerfilEnumDto perfilFirma = null;
 		switch (perfil) {
 		case "AdES-BES":
@@ -4971,9 +4995,6 @@ public class PluginHelper {
 			break;
 		case "AdES-EPES":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.EPES;
-			break;
-		case "PAdES-LTV":
-			perfilFirma = ArxiuFirmaPerfilEnumDto.LTV;
 			break;
 		case "AdES-T":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.T;
@@ -4989,6 +5010,9 @@ public class PluginHelper {
 			break;
 		case "AdES-A":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.A;
+			break;
+		case "PAdES-LTV":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.LTV;
 			break;
 		case "PAdES-Basic":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.Basic;
