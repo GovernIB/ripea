@@ -202,7 +202,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
 		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(codi);
-		if (accions == null) {
+		if (accions == null || accions.isEmpty()) {
 			return new PaginaDto<>();
 		}
 		List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, params.getPaginaTamany());
