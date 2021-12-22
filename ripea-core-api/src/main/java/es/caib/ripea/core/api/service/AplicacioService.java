@@ -6,6 +6,8 @@ package es.caib.ripea.core.api.service;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
@@ -77,15 +79,23 @@ public interface AplicacioService {
 	/**
 	 * Obté la llista de les darreres accions realitzades a una integració.
 	 * 
-	 * @param codi
-	 *             Codi de la integració.
+	 * @param codi Codi de la integració.
 	 * @return La llista amb les darreres accions.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat la integració amb el codi especificat.
+	 * @throws NotFoundException Si no s'ha trobat la integració amb el codi especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_SUPER')")
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(
-			String codi) throws NotFoundException;
+	List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) throws NotFoundException;
+
+	/**
+	 * Obté la llista de les darreres accions realitzades a una integració.
+	 *
+	 * @param codi Codi de la integració.
+	 * @param params Parametres de la paginació.
+	 * @return La llista amb les darreres accions paginada.
+	 * @throws NotFoundException Si no s'ha trobat la integració amb el codi especificat.
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params);
 
 	/**
 	 * Emmagatzema una excepció llençada per un servei.

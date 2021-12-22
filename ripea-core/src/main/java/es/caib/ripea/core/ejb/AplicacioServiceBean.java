@@ -10,6 +10,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -72,6 +74,12 @@ public class AplicacioServiceBean implements AplicacioService {
 	@RolesAllowed({"IPA_SUPER"})
 	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
 		return delegate.integracioFindDarreresAccionsByCodi(codi);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_SUPER"})
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params) {
+		return delegate.integracioFindDarreresAccionsByCodiPaginat(codi, params);
 	}
 
 	@Override

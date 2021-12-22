@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.base.Strings;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,8 +40,6 @@ public class IntegracioController extends BaseUserController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-
-
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -107,21 +107,12 @@ public class IntegracioController extends BaseUserController {
 	}*/
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
-		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_FILTRE);
-		List<IntegracioAccioDto> accions = null;
-		if (codi != null) {
-			accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
-		} else {
-			accions = new ArrayList<IntegracioAccioDto>();
-		}
-		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
-				request,
-				accions);
-		return dtr;
+	public DatatablesResponse datatable(HttpServletRequest request) {
+
+		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
+		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		return Strings.isNullOrEmpty(codi) ? DatatablesHelper.getDatatableResponse(request, new ArrayList<IntegracioAccioDto>())
+				: DatatablesHelper.getDatatableResponse(request, aplicacioService.integracioFindDarreresAccionsByCodiPaginat(codi, params));
 	}
 
 	@RequestMapping(value = "/{codi}/{index}", method = RequestMethod.GET)
@@ -131,10 +122,8 @@ public class IntegracioController extends BaseUserController {
 			@PathVariable int index,
 			Model model) {
 		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
-		if (index < accions.size()) {
-			model.addAttribute(
-					"integracio",
-					accions.get(index));
+		if (accions != null && index < accions.size()) {
+			model.addAttribute("integracio", accions.get(index));
 		}
 		model.addAttribute("codiActual", codi);
 		return "integracioDetall";

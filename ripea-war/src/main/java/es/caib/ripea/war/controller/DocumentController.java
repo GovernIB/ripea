@@ -212,6 +212,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.error(request, missatge);
 			setFluxPredefinit(metaDocument, model, command);
 			emplenarModelPortafirmes(request, documentId, model);
+			log.error("Error al upload del document ", ex);
 			return "portafirmesForm";
 		}
 	}
