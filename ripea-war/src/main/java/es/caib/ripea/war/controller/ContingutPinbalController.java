@@ -81,35 +81,18 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			@Valid PinbalConsultaCommand command,
 			BindingResult bindingResult,
 			Model model) {
+
 		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					pareId,
-					model);
+			omplirModelFormulari(request, pareId, model);
 			return "contingutPinbalForm";
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			documentService.pinbalNovaConsulta(
-					entitatActual.getId(),
-					pareId,
-					command.getMetaDocumentId(),
-					PinbalConsultaCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../contingut/" + pareId,
-					"pinbal.controller.creat.ok");
-		} catch (PinbalException | EJBException ex) {
-			if (ex instanceof PinbalException || (ex instanceof EJBException && ex.getCause() != null && ex.getCause() instanceof PinbalException)) {
-				logger.error("Error en la consulta PINBAL", ex);
-				return getModalControllerReturnValueError(
-						request,
-						"redirect:../contingut/" + pareId,
-						"pinbal.controller.creat.error",
-						new String[] {ex.getMessage()});
-			} else {
-				throw ex;
-			}
+			documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.ok");
+		} catch (Exception ex) {
+			logger.error("Error en la consulta PINBAL", ex);
+			return getModalControllerReturnValueError(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.error", new String[] {ex.getMessage()});
 		}
 	}
 
