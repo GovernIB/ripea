@@ -25,7 +25,12 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	private ContingutLogHelper contingutLogHelper;
 	
 	public ArxiuFirmaDto firmar(DocumentEntity document, FitxerDto fitxer, String motiu) {
-		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, TipusFirma.CADES, motiu, "ca");
+
+		TipusFirma tipusFirma = TipusFirma.CADES;
+		if ("pdf".equals(fitxer.getExtensio())) {
+			tipusFirma = TipusFirma.PADES;
+		}
+		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, tipusFirma, motiu, "ca");
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 //		arxiuFirma.setFitxerNom("firma.cades");
 		arxiuFirma.setFitxerNom(firma.getNom());
