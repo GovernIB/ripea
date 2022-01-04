@@ -132,8 +132,9 @@ public class ExpedientServiceBean implements ExpedientService {
 		delegate.agafarUser(entitatId, id);
 	}
 
+
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public void agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
