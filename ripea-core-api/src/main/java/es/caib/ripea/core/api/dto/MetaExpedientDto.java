@@ -40,6 +40,10 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String revisioComentari;
 	private long numComentaris;
 	
+    public String getCodiSiaINom() {
+    	return classificacioSia + " - " + nom;
+    }
+	
 	public boolean isComu() {
 		if (organGestor == null) {
 			return true;
