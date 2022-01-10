@@ -35,7 +35,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
  */
 @Controller
 @RequestMapping("/organgestor/{organId}/permis")
-public class OrganGestorPermisController extends BaseUserController {
+public class OrganGestorPermisController extends BaseAdminController {
 
 	private final static String ORGANS_FILTRE = "organs_filtre";
 
@@ -63,7 +63,7 @@ public class OrganGestorPermisController extends BaseUserController {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 			permisos = organGestorService.findPermisos(entitat.getId(), organId);
 		} catch (SecurityException e) {
-			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
+			MissatgesHelper.error(request, e.getMessage());
 		}
 		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 	}

@@ -13,6 +13,8 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
@@ -41,6 +43,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -307,13 +310,22 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 					request,
 					"redirect:../../metaDada",
 					"metadada.controller.esborrat.ok");
-		} catch (DataIntegrityViolationException ex) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../esborrat",
-					"metadada.controller.esborrar.error.fk");
+		} catch (Exception e) {
+			logger.error("Error al esborrar metadada", e);
+			if (ExceptionHelper.getRootCauseOrItself(e) instanceof DataIntegrityViolationException) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../esborrat",
+						"metadada.controller.esborrar.error.fk");
+			} else {
+				return getAjaxControllerReturnValueErrorMessage(
+						request,
+						"redirect:../../metaDada",
+						ExceptionHelper.getRootCauseOrItself(e).getMessage());
+			}
 		}
 	}
+	
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/domini", method = RequestMethod.GET)
 	@ResponseBody
@@ -407,4 +419,6 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	    				NumberFormat.getInstance(new Locale("es","ES")),
 	    				true));
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientMetaDadaController.class);
 }
