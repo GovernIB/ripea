@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class PinbalHelper {
 
@@ -297,6 +299,7 @@ public class PinbalHelper {
 		accioParams.put("nombreSolicitante", solicitud.getNombreSolicitante());
 		accioParams.put("codigoProcedimiento", solicitud.getCodigoProcedimiento());
 		accioParams.put("codigoUnidadTramitadora", solicitud.getCodigoUnidadTramitadora());
+		accioParams.put("unidadTramitadora", solicitud.getUnidadTramitadora());
 		accioParams.put("idExpediente", solicitud.getIdExpediente());
 		if (solicitud.getFuncionario() != null) {
 			accioParams.put(
@@ -342,6 +345,8 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
+			if (log.isDebugEnabled())
+				clientSvddgpciws02.enableLogginFilter();
 		}
 		return clientSvddgpciws02;
 	}
@@ -355,6 +360,8 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
+			if (log.isDebugEnabled())
+				clientSvddgpviws02.enableLogginFilter();
 		}
 		return clientSvddgpviws02;
 	}
@@ -368,6 +375,8 @@ public class PinbalHelper {
 					getPinbalBasicAuth(),
 					null,
 					null);
+			if (log.isDebugEnabled())
+				clientSvdccaacpasws01.enableLogginFilter();
 		}
 		return clientSvdccaacpasws01;
 	}
