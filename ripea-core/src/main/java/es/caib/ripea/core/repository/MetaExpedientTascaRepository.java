@@ -39,9 +39,10 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 
 	int deleteByCodi(String codi);
 
-	List<MetaExpedientTascaEntity> findByMetaExpedientAndActivaTrue(
-			MetaExpedientEntity metaExpedient);
-	
+	int deleteMetaExpedientTascaByMetaExpedient(MetaExpedientEntity metaExpedient);
+
+	List<MetaExpedientTascaEntity> findByMetaExpedientAndActivaTrue(MetaExpedientEntity metaExpedient);
+
 	List<MetaExpedientTascaEntity> findByActivaTrue();
 	
 	

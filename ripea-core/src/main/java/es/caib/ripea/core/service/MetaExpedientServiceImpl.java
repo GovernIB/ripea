@@ -247,7 +247,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient;
 		metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
-		metaExpedientTascaRepository.deleteByCodi(metaExpedient.getCodi());
+		metaExpedientTascaRepository.deleteMetaExpedientTascaByMetaExpedient(metaExpedient);
 		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);
 		boolean allEsborats = true;
 		for (ExpedientEntity expedientEntity : expedients) {
