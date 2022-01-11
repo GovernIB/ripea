@@ -562,7 +562,7 @@ function canviVisibilitat(tipus) {
 		<!-- FILA: Notificació (idioma i autorització) -->
 		<div class="row">
 			<div class="col-xs-6"><rip:inputSelect name="preferenciaIdioma" textKey="interessat.form.camp.idioma" optionItems="${idiomaEnumOptions}" optionTextKeyAttribute="text" optionValueAttribute="value" /></div>
-			<div class="col-xs-6"><rip:inputCheckbox name="notificacioAutoritzat" textKey="interessat.form.camp.autoritzat" labelSize="10"/></div>
+<%-- 			<div class="col-xs-6"><rip:inputCheckbox name="notificacioAutoritzat" textKey="interessat.form.camp.autoritzat" labelSize="10"/></div> --%>
 		</div>
 		<c:if test="${!esRepresentant}">
 			<div class="row">
