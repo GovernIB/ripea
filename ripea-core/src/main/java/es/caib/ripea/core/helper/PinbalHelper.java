@@ -345,8 +345,7 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
-			if (log.isDebugEnabled())
-				clientSvddgpciws02.enableLogginFilter();
+			clientSvddgpciws02.enableLogginFilter();
 		}
 		return clientSvddgpciws02;
 	}
@@ -360,8 +359,7 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
-			if (log.isDebugEnabled())
-				clientSvddgpviws02.enableLogginFilter();
+			clientSvddgpviws02.enableLogginFilter();
 		}
 		return clientSvddgpviws02;
 	}
@@ -375,8 +373,7 @@ public class PinbalHelper {
 					getPinbalBasicAuth(),
 					null,
 					null);
-			if (log.isDebugEnabled())
-				clientSvdccaacpasws01.enableLogginFilter();
+			clientSvdccaacpasws01.enableLogginFilter();
 		}
 		return clientSvdccaacpasws01;
 	}
