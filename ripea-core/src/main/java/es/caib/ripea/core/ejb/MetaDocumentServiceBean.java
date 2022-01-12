@@ -42,14 +42,14 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual) {
+			byte[] plantillaContingut, String rolActual, Long organId) {
 		return delegate.create(
 				entitatId,
 				metaExpedientId,
 				metaDocument,
 				plantillaNom,
 				plantillaContentType,
-				plantillaContingut, rolActual);
+				plantillaContingut, rolActual, organId);
 	}
 	
 	@Override
@@ -74,14 +74,14 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual) {
+			byte[] plantillaContingut, String rolActual, Long organId) {
 		return delegate.update(
 				entitatId,
 				metaExpedientId,
 				metaDocument,
 				plantillaNom,
 				plantillaContentType,
-				plantillaContingut, rolActual);
+				plantillaContingut, rolActual, organId);
 	}
 	
 	@Override
@@ -115,11 +115,11 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
-			Long metaDocumentId, String rolActual) {
+			Long metaDocumentId, String rolActual, Long organId) {
 		return delegate.delete(
 				entitatId,
 				metaExpedientId,
-				metaDocumentId, rolActual);
+				metaDocumentId, rolActual, organId);
 	}
 
 	@Override

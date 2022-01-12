@@ -21,17 +21,17 @@ public interface ExpedientEstatService {
 	ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual);
+	ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual, Long organId);
 	
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual);
+	ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual, Long organId);
 
 	@PreAuthorize("hasRole('tothom')")
 	ExpedientEstatDto moveTo(Long entitatId, Long metaExpedientId, Long expedientEstatId, int posicio, String rolActual)
 			throws NotFoundException;
 	
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual) throws NotFoundException;
+	ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual, Long organId) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId);

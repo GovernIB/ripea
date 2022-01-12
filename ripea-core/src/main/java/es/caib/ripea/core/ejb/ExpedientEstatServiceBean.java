@@ -40,14 +40,14 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual) {
-		return delegate.createExpedientEstat(entitatId, estat, rolActual);
+	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual, Long organId) {
+		return delegate.createExpedientEstat(entitatId, estat, rolActual, organId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual) {
-		return delegate.updateExpedientEstat(entitatId, estat, rolActual);
+	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual, Long organId) {
+		return delegate.updateExpedientEstat(entitatId, estat, rolActual, organId);
 	}
 
 	@Override
@@ -62,8 +62,8 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual) throws NotFoundException {
-		return delegate.deleteExpedientEstat(entitatId, expedientEstatId, rolActual);
+	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual, Long organId) throws NotFoundException {
+		return delegate.deleteExpedientEstat(entitatId, expedientEstatId, rolActual, organId);
 	}
 
 	@Override

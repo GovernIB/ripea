@@ -364,7 +364,8 @@ public class EntityComprovarHelper {
 
 	public MetaExpedientEntity comprovarMetaExpedientAdmin(
 			EntitatEntity entitat,
-			Long id) {
+			Long id, 
+			Long organId) {
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(entitat, id);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitat.getId(),
@@ -375,12 +376,25 @@ public class EntityComprovarHelper {
 			return metaExpedient;
 		}
 		if (metaExpedient.getOrganGestor() == null) {
-			throw new ValidationException(id, MetaExpedientEntity.class, "El meta-expedient no té cap organ gestor asociat (id=" + id + ")");
+			if (organId == null) {
+				throw new ValidationException(id, MetaExpedientEntity.class, "El meta-expedient no té cap organ gestor asociat (id=" + id + ")");
+			} else {
+				boolean hasPermisAdminComu = permisosHelper.isGrantedAll(
+						organId,
+						OrganGestorEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU },
+						auth);
+				if (!hasPermisAdminComu) {
+					throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(),
+					        "ADM_COMU");
+				}
+			}
+		} else {
+			// si no es administrador d'entitat comprovar si es administrador del seu organ gestor
+			comprovarOrganGestorAdmin(
+					entitat.getId(),
+					metaExpedient.getOrganGestor().getId());
 		}
-		// si no es administrador d'entitat comprovar si es administrador del seu organ gestor
-		comprovarOrganGestorAdmin(
-				entitat.getId(),
-				metaExpedient.getOrganGestor().getId());
 		return metaExpedient;
 	}
 

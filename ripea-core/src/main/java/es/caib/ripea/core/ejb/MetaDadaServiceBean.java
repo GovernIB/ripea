@@ -38,11 +38,11 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada, String rolActual) {
+			MetaDadaDto metaDada, String rolActual, Long organId) {
 		return delegate.create(
 				entitatId,
 				metaNodeId,
-				metaDada, rolActual);
+				metaDada, rolActual, organId);
 	}
 
 	@Override
@@ -50,11 +50,11 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada, String rolActual) {
+			MetaDadaDto metaDada, String rolActual, Long organId) {
 		return delegate.update(
 				entitatId,
 				metaNodeId,
-				metaDada, rolActual);
+				metaDada, rolActual, organId);
 	}
 
 	@Override
@@ -63,12 +63,12 @@ public class MetaDadaServiceBean implements MetaDadaService {
 			Long entitatId,
 			Long metaNodeId,
 			Long id,
-			boolean activa, String rolActual) {
+			boolean activa, String rolActual, Long organId) {
 		return delegate.updateActiva(
 				entitatId,
 				metaNodeId,
 				id,
-				activa, rolActual);
+				activa, rolActual, organId);
 	}
 
 	@Override
@@ -111,11 +111,11 @@ public class MetaDadaServiceBean implements MetaDadaService {
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
-			Long id, String rolActual) {
+			Long id, String rolActual, Long organId) {
 		return delegate.delete(
 				entitatId,
 				metaNodeId,
-				id, rolActual);
+				id, rolActual, organId);
 	}
 
 	@Override

@@ -140,7 +140,7 @@ public class MetaDocumentController extends BaseAdminController {
 		try {
 			String rolActual = (String)request.getSession().getAttribute(
 					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId, rolActual);
+			metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId, rolActual, null);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
