@@ -377,7 +377,7 @@ public class MetaExpedientHelper {
 		
 		if (revisioActiva) {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
+			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, null);
 
 			if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
 				metaExpedientEntity.updateRevisioEstat(
@@ -389,10 +389,10 @@ public class MetaExpedientHelper {
 		}
 	}
 	
-	public void canviarRevisioADisseny(Long entitatId, Long metaExpedientId) {
+	public void canviarRevisioADisseny(Long entitatId, Long metaExpedientId, Long organId) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, organId);
 
 		if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
 			metaExpedientEntity.updateRevisioEstat(

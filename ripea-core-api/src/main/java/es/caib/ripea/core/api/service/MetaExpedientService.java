@@ -37,6 +37,7 @@ public interface MetaExpedientService {
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a crear.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-expedient creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -44,7 +45,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto create(
 			Long entitatId,
-			MetaExpedientDto metaExpedient, String rolActual) throws NotFoundException;
+			MetaExpedientDto metaExpedient, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Actualitza la informació del meta-expedient que tengui el mateix
@@ -58,6 +59,7 @@ public interface MetaExpedientService {
 	 * @param isCanviEstatDissenyAPendentOrganAdmin
 	 * 			  Indica si la modificació del meta-expedient és un canvi d'estat 
 	 * 			  de disseny a pendent per part de l'admin d'òrgan.
+	 * @param organId TODO
 	 * @return El meta-expedient modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -66,7 +68,7 @@ public interface MetaExpedientService {
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual, 
-			boolean isCanviEstatDissenyAPendentOrganAdmin) throws NotFoundException;
+			boolean isCanviEstatDissenyAPendentOrganAdmin, Long organId) throws NotFoundException;
 	
 	/**
 	 * Marca el meta-expedient especificat com a actiu/inactiu .
@@ -95,6 +97,7 @@ public interface MetaExpedientService {
 	 *            Id de l'entitat.
 	 * @param id
 	 *            Atribut id del meta-expedient a esborrar.
+	 * @param organId TODO
 	 * @return El meta-expedient esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -103,7 +106,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id, Long organId) throws NotFoundException;
 
 	/**
 	 * Consulta un meta-expedient donat el seu id.
@@ -129,12 +132,13 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId Id de l'entitat.
 	 * @param id        Atribut id del meta-expedient.
+	 * @param organId TODO
 	 * @return El metaexpedient amb l'identificador indicat per paràmetre
 	 * 
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id);
+	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id, Long organId);
 	
 	/**
 	 * Consulta un meta-expedient donat el seu codi.

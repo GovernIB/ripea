@@ -137,7 +137,7 @@ public class BaseServiceTest {
 							metaExpedientData.setOrganGestor(organGestorService.findById(entitatId, organGestorId));
 							MetaExpedientDto metaExpedientCreat = metaExpedientService.create(
 									entitatId,
-									metaExpedientData, null);
+									metaExpedientData, null, null);
 							elementsCreats.add(metaExpedientCreat);
 							if (((MetaExpedientDto)element).getPermisos() != null) {
 								for (PermisDto permis: ((MetaExpedientDto)element).getPermisos()) {
@@ -214,7 +214,7 @@ public class BaseServiceTest {
 				} else if (element instanceof MetaExpedientDto) {
 					metaExpedientService.delete(
 							entitatId,
-							((MetaExpedientDto)element).getId());
+							((MetaExpedientDto)element).getId(), null);
 				} else if (element instanceof OrganGestorDto) {
 					autenticarUsuari("admin");
 					organGestorService.delete(

@@ -114,7 +114,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 		return conversioTipusHelper.convertir(
 				metaDadaRepository.save(entity),
@@ -171,7 +171,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 		return conversioTipusHelper.convertir(
 				entity,
@@ -208,7 +208,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 
 		return conversioTipusHelper.convertir(
@@ -245,7 +245,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 		return conversioTipusHelper.convertir(
 				metaDada,

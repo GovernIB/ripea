@@ -196,7 +196,7 @@ public class GrupServiceImpl implements GrupService {
 		metaExpedientEntity.addGrup(grupEntity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), null);
 		}
 
 	}
@@ -225,7 +225,7 @@ public class GrupServiceImpl implements GrupService {
 		metaExpedientEntity.removeGrup(grupEntity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), null);
 		}
 	}
 	

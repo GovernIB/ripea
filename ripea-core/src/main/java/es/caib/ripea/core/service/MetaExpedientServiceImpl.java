@@ -120,7 +120,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional
 	@Override
-	public MetaExpedientDto create(Long entitatId, MetaExpedientDto metaExpedient, String rolActual) {
+	public MetaExpedientDto create(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, Long organId) {
 		logger.debug(
 				"Creant un nou meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient +
 						")");
@@ -158,7 +158,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
 		}
@@ -168,17 +168,17 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional
 	@Override
-	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, boolean isCanviEstatDissenyAPendentByOrganAdmin) {
+	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, boolean isCanviEstatDissenyAPendentByOrganAdmin, Long organId) {
 		logger.debug(
 				"Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" +
 						metaExpedient + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedientEntity;
 		MetaExpedientEntity metaExpedientPare = null;
-		metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedient.getId());
+		metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedient.getId(), organId);
 
 		if (metaExpedient.getPareId() != null) {
-			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedient.getPareId());
+			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedient.getPareId(), null);
 		}
 
 		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
@@ -206,7 +206,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			if (isCanviEstatDissenyAPendentByOrganAdmin)
 				marcarPendentRevisio(entitatId,  metaExpedientEntity.getId());
 			else
-				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId());
+				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else if ("IPA_ADMIN".equals(rolActual)){
 			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 		}
@@ -231,22 +231,22 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Actualitzant propietat activa d'un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ", " + "actiu=" + actiu + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, null);
 		metaExpedient.updateActiu(actiu);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}
 
 	@Transactional
 	@Override
-	public MetaExpedientDto delete(Long entitatId, Long id) {
+	public MetaExpedientDto delete(Long entitatId, Long id, Long organId) {
 		logger.debug("Esborrant meta-expedient (id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient;
-		metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+		metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
 		metaExpedientTascaRepository.deleteMetaExpedientTascaByMetaExpedient(metaExpedient);
 		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);
 		boolean allEsborats = true;
@@ -305,10 +305,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id) {
+	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id, Long organId) {
 		logger.debug("Consulta del meta-expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
@@ -764,7 +764,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				estatFinalitzarTasca).build();
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
 	}
@@ -799,7 +799,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				estatFinalitzarTasca);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -818,7 +818,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entity.updateActiva(activa);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -833,7 +833,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedientTascaRepository.delete(entity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
 		}
 		return conversioTipusHelper.convertir(entity, MetaExpedientTascaDto.class);
 	}
@@ -1013,7 +1013,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 	}
 
@@ -1041,7 +1041,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 	}
 
@@ -1130,7 +1130,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Marcant com a pendent de revisió un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, null);
 
 		metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId());
 		
@@ -1144,9 +1144,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Marcant com en procés de disseny un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, null);
 
-		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}

@@ -131,7 +131,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					plantillaContingut);
 		}
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 		return conversioTipusHelper.convertir(
 				metaDocumentRepository.save(entity),
@@ -246,7 +246,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 		
 		return conversioTipusHelper.convertir(
@@ -338,7 +338,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				id);
 		metaDocument.updateActiu(actiu);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 		return conversioTipusHelper.convertir(
 				metaDocument,
@@ -379,7 +379,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		
 		metaDocumentRepository.delete(metaDocument);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId());
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
 		return conversioTipusHelper.convertir(
 				metaDocument,

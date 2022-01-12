@@ -44,8 +44,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto create(
 			Long entitatId,
-			MetaExpedientDto metaExpedient, String rolActual) {
-		return delegate.create(entitatId, metaExpedient, rolActual);
+			MetaExpedientDto metaExpedient, String rolActual, Long organId) {
+		return delegate.create(entitatId, metaExpedient, rolActual, organId);
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual,
-			boolean isCanviEstatDissenyAPendentByOrganAdmin) {
-		return delegate.update(entitatId, metaExpedient, rolActual, isCanviEstatDissenyAPendentByOrganAdmin);
+			boolean isCanviEstatDissenyAPendentByOrganAdmin, Long organId) {
+		return delegate.update(entitatId, metaExpedient, rolActual, isCanviEstatDissenyAPendentByOrganAdmin, organId);
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto delete(
 			Long entitatId,
-			Long metaExpedientId) {
-		return delegate.delete(entitatId, metaExpedientId);
+			Long metaExpedientId, Long organId) {
+		return delegate.delete(entitatId, metaExpedientId, organId);
 	}
 
 	@Override
@@ -264,10 +264,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"tothom"})
 	public MetaExpedientDto getAndCheckAdminPermission(
 			Long entitatId,
-			Long id) {
+			Long id, Long organId) {
 		return delegate.getAndCheckAdminPermission(
 				entitatId,
-				id);
+				id, null);
 	}
 
 	@Override

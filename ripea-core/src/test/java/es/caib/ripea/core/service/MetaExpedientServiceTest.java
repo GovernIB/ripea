@@ -160,7 +160,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						metaExpedientUpdate.setId(metaExpedientCreat.getId());
 						MetaExpedientDto modificat = metaExpedientService.update(
 								entitatCreada.getId(),
-								metaExpedientUpdate, null, false);
+								metaExpedientUpdate, null, false, null);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -189,7 +189,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						MetaExpedientDto metaExpedientCreat = (MetaExpedientDto)elementsCreats.get(2);
 						MetaExpedientDto esborrat = metaExpedientService.delete(
 								entitatCreada.getId(),
-								metaExpedientCreat.getId());
+								metaExpedientCreat.getId(), null);
 						comprovarMetaExpedientCoincideix(
 								metaExpedientCreate,
 								esborrat);
