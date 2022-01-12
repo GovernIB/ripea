@@ -178,7 +178,7 @@ public class GrupServiceImpl implements GrupService {
 	public void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual) {
+			Long id, String rolActual, Long organId) {
 		logger.debug("Relacionant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
@@ -196,7 +196,7 @@ public class GrupServiceImpl implements GrupService {
 		metaExpedientEntity.addGrup(grupEntity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
 
 	}
@@ -207,7 +207,7 @@ public class GrupServiceImpl implements GrupService {
 	public void desvincularAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual) throws NotFoundException {
+			Long id, String rolActual, Long organId) throws NotFoundException {
 		logger.debug("Desvinculant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
@@ -225,7 +225,7 @@ public class GrupServiceImpl implements GrupService {
 		metaExpedientEntity.removeGrup(grupEntity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
 	}
 	

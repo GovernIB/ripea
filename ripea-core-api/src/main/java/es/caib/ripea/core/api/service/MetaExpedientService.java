@@ -80,6 +80,7 @@ public interface MetaExpedientService {
 	 * @param actiu
 	 *            true si el meta-expedient es vol activar o false en cas contrari.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-expedient modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -88,7 +89,7 @@ public interface MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu, String rolActual) throws NotFoundException;
+			boolean actiu, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Esborra el meta-expedient amb el mateix id que l'especificat.
@@ -246,6 +247,7 @@ public interface MetaExpedientService {
 	 * @param metaExpedientTasca
 	 *            Informació de la tasca del meta-expedient a crear.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-expedient creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -254,7 +256,7 @@ public interface MetaExpedientService {
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
-			MetaExpedientTascaDto metaExpedientTasca, String rolActual) throws NotFoundException;
+			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Actualitza la informació de la tasca del meta-expedient que tengui el mateix
@@ -267,6 +269,7 @@ public interface MetaExpedientService {
 	 * @param metaExpedientTasca
 	 *            Informació de la tasca del meta-expedient a modificar.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return La tasca del meta-expedient modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -275,7 +278,7 @@ public interface MetaExpedientService {
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
-			MetaExpedientTascaDto metaExpedientTasca, String rolActual) throws NotFoundException;
+			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Marca la tasca del meta-expedient com a activa/inactiva .
@@ -289,6 +292,7 @@ public interface MetaExpedientService {
 	 * @param activa
 	 *            true si el meta-expedient es vol activar o false en cas contrari.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-expedient modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -298,7 +302,7 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long metaExpedientId,
 			Long id,
-			boolean activa, String rolActual) throws NotFoundException;
+			boolean activa, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Esborra la tasca del meta-expedient amb el mateix id que l'especificat.
@@ -310,6 +314,7 @@ public interface MetaExpedientService {
 	 * @param id
 	 *            Id de la tasca del meta-expedient a esborrar.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return La tasca del meta-expedient esborrada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -318,7 +323,7 @@ public interface MetaExpedientService {
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual) throws NotFoundException;
+			Long id, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Consulta una tasca del meta-expedient donat el seu id.
@@ -384,6 +389,7 @@ public interface MetaExpedientService {
 	 * @param permis
 	 *            El permís que es vol modificar.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -391,7 +397,7 @@ public interface MetaExpedientService {
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
-			PermisDto permis, String rolActual) throws NotFoundException;
+			PermisDto permis, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a un meta-expedient.
@@ -405,6 +411,7 @@ public interface MetaExpedientService {
 	 * @param organGestorId
 	 *            Si no és null indica que el permís a esborrar està associat a un òrgan gestor.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -413,7 +420,7 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long id,
 			Long permisId,
-			Long organGestorId, String rolActual) throws NotFoundException;
+			Long organGestorId, String rolActual, Long organId) throws NotFoundException;
 
 	 /**
 	  * Consulta els meta-expedients d'una entitat que tenen algún organ gestor asociat de forma paginada.
@@ -504,6 +511,7 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param organId TODO
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a marcar com a pendent.
 	 * @return El meta-expedient modificat.
@@ -513,7 +521,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto marcarPendentRevisio(
 			Long entitatId, 
-			Long id);
+			Long id, Long organId);
 
 	/**
 	 * Marcar com en procés de disseny el meta-expedient que tengui el mateix

@@ -178,7 +178,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Override
 	public ExpedientEstatDto createExpedientEstat(
 			Long entitatId,
-			ExpedientEstatDto estat, String rolActual) {
+			ExpedientEstatDto estat, String rolActual, Long organId) {
 		logger.debug("Creant un nou estat d'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"estat=" + estat + ")");
@@ -207,7 +207,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstatRepository.save(expedientEstat),
@@ -218,7 +218,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Override
 	public ExpedientEstatDto updateExpedientEstat(
 			Long entitatId,
-			ExpedientEstatDto estat, String rolActual) {
+			ExpedientEstatDto estat, String rolActual, Long organId) {
 		logger.debug("Actualitzant estat d'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"estat=" + estat + ")");
@@ -245,7 +245,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
 		return conversioTipusHelper.convertir(
 				expedientEstat,
@@ -323,7 +323,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	public ExpedientEstatDto deleteExpedientEstat(
 			Long entitatId,
 			Long expedientEstatId, 
-			String rolActual) throws NotFoundException {
+			String rolActual, Long organId) throws NotFoundException {
 		logger.debug("Esborrant esta del expedient ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientEstatId=" + expedientEstatId + ")");
@@ -335,7 +335,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		expedientEstatRepository.delete(entity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, entity.getMetaExpedient().getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, entity.getMetaExpedient().getId(), organId);
 		}
 		return conversioTipusHelper.convertir(
 				entity,

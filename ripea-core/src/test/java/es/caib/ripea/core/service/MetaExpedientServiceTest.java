@@ -221,14 +221,14 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						MetaExpedientDto desactivat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
-								false, "tothom");
+								false, "tothom", null);
 						assertEquals(
 								false,
 								desactivat.isActiu());
 						MetaExpedientDto activat = metaExpedientService.updateActiu(
 								entitatCreada.getId(),
 								metaExpedientCreat.getId(),
-								true, "tothom");
+								true, "tothom", null);
 						assertEquals(
 								true,
 								activat.isActiu());

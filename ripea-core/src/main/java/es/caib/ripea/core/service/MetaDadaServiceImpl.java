@@ -69,7 +69,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada, String rolActual) {
+			MetaDadaDto metaDada, String rolActual, Long organId) {
 		logger.debug("Creant una nova meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -114,7 +114,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		return conversioTipusHelper.convertir(
 				metaDadaRepository.save(entity),
@@ -126,7 +126,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada, String rolActual) {
+			MetaDadaDto metaDada, String rolActual, Long organId) {
 		logger.debug("Actualitzant meta-dada existent (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -171,7 +171,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		return conversioTipusHelper.convertir(
 				entity,
@@ -183,7 +183,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
-			Long id, String rolActual) {
+			Long id, String rolActual, Long organId) {
 		logger.debug("Esborrant meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -208,7 +208,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 
 		return conversioTipusHelper.convertir(
@@ -222,7 +222,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			Long entitatId,
 			Long metaNodeId,
 			Long id,
-			boolean activa, String rolActual) {
+			boolean activa, String rolActual, Long organId) {
 		logger.debug("Actualitzant propietat activa de la meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
@@ -245,7 +245,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			} else if (metaNode instanceof MetaDocumentEntity) {
 				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		return conversioTipusHelper.convertir(
 				metaDada,

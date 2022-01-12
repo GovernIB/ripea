@@ -21,14 +21,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.PermisCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per al manteniment de permisos de meta-expedients.
@@ -151,6 +153,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -164,7 +168,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				entitatActual.getId(),
 				metaExpedientId,
 				PermisCommand.asDto(command), 
-				rolActual);
+				rolActual, organActual != null ? organActual.getId() : null);
 		request.setAttribute(REQUEST_PARAMETER_STATISTICS_EXPEDIENTS, null);
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -186,14 +190,14 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,
 				permisId,
 				organGestorId, 
-				rolActual);
+				rolActual, organActual != null ? organActual.getId() : null);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));

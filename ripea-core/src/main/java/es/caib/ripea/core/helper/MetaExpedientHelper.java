@@ -371,13 +371,13 @@ public class MetaExpedientHelper {
 		return metaExpedients;
 	}
 
-	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId) {
+	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId, Long organId) {
 
 		boolean revisioActiva = configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
 		
 		if (revisioActiva) {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, null);
+			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, organId);
 
 			if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
 				metaExpedientEntity.updateRevisioEstat(

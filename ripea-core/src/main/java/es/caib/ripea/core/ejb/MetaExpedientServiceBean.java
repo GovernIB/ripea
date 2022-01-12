@@ -62,8 +62,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
-			boolean actiu, String rolActual) {
-		return delegate.updateActiu(entitatId, id, actiu, rolActual);
+			boolean actiu, String rolActual, Long organId) {
+		return delegate.updateActiu(entitatId, id, actiu, rolActual, organId);
 	}
 
 	@Override
@@ -137,11 +137,11 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
-			MetaExpedientTascaDto metaExpedientTasca, String rolActual) throws NotFoundException {
+			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException {
 		return delegate.tascaCreate(
 				entitatId,
 				metaExpedientId,
-				metaExpedientTasca, rolActual);
+				metaExpedientTasca, rolActual, organId);
 	}
 
 	@Override
@@ -149,11 +149,11 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
-			MetaExpedientTascaDto metaExpedientTasca, String rolActual) throws NotFoundException {
+			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException {
 		return delegate.tascaUpdate(
 				entitatId,
 				metaExpedientId,
-				metaExpedientTasca, rolActual);
+				metaExpedientTasca, rolActual, organId);
 	}
 
 	@Override
@@ -162,12 +162,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long entitatId,
 			Long metaExpedientId,
 			Long id,
-			boolean activa, String rolActual) throws NotFoundException {
+			boolean activa, String rolActual, Long organId) throws NotFoundException {
 		return delegate.tascaUpdateActiu(
 				entitatId,
 				metaExpedientId,
 				id,
-				activa, rolActual);
+				activa, rolActual, organId);
 	}
 
 	@Override
@@ -175,11 +175,11 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual) throws NotFoundException {
+			Long id, String rolActual, Long organId) throws NotFoundException {
 		return delegate.tascaDelete(
 				entitatId,
 				metaExpedientId,
-				id, rolActual);
+				id, rolActual, organId);
 	}
 
 	@Override
@@ -221,21 +221,21 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
-			PermisDto permis, String rolActual) {
+			PermisDto permis, String rolActual, Long organId) {
 		delegate.permisUpdate(
 				entitatId,
 				id,
-				permis, rolActual);
+				permis, rolActual, organId);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public void permisDelete(Long entitatId, Long id, Long permisId, Long organGestorId, String rolActual) {
+	public void permisDelete(Long entitatId, Long id, Long permisId, Long organGestorId, String rolActual, Long organId) {
 		delegate.permisDelete(
 				entitatId,
 				id,
 				permisId,
-				organGestorId, rolActual);
+				organGestorId, rolActual, organId);
 	}
 
 	@Override
@@ -385,8 +385,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id) {
-		return delegate.marcarPendentRevisio(entitatId, id);
+	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id, Long organId) {
+		return delegate.marcarPendentRevisio(entitatId, id, organId);
 	}
 
 	@Override

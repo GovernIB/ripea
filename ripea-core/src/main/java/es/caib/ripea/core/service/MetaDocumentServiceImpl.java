@@ -86,7 +86,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual) {
+			byte[] plantillaContingut, String rolActual, Long organId) {
 		logger.debug("Creant un nou meta-document (" +
 				"entitatId=" + entitatId + ", " +
 				"metaExpedientId=" + metaExpedientId + ", " +
@@ -131,7 +131,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					plantillaContingut);
 		}
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
 		return conversioTipusHelper.convertir(
 				metaDocumentRepository.save(entity),
@@ -199,7 +199,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual) {
+			byte[] plantillaContingut, String rolActual, Long organId) {
 		logger.debug("Actualitzant meta-document existent (" +
 				"entitatId=" + entitatId + ", " +
 				"metaExpedientId=" + metaExpedientId + ", " +
@@ -246,7 +246,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
 		
 		return conversioTipusHelper.convertir(
@@ -350,7 +350,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual) {
+			Long id, String rolActual, Long organId) {
 		logger.debug("Esborrant meta-document (" +
 				"entitatId=" + entitatId + ", " +
 				"metaExpedientId=" + metaExpedientId + ", " +
@@ -379,7 +379,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		
 		metaDocumentRepository.delete(metaDocument);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
 		return conversioTipusHelper.convertir(
 				metaDocument,
