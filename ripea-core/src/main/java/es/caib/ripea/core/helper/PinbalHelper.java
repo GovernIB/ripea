@@ -53,10 +53,6 @@ public class PinbalHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
-	private ClientSvddgpciws02 clientSvddgpciws02;
-	private ClientSvddgpviws02 clientSvddgpviws02;
-	private ClientSvdccaacpasws01 clientSvdccaacpasws01;
-
 	public String novaPeticioSvddgpciws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -337,44 +333,38 @@ public class PinbalHelper {
 	}
 
 	private ClientSvddgpciws02 getClientSvddgpciws02() {
-		if (clientSvddgpciws02 == null) {
-			clientSvddgpciws02 = new ClientSvddgpciws02(
+		ClientSvddgpciws02 clientSvddgpciws02 = new ClientSvddgpciws02(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),
 				getPinbalBasicAuth(),
 				null,
 				null);
-			clientSvddgpciws02.enableLogginFilter();
-		}
+		clientSvddgpciws02.enableLogginFilter();
 		return clientSvddgpciws02;
 	}
 
 	private ClientSvddgpviws02 getClientSvddgpviws02() {
-		if (clientSvddgpviws02 == null) {
-			clientSvddgpviws02 = new ClientSvddgpviws02(
+		ClientSvddgpviws02 clientSvddgpviws02 = new ClientSvddgpviws02(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),
 				getPinbalBasicAuth(),
 				null,
 				null);
-			clientSvddgpviws02.enableLogginFilter();
-		}
+		clientSvddgpviws02.enableLogginFilter();
 		return clientSvddgpviws02;
 	}
 
 	private ClientSvdccaacpasws01 getClientSvdccaacpasws01() {
-		if (clientSvdccaacpasws01 == null) {
-			clientSvdccaacpasws01 = new ClientSvdccaacpasws01(
-					getPinbalBaseUrl(),
-					getPinbalUser(),
-					getPinbalPassword(),
-					getPinbalBasicAuth(),
-					null,
-					null);
-			clientSvdccaacpasws01.enableLogginFilter();
-		}
+		ClientSvdccaacpasws01 clientSvdccaacpasws01 = new ClientSvdccaacpasws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		clientSvdccaacpasws01.enableLogginFilter();
 		return clientSvdccaacpasws01;
 	}
 
