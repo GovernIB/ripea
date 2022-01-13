@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
 
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.io.FileUtils;
 import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
@@ -51,7 +52,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 	}
 
 	@Override
-	public byte[] firmar(
+	public SignaturaResposta firmar(
 			String nom,
 			String motiu,
 			byte[] contingut,
@@ -81,7 +82,9 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 			boolean userRequiresTimeStamp = false;
 			signFile(uuid, sourcePath, destPath, signType, signMode, motiu, idioma, userRequiresTimeStamp);
 			destFile = new File(destPath);
-			return FileUtils.readFileToByteArray(destFile);
+			SignaturaResposta resposta = new SignaturaResposta();
+			resposta.setContingut(FileUtils.readFileToByteArray(destFile));
+			return resposta;
 		} catch (Exception ex) {
 			throw new SistemaExternException(ex);
 		} finally {

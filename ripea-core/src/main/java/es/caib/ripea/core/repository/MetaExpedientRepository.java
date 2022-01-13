@@ -279,8 +279,5 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("ids") List<Long> ids, 
 			@Param("isAdmin") boolean isAdmin);
-	
-	
-	
 
 }

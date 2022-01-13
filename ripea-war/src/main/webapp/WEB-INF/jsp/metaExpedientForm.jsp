@@ -56,9 +56,8 @@
 			text-align: center;
 		}
 	</style>
-	<c:if test="${not isRolAdminOrgan}">
+	<c:if test="${hasPermisAdmComu}">
 		<script type="text/javascript">
-		var novesCarpetes = [];
 		$(document).ready(function() {
 			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
 			$( "#comu" ).change(function () {
@@ -74,7 +73,13 @@
 				selectOrganGestorContainer.hide();
 			}
 		});
-		
+		</script>
+	</c:if>
+
+	<c:if test="${not isRolAdminOrgan}">
+		<script type="text/javascript">
+		var novesCarpetes = [];
+
 		function addFolder() {
 			var arbre = $('#arbreCarpetes');
 			var selectedNode = arbre.jstree("get_selected");
@@ -264,9 +269,14 @@
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 				
 				<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true" readonly="${bloquejarCamps}"/>
-				<c:if test="${not isRolAdminOrgan}">		
-					<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu"/>				
-				</c:if>
+				<c:choose>
+					<c:when test="${hasPermisAdmComu}">
+						<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu"/>
+					</c:when>
+					<c:otherwise>
+						<form:hidden path="comu"/>
+					</c:otherwise>
+				</c:choose>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 

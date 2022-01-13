@@ -130,6 +130,9 @@ public interface ExpedientTascaService {
 	public ExpedientTascaDto canviarEstat(Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
 			String motiu);
+	
+	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
+			String usuariCodi);
 
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
 

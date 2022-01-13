@@ -149,7 +149,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
 			"and (d.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
-			"				where metaDocument.firmaPortafirmesActiva = 1" + 
+			"				where metaDocument.firmaPortafirmesActiva = true" + 
 			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" + 
 			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
 	public Page<DocumentEntity> findDocumentsPerFirmaMassiu(
@@ -235,7 +235,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
 			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
 			"				and docPortafirmes.estat = 'ENVIAT' " +
-			"				and docPortafirmes.error = 1) or d.gesDocAdjuntId!=null)")
+			"				and docPortafirmes.error = true) or d.gesDocAdjuntId!=null)")
 	public Page<DocumentEntity> findDocumentsPerCustodiarMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -337,7 +337,25 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			Pageable pageable);
 
-	
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.entitat = :entitat " +
+			"and d.arxiuUuid = null " +
+			"and d.esborrat = 0 " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) ")
+	public List<Long> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
 	
 

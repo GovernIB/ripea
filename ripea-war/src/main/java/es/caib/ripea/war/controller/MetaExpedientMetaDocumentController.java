@@ -29,6 +29,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
@@ -44,6 +45,7 @@ import es.caib.ripea.core.api.service.TipusDocumentalService;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -181,7 +183,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
@@ -195,7 +198,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes(), rolActual);
+					command.getPlantilla().getBytes(), rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -211,7 +214,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes(), rolActual);
+					command.getPlantilla().getBytes(), rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -231,11 +234,11 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
 			
-			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId, rolActual);
+			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId, rolActual, organActual != null ? organActual.getId() : null);
 
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));

@@ -40,8 +40,8 @@
 				textKey="expedient.estat.form.camp.responsable"
 				suggestValue="codi"
 				suggestText="nom"
-				required="${!expedientEstatCommand.comu}" 
-				disabled="${bloquejarCamps}"/>
+				disabled="${bloquejarCamps}"
+				placeholderKey="expedient.estat.form.camp.responsable"/>
 				
 			<div id="modal-botons">
 				<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

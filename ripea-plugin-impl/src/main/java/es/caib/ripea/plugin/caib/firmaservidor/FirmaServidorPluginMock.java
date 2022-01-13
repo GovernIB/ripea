@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.io.IOUtils;
 
 import es.caib.ripea.plugin.SistemaExternException;
@@ -20,7 +21,7 @@ import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 public class FirmaServidorPluginMock implements FirmaServidorPlugin {
 
 	@Override
-	public byte[] firmar(
+	public SignaturaResposta firmar(
 			String nom,
 			String motiu,
 			byte[] contingut,
@@ -34,15 +35,17 @@ public class FirmaServidorPluginMock implements FirmaServidorPlugin {
 		}
 		// Retorna una firma falsa
 		byte[] firmaContingut = null;
+		SignaturaResposta resposta = new SignaturaResposta();
 		try {
 			firmaContingut = IOUtils.toByteArray(
 					this.getClass().getResourceAsStream("/es/caib/ripea/plugin/firmaservidor/firma_document_mock.xml"));
+			resposta.setContingut(firmaContingut);
 		} catch (IOException e) {
 			String errMsg = "Error llegint el fitxer mock de firma XAdES: " + e.getMessage();
 			Logger.getLogger(FirmaServidorPluginMock.class.getName()).log(Level.SEVERE, errMsg, e);
 			e.printStackTrace();
 		}
-		return firmaContingut;
+		return resposta;
 	}
 
 }

@@ -187,6 +187,11 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		return comentari;
 	}
 	
+	
+	public void updateResponsables(List<UsuariEntity> responsables) {
+		this.responsables = responsables;
+	}
+	
 //	@PreUpdate
 //	public void clearResponsables() {
 //		if (estat.equals(TascaEstatEnumDto.FINALITZADA) || estat.equals(TascaEstatEnumDto.CANCELLADA) || estat.equals(TascaEstatEnumDto.REBUTJADA)) {

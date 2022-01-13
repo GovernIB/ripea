@@ -9,7 +9,7 @@ import es.caib.ripea.plugin.SistemaExternException;
  */
 public interface FirmaServidorPlugin {
 
-	public byte[] firmar(
+	SignaturaResposta firmar(
 			String nom,
 			String motiu,
 			byte[] contingut,

@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private PaginacioHelper paginacioHelper;
 
 
 	@Transactional
@@ -189,9 +193,23 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
-		logger.debug("Consultant les darreres accions per a la integració (" +
-				"codi=" + codi + ")");
+		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
 		return integracioHelper.findAccionsByIntegracioCodi(codi);
+	}
+
+	@Override
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params) {
+
+		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
+		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(codi);
+		if (accions == null || accions.isEmpty()) {
+			return new PaginaDto<>();
+		}
+
+		List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, params.getPaginaTamany());
+		PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(params.getPaginaNum()), null);
+		pagina.setContingut(pagines.get(params.getPaginaNum()));
+		return paginacioHelper.prepararPagina(pagina, pagines, accions);
 	}
 
 	@Override

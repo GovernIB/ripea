@@ -2,6 +2,7 @@ package es.caib.ripea.core.firma;
 
 import java.util.Arrays;
 
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,13 +25,22 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	private ContingutLogHelper contingutLogHelper;
 	
 	public ArxiuFirmaDto firmar(DocumentEntity document, FitxerDto fitxer, String motiu) {
-		byte[] firma = pluginHelper.firmaServidorFirmar(document, fitxer, TipusFirma.CADES, motiu, "ca");
+
+		TipusFirma tipusFirma = TipusFirma.CADES;
+		if ("pdf".equals(fitxer.getExtensio())) {
+			tipusFirma = TipusFirma.PADES;
+		}
+		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, tipusFirma, motiu, "ca");
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
-		arxiuFirma.setFitxerNom("firma.cades");
-		arxiuFirma.setContingut(firma);
-		arxiuFirma.setTipusMime("application/octet-stream");
-		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
-		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+//		arxiuFirma.setFitxerNom("firma.cades");
+		arxiuFirma.setFitxerNom(firma.getNom());
+		arxiuFirma.setContingut(firma.getContingut());
+		arxiuFirma.setTipusMime(firma.getMime());
+//		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+		arxiuFirma.setTipus(pluginHelper.toArxiuFirmaTipus(firma.getTipusFirmaEni()));
+//		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
+		arxiuFirma.setPerfil(perfil);
 		pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
 		logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 		return arxiuFirma;

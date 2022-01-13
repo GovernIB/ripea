@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.88</version>
+		<version>0.9.89</version>
 	</parent>
 	<artifactId>ripea-war</artifactId>
 	<packaging>war</packaging>
@@ -646,7 +646,7 @@
 		<repository>
 			<id>github-governib-maven-repos</id>
 			<name>GitHub GovernIB Maven Repository</name>
-			<url>http://governib.github.io/maven/maven/</url>
+			<url>https://governib.github.io/maven/maven/</url>
 		</repository>
 	</repositories>
 </project>

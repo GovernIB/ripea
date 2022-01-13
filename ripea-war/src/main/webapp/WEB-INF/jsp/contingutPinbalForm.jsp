@@ -25,9 +25,9 @@ metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei}";
 $(document).ready(function() {
 	$('#metaDocumentId').on('change', function() {
 		if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPASWS01") {
-			$('#bloc-datos-especificos').css('display', 'bloc');
+			$('#bloc-datos-especificos').show();
 		} else {
-			$('#bloc-datos-especificos').css('display', 'none');
+			$('#bloc-datos-especificos').hide();
 		}
 	});
 	$('#metaDocumentId').trigger('change');

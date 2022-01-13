@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.codec.binary.Base64;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -1562,7 +1563,7 @@ public class PluginHelper {
 			List<ArxiuFirmaDto> firmes) {
 		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
 		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
-		String accioDescripcio = "Guardar document firmat amb CAdES com a document definitiu";
+		String accioDescripcio = "Guardar document firmat com a document definitiu";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
@@ -3885,7 +3886,7 @@ public class PluginHelper {
 		}
 	}
 
-	public byte[] firmaServidorFirmar(
+	public SignaturaResposta firmaServidorFirmar(
 			DocumentEntity document,
 			FitxerDto fitxer,
 			TipusFirma tipusFirma,
@@ -3897,13 +3898,19 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			byte[] firmaContingut = getFirmaServidorPlugin().firmar(
+			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(
 					document.getNom(),
 					motiu,
 					fitxer.getContingut(),
 					tipusFirma,
 					idioma);
-			return firmaContingut;
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_FIRMASERV,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return resposta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -4954,9 +4961,33 @@ public class PluginHelper {
 		return accioParams;
 	}
 
+	public ArxiuFirmaTipusEnumDto toArxiuFirmaTipus(String tipusFirmaEni) {
 
+		switch (tipusFirmaEni) {
+			case "TF01":
+				return ArxiuFirmaTipusEnumDto.CSV;
+			case "TF02":
+				return ArxiuFirmaTipusEnumDto.XADES_DET;
+			case "TF03":
+				return ArxiuFirmaTipusEnumDto.XADES_ENV;
+			case "TF04":
+				return ArxiuFirmaTipusEnumDto.CADES_DET;
+			case "TF05":
+				return ArxiuFirmaTipusEnumDto.CADES_ATT;
+			case "TF06":
+				return ArxiuFirmaTipusEnumDto.PADES;
+			case "TF07":
+				return ArxiuFirmaTipusEnumDto.SMIME;
+			case "TF08":
+				return ArxiuFirmaTipusEnumDto.ODT;
+			case "TF09":
+				return ArxiuFirmaTipusEnumDto.OOXML;
+			default:
+				return null;
+		}
+	}
 
-	private ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {
+	public ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {
 		ArxiuFirmaPerfilEnumDto perfilFirma = null;
 		switch (perfil) {
 		case "AdES-BES":
@@ -4964,9 +4995,6 @@ public class PluginHelper {
 			break;
 		case "AdES-EPES":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.EPES;
-			break;
-		case "PAdES-LTV":
-			perfilFirma = ArxiuFirmaPerfilEnumDto.LTV;
 			break;
 		case "AdES-T":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.T;
@@ -4982,6 +5010,9 @@ public class PluginHelper {
 			break;
 		case "AdES-A":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.A;
+			break;
+		case "PAdES-LTV":
+			perfilFirma = ArxiuFirmaPerfilEnumDto.LTV;
 			break;
 		case "PAdES-Basic":
 			perfilFirma = ArxiuFirmaPerfilEnumDto.Basic;

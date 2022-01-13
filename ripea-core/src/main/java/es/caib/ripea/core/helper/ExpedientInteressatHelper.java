@@ -315,6 +315,7 @@ public class ExpedientInteressatHelper {
 			for (InteressatEntity interessat : expedient.getInteressats()) {
 				interessat.updateArxiuIntent(false);
 			}
+			exception = new RuntimeException("Expedient de aquest interessat no es guardat en arxiu");
 		}
 		return exception;
 	}

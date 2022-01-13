@@ -314,7 +314,7 @@ function findActiusPerLectura(organId) {
     		}
         }
 	});
-	var select2Options = {theme: 'bootstrap', width: '100%', minimumInputLength: 0, allowClear: true}
+	var select2Options = {theme: 'bootstrap', width: '100%', minimumInputLength: 0, allowClear: true, language: "${requestLocale}"}
 	selProcediments.select2(select2Options);
 }
 

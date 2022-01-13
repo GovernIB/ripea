@@ -49,6 +49,24 @@
 						{{if perDefecte}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="firmaPortafirmesActiva" data-template="#cellFirmaPortafirmesActivaTemplate">
+					<spring:message code="metadocument.list.columna.firmaPortafirmesActiva"/>
+					<script id="cellFirmaPortafirmesActivaTemplate" type="text/x-jsrender">
+						{{if firmaPortafirmesActiva}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="firmaPassarelaActiva" data-template="#cellFirmaPassarelaActivaTemplate">
+					<spring:message code="metadocument.list.columna.firmaPassarelaActiva"/>
+					<script id="cellFirmaPassarelaActivaTemplate" type="text/x-jsrender">
+						{{if firmaPassarelaActiva}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="pinbalActiu" data-template="#cellPinbalActiuTemplate">
+					<spring:message code="metadocument.list.columna.pinbalActiu"/>
+					<script id="cellPinbalActiuTemplate" type="text/x-jsrender">
+						{{if pinbalActiu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="metaDadesCount" data-template="#cellMetaDadesTemplate" data-orderable="false" width="10%">
 					<script id="cellMetaDadesTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/metaDocument/{{:id}}/metaDada"/>" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>

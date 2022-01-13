@@ -33,8 +33,8 @@
 				<td>${expedientTascaDto.metaExpedientTasca.descripcio}</td>
 			</tr>
 			<tr>
-				<td><strong><spring:message code="expedient.tasca.form.camp.responsableCodi"/></strong></td>
-				<td>${expedientTascaDto.responsable.codi}</td>
+				<td><strong><spring:message code="expedient.tasca.form.camp.responsableCodiActual"/></strong></td>
+				<td>${expedientTascaDto.responsableActual.codi}</td>
 			</tr>			
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.dataInici"/></strong></td>

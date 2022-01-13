@@ -594,6 +594,22 @@ public class EmailHelper {
 
 	}	
 	
+	public void enviarEmailReasignarResponsableTasca(
+			ExpedientTascaEntity expedientTascaEntity) {
+		logger.debug("Enviant correu electrònic per a reassignar responsable de tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		enviarEmailReasignarResponsableTasca(
+				expedientTascaEntity, 
+				getGestors(
+						true,
+						false,
+						expedientTascaEntity.getExpedient(),
+						expedientTascaEntity.getCreatedBy().getCodi(),
+						expedientTascaEntity.getResponsables()));
+
+	}	
+	
 	private String getEnllacExpedient(Long expedientId) {
 		String baseUrl = configHelper.getConfig("es.caib.ripea.base.url");
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
@@ -758,6 +774,60 @@ public class EmailHelper {
 
 	}
 	
+	private void enviarEmailReasignarResponsableTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			Set<DadesUsuari> responsables) {
+		logger.debug("Enviant correu electrònic per a reassignar responsable de tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		String from = getRemitent();
+		String subject = PREFIX_RIPEA + " Canvi de responsable de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
+		String text = 			
+					"S'ha modificat el responsable de la tasca a RIPEA:\n" +
+							"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
+							"\tResponsable:" + expedientTascaEntity.getResponsables().get(0).getNom() + " (" +
+							expedientTascaEntity.getResponsables().get(0).getCodi() + ")";
+		
+		List<String> destinatarisAgrupats = new ArrayList<String>();
+		List<String> destinatarisNoAgrupats = new ArrayList<String>();
+		
+		for (DadesUsuari responsable : responsables) {
+			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
+				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
+				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
+					destinatarisAgrupats.add(responsable.getEmail());
+				} else {
+					destinatarisNoAgrupats.add(responsable.getEmail());
+				}
+			}
+		}
+		
+		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
+			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(from);
+			missatge.setTo(to);
+			missatge.setSubject(subject);
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
+		
+		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
+			for (String dest : destinatarisAgrupats) {
+				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
+						from,
+						dest,
+						subject,
+						text,
+						EventTipusEnumDto.CANVI_RESPONSABLES_TASCA)
+						.build();
+				emailPendentEnviarRepository.save(enitity);
+			}
+		}
+
+	}
 
 	private boolean emplenarDestinatariAmbUsuari(
 			MailMessage mailMessage,

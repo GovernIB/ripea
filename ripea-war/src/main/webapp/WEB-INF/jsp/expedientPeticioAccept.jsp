@@ -204,7 +204,7 @@ $(document).ready(function(){
 
 		<rip:inputSelect name="metaExpedientId" textKey="expedientPeticio.form.acceptar.camp.metaExpedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true"
-			optionTextAttribute="nom" optionMinimumResultsForSearch="6"/>
+			optionTextAttribute="codiSiaINom" optionMinimumResultsForSearch="6"/>
 			
 		<div id="input-accio-incorporar" class="hidden">
 			<rip:inputSelect name="expedientId"

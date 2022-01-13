@@ -404,19 +404,32 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				}
 			});
 		}
-		
+				
 		var noResultsFunction = window[$(this).data('noresultsfunction')];
+
+		if (noResultsFunction != null) {
+			$(this).select2({
+			    placeholder: $(this).data('placeholder'),
+			    theme: "bootstrap",
+			    allowClear: $(this).data('placeholder') ? true : false,
+			    minimumResultsForSearch: $(this).data('minimumresults'),
+			    language: {
+					noResults: noResultsFunction
+				},
+			    width: '100%',
+			});
+		}
+		else {
+			$(this).select2({
+			    placeholder: $(this).data('placeholder'),
+			    theme: "bootstrap",
+			    allowClear: $(this).data('placeholder') ? true : false,
+			    minimumResultsForSearch: $(this).data('minimumresults'),
+			    language: $(this).data('idioma'),
+			    width: '100%',
+			});
+		}
 		
-		$(this).select2({
-		    placeholder: $(this).data('placeholder'),
-		    theme: "bootstrap",
-		    allowClear: $(this).data('placeholder') ? true : false,
-		    minimumResultsForSearch: $(this).data('minimumresults'),
-		    language: {
-		        noResults: noResultsFunction
-		    },
-		    width: '100%',
-		});
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();
 		});
@@ -535,6 +548,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
+		    language: $(this).data('idioma'),
 		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumInputLength: $(this).data('minimumInputLength'),
 		    ajax: {

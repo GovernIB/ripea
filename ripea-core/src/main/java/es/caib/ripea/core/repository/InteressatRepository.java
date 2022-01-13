@@ -220,6 +220,29 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			Pageable pageable);
+
+	@Query(	"select " +
+			"    i.id " +
+			"from " +
+			"    InteressatEntity i " +
+			"where " +
+			"    i.expedient.entitat = :entitat " +
+			"and i.arxiuPropagat = false " +
+			"and i.expedient.esborrat = 0 " +
+			"and (:esNullNom = true " +
+			"			or (lower(i.documentNum||' '||i.nom||' '||i.llinatge1||' '||i.llinatge2) like lower('%'||:nom||'%')" +
+			"				or lower(i.raoSocial) like lower('%'||:nom||'%')" +
+			"				or lower(i.organNom) like lower('%'||:nom||'%'))) " +
+			"and (:esNullExpedient = true or i.expedient = :expedient) " +
+			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) ")
+	public List<Long> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
 	
 }

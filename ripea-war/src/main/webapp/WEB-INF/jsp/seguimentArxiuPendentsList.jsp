@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
@@ -35,14 +36,106 @@
 </style>
 <script>
 $(document).ready(function() {
+	$('#arxiuPendentsExpedients').on('selectionchange.dataTable', function (e, accio, ids) {
+		$.get(
+				"<c:url value='/seguimentArxiuPendents/expedients/'/>" + accio,
+				{ids: ids},
+				function(data) {
+					$("#expSeleccioCount").html(data);
+				}
+		);
+	});
 	$('#arxiuPendentsExpedients').on('draw.dt', function (e, settings) {
 		$('.disabledMsg').tooltip();
+		$('#expSeleccioAll').on('click', function() {
+			$.get(
+					"<c:url value='/seguimentArxiuPendents/expedients/select'/>",
+					function(data) {
+						$("#expSeleccioCount").html(data);
+						$('#arxiuPendentsExpedients').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+		$('#expSeleccioNone').on('click', function() {
+			$.get(
+					"<c:url value='/seguimentArxiuPendents/expedients/deselect'/>",
+					function(data) {
+						$("#expSeleccioCount").html(data);
+						$('#arxiuPendentsExpedients').webutilDatatable('select-none');
+						$('#arxiuPendentsExpedients').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+	});
+
+	$('#arxiuPendentsDocuments').on('selectionchange.dataTable', function (e, accio, ids) {
+		$.get(
+				"<c:url value='/seguimentArxiuPendents/documents/'/>" + accio,
+				{ids: ids},
+				function(data) {
+					$("#docSeleccioCount").html(data);
+				}
+		);
 	});
 	$('#arxiuPendentsDocuments').on('draw.dt', function (e, settings) {
 		$('.disabledMsg').tooltip();
+		$('#docSeleccioAll').on('click', function() {
+			$.get(
+					"<c:url value='/seguimentArxiuPendents/documents/select'/>",
+					function(data) {
+						$("#docSeleccioCount").html(data);
+						$('#arxiuPendentsDocuments').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+		$('#docSeleccioNone').on('click', function() {
+			$.get(
+					"<c:url value='/seguimentArxiuPendents/documents/deselect'/>",
+					function(data) {
+						$("#docSeleccioCount").html(data);
+						$('#arxiuPendentsDocuments').webutilDatatable('select-none');
+						$('#arxiuPendentsDocuments').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+	});
+
+	$('#arxiuPendentsInteressats').on('selectionchange.dataTable', function (e, accio, ids) {
+		$.get(
+				"<c:url value='/seguimentArxiuPendents/interessats/'/>" + accio,
+				{ids: ids},
+				function(data) {
+					$("#intSeleccioCount").html(data);
+				}
+		);
 	});
 	$('#arxiuPendentsInteressats').on('draw.dt', function (e, settings) {
 		$('.disabledMsg').tooltip();
+		$('#intSeleccioAll').on('click', function() {
+			$.get(
+					"<c:url value='/seguimentArxiuPendents/interessats/select'/>",
+					function(data) {
+						$("#intSeleccioCount").html(data);
+						$('#arxiuPendentsInteressats').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+		$('#intSeleccioNone').on('click', function() {
+			$.get(
+					"<c:url value='/seguimentArxiuPendents/interessats/deselect'/>",
+					function(data) {
+						$("#intSeleccioCount").html(data);
+						$('#arxiuPendentsInteressats').webutilDatatable('select-none');
+						$('#arxiuPendentsInteressats').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
 	});		
 
 	if (/#expedients/.test(window.location.href)) {
@@ -96,16 +189,28 @@ $(document).ready(function() {
 					</div>
 				</div>
 			</form:form>
-		
+
+
+			<script id="expedientsBotonsTemplate" type="text/x-jsrender">
+				<div class="btn-group pull-right">
+					<a id="expSeleccioAll" title="<spring:message code="seguiment.list.expedients.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
+					<a id="expSeleccioNone" title="<spring:message code="seguiment.list.expedients.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
+					<a id="expReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/expedients/reintentar'/>" >
+						<span id="expSeleccioCount" class="badge">${fn:length(expSeleccio)}</span> <spring:message code="seguiment.list.expedients.boto.reintentar"/>
+					</a>
+				</div>
+			</script>
 			<table 
 				id="arxiuPendentsExpedients" 
 				data-toggle="datatable" 
 				data-url="<c:url value="/seguimentArxiuPendents/expedients"/>" 
 				data-search-enabled="false"
 				data-default-order="2"
-				data-default-dir="desc" 
+				data-default-dir="desc"
+				data-botons-template="#expedientsBotonsTemplate"
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
+				data-selection-enabled="true"
 				style="width:100%">
 				<thead> 
 					<tr>
@@ -153,16 +258,27 @@ $(document).ready(function() {
 					</div>
 				</div>
 			</form:form>
-		
+
+			<script id="documentsBotonsTemplate" type="text/x-jsrender">
+				<div class="btn-group pull-right">
+					<a id="docSeleccioAll" title="<spring:message code="seguiment.list.documents.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
+					<a id="docSeleccioNone" title="<spring:message code="seguiment.list.documents.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
+					<a id="docReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/documents/reintentar'/>" >
+						<span id="docSeleccioCount" class="badge">${fn:length(docSeleccio)}</span> <spring:message code="seguiment.list.documents.boto.reintentar"/>
+					</a>
+				</div>
+			</script>
 			<table 
 				id="arxiuPendentsDocuments" 
 				data-toggle="datatable" 
 				data-url="<c:url value="/seguimentArxiuPendents/documents"/>" 
 				data-search-enabled="false"
 				data-default-order="5"
-				data-default-dir="desc" 
+				data-default-dir="desc"
+				data-botons-template="#documentsBotonsTemplate"
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
+				data-selection-enabled="true"
 				style="width:100%">
 				<thead> 
 					<tr>
@@ -218,16 +334,27 @@ $(document).ready(function() {
 					</div>
 				</div>
 			</form:form>
-		
+
+			<script id="interessatsBotonsTemplate" type="text/x-jsrender">
+				<div class="btn-group pull-right">
+					<a id="intSeleccioAll" title="<spring:message code="seguiment.list.interessats.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
+					<a id="intSeleccioNone" title="<spring:message code="seguiment.list.interessats.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
+					<a id="intReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/interessats/reintentar'/>" >
+						<span id="intSeleccioCount" class="badge">${fn:length(intSeleccio)}</span> <spring:message code="seguiment.list.interessats.boto.reintentar"/>
+					</a>
+				</div>
+			</script>
 			<table 
 				id="arxiuPendentsInteressats" 
 				data-toggle="datatable" 
 				data-url="<c:url value="/seguimentArxiuPendents/interessats"/>" 
 				data-search-enabled="false"
 				data-default-order="5"
-				data-default-dir="desc" 
+				data-default-dir="desc"
+				data-botons-template="#interessatsBotonsTemplate"
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
+				data-selection-enabled="true"
 				style="width:100%">
 				<thead> 
 					<tr>

@@ -1,6 +1,7 @@
 package es.caib.ripea.core.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,14 +211,14 @@ public class SeguimentServiceImpl implements SeguimentService {
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,
 				true,
-				null,
+				"",
 				filtre.getNumero() == null || filtre.getNumero().isEmpty(),
-				filtre.getNumero(),
+				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
 				filtre.getExtracte() == null ||
 				filtre.getExtracte().isEmpty(),
 				filtre.getExtracte() != null ? filtre.getExtracte().trim() : "",
 				true,
-				null,
+				"",
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
@@ -274,6 +275,35 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		return paginacioHelper.toPaginaDto(exps, SeguimentArxiuPendentsDto.class);
 		
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> findArxiuPendentsExpedients(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre) {
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					true,
+					false,
+					false,
+					false,
+					false,
+					null, null);
+		}
+
+		return expedientRepository.findArxiuPendents(
+				entitat,
+				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+				metaExpedient == null,
+				metaExpedient);
 	}
 	
 	
@@ -332,7 +362,47 @@ public class SeguimentServiceImpl implements SeguimentService {
 		return paginacioHelper.toPaginaDto(docs, SeguimentArxiuPendentsDto.class);
 		
 	}
-	
+
+	@Override
+	public List<Long> findArxiuPendentsDocuments(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					null, null);
+		}
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitatId,
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+		}
+
+		return documentRepository.findArxiuPendents(
+				entitat,
+				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+				expedient == null,
+				expedient,
+				metaExpedient == null,
+				metaExpedient);
+	}
+
 
 	@Override
 	@Transactional(readOnly = true)
@@ -388,6 +458,46 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		return paginacioHelper.toPaginaDto(ints, SeguimentArxiuPendentsDto.class);
 		
+	}
+
+	@Override
+	public List<Long> findArxiuPendentsInteressats(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+					entitat,
+					filtre.getMetaExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					null, null);
+		}
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitatId,
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+		}
+
+		return interessatRepository.findArxiuPendents(
+				entitat,
+				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+				expedient == null,
+				expedient,
+				metaExpedient == null,
+				metaExpedient);
 	}
 
 

@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -21,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -476,10 +479,24 @@ public class ContingutHelper {
 				// Cerca els nodes fills
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				List<ContingutDto> contenidorDtos = new ArrayList<ContingutDto>();
-				List<ContingutEntity> fills = contingutRepository.findByPareAndEsborrat(
+//				List<ContingutEntity> fills = contingutRepository.findByPareAndEsborrat(
+//						contingut,
+//						0,
+//						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+				List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
+				List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
 						contingut,
 						0,
 						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+				
+				List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
+						contingut,
+						0,
+						new Sort("createdDate"));
+				
+				fills.addAll(fillsOrder1);
+				fills.addAll(fillsOrder2);
+				
 				if (filtrarFillsSegonsPermisRead) {
 					// Filtra els fills que no tenen permis de lectura
 					Iterator<ContingutEntity> it = fills.iterator();

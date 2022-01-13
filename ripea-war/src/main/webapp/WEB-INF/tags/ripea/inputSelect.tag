@@ -29,6 +29,8 @@
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="iconAddicional" required="false" rtexprvalue="true"%>
+
+<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -53,7 +55,8 @@
 					data-minimumresults="${minimumResultsForSearch}"
 					data-enum="${optionEnum}" data-enum-value="${campValue}"
 					data-noresultsfunction="${noResultsFunction}"
-					multiple="${multiple}">
+					multiple="${multiple}"
+					data-idioma="${idioma}">
 					<c:if test="${emptyOption == 'true'}">
 						<c:choose>
 							<c:when test="${not empty emptyOptionTextKey}">
@@ -115,7 +118,7 @@
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
 			<div class="input-group select2-bootstrap-append">
-				<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-netejar="${netejar}" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}" multiple="${multiple}">
+				<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-netejar="${netejar}" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}" multiple="${multiple}" data-idioma="${idioma}">
 					<c:if test="${emptyOption == 'true'}">
 						<c:choose>
 							<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>
@@ -165,7 +168,8 @@
 						data-minimumresults="${minimumResultsForSearch}" 
 						data-enum="${optionEnum}" 
 						data-enum-value="${campValue}"
-						multiple="${multiple}">
+						multiple="${multiple}"
+						data-idioma="${idioma}">
 			<c:if test="${emptyOption == 'true'}">
 				<c:choose>
 					<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>

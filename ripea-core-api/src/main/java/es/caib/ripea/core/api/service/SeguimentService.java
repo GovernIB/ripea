@@ -11,6 +11,8 @@ import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 
+import java.util.List;
+
 
 public interface SeguimentService {
 
@@ -46,10 +48,20 @@ public interface SeguimentService {
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
+	public List<Long> findArxiuPendentsExpedients(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsDocuments(
 			Long entitatId,
 			SeguimentArxiuPendentsFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public List<Long> findArxiuPendentsDocuments(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre);
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsInteressats(
@@ -57,7 +69,9 @@ public interface SeguimentService {
 			SeguimentArxiuPendentsFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
-
-	
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public List<Long> findArxiuPendentsInteressats(
+			Long entitatId,
+			SeguimentArxiuPendentsFiltreDto filtre);
 
 }

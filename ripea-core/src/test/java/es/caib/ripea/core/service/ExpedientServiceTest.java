@@ -412,7 +412,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						estatPerCrear.setMetaExpedientId(metaExpedientCreat.getId());
 						expedientEstatService.createExpedientEstat(
 								entitatCreada.getId(),
-								estatPerCrear, "tothom");
+								estatPerCrear, "tothom", null);
 						autenticarUsuari("user");
 						List<ExpedientEstatDto> estats1 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),

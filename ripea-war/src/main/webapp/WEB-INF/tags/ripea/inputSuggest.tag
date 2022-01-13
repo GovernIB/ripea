@@ -21,6 +21,7 @@
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
 
+<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="minimumInputLength"><c:choose><c:when test="${not empty minimumInputLength}">${minimumInputLength}</c:when><c:otherwise>${3}</c:otherwise></c:choose></c:set>
@@ -63,7 +64,8 @@
 							data-suggest-text="${suggestText}"
 							data-suggest-text-addicional="${suggestTextAddicional}" 
 							data-url-param-addicional="${urlParamAddicional}" 
-							multiple="${multiple}"/>
+							multiple="${multiple}"
+							data-idioma="${idioma}"/>
 							<a class="input-group-addon btn btn-default ${campPath}_btn" onclick="toggleCarrecs()"><i class="${icon}"></i></a>
 					</div>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
@@ -81,7 +83,8 @@
 							data-suggest-text="${suggestText}"
 							data-suggest-text-addicional="${suggestTextAddicional}" 
 							data-url-param-addicional="${urlParamAddicional}" 
-							multiple="${multiple}"/>
+							multiple="${multiple}"
+							data-idioma="${idioma}"/>
 						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				</c:otherwise>
 			</c:choose>
@@ -99,7 +102,8 @@
 			data-suggest-value="${suggestValue}"
 			data-suggest-text="${suggestText}"
 			data-suggest-text-addicional="${suggestTextAddicional}" 
-			data-url-param-addicional="${urlParamAddicional}"/>
+			data-url-param-addicional="${urlParamAddicional}"
+			data-idioma="${idioma}"/>
 	</c:otherwise>
 </c:choose>
 

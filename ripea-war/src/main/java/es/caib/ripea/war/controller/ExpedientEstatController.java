@@ -19,12 +19,14 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ExpedientEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -145,12 +147,7 @@ public class ExpedientEstatController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		
-		
-		if (!command.isComu() && (command.getResponsableCodi() == null || command.getResponsableCodi().isEmpty())) {
-			bindingResult.rejectValue("responsableCodi", "NotNull");
-		}
-		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		if (bindingResult.hasErrors()) {
 
 			return "expedientEstatForm";
@@ -159,7 +156,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			expedientEstatService.updateExpedientEstat(
 					entitatActual.getId(),
 					ExpedientEstatCommand.asDto(command), 
-					rolActual);
+					rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -172,7 +169,7 @@ public class ExpedientEstatController extends BaseAdminController {
 			expedientEstatService.createExpedientEstat(
 					entitatActual.getId(),
 					ExpedientEstatCommand.asDto(command), 
-					rolActual);
+					rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -217,12 +214,12 @@ public class ExpedientEstatController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		try {
 			expedientEstatService.deleteExpedientEstat(
 					entitatActual.getId(),
 					expedientEstatId, 
-					rolActual);
+					rolActual, organActual != null ? organActual.getId() : null);
 		}catch (Exception e) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class))
 				return getAjaxControllerReturnValueError(request, "redirect:expedientEstat", 

@@ -304,6 +304,34 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				ExpedientTascaDto.class);
 	}
 
+	@Transactional
+	@Override
+	public ExpedientTascaDto updateResponsables(Long expedientTascaId, String usuariCodi) {
+		logger.debug("Canviant responsable de la tasca " +
+				"expedientTascaId=" + expedientTascaId +", "+
+				"usuariCodi=" + usuariCodi +
+				")");
+
+		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
+		
+		UsuariEntity nouResponsable = usuariHelper.getUsuariByCodi(usuariCodi);
+		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
+		responsables.add(nouResponsable);
+		
+		expedientTascaEntity.updateResponsables(responsables);	
+		
+		emailHelper.enviarEmailReasignarResponsableTasca(expedientTascaEntity);
+		
+		for (UsuariEntity responsable: expedientTascaEntity.getResponsables()) {
+			cacheHelper.evictCountTasquesPendents(responsable.getCodi());	
+		}
+		
+		log(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES);
+		
+		return conversioTipusHelper.convertir(expedientTascaEntity,
+				ExpedientTascaDto.class);
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public MetaExpedientTascaDto findMetaExpedientTascaById(Long metaExpedientTascaId) {

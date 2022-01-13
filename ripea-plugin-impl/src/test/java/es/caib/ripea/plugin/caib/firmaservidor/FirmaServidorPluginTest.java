@@ -3,6 +3,7 @@ package es.caib.ripea.plugin.caib.firmaservidor;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,12 +34,7 @@ public class FirmaServidorPluginTest {
 		byte[] contingut = this.obtenirContingutPerFirmar();
 		FirmaServidorPlugin signaturaPlugin = new FirmaServidorPluginPortafib();
 		try {
-			byte[] signatura = signaturaPlugin.firmar(
-					nom,
-					motiu,
-					contingut,
-					TipusFirma.PADES,
-					"ca");
+			SignaturaResposta signatura = signaturaPlugin.firmar(nom, motiu, contingut, TipusFirma.PADES, "ca");
 			assertNotNull("La firma retornada no pot ser nul·la", signatura);
 		} catch (Exception ex) {
 			System.err.println("Excepció obtinguda signant: " + ex.getMessage());
@@ -54,8 +50,9 @@ public class FirmaServidorPluginTest {
 		TipusFirma tipusFirma = TipusFirma.CADES;
 		byte[] contingut = new byte[0];
 		FirmaServidorPlugin signaturaPlugin = new FirmaServidorPluginMock();
-		byte[] signatura = signaturaPlugin.firmar(nom, motiu, contingut, tipusFirma, "ca");
+		SignaturaResposta signatura = signaturaPlugin.firmar(nom, motiu, contingut, tipusFirma, "ca");
 		assertNotNull("La firma retornada no pot ser nul·la", signatura);
+		assertNotNull("El contingut de la firma retornada no pot ser nul", signatura.getContingut());
 	}
 
 	@Test

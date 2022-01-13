@@ -36,7 +36,6 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
@@ -607,4 +606,16 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				InteressatDto.class);
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public Long findExpedientIdByInteressat(Long interessatId) {
+		logger.debug("Consulta de expedient Id per interessat (interessatId=" + interessatId + ")");
+		InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
+				null,
+				interessatId);
+
+		if (interessat != null && interessat.getExpedient() != null)
+			return interessat.getExpedient().getId();
+		return null;
+	}
 }

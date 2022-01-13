@@ -22,7 +22,7 @@ public class MetaNodeDto implements Serializable {
 
 	protected Long id;
 	private String codi;
-	private String nom;
+	protected String nom;
 	private String descripcio;
 	private boolean actiu;
 
@@ -42,6 +42,7 @@ public class MetaNodeDto implements Serializable {
 	public String getIdentificador() {
 		return nom + " (" + codi + ")";
 	}
+	
 
 	@Override
 	public String toString() {

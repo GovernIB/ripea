@@ -99,7 +99,7 @@ public class OrganGestorController extends BaseUserOAdminController {
         } catch (SecurityException e) {
         	logger.error("Error al obtenir el llistat de permisos", e);
             MissatgesHelper.error(request,
-                    getMessage(request, "notificacio.controller.entitat.cap.assignada"));
+                    getMessage(request, e.getMessage()));
         }
         return DatatablesHelper.getDatatableResponse(request, organs, "codi");
     }

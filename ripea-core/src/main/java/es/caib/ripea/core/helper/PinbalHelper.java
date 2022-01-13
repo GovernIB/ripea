@@ -165,9 +165,10 @@ public class PinbalHelper {
 			PinbalConsentimentEnumDto consentiment) {
 		EntitatEntity entitat = metaDocument.getEntitat();
 		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
+		String codiSia = getPinbalDefaultSia();
 		solicitud.setNombreSolicitante(entitat.getNom());
 		solicitud.setIdentificadorSolicitante(entitat.getCif());
-		solicitud.setCodigoProcedimiento(metaExpedient.getClassificacioSia());
+		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacioSia());
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		solicitud.setFinalidad(finalitat);
 		switch (consentiment) {
@@ -340,7 +341,8 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
-		clientSvddgpciws02.enableLogginFilter();
+		if (log.isDebugEnabled())
+			clientSvddgpciws02.enableLogginFilter();
 		return clientSvddgpciws02;
 	}
 
@@ -352,7 +354,8 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
-		clientSvddgpviws02.enableLogginFilter();
+		if (log.isDebugEnabled())
+			clientSvddgpviws02.enableLogginFilter();
 		return clientSvddgpviws02;
 	}
 
@@ -364,7 +367,8 @@ public class PinbalHelper {
 				getPinbalBasicAuth(),
 				null,
 				null);
-		clientSvdccaacpasws01.enableLogginFilter();
+		if (log.isDebugEnabled())
+			clientSvdccaacpasws01.enableLogginFilter();
 		return clientSvdccaacpasws01;
 	}
 
@@ -379,6 +383,9 @@ public class PinbalHelper {
 	}
 	private boolean getPinbalBasicAuth() {
 		return configHelper.getAsBoolean("es.caib.ripea.pinbal.basic.auth");
+	}
+	private String getPinbalDefaultSia() {
+		return configHelper.getConfig("es.caib.ripea.pinbal.codi.sia.peticions");
 	}
 
 }

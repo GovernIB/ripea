@@ -102,12 +102,13 @@ public interface GrupService {
 	 * @param metaExpedientId
 	 * @param id
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual);
+			Long id, String rolActual, Long organId);
 	
 	
 	/**
@@ -117,11 +118,12 @@ public interface GrupService {
 	 * @param metaExpedientId
 	 * @param id
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	void desvincularAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual);
+			Long id, String rolActual, Long organId);
 	
 }
