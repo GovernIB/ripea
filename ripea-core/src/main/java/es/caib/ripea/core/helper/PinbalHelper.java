@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class PinbalHelper {
 
@@ -50,10 +52,6 @@ public class PinbalHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ConfigHelper configHelper;
-
-	private ClientSvddgpciws02 clientSvddgpciws02;
-	private ClientSvddgpviws02 clientSvddgpviws02;
-	private ClientSvdccaacpasws01 clientSvdccaacpasws01;
 
 	public String novaPeticioSvddgpciws02(
 			ExpedientEntity expedient,
@@ -167,9 +165,10 @@ public class PinbalHelper {
 			PinbalConsentimentEnumDto consentiment) {
 		EntitatEntity entitat = metaDocument.getEntitat();
 		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
+		String codiSia = getPinbalDefaultSia();
 		solicitud.setNombreSolicitante(entitat.getNom());
 		solicitud.setIdentificadorSolicitante(entitat.getCif());
-		solicitud.setCodigoProcedimiento(metaExpedient.getClassificacioSia());
+		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacioSia());
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		solicitud.setFinalidad(finalitat);
 		switch (consentiment) {
@@ -297,6 +296,7 @@ public class PinbalHelper {
 		accioParams.put("nombreSolicitante", solicitud.getNombreSolicitante());
 		accioParams.put("codigoProcedimiento", solicitud.getCodigoProcedimiento());
 		accioParams.put("codigoUnidadTramitadora", solicitud.getCodigoUnidadTramitadora());
+		accioParams.put("unidadTramitadora", solicitud.getUnidadTramitadora());
 		accioParams.put("idExpediente", solicitud.getIdExpediente());
 		if (solicitud.getFuncionario() != null) {
 			accioParams.put(
@@ -334,41 +334,41 @@ public class PinbalHelper {
 	}
 
 	private ClientSvddgpciws02 getClientSvddgpciws02() {
-		if (clientSvddgpciws02 == null) {
-			clientSvddgpciws02 = new ClientSvddgpciws02(
+		ClientSvddgpciws02 clientSvddgpciws02 = new ClientSvddgpciws02(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),
 				getPinbalBasicAuth(),
 				null,
 				null);
-		}
+		if (log.isDebugEnabled())
+			clientSvddgpciws02.enableLogginFilter();
 		return clientSvddgpciws02;
 	}
 
 	private ClientSvddgpviws02 getClientSvddgpviws02() {
-		if (clientSvddgpviws02 == null) {
-			clientSvddgpviws02 = new ClientSvddgpviws02(
+		ClientSvddgpviws02 clientSvddgpviws02 = new ClientSvddgpviws02(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),
 				getPinbalBasicAuth(),
 				null,
 				null);
-		}
+		if (log.isDebugEnabled())
+			clientSvddgpviws02.enableLogginFilter();
 		return clientSvddgpviws02;
 	}
 
 	private ClientSvdccaacpasws01 getClientSvdccaacpasws01() {
-		if (clientSvdccaacpasws01 == null) {
-			clientSvdccaacpasws01 = new ClientSvdccaacpasws01(
-					getPinbalBaseUrl(),
-					getPinbalUser(),
-					getPinbalPassword(),
-					getPinbalBasicAuth(),
-					null,
-					null);
-		}
+		ClientSvdccaacpasws01 clientSvdccaacpasws01 = new ClientSvdccaacpasws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientSvdccaacpasws01.enableLogginFilter();
 		return clientSvdccaacpasws01;
 	}
 
@@ -383,6 +383,9 @@ public class PinbalHelper {
 	}
 	private boolean getPinbalBasicAuth() {
 		return configHelper.getAsBoolean("es.caib.ripea.pinbal.basic.auth");
+	}
+	private String getPinbalDefaultSia() {
+		return configHelper.getConfig("es.caib.ripea.pinbal.codi.sia.peticions");
 	}
 
 }

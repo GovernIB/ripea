@@ -267,7 +267,7 @@ public class MetaExpedientController extends BaseAdminController {
 			return "metaExpedientForm";
 		}
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 
 		if (command.getId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), command.getId());
@@ -278,9 +278,9 @@ public class MetaExpedientController extends BaseAdminController {
 				boolean isCanviEstatDissenyAPendentByOrganAdmin = !dto.getRevisioEstat().equals(estatAnterior) 
 						&& estatAnterior.equals(MetaExpedientRevisioEstatEnumDto.DISSENY) 
 						&& dto.getRevisioEstat().equals(MetaExpedientRevisioEstatEnumDto.PENDENT);
-				metaExpedientService.update(entitatActual.getId(), dto, rolActual, isCanviEstatDissenyAPendentByOrganAdmin);
+				metaExpedientService.update(entitatActual.getId(), dto, rolActual, isCanviEstatDissenyAPendentByOrganAdmin, organActual != null ? organActual.getId() : null);
 			} else {
-				metaExpedientService.update(entitatActual.getId(), dto, rolActual, false);
+				metaExpedientService.update(entitatActual.getId(), dto, rolActual, false, organActual != null ? organActual.getId() : null);
 			}
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
@@ -291,7 +291,12 @@ public class MetaExpedientController extends BaseAdminController {
 					"redirect:metaExpedient",
 					"metaexpedient.controller.modificat.ok");
 		} else {
-			metaExpedientService.create(entitatActual.getId(), dto, rolActual);
+
+			metaExpedientService.create(
+					entitatActual.getId(),
+					dto,
+					rolActual,
+					organActual != null ? organActual.getId() : null);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
@@ -335,13 +340,13 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
 				true, 
-				rolActual);
+				rolActual, organActual != null ? organActual.getId() : null);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -357,13 +362,13 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
 				false, 
-				rolActual);
+				rolActual, organActual != null ? organActual.getId() : null);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -378,10 +383,12 @@ public class MetaExpedientController extends BaseAdminController {
 	public String delete(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		try {
 			metaExpedientService.delete(
 					entitatActual.getId(),
-					metaExpedientId);
+					metaExpedientId,
+					organActual == null ? null : organActual.getId());
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaExpedient",
@@ -415,10 +422,10 @@ public class MetaExpedientController extends BaseAdminController {
 	public String marcarPendentRevisio(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		metaExpedientService.marcarPendentRevisio(
 				entitatActual.getId(),
-				metaExpedientId);
+				metaExpedientId, organActual != null ? organActual.getId() : null);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,

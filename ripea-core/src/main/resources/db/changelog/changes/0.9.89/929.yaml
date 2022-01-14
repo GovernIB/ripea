@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1638267492000-3
+      author: limit
+      changes:
+        - sql:
+            sql: "INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.ripea.pinbal.codi.sia.peticions', null, 'Codi SIA a utilitzar en totes les peticions a PINBAL. (En cas de no emplenar-se s''utilitzarà el codi SIA de cada procediment)', 'PINBAL', 4, 0, 'TEXT');"

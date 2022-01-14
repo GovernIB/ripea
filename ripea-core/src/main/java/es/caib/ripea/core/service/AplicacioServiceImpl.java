@@ -205,8 +205,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 		if (accions == null || accions.isEmpty()) {
 			return new PaginaDto<>();
 		}
+
 		List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, params.getPaginaTamany());
-		PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(params.getPaginaNum()), IntegracioAccioDto.class);
+		PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(params.getPaginaNum()), null);
+		pagina.setContingut(pagines.get(params.getPaginaNum()));
 		return paginacioHelper.prepararPagina(pagina, pagines, accions);
 	}
 

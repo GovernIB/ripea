@@ -38,6 +38,7 @@ public interface MetaDocumentService {
 	 * @param plantillaContingut
 	 *            Contingut de l'arxiu de la plantilla.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-document creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -49,7 +50,7 @@ public interface MetaDocumentService {
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual) throws NotFoundException;
+			byte[] plantillaContingut, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Crea un nou meta-document.
@@ -93,6 +94,7 @@ public interface MetaDocumentService {
 	 * @param plantillaContingut
 	 *            Contingut de l'arxiu de la plantilla.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-document modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -104,7 +106,7 @@ public interface MetaDocumentService {
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual) throws NotFoundException;
+			byte[] plantillaContingut, String rolActual, Long organId) throws NotFoundException;
 
 	
 	/**
@@ -165,6 +167,7 @@ public interface MetaDocumentService {
 	 * @param id
 	 *            Atribut id del meta-document a esborrar.
 	 * @param rolActual TODO
+	 * @param organId TODO
 	 * @return El meta-document esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -173,7 +176,7 @@ public interface MetaDocumentService {
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual) throws NotFoundException;
+			Long id, String rolActual, Long organId) throws NotFoundException;
 
 	/**
 	 * Consulta un meta-document donat el seu id.

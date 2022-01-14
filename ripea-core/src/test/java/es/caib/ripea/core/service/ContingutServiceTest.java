@@ -113,37 +113,37 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 						MetaDadaDto metaDadaTextCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaText, "tothom");
+								metaDadaText, "tothom", null);
 						
 						MetaDadaDto metaDadaDataCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaData, "tothom");
+								metaDadaData, "tothom", null);
 						
 						MetaDadaDto metaDadaImportCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaImport, "tothom");
+								metaDadaImport, "tothom", null);
 						
 						MetaDadaDto metaDadaSencerCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaSencer, "tothom");
+								metaDadaSencer, "tothom", null);
 						
 						MetaDadaDto metaDadaFlotantCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaFlotant, "tothom");
+								metaDadaFlotant, "tothom", null);
 						
 						MetaDadaDto metaDadaBooleaCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaBoolea, "tothom");
+								metaDadaBoolea, "tothom", null);
 						
 						MetaDadaDto metaDadaTextMultipleCreada = metaDadaService.create(
 								entitatCreada.getId(),
 								metaExpedient.getId(),
-								metaDadaTextMultiple, "tothom");
+								metaDadaTextMultiple, "tothom", null);
 						
 						
 						autenticarUsuari("user");
