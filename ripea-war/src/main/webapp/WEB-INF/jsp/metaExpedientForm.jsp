@@ -236,7 +236,7 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientCommand">
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>
-			<li role="presentation"><a href="#notificacions" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.notificacions"/></a></li>
+<%-- 			<li role="presentation"><a href="#notificacions" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.notificacions"/></a></li> --%>
 			<c:if test="${isCarpetaDefecte}">
 				<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 			</c:if>
@@ -295,9 +295,9 @@
 				</c:if>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="notificacions">
+			<%-- <div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa" disabled="${bloquejarCamps}"/>
-			</div>
+			</div> --%>
 			<c:if test="${isCarpetaDefecte}">
 				<div role="carpetes" class="tab-pane" id="carpetes">
 					
