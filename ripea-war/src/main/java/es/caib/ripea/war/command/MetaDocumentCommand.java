@@ -76,6 +76,7 @@ public class MetaDocumentCommand {
 	private String plantillaNom;
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	private String pinbalFinalitat;
 	
 	private boolean comu;
 
@@ -216,6 +217,10 @@ public class MetaDocumentCommand {
 
 	public void setPinbalServei(MetaDocumentPinbalServeiEnumDto pinbalServei) {
 		this.pinbalServei = pinbalServei;
+	}
+
+	public void setPinbalFinalitat(String pinbalFinalitat) {
+		this.pinbalFinalitat = pinbalFinalitat;
 	}
 
 }

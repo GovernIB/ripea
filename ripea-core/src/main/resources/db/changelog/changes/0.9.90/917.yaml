@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1642616819000-1
+      author: limit
+      changes:
+        - sql:
+            sql: "
+            ALTER TABLE IPA_METADOCUMENT ADD PINBAL_FINALITAT VARCHAR2(512);
+            "

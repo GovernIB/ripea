@@ -37,6 +37,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	private String pinbalFinalitat;
 	private boolean perDefecte;
 	private Long metaExpedientId;
 	

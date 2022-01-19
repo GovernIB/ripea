@@ -11,7 +11,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -103,6 +102,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private boolean pinbalActiu;
 	@Column(name = "pinbal_servei", length = 64)
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	@Column(name = "pinbal_finalitat", length = 512)
+	protected String pinbalFinalitat;
 	
 	@Column(name = "per_defecte")
 	private boolean perDefecte;
@@ -175,6 +176,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public MetaDocumentPinbalServeiEnumDto getPinbalServei() {
 		return pinbalServei;
 	}
+	public String getPinbalFinalitat() {
+		return pinbalFinalitat;
+	}
 	public boolean isPerDefecte() {
 		return perDefecte;
 	}
@@ -199,7 +203,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			boolean biometricaLectura,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			boolean pinbalActiu,
-			MetaDocumentPinbalServeiEnumDto pinbalServei) {
+			MetaDocumentPinbalServeiEnumDto pinbalServei,
+			String pinbalFinalitat) {
 		update(
 				codi,
 				nom,
@@ -222,6 +227,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.codiPropi = codi;
 		this.pinbalActiu = pinbalActiu;
 		this.pinbalServei = pinbalServei;
+		this.pinbalFinalitat = pinbalFinalitat;
 	}
 
 	public void updatePlantilla(
@@ -246,7 +252,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			String ntiTipoDocumental,
-			boolean pinbalActiu) {
+			boolean pinbalActiu,
+			String pinbalFinalitat) {
 		return new Builder(
 				entitat,
 				codi,
@@ -256,7 +263,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				ntiOrigen,
 				ntiEstadoElaboracion,
 				ntiTipoDocumental,
-				pinbalActiu);
+				pinbalActiu,
+				pinbalFinalitat);
 	}
 	public static class Builder {
 		MetaDocumentEntity built;
@@ -269,7 +277,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				NtiOrigenEnumDto ntiOrigen,
 				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 				String ntiTipoDocumental,
-				boolean pinbalActiu) {
+				boolean pinbalActiu,
+				String pinbalFinalitat) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;
@@ -286,6 +295,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.biometricaLectura = false;
 			built.codiPropi = codi;
 			built.pinbalActiu = pinbalActiu;
+			built.pinbalFinalitat = pinbalFinalitat;
 		}
 		public Builder biometricaLectura(boolean biometricaLectura) {
 			built.biometricaLectura = biometricaLectura;
