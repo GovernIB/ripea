@@ -176,4 +176,10 @@ public class AplicacioServiceBean implements AplicacioService {
 		delegate.setRolUsuariActual(rolActual);
 	}
 
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<String> findUsuarisCodisAmbRol(String rol) {
+		return delegate.findUsuarisCodisAmbRol(rol);
+	}
+
 }

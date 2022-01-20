@@ -195,4 +195,21 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.hasPermisAdminComu(organId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void evictOrganismesEntitatAmbPermis(
+			Long entitatId,
+			String usuariCodi) {
+		delegate.evictOrganismesEntitatAmbPermis(entitatId, usuariCodi);
+		
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(
+			Long entitatId) {
+		return delegate.findOrganismesEntitatAmbPermisCache(
+				entitatId);
+	}
+
 }

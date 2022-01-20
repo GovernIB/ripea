@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -314,6 +315,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private String getIdiomaPerDefecte() {
 		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
 	}
+	
+	
+	@Override
+	public List<String> findUsuarisCodisAmbRol(String rol) {
+		List<DadesUsuari> dadesUsuaris = pluginHelper.dadesUsuariFindAmbGrup(rol);
+		List<String> codisUsuaris = new ArrayList<>();
+		for (DadesUsuari dadesUsuari : dadesUsuaris) {
+			codisUsuaris.add(dadesUsuari.getCodi());
+		}
+		return codisUsuaris;
+	}
+	
+	
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
 

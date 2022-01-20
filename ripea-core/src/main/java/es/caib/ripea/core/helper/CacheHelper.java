@@ -36,6 +36,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
@@ -119,6 +120,10 @@ public class CacheHelper {
 	private ExpedientPeticioRepository expedientPeticioRepository;
 	@Resource
 	private MetaExpedientHelper metaExpedientHelper;
+	@Resource
+	private EntityComprovarHelper entityComprovarHelper;
+	@Resource
+	private OrganGestorHelper organGestorHelper;
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
@@ -177,6 +182,22 @@ public class CacheHelper {
 	@CacheEvict(value = "entitatsUsuari", allEntries=true)
 	public void evictEntitatsAccessiblesAllUsuaris() {
 	}
+	
+	
+	@Cacheable(value = "findOrganismesEntitatAmbPermis", key="{#entitatId, #usuariCodi}")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		return conversioTipusHelper.convertirList(
+				organGestorHelper.findAmbEntitatPermis(
+						entitat,
+						ExtendedPermission.ADMINISTRATION),
+				OrganGestorDto.class);
+	}
+	
+	@CacheEvict(value = "findOrganismesEntitatAmbPermis", key="{#entitatId, #usuariCodi}")
+	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
+	}
+	
 
 	@Cacheable(value = "errorsValidacioNode", key = "#node.id")
 	public List<ValidacioErrorDto> findErrorsValidacioPerNode(

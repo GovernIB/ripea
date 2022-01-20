@@ -251,4 +251,13 @@ public interface OrganGestorService {
 
 	@PreAuthorize("hasRole('tothom')")
     boolean hasPermisAdminComu(Long organId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public void evictOrganismesEntitatAmbPermis(
+			Long entitatId,
+			String usuariCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(
+			Long entitatId);
 }
