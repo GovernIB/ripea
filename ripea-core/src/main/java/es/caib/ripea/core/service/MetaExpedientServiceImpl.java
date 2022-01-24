@@ -508,6 +508,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
+			// Sempre afegirem el nom com a subordre
+			addNomSort(paginacioParams);
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
@@ -551,6 +553,21 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					MetaExpedientDto.class);
 		}
 
+	}
+
+	private void addNomSort(PaginacioParamsDto paginacioParams) {
+		boolean isOrderedByNom = false;
+		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
+			for(PaginacioParamsDto.OrdreDto ordre : paginacioParams.getOrdres()) {
+				if ("nom".equals(ordre.getCamp())) {
+					isOrderedByNom = true;
+					break;
+				}
+			}
+		}
+		if (!isOrderedByNom) {
+			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+		}
 	}
 
 	private PaginaDto<MetaExpedientDto> findByOrganGestor(
