@@ -680,12 +680,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAll(metaExpedientsPermesos, new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-			@Override
-			public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-				return metaExpedient.getId();
-			}
-		}, MetaNodeEntity.class, new Permission[] { ExtendedPermission.READ }, auth);
+		permisosHelper.filterGrantedAll(
+				metaExpedientsPermesos,
+				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+					@Override
+					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+						return metaExpedient.getId();
+					}
+				},
+				MetaNodeEntity.class,
+				new Permission[] { ExtendedPermission.READ },
+				auth);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			return conversioTipusHelper.convertirList(
 					expedientRepository.findByEntitatAndMetaExpedientOrderByNomAsc(
