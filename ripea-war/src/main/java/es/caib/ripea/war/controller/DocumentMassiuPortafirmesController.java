@@ -3,52 +3,27 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.*;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Controlador per al manteniment de bústies.
@@ -56,11 +31,11 @@ import es.caib.ripea.war.helper.RolHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/massiu")
-public class ContingutMassiuController extends BaseUserOAdminOOrganController {
+@RequestMapping("/massiu/portafirmes")
+public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "ContingutMassiuController.session.filtre";
-	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutMassiuController.session.seleccio";
+	private static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuPortafirmesController.session.filtre";
+	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuPortafirmesController.session.seleccio";
 
 	@Autowired
 	private DocumentService documentService;
@@ -77,111 +52,8 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 
-//	@RequestMapping(value = "/portafirmes", method = RequestMethod.GET)
-//	public String getDocuments(
-//			HttpServletRequest request,
-//			Model model) {
-//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-//		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-//		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-//		filtreCommand.setBloquejarTipusElement(true);
-//		filtreCommand.setBloquejarMetaDada(true);
-//		filtreCommand.setBloquejarMetaExpedient(false);
-//		model.addAttribute("portafirmes", true);
-//		model.addAttribute(
-//				"seleccio",
-//				RequestSessionHelper.obtenirObjecteSessio(
-//						request,
-//						SESSION_ATTRIBUTE_SELECCIO));
-//		model.addAttribute(
-//				"titolMassiu",
-//				getMessage(request, "accio.massiva.titol.portafirmes"));
-//		model.addAttribute(
-//				"botoMassiu",
-//				getMessage(request, "accio.massiva.boto.crear.portafirmes"));
-//		model.addAttribute(
-//				filtreCommand);
-//
-//		String rolActual = (String)request.getSession().getAttribute(
-//				SESSION_ATTRIBUTE_ROL_ACTUAL);
-//
-//		boolean checkPerMassiuAdmin = false;
-//		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-//			checkPerMassiuAdmin = true;
-//		}
-//
-//		model.addAttribute(
-//				"metaExpedients",
-//				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
-//
-//		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-//		if (filtreCommand.getMetaExpedientId() != null)
-//			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
-//		model.addAttribute(
-//				"expedients",
-//				expedients);
-//		return "contingutMassiuList";
-//	}
-//
-//	@RequestMapping(value = "/portafirmes", method = RequestMethod.POST)
-//	public String bustiaPost(
-//			HttpServletRequest request,
-//			@Valid ContingutMassiuFiltreCommand filtreCommand,
-//			BindingResult bindingResult,
-//			Model model) {
-//		if (!bindingResult.hasErrors()) {
-//			RequestSessionHelper.actualitzarObjecteSessio(
-//					request,
-//					SESSION_ATTRIBUTE_FILTRE,
-//					filtreCommand);
-//		}
-//
-//		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-//		filtreCommand.setBloquejarTipusElement(true);
-//		filtreCommand.setBloquejarMetaDada(true);
-//		filtreCommand.setBloquejarMetaExpedient(false);
-//
-//		return "redirect:/massiu/portafirmes";
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	@RequestMapping(value = "/crear/portafirmes", method = RequestMethod.GET)
-//	public String getCrearPortafirmes(
-//			HttpServletRequest request,
-//			Model model) {
-//
-//		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-//				request,
-//				SESSION_ATTRIBUTE_SELECCIO);
-//
-//		if (seleccio == null || seleccio.isEmpty()) {
-//			model.addAttribute("portafirmes", true);
-//			return getModalControllerReturnValueError(
-//					request,
-//					"redirect:/massiu/portafirmes",
-//					"accio.massiva.seleccio.buida");
-//		}
-//
-//		getEntitatActualComprovantPermisos(request);
-//
-//		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
-//		model.addAttribute(command);
-//
-//		//Flux de firma
-////		MetaDocumentDto metaDocument = metaDocumentService.findById(
-////				entitatActual.getId(),
-////				filtreCommand.getTipusExpedient(),
-////				filtreCommand.getTipusDocument());
-////
-////		setFluxPredefinit(
-////				metaDocument,
-////				model,
-////				command);
-//		return "enviarPortafirmes";
-//	}
-	
-	@RequestMapping(value = "/definitiu", method = RequestMethod.GET)
-	public String getDocumentsEsborranys(
+	@RequestMapping(method = RequestMethod.GET)
+	public String portafirmesGet(
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -190,7 +62,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		filtreCommand.setBloquejarTipusElement(true);
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
-		model.addAttribute("portafirmes", false);
+//		model.addAttribute("portafirmes", true);
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -198,16 +70,12 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 						SESSION_ATTRIBUTE_SELECCIO));
 		model.addAttribute(
 				"titolMassiu",
-				getMessage(request, "accio.massiva.titol.definitiu"));
+				getMessage(request, "accio.massiva.titol.portafirmes"));
 		model.addAttribute(
 				"botoMassiu",
-				getMessage(request, "accio.massiva.boto.crear.definitiu"));
+				getMessage(request, "accio.massiva.boto.crear.portafirmes"));
 		model.addAttribute(
 				filtreCommand);
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
-		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
@@ -217,16 +85,22 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 			checkPerMassiuAdmin = true;
 		} 
 		
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+
+		// TODO: Obtenir llistat d'expedients i documents, únicament dels que tenen documents configurats per portafirmes
+		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (filtreCommand.getMetaExpedientId() != null)
 			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
 		model.addAttribute(
 				"expedients",
 				expedients);
-		return "contingutMassiuList";
+		return "documentMassiuPortafirmesList";
 	}
 	
-	@RequestMapping(value = "/definitiu", method = RequestMethod.POST)
-	public String filtrePost(
+	@RequestMapping(method = RequestMethod.POST)
+	public String portafirmesPost(
 			HttpServletRequest request,
 			@Valid ContingutMassiuFiltreCommand filtreCommand,
 			BindingResult bindingResult,
@@ -243,51 +117,47 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
 		
-		return "redirect:/massiu/definitiu";
+		return "redirect:/massiu/portafirmes";
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/marcar/definitiu", method = RequestMethod.GET)
-	public String marcarDefinitiu(
+	@RequestMapping(value = "/crear", method = RequestMethod.GET)
+	public String getCrearPortafirmes(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
 		
 		if (seleccio == null || seleccio.isEmpty()) {
-			model.addAttribute("portafirmes", false);
+			model.addAttribute("portafirmes", true);
 			return getModalControllerReturnValueError(
 					request,
-					"redirect:/massiu/definitiu",
+					"redirect:/massiu/portafirmes",
 					"accio.massiva.seleccio.buida");
 		}
 		
 		getEntitatActualComprovantPermisos(request);
 		
-		for (Long docId: seleccio) {
-			DocumentDto document = (DocumentDto) contingutService.findAmbIdUser(
-					entitatActual.getId(),
-					docId,
-					true,
-					false, null);
-			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
-				documentService.documentActualitzarEstat(
-						entitatActual.getId(), 
-						docId, 
-						DocumentEstatEnumDto.DEFINITIU);
-			}
-			
-		}
-		return this.getModalControllerReturnValueSuccess(
-				request,
-				"redirect:/massiu/definitiu",
-				"document.controller.estat.canviat.ok");
+		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
+		model.addAttribute(command);
+		
+		//Flux de firma
+//		MetaDocumentDto metaDocument = metaDocumentService.findById(
+//				entitatActual.getId(), 
+//				filtreCommand.getTipusExpedient(), 
+//				filtreCommand.getTipusDocument());
+//		
+//		setFluxPredefinit(
+//				metaDocument, 
+//				model, 
+//				command);
+		return "enviarPortafirmes";
 	}
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/crear/portafirmes", method = RequestMethod.POST)
+	@RequestMapping(value = "/crear", method = RequestMethod.POST)
 	public String postCrearPortafirmes(
 			HttpServletRequest request,
 			@Valid PortafirmesEnviarCommand filtreCommand,
