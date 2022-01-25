@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1642616819000-1
+      author: limit
+      changes:
+        - sql:
+            sql: "
+            UPDATE IPA_INTERESSAT SET NOT_AUTORITZAT = 1 WHERE NOT_AUTORITZAT = 0;
+			UPDATE IPA_METAEXPEDIENT SET NOT_ACTIVA = 1 WHERE NOT_ACTIVA = 0;
+            "

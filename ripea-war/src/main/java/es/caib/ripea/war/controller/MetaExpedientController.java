@@ -268,6 +268,8 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
+		dto.setNotificacioActiva(true);
 
 		if (command.getId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), command.getId());
