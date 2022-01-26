@@ -1042,6 +1042,8 @@ public class ContingutServiceImpl implements ContingutService {
 						tipusExpedient,
 						(filtre.getNom() == null),
 						filtre.getNom() != null ? filtre.getNom().trim() : "",
+						(filtre.getCreador() == null), filtre.getCreador() != null ?
+						filtre.getCreador().trim() : "",
 						(metaNode == null),
 						metaNode,
 						(dataCreacioInici == null),
