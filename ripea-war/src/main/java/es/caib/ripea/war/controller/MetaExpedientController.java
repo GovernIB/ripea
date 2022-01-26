@@ -334,6 +334,9 @@ public class MetaExpedientController extends BaseAdminController {
 			Model model) throws JsonParseException, IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 
+		if (command.getFile().getSize() == 0) {
+			bindingResult.rejectValue("file", "NotNull");
+		}
 		if (bindingResult.hasErrors()) {
 			return "importMetaExpedientFileForm";
 		}
