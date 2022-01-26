@@ -25,6 +25,7 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaDadaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -63,6 +64,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	private MetaNodeHelper metaNodeHelper;
 	@Resource
 	private MetaExpedientHelper metaExpedientHelper;
+	@Resource
+	private MetaDadaHelper metaDadaHelper;
 
 	@Transactional
 	@Override
@@ -70,55 +73,13 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			Long entitatId,
 			Long metaNodeId,
 			MetaDadaDto metaDada, String rolActual, Long organId) {
-		logger.debug("Creant una nova meta-dada (" +
-				"entitatId=" + entitatId + ", " +
-				"metaNodeId=" + metaNodeId + ", " +
-				"metaDada=" + metaDada + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
-		
-		int ordre = metaDadaRepository.countByMetaNode(metaNode);
-		
-		Object valor = null;
-		if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
-			valor = metaDada.getValorBoolea();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
-			valor = metaDada.getValorData();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
-			valor = metaDada.getValorFlotant();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
-			valor = metaDada.getValorImport();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
-			valor = metaDada.getValorSencer();
-		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDada.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
-			valor = metaDada.getValorString();
-		}
-		
-		
-		MetaDadaEntity entity = MetaDadaEntity.getBuilder(
-				metaDada.getCodi(),
-				metaDada.getNom(),
-				metaDada.getTipus(),
-				metaDada.getMultiplicitat(),		
-				valor,
-				metaDada.isReadOnly(),
-				ordre,
-				metaNode).
-				descripcio(metaDada.getDescripcio()).
-				build();
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			Long metaExpedientId = null;
-			if (metaNode instanceof MetaExpedientEntity) {
-				metaExpedientId = metaNode.getId();
-			} else if (metaNode instanceof MetaDocumentEntity) {
-				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
-			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
-		}
-		return conversioTipusHelper.convertir(
-				metaDadaRepository.save(entity),
-				MetaDadaDto.class);
+
+		return metaDadaHelper.create(
+				entitatId,
+				metaNodeId,
+				metaDada,
+				rolActual,
+				organId);
 	}
 
 	@Transactional

@@ -152,7 +152,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public UsuariDto findUsuariAmbCodiDades(String codi) {
+	public UsuariDto findUsuariCarrecAmbCodiDades(String codi) {
 		logger.debug("Obtenint usuari/càrrec amb codi (codi=" + codi + ")");
 		UsuariDto usuariDto = null;
 		try {
@@ -174,6 +174,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 						DadesUsuari.class);
 			}
 		}
+		return usuariDto;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto findUsuariAmbCodiDades(String codi) {
+		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+		UsuariDto usuariDto = null;
+		usuariDto = conversioTipusHelper.convertir(
+				usuariHelper.getUsuariByCodiDades(codi),
+				UsuariDto.class);
+
 		return usuariDto;
 	}
 

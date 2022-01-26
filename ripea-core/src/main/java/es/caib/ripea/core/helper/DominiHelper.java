@@ -17,9 +17,13 @@ import javax.sql.DataSource;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,7 +32,13 @@ import org.xml.sax.SAXException;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.exception.CipherException;
 import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.entity.DominiEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.repository.DominiRepository;
+import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.service.DominiServiceImpl;
 
 /**
  * Helper per recuperar el resultat d'una consulta d'un domini.
@@ -37,6 +47,43 @@ import es.caib.ripea.core.api.exception.ValidationException;
  */
 @Component
 public class DominiHelper {
+	
+	
+	@Autowired
+	private DominiRepository dominiRepository;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+
+	
+	
+	public DominiDto create(
+			Long entitatId,
+			DominiDto domini, 
+			boolean xifrarContrasenya) throws NotFoundException {
+		logger.debug("Creant un nou domini per l'entitat (" +
+				"entitatId=" + entitatId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false, false, false);
+		DominiEntity entity = DominiEntity.getBuilder(
+				domini.getCodi(),
+				domini.getNom(),
+				domini.getDescripcio(),
+				domini.getConsulta(),
+				domini.getCadena(),
+				xifrarContrasenya ? xifrarContrasenya(domini.getContrasenya()) : null,
+				entitat).build();
+		DominiDto dominiDto = conversioTipusHelper.convertir(
+				dominiRepository.save(entity),
+				DominiDto.class);
+		return dominiDto;
+	}
+	
+	
 
 	public JdbcTemplate setDataSource(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
@@ -131,4 +178,7 @@ public class DominiHelper {
 		return dataSource;
 	}
 
+	
+	private static final Logger logger = LoggerFactory.getLogger(DominiHelper.class);
+	
 }

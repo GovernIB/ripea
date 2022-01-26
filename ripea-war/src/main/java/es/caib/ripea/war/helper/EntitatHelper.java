@@ -125,6 +125,15 @@ public class EntitatHelper {
 		return organGestorActual;
 	}
 	
+	public static Long getOrganGestorActualId(HttpServletRequest request) {
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			return organGestorActual.getId();
+		} else {
+			return null;
+		}
+	}
+	
 	public static void processarCanviOrganGestor(HttpServletRequest request) {
 		String canviOrganGestor = request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL);
 		if (canviOrganGestor != null && canviOrganGestor.length() > 0) {

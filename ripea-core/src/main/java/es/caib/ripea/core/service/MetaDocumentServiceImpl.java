@@ -34,6 +34,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaDocumentHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -77,6 +78,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private MetaExpedientHelper metaExpedientHelper;
+	@Resource
+	private MetaDocumentHelper metaDocumentHelper;
 
 	@Transactional
 	@Override
@@ -87,56 +90,19 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut, String rolActual, Long organId) {
-		logger.debug("Creant un nou meta-document (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"metaDocument=" + metaDocument + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		
+		MetaDocumentDto metaDocumentDto = metaDocumentHelper.create(
 				entitatId,
-				false,
-				false,
-				false, 
-				true, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
-		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
-				entitat,
-				metaDocument.getCodi(),
-				metaDocument.getNom(),
-				metaDocument.getMultiplicitat(),
-				metaExpedient,
-				metaDocument.getNtiOrigen(),
-				metaDocument.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental(),
-				metaDocument.isPinbalActiu(),
-				metaDocument.getPinbalFinalitat()).
-				biometricaLectura(metaDocument.isBiometricaLectura()).
-				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
-				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
-				descripcio(metaDocument.getDescripcio()).
-				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
-				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
-				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
-				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
-				portafirmesCustodiaTipus(metaDocument.getPortafirmesCustodiaTipus()).
-				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
-				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
-				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
-				pinbalServei(metaDocument.getPinbalServei()).
-				build();
-		if (plantillaContingut != null) {
-			entity.updatePlantilla(
-					plantillaNom,
-					plantillaContentType,
-					plantillaContingut);
-		}
-		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		return conversioTipusHelper.convertir(
-				metaDocumentRepository.save(entity),
-				MetaDocumentDto.class);
+				metaExpedientId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut,
+				rolActual,
+				organId);
+
+
+		return metaDocumentDto;
 	}
 
 

@@ -26,7 +26,7 @@ public class MetaDadaDto implements Serializable {
 	private int ordre;
 	private boolean activa;
 	
-	
+	private DominiDto domini;
 	
 	private Long valorSencer;
 	private Double valorFlotant;
@@ -134,7 +134,13 @@ public class MetaDadaDto implements Serializable {
 	public void setTipus(MetaDadaTipusEnumDto tipus) {
 		this.tipus = tipus;
 	}
-
+	
+	public DominiDto getDomini() {
+		return domini;
+	}
+	public void setDomini(DominiDto domini) {
+		this.domini = domini;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
