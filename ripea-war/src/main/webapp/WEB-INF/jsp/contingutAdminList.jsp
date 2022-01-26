@@ -60,8 +60,11 @@ $(document).ready(function() {
 <body>
 	<form:form action="" method="post" cssClass="well" commandName="contingutFiltreCommand">
 		<div class="row">
-			<div class="col-md-7">
+			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputText name="creador" inline="true" placeholderKey="contingut.admin.filtre.creador"/>
 			</div>
 			<div class="col-md-2">
 				<rip:inputSelect name="tipus" optionEnum="ContingutTipusEnumDto" emptyOption="true" placeholderKey="contingut.admin.filtre.tipus" inline="true"/>

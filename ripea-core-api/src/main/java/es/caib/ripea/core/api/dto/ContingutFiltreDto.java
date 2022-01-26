@@ -17,6 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ContingutFiltreDto implements Serializable {
 
 	private String nom;
+	private String creador;
 	private ContingutTipusEnumDto tipus;
 	private Long metaNodeId;
 	private Date dataCreacioInici;
@@ -37,6 +38,12 @@ public class ContingutFiltreDto implements Serializable {
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
+	}
+	public String getCreador() {
+		return creador;
+	}
+	public void setCreador(String creador) {
+		this.creador = creador;
 	}
 	public Long getMetaNodeId() {
 		return metaNodeId;
