@@ -60,6 +60,11 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 			</div>	
 		</div>
 		<div class="row">
+		<!--  optionMinimumResultsForSearch -->
+			<div class="col-md-4">					
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedientPeticio.list.placeholder.metaExpedient" inline="true"/>
+			</div>
+<%--
 			<div class="col-md-4">					
 				<c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaInicial"/>
 				<c:url value="/metaexpedientajax/metaexpedients" var="urlConsultaLlistat"/>
@@ -72,6 +77,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 						suggestText="nom"
 						inline="true"/>	
 			</div>
+ --%>			
 			<div class="col-md-4">							
 				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataInicial"/>
 			</div>	
