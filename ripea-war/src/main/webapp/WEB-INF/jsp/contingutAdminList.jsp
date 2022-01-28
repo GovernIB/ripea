@@ -63,8 +63,22 @@ $(document).ready(function() {
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>
 			</div>
+<%--
 			<div class="col-md-3">
 				<rip:inputText name="creador" inline="true" placeholderKey="contingut.admin.filtre.creador"/>
+			</div>
+--%>
+			<div class="col-md-3">					
+				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+						name="creador"  
+						urlConsultaInicial="${urlConsultaInicial}"
+						urlConsultaLlistat="${urlConsultaLlistat}"
+						placeholderKey="contingut.admin.filtre.creador"
+						suggestValue="codi"
+						suggestText="codiAndNom"
+						inline="true"/>	
 			</div>
 			<div class="col-md-2">
 				<rip:inputSelect name="tipus" optionEnum="ContingutTipusEnumDto" emptyOption="true" placeholderKey="contingut.admin.filtre.tipus" inline="true"/>
