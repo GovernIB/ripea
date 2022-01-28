@@ -72,7 +72,7 @@ $(document).ready(function() {
 		
 		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
-					accio,
+					"portafirmes/" + accio,
 					{ids: ids},
 					function(data) {
 						$("#seleccioCount").html(data);
@@ -173,7 +173,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" comment="accio.massiva.list.filtre.tipusdocument.comment" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
+				<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>

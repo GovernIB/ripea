@@ -218,7 +218,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		} 
 		
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
 		model.addAttribute(
 				"expedients",
 				expedients);
@@ -368,7 +368,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), metaExpedientId, checkPerMassiuAdmin);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, rolActual);
 		return expedients;
 	}
 	

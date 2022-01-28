@@ -226,8 +226,8 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId, boolean checkPerMassiuAdmin) throws NotFoundException {
-		return delegate.findPerUserAndTipus(entitatId, metaExpedientId, checkPerMassiuAdmin);
+	public List<ExpedientSelectorDto> findPerUserAndProcediment(Long entitatId, Long metaExpedientId, String rolActual) throws NotFoundException {
+		return delegate.findPerUserAndProcediment(entitatId, metaExpedientId, rolActual);
 	}
 
 	@Override

@@ -176,14 +176,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<c:choose>
-					<c:when test="${portafirmes}">
-						<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" comment="accio.massiva.list.filtre.tipusdocument.comment" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
-					</c:when>
-					<c:otherwise>
-						<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
-					</c:otherwise>
-				</c:choose>
+				<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
