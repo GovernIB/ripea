@@ -112,10 +112,15 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					ExecucioMassivaTipus.valueOf(dto.getTipus().toString()),
 					dataInici,
 					dto.getMotiu(), 
-					dto.getPrioritat(), 
+					dto.getPrioritat(),
+					dto.getPortafirmesResponsablesString(),
+					dto.getPortafirmesSequenciaTipus(),
+					dto.getPortafirmesFluxId(),
+					dto.getPortafirmesTransaccioId(),
 					dto.getDataCaducitat(), 
 					dto.getEnviarCorreu(),
-					entitat.getId()).build();
+					entitat.getId(),
+					dto.getRolActual()).build();
 		}
 		
 		int ordre = 0;
@@ -408,19 +413,22 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		
 		try {
 			emc.updateDataInici(new Date());
-			
+
 			ExecucioMassivaEntity em = emc.getExecucioMassiva();
 			documentService.portafirmesEnviar(
 					contingut.getEntitat().getId(),
 					contingut.getId(),
 					em.getMotiu(),
 					em.getPrioritat(),
-					null,
-					((DocumentEntity) contingut).getMetaDocument().getPortafirmesResponsables(),
-					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),
+					em.getPortafirmesFluxId(),
+					em.getPortafirmesResponsables() != null ? em.getPortafirmesResponsables().split(",") : null,
+//					((DocumentEntity) contingut).getMetaDocument().getPortafirmesResponsables(),
+					em.getPortafirmesSequenciaTipus(),
+//					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesFluxTipus(),
 					null,
-					null, null);
+					em.getPortafirmesTransaccioId(),
+					em.getRolActual());
 				
 			emc.updateFinalitzat(new Date());
 			execucioMassivaContingutRepository.save(emc);

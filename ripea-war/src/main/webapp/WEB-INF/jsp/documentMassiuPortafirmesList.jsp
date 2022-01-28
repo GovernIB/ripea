@@ -72,7 +72,7 @@ $(document).ready(function() {
 		
 		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
-					accio,
+					"portafirmes/" + accio,
 					{ids: ids},
 					function(data) {
 						$("#seleccioCount").html(data);
@@ -83,7 +83,7 @@ $(document).ready(function() {
 		$('#taulaDades').one('draw.dt', function () {
 			$('#seleccioAll').on('click', function() {
 				$.get(
-						"select",
+						"portafirmes/select",
 						function(data) {
 							$("#seleccioCount").html(data);
 							$('#taulaDades').webutilDatatable('refresh');
@@ -93,7 +93,7 @@ $(document).ready(function() {
 			});
 			$('#seleccioNone').on('click', function() {
 				$.get(
-						"deselect",
+						"portafirmes/deselect",
 						function(data) {
 							$("#seleccioCount").html(data);
 							$('#taulaDades').webutilDatatable('select-none');
@@ -105,16 +105,14 @@ $(document).ready(function() {
 		});
 
 		$('#taulaDades').on('draw.dt', function () {
-			if (${portafirmes}) {
-				var tipus = $('#metaDocumentId').val();
-				$('thead tr th:nth-child(1)', $('#taulaDades')).each(function () {
-					enableDisableSelection($(this), tipus);
-				});
-				$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function () {
-					enableDisableSelection($(this), tipus);
-				});
-				updateSelectionForTipusDocument(tipus);
-			}
+			var tipus = $('#metaDocumentId').val();
+			$('thead tr th:nth-child(1)', $('#taulaDades')).each(function () {
+				enableDisableSelection($(this), tipus);
+			});
+			$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function () {
+				enableDisableSelection($(this), tipus);
+			});
+			updateSelectionForTipusDocument(tipus);
 		});
 
 		$('#metaExpedientId').trigger('change');
@@ -122,7 +120,6 @@ $(document).ready(function() {
 });
 
 function enableDisableSelection($this, tipus) {
-	debugger
     if (tipus != undefined && tipus != "") {
     	$this.removeClass('selection-disabled');
     	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
@@ -131,7 +128,7 @@ function enableDisableSelection($this, tipus) {
     	$this.addClass('selection-disabled');
     	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
 		$.get(
-				"deselect",
+				"portafirmes/deselect",
 				function(data) {
 					$("#seleccioCount").html(data);
 					$('#taulaDades').webutilDatatable('select-none');
@@ -146,7 +143,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 
 	if (tipusInStorage != null && tipusInStorage != currentTipus) {
 		$.get(
-				"deselect",
+				"portafirmes/deselect",
 				function(data) {
 					$("#seleccioCount").html(data);
 					$('#taulaDades').webutilDatatable('select-none');
@@ -181,9 +178,6 @@ function updateSelectionForTipusDocument(currentTipus) {
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
 			</div>
-<!-- 			<div class="col-md-4"> -->
-<%-- 				<rip:inputSelect name="metaDada" optionItems="${metaDades}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.metadada" inline="true" disabled="${not empty contingutMassiuFiltreCommand.bloquejarTipusElement}"/> --%>
-<!-- 			</div> -->
 			<div class="col-md-2">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
 			</div>
@@ -206,24 +200,15 @@ function updateSelectionForTipusDocument(currentTipus) {
 		<div class="btn-group pull-right">
 			<button type="button" id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 			<button type="button" id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			{{if ${portafirmes}}}
-				<button type="button" class="btn btn-default" href="./crear/portafirmes" data-toggle="modal" data-refresh-pagina="false">
+				<button type="button" class="btn btn-default" href="./portafirmes/crear" data-toggle="modal" data-refresh-pagina="false">
 					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
 				</button>
-			{{else}}
-				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
-					<button type="button" class="btn btn-default" data-refresh-pagina="false">
-						<a style="text-decoration: none; color: black;" href="<c:url value="/massiu/marcar/definitiu"/>" data-confirm="${definitiuConfirmacioMsg}">
-							<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
-						</a>
-					</button>
-			{{/if}}
 		</div>
 	</script>
 		
 	<table id="taulaDades" 
 		data-toggle="datatable" 
-		data-url="<c:url value="/massiu/datatable"/>"
+		data-url="<c:url value="/massiu/portafirmes/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
 		data-default-order="7" 
@@ -242,17 +227,15 @@ function updateSelectionForTipusDocument(currentTipus) {
 					<spring:message code="accio.massiva.list.column.ubicacio"/>
 					<script id="cellPathTemplate" type="text/x-jsrender">
 						{{if path}}{{for path}}/
-							{{if expedient}}<span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span>
-							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
-							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span>{{/if}}
-							{{:nom}}
+							{{if expedient}}<a href="../contingut/{{:id}}"><span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span> {{:nom}}</a>
+							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span> {{:nom}}
+							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span> {{:nom}} {{/if}}
 						{{/for}}{{/if}}
 					</script>
 				</th>
 				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
 				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
-<%-- 				<th data-col-name="nomPropietariEscriptoriPare" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.agafatper"/></th> --%>
 			</tr>
 		</thead>
 	</table>

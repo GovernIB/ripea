@@ -660,7 +660,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId, boolean checkPerMassiuAdmin) {
+	public List<ExpedientSelectorDto> findPerUserAndProcediment(Long entitatId, Long metaExpedientId, String rolActual) {
 		logger.debug(
 				"Consultant els expedients segons el tipus per usuaris (" + "entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ")");
@@ -673,24 +673,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					true,
 					false,
-					false, 
-					checkPerMassiuAdmin, 
+					false,
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					null, 
 					null);
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAll(
-				metaExpedientsPermesos,
-				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-					@Override
-					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-						return metaExpedient.getId();
-					}
-				},
-				MetaNodeEntity.class,
-				new Permission[] { ExtendedPermission.READ },
-				auth);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
+//		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		permisosHelper.filterGrantedAll(
+//				metaExpedientsPermesos,
+//				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+//					@Override
+//					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+//						return metaExpedient.getId();
+//					}
+//				},
+//				MetaNodeEntity.class,
+//				new Permission[] { ExtendedPermission.READ },
+//				auth);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			return conversioTipusHelper.convertirList(
 					expedientRepository.findByEntitatAndMetaExpedientOrderByNomAsc(
