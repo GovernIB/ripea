@@ -66,25 +66,10 @@ public class DominiServiceImpl implements DominiService {
 	public DominiDto create(
 			Long entitatId,
 			DominiDto domini) throws NotFoundException {
-		logger.debug("Creant un nou domini per l'entitat (" +
-				"entitatId=" + entitatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		
+		return dominiHelper.create(
 				entitatId,
-				false,
-				true,
-				false, false, false);
-		DominiEntity entity = DominiEntity.getBuilder(
-				domini.getCodi(),
-				domini.getNom(),
-				domini.getDescripcio(),
-				domini.getConsulta(),
-				domini.getCadena(),
-				dominiHelper.xifrarContrasenya(domini.getContrasenya()),
-				entitat).build();
-		DominiDto dominiDto = conversioTipusHelper.convertir(
-				dominiRepository.save(entity),
-				DominiDto.class);
-		return dominiDto;
+				domini, true);
 	}
 
 	@Transactional

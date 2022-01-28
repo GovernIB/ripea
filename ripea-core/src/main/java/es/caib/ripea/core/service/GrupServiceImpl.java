@@ -17,6 +17,7 @@ import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.GrupHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.GrupRepository;
@@ -38,6 +39,8 @@ public class GrupServiceImpl implements GrupService {
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private GrupHelper grupHelper;
 	
 	
 	@Transactional
@@ -45,23 +48,10 @@ public class GrupServiceImpl implements GrupService {
 	public GrupDto create(
 			Long entitatId,
 			GrupDto grupDto) throws NotFoundException {
-		logger.debug("Creant un nou grup per l'entitat (" +
-				"entitatId=" + entitatId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false, false, false);
-		
-		GrupEntity enitity = GrupEntity.getBuilder(
-				grupDto.getRol(),
-				grupDto.getDescripcio(),
-				entitat).build();
 
-		GrupDto dto = conversioTipusHelper.convertir(
-				grupRepository.save(enitity),
-				GrupDto.class);
-		return dto;
+		return grupHelper.create(
+				entitatId,
+				grupDto);
 	}
 
 	@Transactional

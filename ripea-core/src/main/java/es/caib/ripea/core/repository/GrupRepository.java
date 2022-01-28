@@ -1,5 +1,7 @@
 package es.caib.ripea.core.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +24,16 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("filtre") String filtre,	
 			Pageable pageable);
 	
+	@Query(	"from " +
+			"    GrupEntity grup " +
+			"where " +
+			"    grup.entitat = :entitat " +
+			"and grup.rol = :rol " +
+			"and grup.descripcio = :descripcio ")
+	List<GrupEntity> findByRolDescricpio(
+			@Param("entitat") EntitatEntity entitat, 
+			@Param("rol") String rol,
+			@Param("descripcio") String descripcio);
 
+	
 }

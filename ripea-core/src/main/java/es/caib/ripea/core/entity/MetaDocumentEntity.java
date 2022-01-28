@@ -356,12 +356,17 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 
 	private static String getResponsablesFromArray(String[] portafirmesResponsables) {
 		StringBuilder responsablesStr = new StringBuilder();
-		for (String responsable: portafirmesResponsables) {
-			if (responsablesStr.length() > 0)
-				responsablesStr.append(",");
-			responsablesStr.append(responsable);
+		if (portafirmesResponsables != null) {
+			for (String responsable: portafirmesResponsables) {
+				if (responsablesStr.length() > 0)
+					responsablesStr.append(",");
+				responsablesStr.append(responsable);
+			}
+			return responsablesStr.toString();
+		} else {
+			return null;
 		}
-		return responsablesStr.toString();
+
 	}
 
 	@Override
