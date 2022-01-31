@@ -65,8 +65,12 @@ body.loading {
 body.loading .rmodal {
     display: block;
 }
+/* Adapt font color if the background is light or dark  */
+/* .dark-color { color: black }
+.light-color { color: white }	 */
 </style>
 <script>
+
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
 var columnaAgafatPer = 19;
 $(document).ready(function() {
@@ -105,10 +109,29 @@ $(document).ready(function() {
 		});
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
 		$("span[class^='stateColor-']").each(function( index ) {
+			
+			/* var rgb = $(selector).css("background-color");
+
+			  if (rgb.match(/^rgb/)) {
+			    var a = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/),
+			      r = a[1],
+			      g = a[2],
+			      b = a[3];
+			  }
+			  var hsp = Math.sqrt(
+			    0.299 * (r * r) +
+			    0.587 * (g * g) +
+			    0.114 * (b * b)
+			  );
+			  if (hsp > 127.5) {
+			    $(selector).addClass('dark-color');
+			  } else {
+			    $(selector).addClass('light-color');
+			  } */
 
 		    var fullClassNameString = this.className;
 		    var colorString = fullClassNameString.substring(11);
-		    $(this).parent().css( "background-color", colorString );	
+		    $(this).parent().css( "background-color", colorString );
 		});
 		
 
