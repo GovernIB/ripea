@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
@@ -677,6 +678,9 @@ public interface DocumentService {
 			Long documentId, 
 			Long tipusDocumentId,
 			boolean comprovarMetaExpedient);
+
+	@PreAuthorize("hasRole('tothom')")
+	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId);
 
 	
 

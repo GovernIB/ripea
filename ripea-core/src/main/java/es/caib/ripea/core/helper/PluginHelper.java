@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import es.caib.ripea.plugin.PropertiesHelper;
-import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.codec.binary.Base64;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -109,6 +107,7 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -122,6 +121,7 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -133,6 +133,7 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
@@ -3703,6 +3704,20 @@ public class PluginHelper {
 		}
 		return resposta;
 	}
+	
+	
+	public RespostaJustificantEnviamentNotib notificacioDescarregarJustificantEnviamentNotib(
+			String identificador) {
+		RespostaJustificantEnviamentNotib resposta = null;
+		try {
+			resposta = getNotificacioPlugin().consultaJustificantEnviament(
+					identificador);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return resposta;
+	}
+	
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {

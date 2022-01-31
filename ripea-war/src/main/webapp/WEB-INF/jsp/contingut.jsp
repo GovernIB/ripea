@@ -568,6 +568,8 @@ $(document).ready(function() {
 		$('.nav-tabs a[href$="#interessats"]').trigger('click');
 	} else if (/#tasques/.test(window.location.href)){
 		$('.nav-tabs a[href$="#tasques"]').trigger('click');
+	} else if (/#enviaments/.test(window.location.href)){
+		$('.nav-tabs a[href$="#enviaments"]').trigger('click');
 	}
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		  var target = $(e.target).attr("href")

@@ -44,6 +44,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -173,7 +174,25 @@ public class DocumentEnviamentController extends BaseUserController {
 						notificacioId));
 		return "notificacioInfo";
 	}
+	
+	
+	@RequestMapping(value = "/notificacio/actualitzarEstat/{identificador}/{referencia}")
+	public String notificacioActualitzarEstat(
+			HttpServletRequest request,
+			@PathVariable String identificador,
+			@PathVariable String referencia,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		
+		documentService.notificacioActualitzarEstat(
+				identificador, 
+				referencia);
+		return null;
+		
+	}
 
+	
+	
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/{enviamentId}/descarregarJustificant", method = RequestMethod.GET)
 	public String notificacioConsultarIDescarregarJustificant(
 			HttpServletRequest request,
@@ -200,6 +219,32 @@ public class DocumentEnviamentController extends BaseUserController {
 		}
 		return null;
 	}
+	
+	
+	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/descarregarJustificantEnviamentNotib", method = RequestMethod.GET)
+	public String notificacioConsultarIDescarregarJustificant(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long documentId,
+			@PathVariable Long notificacioId) throws IOException {
+		getEntitatActualComprovantPermisos(request);
+		RespostaJustificantEnviamentNotibDto info = documentService.notificacioDescarregarJustificantEnviamentNotib(
+				notificacioId);
+		
+		if (info.getJustificant() != null) {
+			writeFileToResponse(
+					"justificant.pdf",
+					info.getJustificant(),
+					response);
+		} else {
+			return this.getModalControllerReturnValueError(
+					request,
+					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
+					"expedient.controller.notificacio.justificant.ko");
+		}
+		return null;
+	}
+	
 
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}", method = RequestMethod.GET)
