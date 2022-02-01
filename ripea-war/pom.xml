@@ -597,6 +597,27 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<version>1.5.3</version>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<basedir>${basedir}/src/main/webapp/WEB-INF</basedir>
+									<includes>
+										<include>jboss-web.xml</include>
+									</includes>
+									<token>/ripea</token>
+									<value>/${ripea.path}</value>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>

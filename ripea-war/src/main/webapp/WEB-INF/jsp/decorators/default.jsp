@@ -92,7 +92,10 @@
 	<![endif]-->
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	
-	<script>var requestLocale = '${requestLocale}';</script>
+	<script>
+		var requestLocale = '${requestLocale}';
+		var contextAddress = '${pageContext.request.contextPath}';
+	</script>
 	<decorator:head />
 <style>
 body {

@@ -438,7 +438,7 @@ body.loading .rmodal {
 	opacity: 0.1;
 }
 .sortable-dest {
-	background-image: url(/ripea/img/background-pattern.png);
+	background-image: url('<c:url value="../img/background-pattern.png"/>');
 }
 .ordre-col {
     cursor: move;
