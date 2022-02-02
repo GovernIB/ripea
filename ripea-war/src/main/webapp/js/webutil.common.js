@@ -1,6 +1,7 @@
 
 function webutilContextPath() {
-	return '/ripea';
+	//return '/ripea';
+	return contextAddress;
 }
 function webutilModalTancarPath() {
 	return webutilContextPath() + '/modal/tancar';

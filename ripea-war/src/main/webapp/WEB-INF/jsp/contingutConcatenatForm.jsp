@@ -39,7 +39,7 @@ $(document).ready(function() {
 	$('#metaNodeId').on('change', function() {
 		if ($(this).val()) {
 			if ($('#id').val() == '') { // if creating new document
-				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+				$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 					$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
@@ -50,7 +50,7 @@ $(document).ready(function() {
 				})
 			} else { // if modifying existing document 
 				if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
-					$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+					$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
@@ -61,7 +61,7 @@ $(document).ready(function() {
 					})
 				}
 			}
-			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
+			$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val())
 			.done(function(data) {
 				if (data.plantillaNom) {
 					$('#info-plantilla-si').removeClass('hidden');
