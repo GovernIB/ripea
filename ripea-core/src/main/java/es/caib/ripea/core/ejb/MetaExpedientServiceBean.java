@@ -268,7 +268,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id, Long organId) {
 		return delegate.getAndCheckAdminPermission(
 				entitatId,
-				id, null);
+				id, 
+				organId);
 	}
 
 	@Override

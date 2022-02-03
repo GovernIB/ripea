@@ -307,7 +307,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 						if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
 							List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
-							if (dominis == null || dominis.isEmpty()) {
+							if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
 								dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
 							}
 						}
@@ -321,8 +321,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			for (MetaDadaDto metaDadaDto : metaExpedient.getMetaDades()) {
 				if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
 					List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
-					if (dominis == null || dominis.isEmpty()) {
-						dominiHelper.create(entitatId, metaDadaDto.getDomini(), true);
+					if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
+						dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
 					}
 				}
 				metaDadaHelper.create(entitatId, entity.getId(), metaDadaDto, rolActual, organId);
@@ -410,8 +410,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					if (metaDocumentDto.getMetaDades() != null) {
 						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-								DominiEntity domini = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi()).get(0);
-								metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+								if (dominis != null && !dominis.isEmpty()) {
+									DominiEntity domini = dominis.get(0);
+									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+								}
 							}
 						}
 					}

@@ -320,6 +320,8 @@ public class ExpedientInteressatController extends BaseUserController {
 			break;
 		}
 		
+		representantDto.setNotificacioAutoritzat(true);
+		
 		String msgKey = "interessat.controller.representant.afegit.ok";
 		if (interessatCommand.getId() == null) {
 			InteressatDto representant = expedientInteressatService.create(

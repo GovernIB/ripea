@@ -37,7 +37,12 @@ $(document).ready(function() {
 		$('#metaNodeId option[value!=""]').remove();
 		var metaNodeRefresh = function(data) {
 			for (var i = 0; i < data.length; i++) {
-				$('#metaNodeId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+
+				if (data[i].id == '${contingutFiltreCommand.metaNodeId}' ) {
+					$('#metaNodeId').append('<option value="' + data[i].id + '" selected>' + data[i].nom + '</option>');
+				} else {
+					$('#metaNodeId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+				}
 			}
 		};
 		if (tipus == 'EXPEDIENT') {
@@ -54,6 +59,8 @@ $(document).ready(function() {
 			});
 		}
 	});
+
+	$('#tipus').trigger('change');
 });
 </script>
 </head>
