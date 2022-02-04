@@ -41,28 +41,11 @@ public class ExecucioMassivaServiceBean implements ExecucioMassivaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public Long getExecucionsMassivesActiva(Long ultimaExecucioMassiva) {
-		return delegate.getExecucionsMassivesActiva(ultimaExecucioMassiva);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
 	public void executarExecucioMassiva(Long cmasiu_id) throws NotFoundException, ValidationException {
 		delegate.executarExecucioMassiva(cmasiu_id);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public void generaInformeError(Long emc_id, String error) throws NotFoundException {
-		delegate.generaInformeError(emc_id, error);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public void actualitzaUltimaOperacio(Long ome_id) throws NotFoundException, ExecucioMassivaException {
-		delegate.actualitzaUltimaOperacio(ome_id);
-	}
-
+	
 	@Override
 	@RolesAllowed("tothom")
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException {

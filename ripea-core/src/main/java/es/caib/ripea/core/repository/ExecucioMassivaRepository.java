@@ -29,9 +29,15 @@ public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassiva
 	@Query("select min(id) " +
 			"from 	ExecucioMassivaEntity " +
 			"where 	dataInici <= :ara " +
+			"	and dataFi is null ")
+	Long getNextMassiu(@Param("ara") Date ara);
+	
+	@Query("select e " +
+			"from 	ExecucioMassivaEntity e " +
+			"where 	dataInici <= :ara " +
 			"	and dataFi is null " +
-			"	and id > :lastMassiu ")
-	Long getNextMassiu(@Param("lastMassiu") Long lastMassiu, @Param("ara") Date ara);
+			"	order by e.id asc")
+	List<ExecucioMassivaEntity> getMassivesPerProcessar(@Param("ara") Date ara);
 	
 	@Query("select min(id) " +
 			"	from 	ExecucioMassivaEntity " +
