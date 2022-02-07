@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.SeguimentService;
@@ -88,7 +88,7 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
-        PaginaDto<ExpedientPeticioDto> docsPortafirmes = new PaginaDto<ExpedientPeticioDto>();
+        PaginaDto<ExpedientPeticioListDto> docsPortafirmes = new PaginaDto<ExpedientPeticioListDto>();
 
             EntitatDto entitat = getEntitatActualComprovantPermisos(request);
             

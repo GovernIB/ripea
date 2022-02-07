@@ -3,14 +3,12 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import es.caib.ripea.core.entity.*;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -30,6 +28,7 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEst
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
@@ -47,6 +46,26 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.core.entity.AlertaEntity;
+import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.DadaEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExecucioMassivaEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -371,6 +390,26 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});	
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientPeticioEntity, ExpedientPeticioListDto>() {
+					@Override
+					public ExpedientPeticioListDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioListDto> destinationType) {
+						ExpedientPeticioListDto target = new ExpedientPeticioListDto();
+						target.setId(source.getId());
+						RegistreDto registre = new RegistreDto();
+						registre.setIdentificador(source.getRegistre().getIdentificador());
+						registre.setData(source.getRegistre().getData());
+						registre.setExtracte(source.getRegistre().getExtracte());
+						registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
+						target.setRegistre(registre);
+						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
+						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setEstat(source.getEstat());
+						target.setIdentificador(source.getIdentificador());
+						return target;
+					}
+				});
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentPortafirmesEntity, SeguimentDto>() {

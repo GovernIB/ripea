@@ -32,6 +32,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
@@ -228,7 +229,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientPeticioDto> findByExpedientAmbFiltre(
+	public List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams) {
@@ -246,7 +247,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		return conversioTipusHelper.convertirList(
 				peticions,
-				ExpedientPeticioDto.class);
+				ExpedientPeticioListDto.class);
 	}
 
 	@Transactional(readOnly = true)
