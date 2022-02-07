@@ -186,6 +186,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
+		if (command.isPinbalActiu() && (command.getPinbalFinalitat() == null || command.getPinbalFinalitat().isEmpty())) {
+			bindingResult.rejectValue("pinbalFinalitat", "NotNull");
+		}
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
 			return "metaExpedientMetaDocumentForm";
