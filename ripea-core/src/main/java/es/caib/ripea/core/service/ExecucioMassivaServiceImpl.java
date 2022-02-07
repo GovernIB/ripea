@@ -33,6 +33,7 @@ import es.caib.ripea.core.entity.ExecucioMassivaEntity.ExecucioMassivaTipus;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExceptionHelper;
 import es.caib.ripea.core.helper.ExecucioMassivaHelper;
@@ -68,6 +69,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	private AlertaHelper alertaHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private EmailHelper emailHelper;
 
 	@Transactional
 	@Override
@@ -142,10 +145,10 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		
 		List<ExecucioMassivaEntity> exmEntities = new ArrayList<ExecucioMassivaEntity>();
 		if (usuari == null) {
-			exmEntities = execucioMassivaRepository.findByEntitatId(entitat.getId(), paginacio);
+			exmEntities = execucioMassivaRepository.findByEntitatIdOrderByCreatedDateDesc(entitat.getId(), paginacio);
 		} else {
 			UsuariEntity usuariEntity = usuariRepository.findByCodi(usuari.getCodi());
-			exmEntities = execucioMassivaRepository.findByCreatedByAndEntitatId(usuariEntity, entitat.getId(), paginacio);
+			exmEntities = execucioMassivaRepository.findByCreatedByAndEntitatIdOrderByCreatedDateDesc(usuariEntity, entitat.getId(), paginacio);
 		}
 		
 		return recompteErrors(exmEntities);
@@ -187,6 +190,14 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					}
 					execucioMassiva.updateDataFi(new Date());
 					execucioMassivaRepository.save(execucioMassiva);
+					
+					if (execucioMassiva.getEnviarCorreu()) {
+						try {
+							emailHelper.execucioMassivaFinalitzada(execucioMassiva);
+						} catch (Exception e) {
+							logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
+						}
+					}
 				}
 			}
 

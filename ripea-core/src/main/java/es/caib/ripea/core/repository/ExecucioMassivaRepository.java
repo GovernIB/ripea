@@ -22,9 +22,9 @@ import es.caib.ripea.core.entity.UsuariEntity;
  */
 public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassivaEntity, Long> {
 	
-	List<ExecucioMassivaEntity> findByCreatedByAndEntitatId(UsuariEntity createdBy, Long entitatId, Pageable pageable);
+	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(UsuariEntity createdBy, Long entitatId, Pageable pageable);
 	
-	List<ExecucioMassivaEntity> findByEntitatId(Long entitatId, Pageable pageable);
+	List<ExecucioMassivaEntity> findByEntitatIdOrderByCreatedDateDesc(Long entitatId, Pageable pageable);
 	
 	@Query("select min(id) " +
 			"from 	ExecucioMassivaEntity " +

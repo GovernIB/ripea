@@ -513,6 +513,7 @@ public class ConversioTipusHelper {
 						target.setPortafirmesFluxId(source.getPortafirmesFluxId());
 						target.setPortafirmesTransaccioId(source.getPortafirmesTransaccioId());
 						target.setEnviarCorreu(source.getEnviarCorreu());
+						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						return target;
 					}
 				});

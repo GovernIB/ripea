@@ -174,13 +174,32 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			@Valid PortafirmesEnviarCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		// TODO: Validació del command
+		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && (command.getPortafirmesResponsables() == null || command.getPortafirmesResponsables().length == 0)) {
+			bindingResult.rejectValue("portafirmesResponsables", "NotNull");
+		}
+		
 		if (bindingResult.hasErrors()) {
+			
+			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+			
+			MetaDocumentDto metaDocument = metaDocumentService.findById(
+					entitatActual.getId(),
+					filtreCommand.getMetaExpedientId(),
+					filtreCommand.getMetaDocumentId());
+
+			setFluxPredefinit(
+					metaDocument,
+					model,
+					command);
+
+			model.addAttribute("metadocumentId", metaDocument.getId());
+			
 			return "enviarPortafirmes";
 		}
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
