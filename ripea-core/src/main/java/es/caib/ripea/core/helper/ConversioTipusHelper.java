@@ -519,15 +519,15 @@ public class ConversioTipusHelper {
 					}
 				});
 
-		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
-				.byDefault()
-				.register();
-
-		mapperFactory.classMap(RegistreAnnexEntity.class, RegistreAnnexDto.class)
-				.exclude("contingut")
-				.exclude("firmaContingut")
-				.byDefault()
-				.register();
+//		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
+//				.byDefault()
+//				.register();
+//
+//		mapperFactory.classMap(RegistreAnnexEntity.class, RegistreAnnexDto.class)
+//				.exclude("contingut")
+//				.exclude("firmaContingut")
+//				.byDefault()
+//				.register();
 	}
 	
 
