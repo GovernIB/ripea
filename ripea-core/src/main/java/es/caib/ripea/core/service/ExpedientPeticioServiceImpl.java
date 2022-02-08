@@ -95,7 +95,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, boolean isAdmin) {
@@ -159,8 +159,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 						paginacioParams,
 						ordenacioMap));
 
-		PaginaDto<ExpedientPeticioDto> result = paginacioHelper.toPaginaDto(paginaExpedientPeticios,
-				ExpedientPeticioDto.class);
+		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(paginaExpedientPeticios,
+				ExpedientPeticioListDto.class);
 
 		return result;
 

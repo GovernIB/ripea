@@ -17,7 +17,7 @@ import es.caib.ripea.core.api.dto.RegistreDto;
 
 public interface ExpedientPeticioService {
 
-	PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+	PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, boolean isAdmin);

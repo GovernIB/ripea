@@ -41,7 +41,7 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, boolean isAdmin) {

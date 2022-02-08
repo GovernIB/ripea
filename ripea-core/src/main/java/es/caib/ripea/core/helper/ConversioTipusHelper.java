@@ -398,10 +398,13 @@ public class ConversioTipusHelper {
 						ExpedientPeticioListDto target = new ExpedientPeticioListDto();
 						target.setId(source.getId());
 						RegistreDto registre = new RegistreDto();
-						registre.setIdentificador(source.getRegistre().getIdentificador());
-						registre.setData(source.getRegistre().getData());
-						registre.setExtracte(source.getRegistre().getExtracte());
-						registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
+						if (source.getRegistre() != null) {
+							registre.setIdentificador(source.getRegistre().getIdentificador());
+							registre.setData(source.getRegistre().getData());
+							registre.setExtracte(source.getRegistre().getExtracte());
+							registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
+							registre.setOrigenRegistreNumero(source.getRegistre().getOrigenRegistreNumero());
+						}
 						target.setRegistre(registre);
 						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
 						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
