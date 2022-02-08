@@ -570,7 +570,10 @@ $(document).ready(function() {
 		$('.nav-tabs a[href$="#tasques"]').trigger('click');
 	} else if (/#enviaments/.test(window.location.href)){
 		$('.nav-tabs a[href$="#enviaments"]').trigger('click');
+	} else if (/#anotacions/.test(window.location.href)){
+		$('.nav-tabs a[href$="#anotacions"]').trigger('click');
 	}
+	
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		  var target = $(e.target).attr("href")
 		  window.history.replaceState('','', window.location.href.substr(0, window.location.href.indexOf("#")) + target);  
