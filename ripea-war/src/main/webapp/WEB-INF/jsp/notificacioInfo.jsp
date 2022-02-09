@@ -6,7 +6,18 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <html>
 <head>
-	<title><spring:message code="notificacio.info.titol"/></title>
+	
+	<c:choose>
+		<c:when test="${notificacio.tipus == 'NOTIFICACIO'}">
+			<title><spring:message code="notificacio.info.titol"/></title>
+		</c:when>
+		<c:otherwise>
+			<title><spring:message code="notificacio.info.titol.comunicacio"/></title>
+		</c:otherwise>
+	</c:choose>
+	
+	
+	
 	<rip:modalHead/>
 	
 <style type="text/css">
@@ -61,58 +72,95 @@ $(document).ready(function(){
 			<dl class="dl-horizontal">
 
 				<!----------------- NOTIFICACIO INFO ------------------->
-				<table class="table table-bordered">
-					<tbody>
-					<tr>
-						<td><strong><spring:message code="notificacio.info.camp.document"/></strong></td>
-						<td>${notificacio.document.nom} 
-							<a href="<c:url value="/contingut/${notificacio.document.pareId}/document/${notificacio.document.id}/descarregar"/>" class="btn btn-default btn-sm pull-right">
-								<span class="fa fa-download"></span>
-							</a>
-						</td>
-					</tr>
-					<tr>				
-						<td><strong><spring:message code="notificacio.info.camp.data"/></strong></td>
-						<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-					</tr>
-					<tr>				
-						<td><strong><spring:message code="notificacio.info.camp.dataFinalitzada"/></strong></td>
-						<td><fmt:formatDate value="${notificacio.processatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-					</tr>										
-					<tr>						
-						<td><strong><spring:message code="notificacio.info.camp.tipus"/></strong></td>
-						<td><spring:message code="notificacio.tipus.enum.${notificacio.tipus}"/></td>
-					</tr>
-					<tr>						
-						<td><strong><spring:message code="notificacio.info.camp.estat"/></strong></td>
-						<td><spring:message code="notificacio.notificacioEstat.enum.${notificacio.notificacioEstat}"/></td>
-					</tr>
-					<tr>						
-						<td><strong><spring:message code="notificacio.info.camp.assumpte"/></strong></td>
-						<td>${notificacio.assumpte}</td>				
-					</tr>
-					<tr>						
-						<c:if test="${not empty notificacio.observacions}">
-							<td><strong><spring:message code="notificacio.info.camp.observacions"/></strong></td>
-							<td>${notificacio.observacions}</td>
-						</c:if>				
-					</tr>
-					<c:if test="${notificacio.notificacioEstat!='PENDENT'}">
-						<tr><td colspan="2">
-							<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/descarregarJustificantEnviamentNotib'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
-								<spring:message code="notificacio.info.camp.justificant.enviament.notib.boto"/> <span class="fa fa-download"></span>
-							</a>
-						</td></tr>
-					</c:if>					
-					</tbody>
-				</table>	
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<c:choose>
+							<c:when test="${notificacio.tipus == 'NOTIFICACIO'}">
+								<h3 class="panel-title"><strong><spring:message code="notificacio.info.panel.notificacio"/></strong></h3>
+							</c:when>
+							<c:otherwise>
+								<h3 class="panel-title"><strong><spring:message code="notificacio.info.panel.comunicacio"/></strong></h3>
+							</c:otherwise>
+						</c:choose>
+					</div>				
+				
+					<table class="table table-bordered">
+						<tbody>
+						<tr>						
+							<td><strong><spring:message code="notificacio.info.camp.concepte"/></strong></td>
+							<td>${notificacio.assumpte}</td>				
+						</tr>						
+						<tr>						
+							<td><strong><spring:message code="notificacio.info.camp.descripcio"/></strong></td>
+							<td>${notificacio.observacions}</td>				
+						</tr>
+						<tr>						
+							<td><strong><spring:message code="notificacio.info.camp.estat"/></strong></td>
+							<td><spring:message code="notificacio.notificacioEstat.enum.${notificacio.notificacioEstat}"/></td>
+						</tr>						
+						
+						<tr>				
+							<td><strong><spring:message code="notificacio.info.camp.data"/></strong></td>
+							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+						</tr>
+						<tr>				
+							<td><strong><spring:message code="notificacio.info.camp.dataFinalitzada"/></strong></td>
+							<td><fmt:formatDate value="${notificacio.processatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+						</tr>										
+						<tr>						
+							<td><strong><spring:message code="notificacio.info.camp.tipus"/></strong></td>
+							<td><spring:message code="notificacio.tipus.enum.${notificacio.tipus}"/></td>
+						</tr>				
+						</tr>
+						<c:if test="${notificacio.notificacioEstat!='PENDENT'}">
+							<tr><td colspan="2">
+								<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/descarregarJustificantEnviamentNotib'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+									<spring:message code="notificacio.info.camp.justificant.enviament.notib.boto"/> <span class="fa fa-download"></span>
+								</a>
+							</td></tr>
+						</c:if>					
+						</tbody>
+					</table>	
+				</div>
+				
+				
+				
+				
+				<!----------------- DOCUMENT ------------------->
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<c:choose>
+							<c:when test="${notificacio.tipus == 'NOTIFICACIO'}">
+								<h3 class="panel-title"><strong><spring:message code="notificacio.info.panel.document.notificacio"/></strong></h3>
+							</c:when>
+							<c:otherwise>
+								<h3 class="panel-title"><strong><spring:message code="notificacio.info.panel.document.comunicacio"/></strong></h3>
+							</c:otherwise>
+						</c:choose>
+					</div>				
+				
+					<table class="table table-bordered">
+						<tbody>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.camp.arxiu.nom"/></strong></td>
+							<td>${notificacio.document.fitxerNom} 
+								<a href="<c:url value="/contingut/${notificacio.document.pareId}/document/${notificacio.document.id}/descarregar"/>" class="btn btn-default btn-sm pull-right">
+									<spring:message code="notificacio.info.camp.document.btn"/> <span class="fa fa-download"></span>
+								</a>
+							</td>
+						</tr>
+										
+						</tbody>
+					</table>	
+				</div>				
+				
 				
 				<!----------------- ENVIAMENTS INFO ------------------->
 				<c:forEach var="enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
 					<c:set var="interessat" value="${enviament.interessat}"/>				
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</h3>
+							<h3 class="panel-title"><strong><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</strong></h3>
 						</div>
 						
 						<%-- DO NOT DELETE, uncomment to manually refresh state from Notib
