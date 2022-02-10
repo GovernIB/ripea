@@ -40,7 +40,7 @@
 	</c:if>	
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importEdit"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxerEdit"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportEditCommand" role="form">
 
 		<form:hidden path="entitatId"/>
@@ -143,7 +143,7 @@
 		</c:if>
 
 		<div id="modal-botons">
-			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.importar"/></button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

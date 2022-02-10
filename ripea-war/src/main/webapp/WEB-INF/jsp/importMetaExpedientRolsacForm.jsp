@@ -19,11 +19,10 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxer"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="fileCommand" role="form" enctype="multipart/form-data">
-
-	
-		<rip:inputFile name="file" textKey="metaexpedient.import.form.file" required="true"/>
+	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importRolsac"/></c:set>
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportRolsacCommand" role="form" >
+		
+		<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
 		
 		<div style="min-height: 20px;"></div>
 
