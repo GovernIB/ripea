@@ -63,8 +63,8 @@
   						<span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="metaExpedient/importRolsac" data-toggle="modal"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
-						<li><a href="metaExpedient/importFitxer" data-toggle="modal"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
+						<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
+						<li><a href="metaExpedient/importFitxer" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
 					</ul>
 				</div>
 			

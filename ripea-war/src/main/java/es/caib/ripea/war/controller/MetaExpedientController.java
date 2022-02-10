@@ -576,6 +576,14 @@ public class MetaExpedientController extends BaseAdminController {
 		if (!command.isComu() && command.getOrganGestorId() == null) {
 			bindingResult.reject("metaexpedient.import.form.validation.organ.obligatori");
 		}
+		
+		for (int i = 0; i < command.getMetaDocuments().size(); i++) {
+			MetaDocumentCommand metaDocumentCommand = command.getMetaDocuments().get(i);
+			if (metaDocumentCommand.isFirmaPortafirmesActiva() && metaDocumentCommand.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && (metaDocumentCommand.getPortafirmesResponsables() == null || metaDocumentCommand.getPortafirmesResponsables().length == 0)) {
+				bindingResult.rejectValue("metaDocuments[" + i + "].portafirmesResponsables", "NotNull");
+			}
+		}
+		
 		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByCodiSia(command.getEntitatId(),
 				command.getClassificacioSia());
 		boolean valid = true;

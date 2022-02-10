@@ -77,6 +77,7 @@
 				<div class="well"> 
 					<form:hidden path="metaDocuments[${vs.index}].id" />
 					<form:hidden path="metaDocuments[${vs.index}].portafirmesFluxTipus" />
+					<form:hidden path="metaDocuments[${vs.index}].firmaPortafirmesActiva" />
 					<rip:inputText name="metaDocuments[${vs.index}].codi" textKey="metaexpedient.form.camp.codi" required="true" readonly = "true"/>
 					
 					<c:choose>
@@ -91,7 +92,7 @@
 								suggestValue="codi"
 								suggestText="nom"
 								suggestTextAddicional="nif"
-								required="true"/>							
+								required="${metaExpedientImportEditCommand.metaDocuments[vs.index].firmaPortafirmesActiva}"/>							
 						</c:when>
 						<c:otherwise>
 						</c:otherwise>
