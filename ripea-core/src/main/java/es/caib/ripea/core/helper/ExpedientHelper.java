@@ -284,13 +284,13 @@ public class ExpedientHelper {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
-		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
+		for (RegistreInteressatEntity interessatRegistre : expedientPeticioEntity.getRegistre().getInteressats()) {
 			boolean alreadyExists = false;
-			InteressatEntity existingInteressat = null;
-			for (InteressatEntity interessatExpedient : existingInteressats) {
-				if (interessatExpedient.getDocumentNum().equals(registreInteressatEntity.getDocumentNumero())) {
+			InteressatEntity interessatExpedient = null;
+			for (InteressatEntity interessatExp : existingInteressats) {
+				if (interessatExp.getDocumentNum().equals(interessatRegistre.getDocumentNumero())) {
 					alreadyExists = true;
-					existingInteressat = interessatExpedient;
+					interessatExpedient = interessatExp;
 				}
 			}
 			if (!alreadyExists) {
@@ -298,32 +298,32 @@ public class ExpedientHelper {
 						entitatId,
 						expedientId,
 						null,
-						toInteressatDto(registreInteressatEntity, null),
+						toInteressatDto(interessatRegistre, null),
 						true, 
 						permission, 
 						rolActual, 
 						false);
-				if (registreInteressatEntity.getRepresentant() != null) {
+				if (interessatRegistre.getRepresentant() != null) {
 					expedientInteressatHelper.create(
 							entitatId,
 							expedientId,
 							createdInteressat.getId(),
-							toInteressatDto(registreInteressatEntity.getRepresentant(), null),
+							toInteressatDto(interessatRegistre.getRepresentant(), null),
 							true, 
 							permission, 
 							rolActual, 
 							false);
 				}
 			} else {
-				RegistreInteressatEntity representant = registreInteressatEntity.getRepresentant();
-				Long idRepresentant = representant != null ? representant.getId() : null; //modificar o afegir
+				RegistreInteressatEntity representantRegistre = interessatRegistre.getRepresentant();
+				Long idRepresentantExpedient = representantRegistre != null && interessatExpedient.getRepresentant() != null ? interessatExpedient.getRepresentant().getId() : null; //modificar o afegir
 				expedientInteressatHelper.update(
 						entitatId, 
 						expedientId, 
-						existingInteressat.getId(), 
-						toInteressatDto(registreInteressatEntity, existingInteressat.getId()), 
+						interessatExpedient.getId(), 
+						toInteressatDto(interessatRegistre, interessatExpedient.getId()), 
 						true,
-						representant != null ? toInteressatDto(representant, idRepresentant) : null, rolActual);
+						representantRegistre != null ? toInteressatDto(representantRegistre, idRepresentantExpedient) : null, rolActual);
 			}
 		}
 	}
