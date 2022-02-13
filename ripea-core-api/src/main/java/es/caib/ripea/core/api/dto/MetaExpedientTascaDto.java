@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -14,6 +16,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Data
+@NoArgsConstructor
 public class MetaExpedientTascaDto implements Serializable {
 
 	private Long id;
@@ -24,57 +28,12 @@ public class MetaExpedientTascaDto implements Serializable {
 	private boolean activa;
 	private Date dataLimit;
 	private Long estatIdCrearTasca;
+	private String estatNomCrearTasca;
+	private String estatColorCrearTasca;
 	private Long estatIdFinalitzarTasca;
+	private String estatNomFinalitzarTasca;
+	private String estatColorFinalitzarTasca;
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getResponsable() {
-		return responsable;
-	}
-	public void setResponsable(String responsable) {
-		this.responsable = responsable;
-	}
-	public boolean isActiva() {
-		return activa;
-	}
-	public void setActiva(boolean activa) {
-		this.activa = activa;
-	}
-	public Long getEstatIdCrearTasca() {
-		return estatIdCrearTasca;
-	}
-	public void setEstatIdCrearTasca(Long estatIdCrearTasca) {
-		this.estatIdCrearTasca = estatIdCrearTasca;
-	}
-	public Long getEstatIdFinalitzarTasca() {
-		return estatIdFinalitzarTasca;
-	}
-	public void setEstatIdFinalitzarTasca(Long estatIdFinalitzarTasca) {
-		this.estatIdFinalitzarTasca = estatIdFinalitzarTasca;
-	}
-	
 	public String getDataLimitString() {
 		if (dataLimit != null) {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -83,20 +42,6 @@ public class MetaExpedientTascaDto implements Serializable {
 			return "";
 		}
 	}
-	public Date getDataLimit() {
-		return dataLimit;
-	}
-	public void setDataLimit(Date dataLimit) {
-		this.dataLimit = dataLimit;
-	}
-
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
-
-
 
 	private static final long serialVersionUID = -139254994389509932L;
 

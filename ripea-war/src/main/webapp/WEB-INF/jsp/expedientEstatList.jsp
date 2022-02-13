@@ -21,21 +21,18 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-	$('#estats').on('dragupdate.dataTable', function (event, itemId, index) {
-		$.ajax({
-			url: "<c:url value="/ajax/expedientEstat/"/>" + ${metaExpedient.id} + "/" + itemId + "/move/" + index,
-			async: false
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#estats').on('dragupdate.dataTable', function (event, itemId, index) {
+				$.ajax({
+					url: "<c:url value="/ajax/expedientEstat/"/>" + ${metaExpedient.id} + "/" + itemId + "/move/" + index,
+					async: false
+				});
+			});
 		});
-	});
-});
-</script>
+	</script>
 </head>
 <body>
-
-	
-
 
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<c:if test="${!bloquejarCamps}">
@@ -59,6 +56,12 @@ $(document).ready(function() {
 					</script>
 				</th>				
 				<th data-col-name="responsableCodi" data-orderable="false"><spring:message code="expedient.estat.form.camp.responsable"/></th>
+				<th data-col-name="color" data-orderable="false" data-template="#cellColorTemplate" width="80px;">
+					<spring:message code="expedient.estat.form.camp.color"/>
+					<script id="cellColorTemplate" type="text/x-jsrender">
+						<span class="color-legend" {{if color}}style="background-color: {{:color}};"{{/if}}></span>
+					</script>
+				</th>
 				
 				<c:if test="${!esRevisor}">
 					<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">

@@ -149,7 +149,11 @@ public class ConversioTipusHelper {
 						target.setDataLimit(source.getDataLimit());
 						target.setDescripcio(source.getDescripcio());
 						target.setEstatIdCrearTasca(source.getEstatCrearTasca() != null ? source.getEstatCrearTasca().getId() : null);
+						target.setEstatNomCrearTasca(source.getEstatCrearTasca() != null ? source.getEstatCrearTasca().getNom() : null);
+						target.setEstatColorCrearTasca(source.getEstatCrearTasca() != null ? source.getEstatCrearTasca().getColor() : null);
 						target.setEstatIdFinalitzarTasca(source.getEstatFinalitzarTasca() != null ? source.getEstatFinalitzarTasca().getId() : null);
+						target.setEstatNomFinalitzarTasca(source.getEstatFinalitzarTasca() != null ? source.getEstatFinalitzarTasca().getNom() : null);
+						target.setEstatColorFinalitzarTasca(source.getEstatFinalitzarTasca() != null ? source.getEstatFinalitzarTasca().getColor() : null);
 						target.setId(source.getId());
 						target.setNom(source.getNom());
 						target.setResponsable(source.getResponsable());

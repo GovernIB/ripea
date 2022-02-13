@@ -17,14 +17,11 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script type="text/javascript">
-// 		$(document).ready(function(){
-// 			$("#myColor").change(function() {
-// 				$("#color").val($("#myColor").val());
-// 			});
-// 			$("#color").change(function() {
-// 				$("#myColor").val($("#color").val());
-// 			});
-// 		});
+		$(document).ready(function(){
+			$("#ambColor").change(function() {
+				$("#color").prop("disabled", !$("#ambColor").prop('checked'));
+			});
+		});
 	</script>
 	<rip:modalHead/>
 </head>
@@ -41,10 +38,11 @@
 			
 			<div class="row">
 				<div class="col-xs-4" style="text-align: right;">
-					<label for="head">Color</label>
+					<label for="color">Color</label>
 				</div>
 				<div class="col-xs-8">
-					<form:input type="color" path="color" id="color" name="color" value="" style="width: 100%;" />
+					<form:checkbox id="ambColor" path="ambColor" disabled="${bloquejarCamps}" />
+					<form:input type="color" path="color" id="color" name="color" value="" disabled="${bloquejarCamps or not expedientEstatCommand.ambColor}" style="width: calc(100% - 36px); float: right;" />
 				</div>
 			</div>
 			<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial" disabled="${bloquejarCamps}"/>

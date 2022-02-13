@@ -29,6 +29,26 @@
 				<th data-col-name="nom" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.nom"/></th>
 				<th data-col-name="responsable" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.responsable"/></th>
 				<th data-col-name="dataLimit" data-converter="date"><spring:message code="metaexpedient.tasca.form.camp.dataLimit"/></th>
+				<th data-col-name="estatColorCrearTasca" data-visible="false"></th>
+				<th data-col-name="estatNomCrearTasca" data-template="#cellTascaCrearTemplate">
+					<spring:message code="metaexpedient.tasca.list.camp.estat.crearTasca"/>
+					<script id="cellTascaCrearTemplate" type="text/x-jsrender">
+						{{if estatNomCrearTasca}}
+							<span class="color-legend-min" {{if estatColorCrearTasca}}style="background-color: {{:estatColorCrearTasca}};"{{/if}}></span>
+							<span style="vertical-align: super;">{{:estatNomCrearTasca}}</span>
+						{{/if}}
+					</script>
+				</th>
+				<th data-col-name="estatColorFinalitzarTasca" data-visible="false"></th>
+				<th data-col-name="estatNomFinalitzarTasca" data-template="#cellTascaFiTemplate">
+					<spring:message code="metaexpedient.tasca.list.camp.estat.finalitzarTasca"/>
+					<script id="cellTascaFiTemplate" type="text/x-jsrender">
+						{{if estatNomFinalitzarTasca}}
+							<span class="color-legend-min" {{if estatColorFinalitzarTasca}}style="background-color: {{:estatColorFinalitzarTasca}};"{{/if}}></span>
+							<span style="vertical-align: super;">{{:estatNomFinalitzarTasca}}</span>
+						{{/if}}
+					</script>
+				</th>
 				<th data-col-name="activa" data-template="#cellActivaTemplate" data-orderable="false">
 					<spring:message code="metaexpedient.tasca.columna.activa"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
