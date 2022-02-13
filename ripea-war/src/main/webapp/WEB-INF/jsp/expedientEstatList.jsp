@@ -59,7 +59,7 @@
 				<th data-col-name="color" data-orderable="false" data-template="#cellColorTemplate" width="80px;">
 					<spring:message code="expedient.estat.form.camp.color"/>
 					<script id="cellColorTemplate" type="text/x-jsrender">
-						<span class="color-legend" {{if color}}style="background-color: {{:color}};"{{/if}}></span>
+						<span class="color-legend" {{if color}}style="background-color: {{:color}};"{{else}}style="border: dashed 1px #AAA;"{{/if}}></span>
 					</script>
 				</th>
 				

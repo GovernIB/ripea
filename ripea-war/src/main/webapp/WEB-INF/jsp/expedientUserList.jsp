@@ -117,6 +117,7 @@ $(document).ready(function() {
 				if (adaptColor(colorString)) {
 					$(this).parent().css( "color", "white" );
 				}
+				$(this).parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
 			}
 		});
 		

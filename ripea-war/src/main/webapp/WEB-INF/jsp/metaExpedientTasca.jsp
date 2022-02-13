@@ -34,7 +34,7 @@
 					<spring:message code="metaexpedient.tasca.list.camp.estat.crearTasca"/>
 					<script id="cellTascaCrearTemplate" type="text/x-jsrender">
 						{{if estatNomCrearTasca}}
-							<span class="color-legend-min" {{if estatColorCrearTasca}}style="background-color: {{:estatColorCrearTasca}};"{{/if}}></span>
+							<span class="color-legend-min" {{if estatColorCrearTasca}}style="background-color: {{:estatColorCrearTasca}};"{{else}}style="border: dashed 1px #AAA;"{{/if}}></span>
 							<span style="vertical-align: super;">{{:estatNomCrearTasca}}</span>
 						{{/if}}
 					</script>
@@ -44,7 +44,7 @@
 					<spring:message code="metaexpedient.tasca.list.camp.estat.finalitzarTasca"/>
 					<script id="cellTascaFiTemplate" type="text/x-jsrender">
 						{{if estatNomFinalitzarTasca}}
-							<span class="color-legend-min" {{if estatColorFinalitzarTasca}}style="background-color: {{:estatColorFinalitzarTasca}};"{{/if}}></span>
+							<span class="color-legend-min" {{if estatColorFinalitzarTasca}}style="background-color: {{:estatColorFinalitzarTasca}};"{{else}}style="border: dashed 1px #AAA;"{{/if}}></span>
 							<span style="vertical-align: super;">{{:estatNomFinalitzarTasca}}</span>
 						{{/if}}
 					</script>
