@@ -1913,7 +1913,7 @@ $.views.helpers(myHelpers);
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
-									<dd> ${contingut.expedientEstat.nom} </dd>
+									<dd style="<c:if test='${not empty contingut.expedientEstat.color}'>border-left: solid 6px ${contingut.expedientEstat.color}; padding-left: 4px;</c:if>">${contingut.expedientEstat.nom}</dd>
 								</c:when>
 								<c:otherwise>
 									<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
