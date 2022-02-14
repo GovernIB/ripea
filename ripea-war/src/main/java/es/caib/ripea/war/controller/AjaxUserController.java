@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,14 +70,14 @@ public class AjaxUserController extends BaseUserController {
 		}
 	}
 
-	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET)
+	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET, produces= {"application/json; charset=UTF-8"})
 	@ResponseBody
 	public List<UsuariDto> getPluginDadesUsuari(
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
 		try {
-			return aplicacioService.findUsuariAmbTextDades(text);
+			return aplicacioService.findUsuariAmbTextDades(decodedParam(text));
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
 			return new ArrayList<UsuariDto>();
@@ -118,6 +119,18 @@ public class AjaxUserController extends BaseUserController {
 			// TODO: això hauria de cercar per tots els subpackages de dto
 			return Class.forName("es.caib.ripea.core.api.dto.historic." + className);
 		}		
+	}
+
+	private String decodedParam(String param) {
+		String decodedParam = param;
+		if (param != null && !param.isEmpty()) {
+			try {
+				decodedParam = new String(param.getBytes("ISO-8859-1"), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		return decodedParam;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AjaxUserController.class);
