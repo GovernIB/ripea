@@ -122,9 +122,8 @@ public abstract class DocumentEnviamentDto extends AuditoriaDto implements Compa
 	}
 	public String getProcessatDataString() {
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
-		return dateFormat.format(this.processatData);  
+		return this.processatData != null ? dateFormat.format(this.processatData) : null;
 	}
-
 	public boolean isNotificacio() {
 		return this instanceof DocumentNotificacioDto;
 	}
